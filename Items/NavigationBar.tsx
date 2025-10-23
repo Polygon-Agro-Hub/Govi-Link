@@ -21,40 +21,41 @@ const NavigationBar = ({ navigation, state }: { navigation: any; state: any }) =
   // ✅ Define tabs with Ionicons names
   const tabs = [
     { name: "Dashboard", icon: "home-outline", focusedIcon: "home" },
-    { name: "AddNewFarmFirst", icon: "add-circle-outline", focusedIcon: "add-circle" },
-    { name: "MyCultivation", icon: "leaf-outline", focusedIcon: "leaf" },
+    { name: "Dashboard", icon: "add-circle-outline", focusedIcon: "add-circle" },
+    { name: "Dashboard", icon: "leaf-outline", focusedIcon: "leaf" },
   ];
 
-  let currentTabName = state.routes[state.index]?.name || "Dashboard";
-  if (currentTabName === "CropCalander") currentTabName = "MyCrop";
-  else if (["AddFarmList", "AddNewFarmBasicDetails"].includes(currentTabName))
-    currentTabName = "AddNewFarmFirst";
+  let currentTabName = state.routes[state.index]?.name ;
+  console.log(currentTabName)
+  // if (currentTabName === "CropCalander") currentTabName = "MyCrop";
+  // else if (["AddFarmList", "AddNewFarmBasicDetails"].includes(currentTabName))
+  //   currentTabName = "AddNewFarmFirst";
 
   // Save active tab
-  useEffect(() => {
-    const loadActiveTab = async () => {
-      const storedTab = await AsyncStorage.getItem("activeTab");
-      const currentRoute = navigation.getState().routes[navigation.getState().index].name;
-      if (!storedTab || storedTab !== currentRoute) {
-        setActiveTab(currentRoute);
-        await AsyncStorage.setItem("activeTab", currentRoute);
-      } else {
-        setActiveTab(storedTab);
-      }
-    };
-    loadActiveTab();
-  }, []);
+  // useEffect(() => {
+  //   const loadActiveTab = async () => {
+  //     const storedTab = await AsyncStorage.getItem("activeTab");
+  //     const currentRoute = navigation.getState().routes[navigation.getState().index].name;
+  //     if (!storedTab || storedTab !== currentRoute) {
+  //       setActiveTab(currentRoute);
+  //       await AsyncStorage.setItem("activeTab", currentRoute);
+  //     } else {
+  //       setActiveTab(storedTab);
+  //     }
+  //   };
+  //   loadActiveTab();
+  // }, []);
 
-  useFocusEffect(
-    useCallback(() => {
-      const updateTab = async () => {
-        const currentRoute = navigation.getState().routes[navigation.getState().index].name;
-        setActiveTab(currentRoute);
-        await AsyncStorage.setItem("activeTab", currentRoute);
-      };
-      updateTab();
-    }, [])
-  );
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     const updateTab = async () => {
+  //       const currentRoute = navigation.getState().routes[navigation.getState().index].name;
+  //       setActiveTab(currentRoute);
+  //       await AsyncStorage.setItem("activeTab", currentRoute);
+  //     };
+  //     updateTab();
+  //   }, [])
+  // );
 
   // Animation + Navigation handler
   const handleTabPress = async (tabName: string, index: number) => {
@@ -73,7 +74,14 @@ const NavigationBar = ({ navigation, state }: { navigation: any; state: any }) =
   if (isKeyboardVisible) return null;
 
   return (
-    <View className="absolute bottom-0 flex-row justify-between items-center bg-[#21202B] py-2 px-6 rounded-t-3xl w-full">
+    <View className="absolute bottom-0 flex-row justify-between items-center bg-[#ffffff] py-2 px-6 rounded-t-3xl w-full shadow-md"
+      style={{
+                shadowColor: "#000" ,
+                shadowOpacity: 2,
+                shadowRadius: 4,
+                elevation: 20 
+              }}
+    >
       {tabs.map((tab, index) => {
         const isFocused = currentTabName === tab.name;
         return (
@@ -87,24 +95,15 @@ const NavigationBar = ({ navigation, state }: { navigation: any; state: any }) =
               height: 40,
             }}
           >
+            <View  className={`px-8 absolute top-0  -mt-2 py-0.5 rounded-b-full bg-[#F35125] ${isFocused ? "bg-[#F35125]" : "bg-transparent"}`}/>
             <TouchableOpacity
               onPress={() => handleTabPress(tab.name, index)}
-              style={{
-                backgroundColor: isFocused ? "#2AAD7A" : "transparent",
-                padding: 8,
-                borderRadius: 50,
-                borderWidth: isFocused ? 2 : 0,
-                borderColor: "#1A1920",
-                shadowColor: isFocused ? "#000" : "transparent",
-                shadowOpacity: 0.2,
-                shadowRadius: 4,
-                elevation: isFocused ? 5 : 0,
-              }}
+
             >
              <Ionicons
   name={isFocused ? (tab.focusedIcon as keyof typeof Ionicons.glyphMap) : (tab.icon as keyof typeof Ionicons.glyphMap)}
   size={28}
-  color={isFocused ? "#fff" : "#aaa"}
+  color={isFocused ? "#F35125" : "#F35125"}
 />
 
             </TouchableOpacity>

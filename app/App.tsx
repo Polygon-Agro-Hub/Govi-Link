@@ -15,6 +15,9 @@ import { navigationRef } from "../navigationRef";
 
 import { NativeWindStyleSheet } from "nativewind";
 import { LogBox } from 'react-native';
+import Dashboard from "@/component/ChiefFiledOfficer/Dashboard";
+import Lanuage from "@/component/Lanuage";
+import Splash from "@/component/Splash";
 
 
 
@@ -47,7 +50,7 @@ function HomeScreen() {
 }
 
 function MainTabNavigator() {
-      const [initialTab, setInitialTab] = useState('Home');
+      const [initialTab, setInitialTab] = useState('Dashboard');
 
   return (
     <Tab.Navigator
@@ -60,7 +63,7 @@ function MainTabNavigator() {
       
       tabBar={(props) => <NavigationBar {...props} />}
     >
-   <Tab.Screen name="Home" component={HomeScreen} />
+   <Tab.Screen name="Dashboard" component={Dashboard} />
     </Tab.Navigator>
   );
 }
@@ -127,7 +130,10 @@ useEffect(() => {
       >
         <NavigationContainer   ref={navigationRef}>
           <Stack.Navigator screenOptions={{ headerShown: false }}>
-                     <Stack.Screen name='Main' component={MainTabNavigator} options={{ headerShown: false }} />
+            <Stack.Screen name="Splash" component={Splash} />
+                     <Stack.Screen name="Language" component={Lanuage} />
+                    <Stack.Screen name='Main' component={MainTabNavigator} options={{ headerShown: false }} />
+
           </Stack.Navigator>
         </NavigationContainer>
       </SafeAreaView>
