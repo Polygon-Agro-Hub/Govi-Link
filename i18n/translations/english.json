@@ -7,5 +7,24 @@
     "userBlocked": "Too many requests from this device, please try again in 30 minutes.",
     "No Internet Connection": "No Internet Connection",
     "Please turn on mobile data or Wi-Fi to continue.": "Please turn on Mobile Data or Wi-Fi to continue."
+    },
+      "Error":{
+    "error":"Sorry",
+    "Error":"Error",
+    "Failed to fetch empid.":"Failed to fetch Employee ID.",
+    "New password and confirm password do not match.":"New password and confirm password do not match.",
+    "New password must be at least 6 characters long.":"New password must be at least 6 characters long.",
+    "Failed to update password.":"Failed to update password."
+      },
+    "Login":{
+      "Welcome": "Welcome",
+      "Please Sign in to login": "Please Sign in to login",
+      "Employee ID": "Employee ID",
+      "Password": "Password",
+      "Sign in":"Sign in",
+      "Please enter Employee ID in uppercase letters": "Please enter Employee ID in uppercase letters",
+      "Password & Employee ID are not allowed to be empty": "Password & Employee ID are not allowed to be empty",
+      "Password is not allowed to be empty": "Password is not allowed to be empty",
+      "Employee ID is not allowed to be empty": "Employee ID is not allowed to be empty"
     }
 }

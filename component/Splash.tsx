@@ -111,7 +111,8 @@ const Splash: React.FC = () => {
       useNativeDriver: false,
     }).start(() => {
       // Navigate after progress completes
-      navigation.navigate("Main", { screen: "Dashboard" });
+      // navigation.navigate("Main", { screen: "Dashboard" });
+      navigation.navigate("Language" as any)
     });
 
     return () => {
@@ -124,7 +125,7 @@ const Splash: React.FC = () => {
       <Image source={llogo} className="w-full h-48" resizeMode="contain" />
       <Text className="mt-4 text-gray-700">POWERED BY POLYGON</Text>
 
-      <View className="w-[80%] mt-6">
+      <View className=" mt-6">
         <Progress.Bar
           progress={progress}
           animated={false}
@@ -132,6 +133,7 @@ const Splash: React.FC = () => {
           unfilledColor="#E5E5E5"
           borderWidth={0}
           height={10}
+          width={200}
         />
       </View>
     </View>

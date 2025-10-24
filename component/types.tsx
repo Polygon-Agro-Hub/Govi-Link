@@ -5,4 +5,7 @@ export type RootStackParamList = {
    Dashboard: undefined
    Lanuage:undefined
    Splash:undefined
+   Login:undefined
+   FieldOfficerDashboard: undefined
+   FieldOfficerDrawer: { screen: "FieldOfficerDashboard"; params?: any }; 
 }

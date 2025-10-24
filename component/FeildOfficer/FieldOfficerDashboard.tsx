@@ -17,22 +17,25 @@ import { environment } from "@/environment/environment";
 import { useFocusEffect } from "@react-navigation/native";
 import { RootStackParamList } from "../types";
 import { useTranslation } from "react-i18next";
+import { DrawerActions } from '@react-navigation/native';
 
-type DashboardNavigationProps = StackNavigationProp<
+type FieldOfficerDashboardNavigationProps = StackNavigationProp<
   RootStackParamList,
-  "Dashboard"
+  "FieldOfficerDashboard"
 >;
 
-interface DashboardProps {
-  navigation: DashboardNavigationProps;
+interface FieldOfficerDashboardProps {
+  navigation: FieldOfficerDashboardNavigationProps;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
+const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({ navigation }) => {
 
   const [refreshing, setRefreshing] = useState(false);
   const { t } = useTranslation();
   const [selectedLanguage, setSelectedLanguage] = useState<string>("en");
-
+      const openDrawer = ()=>{
+        navigation.dispatch(DrawerActions.openDrawer())
+    }
   
 
   return (
@@ -45,6 +48,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
         <View className="">
       {/* Profile Section */}
       <TouchableOpacity
+       onPress={openDrawer}
         className="flex-row items-center mb-4 p-4"
       >
         <View
@@ -52,8 +56,12 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
         />
       </TouchableOpacity>
 </View>
+
+<Text className="font-bold text-lg">
+    Field Officer Dashboard
+</Text>
     </ScrollView>
   );
 };
 
-export default Dashboard;
+export default FieldOfficerDashboard;

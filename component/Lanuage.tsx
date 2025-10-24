@@ -28,6 +28,8 @@ interface NewsItem {
 
 const Lanuage: React.FC<LanuageProps> = ({ navigation }) => {
   const { changeLanguage } = useContext(LanguageContext);
+  const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
+  console.log("selle l", selectedLanguage)
 
   const [news, setNews] = useState<NewsItem[]>([]);
   const screenWidth = wp(100); 
@@ -35,9 +37,11 @@ const Lanuage: React.FC<LanuageProps> = ({ navigation }) => {
   useEffect(() => {
     const checkLanguagePreference = async () => {
       try {
-        const storedLanguage = await AsyncStorage.getItem("@user_language");
-        if (storedLanguage) {
-          handleLanguageSelect(storedLanguage);
+        const storedLanguage = await AsyncStorage.getItem("user_language");
+                  console.log("st l",storedLanguage)
+
+              if (storedLanguage) {
+          setSelectedLanguage(storedLanguage);
         }
       } catch (error) {
         console.error("Failed to retrieve language preference:", error);
@@ -49,9 +53,9 @@ const Lanuage: React.FC<LanuageProps> = ({ navigation }) => {
 
   const handleLanguageSelect = async (language: string) => {
     try {
-      await AsyncStorage.setItem("@user_language", language);
+      await AsyncStorage.setItem("user_language", language);
       changeLanguage(language);
-      // navigation.navigate("SignupForum" as any); 
+      navigation.navigate("Login" as any); 
     } catch (error) {
       console.error("Failed to save language preference:", error);
     }
@@ -80,6 +84,12 @@ const Lanuage: React.FC<LanuageProps> = ({ navigation }) => {
     }, [])
   );
 
+    const languages = [
+    { code: "en", label: "ENGLISH" },
+    { code: "si", label: "සිංහල" },
+    { code: "ta", label: "தமிழ்" },
+  ];
+
  return (
   <View className="flex-1 bg-white">
     <View className="flex-1 justify-center items-center px-5">
@@ -102,42 +112,31 @@ const Lanuage: React.FC<LanuageProps> = ({ navigation }) => {
         </Text>
       </View>
 
-      <View className="w-72 mt-16">
-        <TouchableOpacity
-          activeOpacity={0.8}
-          onPress={() => handleLanguageSelect("en")}
-          className="w-full rounded-3xl mb-5 overflow-hidden"
-        >
-          <LinearGradient
-            colors={["#F2561D", "#FF1D85"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            className="py-5 items-center justify-center"
-          >
-            <Text className="text-white text-base font-semibold tracking-wide">
-              ENGLISH
-            </Text>
-          </LinearGradient>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => handleLanguageSelect("si")}
-          className="bg-gray-900 py-5 rounded-3xl mb-5 items-center justify-center"
-        >
-          <Text className="text-white text-base font-semibold tracking-wide">
-            සිංහල
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => handleLanguageSelect("ta")}
-          className="bg-gray-900 py-5 rounded-3xl items-center justify-center"
-        >
-          <Text className="text-white text-base font-semibold tracking-wide">
-            தமிழ்
-          </Text>
-        </TouchableOpacity>
-      </View>
+         <View className="w-72 mt-16">
+          {languages.map((lang) => (
+            <TouchableOpacity
+              key={lang.code}
+              activeOpacity={0.8}
+              onPress={() => handleLanguageSelect(lang.code)}
+              className="w-full rounded-3xl mb-5 overflow-hidden"
+            >
+              <LinearGradient
+                colors={
+                  selectedLanguage === lang.code
+                    ? ["#F2561D", "#FF1D85"] // Selected
+                    : ["#000000", "#000000"] // Unselected
+                }
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                className="py-5 items-center justify-center"
+              >
+                <Text className="text-white text-base font-semibold tracking-wide">
+                  {lang.label}
+                </Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          ))}
+        </View>
     </View>
   </View>
 );

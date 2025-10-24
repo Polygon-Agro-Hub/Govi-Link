@@ -15,9 +15,11 @@ import { navigationRef } from "../navigationRef";
 
 import { NativeWindStyleSheet } from "nativewind";
 import { LogBox } from 'react-native';
-import Dashboard from "@/component/ChiefFiledOfficer/Dashboard";
+import Dashboard from "@/component/ChiefFieldOfficer/Dashboard";
 import Lanuage from "@/component/Lanuage";
 import Splash from "@/component/Splash";
+import Login from "@/component/Login";
+import DrawerNavigation from "@/Items/DrawerNavigation";
 
 
 
@@ -51,7 +53,14 @@ function HomeScreen() {
 
 function MainTabNavigator() {
       const [initialTab, setInitialTab] = useState('Dashboard');
-
+  const jobRole = useSelector((state: RootState) => state.auth.jobRole);
+  useEffect(() => {
+    if (jobRole === 'Chief Field Officer') {
+      setInitialTab('Dashboard'); 
+    } else if (jobRole === 'Field Officer') {
+      setInitialTab('FieldOfficerDashboard');
+    } 
+  }, [jobRole]);
   return (
     <Tab.Navigator
        initialRouteName={initialTab}
@@ -63,7 +72,7 @@ function MainTabNavigator() {
       
       tabBar={(props) => <NavigationBar {...props} />}
     >
-   <Tab.Screen name="Dashboard" component={Dashboard} />
+   <Tab.Screen name="Dashboard" component={DrawerNavigation} />
     </Tab.Navigator>
   );
 }
@@ -132,7 +141,11 @@ useEffect(() => {
           <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name="Splash" component={Splash} />
                      <Stack.Screen name="Language" component={Lanuage} />
+                     <Stack.Screen name="Login" component={Login} />
                     <Stack.Screen name='Main' component={MainTabNavigator} options={{ headerShown: false }} />
+                    {/* <Stack.Screen name="FieldOfficerDashboard" component={FieldOfficerDashboard} /> */}
+  <Stack.Screen name="FieldOfficerDrawer" component={DrawerNavigation} />
+
 
           </Stack.Navigator>
         </NavigationContainer>
