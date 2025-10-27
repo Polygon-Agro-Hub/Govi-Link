@@ -26,5 +26,15 @@
       "Password & Employee ID are not allowed to be empty": "Password & Employee ID are not allowed to be empty",
       "Password is not allowed to be empty": "Password is not allowed to be empty",
       "Employee ID is not allowed to be empty": "Employee ID is not allowed to be empty"
+    },
+    "Dashboard":{
+      "Hello":"Hello"
+    },
+    "Drawer":{
+      "Language":"Language",
+      "Profile":"Profile",
+      "Complaints": "Complaints",
+      "Change Password":"Change Password",
+      "Logout": "Logout"
     }
 }

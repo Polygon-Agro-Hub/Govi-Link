@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Animated, TouchableOpacity, View, Keyboard } from "react-native";
 import { useTranslation } from "react-i18next";
-import { AntDesign, MaterialIcons, Ionicons, Octicons } from "@expo/vector-icons";
+import { AntDesign, MaterialIcons, Ionicons, Octicons,Entypo,FontAwesome6 } from "@expo/vector-icons";
 import { useSelector, useDispatch } from "react-redux";
 import type { RootState } from "../services/reducxStore";
 interface UserData {
@@ -22,10 +22,10 @@ const NavigationBar = ({ navigation, state }: { navigation: any; state: any }) =
   );
 console.log('user rolllllllll', userRole)
    const tabs = [
-    { name: "Dashboard", icon: <AntDesign name="home" size={24} color="#000" /> },
+    { name: "Dashboard", icon: <FontAwesome6 name="house" size={24} color="#000" /> },
     { name: "Tasks", icon: <MaterialIcons name="task" size={24} color="#000" /> },
-    { name: "AddAssignment", icon: <Octicons name="person-add" size={24} color="#000" /> },
-    { name: "Users", icon: <Octicons name="person" size={24} color="#000" /> },
+    { name: "AddAssignment", icon: <Entypo name="add-user" size={24} color="#000" /> },
+    { name: "Users", icon: <Entypo name="users" size={24} color="#000" /> },
   ];
 
   let currentTabName = state.routes[state.index]?.name ;
