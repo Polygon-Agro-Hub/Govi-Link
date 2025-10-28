@@ -31,7 +31,11 @@
       "Invalid EMP ID":"Invalid EMP ID"
     },
     "Dashboard":{
-      "Hello":"Hello"
+      "Hello":"Hello",
+      "Today Visits":"Today Visits",
+      "View All":"View All",
+      "Saved Draft":"Saved Draft",
+      "Assigned Target":"Assigned Target"
     },
     "Drawer":{
       "Language":"Language",
