@@ -17,7 +17,7 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
 
     useEffect(() => {
         const loadLanguage = async () => {
-            const storedLanguage = await AsyncStorage.getItem('@user_language');
+            const storedLanguage = await AsyncStorage.getItem('user_language');
             if (storedLanguage) {
                 setLanguage(storedLanguage);
                 i18n.changeLanguage(storedLanguage);
@@ -30,7 +30,7 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
     const changeLanguage = (lng: string) => {
         setLanguage(lng);
         i18n.changeLanguage(lng);
-        AsyncStorage.setItem('@user_language', lng);
+        AsyncStorage.setItem('user_language', lng);
     };
 
     return (

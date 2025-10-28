@@ -97,7 +97,6 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
       if (response.ok && data.jobRole) {
 
         if (data.jobRole.toLowerCase() === "Chief Field Officer") {
-          setEmpIdError(t("Error.Distribution Centre Head are not allowed to access this application"));
           return;
         } else {
         
@@ -205,15 +204,15 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
       if (!response.ok) {
         setLoading(false);
         if (response.status === 404) {
-          Alert.alert(t("Error.error"), t("Error.Invalid EMP ID & Password"));
+          Alert.alert(t("Error.error"), t("Login.Invalid EMP ID & Password"));
         } else if (response.status === 401) {
           Alert.alert(
             t("Error.error"),
-            t("Error.Invalid Password. Please try again.")
+            t("Login.Invalid Password. Please try again.")
           );
         } else if (data.status === "error") {
           console.log("Login error:", data);
-          Alert.alert(t("Error.error"), t("Error.Invalid EMP ID"));
+          Alert.alert(t("Error.error"), t("Login.Invalid EMP ID"));
         } else {
           Alert.alert(t("Error.error"), t("Error.somethingWentWrong"));
         }
@@ -226,9 +225,6 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
       // Continue with normal login flow
       await AsyncStorage.setItem("token", token);
       await AsyncStorage.setItem("jobRole", role);
-    //   await AsyncStorage.setItem("companyNameEnglish", companyNameEnglish);
-    //   await AsyncStorage.setItem("companyNameSinhala", companyNameSinhala);
-    //   await AsyncStorage.setItem("companyNameTamil", companyNameTamil);
       await AsyncStorage.setItem("empid", empId.toString());
       dispatch(setUser({ token, role, empId: empId.toString() }));
       
@@ -255,9 +251,9 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
   if (role === "Chief Field Officer") {
     navigation.navigate("Main", { screen: "Dashboard" });
   } else if (role === "Field Officer"){
-    navigation.navigate("FieldOfficerDrawer", {
-  screen: "FieldOfficerDashboard"
-});
+   navigation.navigate("Main", {
+    screen: "FieldOfficerDashboard"  // Drawer screen
+  });
   }
 }
       }, 4000);

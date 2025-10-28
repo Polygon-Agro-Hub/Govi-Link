@@ -25,7 +25,10 @@
       "Please enter Employee ID in uppercase letters": "Please enter Employee ID in uppercase letters",
       "Password & Employee ID are not allowed to be empty": "Password & Employee ID are not allowed to be empty",
       "Password is not allowed to be empty": "Password is not allowed to be empty",
-      "Employee ID is not allowed to be empty": "Employee ID is not allowed to be empty"
+      "Employee ID is not allowed to be empty": "Employee ID is not allowed to be empty",
+      "Invalid EMP ID & Password":"Invalid EMP ID & Password",
+      "Invalid Password. Please try again.":"Invalid Password. Please try again.",
+      "Invalid EMP ID":"Invalid EMP ID"
     },
     "Dashboard":{
       "Hello":"Hello"
@@ -35,6 +38,8 @@
       "Profile":"Profile",
       "Complaints": "Complaints",
       "Change Password":"Change Password",
-      "Logout": "Logout"
+      "Logout": "Logout",
+      "Report Complaint":"Report Complaint",
+      "View Complaint History":"View Complaint History"
     }
 }

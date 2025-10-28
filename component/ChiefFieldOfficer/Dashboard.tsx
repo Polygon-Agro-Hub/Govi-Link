@@ -19,7 +19,8 @@ import { RootStackParamList } from "../types";
 import { useTranslation } from "react-i18next";
 import { DrawerActions } from '@react-navigation/native';
 import i18n from "@/i18n/i18n";
-
+import { useDispatch } from "react-redux";
+import { setUserProfile } from "@/store/authSlice";
 type DashboardNavigationProps = StackNavigationProp<
   RootStackParamList,
   "Dashboard"
@@ -45,7 +46,8 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
   const { t } = useTranslation();
   const [profile, setProfile] = useState<ProfileData| null> (null)
-  console.log("profileim", profile?.profileImg)
+  const dispatch = useDispatch();
+
       const openDrawer = ()=>{
         navigation.dispatch(DrawerActions.openDrawer())
     }
@@ -63,8 +65,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
           }
         );
         setProfile(response.data.data);
-       console.log("data", response.data.data);
-       
+         dispatch(setUserProfile(response.data.data));
       }
     } catch (error) {
       console.error("Failed to fetch user profile:", error);

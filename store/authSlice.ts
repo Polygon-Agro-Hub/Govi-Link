@@ -4,12 +4,25 @@ interface AuthState {
   token: string | null;
   jobRole: string | null;
   empId: string | null;
+     userProfile: ProfileData | null;
 }
 const initialState: AuthState = {
   token: null,
   jobRole: null,
   empId: null,
+  userProfile: null
 };
+
+interface ProfileData {
+  firstName: string;
+  lastName: string;
+  profileImg: string;
+  firstNameSinhala: string;
+  lastNameSinhala: string;
+  firstNameTamil: string;
+  lastNameTamil: string;
+  empId: string;
+}
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -26,13 +39,12 @@ const authSlice = createSlice({
       state.jobRole = role;
       state.empId = empId;
     },
-    logoutUser: (state) => {
-      state.token = null;
-      state.jobRole = null;
-      state.empId = null;
+        setUserProfile: (state, action: PayloadAction<ProfileData>) => {
+      state.userProfile = action.payload;
     },
+    logoutUser: (state) => {},
   },
 });
 
-export const { setUser, logoutUser } = authSlice.actions;
+export const { setUser, logoutUser, setUserProfile } = authSlice.actions;
 export default authSlice.reducer;

@@ -178,7 +178,7 @@ import NetInfo from "@react-native-community/netinfo";
 import { useTranslation } from "react-i18next";
 import { LogBox } from "react-native";
 
-import store, { RootState } from "@/services/reducxStore";
+import store, { RootState } from "@/services/store";
 import { navigationRef } from "../navigationRef";
 import { LanguageProvider } from "@/context/LanguageContext";
 import NavigationBar from "@/Items/NavigationBar";
@@ -188,6 +188,7 @@ import Login from "@/component/Login";
 import Dashboard from "@/component/ChiefFieldOfficer/Dashboard";
 import { NativeWindStyleSheet } from "nativewind";
 import CustomDrawerContent from '@/Items/CustomDrawerContent';
+import FieldOfficerDashboard from "@/component/FeildOfficer/FieldOfficerDashboard";
 
 LogBox.ignoreAllLogs(true);
 NativeWindStyleSheet.setOutput({ default: "native" });
@@ -244,12 +245,14 @@ function MainDrawer() {
         headerShown: false,
         drawerType: "front", 
                drawerStyle: {
-      width: "70%"
+      width: "80%"
     },
       }}
       drawerContent={(props) => <CustomDrawerContent {...props} />}
     >
       <Drawer.Screen name="MainTabs" component={MainTabs} options={{ drawerItemStyle: { display: "none" } }}/>
+      <Drawer.Screen  name="FieldOfficerDashboard" component={FieldOfficerDashboard} options={{ drawerItemStyle: { display: "none" } }} />
+
     </Drawer.Navigator>
   );
 }
