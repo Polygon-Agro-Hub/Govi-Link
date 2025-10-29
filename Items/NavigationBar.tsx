@@ -3,7 +3,7 @@ import { Animated, TouchableOpacity, View, Keyboard } from "react-native";
 import { useTranslation } from "react-i18next";
 import { AntDesign, MaterialIcons, Ionicons, Octicons,Entypo,FontAwesome6 } from "@expo/vector-icons";
 import { useSelector, useDispatch } from "react-redux";
-import type { RootState } from "../services/reducxStore";
+import type { RootState } from "../services/store";
 interface UserData {
   farmCount: number;
   membership: string;

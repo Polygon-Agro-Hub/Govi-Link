@@ -26,7 +26,7 @@ import i18n from "@/i18n/i18n";
 import { useDispatch } from "react-redux";
 import { setUserProfile } from "@/store/authSlice";
 import { AntDesign,Ionicons, Feather } from "@expo/vector-icons";
-import { Circle } from "react-native-progress";
+import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import { LinearGradient } from 'expo-linear-gradient';
 
 
@@ -49,6 +49,15 @@ interface ProfileData {
   lastNameTamil: string;
   empId: string
 }
+
+interface VisitsData {
+  farmerName:string;
+  jobId: string;
+  propose: string;
+  englishName: string;
+  sinhalaName:string;
+  tamilName:string
+}
 const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({ navigation }) => {
 
   const [refreshing, setRefreshing] = useState(false);
@@ -59,13 +68,34 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({ navigatio
   const [currentIndex, setCurrentIndex] = useState(0);
 const [showPopup, setShowPopup] = useState(false);
 const [selectedItem, setSelectedItem] = useState<any>(null);
+const[visitsData, setVisitsData] = useState<VisitsData[]| null>([])
+console.log("Officer Visits", visitsData)
+
+  // const scrollToIndex = (index: number) => {
+  //   if (flatListRef.current && index >= 0 && index < dashboardData.todayVisits.length) {
+  //     flatListRef.current.scrollToIndex({ index, animated: true });
+  //     setCurrentIndex(index);
+  //   }
+  // };
 
   const scrollToIndex = (index: number) => {
-    if (flatListRef.current && index >= 0 && index < dashboardData.todayVisits.length) {
-      flatListRef.current.scrollToIndex({ index, animated: true });
-      setCurrentIndex(index);
-    }
-  };
+  if (!flatListRef.current || !visitsData || visitsData.length === 0) return;
+
+  // Declare outside the try block so it's always in scope
+  const validIndex = Math.max(0, Math.min(index, visitsData.length - 1));
+
+  try {
+    flatListRef.current.scrollToIndex({ index: validIndex, animated: true });
+    setCurrentIndex(validIndex);
+  } catch (error) {
+    console.warn("scrollToIndex error:", error);
+    flatListRef.current.scrollToOffset({
+      offset: validIndex * 320, // use your card width here
+      animated: true,
+    });
+  }
+};
+
 
       const openDrawer = ()=>{
         navigation.dispatch(DrawerActions.openDrawer())
@@ -93,11 +123,13 @@ const [selectedItem, setSelectedItem] = useState<any>(null);
 
    useEffect(() => {
     fetchUserProfile();
+    fetchVisits()
   }, []);
 
   const onRefresh = async () => {
     setRefreshing(true);
     await fetchUserProfile();
+    await fetchVisits()
     setRefreshing(false);
   };
 
@@ -112,6 +144,20 @@ const [selectedItem, setSelectedItem] = useState<any>(null);
         return `${profile.firstName}`;
     }
   };
+
+const getProposeName = (item: VisitsData) => {
+  if (!item) return "";
+
+  switch (i18n.language) {
+    case "si":
+      return item.sinhalaName || item.propose || "";
+    case "ta":
+      return item.tamilName || item.propose || "";
+    default:
+      return item.englishName || item.propose || "";
+  }
+};
+
 
   useFocusEffect(
     useCallback(() => {
@@ -131,20 +177,7 @@ const [selectedItem, setSelectedItem] = useState<any>(null);
     }
   };
 
-  const dashboardData = {
-  profile: {
-    name: "Kusal",
-    empId: "CFO00001",
-    avatar: "https://i.pravatar.cc/150?img=12", // replace with real avatar
-  },
-  todayVisits: [
-    { id: "#20251012001", name: "Kelum Athukorala", type: "Consultation" },
-    { id: "#20251012002", name: "Another Visit", type: "Consultation" },
-  ],
-  savedDrafts: [
-    { id: "#20251012001", name: "Ravin Kaluhennadi", type: "Consultation", progress: 0.2 },
-  ],
-};
+
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -153,16 +186,15 @@ const screenWidth = Dimensions.get("window").width;
       const token = await AsyncStorage.getItem("token");
       if (token) {
         const response = await axios.get(
-          `${environment.API_BASE_URL}api/officer/user-profile`,
+          `${environment.API_BASE_URL}api/officer/officer-visits`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-        setProfile(response.data.data);
-         dispatch(setUserProfile(response.data.data));
+        setVisitsData(response.data.data)
       }
     } catch (error) {
-      console.error("Failed to fetch user profile:", error);
+      console.error("Failed to fetch officer visits:", error);
     }
   };
 
@@ -178,9 +210,6 @@ const screenWidth = Dimensions.get("window").width;
         className="flex-row items-center mb-4 p-4"
         onPress={openDrawer}
       >
-        {/* <View
-          className="w-16 h-16 rounded-full mr-3 bg-black"
-        /> */}
         <Image
           source={
             profile?.profileImg
@@ -211,7 +240,7 @@ const screenWidth = Dimensions.get("window").width;
 
    <View className="p-2 mt-4">
         <View className="flex-row justify-between items-center mb-1">
-          <Text className="text-base font-bold">{t("Dashboard.Today Visits")} <Text className="text-[#4E6393]">({dashboardData.todayVisits.length.toString().padStart(2,'0')})</Text></Text>
+          {/* <Text className="text-base font-bold">{t("Dashboard.Today Visits")} <Text className="text-[#4E6393]">({visitsData.length.toString().padStart(2,'0')})</Text></Text> */}
           <Pressable>
             <Text className="text-pink-500 font-semibold">{t("Dashboard.View All")}</Text>
           </Pressable>
@@ -221,8 +250,7 @@ const screenWidth = Dimensions.get("window").width;
 
           <View className="flex-row items-center">
             
-        {/* Left Arrow */}
-        <TouchableOpacity
+        {/* <TouchableOpacity
           disabled={currentIndex === 0}
           onPress={() => scrollToIndex(currentIndex - 1)}
           className="p-1"
@@ -232,12 +260,23 @@ const screenWidth = Dimensions.get("window").width;
             size={24}
             color={currentIndex === 0 ? "#ccc" : "#FF1D85"}
           />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
+        <TouchableOpacity
+  disabled={!visitsData || currentIndex <= 0}
+  onPress={() => scrollToIndex(currentIndex - 1)}
+  className="p-1"
+>
+  <AntDesign
+    name="left"
+    size={24}
+    color={!visitsData || currentIndex <= 0 ? "#ccc" : "#FF1D85"}
+  />
+</TouchableOpacity>
 
         <FlatList
           ref={flatListRef}
           horizontal
-          data={dashboardData.todayVisits}
+          data={visitsData}
           keyExtractor={(item) => item.id}
           showsHorizontalScrollIndicator={false}
           renderItem={({ item }) => (
@@ -256,26 +295,68 @@ const screenWidth = Dimensions.get("window").width;
       }}
     >
       <View className="border border-[#FF1D85] rounded-lg p-3 mr-4 w-[304px]">
-        <Text className="text-black text-sm font-medium">{item.id}</Text>
-        <Text className="text-base font-bold mt-1">{item.name}</Text>
-        <Text className="text-[#4E6393] text-base mt-1">{item.type}</Text>
+        <Text className="text-black text-sm font-medium">#{item.jobId}</Text>
+        {item.farmerName? (
+                <Text className="text-base font-bold mt-1">{item.farmerName}</Text>
+        ): null
+        }
+        {item.propose? (
+        <Text className="text-[#4E6393] text-base mt-1">
+  {(() => {
+    if (item.propose === "Cluster") {
+      switch (i18n.language) {
+        case "si":
+          return "ගොවි සමූහ විගණනය"; // Sinhala translation
+        case "ta":
+          return "உழவர் குழு தணிக்கை"; // Tamil translation
+        default:
+          return "Farm Cluster Audit";
+      }
+    } else if (item.propose === "Individual") {
+      switch (i18n.language) {
+        case "si":
+          return "තනි ගොවි විගණනය"; // Sinhala translation
+        case "ta":
+          return "தனிப்பட்ட விவசாயி தணிக்கை"; // Tamil translation
+        default:
+          return "Individual Farmer Audit";
+      }
+    } else {
+      switch (i18n.language) {
+        case "si":
+          return item.sinhalaName || "";
+        case "ta":
+          return item.tamilName || "";
+        default:
+          return item.englishName || "";
+      }
+    }
+  })()}
+</Text>
+
+        ): null}
+             {item.englishName || item.sinhalaName || item.tamilName? (
+        <Text className="text-[#4E6393] text-base mt-1">{getProposeName(item)}</Text>
+
+        ): null}
       </View>
     </TouchableOpacity>
           )}
         />
 
-        {/* Right Arrow */}
-        <TouchableOpacity
-          disabled={currentIndex === dashboardData.todayVisits.length - 1}
-          onPress={() => scrollToIndex(currentIndex + 1)}
-          className="p-1"
-        >
-          <AntDesign
-            name="right"
-            size={24}
-            color={currentIndex === dashboardData.todayVisits.length - 1 ? "#ccc" : "#FF1D85"}
-          />
-        </TouchableOpacity>
+<TouchableOpacity
+  disabled={!visitsData || currentIndex >= visitsData.length - 1}
+  onPress={() => scrollToIndex(currentIndex + 1)}
+  className="p-1"
+>
+  <AntDesign
+    name="right"
+    size={24}
+    color={
+      !visitsData || currentIndex >= visitsData.length - 1 ? "#ccc" : "#FF1D85"
+    }
+  />
+</TouchableOpacity>
       </View>
 
 <View className="p-2 mt-10">
@@ -283,7 +364,6 @@ const screenWidth = Dimensions.get("window").width;
 
 </View>
 
-      {/* Saved Drafts Section */}
       <View className="p-8 -mt-10">
             <View className="border border-[#FF1D85] rounded-lg p-3 mr-4 w-full flex-row justify-between items-center">
               <View>
@@ -292,7 +372,7 @@ const screenWidth = Dimensions.get("window").width;
                 <Text className="text-[#4E6393] text-base mt-1">Consultation</Text>
               </View>
              
-              <CircularProgress 
+              {/* <CircularProgress 
                value={85}
   inActiveStrokeColor={'#E8DEF8'}
   inActiveStrokeOpacity={1}
@@ -303,7 +383,22 @@ const screenWidth = Dimensions.get("window").width;
             valueSuffixStyle={{fontStyle:"normal"}}
   progressValueStyle={{ fontWeight: '500' }}
 
-               />
+               /> */}
+
+<AnimatedCircularProgress
+  size={70}
+  width={6}
+  fill={85}
+  tintColor="#FF6B6B"
+  backgroundColor="#E8DEF8"
+  onAnimationComplete={() => console.log('Animation complete')}
+>
+  {(fill: number) => (
+    <Text className="text-black text-base font-semibold">
+      {Math.round(fill)}%
+    </Text>
+  )}
+</AnimatedCircularProgress>
 
             </View>
       </View>
