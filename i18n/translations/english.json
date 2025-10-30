@@ -35,7 +35,8 @@
       "Today Visits":"Today Visits",
       "View All":"View All",
       "Saved Draft":"Saved Draft",
-      "Assigned Target":"Assigned Target"
+      "Assigned Target":"Assigned Target",
+      "No Jobs for Today":"No Jobs for Today"
     },
     "Drawer":{
       "Language":"Language",
@@ -45,5 +46,29 @@
       "Logout": "Logout",
       "Report Complaint":"Report Complaint",
       "View Complaint History":"View Complaint History"
+    },
+    "AddComplaint":{
+      "Tell us the problem":"Tell us the problem",
+      "Search category...":"Search category...",
+      "Select Complaint Category":"Select Complaint Category",
+      "We will get back to you within 2 days":"We will get back to you within 2 days",
+      "Submit":"Submit",
+      "Other": "Other",
+      "Please fill out all fields.":"Please fill out all fields.",
+      "Complaint submitted successfully!":"Complaint submitted successfully!",
+      "Failed to submit complaint. Please try again.":"Failed to submit complaint. Please try again."
+    },
+    "Profile":{
+      "Employee ID":"Employee ID",
+      "First Name":"First Name",
+      "Last Name":"Last Name",
+      "Phone Number - 1":"Mobile Number - 1",
+      "Phone Number - 2":"Mobile Number - 2",
+      "NIC Number":"NIC Number",
+      "Email Address":"Email Address",
+      "Building / House No":"Building / House No",
+      "Street Name":"Street Name",
+      "City":"City",
+      "Update":"Update"
     }
 }

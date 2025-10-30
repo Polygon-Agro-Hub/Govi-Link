@@ -6,7 +6,6 @@ import {
   Image,
   TouchableOpacity,
   BackHandler,
-  Alert,
   ScrollView,
   RefreshControl,
   Dimensions,
@@ -14,7 +13,6 @@ import {
   Pressable,
   Modal
 } from "react-native";
-import CircularProgress from 'react-native-circular-progress-indicator';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { environment } from "@/environment/environment";
@@ -31,7 +29,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 
 type FieldOfficerDashboardNavigationProps = StackNavigationProp<
-  RootStackParamList,
+   RootStackParamList,
   "FieldOfficerDashboard"
 >;
 
@@ -68,15 +66,8 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({ navigatio
   const [currentIndex, setCurrentIndex] = useState(0);
 const [showPopup, setShowPopup] = useState(false);
 const [selectedItem, setSelectedItem] = useState<any>(null);
-const[visitsData, setVisitsData] = useState<VisitsData[]| null>([])
+const[visitsData, setVisitsData] = useState<VisitsData[]>([])
 console.log("Officer Visits", visitsData)
-
-  // const scrollToIndex = (index: number) => {
-  //   if (flatListRef.current && index >= 0 && index < dashboardData.todayVisits.length) {
-  //     flatListRef.current.scrollToIndex({ index, animated: true });
-  //     setCurrentIndex(index);
-  //   }
-  // };
 
   const scrollToIndex = (index: number) => {
   if (!flatListRef.current || !visitsData || visitsData.length === 0) return;
@@ -214,7 +205,7 @@ const screenWidth = Dimensions.get("window").width;
           source={
             profile?.profileImg
               ? {uri: profile.profileImg}
-              : require("../../assets/mprofile.webp")
+              : require("../../assets/myprofile.webp")
           }
           className="w-16 h-16 rounded-full mr-3"
         />
@@ -240,15 +231,15 @@ const screenWidth = Dimensions.get("window").width;
 
    <View className="p-2 mt-4">
         <View className="flex-row justify-between items-center mb-1">
-          {/* <Text className="text-base font-bold">{t("Dashboard.Today Visits")} <Text className="text-[#4E6393]">({visitsData.length.toString().padStart(2,'0')})</Text></Text> */}
+          <Text className="text-base font-bold">{t("Dashboard.Today Visits")} <Text className="text-[#4E6393]">({visitsData.length.toString().padStart(2,'0')})</Text></Text>
           <Pressable>
             <Text className="text-pink-500 font-semibold">{t("Dashboard.View All")}</Text>
           </Pressable>
         </View>
 
       </View>
-
-          <View className="flex-row items-center">
+{visitsData.length > 0 ? (
+  <View className="flex-row items-center">
             
         {/* <TouchableOpacity
           disabled={currentIndex === 0}
@@ -358,6 +349,20 @@ const screenWidth = Dimensions.get("window").width;
   />
 </TouchableOpacity>
       </View>
+): 
+(
+  <View className=" justify-center items-center mt-4">
+    <Image source={require('../../assets/no tasks.webp')}
+           style={{
+            width: 140,
+            height: 100,
+          }}
+          resizeMode="contain" />
+          <Text className="italic text-[#787878]">{t("Dashboard.No Jobs for Today")}</Text>
+  </View>
+)
+}
+        
 
 <View className="p-2 mt-10">
         <Text className="text-base font-bold mb-3">{t("Dashboard.Saved Draft")}</Text>
@@ -372,19 +377,6 @@ const screenWidth = Dimensions.get("window").width;
                 <Text className="text-[#4E6393] text-base mt-1">Consultation</Text>
               </View>
              
-              {/* <CircularProgress 
-               value={85}
-  inActiveStrokeColor={'#E8DEF8'}
-  inActiveStrokeOpacity={1}
-  progressValueColor={'#000'}
-  valueSuffix={'%'}
-      activeStrokeColor={'#FF6B6B'}
-            radius={40}
-            valueSuffixStyle={{fontStyle:"normal"}}
-  progressValueStyle={{ fontWeight: '500' }}
-
-               /> */}
-
 <AnimatedCircularProgress
   size={70}
   width={6}

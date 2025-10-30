@@ -11,16 +11,14 @@ import {
   Keyboard,
   BackHandler,
 } from "react-native";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "./types";
-// import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { ScrollView } from "react-native-gesture-handler";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { environment } from "@/environment/environment";
 import { useTranslation } from "react-i18next";
-import { AntDesign, MaterialIcons, Ionicons, Octicons } from "@expo/vector-icons";
-import LottieView from "lottie-react-native"; // Import LottieView
+import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { setUser } from '../store/authSlice';
 import { useDispatch } from "react-redux";

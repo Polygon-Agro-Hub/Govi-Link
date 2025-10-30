@@ -189,6 +189,8 @@ import Dashboard from "@/component/ChiefFieldOfficer/Dashboard";
 import { NativeWindStyleSheet } from "nativewind";
 import CustomDrawerContent from '@/Items/CustomDrawerContent';
 import FieldOfficerDashboard from "@/component/FeildOfficer/FieldOfficerDashboard";
+import ProfileScreen from "@/component/Profile";
+import AddComplaintScreen from "@/component/AddComplaint";
 
 LogBox.ignoreAllLogs(true);
 NativeWindStyleSheet.setOutput({ default: "native" });
@@ -210,9 +212,41 @@ function HomeScreen() {
 }
 
 
+// function MainTabs() {
+//   const [initialTab, setInitialTab] = useState("Dashboard");
+//   console.log('initial tab', initialTab)
+//   const jobRole = useSelector((state: RootState) => state.auth.jobRole);
+
+//   useEffect(() => {
+//     if (jobRole === "Chief Field Officer") {
+//       setInitialTab("Dashboard");
+//     } else if (jobRole === "Field Officer") {
+//       setInitialTab("FieldOfficerDashboard");
+//     }
+//   }, [jobRole]);
+
+//   return (
+//     <Tab.Navigator
+//       initialRouteName={initialTab}
+//       screenOptions={{
+//         headerShown: false,
+//         tabBarHideOnKeyboard: false,
+//         tabBarStyle: { position: "absolute", backgroundColor: "#fff" },
+//       }}
+//       tabBar={(props) => <NavigationBar {...props} />}
+//     >
+      
+//                   <Tab.Screen  name="FieldOfficerDashboard" component={FieldOfficerDashboard}/>
+
+//       <Tab.Screen name="Dashboard" component={Dashboard} />
+//                   <Tab.Screen name="Profile" component={ProfileScreen} />
+
+//     </Tab.Navigator>
+//   );
+// }
 function MainTabs() {
-  const [initialTab, setInitialTab] = useState("Dashboard");
   const jobRole = useSelector((state: RootState) => state.auth.jobRole);
+  const [initialTab, setInitialTab] = useState<string | null>(null);
 
   useEffect(() => {
     if (jobRole === "Chief Field Officer") {
@@ -221,6 +255,10 @@ function MainTabs() {
       setInitialTab("FieldOfficerDashboard");
     }
   }, [jobRole]);
+
+  if (!initialTab) {
+    return null; // or <ActivityIndicator />
+  }
 
   return (
     <Tab.Navigator
@@ -232,7 +270,20 @@ function MainTabs() {
       }}
       tabBar={(props) => <NavigationBar {...props} />}
     >
-      <Tab.Screen name="Dashboard" component={Dashboard} />
+      {jobRole === "Chief Field Officer" ? (
+        <>
+          <Tab.Screen name="Dashboard" component={Dashboard} />
+          <Tab.Screen name="Profile" component={ProfileScreen} />
+        </>
+      ) : (
+        <>
+          <Tab.Screen
+            name="FieldOfficerDashboard"
+            component={FieldOfficerDashboard}
+          />
+          <Tab.Screen name="Profile" component={ProfileScreen} />
+        </>
+      )}
     </Tab.Navigator>
   );
 }
@@ -252,6 +303,7 @@ function MainDrawer() {
     >
       <Drawer.Screen name="MainTabs" component={MainTabs} options={{ drawerItemStyle: { display: "none" } }}/>
       <Drawer.Screen  name="FieldOfficerDashboard" component={FieldOfficerDashboard} options={{ drawerItemStyle: { display: "none" } }} />
+      <Drawer.Screen name="AddComplaint" component={AddComplaintScreen} options={{ drawerItemStyle: { display: "none" } }}/>
 
     </Drawer.Navigator>
   );
@@ -313,6 +365,7 @@ function AppContent() {
             <Stack.Screen name="Language" component={Lanuage} />
             <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="Main" component={MainDrawer} />
+              {/* <Stack.Screen name="Profile" component={ProfileScreen} /> */}
           </Stack.Navigator>
         </NavigationContainer>
       </SafeAreaView>

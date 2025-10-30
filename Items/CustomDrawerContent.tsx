@@ -1,20 +1,15 @@
-import { View, Text, Pressable, TouchableOpacity } from "react-native";
-import React, { useCallback, useEffect, useState, useContext } from "react";
+import { View, Text, TouchableOpacity } from "react-native";
+import React, { useEffect, useState, useContext } from "react";
 import {
   DrawerContentScrollView,
   DrawerItemList,
 } from "@react-navigation/drawer";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { DrawerActions, useNavigation } from "@react-navigation/native";
+import { useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { environment } from "@/environment/environment";
-import axios from "axios";
 import i18n from "@/i18n/i18n";
 import { useTranslation } from "react-i18next";
 import {
   Ionicons,
-  MaterialIcons,
-  AntDesign,
   Entypo,
   FontAwesome6,
   FontAwesome,
@@ -24,6 +19,11 @@ import { RootState } from "@/services/store";
 import { LanguageContext } from "@/context/LanguageContext";
 import { useDispatch } from "react-redux";
 import { logoutUser } from "@/store/authSlice";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { DrawerNavigationProp } from "@react-navigation/drawer";
+import { useDrawerStatus } from '@react-navigation/drawer';
+
+import { RootStackParamList } from "@/component/types";
 interface ProfileData {
   firstName: string;
   lastName: string;
@@ -34,14 +34,17 @@ interface ProfileData {
   lastNameTamil: string;
   empId: string;
 }
+type CustomDrawerNavigationProp = NativeStackNavigationProp<RootStackParamList> & DrawerNavigationProp< RootStackParamList>;
+
 
 export default function CustomDrawerContent(props: any) {
   const { t } = useTranslation();
-  const navigation = useNavigation();
-  const [profile, setProfile] = useState<ProfileData | null>(null);
+  const navigation = props.navigation;
+    const [profile, setProfile] = useState<ProfileData | null>(null);
   const [isLanguageDropdownOpen, setLanguageDropdownOpen] =
     useState<boolean>(false);
   const [selectedLanguage, setSelectedLanguage] = useState<string>("en");
+  console.log("se lng", selectedLanguage)
   const [selectedComplaint, setSelectedComplaint] = useState<string | null>(
     null
   );
@@ -62,6 +65,29 @@ export default function CustomDrawerContent(props: any) {
         return `${userProfile.firstName} ${userProfile.lastName}`;
     }
   };
+  const isDrawerOpen = useDrawerStatus() === 'open';
+
+
+
+  useEffect(() => {
+    setLanguageDropdownOpen(false);
+    setComplaintDropdownOpen(false);
+  }, [isDrawerOpen]);
+
+     useFocusEffect(
+    React.useCallback(() => {
+            setComplaintDropdownOpen(false)
+      setLanguageDropdownOpen(false);
+      console.log("Current language:", i18n.language);
+      if (i18n.language === "en") {
+        setSelectedLanguage("en");
+      } else if (i18n.language === "si") {
+        setSelectedLanguage("si");
+      } else if (i18n.language === "ta") {
+        setSelectedLanguage("ta");
+      }
+    }, [i18n.language]) 
+  );
 
   const getTextStyle = () => {
     if (i18n.language === "si") {
@@ -90,7 +116,7 @@ export default function CustomDrawerContent(props: any) {
     setComplaintDropdownOpen(false);
 
     if (complaint === t("Drawer.Report Complaint")) {
-      // navigation.navigate("ComplainPage" as any, { userId: 0 });
+      navigation.navigate("AddComplaint");
     } else if (complaint === t("Drawer.View Complaint History")) {
       // navigation.navigate("Main", { screen: "ComplainHistory" ,params: {fullname: getFullName }} );
     }
@@ -198,7 +224,14 @@ export default function CustomDrawerContent(props: any) {
               </View>
             )}
 
-            <TouchableOpacity className="flex-row items-center py-5">
+            <TouchableOpacity className="flex-row items-center py-5"
+        onPress={() => {
+    navigation.navigate("MainTabs", { // the Drawer screen name
+  screen: "Profile",              // the Tab screen inside MainTabs
+});
+    navigation.closeDrawer(); // <-- closes the drawer after navigation
+  }}
+            >
               <View className="bg-[#F4F9FB] rounded-full p-1">
                 <FontAwesome6 name="user-large" size={18} color="#999999" />
               </View>
@@ -213,8 +246,8 @@ export default function CustomDrawerContent(props: any) {
             {/* Change Password */}
             <TouchableOpacity
               className="flex-row items-center py-5"
-              // onPress={() =>
-              //   navigation.navigate("ChangePassword")}
+              onPress={() =>
+                navigation.navigate("Login")}
             >
               <View className="bg-[#F4F9FB] rounded-full p-1">
                 <Entypo name="lock" size={20} color="#999999" />
@@ -281,7 +314,10 @@ export default function CustomDrawerContent(props: any) {
           className="flex-row items-center py-3"
           onPress={handleLogout}
         >
+                        <View className="bg-[#FFF2EE] rounded-full p-1">
+
           <Ionicons name="log-out-outline" size={20} color="red" />
+          </View>
           <Text className="flex-1 text-lg ml-2 text-red-500">
             {t("Drawer.Logout")}
           </Text>

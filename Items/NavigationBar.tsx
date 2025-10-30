@@ -30,6 +30,7 @@ console.log('user rolllllllll', userRole)
 
   let currentTabName = state.routes[state.index]?.name ;
   console.log(currentTabName)
+
   
   const handleTabPress = async (tabName: string, index: number) => {
     Animated.spring(scales[index], {
