@@ -8,4 +8,5 @@ export type RootStackParamList = {
    FieldOfficerDashboard: undefined
    Profile:undefined;
    AddComplaint:undefined
+     ViewAllVisits: undefined;
 }

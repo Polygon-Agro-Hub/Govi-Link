@@ -23,7 +23,7 @@ const NavigationBar = ({ navigation, state }: { navigation: any; state: any }) =
 console.log('user rolllllllll', userRole)
    const tabs = [
     { name: "Dashboard", icon: <FontAwesome6 name="house" size={24} color="#000" /> },
-    { name: "Tasks", icon: <MaterialIcons name="task" size={24} color="#000" /> },
+    { name: "ViewAllVisits", icon: <MaterialIcons name="task" size={24} color="#000" /> },
     { name: "AddAssignment", icon: <Entypo name="add-user" size={24} color="#000" /> },
     { name: "Users", icon: <Entypo name="users" size={24} color="#000" /> },
   ];

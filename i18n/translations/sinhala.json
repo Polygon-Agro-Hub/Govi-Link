@@ -36,7 +36,7 @@
     "View All": "සියල්ල බලන්න",
     "Saved Draft": "සුරැකි කෙටුම්පත",
     "Assigned Target": "පවරන ලද ඉලක්කය",
-    "No Jobs for Today":"අදට ඉලක්කය නැත"
+    "No Jobs for Today": "අදට ඉලක්කය නැත"
   },
   "Drawer": {
     "Language": "භාෂාව",
@@ -47,28 +47,62 @@
     "Report Complaint": "පැමිණිල්ලක් වාර්තා කරන්න",
     "View Complaint History": "පැමිණිලි ඉතිහාසය බලන්න"
   },
-   "AddComplaint":{
-      "Tell us the problem":"ඔබේ ගැටලුව අපට කියන්න",
-      "Search category...":"කාණ්ඩයක් තෝරන්න...",
-      "Select Complaint Category":"පැමිණිලි කාණ්ඩය තෝරන්න",
-      "We will get back to you within 2 days":"දින 2ක් ඇතුළත අප ඔබගේ ගැටලුවට ප්‍රතිචාර දැක්වීමට කටයුතු කරන්නෙමු.",
-      "Submit":"තහවුරු කරන්න",
-      "Other": "වෙනත්",
-      "Please fill out all fields.":"කරුණාකර සියලු විස්තර පුරවන්න.",
-      "Complaint submitted successfully!":"පැමිණිල්ල එක් කිරීම සාර්ථකයි!",
-      "Failed to submit complaint. Please try again.":"පැමිණිල්ල එක් කිරීම අසාර්ථකයි. කරුණාකර නැවත උත්සාහ කරන්න."
-    },
-        "Profile":{
-      "Employee ID":"පරිශීලක අංකය",
-      "First Name":"මුල් නම",
-      "Last Name":"අවසන් නම",
-      "Phone Number - 1":"දුරකථන අංකය - 1",
-      "Phone Number - 2":"දුරකථන අංකය - 2",
-      "NIC Number":"ජාතික හැඳුනුම්පත් අංකය",
-      "Email Address":"ඊමේල් ලිපිනය",
-      "Building / House No":"නිවාස/ගොඩනැගිලි අංකය",
-      "Street Name":"වීදියේ නම",
-      "City":"නගරය",
-      "Update":"යාවත්කාලීන කරන්න"
-    }
+  "AddComplaint": {
+    "Tell us the problem": "ඔබේ ගැටලුව අපට කියන්න",
+    "Search category...": "කාණ්ඩයක් තෝරන්න...",
+    "Select Complaint Category": "පැමිණිලි කාණ්ඩය තෝරන්න",
+    "We will get back to you within 2 days": "දින 2ක් ඇතුළත අප ඔබගේ ගැටලුවට ප්‍රතිචාර දැක්වීමට කටයුතු කරන්නෙමු.",
+    "Submit": "තහවුරු කරන්න",
+    "Other": "වෙනත්",
+    "Please fill out all fields.": "කරුණාකර සියලු විස්තර පුරවන්න.",
+    "Complaint submitted successfully!": "පැමිණිල්ල එක් කිරීම සාර්ථකයි!",
+    "Failed to submit complaint. Please try again.": "පැමිණිල්ල එක් කිරීම අසාර්ථකයි. කරුණාකර නැවත උත්සාහ කරන්න."
+  },
+  "Profile": {
+    "Employee ID": "පරිශීලක අංකය",
+    "First Name": "මුල් නම",
+    "Last Name": "අවසන් නම",
+    "Phone Number - 1": "දුරකථන අංකය - 1",
+    "Phone Number - 2": "දුරකථන අංකය - 2",
+    "NIC Number": "ජාතික හැඳුනුම්පත් අංකය",
+    "Email Address": "ඊමේල් ලිපිනය",
+    "Building / House No": "නිවාස/ගොඩනැගිලි අංකය",
+    "Street Name": "වීදියේ නම",
+    "City": "නගරය",
+    "Update": "යාවත්කාලීන කරන්න"
+  },
+  "VisitPopup": {
+    "District": "දිස්ත්‍රික්කය",
+    "Location":"ස්ථානය",
+    "Get Call": "ඇමතුම ගන්න",
+    "Address":"ලිපිනය :",
+    "Start":"ආරම්භ කරන්න"
+  },
+  "Districts": {
+    "Ampara": "අම්පාර",
+    "Anuradhapura": "අනුරාධපුර",
+    "Badulla": "බදුල්ල",
+    "Batticaloa": "මඩකලපුව",
+    "Colombo": "කොළඹ",
+    "Galle": "ගාල්ල",
+    "Gampaha": "ගම්පහ",
+    "Hambantota": "හම්බන්තොට",
+    "Jaffna": "යාපනය",
+    "Kalutara": "කළුතර",
+    "Kandy": "මහනුවර",
+    "Kegalle": "කෑගල්ල",
+    "Kilinochchi": "කිලිනොච්චි",
+    "Kurunegala": "කුරුණෑගල",
+    "Mannar": "මන්නාරම",
+    "Matale": "මාතලේ",
+    "Matara": "මාතර",
+    "Moneragala": "මොනරාගල",
+    "Mullaitivu": "මුලතිව්",
+    "NuwaraEliya": "නුවරඑළිය",
+    "Polonnaruwa": "පොළොන්නරුව",
+    "Puttalam": "පුත්තලම",
+    "Rathnapura": "රත්නපුර",
+    "Trincomalee": "ත්‍රිකුණාමලය",
+    "Vavuniya": "වවුනියාව"
+  }
 }

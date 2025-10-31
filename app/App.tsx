@@ -191,6 +191,7 @@ import CustomDrawerContent from '@/Items/CustomDrawerContent';
 import FieldOfficerDashboard from "@/component/FeildOfficer/FieldOfficerDashboard";
 import ProfileScreen from "@/component/Profile";
 import AddComplaintScreen from "@/component/AddComplaint";
+import ViewAllVisits from "@/component/ViewAllVisits";
 
 LogBox.ignoreAllLogs(true);
 NativeWindStyleSheet.setOutput({ default: "native" });
@@ -274,6 +275,7 @@ function MainTabs() {
         <>
           <Tab.Screen name="Dashboard" component={Dashboard} />
           <Tab.Screen name="Profile" component={ProfileScreen} />
+            <Tab.Screen name="ViewAllVisits" component={ViewAllVisits} />
         </>
       ) : (
         <>
@@ -282,6 +284,7 @@ function MainTabs() {
             component={FieldOfficerDashboard}
           />
           <Tab.Screen name="Profile" component={ProfileScreen} />
+            <Tab.Screen name="ViewAllVisits" component={ViewAllVisits} />
         </>
       )}
     </Tab.Navigator>
@@ -304,6 +307,7 @@ function MainDrawer() {
       <Drawer.Screen name="MainTabs" component={MainTabs} options={{ drawerItemStyle: { display: "none" } }}/>
       <Drawer.Screen  name="FieldOfficerDashboard" component={FieldOfficerDashboard} options={{ drawerItemStyle: { display: "none" } }} />
       <Drawer.Screen name="AddComplaint" component={AddComplaintScreen} options={{ drawerItemStyle: { display: "none" } }}/>
+      <Drawer.Screen name="ViewAllVisits" component={ViewAllVisits} options={{ drawerItemStyle: { display: "none" } }}/>
 
     </Drawer.Navigator>
   );
@@ -365,7 +369,6 @@ function AppContent() {
             <Stack.Screen name="Language" component={Lanuage} />
             <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="Main" component={MainDrawer} />
-              {/* <Stack.Screen name="Profile" component={ProfileScreen} /> */}
           </Stack.Navigator>
         </NavigationContainer>
       </SafeAreaView>

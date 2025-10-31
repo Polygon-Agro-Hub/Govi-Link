@@ -7,68 +7,102 @@
     "userBlocked": "Too many requests from this device, please try again in 30 minutes.",
     "No Internet Connection": "No Internet Connection",
     "Please turn on mobile data or Wi-Fi to continue.": "Please turn on Mobile Data or Wi-Fi to continue."
-    },
-      "Error":{
-    "error":"Sorry",
-    "Error":"Error",
-    "Failed to fetch empid.":"Failed to fetch Employee ID.",
-    "New password and confirm password do not match.":"New password and confirm password do not match.",
-    "New password must be at least 6 characters long.":"New password must be at least 6 characters long.",
-    "Failed to update password.":"Failed to update password."
-      },
-    "Login":{
-      "Welcome": "Welcome",
-      "Please Sign in to login": "Please Sign in to login",
-      "Employee ID": "Employee ID",
-      "Password": "Password",
-      "Sign in":"Sign in",
-      "Please enter Employee ID in uppercase letters": "Please enter Employee ID in uppercase letters",
-      "Password & Employee ID are not allowed to be empty": "Password & Employee ID are not allowed to be empty",
-      "Password is not allowed to be empty": "Password is not allowed to be empty",
-      "Employee ID is not allowed to be empty": "Employee ID is not allowed to be empty",
-      "Invalid EMP ID & Password":"Invalid EMP ID & Password",
-      "Invalid Password. Please try again.":"Invalid Password. Please try again.",
-      "Invalid EMP ID":"Invalid EMP ID"
-    },
-    "Dashboard":{
-      "Hello":"Hello",
-      "Today Visits":"Today Visits",
-      "View All":"View All",
-      "Saved Draft":"Saved Draft",
-      "Assigned Target":"Assigned Target",
-      "No Jobs for Today":"No Jobs for Today"
-    },
-    "Drawer":{
-      "Language":"Language",
-      "Profile":"Profile",
-      "Complaints": "Complaints",
-      "Change Password":"Change Password",
-      "Logout": "Logout",
-      "Report Complaint":"Report Complaint",
-      "View Complaint History":"View Complaint History"
-    },
-    "AddComplaint":{
-      "Tell us the problem":"Tell us the problem",
-      "Search category...":"Search category...",
-      "Select Complaint Category":"Select Complaint Category",
-      "We will get back to you within 2 days":"We will get back to you within 2 days",
-      "Submit":"Submit",
-      "Other": "Other",
-      "Please fill out all fields.":"Please fill out all fields.",
-      "Complaint submitted successfully!":"Complaint submitted successfully!",
-      "Failed to submit complaint. Please try again.":"Failed to submit complaint. Please try again."
-    },
-    "Profile":{
-      "Employee ID":"Employee ID",
-      "First Name":"First Name",
-      "Last Name":"Last Name",
-      "Phone Number - 1":"Mobile Number - 1",
-      "Phone Number - 2":"Mobile Number - 2",
-      "NIC Number":"NIC Number",
-      "Email Address":"Email Address",
-      "Building / House No":"Building / House No",
-      "Street Name":"Street Name",
-      "City":"City",
-      "Update":"Update"
-    }
+  },
+  "Error": {
+    "error": "Sorry",
+    "Error": "Error",
+    "Failed to fetch empid.": "Failed to fetch Employee ID.",
+    "New password and confirm password do not match.": "New password and confirm password do not match.",
+    "New password must be at least 6 characters long.": "New password must be at least 6 characters long.",
+    "Failed to update password.": "Failed to update password."
+  },
+  "Login": {
+    "Welcome": "Welcome",
+    "Please Sign in to login": "Please Sign in to login",
+    "Employee ID": "Employee ID",
+    "Password": "Password",
+    "Sign in": "Sign in",
+    "Please enter Employee ID in uppercase letters": "Please enter Employee ID in uppercase letters",
+    "Password & Employee ID are not allowed to be empty": "Password & Employee ID are not allowed to be empty",
+    "Password is not allowed to be empty": "Password is not allowed to be empty",
+    "Employee ID is not allowed to be empty": "Employee ID is not allowed to be empty",
+    "Invalid EMP ID & Password": "Invalid EMP ID & Password",
+    "Invalid Password. Please try again.": "Invalid Password. Please try again.",
+    "Invalid EMP ID": "Invalid EMP ID"
+  },
+  "Dashboard": {
+    "Hello": "Hello",
+    "Today Visits": "Today Visits",
+    "View All": "View All",
+    "Saved Draft": "Saved Draft",
+    "Assigned Target": "Assigned Target",
+    "No Jobs for Today": "No Jobs for Today"
+  },
+  "Drawer": {
+    "Language": "Language",
+    "Profile": "Profile",
+    "Complaints": "Complaints",
+    "Change Password": "Change Password",
+    "Logout": "Logout",
+    "Report Complaint": "Report Complaint",
+    "View Complaint History": "View Complaint History"
+  },
+  "AddComplaint": {
+    "Tell us the problem": "Tell us the problem",
+    "Search category...": "Search category...",
+    "Select Complaint Category": "Select Complaint Category",
+    "We will get back to you within 2 days": "We will get back to you within 2 days",
+    "Submit": "Submit",
+    "Other": "Other",
+    "Please fill out all fields.": "Please fill out all fields.",
+    "Complaint submitted successfully!": "Complaint submitted successfully!",
+    "Failed to submit complaint. Please try again.": "Failed to submit complaint. Please try again."
+  },
+  "Profile": {
+    "Employee ID": "Employee ID",
+    "First Name": "First Name",
+    "Last Name": "Last Name",
+    "Phone Number - 1": "Mobile Number - 1",
+    "Phone Number - 2": "Mobile Number - 2",
+    "NIC Number": "NIC Number",
+    "Email Address": "Email Address",
+    "Building / House No": "Building / House No",
+    "Street Name": "Street Name",
+    "City": "City",
+    "Update": "Update"
+  },
+  "VisitPopup": {
+    "District": "District",
+    "Location":"Location",
+    "Get Call":"Get Call",
+    "Address":"Address :",
+    "Start":"Start"
+  },
+  "Districts": {
+    "Ampara": "Ampara",
+    "Anuradhapura": "Anuradhapura",
+    "Badulla": "Badulla",
+    "Batticaloa": "Batticaloa",
+    "Colombo": "Colombo",
+    "Galle": "Galle",
+    "Gampaha": "Gampaha",
+    "Hambantota": "Hambantota",
+    "Jaffna": "Jaffna",
+    "Kalutara": "Kalutara",
+    "Kandy": "Kandy",
+    "Kegalle": "Kegalle",
+    "Kilinochchi": "Kilinochchi",
+    "Kurunegala": "Kurunegala",
+    "Mannar": "Mannar",
+    "Matale": "Matale",
+    "Matara": "Matara",
+    "Moneragala": "Moneragala",
+    "Mullaitivu": "Mullaitivu",
+    "NuwaraEliya": "Nuwara Eliya",
+    "Polonnaruwa": "Polonnaruwa",
+    "Puttalam": "Puttalam",
+    "Rathnapura": "Rathnapura",
+    "Trincomalee": "Trincomalee",
+    "Vavuniya": "Vavuniya"
+  }
 }

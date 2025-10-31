@@ -54,7 +54,10 @@ interface VisitsData {
   propose: string;
   englishName: string;
   sinhalaName:string;
-  tamilName:string
+  tamilName:string;
+  latitude:string;
+  longitude:string;
+  district:string
 }
 const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({ navigation }) => {
 
@@ -456,7 +459,7 @@ const screenWidth = Dimensions.get("window").width;
           {/* Call Button */}
           <View className="flex-row items-center border border-[#F83B4F] rounded-full px-6 py-2">
             <Feather name="phone-call" size={18} color="#F83B4F" />
-            <Text className="text-base font-normal text-[#434343] ml-2">
+            <Text className="text-base font-normal text-[#434343] ml-2 text-center">
               Get Call
             </Text>
           </View>
