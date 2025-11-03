@@ -1,0 +1,108 @@
+{
+  "Main": {
+    "error": "සමාවන්න",
+    "somethingWentWrong": "කිසියම් දෝෂයක් සිදුව ඇත. කරුණාකර නැවත උත්සාහ කරන්න.",
+    "ok": "හරි",
+    "Sorry": "සමාවන්න",
+    "userBlocked": "මෙම උපාංගයෙන් ඉල්ලීම් බොහෝ වතාවක් යවනු ලැබිය. කරුණාකර විනාඩි 30කට පසුව නැවත උත්සාහ කරන්න.",
+    "No Internet Connection": "අන්තර්ජාල සම්බන්ධතාවයක් නොමැත",
+    "Please turn on mobile data or Wi-Fi to continue.": "කරුණාකර Mobile Data හෝ Wi-Fi සක්‍රීය කරන්න."
+  },
+  "Error": {
+    "error": "සමාවන්න",
+    "Error": "දෝෂය",
+    "Failed to fetch empid.": "සේවක හැඳුනුම්පත සොයා ගැනීමට අසමත් විය.",
+    "New password and confirm password do not match.": "නව මුරපදය සහ එය තහවුරු කිරීමේ මුරපදය එකිනෙකට නොගැලපේ.",
+    "New password must be at least 6 characters long.": "නව මුරපදයට අවම වශයෙන් අක්ෂර 6 ක් තිබිය යුතුය.",
+    "Failed to update password.": "මුරපදය යාවත්කාලීන කිරීම අසාර්ථකයි."
+  },
+  "Login": {
+    "Welcome": "සාදරයෙන් පිළිගනිමු!",
+    "Please Sign in to login": "කරුණාකර ගිණුමට ඇතුළු වීමට පුරන්න",
+    "Employee ID": "පරිශීලක අංකය",
+    "Password": "මුරපදය",
+    "Sign in": "පුරන්න",
+    "Please enter Employee ID in uppercase letters": "කරුණාකර සේවක හැඳුනුම්පත මහකුරුවලින් ඇතුළත් කරන්න.",
+    "Password & Employee ID are not allowed to be empty": "මුරපදය සහ සේවක පරිශීලක අංකය හිස්ව තැබිය නොහැක.",
+    "Password is not allowed to be empty": "මුරපදය හිස්ව තැබිය නොහැක.",
+    "Employee ID is not allowed to be empty": "මුරපදය සහ සේවක පරිශීලක අංකය හිස්ව තැබිය නොහැක.",
+    "Invalid EMP ID & Password": "වැරදි සේවක අංකයක් සහ මුරපදයකි",
+    "Invalid Password. Please try again.": "වැරදි මුරපදයකි. කරුණාකර නැවත උත්සාහ කරන්න.",
+    "Invalid EMP ID": "වැරදි සේවක අංකයකි"
+  },
+  "Dashboard": {
+    "Hello": "හෙලෝ",
+    "Today Visits": "අද සංචාර",
+    "View All": "සියල්ල බලන්න",
+    "Saved Draft": "සුරැකි කෙටුම්පත",
+    "Assigned Target": "පවරන ලද ඉලක්කය",
+    "No Jobs for Today": "අදට ඉලක්කය නැත"
+  },
+  "Drawer": {
+    "Language": "භාෂාව",
+    "Profile": "පැතිකඩ",
+    "Complaints": "පැමිණිලි",
+    "Change Password": "මුරපදය වෙනස් කරන්න",
+    "Logout": "පිටවීම",
+    "Report Complaint": "පැමිණිල්ලක් වාර්තා කරන්න",
+    "View Complaint History": "පැමිණිලි ඉතිහාසය බලන්න"
+  },
+  "AddComplaint": {
+    "Tell us the problem": "ඔබේ ගැටලුව අපට කියන්න",
+    "Search category...": "කාණ්ඩයක් තෝරන්න...",
+    "Select Complaint Category": "පැමිණිලි කාණ්ඩය තෝරන්න",
+    "We will get back to you within 2 days": "දින 2ක් ඇතුළත අප ඔබගේ ගැටලුවට ප්‍රතිචාර දැක්වීමට කටයුතු කරන්නෙමු.",
+    "Submit": "තහවුරු කරන්න",
+    "Other": "වෙනත්",
+    "Please fill out all fields.": "කරුණාකර සියලු විස්තර පුරවන්න.",
+    "Complaint submitted successfully!": "පැමිණිල්ල එක් කිරීම සාර්ථකයි!",
+    "Failed to submit complaint. Please try again.": "පැමිණිල්ල එක් කිරීම අසාර්ථකයි. කරුණාකර නැවත උත්සාහ කරන්න."
+  },
+  "Profile": {
+    "Employee ID": "පරිශීලක අංකය",
+    "First Name": "මුල් නම",
+    "Last Name": "අවසන් නම",
+    "Phone Number - 1": "දුරකථන අංකය - 1",
+    "Phone Number - 2": "දුරකථන අංකය - 2",
+    "NIC Number": "ජාතික හැඳුනුම්පත් අංකය",
+    "Email Address": "ඊමේල් ලිපිනය",
+    "Building / House No": "නිවාස/ගොඩනැගිලි අංකය",
+    "Street Name": "වීදියේ නම",
+    "City": "නගරය",
+    "Update": "යාවත්කාලීන කරන්න"
+  },
+  "VisitPopup": {
+    "District": "දිස්ත්‍රික්කය",
+    "Location":"ස්ථානය",
+    "Get Call": "ඇමතුම ගන්න",
+    "Address":"ලිපිනය :",
+    "Start":"ආරම්භ කරන්න"
+  },
+  "Districts": {
+    "Ampara": "අම්පාර",
+    "Anuradhapura": "අනුරාධපුර",
+    "Badulla": "බදුල්ල",
+    "Batticaloa": "මඩකලපුව",
+    "Colombo": "කොළඹ",
+    "Galle": "ගාල්ල",
+    "Gampaha": "ගම්පහ",
+    "Hambantota": "හම්බන්තොට",
+    "Jaffna": "යාපනය",
+    "Kalutara": "කළුතර",
+    "Kandy": "මහනුවර",
+    "Kegalle": "කෑගල්ල",
+    "Kilinochchi": "කිලිනොච්චි",
+    "Kurunegala": "කුරුණෑගල",
+    "Mannar": "මන්නාරම",
+    "Matale": "මාතලේ",
+    "Matara": "මාතර",
+    "Moneragala": "මොනරාගල",
+    "Mullaitivu": "මුලතිව්",
+    "NuwaraEliya": "නුවරඑළිය",
+    "Polonnaruwa": "පොළොන්නරුව",
+    "Puttalam": "පුත්තලම",
+    "Rathnapura": "රත්නපුර",
+    "Trincomalee": "ත්‍රිකුණාමලය",
+    "Vavuniya": "වවුනියාව"
+  }
+}
