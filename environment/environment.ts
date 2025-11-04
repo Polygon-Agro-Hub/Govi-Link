@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
 
- API_BASE_URL: 'http://192.168.8.103:3000/govilink/',
+ API_BASE_URL: 'http://192.168.1.6:3000/govilink/',
 };

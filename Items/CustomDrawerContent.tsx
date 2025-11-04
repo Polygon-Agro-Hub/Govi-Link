@@ -127,10 +127,12 @@ export default function CustomDrawerContent(props: any) {
   const handleLogout = async () => {
     try {
       await AsyncStorage.clear();
+    await new Promise((resolve) => {
       dispatch(logoutUser());
-      navigation.reset({
+      setTimeout(resolve, 100); // small delay for Redux to finish
+    });      navigation.reset({
         index: 0,
-        routes: [{ name: "Login" as never }],
+        routes: [{ name: "Login" }],
       });
     } catch (error) {
       console.error("Error logging out:", error);
