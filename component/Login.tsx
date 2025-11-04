@@ -199,23 +199,52 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
       const data = await response.json();
      console.log("Login response:", data);
 
-      if (!response.ok) {
-        setLoading(false);
-        if (response.status === 404) {
-          Alert.alert(t("Error.error"), t("Login.Invalid EMP ID & Password"));
-        } else if (response.status === 401) {
-          Alert.alert(
-            t("Error.error"),
-            t("Login.Invalid Password. Please try again.")
-          );
-        } else if (data.status === "error") {
-          console.log("Login error:", data);
-          Alert.alert(t("Error.error"), t("Login.Invalid EMP ID"));
-        } else {
-          Alert.alert(t("Error.error"), t("Error.somethingWentWrong"));
-        }
-        return;
-      }
+      // if (!response.ok) {
+      //   setLoading(false);
+      //   if (response.status === 404) {
+      //     Alert.alert(t("Error.error"), t("Login.Invalid EMP ID & Password"));
+      //   } else if (response.status === 401) {
+      //     Alert.alert(
+      //       t("Error.error"),
+      //       t("Login.Invalid Password. Please try again.")
+      //     );
+          
+      //   } else if (response.status === 401 && response) {
+      //     Alert.alert(
+      //       t("Error.error"),
+      //       t("Login.User Not Found")
+      //     )} else if (data.status === "error") {
+      //     console.log("Login error:", data);
+      //     Alert.alert(t("Error.error"), t("Login.Invalid EMP ID"));
+      //   } else {
+      //     Alert.alert(t("Error.error"), t("Error.somethingWentWrong"));
+      //   }
+      //   return;
+      // }
+if (!response.ok || !data.success) {
+  setLoading(false);
+
+  const message = data.message?.toLowerCase() || "";
+
+  if (message.includes("invalid password")) {
+    Alert.alert(
+      t("Error.error"),
+      t("Login.Invalid Password. Please try again.")
+    );
+  } else if (message.includes("user not found")) {
+    Alert.alert(
+      t("Error.error"),
+      t("Login.Invalid EMP ID & Password")
+    );
+  } else {
+    Alert.alert(
+      t("Error.error"),
+      t("Error.somethingWentWrong")
+    );
+  }
+
+  return;
+}
 
    const { token, passwordUpdate, role, empId } = data.data;
 
