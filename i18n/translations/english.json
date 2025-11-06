@@ -104,5 +104,25 @@
     "Rathnapura": "Rathnapura",
     "Trincomalee": "Trincomalee",
     "Vavuniya": "Vavuniya"
+  },
+  "CertificateQuesanory":{
+    "Started on": "Started on",
+    "Exit": "Exit",
+    "Next":"Next",
+    "Click a Photo":"Click a Photo",
+    "Please take a photo of the completed work in the field.":"Please take a photo of the completed work in the field.",
+    "Open Camera":"Open Camera",
+    "Ready To Submit":"Ready To Submit",
+    "Seconds":"Seconds",
+    "Retake Previous Photo":"Retake Previous Photo",
+    "Submit":"Submit",
+    "Cancel":"Cancel",
+    "OK":"OK",
+    "Confirm Untick":"Confirm Uncheck",
+    "This will remove the uploaded photo for this task. Are you sure you want to continue?":"This will remove the uploaded photo for this task. Are you sure you want to continue?",
+    "Something went wrong while updating question.":"Something went wrong while updating question.",
+    "Success":"Success",
+    "Task complete successfully!":"Task complete successfully!",
+    "Failed to complete task, Please try again":"Failed to complete task, Please try again"
   }
 }

@@ -13,6 +13,7 @@ import {
   BackHandler,
   TouchableWithoutFeedback,
   Linking,
+  Alert,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
@@ -54,6 +55,22 @@ interface VisitsData {
   servicesinhalaName: string;
   servicetamilName: string;
 }
+
+interface DraftVisit {
+  certificationpaymentId: number;
+  jobId: string;
+  userId: number;
+  totalTasks: number;
+  tickCompleted: number;
+  photoCompleted: number;
+  totalCompleted: number;
+  completionPercentage: number;
+  farmerName?: string; 
+  farmerId?: number;   
+  propose?: string;    
+}
+
+
 const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
   const { t } = useTranslation();
@@ -64,7 +81,8 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
   const [showPopup, setShowPopup] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [visitsData, setVisitsData] = useState<VisitsData[]>([]);
-  console.log("Officer Visits", visitsData);
+const [draftVisits, setDraftVisits] = useState<DraftVisit[]>([]);
+        console.log("officer draft visit", draftVisits)
 
   const openDrawer = () => {
     navigation.dispatch(DrawerActions.openDrawer());
@@ -100,8 +118,12 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
         setProfile(response.data.data);
         dispatch(setUserProfile(response.data.data));
       }
-    } catch (error) {
+    } catch (error:any) {
       console.error("Failed to fetch user profile:", error);
+      if (error.response?.status === 401) {
+      Alert.alert("Session expired, please login again");
+      navigation.navigate("Login");
+    }
     } finally {
       setRefreshing(false);
     }
@@ -110,12 +132,14 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
   useEffect(() => {
     fetchUserProfile();
     fetchVisits();
+    fetchVisitsDraft()
   }, []);
 
   const onRefresh = async () => {
     setRefreshing(true);
     await fetchUserProfile();
     await fetchVisits();
+    await fetchVisitsDraft()
     setRefreshing(false);
   };
   const getName = () => {
@@ -173,6 +197,25 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
           }
         );
         setVisitsData(response.data.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch officer visits:", error);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+    const fetchVisitsDraft = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      if (token) {
+        const response = await axios.get(
+          `${environment.API_BASE_URL}api/officer/officer-visits-draft`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setDraftVisits(response.data.data || []);
       }
     } catch (error) {
       console.error("Failed to fetch officer visits:", error);
@@ -378,31 +421,78 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
       </View>
 
       <View className="p-8 -mt-10">
-        <View className="border border-[#FF1D85] rounded-lg p-3 mr-4 w-full flex-row justify-between items-center">
-          <View>
-            <Text className="text-black text-sm font-medium">#20251012001</Text>
+     {/* draft done for only individual audit */}
+        {draftVisits.length > 0 ? (
+    draftVisits.map((item, index) => (
+      <TouchableOpacity  key={index}
+      onPress={()=> navigation.navigate("CertificateQuesanory", { jobId:item.jobId, certificationpaymentId:item.certificationpaymentId })}
+      >
+      <View
+       
+        className="border border-[#FF1D85] rounded-lg p-3 mb-4 w-full flex-row justify-between items-center"
+      >
+        <View>
+          <Text className="text-black text-sm font-medium">#{item.jobId}</Text>
             <Text className="text-base font-bold mt-1">
-              Ravin Kaluhennadige
+              {item.farmerName}
             </Text>
-            <Text className="text-[#4E6393] text-base mt-1">Consultation</Text>
-          </View>
-
-          <AnimatedCircularProgress
-            size={70}
-            width={6}
-            fill={85}
-            tintColor="#FF6B6B"
-            backgroundColor="#E8DEF8"
-            onAnimationComplete={() => console.log("Animation complete")}
-          >
-            {(fill: number) => (
-              <Text className="text-black text-base font-semibold">
-                {Math.round(fill)}%
-              </Text>
-            )}
-          </AnimatedCircularProgress>
+          <Text className="text-[#4E6393] text-base mt-1">
+            {(() => {
+                        if (item.propose === "Cluster") {
+                          switch (i18n.language) {
+                            case "si":
+                              return "ගොවි සමූහ විගණනය";
+                            case "ta":
+                              return "உழவர் குழு தணிக்கை";
+                            default:
+                              return "Farm Cluster Audit";
+                          }
+                        } else if (item.propose === "Individual") {
+                          switch (i18n.language) {
+                            case "si":
+                              return "තනි ගොවි විගණනය";
+                            case "ta":
+                              return "தனிப்பட்ட விவசாயி தணிக்கை";
+                            default:
+                              return "Individual Farmer Audit";
+                          }
+                        } 
+                      })()}
+          </Text>
         </View>
+
+        <AnimatedCircularProgress
+          size={70}
+          width={6}
+          fill={item.completionPercentage || 0}
+          tintColor="#FF6B6B"
+          backgroundColor="#E8DEF8"
+        >
+          {(fill: number) => (
+            <Text className="text-black text-base font-semibold">
+              {Math.round(fill)}%
+            </Text>
+          )}
+        </AnimatedCircularProgress>
       </View>
+      </TouchableOpacity>
+    ))
+  ) : (
+    <View className="items-center justify-center mt-2">
+      <Image
+        source={require("../../assets/no tasks.webp")}
+        style={{ width: 120, height: 90 }}
+        resizeMode="contain"
+      />
+      <Text className="italic text-[#787878]">
+        {t("Dashboard.No Drafts Saved")}
+      </Text>
+    </View>
+  )}
+
+      </View>
+
+      
 
       <Modal transparent visible={showPopup} animationType="slide">
         <TouchableWithoutFeedback
@@ -544,7 +634,13 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                     </>
                   )}
 
-                  <TouchableOpacity onPress={() => setShowPopup(false)}>
+                  <TouchableOpacity 
+                    onPress={() => {
+    setShowPopup(false);
+    if (selectedItem?.farmerId) {
+      navigation.navigate("QRScanner", { farmerId: selectedItem.farmerId, jobId: selectedItem.jobId , certificationpaymentId: selectedItem.certificationpaymentId });
+    } 
+  }}>
                     <LinearGradient
                       colors={["#F2561D", "#FF1D85"]}
                       start={{ x: 0, y: 0 }}
@@ -554,7 +650,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                       <Text className="text-white text-lg font-semibold">
                         {t("VisitPopup.Start")}
                       </Text>
-                      {/*if individual need send  farmerId for check with QR scan ,jobId, certificate id   */}
+                      {/*if individual need send  farmerId for check with QR scan ,jobId,    */}
                     </LinearGradient>
                   </TouchableOpacity>
                 </View>
