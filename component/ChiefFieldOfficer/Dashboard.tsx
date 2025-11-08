@@ -28,6 +28,8 @@ import { setUserProfile } from "@/store/authSlice";
 import { LinearGradient } from "expo-linear-gradient";
 import { AntDesign, Ionicons, Feather, FontAwesome6 } from "@expo/vector-icons";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
+import ContentLoader, { Rect, Circle } from "react-content-loader/native";
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
 type DashboardNavigationProps = StackNavigationProp<
   RootStackParamList,
   "Dashboard"
@@ -49,6 +51,7 @@ interface ProfileData {
 }
 interface VisitsData {
   farmerName: string;
+  farmerMobile:number;
   jobId: string;
   propose: string;
   serviceenglishName: string;
@@ -67,9 +70,35 @@ interface DraftVisit {
   completionPercentage: number;
   farmerName?: string; 
   farmerId?: number;   
-  propose?: string;    
+  propose?: string;  
+  farmerMobile:number  
 }
 
+const LoadingSkeleton = () => {
+  const rectWidth = wp("38%");
+  const gapBetweenRects = wp("8%");
+  const totalWidth = 2 * rectWidth + gapBetweenRects;
+  const startX = (wp("100%") - totalWidth) / 2;
+
+  return (
+    <View style={{ flex: 1, backgroundColor: "#fff", paddingVertical: hp("2%") }}>
+      <ContentLoader
+        speed={1}
+        width="100%"
+        height={hp("100%")}
+        backgroundColor="#f3f3f3"
+        foregroundColor="#ecebeb"
+      >
+<View className="mt-20">
+          <Rect x={wp("6%")} y={hp("2%")} rx="10" ry="10" width={wp("82%")} height={hp("15%")} />
+                    <Rect x={wp("6%")} y={hp("24%")} rx="10" ry="10" width={wp("82%")} height={hp("15%")} />
+
+
+</View>
+      </ContentLoader>
+    </View>
+  );
+};
 
 const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
@@ -82,7 +111,9 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [visitsData, setVisitsData] = useState<VisitsData[]>([]);
 const [draftVisits, setDraftVisits] = useState<DraftVisit[]>([]);
+  const [loadingVisitsdrafts, setLoadingVisitsdrafts] = useState(false);
         console.log("officer draft visit", draftVisits)
+        console.log("officer  visit", visitsData)
 
   const openDrawer = () => {
     navigation.dispatch(DrawerActions.openDrawer());
@@ -108,6 +139,13 @@ const [draftVisits, setDraftVisits] = useState<DraftVisit[]>([]);
   const fetchUserProfile = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
+            if (!token) {
+                 Alert.alert(
+                t("Error.Sorry"),
+                t("Error.Your login session has expired. Please log in again to continue.")
+              );
+              return;
+            }
       if (token) {
         const response = await axios.get(
           `${environment.API_BASE_URL}api/auth/user-profile`,
@@ -121,7 +159,10 @@ const [draftVisits, setDraftVisits] = useState<DraftVisit[]>([]);
     } catch (error:any) {
       console.error("Failed to fetch user profile:", error);
       if (error.response?.status === 401) {
-      Alert.alert("Session expired, please login again");
+              Alert.alert(
+             t("Error.Sorry"),
+             t("Error.Your login session has expired. Please log in again to continue.")
+           );
       navigation.navigate("Login");
     }
     } finally {
@@ -136,7 +177,6 @@ const [draftVisits, setDraftVisits] = useState<DraftVisit[]>([]);
   }, []);
 
   const onRefresh = async () => {
-    setRefreshing(true);
     await fetchUserProfile();
     await fetchVisits();
     await fetchVisitsDraft()
@@ -189,6 +229,7 @@ const [draftVisits, setDraftVisits] = useState<DraftVisit[]>([]);
   const fetchVisits = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
+      
       if (token) {
         const response = await axios.get(
           `${environment.API_BASE_URL}api/officer/officer-visits`,
@@ -197,11 +238,13 @@ const [draftVisits, setDraftVisits] = useState<DraftVisit[]>([]);
           }
         );
         setVisitsData(response.data.data);
+      
       }
     } catch (error) {
       console.error("Failed to fetch officer visits:", error);
     } finally {
       setRefreshing(false);
+
     }
   };
 
@@ -216,13 +259,18 @@ const [draftVisits, setDraftVisits] = useState<DraftVisit[]>([]);
           }
         );
         setDraftVisits(response.data.data || []);
+            console.log(response.data.data)
       }
     } catch (error) {
       console.error("Failed to fetch officer visits:", error);
     } finally {
       setRefreshing(false);
+
     }
   };
+useEffect(() => {
+  console.log("🎯 Loading States:", { loadingVisitsdrafts});
+}, [loadingVisitsdrafts]);
 
   useEffect(() => {
     const backAction = () => {
@@ -273,7 +321,10 @@ const [draftVisits, setDraftVisits] = useState<DraftVisit[]>([]);
         </TouchableOpacity>
         <View></View>
       </View>
-
+      {loadingVisitsdrafts ? (
+        <LoadingSkeleton />
+      ) : (
+          <>
       <View className="p-2 mt-4">
         <View className="flex-row justify-between items-center mb-1">
           <Text className="text-base font-bold">
@@ -425,7 +476,7 @@ const [draftVisits, setDraftVisits] = useState<DraftVisit[]>([]);
         {draftVisits.length > 0 ? (
     draftVisits.map((item, index) => (
       <TouchableOpacity  key={index}
-      onPress={()=> navigation.navigate("CertificateQuesanory", { jobId:item.jobId, certificationpaymentId:item.certificationpaymentId })}
+      onPress={()=> navigation.navigate("CertificateQuesanory", { jobId:item.jobId, certificationpaymentId:item.certificationpaymentId, farmerMobile:item.farmerMobile })}
       >
       <View
        
@@ -492,7 +543,7 @@ const [draftVisits, setDraftVisits] = useState<DraftVisit[]>([]);
 
       </View>
 
-      
+</>)}
 
       <Modal transparent visible={showPopup} animationType="slide">
         <TouchableWithoutFeedback
@@ -638,7 +689,7 @@ const [draftVisits, setDraftVisits] = useState<DraftVisit[]>([]);
                     onPress={() => {
     setShowPopup(false);
     if (selectedItem?.farmerId) {
-      navigation.navigate("QRScanner", { farmerId: selectedItem.farmerId, jobId: selectedItem.jobId , certificationpaymentId: selectedItem.certificationpaymentId });
+      navigation.navigate("QRScanner", { farmerId: selectedItem.farmerId, jobId: selectedItem.jobId , certificationpaymentId: selectedItem.certificationpaymentId, farmerMobile:selectedItem.farmerMobile  });
     } 
   }}>
                     <LinearGradient

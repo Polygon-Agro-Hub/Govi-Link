@@ -6,11 +6,13 @@
     "Sorry": "Sorry",
     "userBlocked": "Too many requests from this device, please try again in 30 minutes.",
     "No Internet Connection": "No Internet Connection",
-    "Please turn on mobile data or Wi-Fi to continue.": "Please turn on Mobile Data or Wi-Fi to continue."
+    "Please turn on mobile data or Wi-Fi to continue.": "Please turn on Mobile Data or Wi-Fi to continue.",
+    "Your login session has expired. Please log in again to continue.":"Your login session has expired. Please log in again to continue."
   },
   "Error": {
     "error": "Sorry",
     "Error": "Error",
+    "Sorry": "Sorry",
     "Failed to fetch empid.": "Failed to fetch Employee ID.",
     "New password and confirm password do not match.": "New password and confirm password do not match.",
     "New password must be at least 6 characters long.": "New password must be at least 6 characters long.",
@@ -125,5 +127,32 @@
     "Success":"Success",
     "Task complete successfully!":"Task complete successfully!",
     "Failed to complete task, Please try again":"Failed to complete task, Please try again"
+  },
+  "CertificateSuggestions":{
+    "Please mention identified problems and suggestions you made below.":"Please mention identified problems and suggestions you made below.",
+    "Problem":"Problem",
+    "Describe the problem...":"Describe the problem...",
+    "Describe the solution...":"Describe the solution...",
+    "Type here...":"Type here...",
+    "Identified Problem":"Identified Problem",
+    "Suggested Solution":"Suggested Solution",
+    "Update":"Update",
+    "Save Problem":"Save Problem",
+    "Add more":"Add more",
+    "Unsaved Problem":"Unsaved Problem",
+    "You have unsaved problems. Do you want to continue without saving?":"You have unsaved problems. Do you want to continue without saving?",
+    "Continue":"Continue",
+    "Both problem and solution must be filled.":"Both problem and solution must be filled.",
+    "Failed to save problem.":"Failed to save problem.",
+    "Something went wrong while saving. try again later":"Something went wrong while saving. try again later"
+  },
+  "Otpverification":{
+    "Enter Verification Code":"Enter Verification Code",
+    "We have sent a Verification Code to Farmer’s mobile number":"We have sent a Verification Code to Farmer’s mobile number",
+    "Verify":"Verify",
+    "Resend in":"Resend in",
+    "RESEND OTP":"RESEND OTP",
+    "Didn’t receive the OTP ?":"Didn’t receive the OTP ?",
+    "Go Back":"Go Back"
   }
 }

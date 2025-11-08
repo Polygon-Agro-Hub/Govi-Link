@@ -28,6 +28,7 @@ import ViewAllVisits from "@/component/ViewAllVisits";
 import QRScanner from "@/component/QRScanner";
 import CertificateQuesanory from "@/component/CertificateQuesanory";
 import CertificateSuggestions from "@/component/CertificateSuggestions"
+import Otpverification from "@/component/Otpverification";
 
 LogBox.ignoreAllLogs(true);
 NativeWindStyleSheet.setOutput({ default: "native" });
@@ -176,6 +177,7 @@ function AppContent() {
             <Stack.Screen name="Main" component={MainDrawer} />
             <Stack.Screen name="CertificateQuesanory" component={CertificateQuesanory} />
             <Stack.Screen name="CertificateSuggestions" component={CertificateSuggestions}/>
+            <Stack.Screen name="Otpverification" component={Otpverification} />
           </Stack.Navigator>
         </NavigationContainer>
       </SafeAreaView>

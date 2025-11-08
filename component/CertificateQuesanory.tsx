@@ -10,6 +10,8 @@ import { environment } from "@/environment/environment";
 import { useTranslation } from "react-i18next";
 import { LinearGradient } from "expo-linear-gradient";
 import { CameraScreen } from "@/Items/CameraScreen";
+import ContentLoader, { Rect, Circle } from "react-content-loader/native";
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
 type CertificateQuesanoryNavigationProp = StackNavigationProp<
   RootStackParamList,
   "CertificateQuesanory"
@@ -36,14 +38,48 @@ interface CertificateData {
   logo: string;
   createdAt:Date;
   srtName: string
+  slavequestionnaireId:number
 }
+
+const LoadingSkeleton = () => {
+  const rectWidth = wp("38%");
+  const gapBetweenRects = wp("8%");
+  const totalWidth = 2 * rectWidth + gapBetweenRects;
+  const startX = (wp("100%") - totalWidth) / 2;
+
+  return (
+    <View style={{ flex: 1, backgroundColor: "#fff", paddingVertical: hp("2%") }}>
+      <ContentLoader
+        speed={1}
+        width="100%"
+        height={hp("100%")}
+        backgroundColor="#f3f3f3"
+        foregroundColor="#ecebeb"
+      >
+                  <Rect x={wp("18%")} y={hp("2%")} rx="10" ry="10" width={wp("20%")} height={hp("10%")} />
+   <Rect x={wp('50%')} y={hp('5%')} rx="4" ry="4" width={wp('30%')} height={hp('1.5%')} />
+      <Rect x={wp('50%')} y={hp('8%')} rx="4" ry="4" width={wp('30%')} height={hp('1.5%')} />
+
+          <Rect x={wp("7%")} y={hp("15%")} rx="10" ry="10" width={wp("86%")} height={hp("10%")} />
+                    <Rect x={wp("7%")} y={hp("28%")} rx="10" ry="10" width={wp("86%")} height={hp("10%")} />
+                                        <Rect x={wp("7%")} y={hp("41%")} rx="10" ry="10" width={wp("86%")} height={hp("10%")} />
+                                        <Rect x={wp("7%")} y={hp("54%")} rx="10" ry="10" width={wp("86%")} height={hp("10%")} />
+                                        <Rect x={wp("7%")} y={hp("67%")} rx="10" ry="10" width={wp("86%")} height={hp("10%")} />
+
+      </ContentLoader>
+    </View>
+  );
+};
+
 const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({ navigation }) => {
   const route = useRoute<GapCertificationRouteProp>();
-  const { jobId, certificationpaymentId} = route.params; 
+  const { jobId, certificationpaymentId,farmerMobile} = route.params; 
   const {t,  i18n} = useTranslation();
     const [questions, setQuestions] = useState<Question[]>([]);
 const [CertificateData, setCertificateData] = useState< CertificateData | null>(null);
+console.log(CertificateData)
 const [loadingQuestionId, setLoadingQuestionId] = useState<number | null>(null);
+const [loaingCertificate, setloaingCertificate] = useState(true)
 const allChecked = questions.length > 0 && questions.every(q => q.tickResult === 1 || q.uploadImage != null);
   const [showCameraModal, setShowCameraModal] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
@@ -74,10 +110,11 @@ useEffect(() => {
 }, [capturedImage]);
   useEffect(() => {
     console.log("Farmer ID from QR:", certificationpaymentId);
-   const fetchUserProfile = async () => {
+   const fetchQuestions = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
       if (token) {
+        setloaingCertificate(true)
         const response = await axios.get(
           `${environment.API_BASE_URL}api/officer/individual-audits-questions/${certificationpaymentId}`,
           {
@@ -88,14 +125,16 @@ useEffect(() => {
              setQuestions(response.data.data.questions);
          
                 setCertificateData(response.data.data.certificate);
+                setloaingCertificate(false)
                
       }
     } catch (error) {
       console.error("Failed to certificate questio:", error);
     } finally {
+          setloaingCertificate(false)
     }
   };
-  fetchUserProfile()
+  fetchQuestions()
   }, [certificationpaymentId]);
 
     const getLocalizedQuestion = (q: Question) => {
@@ -156,10 +195,13 @@ const handleCheck = async (q: Question) => {
 
   try {
     const token = await AsyncStorage.getItem("token");
-    if (!token) {
-         Alert.alert(t("Error.error"), t("Main.somethingWentWrong"));
-      return;
-    }
+      if (!token) {
+           Alert.alert(
+          t("Error.Sorry"),
+          t("Error.Your login session has expired. Please log in again to continue.")
+        );
+        return;
+      }
 
     if (q.type === "Photo Proof") {
       if (q.uploadImage) {
@@ -223,10 +265,13 @@ const handleSubmitPhoto = async (q: Question) => {
   try {
     setLoadingQuestionId(selectedQuestion.id);
     const token = await AsyncStorage.getItem("token");
-    if (!token) {
-      Alert.alert(t("Error.error"), t("Main.somethingWentWrong"));
-      return;
-    }
+      if (!token) {
+           Alert.alert(
+          t("Error.Sorry"),
+          t("Error.Your login session has expired. Please log in again to continue.")
+        );
+        return;
+      }
 
     const fileName = capturedImage.split("/").pop();
     const fileType = fileName?.split(".").pop()
@@ -302,8 +347,11 @@ const handleCameraClose = (imageUri: string | null) => {
 
         </View>
       </View>
-
-      <ScrollView className="p-6">
+{loaingCertificate ? (
+  <LoadingSkeleton/>
+):(
+  <>
+  <ScrollView className="p-6">
         <View className="mb-10">
         <View className=" items-center mb-8 flex-row justify-center ">
 {CertificateData?.logo && (
@@ -373,6 +421,9 @@ const handleCameraClose = (imageUri: string | null) => {
         
         </View>
       </ScrollView>
+  </>
+)}
+      
 
       <View className="flex-row justify-between p-4 border-t border-gray-200">
         <TouchableOpacity className="flex-row items-center bg-[#444444] px-12 py-3 rounded-full ml-2">
@@ -384,7 +435,7 @@ const handleCameraClose = (imageUri: string | null) => {
 {allChecked ? (
   <TouchableOpacity
     onPress={() => {
- navigation.navigate("CertificateSuggestions", { jobId, certificationpaymentId  })
+ navigation.navigate("CertificateSuggestions", { jobId, certificationpaymentId,  slavequestionnaireId: CertificateData!.slavequestionnaireId,farmerMobile  })
     }}
     className="rounded-full overflow-hidden"
   >

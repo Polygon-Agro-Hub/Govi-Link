@@ -9,7 +9,8 @@ export type RootStackParamList = {
    Profile:undefined;
    AddComplaint:undefined
      ViewAllVisits: undefined;
-     QRScanner: { farmerId?: number, jobId? : string, certificationpaymentId:number}; 
-     CertificateQuesanory:{ jobId?: string, certificationpaymentId:number}; 
-     CertificateSuggestions: { jobId?: string, certificationpaymentId:number}; 
+     QRScanner: { farmerId?: number, jobId? : string, certificationpaymentId:number, farmerMobile:number}; 
+     CertificateQuesanory:{ jobId?: string, certificationpaymentId:number, farmerMobile:number}; 
+     CertificateSuggestions: { jobId?: string, certificationpaymentId:number,slavequestionnaireId:number, farmerMobile:number}; 
+     Otpverification:{farmerMobile:number, jobId?:string}
 }
