@@ -127,18 +127,18 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
     
   if (code.length !== 5) {
     Alert.alert(
-      t("Error.InvalidInputTitle", "Incomplete OTP"),
-      t("Otpverification.completeOTP", "Please enter the 5-digit OTP sent to your phone.")
+      t("Error.Sorry"),
+      t("Otpverification.Please enter the 5-digit OTP sent to your phone.")
     );
     return;
   }
 
   if (isOtpExpired) {
     Alert.alert(
-      t("Error.ExpiredOTPTitle", "OTP Expired"),
-      t("Otpverification.OTPExpired", "Your OTP has expired. Please request a new one."),
+      t("Error.Sorry"),
+      t("Otpverification.our OTP is invalid or expired."),
       [
-        { text: t("Otpverification.ResendOTP", "Resend OTP"), onPress: handleResendOTP },
+        { text: t("Otpverification.Resend OTP"), onPress: handleResendOTP },
         { text: t("Otpverification.Cancel", "Cancel"), style: "cancel" }
       ]
     );
@@ -165,8 +165,8 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
       const netState = await NetInfo.fetch();
     if (!netState.isConnected) {
       Alert.alert(
-        t("Error.NetworkError", "No Internet Connection"),
-        t("Error.CheckConnection", "Please check your internet connection and try again.")
+        t("Main.No Internet Connection"),
+        t("Main.Please turn on Mobile Data or Wi-Fi to continue.")
       );
       return;
     }
@@ -174,10 +174,11 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
       switch (statusCode) {
            case "1000": // ✅ Success
         setIsVerified(true);
-        Alert.alert(
-          t("Otpverification.SuccessTitle", "Verification Successful"),
-          t("Otpverification.SuccessMessage", "Your phone number has been verified successfully.")
-        );
+        navigation.navigate("OtpverificationSuccess")
+        // Alert.alert(
+        //   t("Otpverification.Verification Successful"),
+        //   t("Otpverification.Your phone number has been verified successfully.")
+        // );
         break;
 
         case "1001": // Invalid or expired OTP
@@ -186,12 +187,12 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
           if (verificationAttempts >= 2) {
             // After multiple failed attempts, suggest resending
  Alert.alert(
-            t("Error.InvalidOTPTitle", "Invalid OTP"),
-            t("Otpverification.OTPExpiredOrInvalid", "Your OTP is invalid or expired."),
+            t("Otpverification.Invalid OTP"),
+            t("Otpverification.Your OTP is invalid or expired."),
             [
-              { text: t("Otpverification.ResendOTP", "Resend OTP"), onPress: handleResendOTP },
+              { text: t("Otpverification.Resend OTP"), onPress: handleResendOTP },
               {
-                text: t("Otpverification.TryAgain", "Try Again"),
+                text: t("Otpverification.Try Again"),
                 onPress: () => {
                   setOtpCode("");
                   setIsOtpValid(false);
@@ -202,24 +203,24 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
           );
           } else {
                       Alert.alert(
-            t("Error.InvalidOTPTitle", "Invalid OTP"),
-            t("Otpverification.invalidOTP", "The OTP you entered is incorrect. Please try again.")
+            t("Otpverification.Invalid OTP"),
+            t("Otpverification.The OTP you entered is incorrect. Please try again.")
           );
         }
         break;
       case "1002": // ⏰ Expired
         setIsOtpExpired(true);
         Alert.alert(
-          t("Error.ExpiredOTPTitle", "OTP Expired"),
-          t("Otpverification.OTPExpired", "Your OTP has expired. Please request a new one."),
-          [{ text: t("Otpverification.ResendOTP", "Resend OTP"), onPress: handleResendOTP }]
+          t("Otpverification.OTP Expired"),
+          t("Otpverification.Your OTP is invalid or expired."),
+          [{ text: t("Otpverification.Resend OTP"), onPress: handleResendOTP }]
         );
         break;
 
       default:
         Alert.alert(
-          t("Error.GenericErrorTitle", "Something Went Wrong"),
-          message || t("Error.somethingWentWrong", "Please try again later.")
+          t("Error.Sorry"),
+           t("Main.somethingWentWrong")
         );
       }
     } catch (error: any) {
@@ -228,19 +229,19 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
     if (error.response?.data?.statusCode === "1002") {
       setIsOtpExpired(true);
       Alert.alert(
-        t("Error.ExpiredOTPTitle", "OTP Expired"),
-        t("Otpverification.OTPExpired", "Your OTP has expired. Please request a new one."),
-        [{ text: t("Otpverification.ResendOTP", "Resend OTP"), onPress: handleResendOTP }]
+        t("Error.Sorry"),
+        t("Otpverification.Your OTP is invalid or expired."),
+        [{ text: t("Otpverification.Resend OTP"), onPress: handleResendOTP }]
       );
     } else if (error.response?.data?.statusCode === "1001") {
       Alert.alert(
-        t("Error.InvalidOTPTitle", "Invalid OTP"),
-        t("Otpverification.invalidOTP", "The OTP entered is incorrect. Please check and try again.")
+        t("Error.Sorry"),
+        t("Otpverification.Your OTP is invalid or expired.")
       );
     } else {
       Alert.alert(
-        t("Error.GenericErrorTitle", "Verification Failed"),
-        t("Error.somethingWentWrong", "An unexpected error occurred. Please try again later.")
+                 t("Error.Sorry"),
+           t("Main.somethingWentWrong")
       );
     }
   }
@@ -282,24 +283,21 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
       setReferenceId(response.data.referenceId);
       setIsOtpExpired(false);
       Alert.alert(
-        t("Otpverification.SuccessTitle", "OTP Sent"),
-        t("Otpverification.otpResent", "A new OTP has been sent to your mobile number."),
-        [{ text: t("PublicForum.OK", "OK") }]
+        t("Otpverification.Success"),
+        t("Otpverification.A new OTP has been sent to your mobile number.")
       );
       setTimer(240);
       setDisabledResend(true);
     } else {
       Alert.alert(
-        t("Error.GenericErrorTitle", "Failed to Send OTP"),
-        t("Otpverification.otpResendFailed", "We couldn’t send the OTP. Please try again later."),
-        [{ text: t("PublicForum.OK", "OK") }]
+        t("Error.Sorry"),
+        t("Otpverification.We couldn’t send the OTP. Please try again later."),
       );
     }
   } catch (error) {
     Alert.alert(
-      t("Error.NetworkErrorTitle", "Network Error"),
-      t("Otpverification.otpResendFailed", "Unable to resend OTP. Please check your connection."),
-      [{ text: t("PublicForum.OK", "OK") }]
+           t("Error.Sorry"),
+           t("Main.somethingWentWrong")
     );
   }
 };

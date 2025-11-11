@@ -176,12 +176,21 @@ const [draftVisits, setDraftVisits] = useState<DraftVisit[]>([]);
     fetchVisitsDraft()
   }, []);
 
-  const onRefresh = async () => {
-    await fetchUserProfile();
-    await fetchVisits();
-    await fetchVisitsDraft()
+const onRefresh = useCallback(async () => {
+  try {
+    setRefreshing(true);
+    await Promise.all([
+      fetchUserProfile(),
+      fetchVisits(),
+      fetchVisitsDraft(),
+    ]);
+  } catch (error) {
+    console.error("Refresh error:", error);
+  } finally {
     setRefreshing(false);
-  };
+  }
+}, []);
+
   const getName = () => {
     if (!profile) return "Loading...";
     switch (i18n.language) {
@@ -249,6 +258,7 @@ const [draftVisits, setDraftVisits] = useState<DraftVisit[]>([]);
   };
 
     const fetchVisitsDraft = async () => {
+      console.log("hitt")
     try {
       const token = await AsyncStorage.getItem("token");
       if (token) {

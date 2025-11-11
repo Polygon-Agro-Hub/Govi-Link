@@ -153,6 +153,25 @@
     "Resend in":"Resend in",
     "RESEND OTP":"RESEND OTP",
     "Didn’t receive the OTP ?":"Didn’t receive the OTP ?",
-    "Go Back":"Go Back"
+    "Go Back":"Go Back",
+    "Please enter the 5-digit OTP sent to your phone.":"Please enter the 5-digit OTP sent to your phone.",
+    "Your OTP has expired. Please request a new one.":"Your OTP has expired. Please request a new one.",
+    "Resend OTP":"Resend OTP",
+    "Cancel":"Cancel",
+    "Verification Successful":"Verification Successful",
+    "Your phone number has been verified successfully.":"Your phone number has been verified successfully.",
+    "Invalid OTP":"Invalid OTP",
+    "Your OTP is invalid or expired.":"Your OTP is invalid or expired.",
+    "Try Again":"Try Again",
+    "The OTP you entered is incorrect. Please try again.":"The OTP you entered is incorrect. Please try again.",
+    "Success":"Success",
+    "A new OTP has been sent to your mobile number.":"A new OTP has been sent to your mobile number.",
+    "OK":"OK",
+    "We couldn’t send the OTP. Please try again later.":"We couldn’t send the OTP. Please try again later."
+  },
+  "OtpverificationSuccess":{
+    "Well Done":"Well Done!",
+    "You have successfully completed the job":"You have successfully completed the job!",
+    "Go Forward":"Go Forward"
   }
 }
