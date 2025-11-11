@@ -120,7 +120,8 @@ const [draftVisits, setDraftVisits] = useState<DraftVisit[]>([]);
   const [loadingVisitsdrafts, setLoadingVisitsdrafts] = useState(false);
         console.log("officer draft visit", draftVisits)
         console.log("officer  visit", visitsData)
-
+const [currentDraftIndex, setCurrentDraftIndex] = useState(0);
+const draftFlatListRef = useRef<FlatList>(null);
   const openDrawer = () => {
     navigation.dispatch(DrawerActions.openDrawer());
   };
@@ -141,7 +142,19 @@ const [draftVisits, setDraftVisits] = useState<DraftVisit[]>([]);
       });
     }
   };
-
+const scrollDraftToIndex = (index: number) => {
+  if (!draftFlatListRef.current || !draftVisits || draftVisits.length === 0) return;
+  const validIndex = Math.max(0, Math.min(index, draftVisits.length - 1));
+  try {
+    draftFlatListRef.current.scrollToIndex({ index: validIndex, animated: true });
+    setCurrentDraftIndex(validIndex);
+  } catch (error) {
+    draftFlatListRef.current.scrollToOffset({
+      offset: validIndex * 320, // width of item
+      animated: true,
+    });
+  }
+};
   const fetchUserProfile = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
@@ -491,63 +504,94 @@ useEffect(() => {
         </Text>
       </View>
 
-      <View className="p-8 -mt-10">
-     {/* draft done for only individual audit */}
-        {draftVisits.length > 0 ? (
-    draftVisits.map((item, index) => (
-      <TouchableOpacity  key={index}
-      onPress={()=> navigation.navigate("CertificateQuesanory", { jobId:item.jobId, certificationpaymentId:item.certificationpaymentId, farmerMobile:item.farmerMobile , clusterId:item.clusterId, farmId:item.farmId})}
+   <View className="">
+  {/* Drafts done for only individual audit */}
+  {draftVisits.length > 0 ? (
+    <View className="flex-row items-center">
+      {/* Left Arrow */}
+      <TouchableOpacity
+        disabled={currentDraftIndex <= 0}
+        onPress={() => scrollDraftToIndex(currentDraftIndex - 1)}
+        className="p-1"
       >
-      <View
-       
-        className="border border-[#FF1D85] rounded-lg p-3 mb-4 w-full flex-row justify-between items-center"
-      >
-        <View>
-          <Text className="text-black text-sm font-medium">#{item.jobId}</Text>
-            <Text className="text-base font-bold mt-1">
-              {item.farmerName}
-            </Text>
-          <Text className="text-[#4E6393] text-base mt-1">
-            {(() => {
-                        if (item.propose === "Cluster") {
-                          switch (i18n.language) {
-                            case "si":
-                              return "ගොවි සමූහ විගණනය";
-                            case "ta":
-                              return "உழவர் குழு தணிக்கை";
-                            default:
-                              return "Farm Cluster Audit";
-                          }
-                        } else if (item.propose === "Individual") {
-                          switch (i18n.language) {
-                            case "si":
-                              return "තනි ගොවි විගණනය";
-                            case "ta":
-                              return "தனிப்பட்ட விவசாயி தணிக்கை";
-                            default:
-                              return "Individual Farmer Audit";
-                          }
-                        } 
-                      })()}
-          </Text>
-        </View>
-
-        <AnimatedCircularProgress
-          size={70}
-          width={6}
-          fill={item.completionPercentage || 0}
-          tintColor="#FF6B6B"
-          backgroundColor="#E8DEF8"
-        >
-          {(fill: number) => (
-            <Text className="text-black text-base font-semibold">
-              {Math.round(fill)}%
-            </Text>
-          )}
-        </AnimatedCircularProgress>
-      </View>
+        <AntDesign
+          name="left"
+          size={24}
+          color={currentDraftIndex <= 0 ? "#ccc" : "#FF1D85"}
+        />
       </TouchableOpacity>
-    ))
+
+      {/* Drafts FlatList */}
+      <FlatList
+        ref={draftFlatListRef}
+        horizontal
+        data={draftVisits}
+        keyExtractor={(item) => item.id}
+        showsHorizontalScrollIndicator={false}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate("CertificateQuesanory", {
+                jobId: item.jobId,
+                certificationpaymentId: item.certificationpaymentId,
+                farmerMobile: item.farmerMobile,
+                clusterId: item.clusterId,
+                farmId: item.farmId,
+              })
+            }
+          >
+            <View className="border border-[#FF1D85] rounded-lg p-3 mb-4 flex-row justify-between items-center w-[304px] mr-4">
+              <View>
+                <Text className="text-black text-sm font-medium">
+                  #{item.jobId}
+                </Text>
+                <Text className="text-base font-bold mt-1">{item.farmerName}</Text>
+                <Text className="text-[#4E6393] text-base mt-1">
+                  {item.propose === "Cluster"
+                    ? i18n.language === "si"
+                      ? "ගොවි සමූහ විගණනය"
+                      : i18n.language === "ta"
+                      ? "உழவர் குழு தணிக்கை"
+                      : "Farm Cluster Audit"
+                    : i18n.language === "si"
+                    ? "තනි ගොවි විගණනය"
+                    : i18n.language === "ta"
+                    ? "தனிப்பட்ட விவசாயி தணிக்கை"
+                    : "Individual Farmer Audit"}
+                </Text>
+              </View>
+
+              <AnimatedCircularProgress
+                size={70}
+                width={6}
+                fill={item.completionPercentage || 0}
+                tintColor="#FF6B6B"
+                backgroundColor="#E8DEF8"
+              >
+                {(fill: number) => (
+                  <Text className="text-black text-base font-semibold">
+                    {Math.round(fill)}%
+                  </Text>
+                )}
+              </AnimatedCircularProgress>
+            </View>
+          </TouchableOpacity>
+        )}
+      />
+
+      {/* Right Arrow */}
+      <TouchableOpacity
+        disabled={currentDraftIndex >= draftVisits.length - 1}
+        onPress={() => scrollDraftToIndex(currentDraftIndex + 1)}
+        className="p-1"
+      >
+        <AntDesign
+          name="right"
+          size={24}
+          color={currentDraftIndex >= draftVisits.length - 1 ? "#ccc" : "#FF1D85"}
+        />
+      </TouchableOpacity>
+    </View>
   ) : (
     <View className="items-center justify-center mt-2">
       <Image
@@ -560,8 +604,8 @@ useEffect(() => {
       </Text>
     </View>
   )}
+</View>
 
-      </View>
 
 </>)}
 

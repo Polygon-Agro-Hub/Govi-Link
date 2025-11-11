@@ -33,7 +33,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
 
     const route = useRoute<QRScannerRouteProp>();
   const { farmerId, jobId, certificationpaymentId, farmerMobile, clusterId, farmId } = route.params;  
-  console.log("farmerID", farmerId)
+  console.log("farmerID", farmerId,jobId, certificationpaymentId, farmerMobile, clusterId, farmId )
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanned, setScanned] = useState<boolean>(false);
   const [showPermissionModal, setShowPermissionModal] =

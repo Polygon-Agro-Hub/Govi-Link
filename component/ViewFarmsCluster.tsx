@@ -347,12 +347,28 @@ const [loaingCertificate, setloaingCertificate] = useState(true)
                   )}
 
                   <TouchableOpacity 
-                    onPress={() => {
-    setShowPopup(false);
-    if (selectedItem?.farmerId) {
-      navigation.navigate("QRScanner", { farmerId: selectedItem.farmerId, jobId: selectedItem.jobId , certificationpaymentId: selectedItem.certificationpaymentId, farmerMobile:selectedItem.farmerMobile, farmId:selectedItem.farmId, clusterId:selectedItem.clusterId  });
-    } 
-  }}>
+onPress={() => {
+  setShowPopup(false);
+
+  if (selectedItem?.farmerId) {
+    navigation.navigate("Main" as any, {   // <--- cast to any
+      screen: "MainTabs",
+      params: {
+        screen: "QRScanner",
+        params: {
+          farmerId: selectedItem.farmerId,
+          jobId: selectedItem.jobId,
+          certificationpaymentId: selectedItem.certificationpaymentId,
+          farmerMobile: selectedItem.farmerMobile,
+          farmId: selectedItem.farmId,
+          clusterId: selectedItem.clusterId,
+        },
+      },
+    });
+  }
+}}
+
+>
                     <LinearGradient
                       colors={["#F2561D", "#FF1D85"]}
                       start={{ x: 0, y: 0 }}
