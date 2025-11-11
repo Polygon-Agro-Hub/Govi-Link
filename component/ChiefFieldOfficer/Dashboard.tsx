@@ -48,6 +48,7 @@ interface ProfileData {
   firstNameTamil: string;
   lastNameTamil: string;
   empId: string;
+  
 }
 interface VisitsData {
   farmerName: string;
@@ -57,6 +58,8 @@ interface VisitsData {
   serviceenglishName: string;
   servicesinhalaName: string;
   servicetamilName: string;
+  clusterId:number
+  farmId:number
 }
 
 interface DraftVisit {
@@ -69,9 +72,12 @@ interface DraftVisit {
   totalCompleted: number;
   completionPercentage: number;
   farmerName?: string; 
-  farmerId?: number;   
+  farmerId: number;   
   propose?: string;  
-  farmerMobile:number  
+  farmerMobile:number;
+  id:number;
+  clusterId:number
+  farmId:number
 }
 
 const LoadingSkeleton = () => {
@@ -383,7 +389,11 @@ useEffect(() => {
                     setSelectedItem(item);
                     setShowPopup(true);
                   } else {
-                    console.log("navigate to cluster audit");
+    navigation.navigate("ViewFarmsCluster", {
+      jobId: item.jobId,
+      feildauditId: item.id,
+      farmName: item.farmerName,
+    });
                     {
                       /*if cluster need send  clusterID , jobId    */
                     }
@@ -486,7 +496,7 @@ useEffect(() => {
         {draftVisits.length > 0 ? (
     draftVisits.map((item, index) => (
       <TouchableOpacity  key={index}
-      onPress={()=> navigation.navigate("CertificateQuesanory", { jobId:item.jobId, certificationpaymentId:item.certificationpaymentId, farmerMobile:item.farmerMobile })}
+      onPress={()=> navigation.navigate("CertificateQuesanory", { jobId:item.jobId, certificationpaymentId:item.certificationpaymentId, farmerMobile:item.farmerMobile , clusterId:item.clusterId, farmId:item.farmId})}
       >
       <View
        
@@ -699,7 +709,7 @@ useEffect(() => {
                     onPress={() => {
     setShowPopup(false);
     if (selectedItem?.farmerId) {
-      navigation.navigate("QRScanner", { farmerId: selectedItem.farmerId, jobId: selectedItem.jobId , certificationpaymentId: selectedItem.certificationpaymentId, farmerMobile:selectedItem.farmerMobile  });
+      navigation.navigate("QRScanner", { farmerId: selectedItem.farmerId, jobId: selectedItem.jobId , certificationpaymentId: selectedItem.certificationpaymentId, farmerMobile:selectedItem.farmerMobile, farmId:selectedItem.farmId, clusterId:selectedItem.clusterID  });
     } 
   }}>
                     <LinearGradient

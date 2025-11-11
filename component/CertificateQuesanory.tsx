@@ -73,7 +73,7 @@ const LoadingSkeleton = () => {
 
 const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({ navigation }) => {
   const route = useRoute<GapCertificationRouteProp>();
-  const { jobId, certificationpaymentId,farmerMobile} = route.params; 
+  const { jobId, certificationpaymentId,farmerMobile, clusterId, farmId} = route.params; 
   const {t,  i18n} = useTranslation();
     const [questions, setQuestions] = useState<Question[]>([]);
 const [CertificateData, setCertificateData] = useState< CertificateData | null>(null);
@@ -109,7 +109,7 @@ useEffect(() => {
   }
 }, [capturedImage]);
   useEffect(() => {
-    console.log("Farmer ID from QR:", certificationpaymentId);
+    console.log("Farmer ID from QR:", certificationpaymentId, farmId,clusterId);
    const fetchQuestions = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
@@ -119,6 +119,10 @@ useEffect(() => {
           `${environment.API_BASE_URL}api/officer/individual-audits-questions/${certificationpaymentId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
+                      params: {
+             clusterId: clusterId ?? null,// your clusterId variable
+            farmId: farmId,       // your farmId variable
+          },
           }
         );
         console.log(response.data.data.logo)

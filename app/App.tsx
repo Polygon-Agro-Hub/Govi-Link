@@ -30,6 +30,7 @@ import CertificateQuesanory from "@/component/CertificateQuesanory";
 import CertificateSuggestions from "@/component/CertificateSuggestions"
 import Otpverification from "@/component/Otpverification";
 import OtpverificationSuccess from "@/component/OtpverificationSuccess";
+import ViewFarmsCluster from "@/component/ViewFarmsCluster";
 
 LogBox.ignoreAllLogs(true);
 NativeWindStyleSheet.setOutput({ default: "native" });
@@ -180,6 +181,7 @@ function AppContent() {
             <Stack.Screen name="CertificateSuggestions" component={CertificateSuggestions}/>
             <Stack.Screen name="Otpverification" component={Otpverification} />
             <Stack.Screen name="OtpverificationSuccess" component={OtpverificationSuccess} />
+            <Stack.Screen name="ViewFarmsCluster" component={ViewFarmsCluster} />
           </Stack.Navigator>
         </NavigationContainer>
       </SafeAreaView>

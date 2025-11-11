@@ -32,7 +32,7 @@ const scanningAreaSize = width * 0.8;
 const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
 
     const route = useRoute<QRScannerRouteProp>();
-  const { farmerId, jobId, certificationpaymentId, farmerMobile } = route.params;  
+  const { farmerId, jobId, certificationpaymentId, farmerMobile, clusterId, farmId } = route.params;  
   console.log("farmerID", farmerId)
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanned, setScanned] = useState<boolean>(false);
@@ -97,7 +97,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
       throw new Error(t("Error.Wrong QR code"));
     }
         if (userId == farmerId) {
-      navigation.navigate("CertificateQuesanory", { jobId, certificationpaymentId, farmerMobile  })
+      navigation.navigate("CertificateQuesanory", { jobId, certificationpaymentId, farmerMobile , clusterId, farmId })
     }
 
 
