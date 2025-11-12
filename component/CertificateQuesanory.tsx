@@ -31,8 +31,8 @@ interface Question {
   qSinhala: string;
   qTamil: string;
   type: string;
-  tickResult: number;
-  uploadImage: string | null;
+  officerTickResult: number;
+  officerUploadImage: string | null;
 }
 interface CertificateData {
   logo: string;
@@ -73,14 +73,13 @@ const LoadingSkeleton = () => {
 
 const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({ navigation }) => {
   const route = useRoute<GapCertificationRouteProp>();
-  const { jobId, certificationpaymentId,farmerMobile, clusterId, farmId} = route.params; 
+  const { jobId, certificationpaymentId,farmerMobile, clusterId, farmId, isClusterAudit,auditId} = route.params; 
   const {t,  i18n} = useTranslation();
     const [questions, setQuestions] = useState<Question[]>([]);
 const [CertificateData, setCertificateData] = useState< CertificateData | null>(null);
-console.log(CertificateData)
 const [loadingQuestionId, setLoadingQuestionId] = useState<number | null>(null);
 const [loaingCertificate, setloaingCertificate] = useState(true)
-const allChecked = questions.length > 0 && questions.every(q => q.tickResult === 1 || q.uploadImage != null);
+const allChecked = questions.length > 0 && questions.every(q => q.officerTickResult === 1 || q.officerUploadImage != null);
   const [showCameraModal, setShowCameraModal] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
 
@@ -208,7 +207,7 @@ const handleCheck = async (q: Question) => {
       }
 
     if (q.type === "Photo Proof") {
-      if (q.uploadImage) {
+      if (q.officerUploadImage) {
         Alert.alert(
           t("CertificateQuesanory.Confirm Untick"),
   t("CertificateQuesanory.This will remove the uploaded photo for this task. Are you sure you want to continue?"),
@@ -224,7 +223,7 @@ const handleCheck = async (q: Question) => {
                 );
                 setQuestions((prev) =>
                   prev.map((item) =>
-                    item.id === q.id ? { ...item, tickResult: 0, uploadImage: null } : item
+                    item.id === q.id ? { ...item, officerTickResult: 0, officerUploadImage: null } : item
                   )
                 );
                 setLoadingQuestionId(null);
@@ -240,17 +239,17 @@ const handleCheck = async (q: Question) => {
     }
 
     setLoadingQuestionId(q.id);
-    const newTickResult = q.tickResult === 1 ? 0 : 1;
+    const newTickResult = q.officerTickResult === 1 ? 0 : 1;
     const response = await axios.put(
       `${environment.API_BASE_URL}api/officer/check-question/${q.id}`,
-      { tickResult: newTickResult },
+      { officerTickResult: newTickResult },
       { headers: { Authorization: `Bearer ${token}` } }
     );
 
     if (response.data?.success || response.status === 200) {
       setQuestions((prev) =>
         prev.map((item) =>
-          item.id === q.id ? { ...item, tickResult: newTickResult } : item
+          item.id === q.id ? { ...item, officerTickResult: newTickResult } : item
         )
       );
     }
@@ -307,7 +306,7 @@ const handleSubmitPhoto = async (q: Question) => {
       setQuestions((prev) =>
         prev.map((item) =>
           item.id === selectedQuestion.id
-            ? { ...item, tickResult: 1, uploadImage: capturedImage }
+            ? { ...item, officerTickResult: 1, officerUploadImage: capturedImage }
             : item
         )
       );
@@ -400,18 +399,18 @@ const handleCameraClose = (imageUri: string | null) => {
    
 <TouchableOpacity
   className={`absolute top-4 right-4 border border-black p-1 rounded-full ${
-    q.tickResult === 1 || q.uploadImage != null? "bg-black" : "bg-white"
+    q.officerTickResult === 1 || q.officerUploadImage != null? "bg-black" : "bg-white"
   }`}
   onPress={() => handleCheck(q)}
   disabled={loadingQuestionId === q.id}
 >
   {loadingQuestionId === q.id ? (
-    <ActivityIndicator size="small" color={q.tickResult === 1 || q.uploadImage != null ? "#fff" : "#555"} />
+    <ActivityIndicator size="small" color={q.officerTickResult === 1 || q.officerUploadImage != null ? "#fff" : "#555"} />
   ) : (
     <AntDesign
       name="check"
       size={16}
-      color={q.tickResult === 1 || q.uploadImage != null ? "#fff" : "#555"}
+      color={q.officerTickResult === 1 || q.officerUploadImage != null ? "#fff" : "#555"}
     />
   )}
 </TouchableOpacity>
@@ -430,7 +429,8 @@ const handleCameraClose = (imageUri: string | null) => {
       
 
       <View className="flex-row justify-between p-4 border-t border-gray-200">
-        <TouchableOpacity className="flex-row items-center bg-[#444444] px-12 py-3 rounded-full ml-2">
+        <TouchableOpacity className="flex-row items-center bg-[#444444] px-12 py-3 rounded-full ml-2"
+        >
           <AntDesign name="arrow-left" size={20} color="#fff" />
           <Text className="ml-4 text-white font-semibold text-base">{t("CertificateQuesanory.Exit")}</Text>
         </TouchableOpacity>
@@ -439,7 +439,7 @@ const handleCameraClose = (imageUri: string | null) => {
 {allChecked ? (
   <TouchableOpacity
     onPress={() => {
- navigation.navigate("CertificateSuggestions", { jobId, certificationpaymentId,  slavequestionnaireId: CertificateData!.slavequestionnaireId,farmerMobile  })
+ navigation.navigate("CertificateSuggestions", { jobId, certificationpaymentId,  slavequestionnaireId: CertificateData!.slavequestionnaireId,farmerMobile , isClusterAudit, farmId , auditId})
     }}
     className="rounded-full overflow-hidden"
   >

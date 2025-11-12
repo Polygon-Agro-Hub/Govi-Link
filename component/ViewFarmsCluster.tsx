@@ -1,5 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ScrollView, TouchableOpacity, Image, Alert, ActivityIndicator, Modal, FlatList ,  TouchableWithoutFeedback, Linking} from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  Image,
+  Alert,
+  ActivityIndicator,
+  Modal,
+  FlatList,
+  TouchableWithoutFeedback,
+  Linking,
+} from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "./types";
@@ -9,7 +21,10 @@ import axios from "axios";
 import { environment } from "@/environment/environment";
 import { useTranslation } from "react-i18next";
 import ContentLoader, { Rect, Circle } from "react-content-loader/native";
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesome6 } from "@expo/vector-icons";
 
@@ -18,30 +33,28 @@ type ViewFarmsClusterNavigationProp = StackNavigationProp<
   "ViewFarmsCluster"
 >;
 
-type ViewFarmsClusterProp = RouteProp<
-  RootStackParamList,
-  "ViewFarmsCluster"
->;
+type ViewFarmsClusterProp = RouteProp<RootStackParamList, "ViewFarmsCluster">;
 
 interface ViewFarmsClusterProps {
   navigation: ViewFarmsClusterNavigationProp;
 }
 interface VisitsData {
-    id:number
+  id: number;
   farmerName: string;
-  farmerMobile:number;
+  farmerMobile: number;
   jobId: string;
   propose: string;
   serviceenglishName: string;
   servicesinhalaName: string;
   servicetamilName: string;
-  clusterId:number
-  farmId:number
-  regCode:number
-  jobStatus:string
-  isCompleted:number
+  clusterId: number;
+  farmId: number;
+  regCode: number;
+  jobStatus: string;
+  isCompleted: number;
+  certificationpaymentId: number;
+  feildauditId: number;
 }
-
 
 const LoadingSkeleton = () => {
   const rectWidth = wp("38%");
@@ -50,7 +63,9 @@ const LoadingSkeleton = () => {
   const startX = (wp("100%") - totalWidth) / 2;
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#fff", paddingVertical: hp("2%") }}>
+    <View
+      style={{ flex: 1, backgroundColor: "#fff", paddingVertical: hp("2%") }}
+    >
       <ContentLoader
         speed={1}
         width="100%"
@@ -58,15 +73,55 @@ const LoadingSkeleton = () => {
         backgroundColor="#f3f3f3"
         foregroundColor="#ecebeb"
       >
-          <Rect x={wp("7%")} y={hp("4%")} rx="10" ry="10" width={wp("86%")} height={hp("10%")} />
+        <Rect
+          x={wp("7%")}
+          y={hp("4%")}
+          rx="10"
+          ry="10"
+          width={wp("86%")}
+          height={hp("10%")}
+        />
 
-
-          <Rect x={wp("7%")} y={hp("15%")} rx="10" ry="10" width={wp("86%")} height={hp("10%")} />
-                    <Rect x={wp("7%")} y={hp("28%")} rx="10" ry="10" width={wp("86%")} height={hp("10%")} />
-                                        <Rect x={wp("7%")} y={hp("41%")} rx="10" ry="10" width={wp("86%")} height={hp("10%")} />
-                                        <Rect x={wp("7%")} y={hp("54%")} rx="10" ry="10" width={wp("86%")} height={hp("10%")} />
-                                        <Rect x={wp("7%")} y={hp("67%")} rx="10" ry="10" width={wp("86%")} height={hp("10%")} />
-
+        <Rect
+          x={wp("7%")}
+          y={hp("15%")}
+          rx="10"
+          ry="10"
+          width={wp("86%")}
+          height={hp("10%")}
+        />
+        <Rect
+          x={wp("7%")}
+          y={hp("28%")}
+          rx="10"
+          ry="10"
+          width={wp("86%")}
+          height={hp("10%")}
+        />
+        <Rect
+          x={wp("7%")}
+          y={hp("41%")}
+          rx="10"
+          ry="10"
+          width={wp("86%")}
+          height={hp("10%")}
+        />
+        <Rect
+          x={wp("7%")}
+          y={hp("54%")}
+          rx="10"
+          ry="10"
+          width={wp("86%")}
+          height={hp("10%")}
+        />
+        <Rect
+          x={wp("7%")}
+          y={hp("67%")}
+          rx="10"
+          ry="10"
+          width={wp("86%")}
+          height={hp("10%")}
+        />
       </ContentLoader>
     </View>
   );
@@ -74,19 +129,21 @@ const LoadingSkeleton = () => {
 
 const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
   const route = useRoute<ViewFarmsClusterProp>();
-  const { jobId, farmName, feildauditId} = route.params; 
-  console.log(jobId,farmName,feildauditId)
-  const {t,  i18n} = useTranslation();
+  const { jobId, farmName, feildauditId } = route.params;
+  console.log(jobId, farmName, feildauditId);
+  const { t, i18n } = useTranslation();
   const [visitsData, setVisitsData] = useState<VisitsData[]>([]);
-const [loadingQuestionId, setLoadingQuestionId] = useState<number | null>(null);
-const [loaingCertificate, setloaingCertificate] = useState(true)
+  const [loadingQuestionId, setLoadingQuestionId] = useState<number | null>(
+    null
+  );
+  const [loaingCertificate, setloaingCertificate] = useState(true);
   const [showPopup, setShowPopup] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
 
   const fetchclusteVisits = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
-            setloaingCertificate(true)
+      setloaingCertificate(true);
 
       if (token) {
         const response = await axios.get(
@@ -95,20 +152,25 @@ const [loaingCertificate, setloaingCertificate] = useState(true)
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-      console.log(response.data.data)
-            setVisitsData(response.data.data);
-      setloaingCertificate(false)
+        console.log(response.data.data);
+        setVisitsData(response.data.data);
+        setloaingCertificate(false);
       }
     } catch (error) {
       console.error("Failed to fetch officer visit:", error);
     } finally {
-
     }
   };
   useEffect(() => {
     fetchclusteVisits();
   }, []);
 
+    const handleDial = (farmerMobile: string) => {
+      const phoneUrl = `tel:${farmerMobile}`;
+      Linking.openURL(phoneUrl).catch((err) =>
+        console.error("Failed to open dial pad:", err)
+      );
+    };
   return (
     <View className="flex-1 bg-white">
       <View className="flex-row items-center px-4 py-4 bg-white shadow-sm border-b border-[#E5E5E5]">
@@ -120,93 +182,96 @@ const [loaingCertificate, setloaingCertificate] = useState(true)
         </TouchableOpacity>
 
         <View className="flex-1">
-          <Text className="text-base font-semibold text-center">
-           #{jobId}
-          </Text>
-
+          <Text className="text-base font-semibold text-center">#{jobId}</Text>
         </View>
-
-
       </View>
-                      <View className="mt-4">
-          <Text className="text-xl font-semibold text-center">
-           {farmName}
+      <View className="mt-4">
+        <Text className="text-xl font-semibold text-center">{farmName}</Text>
+        {visitsData.length > 0 && (
+          <Text className="text-base text-center text-gray-500 mt-1">
+            {visitsData.filter((v) => v.isCompleted !== 1).length} farms left to
+            finish
           </Text>
-  {visitsData.length > 0 && (
-    <Text className="text-base text-center text-gray-500 mt-1">
-      {visitsData.filter(v => v.isCompleted !== 1).length} farms left to finish
-    </Text>
-  )}
-        </View>
-{loaingCertificate ? (
-  <LoadingSkeleton/>
-):(
-  <>
-  <View className="mt-2 p-2">
+        )}
+      </View>
+      {loaingCertificate ? (
+        <LoadingSkeleton />
+      ) : (
+        <>
+          <View className="mt-2 p-2">
+            <FlatList
+              data={visitsData}
+              keyExtractor={(item) => item.id.toString()}
+              showsVerticalScrollIndicator={false}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  className="bg-white border border-[#9DB2CE] rounded-xl px-5 py-4 mb-3 mx-3 flex-row justify-between items-center"
+                >
+                  {/* Left side — ID */}
+                  <Text className="text-black text-lg font-semibold">
+                    ID : {item.regCode}
+                  </Text>
 
-<FlatList
-  data={visitsData}
-  keyExtractor={(item) => item.id.toString()}
-  showsVerticalScrollIndicator={false}
-  renderItem={({ item }) => (
-    <TouchableOpacity
-      activeOpacity={0.8}
-      className="bg-white border border-[#9DB2CE] rounded-xl px-5 py-4 mb-3 mx-3 flex-row justify-between items-center"
-                      onPress={() => {
-                  setSelectedItem(item);
-                  setShowPopup(true);
-                }}
-    >
-      {/* Left side — ID */}
-      <Text className="text-black text-lg font-semibold">
-        ID : {item.regCode}
-      </Text>
+                  {/* Right side — Button / Status */}
+                  {item.isCompleted === 1 ? (
+                    <View className="bg-[#000] rounded-full p-2">
+                      <AntDesign name="check" size={16} color="#fff" />
+                    </View>
+                  ) : item.jobStatus === "Opend" ? (
+                    <TouchableOpacity
+                      onPress={() =>
+                        navigation.navigate("CertificateQuesanory", {
+                          auditId: item.feildauditId,
+                          jobId: item.jobId,
+                          certificationpaymentId: item.certificationpaymentId,
+                          farmerMobile: item.farmerMobile,
+                          clusterId: item.clusterId,
+                          farmId: item.farmId,
+                          isClusterAudit: !!item.clusterId,
+                        })
+                      }
+                    >
+                      <LinearGradient
+                        colors={["#FF416C", "#FF4B2B"]}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 0 }}
+                        className="rounded-full px-6 py-2"
+                      >
+                        <Text className="text-white text-base font-semibold text-center">
+                          {item.jobStatus}
+                        </Text>
+                      </LinearGradient>
+                    </TouchableOpacity>
+                  ) : (
+                    item.jobStatus === "Start" && (
+                      <TouchableOpacity
+                        className="bg-black rounded-full px-6 py-1.5"
+                        onPress={() => {
+                          setSelectedItem(item);
+                          setShowPopup(true);
+                        }}
+                      >
+                        <Text className="text-white text-base font-semibold text-center">
+                          {item.jobStatus}
+                        </Text>
+                      </TouchableOpacity>
+                    )
+                  )}
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+        </>
+      )}
 
-     {/* Right side — Button / Status */}
-{item.isCompleted === 1 ? (
-  <View className="bg-[#000] rounded-full p-2">
-    <AntDesign
-      name="check"
-      size={16}
-      color="#fff" 
-    />
-  </View>
-) : item.jobStatus === "Opend" ? (
-  <TouchableOpacity
-  >
-    <LinearGradient
-      colors={["#FF416C", "#FF4B2B"]}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 0 }}
-      className="rounded-full px-6 py-2"
-    >
-      <Text className="text-white text-base font-semibold text-center">
-        {item.jobStatus}
-      </Text>
-    </LinearGradient>
-  </TouchableOpacity>
-) : item.jobStatus === "Start" && (
-  <TouchableOpacity
-    className="bg-black rounded-full px-6 py-1.5"
-  
-  >
-    <Text className="text-white text-base font-semibold text-center">
-      {item.jobStatus}
-    </Text>
-  </TouchableOpacity>
-)}
-
-    </TouchableOpacity>
-  )}
-/>
-
-    
-  </View>
-
-  </>
-)}
-      
-   <Modal transparent visible={showPopup} animationType="slide">
+      <Modal transparent visible={showPopup} animationType="slide"
+              onRequestClose={() => {
+    console.log("hitt");
+    setShowPopup(false);
+    setSelectedItem(null);
+  }}
+      >
         <TouchableWithoutFeedback
           onPress={() => {
             setShowPopup(false);
@@ -244,30 +309,25 @@ const [loaingCertificate, setloaingCertificate] = useState(true)
                       </Text>
                       <Text className="text-base font-semibold mt-1">
                         {(() => {
-                          if (selectedItem.propose === "Individual") {
-                            switch (i18n.language) {
-                              case "si":
-                                return "තනි ගොවි විගණනය";
-                              case "ta":
-                                return "தனிப்பட்ட விவசாயி தணிக்கை";
-                              default:
-                                return "Individual Farmer Audit";
-                            }
+                          if (selectedItem.propose === "Cluster") {
+                            return i18n.language === "si"
+                              ? "ගොවි සමූහ විගණනය"
+                              : i18n.language === "ta"
+                              ? "உழவர் குழு தணிக்கை"
+                              : "Farm Cluster Audit";
                           } else {
-                            switch (i18n.language) {
-                              case "si":
-                                return selectedItem.servicesinhalaName || "";
-                              case "ta":
-                                return selectedItem.servicetamilName || "";
-                              default:
-                                return selectedItem.serviceenglishName || "";
-                            }
+                            return i18n.language === "si"
+                              ? "තනි ගොවි විගණනය"
+                              : i18n.language === "ta"
+                              ? "தனிப்பட்ட விவசாயி தணிக்கை"
+                              : "Individual Farmer Audit";
                           }
                         })()}
                       </Text>
 
                       <Text className="text-sm font-medium text-[#4E6393] mt-1">
-                         {t(`Districts.${selectedItem.district}`)} {t("VisitPopup.District")}
+                        {t(`Districts.${selectedItem.district}`)}{" "}
+                        {t("VisitPopup.District")}
                       </Text>
                       <View className="flex flex-row justify-center gap-x-2 mb-4 mt-6 px-4">
                         <TouchableOpacity
@@ -317,7 +377,9 @@ const [loaingCertificate, setloaingCertificate] = useState(true)
                           </View>
                         </TouchableOpacity>
 
-                        <TouchableOpacity className="flex ">
+                        <TouchableOpacity className="flex "
+                           onPress={() => handleDial(selectedItem.farmerMobile)}
+                        >
                           <View className="flex-row items-center justify-center border border-[#F83B4F] rounded-full px-6 py-2">
                             <Ionicons name="call" size={20} color="#F83B4F" />
                             <Text className="text-base font-semibold  ml-2">
@@ -346,39 +408,46 @@ const [loaingCertificate, setloaingCertificate] = useState(true)
                     </>
                   )}
 
-                  <TouchableOpacity 
-onPress={() => {
-  setShowPopup(false);
+                  <TouchableOpacity
+                    onPress={() => {
+                      setShowPopup(false);
 
-  if (selectedItem?.farmerId) {
-    navigation.navigate("Main" as any, {   // <--- cast to any
-      screen: "MainTabs",
-      params: {
-        screen: "QRScanner",
-        params: {
-          farmerId: selectedItem.farmerId,
-          jobId: selectedItem.jobId,
-          certificationpaymentId: selectedItem.certificationpaymentId,
-          farmerMobile: selectedItem.farmerMobile,
-          farmId: selectedItem.farmId,
-          clusterId: selectedItem.clusterId,
-        },
-      },
-    });
-  }
-}}
-
->
+                      if (selectedItem?.farmerId) {
+                        navigation.navigate("Main" as any, {
+                          screen: "MainTabs",
+                          params: {
+                            screen: "QRScanner",
+                            params: {
+                              farmerId: selectedItem.farmerId,
+                              jobId: selectedItem.jobId,
+                              certificationpaymentId:
+                                selectedItem.certificationpaymentId,
+                              farmerMobile: selectedItem.farmerMobile,
+                              farmId: selectedItem.farmId,
+                              clusterId: selectedItem.clusterId,
+                              isClusterAudit: true,
+                              auditId: selectedItem.feildauditId,
+                            },
+                          },
+                        });
+                      }
+                    }}
+                  >
                     <LinearGradient
                       colors={["#F2561D", "#FF1D85"]}
                       start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 0 }}
-                      className= {`py-2 items-center justify-center rounded-full mt-4 ${i18n.language==="si"? "px-24": i18n.language === "ta"? "px-24": "px-[40%]"}`}
+                      className={`py-2 items-center justify-center rounded-full mt-4 ${
+                        i18n.language === "si"
+                          ? "px-24"
+                          : i18n.language === "ta"
+                          ? "px-24"
+                          : "px-[40%]"
+                      }`}
                     >
                       <Text className="text-white text-lg font-semibold">
                         {t("VisitPopup.Start")}
                       </Text>
-                      {/*if individual need send  farmerId for check with QR scan ,jobId,    */}
                     </LinearGradient>
                   </TouchableOpacity>
                 </View>

@@ -76,7 +76,7 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
   navigation,
 }) => {
   const route = useRoute<CertificateSuggestionsRouteProp>();
-  const { jobId, certificationpaymentId, slavequestionnaireId, farmerMobile } = route.params;
+  const { jobId, certificationpaymentId, slavequestionnaireId, farmerMobile,isClusterAudit ,farmId, auditId} = route.params;
   console.log(farmerMobile)
   const { t, i18n } = useTranslation();
   const [problems, setProblems] = useState<ProblemItem[]>([
@@ -251,7 +251,10 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
 
             navigation.navigate("Otpverification", {
               farmerMobile: farmerMobile,
-              jobId:jobId
+              jobId:jobId,
+              farmId,
+              auditId,
+              isClusterAudit
             });
             setIsButtonDisabled(false);
              setOtpSendLoading(false);
@@ -441,7 +444,7 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
                   { text: t("CertificateQuesanory.Cancel"), style: "cancel" },
                   {
                     text: t("CertificateSuggestions.Continue"),
-                    onPress: () => console.log("Navigate Next"),
+                    onPress: () =>  handleNext(),
                   },
                 ]
               );

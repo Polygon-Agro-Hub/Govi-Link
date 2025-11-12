@@ -9,9 +9,9 @@ export type RootStackParamList = {
    Profile:undefined;
    AddComplaint:undefined
      ViewAllVisits: undefined;
-     QRScanner: { farmerId?: number, jobId? : string, certificationpaymentId:number, farmerMobile:number, clusterId:number, farmId:number}; 
-     CertificateQuesanory:{ jobId?: string, certificationpaymentId:number, farmerMobile:number, clusterId:number, farmId:number}; 
-     CertificateSuggestions: { jobId?: string, certificationpaymentId:number,slavequestionnaireId:number, farmerMobile:number}; 
-     Otpverification:{farmerMobile:number, jobId?:string}
+     QRScanner: { farmerId?: number, jobId? : string, certificationpaymentId:number, farmerMobile:number, clusterId:number, farmId:number, isClusterAudit:boolean,  auditId:number}; 
+     CertificateQuesanory:{ jobId?: string, certificationpaymentId:number, farmerMobile:number, clusterId:number, farmId:number, isClusterAudit:boolean,  auditId:number}; 
+     CertificateSuggestions: { jobId?: string, certificationpaymentId:number,slavequestionnaireId:number, farmerMobile:number, isClusterAudit:boolean, farmId:number, auditId:number}; 
+     Otpverification:{farmerMobile:number, jobId?:string, isClusterAudit:boolean, farmId:number, auditId:number}
      ViewFarmsCluster:{ jobId?: string, farmName:string,feildauditId:number}; 
 }

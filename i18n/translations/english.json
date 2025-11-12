@@ -172,6 +172,20 @@
   "OtpverificationSuccess":{
     "Well Done":"Well Done!",
     "You have successfully completed the job":"You have successfully completed the job!",
-    "Go Forward":"Go Forward"
+    "Go Forward":"Go Forward",
+    "Audit completion failed. Please try again.":"Audit completion failed. Please try again."
+  },
+  "QRScanner":{
+    "CameraRequired":"Camera Permission Required",
+    "WeneedCamera":" We need camera access to scan QR codes. Please enable camera permissions in your device settings.",
+    "Close":"Close",
+    "TapScan":"Tap to Scan Again",
+    "Failed":"Failed!",
+    "Requesting for camera permission":"Requesting for camera permission",
+    "Scan the QR": "Scan the QR",
+    "Scan Again":"Scan Again",
+    "User ID not found in QR code":"User ID not found in QR code",
+    "Wrong QR code":"Wrong QR code",
+    "The scanned QR code does not contain a valid user ID or is damaged.":"The scanned QR code does not contain a valid user ID or is damaged."
   }
 }

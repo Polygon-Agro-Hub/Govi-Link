@@ -56,8 +56,12 @@ interface SuccessModalProps {
 const Otpverification: React.FC = ({ navigation, route }: any) => {
   const {
   farmerMobile,
-  jobId
+  jobId,
+   isClusterAudit,
+   farmId,
+   auditId
   } = route.params;
+  console.log("audit complete", auditId, farmId, isClusterAudit)
   
   const [otpCode, setOtpCode] = useState<string>("");
   const [maskedCode, setMaskedCode] = useState<string>("XXXXX");
@@ -174,11 +178,16 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
       switch (statusCode) {
            case "1000": // ✅ Success
         setIsVerified(true);
-        navigation.navigate("OtpverificationSuccess")
-        // Alert.alert(
-        //   t("Otpverification.Verification Successful"),
-        //   t("Otpverification.Your phone number has been verified successfully.")
-        // );
+            const completeSuccess = await handleComplete(); // wait for completion
+
+        if (completeSuccess) {
+          navigation.navigate("OtpverificationSuccess");
+        } else {
+          Alert.alert(
+            t("Error.Sorry"),
+            t("Otpverification.Audit completion failed. Please try again.")
+          );
+        }
         break;
 
         case "1001": // Invalid or expired OTP
@@ -301,6 +310,43 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
     );
   }
 };
+
+
+const handleComplete = async (): Promise<boolean> => {
+  try {
+    const token = await AsyncStorage.getItem("token");
+    if (!token) {
+             Alert.alert(
+                t("Error.Sorry"),
+                t("Error.Your login session has expired. Please log in again to continue.")
+              );
+                    return false;
+    }
+
+    const payload = { isClusterAudit, farmId };
+    console.log("🚀 Sending completion request:", payload);
+
+    const response = await axios.put(
+      `${environment.API_BASE_URL}api/officer/complete/${auditId}`,
+      payload,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    console.log("📩 API Response:", response.data);
+
+    if (response.status === 200 && response.data?.success) {
+      console.log("✅ Audit completion successful");
+      return true;
+    } else {
+      console.warn("⚠️ Audit completion failed:", response.data);
+      return false;
+    }
+  } catch (err) {
+    console.error("❌ Error updating audit completion:", err);
+    return false;
+  }
+};
+
 
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60);

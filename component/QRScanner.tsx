@@ -8,7 +8,6 @@ import {
   Image,
   Dimensions,
 } from "react-native";
-// import { BarCodeScanner } from 'expo-barcode-scanner';
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "./types";
 import { CameraView, Camera } from "expo-camera";
@@ -32,8 +31,8 @@ const scanningAreaSize = width * 0.8;
 const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
 
     const route = useRoute<QRScannerRouteProp>();
-  const { farmerId, jobId, certificationpaymentId, farmerMobile, clusterId, farmId } = route.params;  
-  console.log("farmerID", farmerId,jobId, certificationpaymentId, farmerMobile, clusterId, farmId )
+  const { farmerId, jobId, certificationpaymentId, farmerMobile, clusterId, farmId, isClusterAudit, auditId } = route.params;  
+  console.log("farmerID", farmerId,jobId, certificationpaymentId, farmerMobile, clusterId, farmId, isClusterAudit, auditId )
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanned, setScanned] = useState<boolean>(false);
   const [showPermissionModal, setShowPermissionModal] =
@@ -91,13 +90,13 @@ const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
     //  console.log("User ID:", userId);
 
       if (!userId) {
-        throw new Error(t("Error.User ID not found in QR code"));
+        throw new Error(t("QRScanner.User ID not found in QR code"));
       }
     if (userId !== farmerId) {
-      throw new Error(t("Error.Wrong QR code"));
+      throw new Error(t("QRScanner.Wrong QR code"));
     }
         if (userId == farmerId) {
-      navigation.navigate("CertificateQuesanory", { jobId, certificationpaymentId, farmerMobile , clusterId, farmId })
+      navigation.navigate("CertificateQuesanory", { jobId, certificationpaymentId, farmerMobile , clusterId, farmId, isClusterAudit ,  auditId})
     }
 
 
@@ -106,7 +105,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
       console.error("QR Parsing Error:", error);
       setErrorMessage(
         t(
-          "Error.The scanned QR code does not contain a valid user ID or is damaged."
+          "QRScanner.The scanned QR code does not contain a valid user ID or is damaged."
         )
       );
       setIsUnsuccessfulModalVisible(true);
@@ -123,8 +122,6 @@ const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
       setTimeout(() => {
         setIsUnsuccessfulModalVisible(false);
         setErrorMessage(null);
-        navigation.navigate("SearchFarmer" as any); // Navigate to SearchFarmer
-        console.log("hit");
       }, 5000);
     }
   };
@@ -257,7 +254,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
                       colors={["#F2561D", "#FF1D85"]}
                       start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 0 }}
-                      className= {`items-center justify-center rounded-full mt-4 p-4`}
+                      className= {`items-center justify-center rounded-full mt-4 p-4 px-12`}
                     >
             <Text style={{ color: "#fff", fontSize: 16 }}>
               {t("QRScanner.Scan Again")}
@@ -280,13 +277,13 @@ const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
           {t("QRScanner.Failed")}
         </Text>
         <View className="mb-4">
-          {/* <Image
-            source={require("../assets/images/New/error.png")} // Replace with your own error image
+          <Image
+            source={require("../assets/error.png")} // Replace with your own error image
             className="w-32 h-32"
             resizeMode="contain"
-          /> */}
+          />
         </View>
-        <Text className="text-gray-700">{t("QRScanner.SearchNIC")}</Text>
+        <Text className="text-gray-700">{t("QRScanner.Wrong QR code")}</Text>
       </View>
       
       {/* Red Loading Bar at bottom */}

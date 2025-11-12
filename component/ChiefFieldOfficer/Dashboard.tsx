@@ -66,7 +66,6 @@ interface DraftVisit {
   certificationpaymentId: number;
   jobId: string;
   userId: number;
-  totalTasks: number;
   tickCompleted: number;
   photoCompleted: number;
   totalCompleted: number;
@@ -234,17 +233,31 @@ const onRefresh = useCallback(async () => {
     }
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      const onBackPress = () => true;
-      BackHandler.addEventListener("hardwareBackPress", onBackPress);
-      const subscription = BackHandler.addEventListener(
-        "hardwareBackPress",
-        onBackPress
-      );
-      return () => subscription.remove();
-    }, [])
-  );
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     const onBackPress = () => true;
+  //     BackHandler.addEventListener("hardwareBackPress", onBackPress);
+  //     const subscription = BackHandler.addEventListener(
+  //       "hardwareBackPress",
+  //       onBackPress
+  //     );
+  //     return () => subscription.remove();
+  //   }, [])
+  // );
+useFocusEffect(
+  React.useCallback(() => {
+    const backAction = () => {
+      if (showPopup) {
+        setShowPopup(false);
+        setSelectedItem(null);
+        return true;
+      }
+      return false;
+    };
+    const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction);
+    return () => backHandler.remove();
+  }, [showPopup])
+);
 
   const getTextStyle = () => {
     if (i18n.language === "si") {
@@ -317,6 +330,13 @@ useEffect(() => {
 
     return () => backHandler.remove();
   }, [showPopup]);
+
+  const handleDial = (farmerMobile: string) => {
+    const phoneUrl = `tel:${farmerMobile}`;
+    Linking.openURL(phoneUrl).catch((err) =>
+      console.error("Failed to open dial pad:", err)
+    );
+  };
   return (
     <ScrollView
       className={`flex-1 bg-white p-3  `}
@@ -532,11 +552,13 @@ useEffect(() => {
           <TouchableOpacity
             onPress={() =>
               navigation.navigate("CertificateQuesanory", {
+                auditId:item.id,
                 jobId: item.jobId,
                 certificationpaymentId: item.certificationpaymentId,
                 farmerMobile: item.farmerMobile,
                 clusterId: item.clusterId,
                 farmId: item.farmId,
+                 isClusterAudit: !!item.clusterId,
               })
             }
           >
@@ -609,7 +631,13 @@ useEffect(() => {
 
 </>)}
 
-      <Modal transparent visible={showPopup} animationType="slide">
+      <Modal transparent visible={showPopup} animationType="slide"
+        onRequestClose={() => {
+    console.log("hitt");
+    setShowPopup(false);
+    setSelectedItem(null);
+  }}
+      >
         <TouchableWithoutFeedback
           onPress={() => {
             setShowPopup(false);
@@ -720,7 +748,9 @@ useEffect(() => {
                           </View>
                         </TouchableOpacity>
 
-                        <TouchableOpacity className="flex ">
+                        <TouchableOpacity className="flex "
+                        onPress={() => handleDial(selectedItem.farmerMobile)}
+                        >
                           <View className="flex-row items-center justify-center border border-[#F83B4F] rounded-full px-6 py-2">
                             <Ionicons name="call" size={20} color="#F83B4F" />
                             <Text className="text-base font-semibold  ml-2">
@@ -753,7 +783,7 @@ useEffect(() => {
                     onPress={() => {
     setShowPopup(false);
     if (selectedItem?.farmerId) {
-      navigation.navigate("QRScanner", { farmerId: selectedItem.farmerId, jobId: selectedItem.jobId , certificationpaymentId: selectedItem.certificationpaymentId, farmerMobile:selectedItem.farmerMobile, farmId:selectedItem.farmId, clusterId:selectedItem.clusterID  });
+      navigation.navigate("QRScanner", { farmerId: selectedItem.farmerId, jobId: selectedItem.jobId , certificationpaymentId: selectedItem.certificationpaymentId, farmerMobile:selectedItem.farmerMobile, farmId:selectedItem.farmId, clusterId:selectedItem.clusterID , isClusterAudit:false,  auditId:selectedItem.id });
     } 
   }}>
                     <LinearGradient
