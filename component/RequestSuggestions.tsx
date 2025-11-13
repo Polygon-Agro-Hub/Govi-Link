@@ -130,7 +130,7 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
       let response;
       if (item.saved) {
         response = await axios.put(
-          `${environment.API_BASE_URL}api/officer/requestaudit-update-problem/${item.id}`,
+          `${environment.API_BASE_URL}api/request-audit/update-identifyproblem/${item.id}`,
           {
             problem: item.problem,
             solution: item.solution,
@@ -139,7 +139,7 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
         );
       } else {
         response = await axios.post(
-          `${environment.API_BASE_URL}api/officer/requestaudit-save-problem`,
+          `${environment.API_BASE_URL}api/request-audit/save-identifyproblem`,
           {
             problem: item.problem,
             solution: item.solution,
@@ -185,7 +185,7 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
       }
 
       const response = await axios.get(
-        `${environment.API_BASE_URL}api/officer/requestaudit-get-problems/${govilinkjobid}`,
+        `${environment.API_BASE_URL}api/request-audit/get-identifyproblems/${govilinkjobid}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -249,22 +249,20 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
               otpResponse.data.referenceId
             );
 
-            // navigation.navigate("Otpverification", {
-            //   farmerMobile: farmerMobile,
-            //   jobId:jobId,
-            //   farmId,
-            //   auditId,
-            //   isClusterAudit
-            // });
+            navigation.navigate("OtpverificationRequestAudit", {
+              farmerMobile: farmerMobile,
+              jobId:jobId,
+                govilinkjobid:govilinkjobid
+            });
             setIsButtonDisabled(false);
              setOtpSendLoading(false);
           } catch (error) {
             Alert.alert(t("Main.error"), t("SignupForum.otpSendFailed"), [{
               text: t("PublicForum.OK"),
-              // onPress: () => {
-              //   navigation.navigate("Signin");
-              // }
             }]);
+            setOtpSendLoading(false);
+          }finally{
+            setOtpSendLoading(false);
           }
   }
   return (

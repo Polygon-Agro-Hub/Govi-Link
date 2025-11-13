@@ -38,6 +38,7 @@ import ManageOfficers from "@/component/ChiefFieldOfficer/ManageOfficers";
 import AddOfficerStep1 from "@/component/ChiefFieldOfficer/AddOfficerStep1";
 import AddOfficerStep2 from "@/component/ChiefFieldOfficer/AddOfficerStep2";
 import AddOfficerStep3 from "@/component/ChiefFieldOfficer/AddOfficerStep3";
+import OtpverificationRequestAudit from "@/component/OtpverificationRequestAudit";
 
 LogBox.ignoreAllLogs(true);
 NativeWindStyleSheet.setOutput({ default: "native" });
@@ -195,6 +196,7 @@ function AppContent() {
             <Stack.Screen name="ViewFarmsCluster" component={ViewFarmsCluster} />
             <Stack.Screen name="RequestSuggestions" component={RequestSuggestions} />
             <Stack.Screen name="RequestProblem" component={RequestProblem} />
+            <Stack.Screen name="OtpverificationRequestAudit" component={OtpverificationRequestAudit} />
           </Stack.Navigator>
         </NavigationContainer>
       </SafeAreaView>

@@ -432,19 +432,7 @@ const handleCameraClose = (imageUri: string | null) => {
       <View className="flex-row justify-between p-4 border-t border-gray-200">
         <TouchableOpacity className="flex-row items-center bg-[#444444] px-12 py-3 rounded-full ml-2"
 onPress={() => {
-  const routes = navigation.getState()?.routes;
-  const currentIndex = navigation.getState()?.index;
-
-  // Get the previous route if exists
-  const prevRoute = routes?.[currentIndex - 1];
-
-  if (prevRoute?.name === "QRScanner") {
-    // Skip QRScanner, go back two pages
-    navigation.pop(2);
-  } else {
-    // Go back normally
-    navigation.goBack();
-  }
+navigation.navigate("Main", {screen: "Dashboard"})
 }}
         >
           <AntDesign name="arrow-left" size={20} color="#fff" />

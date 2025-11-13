@@ -17,4 +17,5 @@ export type RootStackParamList = {
      ViewFarmsCluster:{ jobId?: string, farmName:string,feildauditId:number}; 
      RequestSuggestions: { farmerId?: number, govilinkjobid?: number, jobId? : string, farmerMobile?:number};
      RequestProblem: { farmerId?: number, govilinkjobid?: number, jobId? : string, farmerMobile?:number};
+      OtpverificationRequestAudit:{farmerId?: number, govilinkjobid?: number, jobId? : string, farmerMobile?:number};
 }

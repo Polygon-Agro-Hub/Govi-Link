@@ -164,7 +164,7 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
       }
     } catch (err) {
       console.error("❌ Error saving/updating problem:", err);
-      Alert.alert(t("Error.Sorry"), t("Something went wrong while saving. try again later"));
+      Alert.alert(t("Error.Sorry"), t("Main.somethingWentWrong"));
     }
   };
 
@@ -258,14 +258,14 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
             });
             setIsButtonDisabled(false);
              setOtpSendLoading(false);
-          } catch (error) {
-            Alert.alert(t("Main.error"), t("SignupForum.otpSendFailed"), [{
-              text: t("PublicForum.OK"),
-              // onPress: () => {
-              //   navigation.navigate("Signin");
-              // }
-            }]);
-          }
+          }  catch (error) {
+                      Alert.alert(t("Main.error"), t("SignupForum.otpSendFailed"), [{
+                        text: t("PublicForum.OK"),
+                      }]);
+                      setOtpSendLoading(false);
+                    }finally{
+                      setOtpSendLoading(false);
+                    }
   }
   return (
     <KeyboardAvoidingView
