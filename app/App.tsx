@@ -34,6 +34,10 @@ import ViewFarmsCluster from "@/component/ViewFarmsCluster";
 import QRScaneerRequstAudit from "@/component/QRScaneerRequstAudit";
 import RequestSuggestions from "@/component/RequestSuggestions";
 import RequestProblem from "@/component/RequestProblem";
+import ManageOfficers from "@/component/ChiefFieldOfficer/ManageOfficers";
+import AddOfficerStep1 from "@/component/ChiefFieldOfficer/AddOfficerStep1";
+import AddOfficerStep2 from "@/component/ChiefFieldOfficer/AddOfficerStep2";
+import AddOfficerStep3 from "@/component/ChiefFieldOfficer/AddOfficerStep3";
 import OtpverificationRequestAudit from "@/component/OtpverificationRequestAudit";
 
 LogBox.ignoreAllLogs(true);
@@ -86,8 +90,12 @@ function MainTabs() {
         <>
           <Tab.Screen name="Dashboard" component={Dashboard} />
           <Tab.Screen name="Profile" component={ProfileScreen} />
-            <Tab.Screen name="ViewAllVisits" component={ViewAllVisits} />
-            <Tab.Screen name="QRScaneerRequstAudit" component={QRScaneerRequstAudit} />
+          <Tab.Screen name="ViewAllVisits" component={ViewAllVisits} />
+          <Tab.Screen name="QRScaneerRequstAudit" component={QRScaneerRequstAudit} />
+          <Tab.Screen name="ManageOfficers" component={ManageOfficers} />
+          <Tab.Screen name="AddOfficerStep1" component={AddOfficerStep1} />
+          <Tab.Screen name="AddOfficerStep2" component={AddOfficerStep2} />
+          <Tab.Screen name="AddOfficerStep3" component={AddOfficerStep3} />
         </>
       ) : (
         <>
