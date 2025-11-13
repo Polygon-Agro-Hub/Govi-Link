@@ -167,13 +167,13 @@
     "Success":"Success",
     "A new OTP has been sent to your mobile number.":"A new OTP has been sent to your mobile number.",
     "OK":"OK",
-    "We couldn’t send the OTP. Please try again later.":"We couldn’t send the OTP. Please try again later."
+    "We couldn’t send the OTP. Please try again later.":"We couldn’t send the OTP. Please try again later.",
+    "Audit completion failed. Please try again.":"Audit completion failed. Please try again."
   },
   "OtpverificationSuccess":{
     "Well Done":"Well Done!",
     "You have successfully completed the job":"You have successfully completed the job!",
-    "Go Forward":"Go Forward",
-    "Audit completion failed. Please try again.":"Audit completion failed. Please try again."
+    "Go Forward":"Go Forward"
   },
   "QRScanner":{
     "CameraRequired":"Camera Permission Required",
@@ -187,5 +187,16 @@
     "User ID not found in QR code":"User ID not found in QR code",
     "Wrong QR code":"Wrong QR code",
     "The scanned QR code does not contain a valid user ID or is damaged.":"The scanned QR code does not contain a valid user ID or is damaged."
+  },
+  "RequestProblem":{
+    "Farmer’s Say":"Farmer’s Say",
+    "Advice Given":"Advice Given",
+    "Type here...":"Type here...",
+    "Photo":"Photo",
+    "Submit":"Submit",
+    "Image Uploaded":"Image Uploaded",
+    "Please fill out all fields.":"Please fill out all fields.",
+    "Problem submitted successfully!":"Problem submitted successfully!",
+    "Failed to submit problem. Please try again.":"Failed to submit problem. Please try again."
   }
 }

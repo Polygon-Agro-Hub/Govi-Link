@@ -38,18 +38,27 @@ interface RequestProblemProps {
 
 const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
   const route = useRoute<RequestProblemRouteProp>();
-  const { govilinkjobid, jobId } = route.params;
+  const { govilinkjobid, jobId, farmerId, farmerMobile } = route.params;
+  console.log("RequestProblem Params:", govilinkjobid, jobId);
   const { t } = useTranslation();
 
-  const [problem, setProblem] = useState("");
-  const [solution, setSolution] = useState("");
+  const [farmerFeedback, setFarmerFeedback] = useState("");
+  const [advice, setAdvice] = useState("");
   const [image, setImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [showCameraModal, setShowCameraModal] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
+  console.log("Captured Image:", capturedImage);
   const [countdown, setCountdown] = useState(3);
   const [isButtonEnabled, setIsButtonEnabled] = useState(false);
+const [existingProblem, setExistingProblem] = useState<{
+  id: string;
+  farmerFeedback: string;
+  advice: string;
+  image?: string;
+} | null>(null);
+const [existingProblemId, setExistingProblemId] = useState<string | null>(null);
 
   useEffect(() => {
     if (capturedImage) {
@@ -68,42 +77,102 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
     }
   }, [capturedImage]);
 
-  const handleNext = async () => {
-    if (!problem.trim() || !solution.trim()) {
+
+   useEffect(() => {
+    fetchProblem();
+  }, []);
+
+  const fetchProblem = async () => {
+    try {
+      setLoading(true);
+      const token = await AsyncStorage.getItem("token");
+      if (!token) return;
+
+      const response = await axios.get(
+        `${environment.API_BASE_URL}api/request-audit/get-problem/${govilinkjobid}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (response.data.success && response.data.data) {
+        const saved = response.data.data;
+        console.log("Fetched Problem", saved);
+        setFarmerFeedback(saved.farmerFeedback);
+        setAdvice(saved.advice);
+        setExistingProblem(saved);
+        setExistingProblemId(saved.id); // Save ID for update
+        if (saved.image) setCapturedImage(saved.image);
+      }
+    } catch (err) {
+      console.error("❌ Error fetching problem:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+    const handleNext = async () => {
+  if (!farmerFeedback.trim() || !advice.trim()) {
+    Alert.alert(
+      t("Error.Sorry"),
+      t("CertificateSuggestions.Both problem and solution must be filled.")
+    );
+    return;
+  }
+
+  const farmerFeedbackChanged = !existingProblem || farmerFeedback !== existingProblem.farmerFeedback;
+  const adviceChanged = !existingProblem || advice !== existingProblem.advice;
+const imageChanged =
+  (capturedImage && !existingProblem?.image) ||
+  (capturedImage && existingProblem?.image && capturedImage !== existingProblem.image); 
+
+
+  if (!farmerFeedbackChanged && !adviceChanged && !imageChanged) {
+               navigation.navigate("RequestSuggestions", { jobId, farmerId, govilinkjobid, farmerMobile  });
+    return;
+  }
+
+  try {
+    setLoading(true);
+    const token = await AsyncStorage.getItem("token");
+    if (!token) {
       Alert.alert(
         t("Error.Sorry"),
-        t("CertificateSuggestions.Both problem and solution must be filled.")
+        t("Error.Your login session has expired. Please log in again.")
       );
       return;
     }
 
-    try {
-      setLoading(true);
-      const token = await AsyncStorage.getItem("token");
-      if (!token) {
-        Alert.alert(
-          t("Error.Sorry"),
-          t("Error.Your login session has expired. Please log in again.")
-        );
-        return;
-      }
+    const formData = new FormData();
+    formData.append("farmerFeedback", farmerFeedback);
+    formData.append("advice", advice);
 
-      const formData = new FormData();
-      formData.append("problem", problem);
-      formData.append("solution", solution);
+    if (imageChanged && capturedImage) {
+      const filename = capturedImage.split("/").pop() || "upload.jpg";
+      const match = /\.(\w+)$/.exec(filename);
+      const type = match ? `image/${match[1]}` : `image`;
+      formData.append("image", {
+        uri: capturedImage,
+        name: filename,
+        type,
+      } as any);
+    }
 
-      if (capturedImage) {
-        const filename = capturedImage.split("/").pop() || "upload.jpg";
-        const match = /\.(\w+)$/.exec(filename);
-        const type = match ? `image/${match[1]}` : `image`;
-        formData.append("image", {
-          uri: capturedImage,
-          name: filename,
-          type,
-        } as any);
-      }
+    let response;
 
-      const response = await axios.post(
+    if (existingProblemId) {
+      // Update existing
+      response = await axios.put(
+        `${environment.API_BASE_URL}api/request-audit/update-problem/${existingProblemId}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+    } else {
+      // Save new
+      response = await axios.post(
         `${environment.API_BASE_URL}api/request-audit/save-problem/${govilinkjobid}`,
         formData,
         {
@@ -113,24 +182,39 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
           },
         }
       );
-
-      if (response.data.success) {
-        Alert.alert(t("Success"), t("Problem and solution saved successfully."));
-        // navigation.navigate("NextScreen"); // ✅ replace with your next screen
-      } else {
-        Alert.alert(
-          t("Error.Sorry"),
-          t("CertificateSuggestions.Failed to save problem.")
-        );
-      }
-    } catch (err) {
-      console.error("❌ Error saving problem:", err);
-      Alert.alert(t("Error.Sorry"), t("Something went wrong. Try again later."));
-    } finally {
-      setLoading(false);
     }
-  };
 
+    if (response.data.success) {
+      Alert.alert(
+        t("Success"),
+        existingProblemId
+          ? t("RequestProblem.Problem updated successfully.")
+          : t("RequestProblem.Problem saved successfully.")
+      );
+
+      // Update existingProblem state after successful update
+      setExistingProblem({
+        id: existingProblemId || response.data.id,
+        farmerFeedback,
+        advice,
+        image: capturedImage || undefined,
+      });
+      setExistingProblemId(existingProblemId || response.data.id);
+            navigation.navigate("RequestSuggestions", { jobId, farmerId, govilinkjobid, farmerMobile  });
+
+    } else {
+      Alert.alert(
+        t("Error.Sorry"),
+        t("RequestProblem.Failed to submit problem. Please try again.")
+      );
+    }
+  } catch (err) {
+    console.error("❌ Error saving/updating problem:", err);
+    Alert.alert(t("Error.Sorry"), t("Main.somethingWentWrong"));
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleCameraClose = (imageUri: string | null) => {
   setShowCamera(false);
@@ -174,20 +258,20 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
         contentContainerStyle={{ paddingBottom: 120 }}
       >
                <Text className="text-base font-semibold mb-2 mt-1">
-                      {t("CertificateSuggestions.Farmer’s Say")}
+                      {t("RequestProblem.Farmer’s Say")}
                     </Text>
         <TextInput
           className="border border-[#9DB2CE] rounded-md p-2 mb-4"
           multiline
           placeholder={t("CertificateSuggestions.Type here...")}
           textAlignVertical="top"
-          value={problem}
-          onChangeText={setProblem}
+          value={farmerFeedback}
+          onChangeText={setFarmerFeedback}
           style={{ minHeight: 130 }}
         />
 
         <Text className="text-base font-semibold mb-2">
-          {t("CertificateSuggestions.Advice Given")}
+          {t("RequestProblem..Advice Given")}
         </Text>
 
         <TextInput
@@ -195,8 +279,8 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
           multiline
           placeholder={t("CertificateSuggestions.Type here...")}
           textAlignVertical="top"
-          value={solution}
-          onChangeText={setSolution}
+          value={advice}
+          onChangeText={setAdvice}
           style={{ minHeight: 130 }}
         />
 
@@ -214,12 +298,12 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
             className="bg-black rounded-3xl w-full py-3 items-center justify-center"
           >
             <Text className="text-white font-semibold text-base">
-              {t("CertificateQuesanory.Open Camera")}
+              {t("RequestProblem.Photo")}
             </Text>
           </TouchableOpacity>
         {capturedImage && (
-          <Text>
-            {}
+          <Text className="text-center text-[#415CFF]">
+            {t("RequestProblem.Image Uploaded")}
           </Text>
         )}
       </ScrollView>
@@ -228,11 +312,11 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
       <View className="flex-row justify-between p-4 border-t border-gray-200">
         <TouchableOpacity
           className="flex-row items-center bg-[#444444] px-12 py-3 rounded-full ml-2"
-          onPress={() => navigation.goBack()}
+          onPress={() => navigation.navigate("Main", {screen: "Dashboard"})}
         >
           <AntDesign name="arrow-left" size={20} color="#fff" />
           <Text className="ml-4 text-white font-semibold text-base">
-            {t("CertificateQuesanory.Back")}
+            {t("CertificateQuesanory.Exit")}
           </Text>
         </TouchableOpacity>
 
@@ -248,9 +332,7 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
             className="flex-row items-center px-12 py-3 rounded-full"
           >
             <Text className="mr-4 text-white font-semibold text-base">
-              {loading
-                ? t("CertificateQuesanory.Loading...")
-                : t("CertificateQuesanory.Next")}
+                {t("CertificateQuesanory.Next")}
             </Text>
             <AntDesign name="arrow-right" size={20} color="#fff" />
           </LinearGradient>

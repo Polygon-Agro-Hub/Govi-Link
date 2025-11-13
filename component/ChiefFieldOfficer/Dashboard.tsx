@@ -190,8 +190,9 @@ const scrollDraftToIndex = (index: number) => {
 
   useEffect(() => {
     fetchUserProfile();
-    fetchVisits();
-    fetchVisitsDraft()
+    // fetchVisits();
+    // fetchVisitsDraft()
+    fetchAllVisits();
   }, []);
 
 const onRefresh = useCallback(async () => {
@@ -199,8 +200,9 @@ const onRefresh = useCallback(async () => {
     setRefreshing(true);
     await Promise.all([
       fetchUserProfile(),
-      fetchVisits(),
-      fetchVisitsDraft(),
+      // fetchVisits(),
+      // fetchVisitsDraft(),
+      fetchAllVisits(),
     ]);
   } catch (error) {
     console.error("Refresh error:", error);
@@ -267,49 +269,49 @@ useFocusEffect(
       };
     }
   };
-  const fetchVisits = async () => {
-    try {
-      const token = await AsyncStorage.getItem("token");
+  // const fetchVisits = async () => {
+  //   try {
+  //     const token = await AsyncStorage.getItem("token");
       
-      if (token) {
-        const response = await axios.get(
-          `${environment.API_BASE_URL}api/officer/officer-visits`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        setVisitsData(response.data.data);
+  //     if (token) {
+  //       const response = await axios.get(
+  //         `${environment.API_BASE_URL}api/officer/officer-visits`,
+  //         {
+  //           headers: { Authorization: `Bearer ${token}` },
+  //         }
+  //       );
+  //       setVisitsData(response.data.data);
       
-      }
-    } catch (error) {
-      console.error("Failed to fetch officer visits:", error);
-    } finally {
-      setRefreshing(false);
+  //     }
+  //   } catch (error) {
+  //     console.error("Failed to fetch officer visits:", error);
+  //   } finally {
+  //     setRefreshing(false);
 
-    }
-  };
+  //   }
+  // };
 
-    const fetchVisitsDraft = async () => {
-      console.log("hitt")
-    try {
-      const token = await AsyncStorage.getItem("token");
-      if (token) {
-        const response = await axios.get(
-          `${environment.API_BASE_URL}api/officer/officer-visits-draft`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        setDraftVisits(response.data.data || []);
-            console.log(response.data.data)
-      }
-    } catch (error) {
-      console.error("Failed to fetch officer visits:", error);
-    } finally {
-      setRefreshing(false);
+  //   const fetchVisitsDraft = async () => {
+  //     console.log("hitt")
+  //   try {
+  //     const token = await AsyncStorage.getItem("token");
+  //     if (token) {
+  //       const response = await axios.get(
+  //         `${environment.API_BASE_URL}api/officer/officer-visits-draft`,
+  //         {
+  //           headers: { Authorization: `Bearer ${token}` },
+  //         }
+  //       );
+  //       setDraftVisits(response.data.data || []);
+  //           console.log(response.data.data)
+  //     }
+  //   } catch (error) {
+  //     console.error("Failed to fetch officer visits:", error);
+  //   } finally {
+  //     setRefreshing(false);
 
-    }
-  };
+  //   }
+  // };
 useEffect(() => {
   console.log("🎯 Loading States:", { loadingVisitsdrafts});
 }, [loadingVisitsdrafts]);
@@ -337,6 +339,30 @@ useEffect(() => {
       console.error("Failed to open dial pad:", err)
     );
   };
+
+
+  const fetchAllVisits = async () => {
+  try {
+    setLoadingVisitsdrafts(true);
+    const token = await AsyncStorage.getItem("token");
+    if (!token) return;
+
+    const response = await axios.get(`${environment.API_BASE_URL}api/officer/visits`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    const { visits, draftVisits } = response.data.data;
+    console.log("Fetched visits:", visits, draftVisits);
+
+    setVisitsData(visits || []);
+    setDraftVisits(draftVisits || []);
+  } catch (error) {
+    console.error("Failed to fetch officer visits:", error);
+  } finally {
+    setLoadingVisitsdrafts(false);
+  }
+};
+
   return (
     <ScrollView
       className={`flex-1 bg-white p-3  `}
@@ -407,7 +433,7 @@ useEffect(() => {
             ref={flatListRef}
             horizontal
             data={visitsData}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item, index) => `${item.jobId}-${index}`}
             showsHorizontalScrollIndicator={false}
             renderItem={({ item }) => (
               <TouchableOpacity
@@ -546,21 +572,30 @@ useEffect(() => {
         ref={draftFlatListRef}
         horizontal
         data={draftVisits}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item, index) => `${item.jobId}-${index}`}
         showsHorizontalScrollIndicator={false}
         renderItem={({ item }) => (
           <TouchableOpacity
-            onPress={() =>
-              navigation.navigate("CertificateQuesanory", {
-                auditId:item.id,
-                jobId: item.jobId,
-                certificationpaymentId: item.certificationpaymentId,
-                farmerMobile: item.farmerMobile,
-                clusterId: item.clusterId,
-                farmId: item.farmId,
-                 isClusterAudit: !!item.clusterId,
-              })
-            }
+onPress={() => {
+    if (item.propose === "Individual" || item.propose === "Cluster") {
+      navigation.navigate("CertificateQuesanory", {
+        auditId: item.id,
+        jobId: item.jobId,
+        certificationpaymentId: item.certificationpaymentId,
+        farmerMobile: item.farmerMobile,
+        clusterId: item.clusterId,
+        farmId: item.farmId,
+        isClusterAudit: !!item.clusterId,
+      });
+    } else {
+      navigation.navigate("RequestProblem", {
+        jobId: item.jobId,
+        farmerId: item.farmerId,
+        govilinkjobid: item.id,
+        farmerMobile: item.farmerMobile,
+      });
+    }
+  }}
           >
             <View className="border border-[#FF1D85] rounded-lg p-3 mb-4 flex-row justify-between items-center w-[304px] mr-4">
               <View>
@@ -568,19 +603,28 @@ useEffect(() => {
                   #{item.jobId}
                 </Text>
                 <Text className="text-base font-bold mt-1">{item.farmerName}</Text>
-                <Text className="text-[#4E6393] text-base mt-1">
-                  {item.propose === "Cluster"
-                    ? i18n.language === "si"
-                      ? "ගොවි සමූහ විගණනය"
-                      : i18n.language === "ta"
-                      ? "உழவர் குழு தணிக்கை"
-                      : "Farm Cluster Audit"
-                    : i18n.language === "si"
-                    ? "තනි ගොවි විගණනය"
-                    : i18n.language === "ta"
-                    ? "தனிப்பட்ட விவசாயி தணிக்கை"
-                    : "Individual Farmer Audit"}
-                </Text>
+       <Text className="text-[#4E6393] text-base mt-1">
+  {item.propose === "Cluster"
+    ? i18n.language === "si"
+      ? "ගොවි සමූහ විගණනය"
+      : i18n.language === "ta"
+      ? "உழவர் குழு தணிக்கை"
+      : "Farm Cluster Audit"
+    : item.propose === "Requested"
+    ? i18n.language === "si"
+      ? item.servicesinhalaName
+      : i18n.language === "ta"
+      ? item.servicetamilName
+      : item.serviceenglishName
+    : item.propose === "Individual"
+      ? "Farmer Service Request"
+    : i18n.language === "si"
+    ? "තනි ගොවි විගණනය"
+    : i18n.language === "ta"
+    ? "தனிப்பட்ட விவசாயி தணிக்கை"
+    : "Individual Farmer Audit"}
+</Text>
+
               </View>
 
               <AnimatedCircularProgress

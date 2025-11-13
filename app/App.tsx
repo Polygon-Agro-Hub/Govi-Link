@@ -34,6 +34,7 @@ import ViewFarmsCluster from "@/component/ViewFarmsCluster";
 import QRScaneerRequstAudit from "@/component/QRScaneerRequstAudit";
 import RequestSuggestions from "@/component/RequestSuggestions";
 import RequestProblem from "@/component/RequestProblem";
+import OtpverificationRequestAudit from "@/component/OtpverificationRequestAudit";
 
 LogBox.ignoreAllLogs(true);
 NativeWindStyleSheet.setOutput({ default: "native" });
@@ -187,6 +188,7 @@ function AppContent() {
             <Stack.Screen name="ViewFarmsCluster" component={ViewFarmsCluster} />
             <Stack.Screen name="RequestSuggestions" component={RequestSuggestions} />
             <Stack.Screen name="RequestProblem" component={RequestProblem} />
+            <Stack.Screen name="OtpverificationRequestAudit" component={OtpverificationRequestAudit} />
           </Stack.Navigator>
         </NavigationContainer>
       </SafeAreaView>
