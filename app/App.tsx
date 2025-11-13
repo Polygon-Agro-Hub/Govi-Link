@@ -1,170 +1,3 @@
-// import React, { useEffect, useState } from "react";
-// import { Alert, BackHandler, Text, View ,  Dimensions, TextInput} from "react-native";
-// import { NavigationContainer, useNavigation } from "@react-navigation/native";
-// import { createStackNavigator } from "@react-navigation/stack";
-// import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-// import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
-// import NavigationBar from "@/Items/NavigationBar";
-// import { LanguageProvider } from "@/context/LanguageContext";
-// import { GestureHandlerRootView } from "react-native-gesture-handler";
-// import { Provider, useSelector } from "react-redux";
-// import  store, { RootState } from "@/services/reducxStore";
-// import NetInfo from '@react-native-community/netinfo';
-// import { useTranslation } from "react-i18next";
-// import { navigationRef } from "../navigationRef"; 
-
-// import { NativeWindStyleSheet } from "nativewind";
-// import { LogBox } from 'react-native';
-// import Dashboard from "@/component/ChiefFieldOfficer/Dashboard";
-// import Lanuage from "@/component/Lanuage";
-// import Splash from "@/component/Splash";
-// import Login from "@/component/Login";
-// import DrawerNavigation from "@/Items/DrawerNavigation";
-
-
-
-// LogBox.ignoreAllLogs(true);
-// NativeWindStyleSheet.setOutput({
-//   default: "native",
-// });
-
-// (Text as any).defaultProps = {
-//   ...(Text as any).defaultProps,
-//   allowFontScaling: false,
-// };
-
-// (TextInput as any).defaultProps = {
-//   ...(TextInput as any).defaultProps,
-//   allowFontScaling: false,
-// };
-
-// const Stack = createStackNavigator(); 
-// const Tab = createBottomTabNavigator();
-// const windowDimensions = Dimensions.get("window");
-
-// // Example Screens
-// function HomeScreen() {
-//   return (
-//     <View className="flex-1 items-center justify-center bg-blue-100">
-//       <Text className="text-2xl font-bold text-blue-800">Home Screen</Text>
-//     </View>
-//   );
-// }
-
-// function MainTabNavigator() {
-//       const [initialTab, setInitialTab] = useState('Dashboard');
-//   const jobRole = useSelector((state: RootState) => state.auth.jobRole);
-//   useEffect(() => {
-//     if (jobRole === 'Chief Field Officer') {
-//       setInitialTab('Dashboard'); 
-//     } else if (jobRole === 'Field Officer') {
-//       setInitialTab('FieldOfficerDashboard');
-//     } 
-//   }, [jobRole]);
-//   return (
-//     <Tab.Navigator
-//        initialRouteName={initialTab}
-//       screenOptions={({ route }) => ({
-//         headerShown: false,
-//         tabBarHideOnKeyboard: false,
-//         tabBarStyle: { position: "absolute", backgroundColor: "#fff" },
-//       })}
-      
-//       tabBar={(props) => <NavigationBar {...props} />}
-//     >
-//    <Tab.Screen name="Dashboard" component={DrawerNavigation} />
-//     </Tab.Navigator>
-//   );
-// }
-
-// function AppContent() {
-//   const insets = useSafeAreaInsets();
-//  const { t } = useTranslation();
-
-//   const [isOfflineAlertShown, setIsOfflineAlertShown] = useState(false);
-
-//   useEffect(() => {
-//     const unsubscribeNetInfo = NetInfo.addEventListener(state => {
-//       if (!state.isConnected && !isOfflineAlertShown) {
-//         setIsOfflineAlertShown(true); // mark that alert is shown
-//         Alert.alert(
-//           t("Main.No Internet Connection"),
-//           t("Main.Please turn on mobile data or Wi-Fi to continue."),
-//           [
-//             {
-//               text: "OK",
-//               onPress: () => {
-//                 // Reset flag after user presses OK
-//                 setIsOfflineAlertShown(false);
-//               },
-//             },
-//           ]
-//         );
-//       }
-//     });
-
-//     return () => {
-//       unsubscribeNetInfo();
-//     };
-//   }, [isOfflineAlertShown]);
-
-// useEffect(() => {
-//   const backAction = () => {
-//     if (!navigationRef.isReady()) {
-//       // Navigation not ready yet, let default system back handle it
-//       return false;
-//     }
-
-//     const currentRouteName = navigationRef.getCurrentRoute()?.name ?? "";
-
-//     if (currentRouteName === "Dashboard") {
-//       BackHandler.exitApp();
-//       return true;
-//     } else if (navigationRef.canGoBack()) {
-//       navigationRef.goBack();
-//       return true;
-//     }
-//     return false;
-//   };
-
-//   const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction);
-//   return () => backHandler.remove();
-// }, []);
-
-//   return (
-//     <GestureHandlerRootView style={{ flex: 1 }}>
-//       <SafeAreaView
-//         style={{ flex: 1, paddingBottom: insets.bottom, backgroundColor: "#fff" }}
-//         edges={["top", "right", "left"]}
-//       >
-//         <NavigationContainer   ref={navigationRef}>
-//           <Stack.Navigator screenOptions={{ headerShown: false }}>
-//             <Stack.Screen name="Splash" component={Splash} />
-//                      <Stack.Screen name="Language" component={Lanuage} />
-//                      <Stack.Screen name="Login" component={Login} />
-//                     <Stack.Screen name='Main' component={MainTabNavigator} options={{ headerShown: false }} />
-//                     {/* <Stack.Screen name="FieldOfficerDashboard" component={FieldOfficerDashboard} /> */}
-//   <Stack.Screen name="FieldOfficerDrawer" component={DrawerNavigation} />
-
-
-//           </Stack.Navigator>
-//         </NavigationContainer>
-//       </SafeAreaView>
-//     </GestureHandlerRootView>
-//   );
-// }
-// export default function App() {
-//   return (
-//     <SafeAreaProvider>
-//       <Provider store={store}>
-//       <LanguageProvider>
-//         <AppContent />
-//       </LanguageProvider>
-//       </Provider>
-//     </SafeAreaProvider>
-//   );
-// }
-
 import React, { useEffect, useState } from "react";
 import { Alert, BackHandler, Text, View, Dimensions, TextInput } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
@@ -192,6 +25,12 @@ import FieldOfficerDashboard from "@/component/FeildOfficer/FieldOfficerDashboar
 import ProfileScreen from "@/component/Profile";
 import AddComplaintScreen from "@/component/AddComplaint";
 import ViewAllVisits from "@/component/ViewAllVisits";
+import QRScanner from "@/component/QRScanner";
+import CertificateQuesanory from "@/component/CertificateQuesanory";
+import CertificateSuggestions from "@/component/CertificateSuggestions"
+import Otpverification from "@/component/Otpverification";
+import OtpverificationSuccess from "@/component/OtpverificationSuccess";
+import ViewFarmsCluster from "@/component/ViewFarmsCluster";
 
 LogBox.ignoreAllLogs(true);
 NativeWindStyleSheet.setOutput({ default: "native" });
@@ -213,38 +52,6 @@ function HomeScreen() {
 }
 
 
-// function MainTabs() {
-//   const [initialTab, setInitialTab] = useState("Dashboard");
-//   console.log('initial tab', initialTab)
-//   const jobRole = useSelector((state: RootState) => state.auth.jobRole);
-
-//   useEffect(() => {
-//     if (jobRole === "Chief Field Officer") {
-//       setInitialTab("Dashboard");
-//     } else if (jobRole === "Field Officer") {
-//       setInitialTab("FieldOfficerDashboard");
-//     }
-//   }, [jobRole]);
-
-//   return (
-//     <Tab.Navigator
-//       initialRouteName={initialTab}
-//       screenOptions={{
-//         headerShown: false,
-//         tabBarHideOnKeyboard: false,
-//         tabBarStyle: { position: "absolute", backgroundColor: "#fff" },
-//       }}
-//       tabBar={(props) => <NavigationBar {...props} />}
-//     >
-      
-//                   <Tab.Screen  name="FieldOfficerDashboard" component={FieldOfficerDashboard}/>
-
-//       <Tab.Screen name="Dashboard" component={Dashboard} />
-//                   <Tab.Screen name="Profile" component={ProfileScreen} />
-
-//     </Tab.Navigator>
-//   );
-// }
 function MainTabs() {
   const jobRole = useSelector((state: RootState) => state.auth.jobRole);
   const [initialTab, setInitialTab] = useState<string | null>(null);
@@ -276,6 +83,7 @@ function MainTabs() {
           <Tab.Screen name="Dashboard" component={Dashboard} />
           <Tab.Screen name="Profile" component={ProfileScreen} />
             <Tab.Screen name="ViewAllVisits" component={ViewAllVisits} />
+            <Tab.Screen name="QRScanner" component={QRScanner} />
         </>
       ) : (
         <>
@@ -369,6 +177,11 @@ function AppContent() {
             <Stack.Screen name="Language" component={Lanuage} />
             <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="Main" component={MainDrawer} />
+            <Stack.Screen name="CertificateQuesanory" component={CertificateQuesanory} />
+            <Stack.Screen name="CertificateSuggestions" component={CertificateSuggestions}/>
+            <Stack.Screen name="Otpverification" component={Otpverification} />
+            <Stack.Screen name="OtpverificationSuccess" component={OtpverificationSuccess} />
+            <Stack.Screen name="ViewFarmsCluster" component={ViewFarmsCluster} />
           </Stack.Navigator>
         </NavigationContainer>
       </SafeAreaView>
