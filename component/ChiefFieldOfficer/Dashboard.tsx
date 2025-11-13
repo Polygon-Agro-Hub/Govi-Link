@@ -13,6 +13,7 @@ import {
   BackHandler,
   TouchableWithoutFeedback,
   Linking,
+  Alert,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
@@ -27,6 +28,8 @@ import { setUserProfile } from "@/store/authSlice";
 import { LinearGradient } from "expo-linear-gradient";
 import { AntDesign, Ionicons, Feather, FontAwesome6 } from "@expo/vector-icons";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
+import ContentLoader, { Rect, Circle } from "react-content-loader/native";
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
 type DashboardNavigationProps = StackNavigationProp<
   RootStackParamList,
   "Dashboard"
@@ -45,15 +48,63 @@ interface ProfileData {
   firstNameTamil: string;
   lastNameTamil: string;
   empId: string;
+  
 }
 interface VisitsData {
   farmerName: string;
+  farmerMobile:number;
   jobId: string;
   propose: string;
   serviceenglishName: string;
   servicesinhalaName: string;
   servicetamilName: string;
+  clusterId:number
+  farmId:number
 }
+
+interface DraftVisit {
+  certificationpaymentId: number;
+  jobId: string;
+  userId: number;
+  tickCompleted: number;
+  photoCompleted: number;
+  totalCompleted: number;
+  completionPercentage: number;
+  farmerName?: string; 
+  farmerId: number;   
+  propose?: string;  
+  farmerMobile:number;
+  id:number;
+  clusterId:number
+  farmId:number
+}
+
+const LoadingSkeleton = () => {
+  const rectWidth = wp("38%");
+  const gapBetweenRects = wp("8%");
+  const totalWidth = 2 * rectWidth + gapBetweenRects;
+  const startX = (wp("100%") - totalWidth) / 2;
+
+  return (
+    <View style={{ flex: 1, backgroundColor: "#fff", paddingVertical: hp("2%") }}>
+      <ContentLoader
+        speed={1}
+        width="100%"
+        height={hp("100%")}
+        backgroundColor="#f3f3f3"
+        foregroundColor="#ecebeb"
+      >
+<View className="mt-20">
+          <Rect x={wp("6%")} y={hp("2%")} rx="10" ry="10" width={wp("82%")} height={hp("15%")} />
+                    <Rect x={wp("6%")} y={hp("24%")} rx="10" ry="10" width={wp("82%")} height={hp("15%")} />
+
+
+</View>
+      </ContentLoader>
+    </View>
+  );
+};
+
 const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
   const { t } = useTranslation();
@@ -64,8 +115,12 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
   const [showPopup, setShowPopup] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [visitsData, setVisitsData] = useState<VisitsData[]>([]);
-  console.log("Officer Visits", visitsData);
-
+const [draftVisits, setDraftVisits] = useState<DraftVisit[]>([]);
+  const [loadingVisitsdrafts, setLoadingVisitsdrafts] = useState(false);
+        console.log("officer draft visit", draftVisits)
+        console.log("officer  visit", visitsData)
+const [currentDraftIndex, setCurrentDraftIndex] = useState(0);
+const draftFlatListRef = useRef<FlatList>(null);
   const openDrawer = () => {
     navigation.dispatch(DrawerActions.openDrawer());
   };
@@ -86,10 +141,29 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
       });
     }
   };
-
+const scrollDraftToIndex = (index: number) => {
+  if (!draftFlatListRef.current || !draftVisits || draftVisits.length === 0) return;
+  const validIndex = Math.max(0, Math.min(index, draftVisits.length - 1));
+  try {
+    draftFlatListRef.current.scrollToIndex({ index: validIndex, animated: true });
+    setCurrentDraftIndex(validIndex);
+  } catch (error) {
+    draftFlatListRef.current.scrollToOffset({
+      offset: validIndex * 320, // width of item
+      animated: true,
+    });
+  }
+};
   const fetchUserProfile = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
+            if (!token) {
+                 Alert.alert(
+                t("Error.Sorry"),
+                t("Error.Your login session has expired. Please log in again to continue.")
+              );
+              return;
+            }
       if (token) {
         const response = await axios.get(
           `${environment.API_BASE_URL}api/auth/user-profile`,
@@ -100,8 +174,15 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
         setProfile(response.data.data);
         dispatch(setUserProfile(response.data.data));
       }
-    } catch (error) {
+    } catch (error:any) {
       console.error("Failed to fetch user profile:", error);
+      if (error.response?.status === 401) {
+              Alert.alert(
+             t("Error.Sorry"),
+             t("Error.Your login session has expired. Please log in again to continue.")
+           );
+      navigation.navigate("Login");
+    }
     } finally {
       setRefreshing(false);
     }
@@ -110,14 +191,24 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
   useEffect(() => {
     fetchUserProfile();
     fetchVisits();
+    fetchVisitsDraft()
   }, []);
 
-  const onRefresh = async () => {
+const onRefresh = useCallback(async () => {
+  try {
     setRefreshing(true);
-    await fetchUserProfile();
-    await fetchVisits();
+    await Promise.all([
+      fetchUserProfile(),
+      fetchVisits(),
+      fetchVisitsDraft(),
+    ]);
+  } catch (error) {
+    console.error("Refresh error:", error);
+  } finally {
     setRefreshing(false);
-  };
+  }
+}, []);
+
   const getName = () => {
     if (!profile) return "Loading...";
     switch (i18n.language) {
@@ -142,17 +233,31 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
     }
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      const onBackPress = () => true;
-      BackHandler.addEventListener("hardwareBackPress", onBackPress);
-      const subscription = BackHandler.addEventListener(
-        "hardwareBackPress",
-        onBackPress
-      );
-      return () => subscription.remove();
-    }, [])
-  );
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     const onBackPress = () => true;
+  //     BackHandler.addEventListener("hardwareBackPress", onBackPress);
+  //     const subscription = BackHandler.addEventListener(
+  //       "hardwareBackPress",
+  //       onBackPress
+  //     );
+  //     return () => subscription.remove();
+  //   }, [])
+  // );
+useFocusEffect(
+  React.useCallback(() => {
+    const backAction = () => {
+      if (showPopup) {
+        setShowPopup(false);
+        setSelectedItem(null);
+        return true;
+      }
+      return false;
+    };
+    const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction);
+    return () => backHandler.remove();
+  }, [showPopup])
+);
 
   const getTextStyle = () => {
     if (i18n.language === "si") {
@@ -165,6 +270,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
   const fetchVisits = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
+      
       if (token) {
         const response = await axios.get(
           `${environment.API_BASE_URL}api/officer/officer-visits`,
@@ -173,13 +279,40 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
           }
         );
         setVisitsData(response.data.data);
+      
       }
     } catch (error) {
       console.error("Failed to fetch officer visits:", error);
     } finally {
       setRefreshing(false);
+
     }
   };
+
+    const fetchVisitsDraft = async () => {
+      console.log("hitt")
+    try {
+      const token = await AsyncStorage.getItem("token");
+      if (token) {
+        const response = await axios.get(
+          `${environment.API_BASE_URL}api/officer/officer-visits-draft`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setDraftVisits(response.data.data || []);
+            console.log(response.data.data)
+      }
+    } catch (error) {
+      console.error("Failed to fetch officer visits:", error);
+    } finally {
+      setRefreshing(false);
+
+    }
+  };
+useEffect(() => {
+  console.log("🎯 Loading States:", { loadingVisitsdrafts});
+}, [loadingVisitsdrafts]);
 
   useEffect(() => {
     const backAction = () => {
@@ -197,6 +330,13 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
 
     return () => backHandler.remove();
   }, [showPopup]);
+
+  const handleDial = (farmerMobile: string) => {
+    const phoneUrl = `tel:${farmerMobile}`;
+    Linking.openURL(phoneUrl).catch((err) =>
+      console.error("Failed to open dial pad:", err)
+    );
+  };
   return (
     <ScrollView
       className={`flex-1 bg-white p-3  `}
@@ -230,7 +370,10 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
         </TouchableOpacity>
         <View></View>
       </View>
-
+      {loadingVisitsdrafts ? (
+        <LoadingSkeleton />
+      ) : (
+          <>
       <View className="p-2 mt-4">
         <View className="flex-row justify-between items-center mb-1">
           <Text className="text-base font-bold">
@@ -279,7 +422,11 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                     setSelectedItem(item);
                     setShowPopup(true);
                   } else {
-                    console.log("navigate to cluster audit");
+    navigation.navigate("ViewFarmsCluster", {
+      jobId: item.jobId,
+      feildauditId: item.id,
+      farmName: item.farmerName,
+    });
                     {
                       /*if cluster need send  clusterID , jobId    */
                     }
@@ -377,34 +524,120 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
         </Text>
       </View>
 
-      <View className="p-8 -mt-10">
-        <View className="border border-[#FF1D85] rounded-lg p-3 mr-4 w-full flex-row justify-between items-center">
-          <View>
-            <Text className="text-black text-sm font-medium">#20251012001</Text>
-            <Text className="text-base font-bold mt-1">
-              Ravin Kaluhennadige
-            </Text>
-            <Text className="text-[#4E6393] text-base mt-1">Consultation</Text>
-          </View>
+   <View className="">
+  {/* Drafts done for only individual audit */}
+  {draftVisits.length > 0 ? (
+    <View className="flex-row items-center">
+      {/* Left Arrow */}
+      <TouchableOpacity
+        disabled={currentDraftIndex <= 0}
+        onPress={() => scrollDraftToIndex(currentDraftIndex - 1)}
+        className="p-1"
+      >
+        <AntDesign
+          name="left"
+          size={24}
+          color={currentDraftIndex <= 0 ? "#ccc" : "#FF1D85"}
+        />
+      </TouchableOpacity>
 
-          <AnimatedCircularProgress
-            size={70}
-            width={6}
-            fill={85}
-            tintColor="#FF6B6B"
-            backgroundColor="#E8DEF8"
-            onAnimationComplete={() => console.log("Animation complete")}
+      {/* Drafts FlatList */}
+      <FlatList
+        ref={draftFlatListRef}
+        horizontal
+        data={draftVisits}
+        keyExtractor={(item) => item.id}
+        showsHorizontalScrollIndicator={false}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate("CertificateQuesanory", {
+                auditId:item.id,
+                jobId: item.jobId,
+                certificationpaymentId: item.certificationpaymentId,
+                farmerMobile: item.farmerMobile,
+                clusterId: item.clusterId,
+                farmId: item.farmId,
+                 isClusterAudit: !!item.clusterId,
+              })
+            }
           >
-            {(fill: number) => (
-              <Text className="text-black text-base font-semibold">
-                {Math.round(fill)}%
-              </Text>
-            )}
-          </AnimatedCircularProgress>
-        </View>
-      </View>
+            <View className="border border-[#FF1D85] rounded-lg p-3 mb-4 flex-row justify-between items-center w-[304px] mr-4">
+              <View>
+                <Text className="text-black text-sm font-medium">
+                  #{item.jobId}
+                </Text>
+                <Text className="text-base font-bold mt-1">{item.farmerName}</Text>
+                <Text className="text-[#4E6393] text-base mt-1">
+                  {item.propose === "Cluster"
+                    ? i18n.language === "si"
+                      ? "ගොවි සමූහ විගණනය"
+                      : i18n.language === "ta"
+                      ? "உழவர் குழு தணிக்கை"
+                      : "Farm Cluster Audit"
+                    : i18n.language === "si"
+                    ? "තනි ගොවි විගණනය"
+                    : i18n.language === "ta"
+                    ? "தனிப்பட்ட விவசாயி தணிக்கை"
+                    : "Individual Farmer Audit"}
+                </Text>
+              </View>
 
-      <Modal transparent visible={showPopup} animationType="slide">
+              <AnimatedCircularProgress
+                size={70}
+                width={6}
+                fill={item.completionPercentage || 0}
+                tintColor="#FF6B6B"
+                backgroundColor="#E8DEF8"
+              >
+                {(fill: number) => (
+                  <Text className="text-black text-base font-semibold">
+                    {Math.round(fill)}%
+                  </Text>
+                )}
+              </AnimatedCircularProgress>
+            </View>
+          </TouchableOpacity>
+        )}
+      />
+
+      {/* Right Arrow */}
+      <TouchableOpacity
+        disabled={currentDraftIndex >= draftVisits.length - 1}
+        onPress={() => scrollDraftToIndex(currentDraftIndex + 1)}
+        className="p-1"
+      >
+        <AntDesign
+          name="right"
+          size={24}
+          color={currentDraftIndex >= draftVisits.length - 1 ? "#ccc" : "#FF1D85"}
+        />
+      </TouchableOpacity>
+    </View>
+  ) : (
+    <View className="items-center justify-center mt-2">
+      <Image
+        source={require("../../assets/no tasks.webp")}
+        style={{ width: 120, height: 90 }}
+        resizeMode="contain"
+      />
+      <Text className="italic text-[#787878]">
+        {t("Dashboard.No Drafts Saved")}
+      </Text>
+    </View>
+  )}
+</View>
+
+
+</>)}
+
+      <Modal transparent visible={showPopup} animationType="slide"
+        onRequestClose={() => {
+    console.log("hitt");
+    setShowPopup(false);
+    setSelectedItem(null);
+  }}
+      >
         <TouchableWithoutFeedback
           onPress={() => {
             setShowPopup(false);
@@ -515,7 +748,9 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                           </View>
                         </TouchableOpacity>
 
-                        <TouchableOpacity className="flex ">
+                        <TouchableOpacity className="flex "
+                        onPress={() => handleDial(selectedItem.farmerMobile)}
+                        >
                           <View className="flex-row items-center justify-center border border-[#F83B4F] rounded-full px-6 py-2">
                             <Ionicons name="call" size={20} color="#F83B4F" />
                             <Text className="text-base font-semibold  ml-2">
@@ -544,7 +779,13 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                     </>
                   )}
 
-                  <TouchableOpacity onPress={() => setShowPopup(false)}>
+                  <TouchableOpacity 
+                    onPress={() => {
+    setShowPopup(false);
+    if (selectedItem?.farmerId) {
+      navigation.navigate("QRScanner", { farmerId: selectedItem.farmerId, jobId: selectedItem.jobId , certificationpaymentId: selectedItem.certificationpaymentId, farmerMobile:selectedItem.farmerMobile, farmId:selectedItem.farmId, clusterId:selectedItem.clusterID , isClusterAudit:false,  auditId:selectedItem.id });
+    } 
+  }}>
                     <LinearGradient
                       colors={["#F2561D", "#FF1D85"]}
                       start={{ x: 0, y: 0 }}
@@ -554,7 +795,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                       <Text className="text-white text-lg font-semibold">
                         {t("VisitPopup.Start")}
                       </Text>
-                      {/*if individual need send  farmerId for check with QR scan ,jobId, certificate id   */}
+                      {/*if individual need send  farmerId for check with QR scan ,jobId,    */}
                     </LinearGradient>
                   </TouchableOpacity>
                 </View>

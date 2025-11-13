@@ -5,14 +5,15 @@ import {
   Text,
   TouchableOpacity,
   ScrollView,
-  Linking,
 } from "react-native";
 import { RootStackParamList } from "@/component/types";
 import { useTranslation } from "react-i18next";
 import { LinearGradient } from "expo-linear-gradient";
 import dayjs from "dayjs";
-import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import { environment } from "@/environment/environment";
 type ViewAllVisitsNavigationProps = StackNavigationProp<
   RootStackParamList,
   "ViewAllVisits"
@@ -41,11 +42,10 @@ const today = dayjs();
 const currentDay = today.date(); // 31
 console.log("Today date:", currentDay);
 
-const [selectedDate, setSelectedDate] = useState<number>(currentDay);
+  const [selectedDate, setSelectedDate] = useState(dayjs());
   const [selectedMonth] = useState(today.format("MMMM, YYYY"));
 
-  const dates = Array.from({ length: today.daysInMonth() }, (_, i) => i + 1);
-
+  const dates = Array.from({ length: 8 }, (_, i) => today.add(i, "day"));
   const visits: VisitItem[] = [
     {
       id: "SR20251012001",
@@ -60,24 +60,45 @@ const [selectedDate, setSelectedDate] = useState<number>(currentDay);
     },
   ];
 
-  const filteredVisits = visits.filter((v) => v.date === selectedDate);
-const scrollRef = React.useRef<ScrollView>(null);
+  const filteredVisits = visits.filter((v) =>
+    dayjs(v.date).isSame(selectedDate, "day")
+  );const scrollRef = React.useRef<ScrollView>(null);
 
-const ITEM_WIDTH = 50; // width + margin of each date item, adjust if needed
+const ITEM_WIDTH = 0; // width + margin of each date item, adjust if needed
 
 useFocusEffect(
-  useCallback(() => {
-    // Scroll to current date whenever screen is focused
-    setTimeout(() => {
-      if (scrollRef.current) {
-        scrollRef.current.scrollTo({
-          x: (currentDay - 1) * ITEM_WIDTH,
-          animated: true,
-        });
+    useCallback(() => {
+      setSelectedDate(today); // ensure current date is selected
+      setTimeout(() => {
+        if (scrollRef.current) {
+          scrollRef.current.scrollTo({
+            x: 0, // today is first in array, so no offset needed
+            animated: true,
+          });
+        }
+      }, 200);
+    }, [])
+  );
+
+
+    const fetchVisits = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      if (token) {
+        const response = await axios.get(
+          `${environment.API_BASE_URL}api/officer/officer-visits/${selectedDate}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        console.log(response.data.data);
       }
-    }, 100);
-  }, [currentDay])
-);
+    } catch (error) {
+      console.error("Failed to fetch officer visits:", error);
+    } finally {
+    }
+  };
+
   return (
     <View className="flex-1 bg-[#F5F7FB] pt-4">
       {/* Header */}
@@ -105,35 +126,50 @@ useFocusEffect(
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: 4 }}
       >
-        {dates.map((day) => (
-          <TouchableOpacity
-            key={day}
-            onPress={() => setSelectedDate(day)}
-       
-          >
-           <View className="mx-1">
-  {selectedDate === day ? (
-    <LinearGradient
-      colors={["#F2561D", "#FF1D85"]}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 0 }}
-      className="border flex-row gap-x-4 rounded-full w-20 h-10 items-center justify-center border-[#F83B4F] ml-1"
-    >
-      <Text className="font-semibold text-white">{day}</Text>
-     <View className="bg-white rounded-full w-6 h-6 items-center justify-center">
-            <Text className="text-[#F83B4F] font-bold text-xs">01</Text>
-          </View>
-    </LinearGradient>
-  ) : (
-    <View className="border rounded-full w-10 h-10 items-center justify-center border-[#D3D3D3]">
-      <Text className="font-semibold text-black">{day}</Text>
-    </View>
-  )}
-</View>
+     {dates.map((dateObj, index) => {
+            const dayNumber = dateObj.date();
+            const isSelected = selectedDate.isSame(dateObj, "day");
 
-
-          </TouchableOpacity>
-        ))}
+            return (
+              <TouchableOpacity
+                key={index}
+                onPress={() => setSelectedDate(dateObj)}
+              >
+                <View className="mx-1 items-center">
+                  {isSelected ? (
+                    <LinearGradient
+                      colors={["#F2561D", "#FF1D85"]}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 0 }}
+                      className="border flex-row gap-x-4 rounded-full w-20 h-10 items-center justify-center border-[#F83B4F] ml-1"
+                    >
+                      <Text className="font-semibold text-white">
+                        {dayNumber}
+                      </Text>
+                      <View className="bg-white rounded-full w-6 h-6 items-center justify-center">
+                        <Text className="text-[#F83B4F] font-bold text-xs">
+                          01
+                        </Text>
+                      </View>
+                    </LinearGradient>
+                  ) : (
+                    <View className="border rounded-full w-12 h-10 items-center justify-center border-[#F83B4F]">
+                      <Text className="font-semibold text-black">
+                        {dayNumber}
+                      </Text>
+                    </View>
+                  )}
+                  {/* <Text className="text-[10px] text-[#666] mt-1">
+                    {dateObj.isSame(today, "day")
+                      ? "Today"
+                      : dateObj.isSame(today.add(1, "day"), "day")
+                      ? "Tomorrow"
+                      : dateObj.format("ddd")}
+                  </Text> */}
+                </View>
+              </TouchableOpacity>
+            );
+          })}
       </ScrollView>
 
       </View>
