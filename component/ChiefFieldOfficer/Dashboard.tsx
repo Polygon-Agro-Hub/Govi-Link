@@ -782,9 +782,12 @@ useEffect(() => {
                   <TouchableOpacity 
                     onPress={() => {
     setShowPopup(false);
-    if (selectedItem?.farmerId) {
+    if (selectedItem?.farmerId && selectedItem?.propose === "Individual") {
       navigation.navigate("QRScanner", { farmerId: selectedItem.farmerId, jobId: selectedItem.jobId , certificationpaymentId: selectedItem.certificationpaymentId, farmerMobile:selectedItem.farmerMobile, farmId:selectedItem.farmId, clusterId:selectedItem.clusterID , isClusterAudit:false,  auditId:selectedItem.id });
-    } 
+    } else if (selectedItem?.propose === "Requested") {
+       console.log("hitt Request")
+       navigation.navigate("QRScaneerRequstAudit", { farmerId: selectedItem.farmerId, govilinkjobid: selectedItem.id , jobId: selectedItem.jobId, farmerMobile:selectedItem.farmerMobile  });
+    }
   }}>
                     <LinearGradient
                       colors={["#F2561D", "#FF1D85"]}

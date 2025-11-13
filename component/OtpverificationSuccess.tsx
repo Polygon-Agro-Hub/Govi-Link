@@ -28,13 +28,20 @@ const OtpverificationSuccess: React.FC = ({ navigation }: any) => {
 
   useEffect(() => {
     const handleBackPress = () => {
-      return true; // Prevent the default back button behavior
+      // Navigate to Main screen when back button pressed
+      navigation.navigate("Main");
+      return true; // prevent default back behavior
     };
-         const subscription = BackHandler.addEventListener("hardwareBackPress", handleBackPress);
 
-          return () => subscription.remove();
-  }, []);
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      handleBackPress
+    );
 
+    return () => subscription.remove();
+  }, [navigation]);
+
+  
   return (
     <View className="flex-1 bg-white">
       <StatusBar style="light" />

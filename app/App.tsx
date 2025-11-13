@@ -31,6 +31,9 @@ import CertificateSuggestions from "@/component/CertificateSuggestions"
 import Otpverification from "@/component/Otpverification";
 import OtpverificationSuccess from "@/component/OtpverificationSuccess";
 import ViewFarmsCluster from "@/component/ViewFarmsCluster";
+import QRScaneerRequstAudit from "@/component/QRScaneerRequstAudit";
+import RequestSuggestions from "@/component/RequestSuggestions";
+import RequestProblem from "@/component/RequestProblem";
 
 LogBox.ignoreAllLogs(true);
 NativeWindStyleSheet.setOutput({ default: "native" });
@@ -83,7 +86,7 @@ function MainTabs() {
           <Tab.Screen name="Dashboard" component={Dashboard} />
           <Tab.Screen name="Profile" component={ProfileScreen} />
             <Tab.Screen name="ViewAllVisits" component={ViewAllVisits} />
-            <Tab.Screen name="QRScanner" component={QRScanner} />
+            <Tab.Screen name="QRScaneerRequstAudit" component={QRScaneerRequstAudit} />
         </>
       ) : (
         <>
@@ -182,6 +185,8 @@ function AppContent() {
             <Stack.Screen name="Otpverification" component={Otpverification} />
             <Stack.Screen name="OtpverificationSuccess" component={OtpverificationSuccess} />
             <Stack.Screen name="ViewFarmsCluster" component={ViewFarmsCluster} />
+            <Stack.Screen name="RequestSuggestions" component={RequestSuggestions} />
+            <Stack.Screen name="RequestProblem" component={RequestProblem} />
           </Stack.Navigator>
         </NavigationContainer>
       </SafeAreaView>
