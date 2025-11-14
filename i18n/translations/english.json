@@ -16,7 +16,8 @@
     "Failed to fetch empid.": "Failed to fetch Employee ID.",
     "New password and confirm password do not match.": "New password and confirm password do not match.",
     "New password must be at least 6 characters long.": "New password must be at least 6 characters long.",
-    "Failed to update password.": "Failed to update password."
+    "Failed to update password.": "Failed to update password.",
+    "Your login session has expired. Please log in again to continue.":"Your login session has expired. Please log in again to continue."
   },
   "Login": {
     "Welcome": "Welcome",
@@ -197,6 +198,16 @@
     "Image Uploaded":"Image Uploaded",
     "Please fill out all fields.":"Please fill out all fields.",
     "Problem submitted successfully!":"Problem submitted successfully!",
-    "Failed to submit problem. Please try again.":"Failed to submit problem. Please try again."
+    "Failed to save problem. Please try again.":"Failed to save problem. Please try again.",
+    "Problem updated successfully.":"Problem updated successfully.",
+    "Problem saved successfully.":"Problem saved successfully."
+  },
+  "Visits":{
+    "Pending": "Pending",
+    "Completed": "Completed",
+    "Request Placed": "Request Placed",
+    "Request Reviewed": "Request Reviewed",
+    "Finished": "Finished",
+    "Over Due": "Over Due"
   }
 }
