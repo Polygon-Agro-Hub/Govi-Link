@@ -5,17 +5,27 @@ import {
   TouchableOpacity,
   ScrollView,
   StatusBar,
-  Image,
   Alert,
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import { MaterialIcons, Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { MaterialIcons } from "@expo/vector-icons";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../types";
 import * as ImagePicker from "expo-image-picker";
+import { useTranslation } from "react-i18next";
 
-const AddOfficerStep3 = () => {
-  const navigation = useNavigation();
+type AddOfficerStep3NavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "AddOfficerStep3"
+>;
+
+interface AddOfficerStep3Props {
+  navigation: AddOfficerStep3NavigationProp;
+}
+
+const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
+  const { t } = useTranslation();
 
   // State for uploaded images
   const [nicFrontImage, setNicFrontImage] = useState<string | null>(null);
@@ -34,8 +44,8 @@ const AddOfficerStep3 = () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
       Alert.alert(
-        "Permission required",
-        "Sorry, we need camera roll permissions to make this work!"
+        t("AddOfficer.PermissionRequired"),
+        t("AddOfficer.PermissionRequiredMessage")
       );
       return;
     }
@@ -73,39 +83,18 @@ const AddOfficerStep3 = () => {
     }
   };
 
-  const removeImage = (type: string) => {
-    switch (type) {
-      case "nicFront":
-        setNicFrontImage(null);
-        setNicFrontFileName(null);
-        break;
-      case "nicBack":
-        setNicBackImage(null);
-        setNicBackFileName(null);
-        break;
-      case "passbook":
-        setPassbookImage(null);
-        setPassbookFileName(null);
-        break;
-      case "contract":
-        setContractImage(null);
-        setContractFileName(null);
-        break;
-    }
-  };
-
   const handleSubmit = () => {
     // Validate that all required images are uploaded
     if (!nicFrontImage || !nicBackImage || !passbookImage || !contractImage) {
       Alert.alert(
-        "Incomplete",
-        "Please upload all required documents before submitting."
+        t("AddOfficer.Incomplete"),
+        t("AddOfficer.UploadAllDocuments")
       );
       return;
     }
 
     // Submit logic here
-    Alert.alert("Success", "Officer added successfully!");
+    Alert.alert(t("AddOfficer.Success"), t("AddOfficer.OfficerAddedSuccess"));
     navigation.navigate("ManageOfficers");
   };
 
@@ -126,7 +115,7 @@ const AddOfficerStep3 = () => {
         onPress={() => pickImage(type)}
       >
         <View className="flex-row items-center">
-          <MaterialIcons name="file-upload" size={24} />
+          <MaterialIcons name="file-upload" size={24} color="#534E4E" />
           <Text className="text-base text-[#534E4E] ml-4">{title}</Text>
         </View>
       </TouchableOpacity>
@@ -135,7 +124,7 @@ const AddOfficerStep3 = () => {
       {fileName && (
         <View className="mt-2 flex-row items-center">
           <Text className="text-sm text-black font-semibold mr-2">
-            Attached:
+            {t("AddOfficer.Attached")}:
           </Text>
           <Text className="text-sm text-[#415CFF] font-medium">{fileName}</Text>
         </View>
@@ -167,58 +156,64 @@ const AddOfficerStep3 = () => {
               style={{ marginLeft: 10 }}
             />
           </TouchableOpacity>
-          <Text className="text-2xl font-bold text-black text-center flex-1">
-            Add Officer
+          <Text className="text-lg font-bold text-black text-center flex-1">
+            {t("AddOfficer.AddOfficer")}
           </Text>
           <View style={{ width: 55 }} />
         </View>
 
         {/* Document Upload Section */}
-        <View className="px-6 mt-4">
-          <UploadButton
-            title="NIC Front Image"
-            type="nicFront"
-            image={nicFrontImage}
-            fileName={nicFrontFileName}
-          />
+        <View className="p-4">
+          <View className="px-6 mt-4">
+            <UploadButton
+              title={t("AddOfficer.NICFrontImage")}
+              type="nicFront"
+              image={nicFrontImage}
+              fileName={nicFrontFileName}
+            />
 
-          <UploadButton
-            title="NIC Back Image"
-            type="nicBack"
-            image={nicBackImage}
-            fileName={nicBackFileName}
-          />
+            <UploadButton
+              title={t("AddOfficer.NICBackImage")}
+              type="nicBack"
+              image={nicBackImage}
+              fileName={nicBackFileName}
+            />
 
-          <UploadButton
-            title="Passbook Image"
-            type="passbook"
-            image={passbookImage}
-            fileName={passbookFileName}
-          />
+            <UploadButton
+              title={t("AddOfficer.PassbookImage")}
+              type="passbook"
+              image={passbookImage}
+              fileName={passbookFileName}
+            />
 
-          <UploadButton
-            title="Contract Image"
-            type="contract"
-            image={contractImage}
-            fileName={contractFileName}
-          />
-        </View>
+            <UploadButton
+              title={t("AddOfficer.ContractImage")}
+              type="contract"
+              image={contractImage}
+              fileName={contractFileName}
+            />
+          </View>
 
-        {/* Buttons */}
-        <View className="px-6 mt-8 flex-row w-full justify-between">
-          <TouchableOpacity
-            className="bg-[#D9D9D9] rounded-2xl px-6 py-4 w-[48%] items-center"
-            onPress={() => navigation.navigate("AddOfficerStep2")}
-          >
-            <Text className="text-[#686868] font-semibold">Go Back</Text>
-          </TouchableOpacity>
+          {/* Buttons */}
+          <View className="px-6 mt-8 flex-row w-full justify-between">
+            <TouchableOpacity
+              className="bg-[#D9D9D9] rounded-3xl px-6 py-4 w-[48%] items-center"
+              onPress={() => navigation.navigate("AddOfficerStep2")}
+            >
+              <Text className="text-[#686868] font-semibold">
+                {t("AddOfficer.GoBack")}
+              </Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            className="bg-black rounded-2xl px-6 py-4 w-[48%] items-center ml-3"
-            onPress={handleSubmit}
-          >
-            <Text className="text-white font-semibold">Submit</Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              className="bg-black rounded-3xl px-6 py-4 w-[48%] items-center ml-3"
+              onPress={handleSubmit}
+            >
+              <Text className="text-white font-semibold">
+                {t("AddOfficer.Submit")}
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
