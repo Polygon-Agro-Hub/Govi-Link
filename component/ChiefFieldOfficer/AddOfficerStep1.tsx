@@ -5,7 +5,6 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  Image,
   StatusBar,
   Modal,
   FlatList,
@@ -15,10 +14,12 @@ import {
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { RadioButton } from "react-native-paper";
 import Checkbox from "expo-checkbox";
-import { useNavigation } from "@react-navigation/native";
-
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../types";
+import countryData from "@/assets/json/countryflag.json";
+import { useTranslation } from "react-i18next";
+import i18n from "@/i18n/i18n";
+
 type AddOfficerStep1NavigationProp = StackNavigationProp<
   RootStackParamList,
   "AddOfficerStep1"
@@ -28,24 +29,16 @@ interface AddOfficerStep1ScreenProps {
   navigation: AddOfficerStep1NavigationProp;
 }
 
-const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({ navigation }) => {
+const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
+  navigation,
+}) => {
+  const { t } = useTranslation();
   const [type, setType] = useState<"Permanent" | "Temporary">("Permanent");
-// const [languages, setLanguages] = useState<Record<LanguageKey, boolean>>({
-//   Sinhala: true,
-//   English: false,
-//   Tamil: false,
-// });
-
-const [languages, setLanguages] = useState({
-  Sinhala: true,
-  English: false,
-  Tamil: false,
-});
-
-
-// const toggleLanguage = (lang: LanguageKey) => {
-//   setLanguages(prev => ({ ...prev, [lang]: !prev[lang] }));
-// };
+  const [languages, setLanguages] = useState({
+    Sinhala: true,
+    English: false,
+    Tamil: false,
+  });
 
   const [firstNameEN, setFirstNameEN] = useState("");
   const [lastNameEN, setLastNameEN] = useState("");
@@ -70,59 +63,76 @@ const [languages, setLanguages] = useState({
   const [showCountryCodeDropdown2, setShowCountryCodeDropdown2] =
     useState(false);
 
-  // const navigation = useNavigation();
-
-  // Sri Lanka districts
+  // Sri Lanka districts with translations
   const districts = [
-    "Ampara",
-    "Anuradhapura",
-    "Badulla",
-    "Batticaloa",
-    "Colombo",
-    "Galle",
-    "Gampaha",
-    "Hambantota",
-    "Jaffna",
-    "Kalutara",
-    "Kandy",
-    "Kegalle",
-    "Kilinochchi",
-    "Kurunegala",
-    "Mannar",
-    "Matale",
-    "Matara",
-    "Moneragala",
-    "Mullaitivu",
-    "Nuwara Eliya",
-    "Polonnaruwa",
-    "Puttalam",
-    "Ratnapura",
-    "Trincomalee",
-    "Vavuniya",
+    { en: "Ampara", si: "අම්පාර", ta: "அம்பாறை" },
+    { en: "Anuradhapura", si: "අනුරාධපුර", ta: "அனுராதபுரம்" },
+    { en: "Badulla", si: "බදුල්ල", ta: "பதுளை" },
+    { en: "Batticaloa", si: "මඩකලපුව", ta: "மட்டக்களப்பு" },
+    { en: "Colombo", si: "කොළඹ", ta: "கொழும்பு" },
+    { en: "Galle", si: "ගාල්ල", ta: "காலி" },
+    { en: "Gampaha", si: "ගම්පහ", ta: "கம்பஹா" },
+    { en: "Hambantota", si: "හම්බන්තොට", ta: "அம்பாந்தோட்டை" },
+    { en: "Jaffna", si: "යාපනය", ta: "யாழ்ப்பாணம்" },
+    { en: "Kalutara", si: "කළුතර", ta: "களுத்துறை" },
+    { en: "Kandy", si: "මහනුවර", ta: "கண்டி" },
+    { en: "Kegalle", si: "කැගල්ල", ta: "கேகாலை" },
+    { en: "Kilinochchi", si: "කිලිනොච්චි", ta: "கிளிநொச்சி" },
+    { en: "Kurunegala", si: "කුරුණෑගල", ta: "குருநாகல்" },
+    { en: "Mannar", si: "මන්නාරම", ta: "மன்னார்" },
+    { en: "Matale", si: "මාතලේ", ta: "மாதளை" },
+    { en: "Matara", si: "මාතර", ta: "மாத்தறை" },
+    { en: "Moneragala", si: "මොනරාගල", ta: "மொனராகலை" },
+    { en: "Mullaitivu", si: "මුල්ලයිතීවු", ta: "முல்லைத்தீவு" },
+    { en: "Nuwara Eliya", si: "නුවරඑළිය", ta: "நுவரெலியா" },
+    { en: "Polonnaruwa", si: "පොලොන්නරුව", ta: "பொலன்னறுவை" },
+    { en: "Puttalam", si: "පුත්තලම", ta: "புத்தளம்" },
+    { en: "Ratnapura", si: "රත්නපුර", ta: "இரத்தினபுரி" },
+    { en: "Trincomalee", si: "ත්‍රිකුණාමලය", ta: "திருகோணமலை" },
+    { en: "Vavuniya", si: "වවුනියාව", ta: "வவுனியா" },
   ];
 
-  // Country codes
-  const countryCodes = [
-    { code: "+94", country: "Sri Lanka" },
-    { code: "+91", country: "India" },
-    { code: "+1", country: "USA/Canada" },
-    { code: "+44", country: "UK" },
-    { code: "+61", country: "Australia" },
-  ];
-
-  const toggleLanguage = (lang:  keyof typeof languages) => {
+  const toggleLanguage = (lang: keyof typeof languages) => {
     setLanguages((prev) => ({ ...prev, [lang]: !prev[lang] }));
   };
 
+  // Get current language
+  const getCurrentLanguage = () => {
+    return i18n.language || "en";
+  };
+
+  // Get translated district name
+  const getTranslatedDistrict = (district: {
+    en: string;
+    si: string;
+    ta: string;
+  }) => {
+    const lang = getCurrentLanguage();
+    return district[lang as keyof typeof district] || district.en;
+  };
+
+  // Get translated country name
+  const getTranslatedCountry = (country: {
+    name: { en: string; si: string; ta: string };
+  }) => {
+    const lang = getCurrentLanguage();
+    return country.name[lang as keyof typeof country.name] || country.name.en;
+  };
+
   // Toggle district selection
-  const toggleDistrictSelection = (district: string) => {
+  const toggleDistrictSelection = (district: {
+    en: string;
+    si: string;
+    ta: string;
+  }) => {
+    const districtKey = district.en;
     setSelectedDistricts((prev) => {
-      if (prev.includes(district)) {
+      if (prev.includes(districtKey)) {
         // Remove district if already selected
-        return prev.filter((d) => d !== district);
+        return prev.filter((d) => d !== districtKey);
       } else {
         // Add district if not selected
-        return [...prev, district];
+        return [...prev, districtKey];
       }
     });
   };
@@ -135,46 +145,77 @@ const [languages, setLanguages] = useState({
   // Get display text for districts
   const getDistrictDisplayText = () => {
     if (selectedDistricts.length === 0) {
-      return "--Assigned District--";
+      return t("AddOfficer.AssignedDistrict");
     } else if (selectedDistricts.length === 1) {
-      return selectedDistricts[0];
+      const district = districts.find((d) => d.en === selectedDistricts[0]);
+      return district ? getTranslatedDistrict(district) : selectedDistricts[0];
     } else if (selectedDistricts.length === 2) {
-      return `${selectedDistricts[0]}, ${selectedDistricts[1]}`;
+      const district1 = districts.find((d) => d.en === selectedDistricts[0]);
+      const district2 = districts.find((d) => d.en === selectedDistricts[1]);
+      const name1 = district1
+        ? getTranslatedDistrict(district1)
+        : selectedDistricts[0];
+      const name2 = district2
+        ? getTranslatedDistrict(district2)
+        : selectedDistricts[1];
+      return `${name1}, ${name2}`;
     } else {
-      return `${selectedDistricts[0]}, ${selectedDistricts[1]} +${
-        selectedDistricts.length - 2
-      } more`;
+      const district1 = districts.find((d) => d.en === selectedDistricts[0]);
+      const district2 = districts.find((d) => d.en === selectedDistricts[1]);
+      const name1 = district1
+        ? getTranslatedDistrict(district1)
+        : selectedDistricts[0];
+      const name2 = district2
+        ? getTranslatedDistrict(district2)
+        : selectedDistricts[1];
+      return `${name1}, ${name2} +${selectedDistricts.length - 2} ${t(
+        "AddOfficer.more"
+      )}`;
     }
   };
 
-  const renderDistrictItem = ({ item }: { item: string }) => (
+  const renderDistrictItem = ({
+    item,
+  }: {
+    item: { en: string; si: string; ta: string };
+  }) => (
     <TouchableOpacity
       className="px-4 py-3 border-b border-gray-200 flex-row justify-between items-center"
       onPress={() => toggleDistrictSelection(item)}
     >
-      <Text className="text-base text-gray-800">{item}</Text>
+      <Text className="text-base text-gray-800">
+        {getTranslatedDistrict(item)}
+      </Text>
       <Checkbox
-        value={selectedDistricts.includes(item)}
+        value={selectedDistricts.includes(item.en)}
         onValueChange={() => toggleDistrictSelection(item)}
-        color={selectedDistricts.includes(item) ? "#21202B" : undefined}
+        color={selectedDistricts.includes(item.en) ? "#21202B" : undefined}
       />
     </TouchableOpacity>
   );
 
+  // Updated renderCountryCodeItem with translated country names
   const renderCountryCodeItem = (
-    { item }: { item: { code: string; country: string } },
+    { item }: { item: any },
     setCode: Function,
     setShow: Function
   ) => (
     <TouchableOpacity
-      className="px-4 py-3 border-b border-gray-200 flex-row justify-between items-center rounded-3xl"
+      className="px-4 py-3 border-b border-gray-200"
       onPress={() => {
-        setCode(item.code);
+        setCode(item.dial_code);
         setShow(false);
       }}
     >
-      <Text className="text-base text-gray-800 font-medium">{item.code}</Text>
-      <Text className="text-sm text-gray-600">{item.country}</Text>
+      <View className="flex-row items-center justify-between">
+        <View className="flex-row items-center">
+          <Text className="text-2xl mr-3">{item.emoji}</Text>
+          <Text className="text-sm text-gray-600">{item.dial_code}</Text>
+        </View>
+        <Text className="text-base text-gray-800 font-medium">
+          {getTranslatedCountry(item)}
+        </Text>
+      </View>
     </TouchableOpacity>
   );
 
@@ -202,8 +243,8 @@ const [languages, setLanguages] = useState({
               style={{ marginLeft: 10 }}
             />
           </TouchableOpacity>
-          <Text className="text-2xl font-bold text-black text-center flex-1">
-            Add Officer
+          <Text className="text-lg font-bold text-black text-center flex-1">
+            {t("AddOfficer.AddOfficer")}
           </Text>
           <View style={{ width: 55 }} />
         </View>
@@ -219,211 +260,221 @@ const [languages, setLanguages] = useState({
         </View>
 
         {/* Type */}
-        <View className="px-6 mt-6">
-          <View className="flex flex-row items-center space-x-6 justify-between">
-            <Text className="text-base font-medium">Type:</Text>
-            <TouchableOpacity
-              className="flex-row items-center"
-              onPress={() => setType("Permanent")}
-            >
-              <RadioButton
-                value="Permanent"
-                status={type === "Permanent" ? "checked" : "unchecked"}
+        <View className="p-4">
+          <View className="px-6 mt-6">
+            <View className="flex flex-row items-center space-x-6 justify-between">
+              <Text className="text-base font-medium">
+                {t("AddOfficer.Type")}:
+              </Text>
+              <TouchableOpacity
+                className="flex-row items-center"
                 onPress={() => setType("Permanent")}
-                color="#21202B"
-              />
-              <Text className="ml-1 text-base text-[#534E4E]">Permanent</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              className="flex-row items-center"
-              onPress={() => setType("Temporary")}
-            >
-              <RadioButton
-                value="Temporary"
-                status={type === "Temporary" ? "checked" : "unchecked"}
-                onPress={() => setType("Temporary")}
-                color="#21202B"
-              />
-              <Text className="ml-1 text-base text-[#534E4E]">Temporary</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        <View className="border border-[#ADADAD] border-b-0 mt-4"></View>
-
-        {/* Preferred Languages */}
-        <View className="px-6 mt-4">
-          <Text className="text-base font-medium mb-4">
-            Preferred Languages:
-          </Text>
-          <View className="flex-row justify-between space-x-4">
-            {/* {Object.keys(languages).map((lang) => (
-              <View key={lang} className="flex-row items-center space-x-1">
-                <Checkbox
-                  value={languages[lang]}
-                  onValueChange={() => toggleLanguage(lang)}
-                  color={languages[lang] ? "#21202B" : undefined}
+              >
+                <RadioButton
+                  value="Permanent"
+                  status={type === "Permanent" ? "checked" : "unchecked"}
+                  onPress={() => setType("Permanent")}
+                  color="#21202B"
                 />
-                <Text className="text-base text-[#534E4E]">{lang}</Text>
-              </View>
-            ))} */}
+                <Text className="ml-1 text-base text-[#534E4E]">
+                  {t("AddOfficer.Permanent")}
+                </Text>
+              </TouchableOpacity>
 
-{(Object.keys(languages) as Array<keyof typeof languages>).map((lang) => (
-  <View key={lang} className="flex-row items-center space-x-1">
-    <Checkbox
-      value={languages[lang]}
-      onValueChange={() => toggleLanguage(lang)}
-      color={languages[lang] ? "#21202B" : undefined}
-    />
-    <Text className="text-base text-[#534E4E]">{lang}</Text>
-  </View>
-))}
-
+              <TouchableOpacity
+                className="flex-row items-center"
+                onPress={() => setType("Temporary")}
+              >
+                <RadioButton
+                  value="Temporary"
+                  status={type === "Temporary" ? "checked" : "unchecked"}
+                  onPress={() => setType("Temporary")}
+                  color="#21202B"
+                />
+                <Text className="ml-1 text-base text-[#534E4E]">
+                  {t("AddOfficer.Temporary")}
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
 
-        <View className="border border-[#ADADAD] border-b-0 mt-4"></View>
+          <View className="border border-[#ADADAD] border-b-0 mt-4"></View>
 
-        {/* Form Fields */}
-        <View className="px-6 mt-4 space-y-3">
-          {/* District Dropdown - MULTI SELECT */}
-          <TouchableOpacity
-            className="bg-[#F4F4F4] rounded-3xl px-4 py-3 flex-row justify-between items-center"
-            onPress={() => setShowDistrictDropdown(true)}
-          >
-            <Text
-              className={`${
-                selectedDistricts.length > 0 ? "text-black" : "text-[#7D7D7D]"
-              }`}
-            >
-              {getDistrictDisplayText()}
+          {/* Preferred Languages */}
+          <View className="px-6 mt-4">
+            <Text className="text-base font-medium mb-4">
+              {t("AddOfficer.PreferredLanguages")}:
             </Text>
-            <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
-          </TouchableOpacity>
+            <View className="flex-row justify-between space-x-4">
+              {(Object.keys(languages) as Array<keyof typeof languages>).map(
+                (lang) => (
+                  <View key={lang} className="flex-row items-center space-x-1">
+                    <Checkbox
+                      value={languages[lang]}
+                      onValueChange={() => toggleLanguage(lang)}
+                      color={languages[lang] ? "#21202B" : undefined}
+                    />
+                    <Text className="text-base text-[#534E4E]">
+                      {t(`AddOfficer.${lang}`)}
+                    </Text>
+                  </View>
+                )
+              )}
+            </View>
+          </View>
 
-          <TextInput
-            placeholder="--First Name in English--"
-            placeholderTextColor="#7D7D7D"
-            className="bg-[#F4F4F4] rounded-3xl px-4 py-4"
-            value={firstNameEN}
-            onChangeText={setFirstNameEN}
-          />
-          <TextInput
-            placeholder="--Last Name in English--"
-            placeholderTextColor="#7D7D7D"
-            className="bg-[#F4F4F4] rounded-3xl px-4 py-4"
-            value={lastNameEN}
-            onChangeText={setLastNameEN}
-          />
+          <View className="border border-[#ADADAD] border-b-0 mt-4"></View>
 
-          <TextInput
-            placeholder="--First Name in Sinhala--"
-            placeholderTextColor="#7D7D7D"
-            className="bg-[#F4F4F4] rounded-3xl px-4 py-4"
-            value={firstNameSI}
-            onChangeText={setFirstNameSI}
-          />
-          <TextInput
-            placeholder="--Last Name in Sinhala--"
-            placeholderTextColor="#7D7D7D"
-            className="bg-[#F4F4F4] rounded-3xl px-4 py-4"
-            value={lastNameSI}
-            onChangeText={setLastNameSI}
-          />
-
-          <TextInput
-            placeholder="--First Name in Tamil--"
-            placeholderTextColor="#7D7D7D"
-            className="bg-[#F4F4F4] rounded-3xl px-4 py-4"
-            value={firstNameTA}
-            onChangeText={setFirstNameTA}
-          />
-          <TextInput
-            placeholder="--Last Name in Tamil--"
-            placeholderTextColor="#7D7D7D"
-            className="bg-[#F4F4F4] rounded-3xl px-4 py-4"
-            value={lastNameTA}
-            onChangeText={setLastNameTA}
-          />
-        </View>
-        <View className="border border-[#ADADAD] border-b-0 mt-4"></View>
-
-        <View className="px-6 mt-4 space-y-3">
-          {/* Phone Numbers */}
-          <View className="flex-row space-x-2">
-            {/* Phone 1 Country Code */}
+          {/* Form Fields */}
+          <View className="px-6 mt-4 space-y-4">
+            {/* District Dropdown - MULTI SELECT */}
             <TouchableOpacity
-              className="bg-[#F4F4F4] rounded-3xl px-4 py-4 w-20 flex-row justify-between items-center"
-              onPress={() => setShowCountryCodeDropdown1(true)}
+              className="bg-[#F4F4F4] rounded-2xl px-4 py-3 flex-row justify-between items-center"
+              onPress={() => setShowDistrictDropdown(true)}
             >
-              <Text className="text-black">{selectedCountryCode1}</Text>
-              <MaterialIcons name="arrow-drop-down" size={18} color="#666" />
+              <Text
+                className={`${
+                  selectedDistricts.length > 0 ? "text-black" : "text-[#7D7D7D]"
+                }`}
+              >
+                {getDistrictDisplayText()}
+              </Text>
+              <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
             </TouchableOpacity>
 
             <TextInput
-              placeholder="7XXXXXXXX"
+              placeholder={t("AddOfficer.FirstNameEnglish")}
               placeholderTextColor="#7D7D7D"
-              className="bg-[#F4F4F4] rounded-3xl px-4 py-4 flex-1"
-              value={phone1}
-              onChangeText={setPhone1}
-              keyboardType="phone-pad"
+              className="bg-[#F4F4F4] rounded-2xl px-4 py-4"
+              value={firstNameEN}
+              onChangeText={setFirstNameEN}
+              underlineColorAndroid="transparent"
             />
-          </View>
-
-          <View className="flex-row space-x-2">
-            {/* Phone 2 Country Code */}
-            <TouchableOpacity
-              className="bg-[#F4F4F4] rounded-3xl px-4 py-4 w-20 flex-row justify-between items-center"
-              onPress={() => setShowCountryCodeDropdown2(true)}
-            >
-              <Text className="text-black">{selectedCountryCode2}</Text>
-              <MaterialIcons name="arrow-drop-down" size={18} color="#666" />
-            </TouchableOpacity>
+            <TextInput
+              placeholder={t("AddOfficer.LastNameEnglish")}
+              placeholderTextColor="#7D7D7D"
+              className="bg-[#F4F4F4] rounded-2xl px-4 py-4"
+              value={lastNameEN}
+              onChangeText={setLastNameEN}
+              underlineColorAndroid="transparent"
+            />
 
             <TextInput
-              placeholder="7XXXXXXXX"
+              placeholder={t("AddOfficer.FirstNameSinhala")}
               placeholderTextColor="#7D7D7D"
-              className="bg-[#F4F4F4] rounded-3xl px-4 py-4 flex-1"
-              value={phone2}
-              onChangeText={setPhone2}
-              keyboardType="phone-pad"
+              className="bg-[#F4F4F4] rounded-2xl px-4 py-4"
+              value={firstNameSI}
+              onChangeText={setFirstNameSI}
+              underlineColorAndroid="transparent"
+            />
+            <TextInput
+              placeholder={t("AddOfficer.LastNameSinhala")}
+              placeholderTextColor="#7D7D7D"
+              className="bg-[#F4F4F4] rounded-2xl px-4 py-4"
+              value={lastNameSI}
+              onChangeText={setLastNameSI}
+              underlineColorAndroid="transparent"
+            />
+
+            <TextInput
+              placeholder={t("AddOfficer.FirstNameTamil")}
+              placeholderTextColor="#7D7D7D"
+              className="bg-[#F4F4F4] rounded-2xl px-4 py-4"
+              value={firstNameTA}
+              onChangeText={setFirstNameTA}
+              underlineColorAndroid="transparent"
+            />
+            <TextInput
+              placeholder={t("AddOfficer.LastNameTamil")}
+              placeholderTextColor="#7D7D7D"
+              className="bg-[#F4F4F4] rounded-2xl px-4 py-4"
+              value={lastNameTA}
+              onChangeText={setLastNameTA}
+              underlineColorAndroid="transparent"
+            />
+          </View>
+          <View className="border border-[#ADADAD] border-b-0 mt-4"></View>
+
+          <View className="px-6 mt-4 space-y-4">
+            {/* Phone Numbers */}
+            <View className="flex-row space-x-2">
+              {/* Phone 1 Country Code */}
+              <TouchableOpacity
+                className="bg-[#F4F4F4] rounded-2xl px-4 py-4 w-20 flex-row justify-between items-center"
+                onPress={() => setShowCountryCodeDropdown1(true)}
+              >
+                <Text className="text-black">{selectedCountryCode1}</Text>
+                <MaterialIcons name="arrow-drop-down" size={18} color="#666" />
+              </TouchableOpacity>
+
+              <TextInput
+                placeholder="7XXXXXXXX"
+                placeholderTextColor="#7D7D7D"
+                className="bg-[#F4F4F4] rounded-2xl px-4 py-4 flex-1"
+                value={phone1}
+                onChangeText={setPhone1}
+                keyboardType="phone-pad"
+                underlineColorAndroid="transparent"
+              />
+            </View>
+
+            <View className="flex-row space-x-2">
+              {/* Phone 2 Country Code */}
+              <TouchableOpacity
+                className="bg-[#F4F4F4] rounded-2xl px-4 py-4 w-20 flex-row justify-between items-center"
+                onPress={() => setShowCountryCodeDropdown2(true)}
+              >
+                <Text className="text-black">{selectedCountryCode2}</Text>
+                <MaterialIcons name="arrow-drop-down" size={18} color="#666" />
+              </TouchableOpacity>
+
+              <TextInput
+                placeholder="7XXXXXXXX"
+                placeholderTextColor="#7D7D7D"
+                className="bg-[#F4F4F4] rounded-2xl px-4 py-4 flex-1"
+                value={phone2}
+                onChangeText={setPhone2}
+                keyboardType="phone-pad"
+                underlineColorAndroid="transparent"
+              />
+            </View>
+
+            <TextInput
+              placeholder={t("AddOfficer.NICNumber")}
+              placeholderTextColor="#7D7D7D"
+              className="bg-[#F4F4F4] rounded-2xl px-4 py-4"
+              value={nic}
+              onChangeText={setNic}
+              underlineColorAndroid="transparent"
+            />
+            <TextInput
+              placeholder={t("AddOfficer.EmailAddress")}
+              placeholderTextColor="#7D7D7D"
+              className="bg-[#F4F4F4] rounded-2xl px-4 py-4"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              underlineColorAndroid="transparent"
             />
           </View>
 
-          <TextInput
-            placeholder="--NIC Number--"
-            placeholderTextColor="#7D7D7D"
-            className="bg-[#F4F4F4] rounded-3xl px-4 py-4"
-            value={nic}
-            onChangeText={setNic}
-          />
-          <TextInput
-            placeholder="--Email Address--"
-            placeholderTextColor="#7D7D7D"
-            className="bg-[#F4F4F4] rounded-3xl px-4 py-4"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-        </View>
+          {/* Buttons */}
+          <View className="px-6 mt-6 flex-row w-full justify-between">
+            <TouchableOpacity
+              className="bg-[#D9D9D9] rounded-3xl px-6 py-4 w-[48%] items-center"
+              onPress={() => navigation.navigate("ManageOfficers")}
+            >
+              <Text className="text-[#686868]">{t("AddOfficer.Cancel")}</Text>
+            </TouchableOpacity>
 
-        {/* Buttons */}
-        <View className="px-6 mt-6 flex-row w-full justify-between">
-          <TouchableOpacity
-            className="bg-[#D9D9D9] rounded-2xl px-6 py-4 w-[48%] items-center"
-            onPress={() => navigation.navigate("ManageOfficers")}
-          >
-            <Text className="text-[#686868]">Cancel</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            className="bg-black rounded-2xl px-6 py-4 w-[48%] items-center ml-3"
-            onPress={() => navigation.navigate("AddOfficerStep2")}
-          >
-            <Text className="text-white">Next</Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              className="bg-black rounded-3xl px-6 py-4 w-[48%] items-center ml-3"
+              onPress={() => navigation.navigate("AddOfficerStep2")}
+            >
+              <Text className="text-white">{t("AddOfficer.Next")}</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
 
@@ -438,10 +489,12 @@ const [languages, setLanguages] = useState({
           <View className="bg-white rounded-2xl w-11/12 max-h-96">
             <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
               <View>
-                <Text className="text-lg font-semibold">Select Districts</Text>
+                <Text className="text-lg font-semibold">
+                  {t("AddOfficer.SelectDistricts")}
+                </Text>
                 {selectedDistricts.length > 0 && (
                   <Text className="text-sm text-green-600">
-                    {selectedDistricts.length} selected
+                    {selectedDistricts.length} {t("AddOfficer.selected")}
                   </Text>
                 )}
               </View>
@@ -452,7 +505,7 @@ const [languages, setLanguages] = useState({
                     className="mr-3"
                   >
                     <Text className="text-red-500 text-sm font-medium">
-                      Clear All
+                      {t("AddOfficer.ClearAll")}
                     </Text>
                   </TouchableOpacity>
                 )}
@@ -466,7 +519,7 @@ const [languages, setLanguages] = useState({
             <FlatList
               data={districts}
               renderItem={renderDistrictItem}
-              keyExtractor={(item) => item}
+              keyExtractor={(item) => item.en}
               showsVerticalScrollIndicator={false}
               className="max-h-64"
             />
@@ -475,14 +528,16 @@ const [languages, setLanguages] = useState({
                 className="bg-[#21202B] rounded-xl py-3 items-center"
                 onPress={() => setShowDistrictDropdown(false)}
               >
-                <Text className="text-white font-semibold text-base">Done</Text>
+                <Text className="text-white font-semibold text-base">
+                  {t("AddOfficer.Done")}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
         </View>
       </Modal>
 
-      {/* Country Code Dropdown Modal 1 */}
+      {/* Country Code Dropdown Modal 1 with Flags */}
       <Modal
         visible={showCountryCodeDropdown1}
         transparent={true}
@@ -492,7 +547,9 @@ const [languages, setLanguages] = useState({
         <View className="flex-1 bg-black/50 justify-center items-center">
           <View className="bg-white rounded-2xl w-11/12 max-h-80">
             <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
-              <Text className="text-lg font-semibold">Select Country Code</Text>
+              <Text className="text-lg font-semibold">
+                {t("AddOfficer.SelectCountryCode")}
+              </Text>
               <TouchableOpacity
                 onPress={() => setShowCountryCodeDropdown1(false)}
               >
@@ -500,7 +557,7 @@ const [languages, setLanguages] = useState({
               </TouchableOpacity>
             </View>
             <FlatList
-              data={countryCodes}
+              data={countryData}
               renderItem={({ item }) =>
                 renderCountryCodeItem(
                   { item },
@@ -515,7 +572,7 @@ const [languages, setLanguages] = useState({
         </View>
       </Modal>
 
-      {/* Country Code Dropdown Modal 2 */}
+      {/* Country Code Dropdown Modal 2 with Flags */}
       <Modal
         visible={showCountryCodeDropdown2}
         transparent={true}
@@ -525,7 +582,9 @@ const [languages, setLanguages] = useState({
         <View className="flex-1 bg-black/50 justify-center items-center">
           <View className="bg-white rounded-2xl w-11/12 max-h-80">
             <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
-              <Text className="text-lg font-semibold">Select Country Code</Text>
+              <Text className="text-lg font-semibold">
+                {t("AddOfficer.SelectCountryCode")}
+              </Text>
               <TouchableOpacity
                 onPress={() => setShowCountryCodeDropdown2(false)}
               >
@@ -533,7 +592,7 @@ const [languages, setLanguages] = useState({
               </TouchableOpacity>
             </View>
             <FlatList
-              data={countryCodes}
+              data={countryData}
               renderItem={({ item }) =>
                 renderCountryCodeItem(
                   { item },

@@ -7,12 +7,12 @@ import {
   RefreshControl,
   StatusBar,
   Image,
-  Dimensions,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../types";
 import { Ionicons } from "@expo/vector-icons";
+const UserProfileImage = require("@/assets/user-profile.png");
 
 type ManageOfficersNavigationProps = StackNavigationProp<
   RootStackParamList,
@@ -34,11 +34,26 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
   const { t } = useTranslation();
   const [refreshing, setRefreshing] = useState(false);
   const [officers, setOfficers] = useState<Officer[]>([
-    { name: "Amal Perera", empId: "FI00127", status: "approved" },
+    {
+      name: "Amal Perera",
+      empId: "FI00127",
+      status: "approved",
+      image: "https://example.com/dulaj.jpg",
+    },
     { name: "Bhathiya Dias", empId: "FI00134", status: "approved" },
-    { name: "Dulaj Nawanjana", empId: "FI00155", status: "approved" },
+    {
+      name: "Dulaj Nawanjana",
+      empId: "FI00155",
+      status: "approved",
+      image: "https://example.com/dulaj.jpg",
+    },
     { name: "Samitha Herath", empId: "FI00147", status: "approved" },
-    { name: "Umesh Kalhara", empId: "FI00137", status: "approved" },
+    {
+      name: "Umesh Kalhara",
+      empId: "FI00137",
+      status: "approved",
+      image: "https://example.com/umesh.jpg",
+    },
     { name: "Viraj Perera", empId: "FI00137", status: "pending" },
   ]);
 
@@ -61,7 +76,7 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
       <View className="bg-white px-6 py-4 border-b border-[#E5E5E5]">
         <View className="flex-row items-center justify-center">
           <Text className="text-2xl font-bold text-black text-center">
-            Officers
+            {t("ManageOfficers.Officers")}
           </Text>
         </View>
       </View>
@@ -76,8 +91,12 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
       >
         <View className="px-6 py-4 space-y-3">
           <Text className="mt-2 text-[#21202B] text-base">
-            <Text className="font-bold">Officers List </Text>
-            <Text>(All {officers.length})</Text>
+            <Text className="font-bold">
+              {t("ManageOfficers.OfficersList")}{" "}
+            </Text>
+            <Text>
+              ({t("ManageOfficers.All")} {officers.length})
+            </Text>
           </Text>
 
           {officers.map((officer, index) => (
@@ -92,24 +111,31 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
             >
               {/* User Image */}
               <View
-                className="rounded-full bg-gray-300"
+                className="rounded-full bg-gray-300 items-center justify-center"
                 style={{ width: 50, height: 50 }}
               >
-                {officer.image && (
+                {officer.image ? (
                   <Image
                     source={{ uri: officer.image }}
                     style={{ width: 50, height: 50, borderRadius: 25 }}
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <Image
+                    source={UserProfileImage}
+                    style={{ width: 50, height: 50 }}
+                    resizeMode="cover"
                   />
                 )}
               </View>
 
               {/* User Info */}
               <View className="ml-4 flex-1">
-                <Text className="text-[#21202B] text-lg font-semibold">
+                <Text className="text-[#21202B] text-base font-semibold">
                   {officer.name}
                 </Text>
-                <Text className="text-[#565559] text-base">
-                  EMP ID : {officer.empId}
+                <Text className="text-[#565559] text-sm">
+                  {t("ManageOfficers.EMPID")} : {officer.empId}
                 </Text>
               </View>
 
@@ -125,7 +151,7 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
                   }}
                 >
                   <Text className="text-[#FF3434] text-xs">
-                    Not Approved yet
+                    {t("ManageOfficers.NotApprovedYet")}
                   </Text>
                 </View>
               )}
