@@ -17,13 +17,35 @@ import { RadioButton } from "react-native-paper";
 import Checkbox from "expo-checkbox";
 import { useNavigation } from "@react-navigation/native";
 
-const AddOfficerStep1 = () => {
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../types";
+type AddOfficerStep1NavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "AddOfficerStep1"
+>;
+
+interface AddOfficerStep1ScreenProps {
+  navigation: AddOfficerStep1NavigationProp;
+}
+
+const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({ navigation }) => {
   const [type, setType] = useState<"Permanent" | "Temporary">("Permanent");
-  const [languages, setLanguages] = useState({
-    Sinhala: true,
-    English: false,
-    Tamil: false,
-  });
+// const [languages, setLanguages] = useState<Record<LanguageKey, boolean>>({
+//   Sinhala: true,
+//   English: false,
+//   Tamil: false,
+// });
+
+const [languages, setLanguages] = useState({
+  Sinhala: true,
+  English: false,
+  Tamil: false,
+});
+
+
+// const toggleLanguage = (lang: LanguageKey) => {
+//   setLanguages(prev => ({ ...prev, [lang]: !prev[lang] }));
+// };
 
   const [firstNameEN, setFirstNameEN] = useState("");
   const [lastNameEN, setLastNameEN] = useState("");
@@ -48,7 +70,7 @@ const AddOfficerStep1 = () => {
   const [showCountryCodeDropdown2, setShowCountryCodeDropdown2] =
     useState(false);
 
-  const navigation = useNavigation();
+  // const navigation = useNavigation();
 
   // Sri Lanka districts
   const districts = [
@@ -88,7 +110,7 @@ const AddOfficerStep1 = () => {
     { code: "+61", country: "Australia" },
   ];
 
-  const toggleLanguage = (lang: string) => {
+  const toggleLanguage = (lang:  keyof typeof languages) => {
     setLanguages((prev) => ({ ...prev, [lang]: !prev[lang] }));
   };
 
@@ -236,7 +258,7 @@ const AddOfficerStep1 = () => {
             Preferred Languages:
           </Text>
           <View className="flex-row justify-between space-x-4">
-            {Object.keys(languages).map((lang) => (
+            {/* {Object.keys(languages).map((lang) => (
               <View key={lang} className="flex-row items-center space-x-1">
                 <Checkbox
                   value={languages[lang]}
@@ -245,7 +267,19 @@ const AddOfficerStep1 = () => {
                 />
                 <Text className="text-base text-[#534E4E]">{lang}</Text>
               </View>
-            ))}
+            ))} */}
+
+{(Object.keys(languages) as Array<keyof typeof languages>).map((lang) => (
+  <View key={lang} className="flex-row items-center space-x-1">
+    <Checkbox
+      value={languages[lang]}
+      onValueChange={() => toggleLanguage(lang)}
+      color={languages[lang] ? "#21202B" : undefined}
+    />
+    <Text className="text-base text-[#534E4E]">{lang}</Text>
+  </View>
+))}
+
           </View>
         </View>
 

@@ -18,4 +18,8 @@ export type RootStackParamList = {
      RequestSuggestions: { farmerId?: number, govilinkjobid?: number, jobId? : string, farmerMobile?:number};
      RequestProblem: { farmerId?: number, govilinkjobid?: number, jobId? : string, farmerMobile?:number};
       OtpverificationRequestAudit:{farmerId?: number, govilinkjobid?: number, jobId? : string, farmerMobile?:number};
+      ManageOfficers: undefined;
+      AddOfficerStep1: undefined;
+      AddOfficerStep2: undefined;
+      AddOfficerStep3: undefined;
 }

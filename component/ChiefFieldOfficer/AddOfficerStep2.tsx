@@ -12,10 +12,17 @@ import {
   Platform,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../types";
+type AddOfficerStep2NavigationProps = StackNavigationProp<
+  RootStackParamList,
+  "AddOfficerStep2"
+>;
 
-const AddOfficerStep2 = () => {
-  const navigation = useNavigation();
+interface AddOfficerStep2Props {
+  navigation: AddOfficerStep2NavigationProps;
+}
+const AddOfficerStep2 : React.FC<AddOfficerStep2Props> = ({ navigation }) => {
 
   // Address states
   const [housePlotNo, setHousePlotNo] = useState("");
