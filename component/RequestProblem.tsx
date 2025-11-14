@@ -136,7 +136,7 @@ const imageChanged =
     if (!token) {
       Alert.alert(
         t("Error.Sorry"),
-        t("Error.Your login session has expired. Please log in again.")
+        t("Main.Your login session has expired. Please log in again to continue.")
       );
       return;
     }
@@ -205,7 +205,7 @@ const imageChanged =
     } else {
       Alert.alert(
         t("Error.Sorry"),
-        t("RequestProblem.Failed to submit problem. Please try again.")
+        t("RequestProblem.Failed to save problem. Please try again.")
       );
     }
   } catch (err) {
