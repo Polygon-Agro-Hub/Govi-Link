@@ -134,6 +134,13 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
   const [showBankDropdown, setShowBankDropdown] = useState(false);
   const [showBranchDropdown, setShowBranchDropdown] = useState(false);
 
+  // Search states
+  const [countrySearch, setCountrySearch] = useState("");
+  const [provinceSearch, setProvinceSearch] = useState("");
+  const [districtSearch, setDistrictSearch] = useState("");
+  const [bankSearch, setBankSearch] = useState("");
+  const [branchSearch, setBranchSearch] = useState("");
+
   // Available provinces and districts based on country selection
   const [availableProvinces, setAvailableProvinces] = useState<
     Array<{ name: { en: string; si: string; ta: string } }>
@@ -184,6 +191,48 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
   }) => {
     const lang = getCurrentLanguage();
     return district[lang as keyof typeof district] || district.en;
+  };
+
+  // Filter data based on search
+  const getFilteredCountries = () => {
+    if (!countrySearch) return countryData;
+    return countryData.filter((country) =>
+      getTranslatedCountry(country)
+        .toLowerCase()
+        .includes(countrySearch.toLowerCase())
+    );
+  };
+
+  const getFilteredProvinces = () => {
+    if (!provinceSearch) return availableProvinces;
+    return availableProvinces.filter((province) =>
+      getTranslatedProvince(province)
+        .toLowerCase()
+        .includes(provinceSearch.toLowerCase())
+    );
+  };
+
+  const getFilteredDistricts = () => {
+    if (!districtSearch) return availableDistricts;
+    return availableDistricts.filter((district) =>
+      getTranslatedDistrict(district)
+        .toLowerCase()
+        .includes(districtSearch.toLowerCase())
+    );
+  };
+
+  const getFilteredBanks = () => {
+    if (!bankSearch) return banks;
+    return banks.filter((bank) =>
+      bank.name.toLowerCase().includes(bankSearch.toLowerCase())
+    );
+  };
+
+  const getFilteredBranches = () => {
+    if (!branchSearch) return availableBranches;
+    return availableBranches.filter((branch) =>
+      branch.name.toLowerCase().includes(branchSearch.toLowerCase())
+    );
   };
 
   // Update display values when language changes
@@ -277,6 +326,32 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
     }
   }, [selectedBank]);
 
+  // Reset search when modal closes
+  const handleModalClose = (modalType: string) => {
+    switch (modalType) {
+      case 'country':
+        setCountrySearch("");
+        setShowCountryDropdown(false);
+        break;
+      case 'province':
+        setProvinceSearch("");
+        setShowProvinceDropdown(false);
+        break;
+      case 'district':
+        setDistrictSearch("");
+        setShowDistrictDropdown(false);
+        break;
+      case 'bank':
+        setBankSearch("");
+        setShowBankDropdown(false);
+        break;
+      case 'branch':
+        setBranchSearch("");
+        setShowBranchDropdown(false);
+        break;
+    }
+  };
+
   // Render functions for dropdown items
   const renderCountryItem = ({ item }: { item: any }) => (
     <TouchableOpacity
@@ -284,7 +359,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
       onPress={() => {
         setSelectedCountry(item.name.en); // Store English value
         setDisplayCountry(getTranslatedCountry(item)); // Set display value
-        setShowCountryDropdown(false);
+        handleModalClose('country');
       }}
     >
       <Text className="text-2xl mr-3">{item.emoji}</Text>
@@ -307,7 +382,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
       onPress={() => {
         setSelectedProvince(item.name.en); // Store English value
         setDisplayProvince(getTranslatedProvince(item)); // Set display value
-        setShowProvinceDropdown(false);
+        handleModalClose('province');
       }}
     >
       <Text className="text-base text-gray-800">
@@ -326,7 +401,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
       onPress={() => {
         setSelectedDistrict(item.en); // Store English value
         setDisplayDistrict(getTranslatedDistrict(item)); // Set display value
-        setShowDistrictDropdown(false);
+        handleModalClose('district');
       }}
     >
       <Text className="text-base text-gray-800">
@@ -340,7 +415,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
       className="px-4 py-3 border-b border-gray-200 rounded-2xl"
       onPress={() => {
         setSelectedBank(item.name);
-        setShowBankDropdown(false);
+        handleModalClose('bank');
       }}
     >
       <Text className="text-base text-gray-800">{item.name}</Text>
@@ -356,11 +431,36 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
       className="px-4 py-3 border-b border-gray-200 rounded-2xl"
       onPress={() => {
         setSelectedBranch(item.name);
-        setShowBranchDropdown(false);
+        handleModalClose('branch');
       }}
     >
       <Text className="text-base text-gray-800">{item.name}</Text>
     </TouchableOpacity>
+  );
+
+  // Search input component
+  const renderSearchInput = (
+    value: string,
+    onChangeText: (text: string) => void,
+    placeholder: string
+  ) => (
+    <View className="px-4 py-2 border-b border-gray-200">
+      <View className="bg-gray-100 rounded-lg px-3 flex-row items-center">
+        <MaterialIcons name="search" size={20} color="#666" />
+        <TextInput
+          placeholder={placeholder}
+          value={value}
+          onChangeText={onChangeText}
+          className="flex-1 ml-2 text-base"
+          placeholderTextColor="#666"
+        />
+        {value ? (
+          <TouchableOpacity onPress={() => onChangeText("")}>
+            <MaterialIcons name="close" size={20} color="#666" />
+          </TouchableOpacity>
+        ) : null}
+      </View>
+    </View>
   );
 
   // Prepare data for next screen (you can use this when navigating)
@@ -599,23 +699,29 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
         visible={showCountryDropdown}
         transparent={true}
         animationType="slide"
-        onRequestClose={() => setShowCountryDropdown(false)}
+        onRequestClose={() => handleModalClose('country')}
       >
         <View className="flex-1 bg-black/50 justify-center items-center">
-          <View className="bg-white rounded-2xl w-11/12 max-h-80">
-            <View className="flex-row justify-between items-center px-4 py-3">
+          <View className="bg-white rounded-2xl w-11/12 max-h-3/4">
+            <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
               <Text className="text-lg font-semibold">
                 {t("AddOfficer.SelectCountry")}
               </Text>
-              <TouchableOpacity onPress={() => setShowCountryDropdown(false)}>
+              <TouchableOpacity onPress={() => handleModalClose('country')}>
                 <MaterialIcons name="close" size={24} color="#666" />
               </TouchableOpacity>
             </View>
+            {renderSearchInput(
+              countrySearch,
+              setCountrySearch,
+              t("AddOfficer.SearchCountry") || "Search country..."
+            )}
             <FlatList
-              data={countryData}
+              data={getFilteredCountries()}
               renderItem={renderCountryItem}
               keyExtractor={(item) => item.code}
               showsVerticalScrollIndicator={false}
+              className="max-h-96"
             />
           </View>
         </View>
@@ -626,23 +732,29 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
         visible={showProvinceDropdown}
         transparent={true}
         animationType="slide"
-        onRequestClose={() => setShowProvinceDropdown(false)}
+        onRequestClose={() => handleModalClose('province')}
       >
         <View className="flex-1 bg-black/50 justify-center items-center">
-          <View className="bg-white rounded-2xl w-11/12 max-h-80">
-            <View className="flex-row justify-between items-center px-4 py-3">
+          <View className="bg-white rounded-2xl w-11/12 max-h-3/4">
+            <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
               <Text className="text-lg font-semibold">
                 {t("AddOfficer.SelectProvince")}
               </Text>
-              <TouchableOpacity onPress={() => setShowProvinceDropdown(false)}>
+              <TouchableOpacity onPress={() => handleModalClose('province')}>
                 <MaterialIcons name="close" size={24} color="#666" />
               </TouchableOpacity>
             </View>
+            {renderSearchInput(
+              provinceSearch,
+              setProvinceSearch,
+              t("AddOfficer.SearchProvince") || "Search province..."
+            )}
             <FlatList
-              data={availableProvinces}
+              data={getFilteredProvinces()}
               renderItem={renderProvinceItem}
               keyExtractor={(item, index) => index.toString()}
               showsVerticalScrollIndicator={false}
+              className="max-h-96"
             />
           </View>
         </View>
@@ -653,23 +765,29 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
         visible={showDistrictDropdown}
         transparent={true}
         animationType="slide"
-        onRequestClose={() => setShowDistrictDropdown(false)}
+        onRequestClose={() => handleModalClose('district')}
       >
         <View className="flex-1 bg-black/50 justify-center items-center">
-          <View className="bg-white rounded-2xl w-11/12 max-h-80">
-            <View className="flex-row justify-between items-center px-4 py-3">
+          <View className="bg-white rounded-2xl w-11/12 max-h-3/4">
+            <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
               <Text className="text-lg font-semibold">
                 {t("AddOfficer.SelectDistrict")}
               </Text>
-              <TouchableOpacity onPress={() => setShowDistrictDropdown(false)}>
+              <TouchableOpacity onPress={() => handleModalClose('district')}>
                 <MaterialIcons name="close" size={24} color="#666" />
               </TouchableOpacity>
             </View>
+            {renderSearchInput(
+              districtSearch,
+              setDistrictSearch,
+              t("AddOfficer.SearchDistrict") || "Search district..."
+            )}
             <FlatList
-              data={availableDistricts}
+              data={getFilteredDistricts()}
               renderItem={renderDistrictItem}
               keyExtractor={(item, index) => index.toString()}
               showsVerticalScrollIndicator={false}
+              className="max-h-96"
             />
           </View>
         </View>
@@ -680,23 +798,29 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
         visible={showBankDropdown}
         transparent={true}
         animationType="slide"
-        onRequestClose={() => setShowBankDropdown(false)}
+        onRequestClose={() => handleModalClose('bank')}
       >
         <View className="flex-1 bg-black/50 justify-center items-center">
-          <View className="bg-white rounded-2xl w-11/12 max-h-80">
-            <View className="flex-row justify-between items-center px-4 py-3">
+          <View className="bg-white rounded-2xl w-11/12 max-h-3/4">
+            <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
               <Text className="text-lg font-semibold">
                 {t("AddOfficer.SelectBank")}
               </Text>
-              <TouchableOpacity onPress={() => setShowBankDropdown(false)}>
+              <TouchableOpacity onPress={() => handleModalClose('bank')}>
                 <MaterialIcons name="close" size={24} color="#666" />
               </TouchableOpacity>
             </View>
+            {renderSearchInput(
+              bankSearch,
+              setBankSearch,
+              t("AddOfficer.SearchBank") || "Search bank..."
+            )}
             <FlatList
-              data={banks}
+              data={getFilteredBanks()}
               renderItem={renderBankItem}
               keyExtractor={(item) => item.id.toString()}
               showsVerticalScrollIndicator={false}
+              className="max-h-96"
             />
           </View>
         </View>
@@ -707,23 +831,29 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
         visible={showBranchDropdown}
         transparent={true}
         animationType="slide"
-        onRequestClose={() => setShowBranchDropdown(false)}
+        onRequestClose={() => handleModalClose('branch')}
       >
         <View className="flex-1 bg-black/50 justify-center items-center">
-          <View className="bg-white rounded-2xl w-11/12 max-h-80">
-            <View className="flex-row justify-between items-center px-4 py-3">
+          <View className="bg-white rounded-2xl w-11/12 max-h-3/4">
+            <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
               <Text className="text-lg font-semibold">
                 {t("AddOfficer.SelectBranch")}
               </Text>
-              <TouchableOpacity onPress={() => setShowBranchDropdown(false)}>
+              <TouchableOpacity onPress={() => handleModalClose('branch')}>
                 <MaterialIcons name="close" size={24} color="#666" />
               </TouchableOpacity>
             </View>
+            {renderSearchInput(
+              branchSearch,
+              setBranchSearch,
+              t("AddOfficer.SearchBranch") || "Search branch..."
+            )}
             <FlatList
-              data={availableBranches}
+              data={getFilteredBranches()}
               renderItem={renderBranchItem}
               keyExtractor={(item) => item.ID.toString()}
               showsVerticalScrollIndicator={false}
+              className="max-h-96"
             />
           </View>
         </View>

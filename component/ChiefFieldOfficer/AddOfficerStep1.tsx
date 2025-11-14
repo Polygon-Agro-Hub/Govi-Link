@@ -54,6 +54,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
   // District dropdown states - MULTI SELECT
   const [selectedDistricts, setSelectedDistricts] = useState<string[]>([]);
   const [showDistrictDropdown, setShowDistrictDropdown] = useState(false);
+  const [districtSearch, setDistrictSearch] = useState("");
 
   // Country code dropdown states
   const [selectedCountryCode1, setSelectedCountryCode1] = useState("+94");
@@ -119,6 +120,21 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     return country.name[lang as keyof typeof country.name] || country.name.en;
   };
 
+  // Filter districts based on search
+  const getFilteredDistricts = () => {
+    if (!districtSearch) return districts;
+
+    return districts.filter((district) => {
+      const searchTerm = districtSearch.toLowerCase();
+      return (
+        district.en.toLowerCase().includes(searchTerm) ||
+        district.si.includes(districtSearch) || // Sinhala doesn't need lowercase
+        district.ta.includes(districtSearch) || // Tamil doesn't need lowercase
+        getTranslatedDistrict(district).toLowerCase().includes(searchTerm)
+      );
+    });
+  };
+
   // Toggle district selection
   const toggleDistrictSelection = (district: {
     en: string;
@@ -140,6 +156,17 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
   // Clear all selected districts
   const clearAllDistricts = () => {
     setSelectedDistricts([]);
+  };
+
+  // Clear search
+  const clearSearch = () => {
+    setDistrictSearch("");
+  };
+
+  // Handle modal close
+  const handleDistrictModalClose = () => {
+    setDistrictSearch("");
+    setShowDistrictDropdown(false);
   };
 
   // Get display text for districts
@@ -192,6 +219,27 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
         color={selectedDistricts.includes(item.en) ? "#21202B" : undefined}
       />
     </TouchableOpacity>
+  );
+
+  // Search input component for districts
+  const renderDistrictSearchInput = () => (
+    <View className="px-4 py-2 border-b border-gray-200">
+      <View className="bg-gray-100 rounded-lg px-3 flex-row items-center">
+        <MaterialIcons name="search" size={20} color="#666" />
+        <TextInput
+          placeholder={t("AddOfficer.SearchDistrict") || "Search district..."}
+          value={districtSearch}
+          onChangeText={setDistrictSearch}
+          className="flex-1 ml-2 text-base"
+          placeholderTextColor="#666"
+        />
+        {districtSearch ? (
+          <TouchableOpacity onPress={clearSearch}>
+            <MaterialIcons name="close" size={20} color="#666" />
+          </TouchableOpacity>
+        ) : null}
+      </View>
+    </View>
   );
 
   // Updated renderCountryCodeItem with translated country names
@@ -478,15 +526,15 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
         </View>
       </ScrollView>
 
-      {/* District Dropdown Modal - MULTI SELECT */}
+      {/* District Dropdown Modal - MULTI SELECT with Search */}
       <Modal
         visible={showDistrictDropdown}
         transparent={true}
         animationType="slide"
-        onRequestClose={() => setShowDistrictDropdown(false)}
+        onRequestClose={handleDistrictModalClose}
       >
         <View className="flex-1 bg-black/50 justify-center items-center">
-          <View className="bg-white rounded-2xl w-11/12 max-h-96">
+          <View className="bg-white rounded-2xl w-11/12 max-h-3/4">
             <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
               <View>
                 <Text className="text-lg font-semibold">
@@ -509,24 +557,33 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
                     </Text>
                   </TouchableOpacity>
                 )}
-                <TouchableOpacity
-                  onPress={() => setShowDistrictDropdown(false)}
-                >
+                <TouchableOpacity onPress={handleDistrictModalClose}>
                   <MaterialIcons name="close" size={24} color="#666" />
                 </TouchableOpacity>
               </View>
             </View>
+
+            {/* Search Bar */}
+            {renderDistrictSearchInput()}
+
             <FlatList
-              data={districts}
+              data={getFilteredDistricts()}
               renderItem={renderDistrictItem}
               keyExtractor={(item) => item.en}
               showsVerticalScrollIndicator={false}
               className="max-h-64"
+              ListEmptyComponent={
+                <View className="px-4 py-8 items-center">
+                  <Text className="text-gray-500 text-base">
+                    {t("AddOfficer.NoDistrictsFound") || "No districts found"}
+                  </Text>
+                </View>
+              }
             />
             <View className="px-4 py-3 border-t border-gray-200">
               <TouchableOpacity
                 className="bg-[#21202B] rounded-xl py-3 items-center"
-                onPress={() => setShowDistrictDropdown(false)}
+                onPress={handleDistrictModalClose}
               >
                 <Text className="text-white font-semibold text-base">
                   {t("AddOfficer.Done")}

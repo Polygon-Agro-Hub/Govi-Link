@@ -254,7 +254,12 @@
     "Incomplete": "Incomplete",
     "UploadAllDocuments": "Please upload all required documents before submitting.",
     "Success": "Success",
-    "OfficerAddedSuccess": "Officer added successfully!"
+    "OfficerAddedSuccess": "Officer added successfully!",
+    "SearchCountry": "Search country...",
+    "SearchProvince": "Search province...",
+    "SearchDistrict": "Search district...",
+    "SearchBank": "Search bank...",
+    "SearchBranch": "Search branch..."
   },
   "ManageOfficers": {
     "Officers": "Officers",

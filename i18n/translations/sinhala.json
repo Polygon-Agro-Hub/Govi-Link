@@ -73,10 +73,10 @@
   },
   "VisitPopup": {
     "District": "දිස්ත්‍රික්කය",
-    "Location":"ස්ථානය",
+    "Location": "ස්ථානය",
     "Get Call": "ඇමතුම ගන්න",
-    "Address":"ලිපිනය :",
-    "Start":"ආරම්භ කරන්න"
+    "Address": "ලිපිනය :",
+    "Start": "ආරම්භ කරන්න"
   },
   "Districts": {
     "Ampara": "අම්පාර",
@@ -151,7 +151,7 @@
     "SelectBranch": "ශාඛාව තෝරන්න",
     "NICFrontImage": "ජා.හැ.අ. ඉදිරිපස ඡායාරූපය",
     "NICBackImage": "ජා.හැ.අ. පසුපස ඡායාරූපය",
-    "PassbookImage": "පාස්බුක් ඡායාරූපය", 
+    "PassbookImage": "පාස්බුක් ඡායාරූපය",
     "ContractImage": "ගිවිසුම් ඡායාරූපය",
     "Attached": "ඇමුණුණු",
     "Submit": "ඉදිරිපත් කරන්න",
@@ -160,7 +160,12 @@
     "Incomplete": "අසම්පූර්ණයි",
     "UploadAllDocuments": "ඉදිරිපත් කිරීමට පෙර සියලුම අවශ්‍ය ලේඛන උඩුගත කරන්න.",
     "Success": "සාර්ථකයි",
-    "OfficerAddedSuccess": "නිලධාරියා සාර්ථකව එක් කරන ලදී!"
+    "OfficerAddedSuccess": "නිලධාරියා සාර්ථකව එක් කරන ලදී!",
+    "SearchCountry": "රට සොයන්න...",
+    "SearchProvince": "පළාත සොයන්න...",
+    "SearchDistrict": "දිස්ත්‍රික්කය සොයන්න...",
+    "SearchBank": "බැංකුව සොයන්න...",
+    "SearchBranch": "ශාඛාව සොයන්න..."
   },
   "ManageOfficers": {
     "Officers": "නිලධාරීන්",

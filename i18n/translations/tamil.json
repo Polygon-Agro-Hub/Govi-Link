@@ -63,7 +63,12 @@
     "Incomplete": "முழுமையற்றது",
     "UploadAllDocuments": "சமர்ப்பிப்பதற்கு முன் அனைத்து தேவையான ஆவணங்களையும் பதிவேற்றவும்.",
     "Success": "வெற்றி",
-    "OfficerAddedSuccess": "அதிகாரி வெற்றிகரமாக சேர்க்கப்பட்டது!"
+    "OfficerAddedSuccess": "அதிகாரி வெற்றிகரமாக சேர்க்கப்பட்டது!",
+    "SearchCountry": "நாட்டைத் தேடு...",
+    "SearchProvince": "மாகாணத்தைத் தேடு...",
+    "SearchDistrict": "மாவட்டத்தைத் தேடு...",
+    "SearchBank": "வங்கியைத் தேடு...",
+    "SearchBranch": "கிளையைத் தேடு..."
   },
   "ManageOfficers": {
     "Officers": "அதிகாரிகள்",
