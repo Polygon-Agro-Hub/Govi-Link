@@ -10,6 +10,8 @@ import {
   FlatList,
   KeyboardAvoidingView,
   Platform,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -19,6 +21,7 @@ import banksData from "@/assets/json/banks.json";
 import branchesData from "@/assets/json/branches.json";
 import { useTranslation } from "react-i18next";
 import i18n from "@/i18n/i18n";
+import { RouteProp, useRoute } from "@react-navigation/native";
 
 type AddOfficerStep2NavigationProps = StackNavigationProp<
   RootStackParamList,
@@ -27,6 +30,10 @@ type AddOfficerStep2NavigationProps = StackNavigationProp<
 
 interface AddOfficerStep2Props {
   navigation: AddOfficerStep2NavigationProps;
+}
+
+interface RouteParams {
+  formData: any;
 }
 
 // Sri Lanka provinces and districts data
@@ -105,14 +112,16 @@ const sriLankaData = {
 
 const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
   const { t } = useTranslation();
+  const route = useRoute<RouteProp<RootStackParamList, "AddOfficerStep2">>();
+  const { formData: step1Data } = route.params as RouteParams;
 
   // Address states - store English values for backend
   const [housePlotNo, setHousePlotNo] = useState("");
   const [streetName, setStreetName] = useState("");
   const [city, setCity] = useState("");
-  const [selectedCountry, setSelectedCountry] = useState("Sri Lanka"); // English value
-  const [selectedProvince, setSelectedProvince] = useState(""); // English value
-  const [selectedDistrict, setSelectedDistrict] = useState(""); // English value
+  const [selectedCountry, setSelectedCountry] = useState("Sri Lanka");
+  const [selectedProvince, setSelectedProvince] = useState("");
+  const [selectedDistrict, setSelectedDistrict] = useState("");
 
   // Display states - for showing translated values
   const [displayCountry, setDisplayCountry] = useState("Sri Lanka");
@@ -127,12 +136,23 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
   const [selectedBank, setSelectedBank] = useState("");
   const [selectedBranch, setSelectedBranch] = useState("");
 
+  // Validation states
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(false);
+
   // Dropdown states
   const [showCountryDropdown, setShowCountryDropdown] = useState(false);
   const [showProvinceDropdown, setShowProvinceDropdown] = useState(false);
   const [showDistrictDropdown, setShowDistrictDropdown] = useState(false);
   const [showBankDropdown, setShowBankDropdown] = useState(false);
   const [showBranchDropdown, setShowBranchDropdown] = useState(false);
+
+  // Search states
+  const [countrySearch, setCountrySearch] = useState("");
+  const [provinceSearch, setProvinceSearch] = useState("");
+  const [districtSearch, setDistrictSearch] = useState("");
+  const [bankSearch, setBankSearch] = useState("");
+  const [branchSearch, setBranchSearch] = useState("");
 
   // Available provinces and districts based on country selection
   const [availableProvinces, setAvailableProvinces] = useState<
@@ -186,6 +206,102 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
     return district[lang as keyof typeof district] || district.en;
   };
 
+  // Clear specific field error
+  const clearFieldError = (fieldName: string) => {
+    setErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors[fieldName];
+      return newErrors;
+    });
+  };
+
+  // Field change handlers
+  const handleHousePlotNoChange = (text: string) => {
+    clearFieldError("housePlotNo");
+    setHousePlotNo(text);
+  };
+
+  const handleStreetNameChange = (text: string) => {
+    clearFieldError("streetName");
+    const capitalizedText = text.charAt(0).toUpperCase() + text.slice(1);
+    setStreetName(capitalizedText);
+  };
+
+  const handleCityChange = (text: string) => {
+    clearFieldError("city");
+    const capitalizedText = text.charAt(0).toUpperCase() + text.slice(1);
+    setCity(capitalizedText);
+  };
+
+  const handleCommissionAmountChange = (text: string) => {
+    clearFieldError("commissionAmount");
+    // Allow only numbers and decimal point
+    const filteredText = text.replace(/[^0-9.]/g, "");
+    setCommissionAmount(filteredText);
+  };
+
+  const handleAccountHolderNameChange = (text: string) => {
+    clearFieldError("accountHolderName");
+    const filteredText = text.replace(/[^a-zA-Z\s]/g, "");
+    const capitalizedText =
+      filteredText.charAt(0).toUpperCase() + filteredText.slice(1);
+    setAccountHolderName(capitalizedText);
+  };
+
+  const handleAccountNumberChange = (text: string) => {
+    clearFieldError("accountNumber");
+    const numbersOnly = text.replace(/[^0-9]/g, "");
+    setAccountNumber(numbersOnly);
+  };
+
+  const handleConfirmAccountNumberChange = (text: string) => {
+    clearFieldError("confirmAccountNumber");
+    const numbersOnly = text.replace(/[^0-9]/g, "");
+    setConfirmAccountNumber(numbersOnly);
+  };
+
+  // Filter data based on search
+  const getFilteredCountries = () => {
+    if (!countrySearch) return countryData;
+    return countryData.filter((country) =>
+      getTranslatedCountry(country)
+        .toLowerCase()
+        .includes(countrySearch.toLowerCase())
+    );
+  };
+
+  const getFilteredProvinces = () => {
+    if (!provinceSearch) return availableProvinces;
+    return availableProvinces.filter((province) =>
+      getTranslatedProvince(province)
+        .toLowerCase()
+        .includes(provinceSearch.toLowerCase())
+    );
+  };
+
+  const getFilteredDistricts = () => {
+    if (!districtSearch) return availableDistricts;
+    return availableDistricts.filter((district) =>
+      getTranslatedDistrict(district)
+        .toLowerCase()
+        .includes(districtSearch.toLowerCase())
+    );
+  };
+
+  const getFilteredBanks = () => {
+    if (!bankSearch) return banks;
+    return banks.filter((bank) =>
+      bank.name.toLowerCase().includes(bankSearch.toLowerCase())
+    );
+  };
+
+  const getFilteredBranches = () => {
+    if (!branchSearch) return availableBranches;
+    return availableBranches.filter((branch) =>
+      branch.name.toLowerCase().includes(branchSearch.toLowerCase())
+    );
+  };
+
   // Update display values when language changes
   useEffect(() => {
     // Update country display
@@ -230,7 +346,6 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
     const bankID = bank.id.toString();
     const branches = branchesData[bankID as keyof typeof branchesData] || [];
 
-    // convert ID to number
     return branches.map((b: any) => ({
       ID: Number(b.ID),
       name: b.name,
@@ -277,15 +392,143 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
     }
   }, [selectedBank]);
 
+  // Reset search when modal closes
+  const handleModalClose = (modalType: string) => {
+    switch (modalType) {
+      case "country":
+        setCountrySearch("");
+        setShowCountryDropdown(false);
+        break;
+      case "province":
+        setProvinceSearch("");
+        setShowProvinceDropdown(false);
+        break;
+      case "district":
+        setDistrictSearch("");
+        setShowDistrictDropdown(false);
+        break;
+      case "bank":
+        setBankSearch("");
+        setShowBankDropdown(false);
+        break;
+      case "branch":
+        setBranchSearch("");
+        setShowBranchDropdown(false);
+        break;
+    }
+  };
+
+  // Handle dropdown selections with error clearing
+  const handleCountrySelect = (country: any) => {
+    setSelectedCountry(country.name.en);
+    setDisplayCountry(getTranslatedCountry(country));
+    clearFieldError("country");
+    handleModalClose("country");
+  };
+
+  const handleProvinceSelect = (province: { name: { en: string; si: string; ta: string } }) => {
+    setSelectedProvince(province.name.en);
+    setDisplayProvince(getTranslatedProvince(province));
+    clearFieldError("province");
+    handleModalClose("province");
+  };
+
+  const handleDistrictSelect = (district: { en: string; si: string; ta: string }) => {
+    setSelectedDistrict(district.en);
+    setDisplayDistrict(getTranslatedDistrict(district));
+    clearFieldError("district");
+    handleModalClose("district");
+  };
+
+  const handleBankSelect = (bank: { id: number; name: string }) => {
+    setSelectedBank(bank.name);
+    clearFieldError("bank");
+    handleModalClose("bank");
+  };
+
+  const handleBranchSelect = (branch: { ID: number; name: string }) => {
+    setSelectedBranch(branch.name);
+    clearFieldError("branch");
+    handleModalClose("branch");
+  };
+
+  // Validate all fields before proceeding
+  const validateStep2 = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!housePlotNo.trim())
+      newErrors.housePlotNo = t("Error.House/Plot number is required");
+    if (!streetName.trim())
+      newErrors.streetName = t("Error.Street name is required");
+    if (!city.trim()) newErrors.city = t("Error.City is required");
+    if (!selectedCountry) newErrors.country = t("Error.Country is required");
+    if (!selectedProvince) newErrors.province = t("Error.Province is required");
+    if (!selectedDistrict) newErrors.district = t("Error.District is required");
+    if (!commissionAmount.trim())
+      newErrors.commissionAmount = t("Error.Commission amount is required");
+    if (!accountHolderName.trim())
+      newErrors.accountHolderName = t("Error.Account holder name is required");
+    if (!accountNumber.trim())
+      newErrors.accountNumber = t("Error.Account number is required");
+    if (!confirmAccountNumber.trim())
+      newErrors.confirmAccountNumber = t(
+        "Error.Confirm account number is required"
+      );
+    if (!selectedBank) newErrors.bank = t("Error.Bank is required");
+    if (!selectedBranch) newErrors.branch = t("Error.Branch is required");
+
+    if (accountNumber !== confirmAccountNumber) {
+      newErrors.confirmAccountNumber = t("Error.Account numbers do not match");
+    }
+
+    if (commissionAmount && isNaN(parseFloat(commissionAmount))) {
+      newErrors.commissionAmount = t(
+        "Error.Commission amount must be a number"
+      );
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleNext = () => {
+    if (!validateStep2()) {
+      Alert.alert(
+        t("Error.Validation Error"),
+        t("Error.Please fix all errors before proceeding")
+      );
+      return;
+    }
+
+    // Prepare form data for next step
+    const step2Data = {
+      house: housePlotNo,
+      street: streetName,
+      city,
+      country: selectedCountry,
+      province: selectedProvince,
+      distrct: selectedDistrict,
+      comAmount: parseFloat(commissionAmount),
+      accName: accountHolderName,
+      accNumber: accountNumber,
+      bank: selectedBank,
+      branch: selectedBranch,
+    };
+
+    // Combine step1 and step2 data
+    const combinedData = {
+      ...step1Data,
+      ...step2Data,
+    };
+
+    navigation.navigate("AddOfficerStep3", { formData: combinedData });
+  };
+
   // Render functions for dropdown items
   const renderCountryItem = ({ item }: { item: any }) => (
     <TouchableOpacity
       className="px-4 py-3 border-b border-gray-200 rounded-2xl flex-row items-center"
-      onPress={() => {
-        setSelectedCountry(item.name.en); // Store English value
-        setDisplayCountry(getTranslatedCountry(item)); // Set display value
-        setShowCountryDropdown(false);
-      }}
+      onPress={() => handleCountrySelect(item)}
     >
       <Text className="text-2xl mr-3">{item.emoji}</Text>
       <View className="flex-1">
@@ -304,11 +547,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
   }) => (
     <TouchableOpacity
       className="px-4 py-3 border-b border-gray-200 rounded-2xl"
-      onPress={() => {
-        setSelectedProvince(item.name.en); // Store English value
-        setDisplayProvince(getTranslatedProvince(item)); // Set display value
-        setShowProvinceDropdown(false);
-      }}
+      onPress={() => handleProvinceSelect(item)}
     >
       <Text className="text-base text-gray-800">
         {getTranslatedProvince(item)}
@@ -323,11 +562,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
   }) => (
     <TouchableOpacity
       className="px-4 py-3 border-b border-gray-200 rounded-2xl"
-      onPress={() => {
-        setSelectedDistrict(item.en); // Store English value
-        setDisplayDistrict(getTranslatedDistrict(item)); // Set display value
-        setShowDistrictDropdown(false);
-      }}
+      onPress={() => handleDistrictSelect(item)}
     >
       <Text className="text-base text-gray-800">
         {getTranslatedDistrict(item)}
@@ -338,10 +573,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
   const renderBankItem = ({ item }: { item: { id: number; name: string } }) => (
     <TouchableOpacity
       className="px-4 py-3 border-b border-gray-200 rounded-2xl"
-      onPress={() => {
-        setSelectedBank(item.name);
-        setShowBankDropdown(false);
-      }}
+      onPress={() => handleBankSelect(item)}
     >
       <Text className="text-base text-gray-800">{item.name}</Text>
     </TouchableOpacity>
@@ -354,43 +586,36 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
   }) => (
     <TouchableOpacity
       className="px-4 py-3 border-b border-gray-200 rounded-2xl"
-      onPress={() => {
-        setSelectedBranch(item.name);
-        setShowBranchDropdown(false);
-      }}
+      onPress={() => handleBranchSelect(item)}
     >
       <Text className="text-base text-gray-800">{item.name}</Text>
     </TouchableOpacity>
   );
 
-  // Prepare data for next screen (you can use this when navigating)
-  const prepareFormData = () => {
-    return {
-      address: {
-        housePlotNo,
-        streetName,
-        city,
-        country: selectedCountry, // English value for backend
-        province: selectedProvince, // English value for backend
-        district: selectedDistrict, // English value for backend
-      },
-      bankDetails: {
-        commissionAmount,
-        accountHolderName,
-        accountNumber,
-        confirmAccountNumber,
-        bank: selectedBank,
-        branch: selectedBranch,
-      },
-    };
-  };
-
-  const handleNext = () => {
-    const formData = prepareFormData();
-    console.log("Form Data for backend:", formData);
-    // Navigate to next screen with the data
-    navigation.navigate("AddOfficerStep3");
-  };
+  // Search input component
+  const renderSearchInput = (
+    value: string,
+    onChangeText: (text: string) => void,
+    placeholder: string
+  ) => (
+    <View className="px-4 py-2 border-b border-gray-200">
+      <View className="bg-gray-100 rounded-lg px-3 flex-row items-center">
+        <MaterialIcons name="search" size={20} color="#666" />
+        <TextInput
+          placeholder={placeholder}
+          value={value}
+          onChangeText={onChangeText}
+          className="flex-1 ml-2 text-base"
+          placeholderTextColor="#666"
+        />
+        {value ? (
+          <TouchableOpacity onPress={() => onChangeText("")}>
+            <MaterialIcons name="close" size={20} color="#666" />
+          </TouchableOpacity>
+        ) : null}
+      </View>
+    </View>
+  );
 
   return (
     <KeyboardAvoidingView
@@ -425,76 +650,142 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
           {/* Address Section */}
           <View className="px-6 mt-4">
             <View className="space-y-4">
-              <TextInput
-                placeholder={t("AddOfficer.HousePlotNumber")}
-                placeholderTextColor="#7D7D7D"
-                className="bg-[#F4F4F4] rounded-2xl px-4 py-4"
-                value={housePlotNo}
-                onChangeText={setHousePlotNo}
-              />
+              <View>
+                <TextInput
+                  placeholder={t("AddOfficer.HousePlotNumber")}
+                  placeholderTextColor="#7D7D7D"
+                  className={`bg-[#F4F4F4] rounded-2xl px-4 py-4 ${
+                    errors.housePlotNo ? "border border-red-500" : ""
+                  }`}
+                  value={housePlotNo}
+                  onChangeText={handleHousePlotNoChange}
+                />
+                {errors.housePlotNo && (
+                  <Text className="text-red-500 text-sm mt-1 ml-2">
+                    {errors.housePlotNo}
+                  </Text>
+                )}
+              </View>
 
-              <TextInput
-                placeholder={t("AddOfficer.StreetName")}
-                placeholderTextColor="#7D7D7D"
-                className="bg-[#F4F4F4] rounded-2xl px-4 py-4"
-                value={streetName}
-                onChangeText={setStreetName}
-              />
+              <View>
+                <TextInput
+                  placeholder={t("AddOfficer.StreetName")}
+                  placeholderTextColor="#7D7D7D"
+                  className={`bg-[#F4F4F4] rounded-2xl px-4 py-4 ${
+                    errors.streetName ? "border border-red-500" : ""
+                  }`}
+                  value={streetName}
+                  onChangeText={handleStreetNameChange}
+                />
+                {errors.streetName && (
+                  <Text className="text-red-500 text-sm mt-1 ml-2">
+                    {errors.streetName}
+                  </Text>
+                )}
+              </View>
 
-              <TextInput
-                placeholder={t("AddOfficer.City")}
-                placeholderTextColor="#7D7D7D"
-                className="bg-[#F4F4F4] rounded-2xl px-4 py-4"
-                value={city}
-                onChangeText={setCity}
-              />
+              <View>
+                <TextInput
+                  placeholder={t("AddOfficer.City")}
+                  placeholderTextColor="#7D7D7D"
+                  className={`bg-[#F4F4F4] rounded-2xl px-4 py-4 ${
+                    errors.city ? "border border-red-500" : ""
+                  }`}
+                  value={city}
+                  onChangeText={handleCityChange}
+                />
+                {errors.city && (
+                  <Text className="text-red-500 text-sm mt-1 ml-2">
+                    {errors.city}
+                  </Text>
+                )}
+              </View>
 
               {/* Country Dropdown */}
-              <TouchableOpacity
-                className="bg-[#F4F4F4] rounded-2xl px-4 py-3 flex-row justify-between items-center"
-                onPress={() => setShowCountryDropdown(true)}
-              >
-                <Text
-                  className={`${
-                    displayCountry ? "text-black" : "text-[#7D7D7D]"
+              <View>
+                <TouchableOpacity
+                  className={`bg-[#F4F4F4] rounded-2xl px-4 py-3 flex-row justify-between items-center ${
+                    errors.country ? "border border-red-500" : ""
                   }`}
+                  onPress={() => setShowCountryDropdown(true)}
                 >
-                  {displayCountry || t("AddOfficer.Country")}
-                </Text>
-                <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
-              </TouchableOpacity>
+                  <Text
+                    className={`${
+                      displayCountry ? "text-black" : "text-[#7D7D7D]"
+                    }`}
+                  >
+                    {displayCountry || t("AddOfficer.Country")}
+                  </Text>
+                  <MaterialIcons
+                    name="arrow-drop-down"
+                    size={24}
+                    color="#666"
+                  />
+                </TouchableOpacity>
+                {errors.country && (
+                  <Text className="text-red-500 text-sm mt-1 ml-2">
+                    {errors.country}
+                  </Text>
+                )}
+              </View>
 
               {/* Province Dropdown */}
-              <TouchableOpacity
-                className="bg-[#F4F4F4] rounded-2xl px-4 py-3 flex-row justify-between items-center"
-                onPress={() => setShowProvinceDropdown(true)}
-                disabled={availableProvinces.length === 0}
-              >
-                <Text
-                  className={`${
-                    displayProvince ? "text-black" : "text-[#7D7D7D]"
+              <View>
+                <TouchableOpacity
+                  className={`bg-[#F4F4F4] rounded-2xl px-4 py-3 flex-row justify-between items-center ${
+                    errors.province ? "border border-red-500" : ""
                   }`}
+                  onPress={() => setShowProvinceDropdown(true)}
+                  disabled={availableProvinces.length === 0}
                 >
-                  {displayProvince || t("AddOfficer.Province")}
-                </Text>
-                <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
-              </TouchableOpacity>
+                  <Text
+                    className={`${
+                      displayProvince ? "text-black" : "text-[#7D7D7D]"
+                    }`}
+                  >
+                    {displayProvince || t("AddOfficer.Province")}
+                  </Text>
+                  <MaterialIcons
+                    name="arrow-drop-down"
+                    size={24}
+                    color="#666"
+                  />
+                </TouchableOpacity>
+                {errors.province && (
+                  <Text className="text-red-500 text-sm mt-1 ml-2">
+                    {errors.province}
+                  </Text>
+                )}
+              </View>
 
               {/* District Dropdown */}
-              <TouchableOpacity
-                className="bg-[#F4F4F4] rounded-2xl px-4 py-3 flex-row justify-between items-center"
-                onPress={() => setShowDistrictDropdown(true)}
-                disabled={availableDistricts.length === 0}
-              >
-                <Text
-                  className={`${
-                    displayDistrict ? "text-black" : "text-[#7D7D7D]"
+              <View>
+                <TouchableOpacity
+                  className={`bg-[#F4F4F4] rounded-2xl px-4 py-3 flex-row justify-between items-center ${
+                    errors.district ? "border border-red-500" : ""
                   }`}
+                  onPress={() => setShowDistrictDropdown(true)}
+                  disabled={availableDistricts.length === 0}
                 >
-                  {displayDistrict || t("AddOfficer.District")}
-                </Text>
-                <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
-              </TouchableOpacity>
+                  <Text
+                    className={`${
+                      displayDistrict ? "text-black" : "text-[#7D7D7D]"
+                    }`}
+                  >
+                    {displayDistrict || t("AddOfficer.District")}
+                  </Text>
+                  <MaterialIcons
+                    name="arrow-drop-down"
+                    size={24}
+                    color="#666"
+                  />
+                </TouchableOpacity>
+                {errors.district && (
+                  <Text className="text-red-500 text-sm mt-1 ml-2">
+                    {errors.district}
+                  </Text>
+                )}
+              </View>
             </View>
           </View>
 
@@ -503,71 +794,133 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
           {/* Bank Details Section */}
           <View className="px-6 mt-6">
             <View className="space-y-4">
-              <TextInput
-                placeholder={t("AddOfficer.CommissionAmount")}
-                placeholderTextColor="#7D7D7D"
-                className="bg-[#F4F4F4] rounded-2xl px-4 py-4"
-                value={commissionAmount}
-                onChangeText={setCommissionAmount}
-                keyboardType="numeric"
-              />
+              <View>
+                <TextInput
+                  placeholder={t("AddOfficer.CommissionAmount")}
+                  placeholderTextColor="#7D7D7D"
+                  className={`bg-[#F4F4F4] rounded-2xl px-4 py-4 ${
+                    errors.commissionAmount ? "border border-red-500" : ""
+                  }`}
+                  value={commissionAmount}
+                  onChangeText={handleCommissionAmountChange}
+                  keyboardType="numeric"
+                />
+                {errors.commissionAmount && (
+                  <Text className="text-red-500 text-sm mt-1 ml-2">
+                    {errors.commissionAmount}
+                  </Text>
+                )}
+              </View>
 
-              <TextInput
-                placeholder={t("AddOfficer.AccountHolderName")}
-                placeholderTextColor="#7D7D7D"
-                className="bg-[#F4F4F4] rounded-2xl px-4 py-4"
-                value={accountHolderName}
-                onChangeText={setAccountHolderName}
-              />
+              <View>
+                <TextInput
+                  placeholder={t("AddOfficer.AccountHolderName")}
+                  placeholderTextColor="#7D7D7D"
+                  className={`bg-[#F4F4F4] rounded-2xl px-4 py-4 ${
+                    errors.accountHolderName ? "border border-red-500" : ""
+                  }`}
+                  value={accountHolderName}
+                  onChangeText={handleAccountHolderNameChange}
+                />
+                {errors.accountHolderName && (
+                  <Text className="text-red-500 text-sm mt-1 ml-2">
+                    {errors.accountHolderName}
+                  </Text>
+                )}
+              </View>
 
-              <TextInput
-                placeholder={t("AddOfficer.AccountNumber")}
-                placeholderTextColor="#7D7D7D"
-                className="bg-[#F4F4F4] rounded-2xl px-4 py-4"
-                value={accountNumber}
-                onChangeText={setAccountNumber}
-                keyboardType="numeric"
-              />
+              <View>
+                <TextInput
+                  placeholder={t("AddOfficer.AccountNumber")}
+                  placeholderTextColor="#7D7D7D"
+                  className={`bg-[#F4F4F4] rounded-2xl px-4 py-4 ${
+                    errors.accountNumber ? "border border-red-500" : ""
+                  }`}
+                  value={accountNumber}
+                  onChangeText={handleAccountNumberChange}
+                  keyboardType="numeric"
+                />
+                {errors.accountNumber && (
+                  <Text className="text-red-500 text-sm mt-1 ml-2">
+                    {errors.accountNumber}
+                  </Text>
+                )}
+              </View>
 
-              <TextInput
-                placeholder={t("AddOfficer.ConfirmAccountNumber")}
-                placeholderTextColor="#7D7D7D"
-                className="bg-[#F4F4F4] rounded-2xl px-4 py-4"
-                value={confirmAccountNumber}
-                onChangeText={setConfirmAccountNumber}
-                keyboardType="numeric"
-              />
+              <View>
+                <TextInput
+                  placeholder={t("AddOfficer.ConfirmAccountNumber")}
+                  placeholderTextColor="#7D7D7D"
+                  className={`bg-[#F4F4F4] rounded-2xl px-4 py-4 ${
+                    errors.confirmAccountNumber ? "border border-red-500" : ""
+                  }`}
+                  value={confirmAccountNumber}
+                  onChangeText={handleConfirmAccountNumberChange}
+                  keyboardType="numeric"
+                />
+                {errors.confirmAccountNumber && (
+                  <Text className="text-red-500 text-sm mt-1 ml-2">
+                    {errors.confirmAccountNumber}
+                  </Text>
+                )}
+              </View>
 
               {/* Bank Dropdown */}
-              <TouchableOpacity
-                className="bg-[#F4F4F4] rounded-2xl px-4 py-3 flex-row justify-between items-center"
-                onPress={() => setShowBankDropdown(true)}
-              >
-                <Text
-                  className={`${
-                    selectedBank ? "text-black" : "text-[#7D7D7D]"
+              <View>
+                <TouchableOpacity
+                  className={`bg-[#F4F4F4] rounded-2xl px-4 py-3 flex-row justify-between items-center ${
+                    errors.bank ? "border border-red-500" : ""
                   }`}
+                  onPress={() => setShowBankDropdown(true)}
                 >
-                  {selectedBank || t("AddOfficer.BankName")}
-                </Text>
-                <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
-              </TouchableOpacity>
+                  <Text
+                    className={`${
+                      selectedBank ? "text-black" : "text-[#7D7D7D]"
+                    }`}
+                  >
+                    {selectedBank || t("AddOfficer.BankName")}
+                  </Text>
+                  <MaterialIcons
+                    name="arrow-drop-down"
+                    size={24}
+                    color="#666"
+                  />
+                </TouchableOpacity>
+                {errors.bank && (
+                  <Text className="text-red-500 text-sm mt-1 ml-2">
+                    {errors.bank}
+                  </Text>
+                )}
+              </View>
 
               {/* Branch Dropdown */}
-              <TouchableOpacity
-                className="bg-[#F4F4F4] rounded-2xl px-4 py-3 flex-row justify-between items-center"
-                onPress={() => setShowBranchDropdown(true)}
-                disabled={availableBranches.length === 0}
-              >
-                <Text
-                  className={`${
-                    selectedBranch ? "text-black" : "text-[#7D7D7D]"
+              <View>
+                <TouchableOpacity
+                  className={`bg-[#F4F4F4] rounded-2xl px-4 py-3 flex-row justify-between items-center ${
+                    errors.branch ? "border border-red-500" : ""
                   }`}
+                  onPress={() => setShowBranchDropdown(true)}
+                  disabled={availableBranches.length === 0}
                 >
-                  {selectedBranch || t("AddOfficer.BranchName")}
-                </Text>
-                <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
-              </TouchableOpacity>
+                  <Text
+                    className={`${
+                      selectedBranch ? "text-black" : "text-[#7D7D7D]"
+                    }`}
+                  >
+                    {selectedBranch || t("AddOfficer.BranchName")}
+                  </Text>
+                  <MaterialIcons
+                    name="arrow-drop-down"
+                    size={24}
+                    color="#666"
+                  />
+                </TouchableOpacity>
+                {errors.branch && (
+                  <Text className="text-red-500 text-sm mt-1 ml-2">
+                    {errors.branch}
+                  </Text>
+                )}
+              </View>
             </View>
           </View>
 
@@ -585,10 +938,15 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
             <TouchableOpacity
               className="bg-black rounded-3xl px-6 py-4 w-[48%] items-center ml-3"
               onPress={handleNext}
+              disabled={loading}
             >
-              <Text className="text-white font-semibold">
-                {t("AddOfficer.Next")}
-              </Text>
+              {loading ? (
+                <ActivityIndicator color="white" size="small" />
+              ) : (
+                <Text className="text-white font-semibold">
+                  {t("AddOfficer.Next")}
+                </Text>
+              )}
             </TouchableOpacity>
           </View>
         </View>
@@ -599,23 +957,29 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
         visible={showCountryDropdown}
         transparent={true}
         animationType="slide"
-        onRequestClose={() => setShowCountryDropdown(false)}
+        onRequestClose={() => handleModalClose("country")}
       >
         <View className="flex-1 bg-black/50 justify-center items-center">
-          <View className="bg-white rounded-2xl w-11/12 max-h-80">
-            <View className="flex-row justify-between items-center px-4 py-3">
+          <View className="bg-white rounded-2xl w-11/12 max-h-3/4">
+            <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
               <Text className="text-lg font-semibold">
                 {t("AddOfficer.SelectCountry")}
               </Text>
-              <TouchableOpacity onPress={() => setShowCountryDropdown(false)}>
+              <TouchableOpacity onPress={() => handleModalClose("country")}>
                 <MaterialIcons name="close" size={24} color="#666" />
               </TouchableOpacity>
             </View>
+            {renderSearchInput(
+              countrySearch,
+              setCountrySearch,
+              t("AddOfficer.SearchCountry") || "Search country..."
+            )}
             <FlatList
-              data={countryData}
+              data={getFilteredCountries()}
               renderItem={renderCountryItem}
               keyExtractor={(item) => item.code}
               showsVerticalScrollIndicator={false}
+              className="max-h-96"
             />
           </View>
         </View>
@@ -626,23 +990,29 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
         visible={showProvinceDropdown}
         transparent={true}
         animationType="slide"
-        onRequestClose={() => setShowProvinceDropdown(false)}
+        onRequestClose={() => handleModalClose("province")}
       >
         <View className="flex-1 bg-black/50 justify-center items-center">
-          <View className="bg-white rounded-2xl w-11/12 max-h-80">
-            <View className="flex-row justify-between items-center px-4 py-3">
+          <View className="bg-white rounded-2xl w-11/12 max-h-3/4">
+            <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
               <Text className="text-lg font-semibold">
                 {t("AddOfficer.SelectProvince")}
               </Text>
-              <TouchableOpacity onPress={() => setShowProvinceDropdown(false)}>
+              <TouchableOpacity onPress={() => handleModalClose("province")}>
                 <MaterialIcons name="close" size={24} color="#666" />
               </TouchableOpacity>
             </View>
+            {renderSearchInput(
+              provinceSearch,
+              setProvinceSearch,
+              t("AddOfficer.SearchProvince") || "Search province..."
+            )}
             <FlatList
-              data={availableProvinces}
+              data={getFilteredProvinces()}
               renderItem={renderProvinceItem}
               keyExtractor={(item, index) => index.toString()}
               showsVerticalScrollIndicator={false}
+              className="max-h-96"
             />
           </View>
         </View>
@@ -653,23 +1023,29 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
         visible={showDistrictDropdown}
         transparent={true}
         animationType="slide"
-        onRequestClose={() => setShowDistrictDropdown(false)}
+        onRequestClose={() => handleModalClose("district")}
       >
         <View className="flex-1 bg-black/50 justify-center items-center">
-          <View className="bg-white rounded-2xl w-11/12 max-h-80">
-            <View className="flex-row justify-between items-center px-4 py-3">
+          <View className="bg-white rounded-2xl w-11/12 max-h-3/4">
+            <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
               <Text className="text-lg font-semibold">
                 {t("AddOfficer.SelectDistrict")}
               </Text>
-              <TouchableOpacity onPress={() => setShowDistrictDropdown(false)}>
+              <TouchableOpacity onPress={() => handleModalClose("district")}>
                 <MaterialIcons name="close" size={24} color="#666" />
               </TouchableOpacity>
             </View>
+            {renderSearchInput(
+              districtSearch,
+              setDistrictSearch,
+              t("AddOfficer.SearchDistrict") || "Search district..."
+            )}
             <FlatList
-              data={availableDistricts}
+              data={getFilteredDistricts()}
               renderItem={renderDistrictItem}
               keyExtractor={(item, index) => index.toString()}
               showsVerticalScrollIndicator={false}
+              className="max-h-96"
             />
           </View>
         </View>
@@ -680,23 +1056,29 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
         visible={showBankDropdown}
         transparent={true}
         animationType="slide"
-        onRequestClose={() => setShowBankDropdown(false)}
+        onRequestClose={() => handleModalClose("bank")}
       >
         <View className="flex-1 bg-black/50 justify-center items-center">
-          <View className="bg-white rounded-2xl w-11/12 max-h-80">
-            <View className="flex-row justify-between items-center px-4 py-3">
+          <View className="bg-white rounded-2xl w-11/12 max-h-3/4">
+            <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
               <Text className="text-lg font-semibold">
                 {t("AddOfficer.SelectBank")}
               </Text>
-              <TouchableOpacity onPress={() => setShowBankDropdown(false)}>
+              <TouchableOpacity onPress={() => handleModalClose("bank")}>
                 <MaterialIcons name="close" size={24} color="#666" />
               </TouchableOpacity>
             </View>
+            {renderSearchInput(
+              bankSearch,
+              setBankSearch,
+              t("AddOfficer.SearchBank") || "Search bank..."
+            )}
             <FlatList
-              data={banks}
+              data={getFilteredBanks()}
               renderItem={renderBankItem}
               keyExtractor={(item) => item.id.toString()}
               showsVerticalScrollIndicator={false}
+              className="max-h-96"
             />
           </View>
         </View>
@@ -707,23 +1089,29 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
         visible={showBranchDropdown}
         transparent={true}
         animationType="slide"
-        onRequestClose={() => setShowBranchDropdown(false)}
+        onRequestClose={() => handleModalClose("branch")}
       >
         <View className="flex-1 bg-black/50 justify-center items-center">
-          <View className="bg-white rounded-2xl w-11/12 max-h-80">
-            <View className="flex-row justify-between items-center px-4 py-3">
+          <View className="bg-white rounded-2xl w-11/12 max-h-3/4">
+            <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
               <Text className="text-lg font-semibold">
                 {t("AddOfficer.SelectBranch")}
               </Text>
-              <TouchableOpacity onPress={() => setShowBranchDropdown(false)}>
+              <TouchableOpacity onPress={() => handleModalClose("branch")}>
                 <MaterialIcons name="close" size={24} color="#666" />
               </TouchableOpacity>
             </View>
+            {renderSearchInput(
+              branchSearch,
+              setBranchSearch,
+              t("AddOfficer.SearchBranch") || "Search branch..."
+            )}
             <FlatList
-              data={availableBranches}
+              data={getFilteredBranches()}
               renderItem={renderBranchItem}
               keyExtractor={(item) => item.ID.toString()}
               showsVerticalScrollIndicator={false}
+              className="max-h-96"
             />
           </View>
         </View>

@@ -20,8 +20,8 @@ export type RootStackParamList = {
       OtpverificationRequestAudit:{farmerId?: number, govilinkjobid?: number, jobId? : string, farmerMobile?:number};
       ManageOfficers: undefined;
       AddOfficerStep1: undefined;
-      AddOfficerStep2: undefined;
-      AddOfficerStep3: undefined;
+      AddOfficerStep2: { formData: any };
+      AddOfficerStep3: { formData: any }; 
       ChangePassword: {passwordUpdate: number};
       ComplainHistory:undefined;
       AssignJobs: undefined;

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,11 +7,19 @@ import {
   RefreshControl,
   StatusBar,
   Image,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../types";
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import { environment } from "@/environment/environment";
+import { useFocusEffect } from "@react-navigation/native";
+import i18n from "@/i18n/i18n";
+
 const UserProfileImage = require("@/assets/user-profile.png");
 
 type ManageOfficersNavigationProps = StackNavigationProp<
@@ -24,49 +32,138 @@ interface ManageOfficersProps {
 }
 
 interface Officer {
-  name: string;
+  firstName: string;
+  firstNameSinhala: string;
+  firstNameTamil: string;
+  lastName: string;
+  lastNameSinhala: string;
+  lastNameTamil: string;
   empId: string;
-  status: "approved" | "pending";
-  image?: string;
+  status: string;
+  profile?: string;
 }
 
 const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
   const { t } = useTranslation();
   const [refreshing, setRefreshing] = useState(false);
-  const [officers, setOfficers] = useState<Officer[]>([
-    {
-      name: "Amal Perera",
-      empId: "FI00127",
-      status: "approved",
-      image: "https://example.com/dulaj.jpg",
-    },
-    { name: "Bhathiya Dias", empId: "FI00134", status: "approved" },
-    {
-      name: "Dulaj Nawanjana",
-      empId: "FI00155",
-      status: "approved",
-      image: "https://example.com/dulaj.jpg",
-    },
-    { name: "Samitha Herath", empId: "FI00147", status: "approved" },
-    {
-      name: "Umesh Kalhara",
-      empId: "FI00137",
-      status: "approved",
-      image: "https://example.com/umesh.jpg",
-    },
-    { name: "Viraj Perera", empId: "FI00137", status: "pending" },
-  ]);
+  const [loading, setLoading] = useState(true);
+  const [officers, setOfficers] = useState<Officer[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const onRefresh = () => {
-    setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 1000);
+  const fetchFieldOfficers = async (search: string = "") => {
+    try {
+      setLoading(true);
+      const token = await AsyncStorage.getItem("token");
+
+      if (!token) {
+        Alert.alert(
+          t("Error.Sorry"),
+          t(
+            "Error.Your login session has expired. Please log in again to continue."
+          )
+        );
+        navigation.navigate("Login");
+        return;
+      }
+
+      let url = `${environment.API_BASE_URL}api/officer/get-field-officers`;
+      if (search.trim() !== "") {
+        url += `?search=${encodeURIComponent(search)}`;
+      }
+
+      const response = await axios.get(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.data.status === "success") {
+        setOfficers(response.data.data || []);
+      } else {
+        throw new Error(response.data.message || "Failed to fetch officers");
+      }
+    } catch (error: any) {
+      console.error("Failed to fetch field officers:", error);
+
+      if (error.response?.status === 401) {
+        Alert.alert(
+          t("Error.Sorry"),
+          t(
+            "Error.Your login session has expired. Please log in again to continue."
+          )
+        );
+        navigation.navigate("Login");
+      } else {
+        Alert.alert(
+          t("Error.Error"),
+          error.response?.data?.message || t("Error.FailedToLoadOfficers")
+        );
+      }
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
   };
 
-  const getStatusColor = (status: string) =>
-    status === "approved" ? "#4CAF50" : "#FF3434";
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchFieldOfficers(searchQuery);
+  }, [searchQuery]);
 
-  const getBorderColor = (status: string) =>
-    status === "approved" ? "#ADADAD1A" : "#FF9797";
+  useFocusEffect(
+    useCallback(() => {
+      fetchFieldOfficers(searchQuery);
+    }, [searchQuery])
+  );
+
+  const getName = (officer: Officer) => {
+    if (!officer) return "";
+
+    switch (i18n.language) {
+      case "si":
+        return `${officer.firstNameSinhala || officer.firstName} ${
+          officer.lastNameSinhala || officer.lastName
+        }`;
+      case "ta":
+        return `${officer.firstNameTamil || officer.firstName} ${
+          officer.lastNameTamil || officer.lastName
+        }`;
+      default:
+        return `${officer.firstName} ${officer.lastName}`;
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    const statusLower = status?.toLowerCase();
+    return statusLower === "active" || statusLower === "approved"
+      ? "#4CAF50"
+      : "#FF3434";
+  };
+
+  const getBorderColor = (status: string) => {
+    const statusLower = status?.toLowerCase();
+    return statusLower === "active" || statusLower === "approved"
+      ? "#ADADAD1A"
+      : "#FF9797";
+  };
+
+  const getStatusText = (status: string) => {
+    const statusLower = status?.toLowerCase();
+    if (statusLower === "active" || statusLower === "approved") {
+      return t("ManageOfficers.Approved");
+    } else {
+      return t("ManageOfficers.NotApprovedYet");
+    }
+  };
+
+  if (loading && !refreshing) {
+    return (
+      <View className="flex-1 bg-white justify-center items-center">
+        <ActivityIndicator size="large" color="#21202B" />
+        <Text className="mt-4 text-[#565559]">
+          {t("ManageOfficers.LoadingOfficers")}
+        </Text>
+      </View>
+    );
+  }
 
   return (
     <View className="flex-1 bg-white">
@@ -99,64 +196,78 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
             </Text>
           </Text>
 
-          {officers.map((officer, index) => (
-            <View
-              key={index}
-              className="bg-white rounded-3xl p-4 flex-row items-center"
-              style={{
-                borderWidth: 1,
-                borderColor: getBorderColor(officer.status),
-                backgroundColor: "#ADADAD1A",
-              }}
-            >
-              {/* User Image */}
+          {officers.length === 0 ? (
+            <View className="justify-center items-center py-10">
+              <Image
+                source={require("../../assets/no tasks.webp")}
+                style={{ width: 120, height: 90 }}
+                resizeMode="contain"
+              />
+              <Text className="italic text-[#787878] mt-4">
+                {searchQuery
+                  ? t("ManageOfficers.NoOfficersFound")
+                  : t("ManageOfficers.NoOfficers")}
+              </Text>
+            </View>
+          ) : (
+            officers.map((officer, index) => (
               <View
-                className="rounded-full bg-gray-300 items-center justify-center"
-                style={{ width: 50, height: 50 }}
+                key={`${officer.empId}-${index}`}
+                className="bg-white rounded-3xl p-4 flex-row items-center"
+                style={{
+                  borderWidth: 1,
+                  borderColor: getBorderColor(officer.status),
+                  backgroundColor: "#ADADAD1A",
+                }}
               >
-                {officer.image ? (
+                {/* User Image */}
+                <View
+                  className="rounded-full bg-gray-300 items-center justify-center"
+                  style={{ width: 50, height: 50 }}
+                >
                   <Image
-                    source={{ uri: officer.image }}
+                    source={
+                      officer.profile
+                        ? { uri: officer.profile }
+                        : UserProfileImage
+                    }
                     style={{ width: 50, height: 50, borderRadius: 25 }}
                     resizeMode="cover"
                   />
-                ) : (
-                  <Image
-                    source={UserProfileImage}
-                    style={{ width: 50, height: 50 }}
-                    resizeMode="cover"
-                  />
-                )}
-              </View>
+                </View>
 
-              {/* User Info */}
-              <View className="ml-4 flex-1">
-                <Text className="text-[#21202B] text-base font-semibold">
-                  {officer.name}
-                </Text>
-                <Text className="text-[#565559] text-sm">
-                  {t("ManageOfficers.EMPID")} : {officer.empId}
-                </Text>
-              </View>
-
-              {/* Status Badge */}
-              {officer.status === "pending" && (
-                <View
-                  style={{
-                    position: "absolute",
-                    top: 8,
-                    right: 8,
-                    paddingHorizontal: 8,
-                    paddingVertical: 2,
-                  }}
-                >
-                  <Text className="text-[#FF3434] text-xs">
-                    {t("ManageOfficers.NotApprovedYet")}
+                {/* User Info */}
+                <View className="ml-4 flex-1">
+                  <Text className="text-[#21202B] text-base font-semibold">
+                    {getName(officer)}
+                  </Text>
+                  <Text className="text-[#565559] text-sm">
+                    {t("ManageOfficers.EMPID")} : {officer.empId}
                   </Text>
                 </View>
-              )}
-            </View>
-          ))}
+
+                {/* Status Badge */}
+                {officer.status === "Not Approved" && (
+                  <View
+                    style={{
+                      position: "absolute",
+                      top: 8,
+                      right: 8,
+                      paddingHorizontal: 8,
+                      paddingVertical: 2,
+                    }}
+                  >
+                    <Text
+                      style={{ color: getStatusColor(officer.status) }}
+                      className="text-xs font-semibold"
+                    >
+                      {getStatusText(officer.status)}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            ))
+          )}
         </View>
       </ScrollView>
 
