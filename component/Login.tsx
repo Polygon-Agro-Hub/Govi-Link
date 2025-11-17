@@ -288,7 +288,7 @@ if (!response.ok || !data.success) {
     } catch (error) {
       setLoading(false);
       console.error("Login error:", error);
-      Alert.alert(t("Error.error"), t("Error.somethingWentWrong"));
+      Alert.alert(t("Error.error"), t("Main.somethingWentWrong"));
     }
   };
 

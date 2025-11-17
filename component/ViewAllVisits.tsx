@@ -38,7 +38,7 @@ interface VisitItem {
   tickCompleted: number;
   photoCompleted: number;
   totalCompleted: number;
-  completionPercentage: number;
+  completionPercentage: string;
   farmerName?: string; 
   farmerId: number;   
   propose?: string;  
@@ -52,6 +52,7 @@ interface VisitItem {
   sheduleDate:string;
   completedClusterCount?: number;
   totalClusterCount?: number;
+  
 }
 
 const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation }) => {
@@ -129,7 +130,7 @@ const pendingCount = filteredVisits.filter((item) => {
   if (item.propose === "Cluster" && item.totalClusterCount) {
     return !item.completedClusterCount || item.completedClusterCount < item.totalClusterCount;
   }
-  else if(item.propose === "Requested" && item.status === "Request Reviewed"){
+  else if(item.propose === "Requested" && item.status === "Pending"){
     return true;
   } else {
     return item.status === "Pending";
@@ -239,7 +240,7 @@ const pendingCount = filteredVisits.filter((item) => {
       </View>
      
       {/* Visit Cards */}
-      <ScrollView className="mt-6 px-4 bg-white rounded-t-3xl">
+      {/* <ScrollView className="mt-6 px-4 bg-white rounded-t-3xl">
         {filteredVisits.length > 0 ? (
           filteredVisits.map((item) => {
 
@@ -259,7 +260,6 @@ const pendingCount = filteredVisits.filter((item) => {
               <TouchableOpacity
                 key={item.id}
                  onPress={() => {
-                  //requested comes from govilinkjobs , individual comes from farmaudits
                   if (
                     item.propose === "Individual" ||
                     item.propose === "Requested"
@@ -272,16 +272,14 @@ const pendingCount = filteredVisits.filter((item) => {
       feildauditId: item.id,
       farmName: item.farmerName || "",
     });
-                    {
-                      /*if cluster need send  clusterID , jobId    */
-                    }
+            
                   }
                 }}
-                disabled={(item.propose === "Cluster" && item.completedClusterCount === item.totalClusterCount )|| item.status === "Completed" || item.status === "Finished" || dayjs(item.sheduleDate).isAfter(today, "day")}
+                disabled={(item.propose === "Cluster" && item.completedClusterCount === item.totalClusterCount || item.completionPercentage === "20" )|| item.status === "Completed" || item.status === "Finished" || dayjs(item.sheduleDate).isAfter(today, "day")}
               >
               <View
                 key={item.id}
-                className={`bg-white border ${(item.propose === "Cluster" && item.completedClusterCount === item.totalClusterCount) || item.status === "Completed" || item.status === "Finished" || dayjs(item.sheduleDate).isAfter(today, "day") ? " border-[#9DB2CE]" : "border-[#FF1D85]"} rounded-lg p-4 mt-4`}
+                className={`bg-white border ${(item.propose === "Cluster" && item.completedClusterCount === item.totalClusterCount || item.completionPercentage === "20") || item.status === "Completed" || item.status === "Finished" || dayjs(item.sheduleDate).isAfter(today, "day") ? " border-[#9DB2CE]" : "border-[#FF1D85]"} rounded-lg p-4 mt-4`}
                 style={{
                   shadowColor: "#000",
                   shadowOpacity: 0.05,
@@ -343,7 +341,130 @@ const pendingCount = filteredVisits.filter((item) => {
             {t("ViewAllVisits.NoVisits")}
           </Text>
         )}
-      </ScrollView>
+      </ScrollView> */}
+{/* Visit Cards */}
+<ScrollView className="mt-6 px-4 bg-white rounded-t-3xl">
+  {filteredVisits.length > 0 ? (
+    // Sort visits: Pending first
+    [...filteredVisits]
+      .sort((a, b) => {
+        // Use displayStatus logic for clusters
+        const getStatus = (item: VisitItem) => {
+          if (item.propose === "Cluster" && item.totalClusterCount) {
+            if (item.completedClusterCount === item.totalClusterCount) return "Completed";
+            if (item.completedClusterCount && item.completedClusterCount > 0) return "Partial";
+            return "Pending";
+          }
+          return item.status;
+        };
+
+        const statusA = getStatus(a);
+        const statusB = getStatus(b);
+
+        // Pending first, then others
+        if (statusA === "Pending" && statusB !== "Pending") return -1;
+        if (statusA !== "Pending" && statusB === "Pending") return 1;
+        return 0; // keep original order otherwise
+      })
+      .map((item) => {
+
+        let displayStatus = t(`Visits.${item.status}`);
+        if (item.propose === "Cluster" && item.totalClusterCount) {
+          if (item.completedClusterCount === item.totalClusterCount) {
+            displayStatus = t("Visits.Completed");
+          } else if (item.completedClusterCount && item.completedClusterCount > 0) {
+            displayStatus = `${t("Visits.Completed")} (${item.completedClusterCount}/${item.totalClusterCount})`;
+          } else {
+            displayStatus = `${t("Visits.Pending")} (0/${item.totalClusterCount})`;
+          }
+        }
+
+        return (
+          <TouchableOpacity
+            key={item.id}
+            onPress={() => {
+              if (item.propose === "Individual" || item.propose === "Requested") {
+                setSelectedItem(item);
+                setShowPopup(true);
+              } else {
+                navigation.navigate("ViewFarmsCluster", {
+                  jobId: item.jobId,
+                  feildauditId: item.id,
+                  farmName: item.farmerName || "",
+                });
+              }
+            }}
+            disabled={
+              (item.propose === "Cluster" && item.completedClusterCount === item.totalClusterCount) ||
+              item.completionPercentage === "20" ||
+              item.status === "Completed" ||
+              item.status === "Finished" ||
+              dayjs(item.sheduleDate).isAfter(today, "day")
+            }
+          >
+            <View
+              key={item.id}
+              className={`bg-white border ${
+                (item.propose === "Cluster" && item.completedClusterCount === item.totalClusterCount) ||
+                item.completionPercentage === "20" ||
+                item.status === "Completed" ||
+                item.status === "Finished" ||
+                dayjs(item.sheduleDate).isAfter(today, "day")
+                  ? "border-[#9DB2CE]"
+                  : "border-[#FF1D85]"
+              } rounded-lg p-4 mt-4`}
+              style={{ shadowColor: "#000", shadowOpacity: 0.05, shadowRadius: 4 }}
+            >
+              <Text className="text-sm font-medium">#{item.jobId}</Text>
+
+              {item.propose ? (
+                <Text className="text-[16px] font-bold text-[#000] mt-1">
+                  {(() => {
+                    if (item.propose === "Cluster") {
+                      switch (i18n.language) {
+                        case "si":
+                          return "ගොවි සමූහ විගණනය";
+                        case "ta":
+                          return "உழவர் குழு தணிக்கை";
+                        default:
+                          return "Farm Cluster Audit";
+                      }
+                    } else if (item.propose === "Individual") {
+                      switch (i18n.language) {
+                        case "si":
+                          return "තනි ගොවි විගණනය";
+                        case "ta":
+                          return "தனிப்பட்ட விவசாயி தணிக்கை";
+                        default:
+                          return "Individual Farmer Audit";
+                      }
+                    } else {
+                      switch (i18n.language) {
+                        case "si":
+                          return item.servicesinhalaName || "";
+                        case "ta":
+                          return item.servicetamilName || "";
+                        default:
+                          return item.serviceenglishName || "";
+                      }
+                    }
+                  })()}
+                </Text>
+              ) : null}
+
+              <Text className="text-[12px] font-medium text-[#4E6393] mt-1">
+                {t(`Districts.${item.district}`)} {t("VisitPopup.District")}
+              </Text>
+
+              <Text className="text-[12px] text-[#FF1D85] mt-1">{displayStatus}</Text>
+            </View>
+          </TouchableOpacity>
+        );
+      })
+  ) : (
+    <Text className="text-center text-gray-400 mt-4">No visits available</Text>
+  )}
+</ScrollView>
 
           <Modal transparent visible={showPopup} animationType="slide"
         onRequestClose={() => {
