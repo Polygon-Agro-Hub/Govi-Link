@@ -22,4 +22,7 @@ export type RootStackParamList = {
       AddOfficerStep1: undefined;
       AddOfficerStep2: { formData: any };
       AddOfficerStep3: { formData: any }; 
+      ChangePassword: {passwordUpdate: number};
+      ComplainHistory:undefined;
+      AssignJobs: undefined;
 }

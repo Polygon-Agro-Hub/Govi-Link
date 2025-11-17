@@ -18,7 +18,7 @@ import { ScrollView } from "react-native-gesture-handler";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { environment } from "@/environment/environment";
 import { useTranslation } from "react-i18next";
-import { AntDesign, Ionicons } from "@expo/vector-icons";
+import { AntDesign, Ionicons, FontAwesome, SimpleLineIcons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { setUser } from '../store/authSlice';
 import { useDispatch } from "react-redux";
@@ -272,7 +272,7 @@ if (!response.ok || !data.success) {
         setLoading(false);
         
       if (  passwordUpdate === 0) {
-//   navigation.navigate("ChangePassword");
+  navigation.navigate("ChangePassword",  {passwordUpdate : passwordUpdate});
 } else {
   // Fixed: Check for both Distribution roles individually
   if (role === "Chief Field Officer") {
@@ -288,7 +288,7 @@ if (!response.ok || !data.success) {
     } catch (error) {
       setLoading(false);
       console.error("Login error:", error);
-      Alert.alert(t("Error.error"), t("Error.somethingWentWrong"));
+      Alert.alert(t("Error.error"), t("Main.somethingWentWrong"));
     }
   };
 
@@ -355,7 +355,12 @@ return(
             empIdError ? "border-red-500" : "border-[#F4F4F4]"
           }`}
         >
-          <Image source={user} style={{ width: 24, height: 24 }} resizeMode="contain" />
+                  <FontAwesome
+              name="user-o"
+              size={20}
+              color="#353535"
+            />
+          {/* <Image source={user} style={{ width: 24, height: 24 }} resizeMode="contain" /> */}
           <TextInput
             className="flex-1 h-[40px] text-base pl-2"
             autoCapitalize="characters"
@@ -371,8 +376,11 @@ return(
           {t("Login.Password")}
         </Text>
         <View className="flex-row items-center bg-[#F4F4F4] border border-[#F4F4F4] rounded-3xl h-[53px] mb-8 px-3">
-          <Image source={passwordicon} style={{ width: 40, height: 40 }} resizeMode="contain" />
-          <TextInput
+               <SimpleLineIcons
+              name="lock"
+              size={22}
+              color="#353535"
+            />          <TextInput
             className="flex-1 h-[40px] text-base pl-2"
             secureTextEntry={secureTextEntry}
             value={password}
