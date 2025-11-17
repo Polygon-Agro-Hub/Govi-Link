@@ -8,6 +8,7 @@ import {
   Modal,
   TouchableWithoutFeedback,
   Linking,
+  ActivityIndicator
 } from "react-native";
 import { RootStackParamList } from "@/component/types";
 import { useTranslation } from "react-i18next";
@@ -18,6 +19,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 import { AntDesign, Ionicons, Feather, FontAwesome6 } from "@expo/vector-icons";
+import LottieView from "lottie-react-native";
 
 type ViewAllVisitsNavigationProps = StackNavigationProp<
   RootStackParamList,
@@ -65,6 +67,7 @@ console.log("Today date:", currentDay);
   const [selectedDate, setSelectedDate] = useState(dayjs());
   const [selectedMonth] = useState(today.format("MMMM, YYYY"));
 const [isOverdueSelected, setIsOverdueSelected] = useState(false);
+const [loading, setLoading] = useState(false);
 
   const dates = Array.from({ length: 8 }, (_, i) => today.add(i, "day"));
 const [visits, setVisits] = useState<VisitItem[]>([]);
@@ -105,6 +108,7 @@ useEffect(() => {
 
 const fetchVisits = async () => {
   console.log("Fetching visits for date:", selectedDate.format("YYYY-MM-DD"), "Overdue:", isOverdueSelected);
+  setLoading(true);
   try {
     const token = await AsyncStorage.getItem("token");
     if (token) {
@@ -120,9 +124,10 @@ const fetchVisits = async () => {
     }
   } catch (error) {
     console.error("Failed to fetch officer visits:", error);
+  }finally {
+    setLoading(false);
   }
 };
-
 
 
 // Count only pending visits
@@ -238,117 +243,27 @@ const pendingCount = filteredVisits.filter((item) => {
       </ScrollView>
 
       </View>
-     
-      {/* Visit Cards */}
-      {/* <ScrollView className="mt-6 px-4 bg-white rounded-t-3xl">
-        {filteredVisits.length > 0 ? (
-          filteredVisits.map((item) => {
 
-
-                  let displayStatus = t(`Visits.${item.status}`);
-      if (item.propose === "Cluster" && item.totalClusterCount) {
-        if (item.completedClusterCount === item.totalClusterCount) {
-          displayStatus = (t("Visits.Completed"));
-        } else if (item.completedClusterCount && item.completedClusterCount > 0) {
-          displayStatus = `${t("Visits.Completed")} (${item.completedClusterCount}/${item.totalClusterCount})`;
-        } else {
-          displayStatus = `${t("Visits.Pending")} (0/${item.totalClusterCount})`;
-        }
-      }
-
-            return (
-              <TouchableOpacity
-                key={item.id}
-                 onPress={() => {
-                  if (
-                    item.propose === "Individual" ||
-                    item.propose === "Requested"
-                  ) {
-                    setSelectedItem(item);
-                    setShowPopup(true);
-                  } else {
-    navigation.navigate("ViewFarmsCluster", {
-      jobId: item.jobId,
-      feildauditId: item.id,
-      farmName: item.farmerName || "",
-    });
-            
-                  }
-                }}
-                disabled={(item.propose === "Cluster" && item.completedClusterCount === item.totalClusterCount || item.completionPercentage === "20" )|| item.status === "Completed" || item.status === "Finished" || dayjs(item.sheduleDate).isAfter(today, "day")}
-              >
-              <View
-                key={item.id}
-                className={`bg-white border ${(item.propose === "Cluster" && item.completedClusterCount === item.totalClusterCount || item.completionPercentage === "20") || item.status === "Completed" || item.status === "Finished" || dayjs(item.sheduleDate).isAfter(today, "day") ? " border-[#9DB2CE]" : "border-[#FF1D85]"} rounded-lg p-4 mt-4`}
-                style={{
-                  shadowColor: "#000",
-                  shadowOpacity: 0.05,
-                  shadowRadius: 4,
-                }}
-              >
-                <Text className="text-sm font-medium ">
-                  #{item.jobId}
-                </Text>
-      
-                   {item.propose ? (
-                    <Text className="text-[16px] font-bold text-[#000] mt-1">
-                      {(() => {
-                        if (item.propose === "Cluster") {
-                          switch (i18n.language) {
-                            case "si":
-                              return "ගොවි සමූහ විගණනය";
-                            case "ta":
-                              return "உழவர் குழு தணிக்கை";
-                            default:
-                              return "Farm Cluster Audit";
-                          }
-                        } else if (item.propose === "Individual") {
-                          switch (i18n.language) {
-                            case "si":
-                              return "තනි ගොවි විගණනය";
-                            case "ta":
-                              return "தனிப்பட்ட விவசாயி தணிக்கை";
-                            default:
-                              return "Individual Farmer Audit";
-                          }
-                        } else {
-                          switch (i18n.language) {
-                            case "si":
-                              return item.servicesinhalaName || "";
-                            case "ta":
-                              return item.servicetamilName || "";
-                            default:
-                              return item.serviceenglishName || "";
-                          }
-                        }
-                      })()}
-                    </Text>
-                  ) : null}
-                <Text className="text-[12px] font-medium text-[#4E6393] mt-1">
-                  {t(`Districts.${item.district}`)} {t("VisitPopup.District")}
-                </Text>
-
-          <Text className="text-[12px] text-[#FF1D85] mt-1">
-            {displayStatus}
-          </Text>
-
-              </View>
-              </TouchableOpacity>
-            );
-          })
-        ) : (
-          <Text className="text-center text-[#9A9A9A] mt-10">
-            {t("ViewAllVisits.NoVisits")}
-          </Text>
-        )}
-      </ScrollView> */}
-{/* Visit Cards */}
+{loading ?
+(
+      <View className="flex-1 justify-center items-center mt-6 px-4 bg-white rounded-t-3xl">
+      {/* If you want to use Lottie again, uncomment */}
+      {/* 
+      <LottieView
+        source={require('../assets/jsons/loader.json')}
+        autoPlay
+        loop
+        style={{ width: 300, height: 300 }}
+      />
+      */}
+      <ActivityIndicator size="large" color="#FF1D85" />
+    </View>
+):
+(
 <ScrollView className="mt-6 px-4 bg-white rounded-t-3xl">
   {filteredVisits.length > 0 ? (
-    // Sort visits: Pending first
     [...filteredVisits]
       .sort((a, b) => {
-        // Use displayStatus logic for clusters
         const getStatus = (item: VisitItem) => {
           if (item.propose === "Cluster" && item.totalClusterCount) {
             if (item.completedClusterCount === item.totalClusterCount) return "Completed";
@@ -462,9 +377,21 @@ const pendingCount = filteredVisits.filter((item) => {
         );
       })
   ) : (
-    <Text className="text-center text-gray-400 mt-4">No visits available</Text>
+  <View className="flex-1 items-center justify-center mt-32">
+    <LottieView
+      source={require("../assets/json/NoData.json")}
+      style={{ width: 200, height: 200 }}
+      autoPlay
+      loop
+    />
+    <Text className="text-center text-gray-600 mt-2">
+      {t("Visits.No Jobs Available")}
+    </Text>
+  </View>
   )}
 </ScrollView>
+
+)}
 
           <Modal transparent visible={showPopup} animationType="slide"
         onRequestClose={() => {
@@ -633,7 +560,6 @@ const pendingCount = filteredVisits.filter((item) => {
                       <Text className="text-white text-lg font-semibold">
                         {t("VisitPopup.Start")}
                       </Text>
-                      {/*if individual need send  farmerId for check with QR scan ,jobId,    */}
                     </LinearGradient>
                   </TouchableOpacity>
                 </View>

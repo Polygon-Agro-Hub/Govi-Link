@@ -39,6 +39,9 @@ import AddOfficerStep1 from "@/component/ChiefFieldOfficer/AddOfficerStep1";
 import AddOfficerStep2 from "@/component/ChiefFieldOfficer/AddOfficerStep2";
 import AddOfficerStep3 from "@/component/ChiefFieldOfficer/AddOfficerStep3";
 import OtpverificationRequestAudit from "@/component/OtpverificationRequestAudit";
+import ChangePassword from "@/component/ChangePassword";
+import ComplainHistory from "@/component/ComplainHistory";
+import AssignJobs from "@/component/AssignJobs";
 
 LogBox.ignoreAllLogs(true);
 NativeWindStyleSheet.setOutput({ default: "native" });
@@ -97,6 +100,7 @@ function MainTabs() {
           <Tab.Screen name="AddOfficerStep1" component={AddOfficerStep1} />
           <Tab.Screen name="AddOfficerStep2" component={AddOfficerStep2} />
           <Tab.Screen name="AddOfficerStep3" component={AddOfficerStep3} />
+          <Tab.Screen name="AssignJobs" component={AssignJobs} />
         </>
       ) : (
         <>
@@ -198,6 +202,8 @@ function AppContent() {
             <Stack.Screen name="RequestSuggestions" component={RequestSuggestions} />
             <Stack.Screen name="RequestProblem" component={RequestProblem} />
             <Stack.Screen name="OtpverificationRequestAudit" component={OtpverificationRequestAudit} />
+            <Stack.Screen name="ChangePassword" component={ChangePassword} />
+            <Stack.Screen name="ComplainHistory" component={ComplainHistory} />
           </Stack.Navigator>
         </NavigationContainer>
       </SafeAreaView>

@@ -666,7 +666,7 @@ onPress={() => {
         resizeMode="contain"
       />
       <Text className="italic text-[#787878]">
-        {t("Dashboard.No Drafts Saved")}
+        {t("Dashboard.No Saved Drafts for Today")}
       </Text>
     </View>
   )}
