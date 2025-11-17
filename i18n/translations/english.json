@@ -198,7 +198,10 @@
     "Image Uploaded": "Image Uploaded",
     "Please fill out all fields.": "Please fill out all fields.",
     "Problem submitted successfully!": "Problem submitted successfully!",
-    "Failed to submit problem. Please try again.": "Failed to submit problem. Please try again."
+    "Failed to submit problem. Please try again.": "Failed to submit problem. Please try again.",
+    "Failed to save problem. Please try again.":"Failed to save problem. Please try again.",
+    "Problem updated successfully.":"Problem updated successfully.",
+    "Problem saved successfully.":"Problem saved successfully."
   },
   "AddOfficer": {
     "AddOfficer": "Add Officer",
@@ -262,24 +265,11 @@
     "OfficersList": "Officers List",
     "All": "All",
     "EMPID": "EMP ID",
-    "NotApprovedYet": "Not Approved yet"
+    "NotApprovedYet": "Not Approved yet",
     "Scan Again":"Scan Again",
     "User ID not found in QR code":"User ID not found in QR code",
     "Wrong QR code":"Wrong QR code",
     "The scanned QR code does not contain a valid user ID or is damaged.":"The scanned QR code does not contain a valid user ID or is damaged."
-  },
-  "RequestProblem":{
-    "Farmer’s Say":"Farmer’s Say",
-    "Advice Given":"Advice Given",
-    "Type here...":"Type here...",
-    "Photo":"Photo",
-    "Submit":"Submit",
-    "Image Uploaded":"Image Uploaded",
-    "Please fill out all fields.":"Please fill out all fields.",
-    "Problem submitted successfully!":"Problem submitted successfully!",
-    "Failed to save problem. Please try again.":"Failed to save problem. Please try again.",
-    "Problem updated successfully.":"Problem updated successfully.",
-    "Problem saved successfully.":"Problem saved successfully."
   },
   "Visits":{
     "Pending": "Pending",
