@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -10,6 +10,9 @@ import {
   FlatList,
   KeyboardAvoidingView,
   Platform,
+  Alert,
+  ActivityIndicator,
+  Image,
 } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { RadioButton } from "react-native-paper";
@@ -19,6 +22,10 @@ import { RootStackParamList } from "../types";
 import countryData from "@/assets/json/countryflag.json";
 import { useTranslation } from "react-i18next";
 import i18n from "@/i18n/i18n";
+import axios from "axios";
+import { environment } from "@/environment/environment";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as ImagePicker from "expo-image-picker";
 
 type AddOfficerStep1NavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -50,6 +57,13 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
   const [phone2, setPhone2] = useState("");
   const [nic, setNic] = useState("");
   const [email, setEmail] = useState("");
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+
+  // Validation states
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [isValidating, setIsValidating] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   // District dropdown states - MULTI SELECT
   const [selectedDistricts, setSelectedDistricts] = useState<string[]>([]);
@@ -93,8 +107,336 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     { en: "Vavuniya", si: "වවුනියාව", ta: "வவுனியா" },
   ];
 
+  // Mark field as touched
+  const markFieldAsTouched = (fieldName: string) => {
+    setTouched((prev) => ({ ...prev, [fieldName]: true }));
+  };
+
+  // Clear specific field error
+  const clearFieldError = (fieldName: string) => {
+    setErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors[fieldName];
+      return newErrors;
+    });
+  };
+
+  // Validation functions
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailRegex.test(email);
+  };
+
+  const validateNIC = (nic: string): boolean => {
+    return /^\d{9}[Vv]?$|^\d{12}$/.test(nic);
+  };
+
+  const validatePhoneNumber = (phone: string): boolean => {
+    return /^7[0-9]{8}$/.test(phone);
+  };
+
+  // Field change handlers with validation on blur
+  const handleFirstNameENChange = (text: string) => {
+    const filteredText = text.replace(/[^a-zA-Z\s]/g, "");
+    const capitalizedText =
+      filteredText.charAt(0).toUpperCase() + filteredText.slice(1);
+    setFirstNameEN(capitalizedText);
+  };
+
+  const handleFirstNameENBlur = () => {
+    markFieldAsTouched("firstNameEN");
+    if (!firstNameEN.trim()) {
+      setErrors((prev) => ({
+        ...prev,
+        firstNameEN: t("Error.First name is required"),
+      }));
+    } else {
+      clearFieldError("firstNameEN");
+    }
+  };
+
+  const handleLastNameENChange = (text: string) => {
+    const filteredText = text.replace(/[^a-zA-Z\s]/g, "");
+    const capitalizedText =
+      filteredText.charAt(0).toUpperCase() + filteredText.slice(1);
+    setLastNameEN(capitalizedText);
+  };
+
+  const handleLastNameENBlur = () => {
+    markFieldAsTouched("lastNameEN");
+    if (!lastNameEN.trim()) {
+      setErrors((prev) => ({
+        ...prev,
+        lastNameEN: t("Error.Last name is required"),
+      }));
+    } else {
+      clearFieldError("lastNameEN");
+    }
+  };
+
+  const handlePhone1Change = (input: string) => {
+    let numbersOnly = input.replace(/[^0-9]/g, "");
+    if (numbersOnly.startsWith("0")) {
+      numbersOnly = numbersOnly.replace(/^0+/, "");
+    }
+    setPhone1(numbersOnly);
+  };
+
+  const handlePhone1Blur = () => {
+    markFieldAsTouched("phone1");
+    if (!phone1.trim()) {
+      setErrors((prev) => ({
+        ...prev,
+        phone1: t("Error.Phone number is required"),
+      }));
+    } else if (!validatePhoneNumber(phone1)) {
+      setErrors((prev) => ({
+        ...prev,
+        phone1: t("Error.Invalid phone number"),
+      }));
+    } else {
+      clearFieldError("phone1");
+      checkPhoneExists(selectedCountryCode1, phone1, "phone1");
+    }
+  };
+
+  const handlePhone2Change = (input: string) => {
+    let numbersOnly = input.replace(/[^0-9]/g, "");
+    if (numbersOnly.startsWith("0")) {
+      numbersOnly = numbersOnly.replace(/^0+/, "");
+    }
+    setPhone2(numbersOnly);
+  };
+
+  const handlePhone2Blur = () => {
+    markFieldAsTouched("phone2");
+
+    if (phone2) {
+      if (!validatePhoneNumber(phone2)) {
+        setErrors((prev) => ({
+          ...prev,
+          phone2: t("Error.Invalid phone number"),
+        }));
+      } else {
+        clearFieldError("phone2");
+        // Check if phone2 exists in backend only if it's provided
+        checkPhoneExists(selectedCountryCode2, phone2, "phone2");
+      }
+    } else {
+      // Phone 2 is optional, so clear any errors if empty
+      clearFieldError("phone2");
+    }
+  };
+
+  const handleNICChange = (input: string) => {
+    const filteredInput = input.replace(/[^0-9Vv]/g, "");
+    const normalizedInput = filteredInput.replace(/[vV]/g, "V");
+    setNic(normalizedInput);
+  };
+
+  const handleNICBlur = () => {
+    markFieldAsTouched("nic");
+    if (!nic.trim()) {
+      setErrors((prev) => ({ ...prev, nic: t("Error.NIC is required") }));
+    } else if (!validateNIC(nic)) {
+      setErrors((prev) => ({ ...prev, nic: t("Error.Invalid NIC format") }));
+    } else {
+      clearFieldError("nic");
+      checkNICExists(nic);
+    }
+  };
+
+  const handleEmailChange = (input: string) => {
+    const trimmedInput = input.trim();
+    setEmail(trimmedInput);
+  };
+
+  const handleEmailBlur = () => {
+    markFieldAsTouched("email");
+    if (!email.trim()) {
+      setErrors((prev) => ({ ...prev, email: t("Error.Email is required") }));
+    } else if (!validateEmail(email)) {
+      setErrors((prev) => ({
+        ...prev,
+        email: t("Error.Invalid email address"),
+      }));
+    } else {
+      clearFieldError("email");
+      checkEmailExists(email);
+    }
+  };
+
+  // Handle blur for other fields
+  const handleFirstNameSIBlur = () => {
+    markFieldAsTouched("firstNameSI");
+    if (!firstNameSI.trim()) {
+      setErrors((prev) => ({
+        ...prev,
+        firstNameSI: t("Error.Sinhala first name is required"),
+      }));
+    } else {
+      clearFieldError("firstNameSI");
+    }
+  };
+
+  const handleLastNameSIBlur = () => {
+    markFieldAsTouched("lastNameSI");
+    if (!lastNameSI.trim()) {
+      setErrors((prev) => ({
+        ...prev,
+        lastNameSI: t("Error.Sinhala last name is required"),
+      }));
+    } else {
+      clearFieldError("lastNameSI");
+    }
+  };
+
+  const handleFirstNameTABlur = () => {
+    markFieldAsTouched("firstNameTA");
+    if (!firstNameTA.trim()) {
+      setErrors((prev) => ({
+        ...prev,
+        firstNameTA: t("Error.Tamil first name is required"),
+      }));
+    } else {
+      clearFieldError("firstNameTA");
+    }
+  };
+
+  const handleLastNameTABlur = () => {
+    markFieldAsTouched("lastNameTA");
+    if (!lastNameTA.trim()) {
+      setErrors((prev) => ({
+        ...prev,
+        lastNameTA: t("Error.Tamil last name is required"),
+      }));
+    } else {
+      clearFieldError("lastNameTA");
+    }
+  };
+
+  // Profile image picker
+  const pickProfileImage = async () => {
+    try {
+      // Request permissions
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert(
+          t("Error.Permission Denied"),
+          t("Error.Gallery permission is required")
+        );
+        return;
+      }
+
+      // Launch image picker
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        setProfileImage(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error("Error picking image:", error);
+      Alert.alert(t("Error.Error"), t("Error.Failed to pick image"));
+    }
+  };
+
+  // API validation checks
+  const checkNICExists = async (nicNumber: string) => {
+    try {
+      setIsValidating(true);
+      const token = await AsyncStorage.getItem("token");
+      const response = await axios.get(
+        `${environment.API_BASE_URL}api/officer/field-officers/check-nic/${nicNumber}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (response.data.exists) {
+        setErrors((prev) => ({ ...prev, nic: t("Error.NIC already exists") }));
+      }
+    } catch (error) {
+      console.error("Error checking NIC:", error);
+    } finally {
+      setIsValidating(false);
+    }
+  };
+
+  const checkEmailExists = async (email: string) => {
+    try {
+      setIsValidating(true);
+      const token = await AsyncStorage.getItem("token");
+      const response = await axios.get(
+        `${environment.API_BASE_URL}api/officer/field-officers/check-email/${email}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (response.data.exists) {
+        setErrors((prev) => ({
+          ...prev,
+          email: t("Error.Email already exists"),
+        }));
+      }
+    } catch (error) {
+      console.error("Error checking email:", error);
+    } finally {
+      setIsValidating(false);
+    }
+  };
+
+  const checkPhoneExists = async (
+    phoneCode: string,
+    phoneNumber: string,
+    field: string
+  ) => {
+    // Don't check if phone number is empty (for optional phone2)
+    if (!phoneNumber.trim()) {
+      return;
+    }
+
+    try {
+      setIsValidating(true);
+      const token = await AsyncStorage.getItem("token");
+      const response = await axios.get(
+        `${environment.API_BASE_URL}api/officer/field-officers/check-phone/${phoneCode}/${phoneNumber}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (response.data.exists) {
+        setErrors((prev) => ({
+          ...prev,
+          [field]:
+            field === "phone1"
+              ? t("Error.Phone already exists")
+              : t("Error.Phone 2 already exists"),
+        }));
+      } else {
+        // Clear the error if phone doesn't exist
+        clearFieldError(field);
+      }
+    } catch (error) {
+      console.error("Error checking phone:", error);
+    } finally {
+      setIsValidating(false);
+    }
+  };
+
   const toggleLanguage = (lang: keyof typeof languages) => {
-    setLanguages((prev) => ({ ...prev, [lang]: !prev[lang] }));
+    clearFieldError("languages");
+    setLanguages((prev) => ({
+      ...prev,
+      [lang]: !prev[lang],
+    }));
   };
 
   // Get current language
@@ -128,8 +470,8 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
       const searchTerm = districtSearch.toLowerCase();
       return (
         district.en.toLowerCase().includes(searchTerm) ||
-        district.si.includes(districtSearch) || // Sinhala doesn't need lowercase
-        district.ta.includes(districtSearch) || // Tamil doesn't need lowercase
+        district.si.includes(districtSearch) ||
+        district.ta.includes(districtSearch) ||
         getTranslatedDistrict(district).toLowerCase().includes(searchTerm)
       );
     });
@@ -144,10 +486,8 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     const districtKey = district.en;
     setSelectedDistricts((prev) => {
       if (prev.includes(districtKey)) {
-        // Remove district if already selected
         return prev.filter((d) => d !== districtKey);
       } else {
-        // Add district if not selected
         return [...prev, districtKey];
       }
     });
@@ -165,6 +505,15 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
 
   // Handle modal close
   const handleDistrictModalClose = () => {
+    markFieldAsTouched("districts");
+    if (selectedDistricts.length === 0) {
+      setErrors((prev) => ({
+        ...prev,
+        districts: t("Error.At least one district is required"),
+      }));
+    } else {
+      clearFieldError("districts");
+    }
     setDistrictSearch("");
     setShowDistrictDropdown(false);
   };
@@ -199,6 +548,124 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
         "AddOfficer.more"
       )}`;
     }
+  };
+
+  // Validate all fields before proceeding
+  const validateStep1 = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!firstNameEN.trim())
+      newErrors.firstNameEN = t("Error.First name is required");
+    if (!lastNameEN.trim())
+      newErrors.lastNameEN = t("Error.Last name is required");
+    if (!firstNameSI.trim())
+      newErrors.firstNameSI = t("Error.Sinhala first name is required");
+    if (!lastNameSI.trim())
+      newErrors.lastNameSI = t("Error.Sinhala last name is required");
+    if (!firstNameTA.trim())
+      newErrors.firstNameTA = t("Error.Tamil first name is required");
+    if (!lastNameTA.trim())
+      newErrors.lastNameTA = t("Error.Tamil last name is required");
+    if (!phone1.trim()) newErrors.phone1 = t("Error.Phone number is required");
+    if (!nic.trim()) newErrors.nic = t("Error.NIC is required");
+    if (!email.trim()) newErrors.email = t("Error.Email is required");
+    if (selectedDistricts.length === 0)
+      newErrors.districts = t("Error.At least one district is required");
+    if (Object.values(languages).every((val) => !val))
+      newErrors.languages = t("Error.At least one language is required");
+
+    if (phone1 && !validatePhoneNumber(phone1))
+      newErrors.phone1 = t("Error.Invalid phone number");
+    if (phone2 && !validatePhoneNumber(phone2))
+      newErrors.phone2 = t("Error.Invalid phone number");
+    if (nic && !validateNIC(nic)) newErrors.nic = t("Error.Invalid NIC format");
+    if (email && !validateEmail(email))
+      newErrors.email = t("Error.Invalid email address");
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // Clear all form data function
+  const clearFormData = () => {
+    // Reset all form fields
+    setType("Permanent");
+    setLanguages({
+      Sinhala: true,
+      English: false,
+      Tamil: false,
+    });
+    setFirstNameEN("");
+    setLastNameEN("");
+    setFirstNameSI("");
+    setLastNameSI("");
+    setFirstNameTA("");
+    setLastNameTA("");
+    setPhone1("");
+    setPhone2("");
+    setNic("");
+    setEmail("");
+    setProfileImage(null);
+    setSelectedDistricts([]);
+    setSelectedCountryCode1("+94");
+    setSelectedCountryCode2("+94");
+
+    // Clear errors and touched states
+    setErrors({});
+    setTouched({});
+  };
+
+  // Updated cancel button handler
+  const handleCancel = () => {
+    clearFormData();
+    navigation.navigate("ManageOfficers");
+  };
+
+  const handleNext = () => {
+    // Mark all fields as touched to show all errors
+    const allFields = [
+      "firstNameEN",
+      "lastNameEN",
+      "firstNameSI",
+      "lastNameSI",
+      "firstNameTA",
+      "lastNameTA",
+      "phone1",
+      "nic",
+      "email",
+      "districts",
+    ];
+    allFields.forEach((field) => markFieldAsTouched(field));
+
+    if (!validateStep1()) {
+      Alert.alert(
+        t("Error.Validation Error"),
+        t("Error.Please fix all errors before proceeding")
+      );
+      return;
+    }
+
+    // Prepare form data for next step
+    const formData = {
+      empType: type,
+      languages,
+      assignDistrict: selectedDistricts,
+      firstName: firstNameEN,
+      lastName: lastNameEN,
+      firstNameSinhala: firstNameSI,
+      lastNameSinhala: lastNameSI,
+      firstNameTamil: firstNameTA,
+      lastNameTamil: lastNameTA,
+      phoneCode1: selectedCountryCode1,
+      phoneNumber1: phone1,
+      phoneCode2: selectedCountryCode2,
+      phoneNumber2: phone2,
+      nic,
+      email,
+      profileImage, 
+    };
+
+    navigation.navigate("AddOfficerStep2", { formData });
   };
 
   const renderDistrictItem = ({
@@ -299,12 +766,27 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
 
         {/* Profile Picture */}
         <View className="items-center mt-6">
-          <View className="w-20 h-20 bg-gray-300 rounded-full items-center justify-center">
-            <Ionicons name="person" size={40} color="#fff" />
-            <View className="absolute bottom-0 right-0 w-6 h-6 bg-gray-800 rounded-full items-center justify-center">
-              <Ionicons name="pencil" size={14} color="#fff" />
+          <TouchableOpacity onPress={pickProfileImage}>
+            <View className="relative">
+              {/* Round image */}
+              <View className="w-20 h-20 bg-gray-300 rounded-full overflow-hidden items-center justify-center">
+                {profileImage ? (
+                  <Image
+                    source={{ uri: profileImage }}
+                    className="w-full h-full"
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <Ionicons name="person" size={40} color="#fff" />
+                )}
+              </View>
+
+              {/* Pencil icon */}
+              <View className="absolute bottom-0 right-0 w-6 h-6 bg-gray-800 rounded-full items-center justify-center">
+                <Ionicons name="pencil" size={14} color="#fff" />
+              </View>
             </View>
-          </View>
+          </TouchableOpacity>
         </View>
 
         {/* Type */}
@@ -369,6 +851,11 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
                 )
               )}
             </View>
+            {errors.languages && (
+              <Text className="text-red-500 text-sm mt-1">
+                {errors.languages}
+              </Text>
+            )}
           </View>
 
           <View className="border border-[#ADADAD] border-b-0 mt-4"></View>
@@ -376,151 +863,305 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
           {/* Form Fields */}
           <View className="px-6 mt-4 space-y-4">
             {/* District Dropdown - MULTI SELECT */}
-            <TouchableOpacity
-              className="bg-[#F4F4F4] rounded-2xl px-4 py-3 flex-row justify-between items-center"
-              onPress={() => setShowDistrictDropdown(true)}
-            >
-              <Text
-                className={`${
-                  selectedDistricts.length > 0 ? "text-black" : "text-[#7D7D7D]"
+            <View>
+              <TouchableOpacity
+                className={`bg-[#F4F4F4] rounded-2xl px-4 py-3 flex-row justify-between items-center ${
+                  errors.districts && touched.districts
+                    ? "border border-red-500"
+                    : ""
                 }`}
+                onPress={() => setShowDistrictDropdown(true)}
               >
-                {getDistrictDisplayText()}
-              </Text>
-              <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
-            </TouchableOpacity>
+                <Text
+                  className={`${
+                    selectedDistricts.length > 0
+                      ? "text-black"
+                      : "text-[#7D7D7D]"
+                  }`}
+                >
+                  {getDistrictDisplayText()}
+                </Text>
+                <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
+              </TouchableOpacity>
+              {errors.districts && touched.districts && (
+                <Text className="text-red-500 text-sm mt-1 ml-2">
+                  {errors.districts}
+                </Text>
+              )}
+            </View>
 
-            <TextInput
-              placeholder={t("AddOfficer.FirstNameEnglish")}
-              placeholderTextColor="#7D7D7D"
-              className="bg-[#F4F4F4] rounded-2xl px-4 py-4"
-              value={firstNameEN}
-              onChangeText={setFirstNameEN}
-              underlineColorAndroid="transparent"
-            />
-            <TextInput
-              placeholder={t("AddOfficer.LastNameEnglish")}
-              placeholderTextColor="#7D7D7D"
-              className="bg-[#F4F4F4] rounded-2xl px-4 py-4"
-              value={lastNameEN}
-              onChangeText={setLastNameEN}
-              underlineColorAndroid="transparent"
-            />
+            <View>
+              <TextInput
+                placeholder={t("AddOfficer.FirstNameEnglish")}
+                placeholderTextColor="#7D7D7D"
+                className={`bg-[#F4F4F4] rounded-2xl px-4 py-4 ${
+                  errors.firstNameEN && touched.firstNameEN
+                    ? "border border-red-500"
+                    : ""
+                }`}
+                value={firstNameEN}
+                onChangeText={handleFirstNameENChange}
+                onBlur={handleFirstNameENBlur}
+                underlineColorAndroid="transparent"
+              />
+              {errors.firstNameEN && touched.firstNameEN && (
+                <Text className="text-red-500 text-sm mt-1 ml-2">
+                  {errors.firstNameEN}
+                </Text>
+              )}
+            </View>
 
-            <TextInput
-              placeholder={t("AddOfficer.FirstNameSinhala")}
-              placeholderTextColor="#7D7D7D"
-              className="bg-[#F4F4F4] rounded-2xl px-4 py-4"
-              value={firstNameSI}
-              onChangeText={setFirstNameSI}
-              underlineColorAndroid="transparent"
-            />
-            <TextInput
-              placeholder={t("AddOfficer.LastNameSinhala")}
-              placeholderTextColor="#7D7D7D"
-              className="bg-[#F4F4F4] rounded-2xl px-4 py-4"
-              value={lastNameSI}
-              onChangeText={setLastNameSI}
-              underlineColorAndroid="transparent"
-            />
+            <View>
+              <TextInput
+                placeholder={t("AddOfficer.LastNameEnglish")}
+                placeholderTextColor="#7D7D7D"
+                className={`bg-[#F4F4F4] rounded-2xl px-4 py-4 ${
+                  errors.lastNameEN && touched.lastNameEN
+                    ? "border border-red-500"
+                    : ""
+                }`}
+                value={lastNameEN}
+                onChangeText={handleLastNameENChange}
+                onBlur={handleLastNameENBlur}
+                underlineColorAndroid="transparent"
+              />
+              {errors.lastNameEN && touched.lastNameEN && (
+                <Text className="text-red-500 text-sm mt-1 ml-2">
+                  {errors.lastNameEN}
+                </Text>
+              )}
+            </View>
 
-            <TextInput
-              placeholder={t("AddOfficer.FirstNameTamil")}
-              placeholderTextColor="#7D7D7D"
-              className="bg-[#F4F4F4] rounded-2xl px-4 py-4"
-              value={firstNameTA}
-              onChangeText={setFirstNameTA}
-              underlineColorAndroid="transparent"
-            />
-            <TextInput
-              placeholder={t("AddOfficer.LastNameTamil")}
-              placeholderTextColor="#7D7D7D"
-              className="bg-[#F4F4F4] rounded-2xl px-4 py-4"
-              value={lastNameTA}
-              onChangeText={setLastNameTA}
-              underlineColorAndroid="transparent"
-            />
+            <View>
+              <TextInput
+                placeholder={t("AddOfficer.FirstNameSinhala")}
+                placeholderTextColor="#7D7D7D"
+                className={`bg-[#F4F4F4] rounded-2xl px-4 py-4 ${
+                  errors.firstNameSI && touched.firstNameSI
+                    ? "border border-red-500"
+                    : ""
+                }`}
+                value={firstNameSI}
+                onChangeText={setFirstNameSI}
+                onBlur={handleFirstNameSIBlur}
+                underlineColorAndroid="transparent"
+              />
+              {errors.firstNameSI && touched.firstNameSI && (
+                <Text className="text-red-500 text-sm mt-1 ml-2">
+                  {errors.firstNameSI}
+                </Text>
+              )}
+            </View>
+
+            <View>
+              <TextInput
+                placeholder={t("AddOfficer.LastNameSinhala")}
+                placeholderTextColor="#7D7D7D"
+                className={`bg-[#F4F4F4] rounded-2xl px-4 py-4 ${
+                  errors.lastNameSI && touched.lastNameSI
+                    ? "border border-red-500"
+                    : ""
+                }`}
+                value={lastNameSI}
+                onChangeText={setLastNameSI}
+                onBlur={handleLastNameSIBlur}
+                underlineColorAndroid="transparent"
+              />
+              {errors.lastNameSI && touched.lastNameSI && (
+                <Text className="text-red-500 text-sm mt-1 ml-2">
+                  {errors.lastNameSI}
+                </Text>
+              )}
+            </View>
+
+            <View>
+              <TextInput
+                placeholder={t("AddOfficer.FirstNameTamil")}
+                placeholderTextColor="#7D7D7D"
+                className={`bg-[#F4F4F4] rounded-2xl px-4 py-4 ${
+                  errors.firstNameTA && touched.firstNameTA
+                    ? "border border-red-500"
+                    : ""
+                }`}
+                value={firstNameTA}
+                onChangeText={setFirstNameTA}
+                onBlur={handleFirstNameTABlur}
+                underlineColorAndroid="transparent"
+              />
+              {errors.firstNameTA && touched.firstNameTA && (
+                <Text className="text-red-500 text-sm mt-1 ml-2">
+                  {errors.firstNameTA}
+                </Text>
+              )}
+            </View>
+
+            <View>
+              <TextInput
+                placeholder={t("AddOfficer.LastNameTamil")}
+                placeholderTextColor="#7D7D7D"
+                className={`bg-[#F4F4F4] rounded-2xl px-4 py-4 ${
+                  errors.lastNameTA && touched.lastNameTA
+                    ? "border border-red-500"
+                    : ""
+                }`}
+                value={lastNameTA}
+                onChangeText={setLastNameTA}
+                onBlur={handleLastNameTABlur}
+                underlineColorAndroid="transparent"
+              />
+              {errors.lastNameTA && touched.lastNameTA && (
+                <Text className="text-red-500 text-sm mt-1 ml-2">
+                  {errors.lastNameTA}
+                </Text>
+              )}
+            </View>
           </View>
           <View className="border border-[#ADADAD] border-b-0 mt-4"></View>
 
           <View className="px-6 mt-4 space-y-4">
             {/* Phone Numbers */}
-            <View className="flex-row space-x-2">
-              {/* Phone 1 Country Code */}
-              <TouchableOpacity
-                className="bg-[#F4F4F4] rounded-2xl px-4 py-4 w-20 flex-row justify-between items-center"
-                onPress={() => setShowCountryCodeDropdown1(true)}
-              >
-                <Text className="text-black">{selectedCountryCode1}</Text>
-                <MaterialIcons name="arrow-drop-down" size={18} color="#666" />
-              </TouchableOpacity>
+            <View>
+              <View className="flex-row space-x-2">
+                {/* Phone 1 Country Code */}
+                <TouchableOpacity
+                  className="bg-[#F4F4F4] rounded-2xl px-4 py-4 w-20 flex-row justify-between items-center"
+                  onPress={() => setShowCountryCodeDropdown1(true)}
+                >
+                  <Text className="text-black">{selectedCountryCode1}</Text>
+                  <MaterialIcons
+                    name="arrow-drop-down"
+                    size={18}
+                    color="#666"
+                  />
+                </TouchableOpacity>
 
-              <TextInput
-                placeholder="7XXXXXXXX"
-                placeholderTextColor="#7D7D7D"
-                className="bg-[#F4F4F4] rounded-2xl px-4 py-4 flex-1"
-                value={phone1}
-                onChangeText={setPhone1}
-                keyboardType="phone-pad"
-                underlineColorAndroid="transparent"
-              />
+                <View className="flex-1">
+                  <TextInput
+                    placeholder="7XXXXXXXX"
+                    placeholderTextColor="#7D7D7D"
+                    className={`bg-[#F4F4F4] rounded-2xl px-4 py-4 flex-1 ${
+                      errors.phone1 && touched.phone1
+                        ? "border border-red-500"
+                        : ""
+                    }`}
+                    value={phone1}
+                    onChangeText={handlePhone1Change}
+                    onBlur={handlePhone1Blur}
+                    keyboardType="phone-pad"
+                    underlineColorAndroid="transparent"
+                    maxLength={9}
+                  />
+                </View>
+              </View>
+              {errors.phone1 && touched.phone1 && (
+                <Text className="text-red-500 text-sm mt-1 ml-2">
+                  {errors.phone1}
+                </Text>
+              )}
             </View>
 
-            <View className="flex-row space-x-2">
-              {/* Phone 2 Country Code */}
-              <TouchableOpacity
-                className="bg-[#F4F4F4] rounded-2xl px-4 py-4 w-20 flex-row justify-between items-center"
-                onPress={() => setShowCountryCodeDropdown2(true)}
-              >
-                <Text className="text-black">{selectedCountryCode2}</Text>
-                <MaterialIcons name="arrow-drop-down" size={18} color="#666" />
-              </TouchableOpacity>
+            <View>
+              <View className="flex-row space-x-2">
+                {/* Phone 2 Country Code */}
+                <TouchableOpacity
+                  className="bg-[#F4F4F4] rounded-2xl px-4 py-4 w-20 flex-row justify-between items-center"
+                  onPress={() => setShowCountryCodeDropdown2(true)}
+                >
+                  <Text className="text-black">{selectedCountryCode2}</Text>
+                  <MaterialIcons
+                    name="arrow-drop-down"
+                    size={18}
+                    color="#666"
+                  />
+                </TouchableOpacity>
 
-              <TextInput
-                placeholder="7XXXXXXXX"
-                placeholderTextColor="#7D7D7D"
-                className="bg-[#F4F4F4] rounded-2xl px-4 py-4 flex-1"
-                value={phone2}
-                onChangeText={setPhone2}
-                keyboardType="phone-pad"
-                underlineColorAndroid="transparent"
-              />
+                <View className="flex-1">
+                  <TextInput
+                    placeholder="7XXXXXXXX"
+                    placeholderTextColor="#7D7D7D"
+                    className={`bg-[#F4F4F4] rounded-2xl px-4 py-4 flex-1 ${
+                      errors.phone2 && touched.phone2
+                        ? "border border-red-500"
+                        : ""
+                    }`}
+                    value={phone2}
+                    onChangeText={handlePhone2Change}
+                    onBlur={handlePhone2Blur}
+                    keyboardType="phone-pad"
+                    underlineColorAndroid="transparent"
+                    maxLength={9}
+                  />
+                </View>
+              </View>
+              {errors.phone2 && touched.phone2 && (
+                <Text className="text-red-500 text-sm mt-1 ml-2">
+                  {errors.phone2}
+                </Text>
+              )}
             </View>
 
-            <TextInput
-              placeholder={t("AddOfficer.NICNumber")}
-              placeholderTextColor="#7D7D7D"
-              className="bg-[#F4F4F4] rounded-2xl px-4 py-4"
-              value={nic}
-              onChangeText={setNic}
-              underlineColorAndroid="transparent"
-            />
-            <TextInput
-              placeholder={t("AddOfficer.EmailAddress")}
-              placeholderTextColor="#7D7D7D"
-              className="bg-[#F4F4F4] rounded-2xl px-4 py-4"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              underlineColorAndroid="transparent"
-            />
+            <View>
+              <TextInput
+                placeholder={t("AddOfficer.NICNumber")}
+                placeholderTextColor="#7D7D7D"
+                className={`bg-[#F4F4F4] rounded-2xl px-4 py-4 ${
+                  errors.nic && touched.nic ? "border border-red-500" : ""
+                }`}
+                value={nic}
+                onChangeText={handleNICChange}
+                onBlur={handleNICBlur}
+                underlineColorAndroid="transparent"
+                maxLength={12}
+                autoCapitalize="characters"
+              />
+              {errors.nic && touched.nic && (
+                <Text className="text-red-500 text-sm mt-1 ml-2">
+                  {errors.nic}
+                </Text>
+              )}
+            </View>
+
+            <View>
+              <TextInput
+                placeholder={t("AddOfficer.EmailAddress")}
+                placeholderTextColor="#7D7D7D"
+                className={`bg-[#F4F4F4] rounded-2xl px-4 py-4 ${
+                  errors.email && touched.email ? "border border-red-500" : ""
+                }`}
+                value={email}
+                onChangeText={handleEmailChange}
+                onBlur={handleEmailBlur}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                underlineColorAndroid="transparent"
+              />
+              {errors.email && touched.email && (
+                <Text className="text-red-500 text-sm mt-1 ml-2">
+                  {errors.email}
+                </Text>
+              )}
+            </View>
           </View>
 
           {/* Buttons */}
           <View className="px-6 mt-6 flex-row w-full justify-between">
             <TouchableOpacity
               className="bg-[#D9D9D9] rounded-3xl px-6 py-4 w-[48%] items-center"
-              onPress={() => navigation.navigate("ManageOfficers")}
+              onPress={handleCancel}
             >
               <Text className="text-[#686868]">{t("AddOfficer.Cancel")}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               className="bg-black rounded-3xl px-6 py-4 w-[48%] items-center ml-3"
-              onPress={() => navigation.navigate("AddOfficerStep2")}
+              onPress={handleNext}
+              disabled={loading}
             >
-              <Text className="text-white">{t("AddOfficer.Next")}</Text>
+              {loading ? (
+                <ActivityIndicator color="white" size="small" />
+              ) : (
+                <Text className="text-white">{t("AddOfficer.Next")}</Text>
+              )}
             </TouchableOpacity>
           </View>
         </View>
