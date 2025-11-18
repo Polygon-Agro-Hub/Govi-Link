@@ -421,9 +421,9 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
           </View>
 
           {/* Buttons */}
-          <View className="px-6 mt-8 flex-row w-full justify-between">
+          <View className="px-6 flex-col w-full gap-4 mt-4">
             <TouchableOpacity
-              className="bg-[#D9D9D9] rounded-3xl px-6 py-4 w-[48%] items-center"
+              className="bg-[#D9D9D9] rounded-3xl px-6 py-4 w-full items-center"
               onPress={handleGoBack}
               disabled={loading}
             >
@@ -433,7 +433,7 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
             </TouchableOpacity>
 
             <TouchableOpacity
-              className="bg-black rounded-3xl px-6 py-4 w-[48%] items-center ml-3"
+              className="bg-black rounded-3xl px-6 py-4 w-full items-center"
               onPress={handleSubmit}
               disabled={loading}
             >

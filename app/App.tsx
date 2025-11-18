@@ -42,6 +42,7 @@ import OtpverificationRequestAudit from "@/component/OtpverificationRequestAudit
 import ChangePassword from "@/component/ChangePassword";
 import ComplainHistory from "@/component/ComplainHistory";
 import AssignJobs from "@/component/AssignJobs";
+import CapitalRequests from "@/component/ChiefFieldOfficer/CapitalRequests";
 
 LogBox.ignoreAllLogs(true);
 NativeWindStyleSheet.setOutput({ default: "native" });
@@ -101,6 +102,7 @@ function MainTabs() {
           <Tab.Screen name="AddOfficerStep2" component={AddOfficerStep2} />
           <Tab.Screen name="AddOfficerStep3" component={AddOfficerStep3} />
           <Tab.Screen name="AssignJobs" component={AssignJobs} />
+          <Tab.Screen name="CapitalRequests" component={CapitalRequests} />
         </>
       ) : (
         <>

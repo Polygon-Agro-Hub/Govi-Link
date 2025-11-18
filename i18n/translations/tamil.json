@@ -125,5 +125,21 @@
     "Contract image is required": "ஒப்பந்த படம் தேவை",
     "FailedToCreateOfficer": "அதிகாரியை உருவாக்க முடியவில்லை",
     "RequestTimeout": "கோரிக்கை நேரம் முடிந்துவிட்டது, மீண்டும் முயற்சிக்கவும்"
+  },
+  "CapitalRequests": {
+    "CapitalRequests": "மூலதன கோரிக்கைகள்",
+    "RequestsList": "கோரிக்கைகள் பட்டியல்",
+    "All": "அனைத்தும்",
+    "LoadingRequests": "கோரிக்கைகள் ஏற்றப்படுகின்றன...",
+    "NoRequests": "மூலதன கோரிக்கைகள் இல்லை",
+    "NoRequestsFound": "கோரிக்கைகள் கிடைக்கவில்லை",
+    "Approved": "அனுமதிக்கப்பட்டது",
+    "Pending": "நிலுவையில்",
+    "Rejected": "நிராகரிக்கப்பட்டது",
+    "LoanRequest": "கடன் கோரிக்கை",
+    "InvestmentRequest": "முதலீட்டு கோரிக்கை",
+    "RequestNumber": "கோரிக்கை எண்",
+    "CustomerName": "வாடிக்கையாளர் பெயர்",
+    "RequestType": "கோரிக்கை வகை"
   }
 }

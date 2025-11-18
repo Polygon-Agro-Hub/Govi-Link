@@ -77,6 +77,8 @@ const sriLankaData = {
         { en: "Jaffna", si: "යාපනය", ta: "யாழ்ப்பாணம்" },
         { en: "Kilinochchi", si: "කිලිනොච්චි", ta: "கில்லினோச்சி" },
         { en: "Mullaitivu", si: "මුල්ලිතිවු", ta: "முல்லைத்தீவு" },
+        { en: "Vavuniya", si: "වවුනියාව", ta: "வவுனியா" },
+        { en: "Mannar", si: "මන්නාරම", ta: "மன்னார்" },
       ],
     },
     {
@@ -925,9 +927,9 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
           </View>
 
           {/* Buttons */}
-          <View className="px-6 mt-8 flex-row w-full justify-between">
+          <View className="px-6 flex-col w-full gap-4 mt-4">
             <TouchableOpacity
-              className="bg-[#D9D9D9] rounded-3xl px-6 py-4 w-[48%] items-center"
+              className="bg-[#D9D9D9] rounded-3xl px-6 py-4 w-full items-center"
               onPress={() => navigation.navigate("AddOfficerStep1")}
             >
               <Text className="text-[#686868] font-semibold">
@@ -936,7 +938,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
             </TouchableOpacity>
 
             <TouchableOpacity
-              className="bg-black rounded-3xl px-6 py-4 w-[48%] items-center ml-3"
+              className="bg-black rounded-3xl px-6 py-4 w-full items-center"
               onPress={handleNext}
               disabled={loading}
             >
