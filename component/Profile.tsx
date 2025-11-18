@@ -463,7 +463,7 @@ const getLocalizedName = () => {
                 </Text>
               </View>
               </View>
-               <View className="">
+               {/* <View className="">
               <TouchableOpacity  onPress={handleUpdate} >
 
                  <LinearGradient colors={["#F2561D", "#FF1D85"]}   
@@ -479,7 +479,7 @@ const getLocalizedName = () => {
                               </TouchableOpacity>
 
             
-              </View>
+              </View> */}
             </View>
           </View>
           </LinearGradient>

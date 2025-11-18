@@ -124,7 +124,6 @@ useEffect(() => {
           },
           }
         );
-        console.log(response.data.data.logo)
              setQuestions(response.data.data.questions);
          
                 setCertificateData(response.data.data.certificate);
@@ -355,34 +354,36 @@ const handleCameraClose = (imageUri: string | null) => {
 ):(
   <>
   <ScrollView className="p-6">
-        <View className="mb-10">
-        <View className=" items-center mb-8 flex-row justify-center ">
-{CertificateData?.logo && (
-  <Image 
-    source={{ uri: CertificateData.logo }}
-    style={{ width: 140, height: 100 }}
-    resizeMode="contain"
-  />
-)}
-            <View className=" items-start ml-4">
-                  <Text className="text-lg font-semibold  text-center">
-          {CertificateData?.srtName}
-        </Text>
-  <Text className="text-[#555555] text-center">
-  {t("CertificateQuesanory.Started on")} :{" "}
-  {CertificateData?.createdAt
-    ? new Date(CertificateData.createdAt).toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      })
-    : ""}
-</Text>
+        <View className="mb-10 ">
+  <View className="w-full items-center mb-8">
+      {/* Inner row: logo + text */}
+      <View className="flex-row items-center justify-center max-w-[240px]">
+        {CertificateData?.logo && (
+          <Image
+            source={{ uri: CertificateData.logo }}
+            style={{ width: 100, height: 100 }}
+            resizeMode="contain"
+          />
+        )}
 
-            </View>
+        <View className="ml-4 ">
+          <Text className="text-lg font-semibold text-left">
+            {CertificateData?.srtName} 
+          </Text>
 
+          <Text className="text-[#555555] text-left mt-1">
+            {t("CertificateQuesanory.Started on")} :{" "}
+            {CertificateData?.createdAt
+              ? new Date(CertificateData.createdAt).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                })
+              : ""}
+          </Text>
         </View>
-
+      </View>
+    </View>
 
         {questions.map((q, i) => (
 <View
@@ -430,6 +431,9 @@ const handleCameraClose = (imageUri: string | null) => {
 
       <View className="flex-row justify-between p-4 border-t border-gray-200">
         <TouchableOpacity className="flex-row items-center bg-[#444444] px-12 py-3 rounded-full ml-2"
+onPress={() => {
+navigation.navigate("Main", {screen: "Dashboard"})
+}}
         >
           <AntDesign name="arrow-left" size={20} color="#fff" />
           <Text className="ml-4 text-white font-semibold text-base">{t("CertificateQuesanory.Exit")}</Text>

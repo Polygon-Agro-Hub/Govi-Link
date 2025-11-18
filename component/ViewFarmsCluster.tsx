@@ -246,7 +246,7 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
                   ) : (
                     item.jobStatus === "Start" && (
                       <TouchableOpacity
-                        className="bg-black rounded-full px-6 py-1.5"
+                        className="bg-black rounded-full px-7 py-1.5"
                         onPress={() => {
                           setSelectedItem(item);
                           setShowPopup(true);

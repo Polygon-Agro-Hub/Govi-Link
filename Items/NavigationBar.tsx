@@ -24,8 +24,8 @@ console.log('user rolllllllll', userRole)
    const tabs = [
     { name: "Dashboard", icon: <FontAwesome6 name="house" size={24} color="#000" /> },
     { name: "ViewAllVisits", icon: <MaterialIcons name="task" size={24} color="#000" /> },
-    { name: "AddAssignment", icon: <Entypo name="add-user" size={24} color="#000" /> },
-    { name: "Users", icon: <Entypo name="users" size={24} color="#000" /> },
+    { name: "AssignJobs", icon: <Entypo name="add-user" size={24} color="#000" /> },
+    { name: "ManageOfficers", icon: <Entypo name="users" size={24} color="#000" /> }, 
   ];
 
   let currentTabName = state.routes[state.index]?.name ;

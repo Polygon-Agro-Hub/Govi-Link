@@ -23,18 +23,18 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-type CertificateSuggestionsNavigationProp = StackNavigationProp<
+type RequestSuggestionsNavigationProp = StackNavigationProp<
   RootStackParamList,
-  "CertificateSuggestions"
+  "RequestSuggestions"
 >;
 
-type CertificateSuggestionsRouteProp = RouteProp<
+type RequestSuggestionsRouteProp = RouteProp<
   RootStackParamList,
-  "CertificateSuggestions"
+  "RequestSuggestions"
 >;
 
-interface CertificateSuggestionsProps {
-  navigation: CertificateSuggestionsNavigationProp;
+interface RequestSuggestionsProps {
+  navigation: RequestSuggestionsNavigationProp;
 }
 
 interface ProblemItem {
@@ -72,11 +72,11 @@ const LoadingSkeleton = () => {
     </View>
   );
 };
-const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
+const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
   navigation,
 }) => {
-  const route = useRoute<CertificateSuggestionsRouteProp>();
-  const { jobId, certificationpaymentId, slavequestionnaireId, farmerMobile,isClusterAudit ,farmId, auditId} = route.params;
+  const route = useRoute<RequestSuggestionsRouteProp>();
+  const { farmerId, govilinkjobid, jobId, farmerMobile} = route.params;
   console.log(farmerMobile)
   const { t, i18n } = useTranslation();
   const [problems, setProblems] = useState<ProblemItem[]>([
@@ -130,7 +130,7 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
       let response;
       if (item.saved) {
         response = await axios.put(
-          `${environment.API_BASE_URL}api/officer/update-problem/${item.id}`,
+          `${environment.API_BASE_URL}api/request-audit/update-identifyproblem/${item.id}`,
           {
             problem: item.problem,
             solution: item.solution,
@@ -139,11 +139,11 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
         );
       } else {
         response = await axios.post(
-          `${environment.API_BASE_URL}api/officer/save-problem`,
+          `${environment.API_BASE_URL}api/request-audit/save-identifyproblem`,
           {
             problem: item.problem,
             solution: item.solution,
-            slavequestionnaireId,
+            govilinkjobid,
           },
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -164,7 +164,7 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
       }
     } catch (err) {
       console.error("❌ Error saving/updating problem:", err);
-      Alert.alert(t("Error.Sorry"), t("Main.somethingWentWrong"));
+      Alert.alert(t("Error.Sorry"), t("Something went wrong while saving. try again later"));
     }
   };
 
@@ -185,7 +185,7 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
       }
 
       const response = await axios.get(
-        `${environment.API_BASE_URL}api/officer/get-problems/${slavequestionnaireId}`,
+        `${environment.API_BASE_URL}api/request-audit/get-identifyproblems/${govilinkjobid}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -249,23 +249,21 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
               otpResponse.data.referenceId
             );
 
-            navigation.navigate("Otpverification", {
+            navigation.navigate("OtpverificationRequestAudit", {
               farmerMobile: farmerMobile,
               jobId:jobId,
-              farmId,
-              auditId,
-              isClusterAudit
+                govilinkjobid:govilinkjobid
             });
             setIsButtonDisabled(false);
              setOtpSendLoading(false);
-          }  catch (error) {
-                      Alert.alert(t("Main.error"), t("SignupForum.otpSendFailed"), [{
-                        text: t("PublicForum.OK"),
-                      }]);
-                      setOtpSendLoading(false);
-                    }finally{
-                      setOtpSendLoading(false);
-                    }
+          } catch (error) {
+            Alert.alert(t("Main.error"), t("SignupForum.otpSendFailed"), [{
+              text: t("PublicForum.OK"),
+            }]);
+            setOtpSendLoading(false);
+          }finally{
+            setOtpSendLoading(false);
+          }
   }
   return (
     <KeyboardAvoidingView
@@ -479,4 +477,4 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
   );
 };
 
-export default CertificateSuggestions;
+export default RequestSuggestions;
