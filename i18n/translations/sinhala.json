@@ -76,7 +76,8 @@
     "View All": "සියල්ල බලන්න",
     "Saved Draft": "සුරැකි කෙටුම්පත",
     "Assigned Target": "පවරන ලද ඉලක්කය",
-    "No Jobs for Today": "අදට ඉලක්කය නැත"
+    "No Jobs for Today": "අදට ඉලක්කය නැත",
+    "Capital Requests": "මුල්ධන ඉල්ලීම්"
   },
   "Drawer": {
     "Language": "භාෂාව",
@@ -236,5 +237,24 @@
     "RequestNumber": "ඉල්ලීම් අංකය",
     "CustomerName": "පාරිභෝගික නම",
     "RequestType": "ඉල්ලීම් වර්ගය"
+  },
+  "AssignJobOfficerList": {
+    "HeaderJobIds": "වැඩ අංක",
+    "HeaderOn": "මත",
+    "LoadingOfficers": "නිලධාරීන් පූරණය වෙමින්...",
+    "AssignButton": "නියෝජනය කරන්න",
+    "UndoButton": "අහෝසි කරන්න",
+    "ConfirmLeaveButton": "තහවුරු කර පිටවන්න",
+    "CountdownInstruction1": "කරුණාකර තහවුරු කරන්න",
+    "CountdownInstruction2": "තත්පර ඇතුළත.",
+    "CountdownInstruction3": "ඔබට අහෝසි කළ හැකිය; එසේ නොමැතිනම්, මෙම නිලධාරියා ස්වයංක්‍රීයව නියෝජනය කරනු ඇත.",
+    "NoOfficersAvailable": "නිලධාරීන් නොමැත",
+    "OfficerAssignedJobs": "නියෝජිත",
+    "AutoAssignedSuccess": "වැඩ ස්වයංක්‍රීයව නියෝජනය කර ඇත",
+    "AssignSuccess": "වැඩ සාර්ථකව නියෝජනය කර ඇත",
+    "AssignConfirmTitle": "වැඩ නියෝජනය",
+    "AssignConfirmMessage": "වැඩ {{count}} ක් මෙම නිලධාරියාට නියෝජනය කරන්නද?",
+    "NoJobsSelected": "වැඩ තෝරා නැත",
+    "SelectAtLeastOneJob": "කරුණාකර නියෝජනය කිරීම සඳහා අවම වශයෙන් එක් වැඩයක් හෝ තෝරන්න."
   }
 }
