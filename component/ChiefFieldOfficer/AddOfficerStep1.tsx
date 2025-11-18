@@ -662,7 +662,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
       phoneNumber2: phone2,
       nic,
       email,
-      profileImage, 
+      profileImage,
     };
 
     navigation.navigate("AddOfficerStep2", { formData });
@@ -1144,16 +1144,16 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
           </View>
 
           {/* Buttons */}
-          <View className="px-6 mt-6 flex-row w-full justify-between">
+          <View className="px-6 flex-col w-full gap-4 mt-4">
             <TouchableOpacity
-              className="bg-[#D9D9D9] rounded-3xl px-6 py-4 w-[48%] items-center"
+              className="bg-[#D9D9D9] rounded-3xl px-6 py-4 w-full items-center"
               onPress={handleCancel}
             >
               <Text className="text-[#686868]">{t("AddOfficer.Cancel")}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              className="bg-black rounded-3xl px-6 py-4 w-[48%] items-center ml-3"
+              className="bg-black rounded-3xl px-6 py-4 w-full items-center"
               onPress={handleNext}
               disabled={loading}
             >
@@ -1181,14 +1181,14 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
                 <Text className="text-lg font-semibold">
                   {t("AddOfficer.SelectDistricts")}
                 </Text>
-                {selectedDistricts.length > 0 && (
+                {/* {selectedDistricts.length > 0 && (
                   <Text className="text-sm text-green-600">
                     {selectedDistricts.length} {t("AddOfficer.selected")}
                   </Text>
-                )}
+                )} */}
               </View>
               <View className="flex-row items-center">
-                {selectedDistricts.length > 0 && (
+                {/* {selectedDistricts.length > 0 && (
                   <TouchableOpacity
                     onPress={clearAllDistricts}
                     className="mr-3"
@@ -1197,7 +1197,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
                       {t("AddOfficer.ClearAll")}
                     </Text>
                   </TouchableOpacity>
-                )}
+                )} */}
                 <TouchableOpacity onPress={handleDistrictModalClose}>
                   <MaterialIcons name="close" size={24} color="#666" />
                 </TouchableOpacity>

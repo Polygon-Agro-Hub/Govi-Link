@@ -154,6 +154,13 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
     }
   };
 
+  const truncateText = (text: string, maxLength: number) => {
+    if (!text) return "";
+    return text.length > maxLength
+      ? text.substring(0, maxLength) + "..."
+      : text;
+  };
+
   if (loading && !refreshing) {
     return (
       <View className="flex-1 bg-white justify-center items-center">
@@ -172,7 +179,7 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
       {/* Header */}
       <View className="bg-white px-6 py-4 border-b border-[#E5E5E5]">
         <View className="flex-row items-center justify-center">
-          <Text className="text-2xl font-bold text-black text-center">
+          <Text className="text-lg font-bold text-black text-center">
             {t("ManageOfficers.Officers")}
           </Text>
         </View>
@@ -213,7 +220,7 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
             officers.map((officer, index) => (
               <View
                 key={`${officer.empId}-${index}`}
-                className="bg-white rounded-3xl p-4 flex-row items-center"
+                className="bg-white rounded-3xl py-5 px-4  flex-row items-center"
                 style={{
                   borderWidth: 1,
                   borderColor: getBorderColor(officer.status),
@@ -239,7 +246,7 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
                 {/* User Info */}
                 <View className="ml-4 flex-1">
                   <Text className="text-[#21202B] text-base font-semibold">
-                    {getName(officer)}
+                    {truncateText(getName(officer), 14)}
                   </Text>
                   <Text className="text-[#565559] text-sm">
                     {t("ManageOfficers.EMPID")} : {officer.empId}
@@ -251,8 +258,8 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
                   <View
                     style={{
                       position: "absolute",
-                      top: 8,
-                      right: 8,
+                      top: 4,
+                      right: 4,
                       paddingHorizontal: 8,
                       paddingVertical: 2,
                     }}

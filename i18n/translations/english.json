@@ -80,7 +80,8 @@
     "Saved Draft": "Saved Draft",
     "Assigned Target": "Assigned Target",
     "No Jobs for Today": "No Jobs for Today",
-    "No Saved Drafts for Today": "No Saved Drafts for Today"
+    "No Saved Drafts for Today": "No Saved Drafts for Today",
+    "Capital Requests": "Capital Requests"
   },
   "Drawer": {
     "Language": "Language",
@@ -328,28 +329,44 @@
     "Finished": "Finished",
     "Over Due": "Over Due",
     "No Jobs Available": "No Jobs Available",
-    "Today":"Today"
+    "Today": "Today"
   },
-  "ChangePassword":{
-    "ChoosePassword":"Change Password",
-    "Changepassword":"Change the password and keep it secured",
-    "CurrentPassword":"Current Password",
-    "NewPassword":"New Password",
-    "ConfirmNewPassword":"Confirm New Password",
-    "Next":"Next",
-    "Password updated successfully":"Password updated successfully",
-    "Invalid current password":"Invalid current password",
-    "Failed to update password":"Failed to update password"
+  "ChangePassword": {
+    "ChoosePassword": "Change Password",
+    "Changepassword": "Change the password and keep it secured",
+    "CurrentPassword": "Current Password",
+    "NewPassword": "New Password",
+    "ConfirmNewPassword": "Confirm New Password",
+    "Next": "Next",
+    "Password updated successfully": "Password updated successfully",
+    "Invalid current password": "Invalid current password",
+    "Failed to update password": "Failed to update password"
   },
-  "ComplainHistory":{
-    "No Reply":"No Reply",
-    "OK":"OK",
-    "Complaint History":"Complaint History",
-    "No Data":"No Data",
-    "RefNo":"RefNo",
-    "Sent":"Sent",
-    "View Response":"View Response",
-    "Opened":"Opened",
-    "Closed":"Closed"
+  "ComplainHistory": {
+    "No Reply": "No Reply",
+    "OK": "OK",
+    "Complaint History": "Complaint History",
+    "No Data": "No Data",
+    "RefNo": "RefNo",
+    "Sent": "Sent",
+    "View Response": "View Response",
+    "Opened": "Opened",
+    "Closed": "Closed"
+  },
+  "CapitalRequests": {
+    "CapitalRequests": "Capital Requests",
+    "RequestsList": "Requests List",
+    "All": "All",
+    "LoadingRequests": "Loading requests...",
+    "NoRequests": "No capital requests available",
+    "NoRequestsFound": "No requests found",
+    "Approved": "Approved",
+    "Pending": "Pending",
+    "Rejected": "Rejected",
+    "LoanRequest": "Loan Request",
+    "InvestmentRequest": "Investment Request",
+    "RequestNumber": "Request No",
+    "CustomerName": "Customer Name",
+    "RequestType": "Request Type"
   }
 }

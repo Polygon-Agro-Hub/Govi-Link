@@ -675,6 +675,35 @@ onPress={() => {
 
 </>)}
 
+      <View className="p-8 mt-4">
+  <TouchableOpacity
+    className="bg-[#FEE5E6] rounded-lg p-3 h-28 mr-4 w-full flex-row justify-between items-center"
+    style={{
+      shadowColor: "#000",
+      shadowOffset: { width: 1, height: 1 },
+      shadowOpacity: 0.3,
+      shadowRadius: 6,
+      elevation: 2,
+    }}
+    onPress={() => navigation.navigate("CapitalRequests")}
+  >
+    <Text className="text-base font-bold text-[#434343]">
+      {t("Dashboard.Capital Requests")}
+    </Text>
+    <Image
+      source={require("../../assets/request.png")}
+      style={{
+        width: 100,
+        height: 100,
+        position: "absolute",
+        bottom: 0,
+        right: 10,
+      }}
+      resizeMode="contain"
+    />
+  </TouchableOpacity>
+</View>
+
       <Modal transparent visible={showPopup} animationType="slide"
         onRequestClose={() => {
     console.log("hitt");
