@@ -81,5 +81,7 @@ export type RootStackParamList = {
     selectedJobIds: string[];
     selectedDate: string;
     isOverdueSelected: boolean;
+    propose?: string;
+    fieldAuditId?: number;
   };
 };

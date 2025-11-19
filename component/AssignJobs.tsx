@@ -44,7 +44,7 @@ interface VisitItem {
   completionPercentage: string;
   farmerName?: string;
   farmerId: number;
-  propose?: string;
+  propose: string;
   farmerMobile: number;
   id: number;
   clusterId: number;
@@ -108,22 +108,44 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
     });
   };
 
-  const handleAssignJobs = () => {
-    if (selectedJobs.length === 0) {
-      Alert.alert(
-        "No Jobs Selected",
-        "Please select at least one job to assign."
-      );
-      return;
-    }
+const handleAssignJobs = () => {
+  if (selectedJobs.length === 0) {
+    Alert.alert(
+      "No Jobs Selected",
+      "Please select at least one job to assign."
+    );
+    return;
+  }
 
-    // Navigate to assign job officer list with selected job IDs and selected date
-    navigation.navigate("AssignJobOfficerList", {
-      selectedJobIds: selectedJobs,
-      selectedDate: selectedDate,
-      isOverdueSelected: isOverdueSelected,
-    });
-  };
+  // Debug: Check what's happening
+  console.log("Selected job IDs:", selectedJobs);
+  console.log("All visits:", visits);
+  
+  // Get the first selected job details from visits
+  const firstSelectedJob = visits.find(item => selectedJobs.includes(item.jobId));
+
+  console.log("First selected job details:", firstSelectedJob);
+  
+  // Check if we found a job and if it has the required fields
+  if (firstSelectedJob) {
+    console.log("Propose value:", firstSelectedJob.propose);
+    console.log("ID value:", firstSelectedJob.id);
+    console.log("Job ID:", firstSelectedJob.jobId);
+  } else {
+    console.error("No matching job found!");
+    Alert.alert("Error", "Could not find selected job details. Please try again.");
+    return;
+  }
+
+  // Navigate to assign job officer list with selected job IDs and details
+  navigation.navigate("AssignJobOfficerList", {
+    selectedJobIds: selectedJobs,
+    selectedDate: selectedDate,
+    isOverdueSelected: isOverdueSelected,
+    propose: firstSelectedJob.propose,
+    fieldAuditId: firstSelectedJob.id,
+  });
+};
 
   const handleStartJobs = () => {
     // Add your start jobs logic here
@@ -224,11 +246,9 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
           <TouchableOpacity
             onPress={handleAssignJobs}
             disabled={selectedJobs.length === 0}
-            className="bg-black px-5 py-2 rounded-3xl"
+            className="bg-black px-5 py-1.5 rounded-3xl"
           >
-            <Text className="font-bold text-white text-lg">
-              Assign
-            </Text>
+            <Text className="font-bold text-white text-lg">Assign</Text>
           </TouchableOpacity>
         </View>
       </View>

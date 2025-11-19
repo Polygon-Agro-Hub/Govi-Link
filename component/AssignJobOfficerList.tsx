@@ -16,6 +16,10 @@ import { LinearGradient } from "expo-linear-gradient";
 import { MaterialIcons } from "@expo/vector-icons";
 import Svg, { Circle, G, Text as SvgText } from "react-native-svg";
 import { RouteProp, useRoute } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import { environment } from "@/environment/environment";
+import { useFocusEffect } from "@react-navigation/native";
 
 type AssignJobOfficerListNavigationProps = StackNavigationProp<
   RootStackParamList,
@@ -27,11 +31,17 @@ interface AssignJobOfficerListProps {
 }
 
 interface Officer {
-  id: string;
-  name: string;
-  officerId: string;
-  assignedJobs: number;
-  contactNumber: string;
+  id: number;
+  firstName: string;
+  firstNameSinhala: string;
+  firstNameTamil: string;
+  lastName: string;
+  lastNameSinhala: string;
+  lastNameTamil: string;
+  empId: string;
+  irmId: number | null;
+  status: string;
+  assigned: number;
 }
 
 const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
@@ -39,13 +49,20 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
 }) => {
   const route =
     useRoute<RouteProp<RootStackParamList, "AssignJobOfficerList">>();
-  const { selectedJobIds, selectedDate, isOverdueSelected } = route.params;
-  const { t } = useTranslation();
+  const {
+    selectedJobIds,
+    selectedDate,
+    isOverdueSelected,
+    propose,
+    fieldAuditId,
+  } = route.params;
+  const { t, i18n } = useTranslation();
   const [loading, setLoading] = useState(false);
+  const [assigning, setAssigning] = useState(false);
   const [officers, setOfficers] = useState<Officer[]>([]);
   const [selectedOfficer, setSelectedOfficer] = useState<Officer | null>(null);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
-  const [countdown, setCountdown] = useState(30); // 30 seconds countdown
+  const [countdown, setCountdown] = useState(30);
 
   // Animated values for smooth progress
   const progressAnim = useRef(new Animated.Value(100)).current;
@@ -53,6 +70,24 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
 
   const timerRef = useRef<number | null>(null);
   const animationRef = useRef<Animated.CompositeAnimation | null>(null);
+
+  // Get officer name based on current language
+  const getOfficerName = (officer: Officer) => {
+    const currentLanguage = i18n.language;
+
+    switch (currentLanguage) {
+      case "si":
+        return `${officer.firstNameSinhala || officer.firstName} ${
+          officer.lastNameSinhala || officer.lastName
+        }`;
+      case "ta":
+        return `${officer.firstNameTamil || officer.firstName} ${
+          officer.lastNameTamil || officer.lastName
+        }`;
+      default:
+        return `${officer.firstName} ${officer.lastName}`;
+    }
+  };
 
   // Format date to "On October 12" format
   const formatDate = (dateString: string) => {
@@ -64,69 +99,28 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
     return `On ${date.toLocaleDateString("en-US", options)}`;
   };
 
-  // Mock data for officers - replace with actual API call
-  const mockOfficers: Officer[] = [
-    {
-      id: "1",
-      name: "Ajith Gunasekara",
-      officerId: "FIO00001",
-      assignedJobs: 0,
-      contactNumber: "+94 77 123 4567",
-    },
-    {
-      id: "2",
-      name: "Kamal Perera",
-      officerId: "FIO00002",
-      assignedJobs: 2,
-      contactNumber: "+94 77 234 5678",
-    },
-    {
-      id: "3",
-      name: "Nimal Fernando",
-      officerId: "FIO00003",
-      assignedJobs: 1,
-      contactNumber: "+94 77 345 6789",
-    },
-    {
-      id: "4",
-      name: "Sunil Rathnayake",
-      officerId: "FIO00004",
-      assignedJobs: 3,
-      contactNumber: "+94 77 456 7890",
-    },
-  ];
-
-  useEffect(() => {
-    fetchOfficers();
-  }, []);
-
   // Start smooth countdown animation
   const startCountdownAnimation = () => {
-    // Reset animated values
     progressAnim.setValue(100);
     countdownAnim.setValue(30);
-    
-    // Stop any existing animation
+
     if (animationRef.current) {
       animationRef.current.stop();
     }
 
-    // Create parallel animations for progress and countdown
     animationRef.current = Animated.parallel([
-      // Progress animation from 100 to 0 over 30 seconds
       Animated.timing(progressAnim, {
         toValue: 0,
-        duration: 30000, // 30 seconds
+        duration: 30000,
         easing: Easing.linear,
         useNativeDriver: false,
       }),
-      // Countdown animation from 30 to 0 over 30 seconds
       Animated.timing(countdownAnim, {
         toValue: 0,
-        duration: 30000, // 30 seconds
+        duration: 30000,
         easing: Easing.linear,
         useNativeDriver: false,
-      })
+      }),
     ]);
 
     animationRef.current.start(({ finished }) => {
@@ -141,7 +135,6 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
     if (showConfirmationModal) {
       startCountdownAnimation();
     } else {
-      // Clean up animations when modal closes
       if (animationRef.current) {
         animationRef.current.stop();
       }
@@ -169,9 +162,35 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
   const fetchOfficers = async () => {
     setLoading(true);
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setOfficers(mockOfficers);
+      const token = await AsyncStorage.getItem("token");
+      if (!token) {
+        Alert.alert(t("Common.Error"), t("Common.AuthTokenNotFound"));
+        return;
+      }
+
+      const jobId = selectedJobIds[0];
+      if (!jobId) {
+        Alert.alert(t("Common.Error"), t("AssignJobOfficerList.NoJobIdFound"));
+        return;
+      }
+
+      const response = await axios.get(
+        `${environment.API_BASE_URL}api/assign-jobs/get-assign-officer-list/${jobId}/${selectedDate}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      console.log("IRM Users API Response:", response.data);
+
+      if (response.data.status === "success") {
+        setOfficers(response.data.data);
+      } else {
+        Alert.alert(
+          t("Common.Error"),
+          t("AssignJobOfficerList.FailedToFetchOfficers")
+        );
+      }
     } catch (error) {
       console.error("Failed to fetch officers:", error);
       Alert.alert(
@@ -183,13 +202,18 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
     }
   };
 
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchOfficers();
+    }, [])
+  );
+
   const handleAssignToOfficer = (officer: Officer) => {
     setSelectedOfficer(officer);
     setShowConfirmationModal(true);
   };
 
   const handleUndo = () => {
-    // Stop animations
     if (animationRef.current) {
       animationRef.current.stop();
     }
@@ -198,36 +222,85 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
   };
 
   const handleConfirmAndLeave = () => {
-    // Stop animations
     if (animationRef.current) {
       animationRef.current.stop();
     }
     setShowConfirmationModal(false);
-    // Handle final assignment logic here
-    console.log(
-      `Assigning jobs: ${selectedJobIds.join(", ")} to officer: ${
-        selectedOfficer?.id
-      }`
-    );
-    Alert.alert(
-      t("Common.Success"),
-      t("AssignJobOfficerList.AssignSuccess")
-    );
-    // You can navigate back or show success message
+    assignJobsToOfficer();
+  };
+
+  const assignJobsToOfficer = async () => {
+    if (!selectedOfficer) return;
+
+    setAssigning(true);
+    try {
+      const token = await AsyncStorage.getItem("token");
+      if (!token) {
+        Alert.alert(t("Common.Error"), t("Common.AuthTokenNotFound"));
+        return;
+      }
+
+      console.log("Sending assignment request with:", {
+        officerId: selectedOfficer.id,
+        jobIds: selectedJobIds,
+        date: selectedDate,
+        propose: propose,
+        fieldAuditId: fieldAuditId,
+      });
+
+      const response = await axios.post(
+        `${environment.API_BASE_URL}api/assign-jobs/assign-officer-to-field-audits`,
+        {
+          officerId: selectedOfficer.id,
+          jobIds: selectedJobIds,
+          date: selectedDate,
+          propose: propose,
+          fieldAuditId: fieldAuditId,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      console.log("Assignment API Response:", response.data);
+
+      if (response.data.status === "success") {
+        Alert.alert(
+          t("Common.Success"),
+          t("AssignJobOfficerList.AssignSuccess", {
+            name: getOfficerName(selectedOfficer),
+          }),
+          [
+            {
+              text: "OK",
+              onPress: () => navigation.navigate("AssignJobs"),
+            },
+          ]
+        );
+      } else {
+        Alert.alert(
+          t("Common.Error"),
+          response.data.message || t("AssignJobOfficerList.FailedToAssignJobs")
+        );
+      }
+    } catch (error: any) {
+      console.error("Failed to assign jobs:", error);
+      Alert.alert(
+        t("Common.Error"),
+        error.response?.data?.message ||
+          error.message ||
+          t("AssignJobOfficerList.FailedToAssignJobs")
+      );
+    } finally {
+      setAssigning(false);
+    }
   };
 
   const handleAutoAssign = () => {
     setShowConfirmationModal(false);
-    // Handle auto assignment logic here
-    console.log(
-      `Auto assigning jobs: ${selectedJobIds.join(", ")} to officer: ${
-        selectedOfficer?.id
-      }`
-    );
-    Alert.alert(
-      t("AssignJobOfficerList.AutoAssigned"),
-      t("AssignJobOfficerList.AutoAssignedSuccess")
-    );
+    if (selectedOfficer) {
+      assignJobsToOfficer();
+    }
   };
 
   const formatTime = (seconds: number) => {
@@ -269,7 +342,9 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
             #{selectedJobIds.join(", ")}
           </Text>
           <Text className="text-sm text-black mt-1">
-            {selectedDate ? formatDate(selectedDate) : t("AssignJobOfficerList.HeaderOn")}
+            {selectedDate
+              ? formatDate(selectedDate)
+              : t("AssignJobOfficerList.HeaderOn")}
           </Text>
         </View>
 
@@ -299,27 +374,36 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
                 >
                   <View className="flex-row justify-between items-start">
                     <View className="flex-1">
+                      {/* Officer Name - Language Specific */}
                       <Text className="text-md font-bold text-[#212121]">
-                        {officer.name}
+                        {getOfficerName(officer)}
                       </Text>
 
                       <Text className="text-sm font-medium text-[#4E6393] mt-1">
-                        {officer.officerId}
+                        {officer.empId}
                       </Text>
 
                       <Text className="text-sm font-medium text-[#000000]">
-                        {t("AssignJobOfficerList.OfficerAssignedJobs")}: {officer.assignedJobs}
+                        {t("AssignJobOfficerList.OfficerAssignedJobs")}:{" "}
+                        {officer.assigned}
                       </Text>
                     </View>
 
                     {/* Assign Button */}
                     <TouchableOpacity
                       onPress={() => handleAssignToOfficer(officer)}
-                      className="bg-black px-5 py-3 rounded-3xl items-center mt-auto ml-3"
+                      disabled={assigning}
+                      className={`px-5 py-3 rounded-3xl items-center mt-auto ml-3 ${
+                        assigning ? "bg-gray-400" : "bg-black"
+                      }`}
                     >
-                      <Text className="text-white text-[14px] font-semibold">
-                        {t("AssignJobOfficerList.AssignButton")}
-                      </Text>
+                      {assigning ? (
+                        <ActivityIndicator size="small" color="white" />
+                      ) : (
+                        <Text className="text-white text-[14px] font-semibold">
+                          {t("AssignJobOfficerList.AssignButton")}
+                        </Text>
+                      )}
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -342,7 +426,6 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
             <View className="items-center mb-8">
               <Svg width={150} height={150}>
                 <G rotation="-90" origin="75, 75">
-                  {/* Background Circle */}
                   <Circle
                     cx="75"
                     cy="75"
@@ -351,7 +434,6 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
                     strokeWidth={8}
                     fill="transparent"
                   />
-                  {/* Animated Progress Circle */}
                   <AnimatedCircle
                     cx="75"
                     cy="75"
@@ -362,13 +444,11 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
                     strokeDasharray={circumference}
                     strokeDashoffset={progressAnim.interpolate({
                       inputRange: [0, 100],
-                      outputRange: [circumference, 0]
+                      outputRange: [circumference, 0],
                     })}
                     strokeLinecap="round"
                   />
                 </G>
-
-                {/* Use regular SvgText with the actual countdown state */}
                 <SvgText
                   fontSize="26"
                   fontWeight="bold"
@@ -400,24 +480,32 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
                 <View className="flex-row justify-between items-start">
                   <View className="flex-1">
                     <Text className="text-md font-bold text-[#212121]">
-                      {selectedOfficer.name}
+                      {getOfficerName(selectedOfficer)}
                     </Text>
                     <Text className="text-sm font-medium text-[#4E6393] mt-1">
-                      {selectedOfficer.officerId}
+                      {selectedOfficer.empId}
                     </Text>
                     <Text className="text-sm font-medium text-[#000000]">
-                      {t("AssignJobOfficerList.OfficerAssignedJobs")}: {selectedOfficer.assignedJobs}
+                      {t("AssignJobOfficerList.OfficerAssignedJobs")}:{" "}
+                      {selectedOfficer.assigned}
                     </Text>
                   </View>
 
                   {/* Undo Button */}
                   <TouchableOpacity
                     onPress={handleUndo}
-                    className="bg-black px-5 py-3 rounded-3xl items-center ml-3 mt-auto"
+                    disabled={assigning}
+                    className={`px-5 py-3 rounded-3xl items-center ml-3 mt-auto ${
+                      assigning ? "bg-gray-400" : "bg-black"
+                    }`}
                   >
-                    <Text className="text-white text-md font-semibold">
-                      {t("AssignJobOfficerList.UndoButton")}
-                    </Text>
+                    {assigning ? (
+                      <ActivityIndicator size="small" color="white" />
+                    ) : (
+                      <Text className="text-white text-md font-semibold">
+                        {t("AssignJobOfficerList.UndoButton")}
+                      </Text>
+                    )}
                   </TouchableOpacity>
                 </View>
               </View>
@@ -428,17 +516,24 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
           <View className="px-12 pb-8 mt-auto mb-14">
             <TouchableOpacity
               onPress={handleConfirmAndLeave}
+              disabled={assigning}
               className="w-full"
             >
               <LinearGradient
-                colors={["#F2561D", "#FF1D85"]}
+                colors={
+                  assigning ? ["#CCCCCC", "#CCCCCC"] : ["#F2561D", "#FF1D85"]
+                }
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
                 className="rounded-3xl px-6 py-4 items-center"
               >
-                <Text className="text-white text-lg font-semibold">
-                  {t("AssignJobOfficerList.ConfirmLeaveButton")}
-                </Text>
+                {assigning ? (
+                  <ActivityIndicator size="small" color="white" />
+                ) : (
+                  <Text className="text-white text-lg font-semibold">
+                    {t("AssignJobOfficerList.ConfirmLeaveButton")}
+                  </Text>
+                )}
               </LinearGradient>
             </TouchableOpacity>
           </View>
