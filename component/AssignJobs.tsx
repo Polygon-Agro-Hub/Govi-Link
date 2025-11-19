@@ -10,6 +10,7 @@ import {
   Linking,
   ActivityIndicator,
   Alert,
+  BackHandler,
 } from "react-native";
 import { RootStackParamList } from "@/component/types";
 import { useTranslation } from "react-i18next";
@@ -19,8 +20,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 import { AntDesign, Ionicons, Feather, FontAwesome6 } from "@expo/vector-icons";
-import LottieView from "lottie-react-native";
-import { black } from "react-native-paper/lib/typescript/styles/themes/v2/colors";
 
 type AssignJobsNavigationProps = StackNavigationProp<
   RootStackParamList,
@@ -55,6 +54,11 @@ interface VisitItem {
   sheduleDate: string;
   completedClusterCount?: number;
   totalClusterCount?: number;
+  latitude?: number;
+  longitude?: number;
+  city?: string;
+  plotNo?: string;
+  street?: string;
 }
 
 const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
@@ -65,6 +69,8 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [selectedJobs, setSelectedJobs] = useState<string[]>([]);
   const [visits, setVisits] = useState<VisitItem[]>([]);
+  const [showPopup, setShowPopup] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<VisitItem | null>(null);
 
   useEffect(() => {
     const today = new Date().toISOString().split("T")[0];
@@ -98,6 +104,27 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
     fetchVisits();
   }, [selectedDate, isOverdueSelected]);
 
+  // Handle back button when modal is open
+  useFocusEffect(
+    React.useCallback(() => {
+      const backAction = () => {
+        if (showPopup) {
+          setShowPopup(false);
+          setSelectedItem(null);
+          return true;
+        }
+        return false;
+      };
+
+      const backHandler = BackHandler.addEventListener(
+        "hardwareBackPress",
+        backAction
+      );
+
+      return () => backHandler.remove();
+    }, [showPopup])
+  );
+
   const toggleJobSelection = (jobId: string) => {
     setSelectedJobs((prev) => {
       if (prev.includes(jobId)) {
@@ -108,48 +135,114 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
     });
   };
 
-const handleAssignJobs = () => {
-  if (selectedJobs.length === 0) {
-    Alert.alert(
-      "No Jobs Selected",
-      "Please select at least one job to assign."
-    );
-    return;
-  }
+  const handleCardPress = (item: VisitItem) => {
+    // If propose is Individual or Requested, show modal
+    if (item.propose === "Individual" || item.propose === "Requested") {
+      setSelectedItem(item);
+      setShowPopup(true);
+    } else {
+      // For other propose types (like Cluster), navigate directly
+      navigation.navigate("ViewFarmsCluster", {
+        jobId: item.jobId,
+        feildauditId: item.id,
+        farmName: item.farmerName ?? "",
+      });
+    }
+  };
 
-  // Debug: Check what's happening
-  console.log("Selected job IDs:", selectedJobs);
-  console.log("All visits:", visits);
-  
-  // Get the first selected job details from visits
-  const firstSelectedJob = visits.find(item => selectedJobs.includes(item.jobId));
+  const handleStartJobFromModal = () => {
+    if (!selectedItem) return;
 
-  console.log("First selected job details:", firstSelectedJob);
-  
-  // Check if we found a job and if it has the required fields
-  if (firstSelectedJob) {
-    console.log("Propose value:", firstSelectedJob.propose);
-    console.log("ID value:", firstSelectedJob.id);
-    console.log("Job ID:", firstSelectedJob.jobId);
-  } else {
-    console.error("No matching job found!");
-    Alert.alert("Error", "Could not find selected job details. Please try again.");
-    return;
-  }
+    // Handle navigation based on propose type when Start is pressed in modal
+    if (selectedItem.propose === "Individual") {
+      navigation.navigate("QRScanner", { 
+        farmerId: selectedItem.farmerId, 
+        jobId: selectedItem.jobId,
+        certificationpaymentId: selectedItem.certificationpaymentId, 
+        farmerMobile: selectedItem.farmerMobile, 
+        farmId: selectedItem.farmId, 
+        clusterId: selectedItem.clusterId, 
+        isClusterAudit: false,
+        auditId: selectedItem.id 
+      });
+    } else if (selectedItem.propose === "Requested") {
+      navigation.navigate("QRScaneerRequstAudit", { 
+        farmerId: selectedItem.farmerId, 
+        govilinkjobid: selectedItem.id, 
+        jobId: selectedItem.jobId, 
+        farmerMobile: selectedItem.farmerMobile  
+      });
+    }
+    
+    setShowPopup(false);
+    setSelectedItem(null);
+  };
 
-  // Navigate to assign job officer list with selected job IDs and details
-  navigation.navigate("AssignJobOfficerList", {
-    selectedJobIds: selectedJobs,
-    selectedDate: selectedDate,
-    isOverdueSelected: isOverdueSelected,
-    propose: firstSelectedJob.propose,
-    fieldAuditId: firstSelectedJob.id,
-  });
-};
+  const handleAssignJobs = () => {
+    if (selectedJobs.length === 0) {
+      Alert.alert(
+        "No Jobs Selected",
+        "Please select at least one job to assign."
+      );
+      return;
+    }
+
+    const firstSelectedJob = visits.find(item => selectedJobs.includes(item.jobId));
+    
+    if (firstSelectedJob) {
+      navigation.navigate("AssignJobOfficerList", {
+        selectedJobIds: selectedJobs,
+        selectedDate: selectedDate,
+        isOverdueSelected: isOverdueSelected,
+        propose: firstSelectedJob.propose,
+        fieldAuditId: firstSelectedJob.id,
+      });
+    } else {
+      Alert.alert("Error", "Could not find selected job details. Please try again.");
+      return;
+    }
+  };
 
   const handleStartJobs = () => {
-    // Add your start jobs logic here
     console.log("Start jobs clicked");
+  };
+
+  const handleDial = (farmerMobile: number) => {
+    const phoneUrl = `tel:${farmerMobile}`;
+    Linking.openURL(phoneUrl).catch((err) =>
+      console.error("Failed to open dial pad:", err)
+    );
+  };
+
+  const getServiceName = (item: VisitItem) => {
+    if (item.propose === "Cluster") {
+      switch (i18n.language) {
+        case "si":
+          return "ගොවි සමූහ විගණනය";
+        case "ta":
+          return "உழவர் குழு தணிக்கை";
+        default:
+          return "Farm Cluster Audit";
+      }
+    } else if (item.propose === "Individual") {
+      switch (i18n.language) {
+        case "si":
+          return "තනි ගොවි විගණනය";
+        case "ta":
+          return "தனிப்பட்ட விவசாயி தணிக்கை";
+        default:
+          return "Individual Farmer Audit";
+      }
+    } else {
+      switch (i18n.language) {
+        case "si":
+          return item.servicesinhalaName || "";
+        case "ta":
+          return item.servicetamilName || "";
+        default:
+          return item.serviceenglishName || "";
+      }
+    }
   };
 
   return (
@@ -159,7 +252,7 @@ const handleAssignJobs = () => {
           className="mb-2"
           onPress={() => {
             setIsOverdueSelected(true);
-            setSelectedJobs([]); // Clear selection when switching tabs
+            setSelectedJobs([]);
           }}
         >
           <LinearGradient
@@ -193,7 +286,7 @@ const handleAssignJobs = () => {
           className="mb-2"
           onPress={() => {
             setIsOverdueSelected(false);
-            setSelectedJobs([]); // Clear selection when switching tabs
+            setSelectedJobs([]);
           }}
         >
           <LinearGradient
@@ -224,10 +317,9 @@ const handleAssignJobs = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Action Buttons - Updated Layout */}
+      {/* Action Buttons */}
       <View className="flex-row p-4 justify-between items-center">
         <View className="flex-1"></View>
-        {/* Start Button - Centered */}
         <View className="flex-1 items-center">
           <TouchableOpacity onPress={handleStartJobs}>
             <LinearGradient
@@ -240,8 +332,6 @@ const handleAssignJobs = () => {
             </LinearGradient>
           </TouchableOpacity>
         </View>
-
-        {/* Assign Button - Aligned to Right */}
         <View className="flex-1 items-end">
           <TouchableOpacity
             onPress={handleAssignJobs}
@@ -262,7 +352,7 @@ const handleAssignJobs = () => {
           {visits.map((item) => (
             <TouchableOpacity
               key={item.jobId}
-              onPress={() => toggleJobSelection(item.jobId)}
+              onPress={() => handleCardPress(item)}
             >
               <View
                 className="border border-[#FF1D85] bg-white p-4 mb-4 rounded-lg"
@@ -275,7 +365,11 @@ const handleAssignJobs = () => {
               >
                 <View className="flex-row justify-between items-start">
                   {/* Checkbox on Left Side */}
-                  <View
+                  <TouchableOpacity
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      toggleJobSelection(item.jobId);
+                    }}
                     className={`w-5 h-5 rounded-sm border-2 flex items-center justify-center mr-3 my-auto ${
                       selectedJobs.includes(item.jobId)
                         ? "bg-black border-black"
@@ -285,50 +379,16 @@ const handleAssignJobs = () => {
                     {selectedJobs.includes(item.jobId) && (
                       <AntDesign name="check" size={14} color="white" />
                     )}
-                  </View>
+                  </TouchableOpacity>
 
                   {/* Card Content */}
                   <View className="flex-1">
                     <Text className="text-sm font-medium">#{item.jobId}</Text>
-
-                    {item.propose ? (
-                      <Text className="text-[16px] font-bold text-[#000] mt-1">
-                        {(() => {
-                          if (item.propose === "Cluster") {
-                            switch (i18n.language) {
-                              case "si":
-                                return "ගොවි සමූහ විගණනය";
-                              case "ta":
-                                return "உழவர் குழு தணிக்கை";
-                              default:
-                                return "Farm Cluster Audit";
-                            }
-                          } else if (item.propose === "Individual") {
-                            switch (i18n.language) {
-                              case "si":
-                                return "තනි ගොවි විගණනය";
-                              case "ta":
-                                return "தனிப்பட்ட விவசாயி தணிக்கை";
-                              default:
-                                return "Individual Farmer Audit";
-                            }
-                          } else {
-                            switch (i18n.language) {
-                              case "si":
-                                return item.servicesinhalaName || "";
-                              case "ta":
-                                return item.servicetamilName || "";
-                              default:
-                                return item.serviceenglishName || "";
-                            }
-                          }
-                        })()}
-                      </Text>
-                    ) : null}
-
+                    <Text className="text-[16px] font-bold text-[#000] mt-1">
+                      {getServiceName(item)}
+                    </Text>
                     <Text className="text-[12px] font-medium text-[#4E6393] mt-1">
-                      {t(`Districts.${item.district}`)}{" "}
-                      {t("VisitPopup.District")}
+                      {t(`Districts.${item.district}`)} {t("VisitPopup.District")}
                     </Text>
                     <Text className="text-[12px] font-medium text-[#4E6393] mt-1">
                       {item.status}
@@ -344,6 +404,174 @@ const handleAssignJobs = () => {
           <Text className="text-gray-500 text-lg">No jobs available</Text>
         </View>
       )}
+
+      {/* Modal Popup */}
+      <Modal
+        transparent
+        visible={showPopup}
+        animationType="slide"
+        onRequestClose={() => {
+          setShowPopup(false);
+          setSelectedItem(null);
+        }}
+      >
+        <TouchableWithoutFeedback
+          onPress={() => {
+            setShowPopup(false);
+            setSelectedItem(null);
+          }}
+        >
+          <View className="flex-1 justify-end bg-black/50">
+            <TouchableWithoutFeedback>
+              <View className="bg-white rounded-t-3xl p-5 w-full">
+                <View className="items-center mt-4">
+                  {/* Draggable Handle */}
+                  <TouchableOpacity
+                    className="z-50 justify-center items-center"
+                    onPress={() => {
+                      setShowPopup(false);
+                      setSelectedItem(null);
+                    }}
+                  >
+                    <View className="bg-[#D9D9D9] w-20 py-0.5 rounded-full -mt-6" />
+                    <View className="bg-[#D9D9D9] w-8 py-0.5 rounded-full mt-1 mb-6" />
+                  </TouchableOpacity>
+
+                  {selectedItem && (
+                    <>
+                      <Text className="text-base font-semibold text-[#747474]">
+                        #{selectedItem.jobId || "N/A"}
+                      </Text>
+                      <Text className="text-lg font-bold mt-2">
+                        {selectedItem.farmerName || "N/A"}
+                      </Text>
+                      <Text className="text-base font-semibold mt-1">
+                        {getServiceName(selectedItem)}
+                      </Text>
+
+                      <Text className="text-sm font-medium text-[#4E6393] mt-1">
+                        {t(`Districts.${selectedItem.district}`)} {t("VisitPopup.District")}
+                      </Text>
+                      
+                      <View className="flex flex-row justify-center gap-x-2 mb-4 mt-6 px-4">
+                        {/* Location Button */}
+                        <TouchableOpacity
+                          className="flex-1"
+                          disabled={!selectedItem?.latitude || !selectedItem?.longitude}
+                          onPress={() => {
+                            if (selectedItem?.latitude && selectedItem?.longitude) {
+                              const lat = selectedItem.latitude;
+                              const lon = selectedItem.longitude;
+                              const url = `https://www.google.com/maps?q=${lat},${lon}`;
+                              Linking.openURL(url);
+                            }
+                          }}
+                        >
+                          <View
+                            className={`flex flex-row items-center justify-center rounded-full py-2 border ${
+                              selectedItem?.latitude && selectedItem?.longitude
+                                ? "border-[#F83B4F]"
+                                : "border-[#9DB2CE]"
+                            }`}
+                          >
+                            <FontAwesome6
+                              name="location-dot"
+                              size={20}
+                              color={
+                                selectedItem?.latitude && selectedItem?.longitude
+                                  ? "#F83B4F"
+                                  : "#9DB2CE"
+                              }
+                            />
+                            <Text
+                              className={`text-base font-semibold ml-2 ${
+                                selectedItem?.latitude && selectedItem?.longitude
+                                  ? "text-[#000000]"
+                                  : "text-[#9DB2CE]"
+                              }`}
+                            >
+                              {t("VisitPopup.Location")}
+                            </Text>
+                          </View>
+                        </TouchableOpacity>
+
+                        {/* Call Button */}
+                        <TouchableOpacity 
+                          className="flex"
+                          onPress={() => handleDial(selectedItem.farmerMobile)}
+                        >
+                          <View className="flex-row items-center justify-center border border-[#F83B4F] rounded-full px-6 py-2">
+                            <Ionicons name="call" size={20} color="#F83B4F" />
+                            <Text className="text-base font-semibold ml-2">
+                              {t("VisitPopup.Get Call")}
+                            </Text>
+                          </View>
+                        </TouchableOpacity>
+                      </View>
+
+                      {/* Address Section */}
+                      {(selectedItem.city || selectedItem.plotNo || selectedItem.street) && (
+                        <View className="flex text-center justify-center items-center">
+                          <Text className="text-sm font-semibold text-[#4E6393] mb-2">
+                            {t("VisitPopup.Address")}
+                          </Text>
+                          <Text className="text-base font-medium text-[#434343]">
+                            {selectedItem.plotNo}, {selectedItem.street},
+                          </Text>
+                          <Text className="text-base font-medium text-[#434343]">
+                            {selectedItem.city}
+                          </Text>
+                        </View>
+                      )}
+                    </>
+                  )}
+
+                  {/* Action Buttons in Modal */}
+                  <View className="flex-row justify-between w-full mt-6 px-4 gap-x-4">
+                    {/* Select Button */}
+                    <TouchableOpacity 
+                      className="flex-1"
+                      onPress={() => {
+                        if (selectedItem) {
+                          toggleJobSelection(selectedItem.jobId);
+                          setShowPopup(false);
+                          setSelectedItem(null);
+                        }
+                      }}
+                    >
+                      <View className="border border-[#F83B4F] rounded-full py-3 items-center justify-center">
+                        <Text className="text-[#F83B4F] text-lg font-semibold">
+                          {selectedItem && selectedJobs.includes(selectedItem.jobId) 
+                            ? "Deselect" 
+                            : "Select"
+                          }
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+
+                    {/* Start Button */}
+                    <TouchableOpacity 
+                      className="flex-1"
+                      onPress={handleStartJobFromModal}
+                    >
+                      <LinearGradient
+                        colors={["#F2561D", "#FF1D85"]}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 0 }}
+                        className="py-3 items-center justify-center rounded-full"
+                      >
+                        <Text className="text-white text-lg font-semibold">
+                          {t("VisitPopup.Start")}
+                        </Text>
+                      </LinearGradient>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
     </View>
   );
 };
