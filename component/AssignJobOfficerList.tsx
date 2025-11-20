@@ -164,13 +164,13 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
     try {
       const token = await AsyncStorage.getItem("token");
       if (!token) {
-        Alert.alert(t("Common.Error"), t("Common.AuthTokenNotFound"));
+        Alert.alert(t("Error.Error"), t("Error.AuthTokenNotFound"));
         return;
       }
 
       const jobId = selectedJobIds[0];
       if (!jobId) {
-        Alert.alert(t("Common.Error"), t("AssignJobOfficerList.NoJobIdFound"));
+        Alert.alert(t("Error.Error"), t("AssignJobOfficerList.NoJobIdFound"));
         return;
       }
 
@@ -187,14 +187,14 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
         setOfficers(response.data.data);
       } else {
         Alert.alert(
-          t("Common.Error"),
+          t("Error.Error"),
           t("AssignJobOfficerList.FailedToFetchOfficers")
         );
       }
     } catch (error) {
       console.error("Failed to fetch officers:", error);
       Alert.alert(
-        t("Common.Error"),
+        t("Error.Error"),
         t("AssignJobOfficerList.FailedToLoadOfficers")
       );
     } finally {
@@ -236,7 +236,7 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
     try {
       const token = await AsyncStorage.getItem("token");
       if (!token) {
-        Alert.alert(t("Common.Error"), t("Common.AuthTokenNotFound"));
+        Alert.alert(t("Error.Error"), t("Error.AuthTokenNotFound"));
         return;
       }
 
@@ -266,7 +266,7 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
 
       if (response.data.status === "success") {
         Alert.alert(
-          t("Common.Success"),
+          t("Main.Success"),
           t("AssignJobOfficerList.AssignSuccess", {
             name: getOfficerName(selectedOfficer),
           }),
@@ -279,14 +279,14 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
         );
       } else {
         Alert.alert(
-          t("Common.Error"),
+          t("Main.Error"),
           response.data.message || t("AssignJobOfficerList.FailedToAssignJobs")
         );
       }
     } catch (error: any) {
       console.error("Failed to assign jobs:", error);
       Alert.alert(
-        t("Common.Error"),
+        t("Main.Error"),
         error.response?.data?.message ||
           error.message ||
           t("AssignJobOfficerList.FailedToAssignJobs")
