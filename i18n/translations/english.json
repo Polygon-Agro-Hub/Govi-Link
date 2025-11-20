@@ -367,6 +367,26 @@
     "InvestmentRequest": "Investment Request",
     "RequestNumber": "Request No",
     "CustomerName": "Customer Name",
-    "RequestType": "Request Type"
+    "RequestType": "Request Type",
+    "Request Letter": "Request Letter"
+  },
+  "AssignJobOfficerList": {
+    "HeaderJobIds": "Job IDs",
+    "HeaderOn": "On",
+    "LoadingOfficers": "Loading officers...",
+    "AssignButton": "Assign",
+    "UndoButton": "Undo",
+    "ConfirmLeaveButton": "Confirm & Leave",
+    "CountdownInstruction1": "Please confirm within",
+    "CountdownInstruction2": "seconds.",
+    "CountdownInstruction3": "You can undo; otherwise, this officer will be assigned automatically.",
+    "NoOfficersAvailable": "No officers available",
+    "OfficerAssignedJobs": "Assigned",
+    "AutoAssignedSuccess": "Jobs have been automatically assigned",
+    "AssignSuccess": "Jobs assigned successfully",
+    "AssignConfirmTitle": "Assign Jobs",
+    "AssignConfirmMessage": "Assign {{count}} job(s) to this officer?",
+    "NoJobsSelected": "No Jobs Selected",
+    "SelectAtLeastOneJob": "Please select at least one job to assign."
   }
 }
