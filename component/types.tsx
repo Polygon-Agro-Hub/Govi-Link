@@ -77,4 +77,11 @@ export type RootStackParamList = {
   AssignJobs: undefined;
   CapitalRequests: undefined;
   RequestDetails: { requestId: string };
+  AssignJobOfficerList: {
+    selectedJobIds: string[];
+    selectedDate: string;
+    isOverdueSelected: boolean;
+    propose?: string;
+    fieldAuditId?: number;
+  };
 };

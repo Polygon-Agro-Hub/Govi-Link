@@ -7,12 +7,14 @@
     "userBlocked": "Too many requests from this device, please try again in 30 minutes.",
     "No Internet Connection": "No Internet Connection",
     "Please turn on mobile data or Wi-Fi to continue.": "Please turn on Mobile Data or Wi-Fi to continue.",
-    "Your login session has expired. Please log in again to continue.": "Your login session has expired. Please log in again to continue."
+    "Your login session has expired. Please log in again to continue.": "Your login session has expired. Please log in again to continue.",
+    "Success": "Success"
   },
   "Error": {
     "error": "Sorry",
     "Error": "Error",
     "Sorry": "Sorry",
+    "AuthTokenNotFound": "Authentication token not found. Please log in again.",
     "Failed to fetch empid.": "Failed to fetch Employee ID.",
     "New password and confirm password do not match.": "New password and confirm password do not match.",
     "New password must be at least 6 characters long.": "New password must be at least 6 characters long.",
@@ -367,6 +369,26 @@
     "InvestmentRequest": "Investment Request",
     "RequestNumber": "Request No",
     "CustomerName": "Customer Name",
-    "RequestType": "Request Type"
+    "RequestType": "Request Type",
+    "Request Letter": "Request Letter"
+  },
+  "AssignJobOfficerList": {
+    "HeaderJobIds": "Job IDs",
+    "HeaderOn": "On",
+    "LoadingOfficers": "Loading officers...",
+    "AssignButton": "Assign",
+    "UndoButton": "Undo",
+    "ConfirmLeaveButton": "Confirm & Leave",
+    "CountdownInstruction1": "Please confirm within",
+    "CountdownInstruction2": "seconds.",
+    "CountdownInstruction3": "You can undo; otherwise, this officer will be assigned automatically.",
+    "NoOfficersAvailable": "No officers available",
+    "OfficerAssignedJobs": "Assigned",
+    "AutoAssignedSuccess": "Jobs have been automatically assigned",
+    "AssignSuccess": "Jobs assigned successfully",
+    "AssignConfirmTitle": "Assign Jobs",
+    "AssignConfirmMessage": "Assign {{count}} job(s) to this officer?",
+    "NoJobsSelected": "No Jobs Selected",
+    "SelectAtLeastOneJob": "Please select at least one job to assign."
   }
 }
