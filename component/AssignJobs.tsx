@@ -130,22 +130,52 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
       if (prev.includes(jobId)) {
         return prev.filter((id) => id !== jobId);
       } else {
-        return [...prev, jobId];
+        // Only allow one job to be selected at a time
+        return [jobId];
       }
     });
   };
 
   const handleCardPress = (item: VisitItem) => {
+    // Only select the job, don't show modal or navigate immediately
+    toggleJobSelection(item.jobId);
+  };
+
+  const handleStartJob = () => {
+    if (selectedJobs.length === 0) {
+      Alert.alert(
+        "No Job Selected",
+        "Please select at least one job to start."
+      );
+      return;
+    }
+
+    // Get the selected job details
+    const selectedJob = visits.find((item) =>
+      selectedJobs.includes(item.jobId)
+    );
+
+    if (!selectedJob) {
+      Alert.alert(
+        "Error",
+        "Could not find selected job details. Please try again."
+      );
+      return;
+    }
+
     // If propose is Individual or Requested, show modal
-    if (item.propose === "Individual" || item.propose === "Requested") {
-      setSelectedItem(item);
+    if (
+      selectedJob.propose === "Individual" ||
+      selectedJob.propose === "Requested"
+    ) {
+      setSelectedItem(selectedJob);
       setShowPopup(true);
     } else {
       // For other propose types (like Cluster), navigate directly
       navigation.navigate("ViewFarmsCluster", {
-        jobId: item.jobId,
-        feildauditId: item.id,
-        farmName: item.farmerName ?? "",
+        jobId: selectedJob.jobId,
+        feildauditId: selectedJob.id,
+        farmName: selectedJob.farmerName ?? "",
       });
     }
   };
@@ -155,27 +185,28 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
 
     // Handle navigation based on propose type when Start is pressed in modal
     if (selectedItem.propose === "Individual") {
-      navigation.navigate("QRScanner", { 
-        farmerId: selectedItem.farmerId, 
+      navigation.navigate("QRScanner", {
+        farmerId: selectedItem.farmerId,
         jobId: selectedItem.jobId,
-        certificationpaymentId: selectedItem.certificationpaymentId, 
-        farmerMobile: selectedItem.farmerMobile, 
-        farmId: selectedItem.farmId, 
-        clusterId: selectedItem.clusterId, 
+        certificationpaymentId: selectedItem.certificationpaymentId,
+        farmerMobile: selectedItem.farmerMobile,
+        farmId: selectedItem.farmId,
+        clusterId: selectedItem.clusterId,
         isClusterAudit: false,
-        auditId: selectedItem.id 
+        auditId: selectedItem.id,
       });
     } else if (selectedItem.propose === "Requested") {
-      navigation.navigate("QRScaneerRequstAudit", { 
-        farmerId: selectedItem.farmerId, 
-        govilinkjobid: selectedItem.id, 
-        jobId: selectedItem.jobId, 
-        farmerMobile: selectedItem.farmerMobile  
+      navigation.navigate("QRScaneerRequstAudit", {
+        farmerId: selectedItem.farmerId,
+        govilinkjobid: selectedItem.id,
+        jobId: selectedItem.jobId,
+        farmerMobile: selectedItem.farmerMobile,
       });
     }
-    
+
     setShowPopup(false);
     setSelectedItem(null);
+    setSelectedJobs([]); // Clear selection after starting
   };
 
   const handleAssignJobs = () => {
@@ -187,8 +218,10 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
       return;
     }
 
-    const firstSelectedJob = visits.find(item => selectedJobs.includes(item.jobId));
-    
+    const firstSelectedJob = visits.find((item) =>
+      selectedJobs.includes(item.jobId)
+    );
+
     if (firstSelectedJob) {
       navigation.navigate("AssignJobOfficerList", {
         selectedJobIds: selectedJobs,
@@ -198,13 +231,12 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
         fieldAuditId: firstSelectedJob.id,
       });
     } else {
-      Alert.alert("Error", "Could not find selected job details. Please try again.");
+      Alert.alert(
+        "Error",
+        "Could not find selected job details. Please try again."
+      );
       return;
     }
-  };
-
-  const handleStartJobs = () => {
-    console.log("Start jobs clicked");
   };
 
   const handleDial = (farmerMobile: number) => {
@@ -317,31 +349,32 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      {/* Action Buttons */}
-      <View className="flex-row p-4 justify-between items-center">
-        <View className="flex-1"></View>
-        <View className="flex-1 items-center">
-          <TouchableOpacity onPress={handleStartJobs}>
-            <LinearGradient
-              colors={["#F2561D", "#FF1D85"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              className="flex-row px-6 h-10 rounded-full items-center justify-center"
+      {/* Action Buttons - Only show when at least one job is selected */}
+      {selectedJobs.length > 0 && (
+        <View className="flex-row p-4 justify-between items-center">
+          <View className="flex-1"></View>
+          <View className="flex-1 items-center">
+            <TouchableOpacity onPress={handleStartJob}>
+              <LinearGradient
+                colors={["#F2561D", "#FF1D85"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                className="flex-row px-6 h-10 rounded-full items-center justify-center"
+              >
+                <Text className="text-white font-bold text-lg">Start</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
+          <View className="flex-1 items-end">
+            <TouchableOpacity
+              onPress={handleAssignJobs}
+              className="bg-black px-5 py-1.5 rounded-3xl"
             >
-              <Text className="text-white font-bold text-lg">Start</Text>
-            </LinearGradient>
-          </TouchableOpacity>
+              <Text className="font-bold text-white text-lg">Assign</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-        <View className="flex-1 items-end">
-          <TouchableOpacity
-            onPress={handleAssignJobs}
-            disabled={selectedJobs.length === 0}
-            className="bg-black px-5 py-1.5 rounded-3xl"
-          >
-            <Text className="font-bold text-white text-lg">Assign</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+      )}
 
       {loading ? (
         <View className="flex-1 justify-center items-center mt-6 px-4 bg-white rounded-t-3xl">
@@ -388,7 +421,8 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
                       {getServiceName(item)}
                     </Text>
                     <Text className="text-[12px] font-medium text-[#4E6393] mt-1">
-                      {t(`Districts.${item.district}`)} {t("VisitPopup.District")}
+                      {t(`Districts.${item.district}`)}{" "}
+                      {t("VisitPopup.District")}
                     </Text>
                     <Text className="text-[12px] font-medium text-[#4E6393] mt-1">
                       {item.status}
@@ -450,16 +484,22 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
                       </Text>
 
                       <Text className="text-sm font-medium text-[#4E6393] mt-1">
-                        {t(`Districts.${selectedItem.district}`)} {t("VisitPopup.District")}
+                        {t(`Districts.${selectedItem.district}`)}{" "}
+                        {t("VisitPopup.District")}
                       </Text>
-                      
+
                       <View className="flex flex-row justify-center gap-x-2 mb-4 mt-6 px-4">
                         {/* Location Button */}
                         <TouchableOpacity
                           className="flex-1"
-                          disabled={!selectedItem?.latitude || !selectedItem?.longitude}
+                          disabled={
+                            !selectedItem?.latitude || !selectedItem?.longitude
+                          }
                           onPress={() => {
-                            if (selectedItem?.latitude && selectedItem?.longitude) {
+                            if (
+                              selectedItem?.latitude &&
+                              selectedItem?.longitude
+                            ) {
                               const lat = selectedItem.latitude;
                               const lon = selectedItem.longitude;
                               const url = `https://www.google.com/maps?q=${lat},${lon}`;
@@ -478,14 +518,16 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
                               name="location-dot"
                               size={20}
                               color={
-                                selectedItem?.latitude && selectedItem?.longitude
+                                selectedItem?.latitude &&
+                                selectedItem?.longitude
                                   ? "#F83B4F"
                                   : "#9DB2CE"
                               }
                             />
                             <Text
                               className={`text-base font-semibold ml-2 ${
-                                selectedItem?.latitude && selectedItem?.longitude
+                                selectedItem?.latitude &&
+                                selectedItem?.longitude
                                   ? "text-[#000000]"
                                   : "text-[#9DB2CE]"
                               }`}
@@ -496,7 +538,7 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
                         </TouchableOpacity>
 
                         {/* Call Button */}
-                        <TouchableOpacity 
+                        <TouchableOpacity
                           className="flex"
                           onPress={() => handleDial(selectedItem.farmerMobile)}
                         >
@@ -510,7 +552,9 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
                       </View>
 
                       {/* Address Section */}
-                      {(selectedItem.city || selectedItem.plotNo || selectedItem.street) && (
+                      {(selectedItem.city ||
+                        selectedItem.plotNo ||
+                        selectedItem.street) && (
                         <View className="flex text-center justify-center items-center">
                           <Text className="text-sm font-semibold text-[#4E6393] mb-2">
                             {t("VisitPopup.Address")}
@@ -528,29 +572,8 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
 
                   {/* Action Buttons in Modal */}
                   <View className="flex-row justify-between w-full mt-6 px-4 gap-x-4">
-                    {/* Select Button */}
-                    <TouchableOpacity 
-                      className="flex-1"
-                      onPress={() => {
-                        if (selectedItem) {
-                          toggleJobSelection(selectedItem.jobId);
-                          setShowPopup(false);
-                          setSelectedItem(null);
-                        }
-                      }}
-                    >
-                      <View className="border border-[#F83B4F] rounded-full py-3 items-center justify-center">
-                        <Text className="text-[#F83B4F] text-lg font-semibold">
-                          {selectedItem && selectedJobs.includes(selectedItem.jobId) 
-                            ? "Deselect" 
-                            : "Select"
-                          }
-                        </Text>
-                      </View>
-                    </TouchableOpacity>
-
                     {/* Start Button */}
-                    <TouchableOpacity 
+                    <TouchableOpacity
                       className="flex-1"
                       onPress={handleStartJobFromModal}
                     >

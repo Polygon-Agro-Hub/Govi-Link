@@ -6,15 +6,20 @@
     "Sorry": "සමාවන්න",
     "userBlocked": "මෙම උපාංගයෙන් ඉල්ලීම් බොහෝ වතාවක් යවනු ලැබිය. කරුණාකර විනාඩි 30කට පසුව නැවත උත්සාහ කරන්න.",
     "No Internet Connection": "අන්තර්ජාල සම්බන්ධතාවයක් නොමැත",
-    "Please turn on mobile data or Wi-Fi to continue.": "කරුණාකර Mobile Data හෝ Wi-Fi සක්‍රීය කරන්න."
+    "Please turn on mobile data or Wi-Fi to continue.": "කරුණාකර Mobile Data හෝ Wi-Fi සක්‍රීය කරන්න.",
+    "Your login session has expired. Please log in again to continue.": "ඔබගේ පුරනය වීමේ සැසිය කල් ඉකුත් වී ඇත. කරුණාකර නැවත පුරනය වන්න.",
+    "Success": "සාර්ථකයි"
   },
   "Error": {
     "error": "සමාවන්න",
     "Error": "දෝෂය",
+    "Sorry": "සමාවන්න",
     "Failed to fetch empid.": "සේවක හැඳුනුම්පත සොයා ගැනීමට අසමත් විය.",
+    "AuthTokenNotFound": "සත්‍යාපන ටෝකනය හමු නොවීය. කරුණාකර නැවත පුරනය වන්න.",
     "New password and confirm password do not match.": "නව මුරපදය සහ එය තහවුරු කිරීමේ මුරපදය එකිනෙකට නොගැලපේ.",
     "New password must be at least 6 characters long.": "නව මුරපදයට අවම වශයෙන් අක්ෂර 6 ක් තිබිය යුතුය.",
     "Failed to update password.": "මුරපදය යාවත්කාලීන කිරීම අසාර්ථකයි.",
+    "Your login session has expired. Please log in again to continue.": "ඔබගේ පුරනය වීමේ සැසිය කල් ඉකුත් වී ඇත. කරුණාකර නැවත පුරනය වන්න.",
     "First name is required": "පළමු නම අවශ්‍යයි",
     "Last name is required": "අවසන් නම අවශ්‍යයි",
     "Sinhala first name is required": "සිංහලෙන් පළමු නම අවශ්‍යයි",
@@ -77,6 +82,7 @@
     "Saved Draft": "සුරැකි කෙටුම්පත",
     "Assigned Target": "පවරන ලද ඉලක්කය",
     "No Jobs for Today": "අදට ඉලක්කය නැත",
+    "No Saved Drafts for Today": "අදට සුරැකූ කෙටුම්පත් නොමැත",
     "Capital Requests": "මුල්ධන ඉල්ලීම්"
   },
   "Drawer": {
@@ -145,6 +151,101 @@
     "Rathnapura": "රත්නපුර",
     "Trincomalee": "ත්‍රිකුණාමලය",
     "Vavuniya": "වවුනියාව"
+  },
+  "CertificateQuesanory": {
+    "Started on": "ආරම්භ කළ දිනය",
+    "Exit": "පිටවීම",
+    "Next": "ඊළඟ",
+    "Back": "ආපසු",
+    "Click a Photo": "ඡායාරූපයක් ගන්න",
+    "Please take a photo of the completed work in the field.": "කරුණාකර ක්ෂේත්‍රයේ සම්පූර්ණ කළ වැඩයේ ඡායාරූපයක් ගන්න.",
+    "Open Camera": "කැමරාව අරින්න",
+    "Ready To Submit": "ඉදිරිපත් කිරීමට සූදානම්",
+    "Seconds": "තත්පර",
+    "Retake Previous Photo": "පෙර ඡායාරූපය නැවත ගන්න",
+    "Submit": "ඉදිරිපත් කරන්න",
+    "Cancel": "අවලංගු කරන්න",
+    "OK": "හරි",
+    "Confirm Untick": "ඉවත් කිරීම තහවුරු කරන්න",
+    "This will remove the uploaded photo for this task. Are you sure you want to continue?": "මෙය මෙම කාර්යය සඳහා උඩුගත කළ ඡායාරූපය ඉවත් කරයි. ඔබට ඉදිරියට යාමට අවශ්‍ය බව තහවුරු කරන්නද?",
+    "Something went wrong while updating question.": "ප්‍රශ්නය යාවත්කාලීන කිරීමේදී දෝෂයක් ඇතිවිය.",
+    "Success": "සාර්ථකයි",
+    "Task complete successfully!": "කාර්යය සාර්ථකව සම්පූර්ණ විය!",
+    "Failed to complete task, Please try again": "කාර්යය සම්පූර්ණ කිරීම අසාර්ථක විය, කරුණාකර නැවත උත්සාහ කරන්න"
+  },
+  "CertificateSuggestions": {
+    "Please mention identified problems and suggestions you made below.": "කරුණාකර හඳුනාගත් ගැටලු සහ ඔබ කළ යෝජනා පහත සඳහන් කරන්න.",
+    "Problem": "ගැටලුව",
+    "Describe the problem...": "ගැටලුව විස්තර කරන්න...",
+    "Describe the solution...": "විසඳුම විස්තර කරන්න...",
+    "Type here...": "මෙහි ටයිප් කරන්න...",
+    "Identified Problem": "හඳුනාගත් ගැටලුව",
+    "Suggested Solution": "යෝජිත විසඳුම",
+    "Update": "යාවත්කාලීන කරන්න",
+    "Save Problem": "ගැටලුව සුරකින්න",
+    "Add more": "තවත් එකතු කරන්න",
+    "Unsaved Problem": "සුරැකී නොමැති ගැටලුව",
+    "You have unsaved problems. Do you want to continue without saving?": "ඔබට සුරැකී නොමැති ගැටලු ඇත. සුරැකීමෙන් තොරව ඉදිරියට යාමට අවශ්‍යද?",
+    "Continue": "ඉදිරියට යන්න",
+    "Both problem and solution must be filled.": "ගැටලුව සහ විසඳුම දෙකම පුරවා තිබිය යුතුය.",
+    "Failed to save problem.": "ගැටලුව සුරැකීම අසාර්ථක විය.",
+    "Something went wrong while saving. try again later": "සුරැකීමේදී දෝෂයක් ඇතිවිය. පසුව නැවත උත්සාහ කරන්න"
+  },
+  "Otpverification": {
+    "Enter Verification Code": "තහවුරු කිරීමේ කේතය ඇතුළත් කරන්න",
+    "We have sent a Verification Code to Farmer's mobile number": "අපි විලාසිත සත්‍යාපන කේතයක් ගොවියාගේ දුරකථන අංකයට යවා ඇත",
+    "Verify": "තහවුරු කරන්න",
+    "Resend in": "නැවත යවන්න",
+    "RESEND OTP": "OTP නැවත යවන්න",
+    "Didn't receive the OTP ?": "OTP ලැබුණේ නැතිද?",
+    "Go Back": "ආපසු යන්න",
+    "Please enter the 5-digit OTP sent to your phone.": "කරුණාකර ඔබගේ දුරකථනයට යවන ලද අංක 5ක OTP ඇතුළත් කරන්න.",
+    "Your OTP has expired. Please request a new one.": "ඔබගේ OTP කල් ඉකුත් වී ඇත. කරුණාකර නව OTP එකක් ඉල්ලන්න.",
+    "Resend OTP": "OTP නැවත යවන්න",
+    "Cancel": "අවලංගු කරන්න",
+    "Verification Successful": "තහවුරු කිරීම සාර්ථකයි",
+    "Your phone number has been verified successfully.": "ඔබගේ දුරකථන අංකය සාර්ථකව තහවුරු කර ඇත.",
+    "Invalid OTP": "වලංගු නොවන OTP",
+    "Your OTP is invalid or expired.": "ඔබගේ OTP වලංගු නොවන හෝ කල් ඉකුත් වී ඇත.",
+    "Try Again": "නැවත උත්සාහ කරන්න",
+    "The OTP you entered is incorrect. Please try again.": "ඔබ ඇතුළත් කළ OTP වැරදිය. කරුණාකර නැවත උත්සාහ කරන්න.",
+    "Success": "සාර්ථකයි",
+    "A new OTP has been sent to your mobile number.": "නව OTP එකක් ඔබගේ දුරකථන අංකයට යවා ඇත.",
+    "OK": "හරි",
+    "We couldn't send the OTP. Please try again later.": "අපට OTP යැවීමට නොහැකි විය. කරුණාකර පසුව නැවත උත්සාහ කරන්න.",
+    "Audit completion failed. Please try again.": "ලේඛන පරීක්ෂණය සම්පූර්ණ කිරීම අසාර්ථක විය. කරුණාකර නැවත උත්සාහ කරන්න."
+  },
+  "OtpverificationSuccess": {
+    "Well Done": "හොඳට කලා!",
+    "You have successfully completed the job": "ඔබ වැඩය සාර්ථකව සම්පූර්ණ කර ඇත!",
+    "Go Forward": "ඉදිරියට යන්න"
+  },
+  "QRScanner": {
+    "CameraRequired": "කැමරා අවසරය අවශ්‍යයි",
+    "WeneedCamera": "QR කේත ස්කෑන් කිරීම සඳහා අපට කැමරා ප්‍රවේශය අවශ්‍යය. කරුණාකර ඔබගේ උපාංග සැකසුම්වල කැමරා අවසර සක්‍රීය කරන්න.",
+    "Close": "වසන්න",
+    "TapScan": "නැවත ස්කෑන් කිරීමට තට්ටු කරන්න",
+    "Failed": "අසාර්ථකයි!",
+    "Requesting for camera permission": "කැමරා අවසරය ඉල්ලමින්",
+    "Scan the QR": "QR කේතය ස්කෑන් කරන්න",
+    "Scan Again": "නැවත ස්කෑන් කරන්න",
+    "User ID not found in QR code": "QR කේතයේ පරිශීලක හැඳුනුම්පත හමු නොවීය",
+    "Wrong QR code": "වැරදි QR කේතය",
+    "The scanned QR code does not contain a valid user ID or is damaged.": "ස්කෑන් කළ QR කේතයේ වලංගු පරිශීලක හැඳුනුම්පතක් නොමැති හෝ එය අස්ථානගත වී ඇත."
+  },
+  "RequestProblem": {
+    "Farmer's Say": "ගොවියාගේ කියමන",
+    "Advice Given": "ලබා දුන් උපදෙස්",
+    "Type here...": "මෙහි ටයිප් කරන්න...",
+    "Photo": "ඡායාරූපය",
+    "Submit": "ඉදිරිපත් කරන්න",
+    "Image Uploaded": "ඡායාරූපය උඩුගත කරන ලදී",
+    "Please fill out all fields.": "කරුණාකර සියලු ක්ෂේත්‍ර පුරවන්න.",
+    "Problem submitted successfully!": "ගැටලුව සාර්ථකව ඉදිරිපත් කරන ලදී!",
+    "Failed to submit problem. Please try again.": "ගැටලුව ඉදිරිපත් කිරීම අසාර්ථක විය. කරුණාකර නැවත උත්සාහ කරන්න.",
+    "Failed to save problem. Please try again.": "ගැටලුව සුරැකීම අසාර්ථක විය. කරුණාකර නැවත උත්සාහ කරන්න.",
+    "Problem updated successfully.": "ගැටලුව සාර්ථකව යාවත්කාලීන කරන ලදී.",
+    "Problem saved successfully.": "ගැටලුව සාර්ථකව සුරකින ලදී."
   },
   "AddOfficer": {
     "AddOfficer": "නිලධාරියෙකු එක් කරන්න",
@@ -222,6 +323,39 @@
     "NoOfficersFound": "ඔබගේ සෙවුමට ගැලපෙන නිලධාරීන් නොමැත",
     "Approved": "අනුමත කළා"
   },
+
+  "Visits": {
+    "Pending": "පූර්ණ වෙමින්",
+    "Completed": "සම්පූර්ණ කළා",
+    "Request Placed": "ඉල්ලීම ඉදිරිපත් කළා",
+    "Request Reviewed": "ඉල්ලීම සමාලෝචනය කළා",
+    "Finished": "අවසන් කළා",
+    "Over Due": "කල් ඉකුත් විය",
+    "No Jobs Available": "වැඩ නොමැත",
+    "Today": "අද"
+  },
+  "ChangePassword": {
+    "ChoosePassword": "මුරපදය වෙනස් කරන්න",
+    "Changepassword": "මුරපදය වෙනස් කර ආරක්ෂිතව තබා ගන්න",
+    "CurrentPassword": "වර්තමාන මුරපදය",
+    "NewPassword": "නව මුරපදය",
+    "ConfirmNewPassword": "නව මුරපදය තහවුරු කරන්න",
+    "Next": "ඊළඟ",
+    "Password updated successfully": "මුරපදය සාර්ථකව යාවත්කාලීන කරන ලදී",
+    "Invalid current password": "වලංගු නොවන වර්තමාන මුරපදය",
+    "Failed to update password": "මුරපදය යාවත්කාලීන කිරීම අසාර්ථක විය"
+  },
+  "ComplainHistory": {
+    "No Reply": "ප්‍රතිචාරයක් නැත",
+    "OK": "හරි",
+    "Complaint History": "පැමිණිලි ඉතිහාසය",
+    "No Data": "දත්ත නැත",
+    "RefNo": "යොමු අංකය",
+    "Sent": "යවන ලදී",
+    "View Response": "ප්‍රතිචාරය බලන්න",
+    "Opened": "විවෘත කළා",
+    "Closed": "වසා දමන ලදී"
+  },
   "CapitalRequests": {
     "CapitalRequests": "මූල්‍ය ඉල්ලීම්",
     "RequestsList": "ඉල්ලීම් ලැයිස්තුව",
@@ -236,7 +370,8 @@
     "InvestmentRequest": "ආයෝජන ඉල්ලීම",
     "RequestNumber": "ඉල්ලීම් අංකය",
     "CustomerName": "පාරිභෝගික නම",
-    "RequestType": "ඉල්ලීම් වර්ගය"
+    "RequestType": "ඉල්ලීම් වර්ගය",
+    "Request Letter": "ඉල්ලීම් ලිපිය"
   },
   "AssignJobOfficerList": {
     "HeaderJobIds": "වැඩ අංක",
