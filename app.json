@@ -21,33 +21,33 @@
         "backgroundColor": "#ffffff",
         "softwareKeyboardLayoutMode": "pan",
         "versionCode": 12,
-      "compileSdkVersion": 35,
-      "targetSdkVersion": 35,
-      "minSdkVersion": 24,
-      "permissions": [
-        "INTERNET",
-        "CAMERA",
-        "RECORD_AUDIO",
-        "READ_MEDIA_IMAGES",
-        "READ_MEDIA_VIDEO",
-        "WRITE_EXTERNAL_STORAGE",
-        "ACCESS_COARSE_LOCATION",
-        "ACCESS_FINE_LOCATION",
-        "VIBRATE",
-        "WAKE_LOCK",
-        "RECEIVE_BOOT_COMPLETED",
-        "LOCATION",
-        "ACCESS_BACKGROUND_LOCATION",
-        "ACCESS_WIFI_STATE",
-        "CHANGE_WIFI_STATE",
-        "ACCESS_NETWORK_STATE",
-        "CHANGE_NETWORK_STATE",
-        "SYSTEM_ALERT_WINDOW",
-        "FOREGROUND_SERVICE",
-        "NOTIFICATIONS",
-        "WRITE_EXTERNAL_STORAGE",
-        "CALL_PHONE"
-      ]
+        "compileSdkVersion": 35,
+        "targetSdkVersion": 35,
+        "minSdkVersion": 24,
+        "permissions": [
+          "INTERNET",
+          "CAMERA",
+          "RECORD_AUDIO",
+          "READ_MEDIA_IMAGES",
+          "READ_MEDIA_VIDEO",
+          "WRITE_EXTERNAL_STORAGE",
+          "ACCESS_COARSE_LOCATION",
+          "ACCESS_FINE_LOCATION",
+          "VIBRATE",
+          "WAKE_LOCK",
+          "RECEIVE_BOOT_COMPLETED",
+          "LOCATION",
+          "ACCESS_BACKGROUND_LOCATION",
+          "ACCESS_WIFI_STATE",
+          "CHANGE_WIFI_STATE",
+          "ACCESS_NETWORK_STATE",
+          "CHANGE_NETWORK_STATE",
+          "SYSTEM_ALERT_WINDOW",
+          "FOREGROUND_SERVICE",
+          "NOTIFICATIONS",
+          "WRITE_EXTERNAL_STORAGE",
+          "CALL_PHONE"
+        ]
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
@@ -56,12 +56,12 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-     "plugins": [
+    "plugins": [
       "expo-router",
       [
         "expo-notifications",
         {
-          "icon": "./assets/images/favicon.png",
+          "icon": "./assets/favicon.png",
           "color": "#ffffff",
           "defaultChannel": "default",
           "enableBackgroundRemoteNotifications": false
@@ -80,14 +80,14 @@
       ]
     ],
     "extra": {
-       "router": {
+      "router": {
         "origin": false
       },
       "eas": {
-        "projectId": "5a3c3edf-d307-486f-bb02-98c32aee96ca"
+        "projectId": "e3c99f6c-b01a-4691-8b57-062134d10180"
       }
     },
-        "expo-camera": {
+    "expo-camera": {
       "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
       "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
       "recordAudioAndroid": true
