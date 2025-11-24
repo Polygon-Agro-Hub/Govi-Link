@@ -325,7 +325,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                     <Text className="text-black mb-1">
                       {t("Profile.Employee ID")}
                     </Text>
-                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-full px-4 py-3 text-[#8492A3]">
+                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-2xl px-4 py-3 text-[#8492A3]">
                       {formData.empId}
                     </Text>
                   </View>
@@ -340,7 +340,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                   onChangeText={(text) => handleInputChange("firstName", text)}
                   placeholder="Enter First Name"
                 /> */}
-                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-full px-4 py-3 text-[#8492A3]">
+                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-2xl px-4 py-3 text-[#8492A3]">
                       {i18n.language === "si"
                         ? formData.firstNameSinhala
                         : i18n.language === "ta"
@@ -359,7 +359,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                   onChangeText={(text) => handleInputChange("lastName", text)}
                   placeholder="Enter Last Name"
                 /> */}
-                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-full px-4 py-3 text-[#8492A3]">
+                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-2xl px-4 py-3 text-[#8492A3]">
                       {i18n.language === "si"
                         ? formData.lastNameSinhala
                         : i18n.language === "ta"
@@ -372,7 +372,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                     <Text className="text-black mb-1">
                       {t("Profile.Phone Number - 1")}
                     </Text>
-                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-full px-4 py-3 text-[#8492A3]">
+                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-2xl px-4 py-3 text-[#8492A3]">
                       {formData.phoneNumber1}
                     </Text>
                   </View>
@@ -381,7 +381,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                     <Text className="text-black mb-1">
                       {t("Profile.Phone Number - 2")}
                     </Text>
-                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-full px-4 py-3 text-[#8492A3]">
+                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-2xl px-4 py-3 text-[#8492A3]">
                       {formData.phoneNumber2 || "---"}
                     </Text>
                   </View>
@@ -390,7 +390,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                     <Text className="text-black mb-1">
                       {t("Profile.NIC Number")}
                     </Text>
-                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-full px-4 py-3 text-[#8492A3]">
+                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-2xl px-4 py-3 text-[#8492A3]">
                       {formData.nic}
                     </Text>
                   </View>
@@ -400,7 +400,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                       {t("Profile.Email Address")}
                     </Text>
 
-                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-full px-4 py-3 text-[#8492A3]">
+                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-2xl px-4 py-3 text-[#8492A3]">
                       {formData.email}
                     </Text>
                   </View>
@@ -415,7 +415,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                   onChangeText={(text) => handleInputChange("houseNumber", text)}
                   placeholder="Enter Building Number"
                 /> */}
-                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-full px-4 py-3 text-[#8492A3]">
+                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-2xl px-4 py-3 text-[#8492A3]">
                       {formData.house}
                     </Text>
                   </View>
@@ -430,7 +430,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                   onChangeText={(text) => handleInputChange("streetName", text)}
                   placeholder="Enter Street Name"
                 /> */}
-                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-full px-4 py-3 text-[#8492A3]">
+                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-2xl px-4 py-3 text-[#8492A3]">
                       {formData.street}
                     </Text>
                   </View>
@@ -443,7 +443,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                   onChangeText={(text) => handleInputChange("city", text)}
                   placeholder="Enter City"
                 /> */}
-                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-full px-4 py-3 text-[#8492A3]">
+                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-2xl px-4 py-3 text-[#8492A3]">
                       {formData.city}
                     </Text>
                   </View>
