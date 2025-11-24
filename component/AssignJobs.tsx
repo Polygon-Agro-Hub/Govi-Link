@@ -20,6 +20,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 import { AntDesign, Ionicons, Feather, FontAwesome6 } from "@expo/vector-icons";
+import LottieView from "lottie-react-native";
 
 type AssignJobsNavigationProps = StackNavigationProp<
   RootStackParamList,
@@ -277,6 +278,17 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
     }
   };
 
+  // Calculate counts based on visits data with leading zeros
+  const getOverdueCount = () => {
+    if (!isOverdueSelected) return "00";
+    return visits.length.toString().padStart(2, "0");
+  };
+
+  const getTodayCount = () => {
+    if (isOverdueSelected) return "00";
+    return visits.length.toString().padStart(2, "0");
+  };
+
   return (
     <View className="flex-1 bg-white pt-4">
       <View className="flex-row p-2 justify-center items-center gap-x-6 border-b border-gray-200">
@@ -307,7 +319,9 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
               </Text>
               {isOverdueSelected && (
                 <View className="bg-white rounded-full w-6 h-6 items-center justify-center">
-                  <Text className="text-[#F83B4F] font-bold text-xs">01</Text>
+                  <Text className="text-[#F83B4F] font-bold text-xs">
+                    {getOverdueCount()}
+                  </Text>
                 </View>
               )}
             </View>
@@ -341,7 +355,9 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
               </Text>
               {!isOverdueSelected && (
                 <View className="bg-white rounded-full w-6 h-6 items-center justify-center">
-                  <Text className="text-[#F83B4F] font-bold text-xs">01</Text>
+                  <Text className="text-[#F83B4F] font-bold text-xs">
+                    {getTodayCount()}
+                  </Text>
                 </View>
               )}
             </View>
@@ -434,8 +450,16 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
           ))}
         </ScrollView>
       ) : (
-        <View className="flex-1 justify-center items-center mt-6 px-4 bg-white rounded-t-3xl">
-          <Text className="text-gray-500 text-lg">No jobs available</Text>
+        <View className=" items-center justify-center mt-32">
+          <LottieView
+            source={require("../assets/json/NoData.json")}
+            style={{ width: 200, height: 200 }}
+            autoPlay
+            loop
+          />
+          <Text className="text-center text-gray-600 mt-2">
+            {t("Visits.No Jobs Available")}
+          </Text>
         </View>
       )}
 
