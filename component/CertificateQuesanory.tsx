@@ -358,13 +358,19 @@ const handleCameraClose = (imageUri: string | null) => {
   <View className="w-full items-center mb-8">
       {/* Inner row: logo + text */}
       <View className="flex-row items-center justify-center max-w-[240px]">
-        {CertificateData?.logo && (
+        {/* {CertificateData?.logo && (
           <Image
             source={{ uri: CertificateData.logo }}
             style={{ width: 100, height: 100 }}
             resizeMode="contain"
           />
-        )}
+        )} */}
+
+        <Image 
+          source={require("../assets/staraward.png")}
+          style={{ width: 40, height: 100 }}
+          resizeMode="contain"
+        />
 
         <View className="ml-4 ">
           <Text className="text-lg font-semibold text-left">

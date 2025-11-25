@@ -101,9 +101,11 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
     }
   };
 
-  useEffect(() => {
-    fetchVisits();
-  }, [selectedDate, isOverdueSelected]);
+  useFocusEffect(
+    useCallback(() => {
+      fetchVisits();
+    }, [selectedDate, isOverdueSelected])
+  );
 
   // Handle back button when modal is open
   useFocusEffect(

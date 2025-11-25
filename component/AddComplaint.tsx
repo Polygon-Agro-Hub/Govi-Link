@@ -206,7 +206,7 @@ const handleSearchChange = (text: string) => {
   placeholder={t("AddComplaint.Select Complaint Category")}
   style={{
     borderColor: "#fff",
-    borderRadius: 30,
+    borderRadius: 15,
     height: 50,
     backgroundColor: "#F6F6F6",
   }}

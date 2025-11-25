@@ -715,7 +715,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
         </>
       )}
 
-      <View className="p-8 mt-4">
+      {/* <View className="p-8 mt-4">
         <TouchableOpacity
           className="bg-[#FEE5E6] rounded-lg p-3 h-28 mr-4 w-full flex-row justify-between items-center"
           style={{
@@ -742,7 +742,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
             resizeMode="contain"
           />
         </TouchableOpacity>
-      </View>
+      </View> */}
 
       <Modal
         transparent
@@ -941,7 +941,6 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                       <Text className="text-white text-lg font-semibold">
                         {t("VisitPopup.Start")}
                       </Text>
-                      {/*if individual need send  farmerId for check with QR scan ,jobId,    */}
                     </LinearGradient>
                   </TouchableOpacity>
                 </View>
