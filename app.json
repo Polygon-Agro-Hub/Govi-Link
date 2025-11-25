@@ -17,7 +17,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/favicon-icon.png",
         "backgroundColor": "#ffffff",
         "softwareKeyboardLayoutMode": "pan",
         "versionCode": 12,
@@ -54,14 +54,14 @@
       "package": "com.polygonagro.GoviLink"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon-icon.png"
     },
     "plugins": [
       "expo-router",
       [
         "expo-notifications",
         {
-          "icon": "./assets/favicon.png",
+          "icon": "./assets/favicon-icon.png",
           "color": "#ffffff",
           "defaultChannel": "default",
           "enableBackgroundRemoteNotifications": false
