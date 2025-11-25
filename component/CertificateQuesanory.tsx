@@ -368,7 +368,7 @@ const handleCameraClose = (imageUri: string | null) => {
 
         <Image 
           source={require("../assets/staraward.png")}
-          style={{ width: 100, height: 100 }}
+          style={{ width: 40, height: 100 }}
           resizeMode="contain"
         />
 
