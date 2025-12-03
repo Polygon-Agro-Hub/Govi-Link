@@ -63,48 +63,6 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
   };
 
 
-  const checkDCMAccess = async (empId: string, pass: string) => {
-    if (!empId.trim() || !pass.trim()) return;
-
-    const trimmedEmpId = empId.trim();
-    
-    // First validate format
-    if (trimmedEmpId !== trimmedEmpId.toUpperCase()) {
-      setEmpIdError(t("Login.Please enter Employee ID in uppercase letters"));
-      return;
-    }
-
-    try {
-      const response = await fetch(
-        `${environment}api/collection-officer/login`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            empId: trimmedEmpId,
-            password: pass,
-          }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (response.ok && data.jobRole) {
-
-        if (data.jobRole.toLowerCase() === "Chief Field Officer") {
-          return;
-        } else {
-        
-          setEmpIdError("");
-        }
-      }
-    } catch (error) {
-     
-      console.log("Validation check error:", error);
-    }
-  };
 
   const handleEmpIdChange = (text: string) => {
     setEmpid(text);
@@ -112,19 +70,11 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
     if (empIdError) {
       setEmpIdError("");
     }
-
-    if (password.trim()) {
-      checkDCMAccess(text, password);
-    }
   };
 
 
   const handlePasswordChange = (text: string) => {
     setPassword(text);
-
-    if (empid.trim() && text.trim()) {
-      checkDCMAccess(empid, text);
-    }
   };
 
   const handleLogin = async () => {

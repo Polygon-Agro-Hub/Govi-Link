@@ -86,7 +86,7 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({
 
     // Check if new password and confirm password match
     if (newPassword !== confirmPassword) {
-      Alert.alert(t("Error.error"), 'New password and confirm password do not match');
+      Alert.alert(t("Error.error"), t('Error.New password and confirm password do not match'));
       return false;
     }
 

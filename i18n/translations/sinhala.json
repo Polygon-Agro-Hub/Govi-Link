@@ -59,7 +59,12 @@
     "Passbook image is required": "පාස්බුක් ඡායාරූපය අවශ්‍යයි",
     "Contract image is required": "ගිවිසුම් ඡායාරූපය අවශ්‍යයි",
     "FailedToCreateOfficer": "නිලධාරියා සෑදීමට අපොහොසත් විය",
-    "RequestTimeout": "ඉල්ලීම කල් ඉකුත් විය, කරුණාකර නැවත උත්සාහ කරන්න"
+    "RequestTimeout": "ඉල්ලීම කල් ඉකුත් විය, කරුණාකර නැවත උත්සාහ කරන්න",
+    "All fields are required":"සියලුම ක්ෂේත්‍ර අවශ්‍යයි.",
+"Your password must contain":"ඔබගේ මුරපදයේ අවම වශයෙන් අක්ෂර 8 ක් අඩංගු විය යුතු අතර එක් කැපිටල් අකුරක්, අංක සහ විශේෂ සංකේතයක් අඩංගු විය යුතුය.",
+"Your password must contain a minimum":"ඔබගේ මුරපදයේ අවම වශයෙන් අක්ෂර 8 ක් අඩංගු විය යුතු අතර එක් ලොකු අකුරක්, අංක සහ විශේෂ අක්ෂරයක් අඩංගු විය යුතුය.",
+"New password and confirm password do not match":"නව මුරපදය සහ එය තහවුරු කිරීමේ මුරපදය නොගැලපේ.",
+"Password updated successfully":"මුරපදය සාර්ථකව යාවත්කාලීන කරන ලදී"
   },
   "Login": {
     "Welcome": "සාදරයෙන් පිළිගනිමු!",
