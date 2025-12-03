@@ -59,7 +59,12 @@
     "Passbook image is required": "Passbook image is required",
     "Contract image is required": "Contract image is required",
     "FailedToCreateOfficer": "Failed to create officer",
-    "RequestTimeout": "Request timeout, please try again"
+    "RequestTimeout": "Request timeout, please try again",
+    "All fields are required":"அனைத்து புலங்களும் தேவை",
+"Your password must contain":"உங்கள் கடவுச்சொல்லில் குறைந்தபட்சம் 8 எழுத்துகள் இருக்க வேண்டும், அதில் ஒரு பெரிய எழுத்து, எண்கள் மற்றும் சிறப்பு எழுத்துகள் இருக்க வேண்டும்.",
+"Your password must contain a minimum":"உங்கள் கடவுச்சொல்லில் குறைந்தபட்சம் 8 எழுத்துகள் இருக்க வேண்டும், அதில் ஒரு பெரிய எழுத்து, எண்கள் மற்றும் சிறப்பு எழுத்துகள் இருக்க வேண்டும்.",
+"New password and confirm password do not match":"புதிய கடவுச்சொல் மற்றும் உறுதிப்படுத்தல் கடவுச்சொல் பொருந்தவில்லை.",
+"Password updated successfully":"கடவுச்சொல் வெற்றிகரமாக புதுப்பிக்கப்பட்டது"
   },
   "Login": {
     "Welcome": "வரவேற்கிறோம்",
