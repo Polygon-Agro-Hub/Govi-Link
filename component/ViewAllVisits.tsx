@@ -260,7 +260,9 @@ const pendingCount = filteredVisits.filter((item) => {
     </View>
 ):
 (
-<ScrollView className="mt-6 px-4 bg-white rounded-t-3xl">
+<ScrollView className="mt-6 px-4 bg-white rounded-t-3xl"
+  contentContainerStyle={{ paddingBottom: 80 }}
+  >
   {filteredVisits.length > 0 ? (
     [...filteredVisits]
       .sort((a, b) => {

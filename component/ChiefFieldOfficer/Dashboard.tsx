@@ -456,7 +456,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                 <AntDesign
                   name="left"
                   size={24}
-                  color={!visitsData || currentIndex <= 0 ? "#ccc" : "#FF1D85"}
+                  color={!visitsData || currentIndex <= 0 ? "#ccc" : "#00000"}
                 />
               </TouchableOpacity>
 
@@ -468,7 +468,8 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                 showsHorizontalScrollIndicator={false}
                 renderItem={({ item }) => (
                   <TouchableOpacity
-                    className="border border-[#FF1D85] rounded-lg p-3 mr-4 w-[304px]"
+                   style={{ width: wp("77%") }}
+                    className="border border-[#FF1D85] rounded-lg p-3 mr-4 "
                     activeOpacity={0.8}
                     onPress={() => {
                       //requested comes from govilinkjobs , individual comes from farmaudits
@@ -556,7 +557,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                   color={
                     !visitsData || currentIndex >= visitsData.length - 1
                       ? "#ccc"
-                      : "#FF1D85"
+                      : "#00000"
                   }
                 />
               </TouchableOpacity>
@@ -596,7 +597,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                   <AntDesign
                     name="left"
                     size={24}
-                    color={currentDraftIndex <= 0 ? "#ccc" : "#FF1D85"}
+                    color={currentDraftIndex <= 0 ? "#ccc" : "#00000"}
                   />
                 </TouchableOpacity>
 
@@ -633,7 +634,9 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                         }
                       }}
                     >
-                      <View className="border border-[#FF1D85] rounded-lg p-3 mb-4 flex-row justify-between items-center w-[304px] mr-4">
+                      <View className="border border-[#FF1D85] rounded-lg p-3 mb-4 flex-row justify-between items-center mr-4"
+                        style={{ width: wp("77%") }}
+                      >
                         <View>
                           <Text className="text-black text-sm font-medium">
                             #{item.jobId}
@@ -655,12 +658,12 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                                 ? item.servicetamilName
                                 : item.serviceenglishName
                               : item.propose === "Individual"
-                              ? "Farmer Service Request"
-                              : i18n.language === "si"
+                              ?  i18n.language === "si"
                               ? "තනි ගොවි විගණනය"
                               : i18n.language === "ta"
                               ? "தனிப்பட்ட விவசாயி தணிக்கை"
-                              : "Individual Farmer Audit"}
+                              : "Individual Farmer Audit"
+                            : ""}
                           </Text>
                         </View>
 
@@ -694,7 +697,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                     color={
                       currentDraftIndex >= draftVisits.length - 1
                         ? "#ccc"
-                        : "#FF1D85"
+                        : "#00000"
                     }
                   />
                 </TouchableOpacity>

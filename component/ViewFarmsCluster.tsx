@@ -198,8 +198,9 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
         <LoadingSkeleton />
       ) : (
         <>
-          <View className="mt-2 p-2">
+          <View className="flex-1 mt-2 p-2">
             <FlatList
+            className=""
               data={visitsData}
               keyExtractor={(item) => item.id.toString()}
               showsVerticalScrollIndicator={false}
@@ -239,7 +240,7 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
                         className="rounded-full px-6 py-2"
                       >
                         <Text className="text-white text-base font-semibold text-center">
-                          {item.jobStatus}
+                          Open
                         </Text>
                       </LinearGradient>
                     </TouchableOpacity>
