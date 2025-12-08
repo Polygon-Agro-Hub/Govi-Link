@@ -210,7 +210,8 @@
     "Cancel": "Cancel",
     "Verification Successful": "Verification Successful",
     "Your phone number has been verified successfully.": "Your phone number has been verified successfully.",
-    "Invalid OTP": "Invalid OTP",
+    "Invalid OTP": "OTP Expired",
+    "OTP Expired":"OTP Expired",
     "Your OTP is invalid or expired.": "Your OTP is invalid or expired.",
     "Try Again": "மீண்டும் முயற்சிக்கவும்",
     "The OTP you entered is incorrect. Please try again.": "The OTP you entered is incorrect. Please try again.",
@@ -239,7 +240,7 @@
     "The scanned QR code does not contain a valid user ID or is damaged.": "The scanned QR code does not contain a valid user ID or is damaged."
   },
   "RequestProblem": {
-    "Farmer’s Say": "Farmer’s Say",
+    "FarmerSay": "Farmer’s Say",
     "Advice Given": "Advice Given",
     "Type here...": "Type here...",
     "Photo": "Photo",

@@ -392,6 +392,15 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
     }
   };
 
+  const truncateText = (text: string, maxLength = 30) => {
+  if (!text) return "";
+  return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
+};
+
+  const truncateTextDraft = (text: string, maxLength = 20) => {
+  if (!text) return "";
+  return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
+};
   return (
     <ScrollView
       className={`flex-1 bg-white p-3  `}
@@ -484,6 +493,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                           jobId: item.jobId,
                           feildauditId: item.id,
                           farmName: item.farmerName,
+                          screenName: "Dashboard"
                         });
                         {
                           /*if cluster need send  clusterID , jobId    */
@@ -500,7 +510,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                           {item.farmerName}
                         </Text>
                       ) : null}
-                      {item.propose ? (
+                      {/* {item.propose ? (
                         <Text className="text-[#4E6393] text-base mt-1">
                           {(() => {
                             if (item.propose === "Cluster") {
@@ -540,7 +550,42 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                         <Text className="text-[#4E6393] text-base mt-1">
                           {getProposeName(item)}
                         </Text>
-                      ) : null}
+                      ) : null} */}
+                      <Text className="text-[#4E6393] text-sm mt-1">
+  {truncateText(
+    (() => {
+      if (item.propose === "Cluster") {
+        switch (i18n.language) {
+          case "si":
+            return "ගොවි සමූහ විගණනය";
+          case "ta":
+            return "உழவர் குழு தணிக்கை";
+          default:
+            return "Farm Cluster Audit";
+        }
+      } else if (item.propose === "Individual") {
+        switch (i18n.language) {
+          case "si":
+            return "තනි ගොවි විගණනය";
+          case "ta":
+            return "தனிப்பட்ட விவசாயி தணிக்கை";
+          default:
+            return "Individual Farmer Audit";
+        }
+      } else {
+        switch (i18n.language) {
+          case "si":
+            return item.servicesinhalaName || "";
+          case "ta":
+            return item.servicetamilName || "";
+          default:
+            return item.serviceenglishName || "";
+        }
+      }
+    })()
+  )}
+</Text>
+
                     </View>
                   </TouchableOpacity>
                 )}
@@ -623,6 +668,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                             clusterId: item.clusterId,
                             farmId: item.farmId,
                             isClusterAudit: !!item.clusterId,
+                            screenName: "Dashboard"
                           });
                         } else {
                           navigation.navigate("RequestProblem", {
@@ -630,6 +676,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                             farmerId: item.farmerId,
                             govilinkjobid: item.id,
                             farmerMobile: item.farmerMobile,
+                            screenName:"Dashboard"
                           });
                         }
                       }}
@@ -644,8 +691,8 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                           <Text className="text-base font-bold mt-1">
                             {item.farmerName}
                           </Text>
-                          <Text className="text-[#4E6393] text-base mt-1">
-                            {item.propose === "Cluster"
+                          <Text className="text-[#4E6393] text-sm mt-1">
+                            {/* {item.propose === "Cluster"
                               ? i18n.language === "si"
                                 ? "ගොවි සමූහ විගණනය"
                                 : i18n.language === "ta"
@@ -657,13 +704,45 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                                 : i18n.language === "ta"
                                 ? item.servicetamilName
                                 : item.serviceenglishName
-                              : item.propose === "Individual"
-                              ?  i18n.language === "si"
+                                   : item.propose === "Individual"
+                              ? "Farmer Service Request"
+                              : i18n.language === "si"
                               ? "තනි ගොවි විගණනය"
                               : i18n.language === "ta"
                               ? "தனிப்பட்ட விவசாயி தணிக்கை"
-                              : "Individual Farmer Audit"
-                            : ""}
+                              : "Individual Farmer Audit"} */}
+                               {truncateTextDraft(
+    (() => {
+      if (item.propose === "Cluster") {
+        switch (i18n.language) {
+          case "si":
+            return "ගොවි සමූහ විගණනය";
+          case "ta":
+            return "உழவர் குழு தணிக்கை";
+          default:
+            return "Farm Cluster Audit";
+        }
+      } else if (item.propose === "Individual") {
+        switch (i18n.language) {
+          case "si":
+            return "තනි ගොවි විගණනය";
+          case "ta":
+            return "தனிப்பட்ட விவசாயி தணிக்கை";
+          default:
+            return "Individual Farmer Audit";
+        }
+      } else {
+        switch (i18n.language) {
+          case "si":
+            return item.servicesinhalaName || "";
+          case "ta":
+            return item.servicetamilName || "";
+          default:
+            return item.serviceenglishName || "";
+        }
+      }
+    })()
+  )}
                           </Text>
                         </View>
 
@@ -917,6 +996,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                           clusterId: selectedItem.clusterID,
                           isClusterAudit: false,
                           auditId: selectedItem.id,
+                          screenName: "Dashboard"
                         });
                       } else if (selectedItem?.propose === "Requested") {
                         console.log("hitt Request");
@@ -925,6 +1005,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                           govilinkjobid: selectedItem.id,
                           jobId: selectedItem.jobId,
                           farmerMobile: selectedItem.farmerMobile,
+                          screenName: "Dashboard"
                         });
                       }
                     }}
@@ -940,6 +1021,9 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                           ? "px-24"
                           : "px-[40%]"
                       }`}
+                      style={{
+                        marginBottom:30
+                      }}
                     >
                       <Text className="text-white text-lg font-semibold">
                         {t("VisitPopup.Start")}

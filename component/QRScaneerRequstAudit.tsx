@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState , useCallback} from "react";
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   Animated,
   Image,
   Dimensions,
+  BackHandler
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "./types";
@@ -15,6 +16,7 @@ import { useTranslation } from "react-i18next";
 import {AntDesign} from "@expo/vector-icons";
 import { useRoute, RouteProp } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
+import { useFocusEffect } from "@react-navigation/native";
 
 type QRScaneerRequstAuditNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -31,7 +33,7 @@ const scanningAreaSize = width * 0.8;
 const QRScaneerRequstAudit: React.FC<QRScaneerRequstAuditProps> = ({ navigation }) => {
 
     const route = useRoute<QRScaneerRequstAuditRouteProp>();
-  const { farmerId, govilinkjobid, jobId, farmerMobile} = route.params;  
+  const { farmerId, govilinkjobid, jobId, farmerMobile, screenName} = route.params;  
   console.log("farmerID", farmerId,govilinkjobid, jobId )
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanned, setScanned] = useState<boolean>(false);
@@ -96,7 +98,7 @@ const QRScaneerRequstAudit: React.FC<QRScaneerRequstAuditProps> = ({ navigation 
       throw new Error(t("QRScanner.Wrong QR code"));
     }
         if (userId == farmerId) {
-      navigation.navigate("RequestProblem", { jobId, farmerId, govilinkjobid, farmerMobile  });
+      navigation.navigate("RequestProblem", { jobId, farmerId, govilinkjobid, farmerMobile, screenName:screenName  });
     }
 
 
@@ -129,6 +131,26 @@ const QRScaneerRequstAudit: React.FC<QRScaneerRequstAuditProps> = ({ navigation 
   const handleError = (err: any) => {
     console.error("QR Reader Error:", err);
   };
+
+useFocusEffect(
+  useCallback(() => {
+    const onBackPress = () => {
+      // Navigate to screenName with params
+      navigation.navigate("Main", {screen:screenName})
+      return true; // prevent default back behavior
+    };
+
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      onBackPress
+    );
+
+    // Cleanup
+    return () => subscription.remove();
+  }, [screenName])
+);
+
+
 
   if (hasPermission === null) {
     return (
@@ -200,7 +222,7 @@ const QRScaneerRequstAudit: React.FC<QRScaneerRequstAuditProps> = ({ navigation 
   return (
     <View style={{ flex: 1, position: "relative" }}>
                     <View className="flex-row items-center px-4 py-4 bg-white shadow-sm">
-                      <TouchableOpacity  className="bg-[#F6F6F680] rounded-full p-2 justify-center w-10 z-20 " onPress={() => navigation.goBack()}>
+                      <TouchableOpacity  className="bg-[#F6F6F680] rounded-full p-2 justify-center w-10 z-20 " onPress={() => navigation.navigate("Main", {screen:screenName})}>
                         <AntDesign name="left" size={22} color="#000" />
                       </TouchableOpacity>
        

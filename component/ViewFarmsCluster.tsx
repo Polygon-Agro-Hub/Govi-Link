@@ -129,7 +129,7 @@ const LoadingSkeleton = () => {
 
 const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
   const route = useRoute<ViewFarmsClusterProp>();
-  const { jobId, farmName, feildauditId } = route.params;
+  const { jobId, farmName, feildauditId, screenName } = route.params;
   console.log(jobId, farmName, feildauditId);
   const { t, i18n } = useTranslation();
   const [visitsData, setVisitsData] = useState<VisitsData[]>([]);
@@ -230,6 +230,7 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
                           clusterId: item.clusterId,
                           farmId: item.farmId,
                           isClusterAudit: !!item.clusterId,
+                          screenName: screenName
                         })
                       }
                     >
@@ -414,11 +415,7 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
                       setShowPopup(false);
 
                       if (selectedItem?.farmerId) {
-                        navigation.navigate("Main" as any, {
-                          screen: "MainTabs",
-                          params: {
-                            screen: "QRScanner",
-                            params: {
+                        navigation.navigate("QRScanner",{
                               farmerId: selectedItem.farmerId,
                               jobId: selectedItem.jobId,
                               certificationpaymentId:
@@ -428,9 +425,10 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
                               clusterId: selectedItem.clusterId,
                               isClusterAudit: true,
                               auditId: selectedItem.feildauditId,
-                            },
-                          },
-                        });
+                               screenName: screenName,
+                            }
+                          
+                        );
                       }
                     }}
                   >
@@ -445,6 +443,9 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
                           ? "px-24"
                           : "px-[40%]"
                       }`}
+                                    style={{
+                        marginBottom:30
+                      }}
                     >
                       <Text className="text-white text-lg font-semibold">
                         {t("VisitPopup.Start")}
