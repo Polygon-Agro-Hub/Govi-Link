@@ -14,6 +14,7 @@
     "error": "Sorry",
     "Error": "Error",
     "Sorry": "Sorry",
+    "somethingWentWrong": "Something went wrong. Please try again later.",
     "AuthTokenNotFound": "Authentication token not found. Please log in again.",
     "Failed to fetch empid.": "Failed to fetch Employee ID.",
     "New password and confirm password do not match.": "New password and confirm password do not match.",
@@ -60,11 +61,11 @@
     "Contract image is required": "Contract image is required",
     "FailedToCreateOfficer": "Failed to create officer",
     "RequestTimeout": "Request timeout, please try again",
-   "All fields are required":"All fields are required",
-"Your password must contain":"Your password must contain a minimum of 8 characters with 1 Uppercase, Numbers & Special characters.",
-"Your password must contain a minimum":"Your password must contain a minimum of 8 characters with 1 Uppercase, Numbers & Special characters.",
-"New password and confirm password do not match":"New password and confirm password do not match",
-"Password updated successfully":"Password updated successfully"
+    "All fields are required": "All fields are required",
+    "Your password must contain": "Your password must contain a minimum of 8 characters with 1 Uppercase, Numbers & Special characters.",
+    "Your password must contain a minimum": "Your password must contain a minimum of 8 characters with 1 Uppercase, Numbers & Special characters.",
+    "New password and confirm password do not match": "New password and confirm password do not match",
+    "Password updated successfully": "Password updated successfully"
   },
   "Login": {
     "Welcome": "Welcome!",
@@ -211,7 +212,7 @@
     "Verification Successful": "Verification Successful",
     "Your phone number has been verified successfully.": "Your phone number has been verified successfully.",
     "Invalid OTP": "OTP Expired",
-    "OTP Expired":"OTP Expired",
+    "OTP Expired": "OTP Expired",
     "Your OTP is invalid or expired.": "Your OTP has expired. Please request a new one to continue.",
     "Try Again": "Try Again",
     "The OTP you entered is incorrect. Please try again.": "The OTP you entered is incorrect. Please try again.",

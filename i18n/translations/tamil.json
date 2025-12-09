@@ -14,6 +14,7 @@
     "error": "மன்னிக்கவும்",
     "Error": "Error",
     "Sorry": "மன்னிக்கவும்",
+    "somethingWentWrong": "ஏதோ தவறாகிவிட்டது. பிறகு முயற்சிக்கவும்.",
     "AuthTokenNotFound": "Authentication token not found. Please log in again.",
     "Failed to fetch empid.": "பணியாளர் ஐடியைப் பெறுவதில் தோல்வி.",
     "New password and confirm password do not match.": "புதிய கடவுச்சொல்லும் உறுதிப்படுத்தல் கடவுச்சொல்லும் பொருந்தவில்லை.",
