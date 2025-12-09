@@ -5,13 +5,15 @@ import {
   Text,
   Image,
   TouchableOpacity,
-  BackHandler,
   ScrollView,
   RefreshControl,
-  Dimensions,
   FlatList,
   Pressable,
-  Modal
+  Modal,
+  BackHandler,
+  TouchableWithoutFeedback,
+  Linking,
+  Alert,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
@@ -19,15 +21,18 @@ import { environment } from "@/environment/environment";
 import { useFocusEffect } from "@react-navigation/native";
 import { RootStackParamList } from "../types";
 import { useTranslation } from "react-i18next";
-import { DrawerActions } from '@react-navigation/native';
+import { DrawerActions } from "@react-navigation/native";
 import i18n from "@/i18n/i18n";
 import { useDispatch } from "react-redux";
 import { setUserProfile } from "@/store/authSlice";
-import { AntDesign,Ionicons, Feather } from "@expo/vector-icons";
-import { AnimatedCircularProgress } from 'react-native-circular-progress';
-import { LinearGradient } from 'expo-linear-gradient';
-
-
+import { LinearGradient } from "expo-linear-gradient";
+import { AntDesign, Ionicons, Feather, FontAwesome6 } from "@expo/vector-icons";
+import { AnimatedCircularProgress } from "react-native-circular-progress";
+import ContentLoader, { Rect, Circle } from "react-content-loader/native";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 type FieldOfficerDashboardNavigationProps = StackNavigationProp<
    RootStackParamList,
   "FieldOfficerDashboard"
@@ -36,7 +41,6 @@ type FieldOfficerDashboardNavigationProps = StackNavigationProp<
 interface FieldOfficerDashboardProps {
   navigation: FieldOfficerDashboardNavigationProps;
 }
-
 interface ProfileData {
   firstName: string;
   lastName: string;
@@ -45,61 +49,142 @@ interface ProfileData {
   lastNameSinhala: string;
   firstNameTamil: string;
   lastNameTamil: string;
-  empId: string
+  empId: string;
 }
-
 interface VisitsData {
-  farmerName:string;
+  farmerName: string;
+  farmerMobile: number;
   jobId: string;
   propose: string;
-  englishName: string;
-  sinhalaName:string;
-  tamilName:string;
-  latitude:string;
-  longitude:string;
-  district:string
+  serviceenglishName: string;
+  servicesinhalaName: string;
+  servicetamilName: string;
+  clusterId: number;
+  farmId: number;
 }
-const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({ navigation }) => {
 
-  const [refreshing, setRefreshing] = useState(false);
-  const { t } = useTranslation();
-  const [profile, setProfile] = useState<ProfileData| null> (null)
-  const dispatch = useDispatch();
-    const flatListRef = useRef<FlatList>(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
-const [showPopup, setShowPopup] = useState(false);
-const [selectedItem, setSelectedItem] = useState<any>(null);
-const[visitsData, setVisitsData] = useState<VisitsData[]>([])
-console.log("Officer Visits", visitsData)
+interface DraftVisit {
+  certificationpaymentId: number;
+  jobId: string;
+  userId: number;
+  tickCompleted: number;
+  photoCompleted: number;
+  totalCompleted: number;
+  completionPercentage: number;
+  farmerName?: string;
+  farmerId: number;
+  propose?: string;
+  farmerMobile: number;
+  id: number;
+  clusterId: number;
+  farmId: number;
+}
 
-  const scrollToIndex = (index: number) => {
-  if (!flatListRef.current || !visitsData || visitsData.length === 0) return;
+const LoadingSkeleton = () => {
+  const rectWidth = wp("38%");
+  const gapBetweenRects = wp("8%");
+  const totalWidth = 2 * rectWidth + gapBetweenRects;
+  const startX = (wp("100%") - totalWidth) / 2;
 
-  // Declare outside the try block so it's always in scope
-  const validIndex = Math.max(0, Math.min(index, visitsData.length - 1));
-
-  try {
-    flatListRef.current.scrollToIndex({ index: validIndex, animated: true });
-    setCurrentIndex(validIndex);
-  } catch (error) {
-    console.warn("scrollToIndex error:", error);
-    flatListRef.current.scrollToOffset({
-      offset: validIndex * 320, // use your card width here
-      animated: true,
-    });
-  }
+  return (
+    <View
+      style={{ flex: 1, backgroundColor: "#fff", paddingVertical: hp("2%") }}
+    >
+      <ContentLoader
+        speed={1}
+        width="100%"
+        height={hp("100%")}
+        backgroundColor="#f3f3f3"
+        foregroundColor="#ecebeb"
+      >
+        <View className="mt-20">
+          <Rect
+            x={wp("6%")}
+            y={hp("2%")}
+            rx="10"
+            ry="10"
+            width={wp("82%")}
+            height={hp("15%")}
+          />
+          <Rect
+            x={wp("6%")}
+            y={hp("24%")}
+            rx="10"
+            ry="10"
+            width={wp("82%")}
+            height={hp("15%")}
+          />
+        </View>
+      </ContentLoader>
+    </View>
+  );
 };
 
+const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({ navigation }) => {
+  const [refreshing, setRefreshing] = useState(false);
+  const { t } = useTranslation();
+  const [profile, setProfile] = useState<ProfileData | null>(null);
+  const dispatch = useDispatch();
+  const flatListRef = useRef<FlatList>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [showPopup, setShowPopup] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [visitsData, setVisitsData] = useState<VisitsData[]>([]);
+  const [draftVisits, setDraftVisits] = useState<DraftVisit[]>([]);
+  const [loadingVisitsdrafts, setLoadingVisitsdrafts] = useState(false);
+  console.log("officer draft visit", draftVisits);
+  console.log("officer  visit", visitsData);
+  const [currentDraftIndex, setCurrentDraftIndex] = useState(0);
+  const draftFlatListRef = useRef<FlatList>(null);
+  const openDrawer = () => {
+    navigation.dispatch(DrawerActions.openDrawer());
+  };
 
-      const openDrawer = ()=>{
-        navigation.dispatch(DrawerActions.openDrawer())
+  const scrollToIndex = (index: number) => {
+    if (!flatListRef.current || !visitsData || visitsData.length === 0) return;
+
+    const validIndex = Math.max(0, Math.min(index, visitsData.length - 1));
+
+    try {
+      flatListRef.current.scrollToIndex({ index: validIndex, animated: true });
+      setCurrentIndex(validIndex);
+    } catch (error) {
+      console.warn("scrollToIndex error:", error);
+      flatListRef.current.scrollToOffset({
+        offset: validIndex * 320,
+        animated: true,
+      });
     }
-  
-
-
-     const fetchUserProfile = async () => {
+  };
+  const scrollDraftToIndex = (index: number) => {
+    if (!draftFlatListRef.current || !draftVisits || draftVisits.length === 0)
+      return;
+    const validIndex = Math.max(0, Math.min(index, draftVisits.length - 1));
+    try {
+      draftFlatListRef.current.scrollToIndex({
+        index: validIndex,
+        animated: true,
+      });
+      setCurrentDraftIndex(validIndex);
+    } catch (error) {
+      draftFlatListRef.current.scrollToOffset({
+        offset: validIndex * 320, // width of item
+        animated: true,
+      });
+    }
+  };
+  const fetchUserProfile = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
+      if (!token) {
+        Alert.alert(
+          t("Error.Sorry"),
+          t(
+            "Error.Your login session has expired. Please log in again to continue."
+          )
+        );
+        return;
+      }
       if (token) {
         const response = await axios.get(
           `${environment.API_BASE_URL}api/auth/user-profile`,
@@ -108,26 +193,48 @@ console.log("Officer Visits", visitsData)
           }
         );
         setProfile(response.data.data);
-         dispatch(setUserProfile(response.data.data));
+        dispatch(setUserProfile(response.data.data));
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to fetch user profile:", error);
+      if (error.response?.status === 401) {
+        Alert.alert(
+          t("Error.Sorry"),
+          t(
+            "Error.Your login session has expired. Please log in again to continue."
+          )
+        );
+        navigation.navigate("Login");
+      }
+    } finally {
+      setRefreshing(false);
     }
   };
 
-   useEffect(() => {
+  useEffect(() => {
     fetchUserProfile();
-    fetchVisits()
+    // fetchVisits();
+    // fetchVisitsDraft()
+    fetchAllVisits();
   }, []);
 
-  const onRefresh = async () => {
-    setRefreshing(true);
-    await fetchUserProfile();
-    await fetchVisits()
-    setRefreshing(false);
-  };
+  const onRefresh = useCallback(async () => {
+    try {
+      setRefreshing(true);
+      await Promise.all([
+        fetchUserProfile(),
+        // fetchVisits(),
+        // fetchVisitsDraft(),
+        fetchAllVisits(),
+      ]);
+    } catch (error) {
+      console.error("Refresh error:", error);
+    } finally {
+      setRefreshing(false);
+    }
+  }, []);
 
-    const getName = () => {
+  const getName = () => {
     if (!profile) return "Loading...";
     switch (i18n.language) {
       case "si":
@@ -138,31 +245,49 @@ console.log("Officer Visits", visitsData)
         return `${profile.firstName}`;
     }
   };
+  const getProposeName = (item: VisitsData) => {
+    if (!item) return "";
 
-const getProposeName = (item: VisitsData) => {
-  if (!item) return "";
+    switch (i18n.language) {
+      case "si":
+        return item.servicesinhalaName || item.propose || "";
+      case "ta":
+        return item.servicetamilName || item.propose || "";
+      default:
+        return item.serviceenglishName || item.propose || "";
+    }
+  };
 
-  switch (i18n.language) {
-    case "si":
-      return item.sinhalaName || item.propose || "";
-    case "ta":
-      return item.tamilName || item.propose || "";
-    default:
-      return item.englishName || item.propose || "";
-  }
-};
-
-
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     const onBackPress = () => true;
+  //     BackHandler.addEventListener("hardwareBackPress", onBackPress);
+  //     const subscription = BackHandler.addEventListener(
+  //       "hardwareBackPress",
+  //       onBackPress
+  //     );
+  //     return () => subscription.remove();
+  //   }, [])
+  // );
   useFocusEffect(
-    useCallback(() => {
-      const onBackPress = () => true;
-      BackHandler.addEventListener("hardwareBackPress", onBackPress);
-   const subscription = BackHandler.addEventListener("hardwareBackPress", onBackPress);
-      return () => subscription.remove();
-    }, [])
+    React.useCallback(() => {
+      const backAction = () => {
+        if (showPopup) {
+          setShowPopup(false);
+          setSelectedItem(null);
+          return true;
+        }
+        return false;
+      };
+      const backHandler = BackHandler.addEventListener(
+        "hardwareBackPress",
+        backAction
+      );
+      return () => backHandler.remove();
+    }, [showPopup])
   );
 
-    const getTextStyle = () => {
+  const getTextStyle = () => {
     if (i18n.language === "si") {
       return {
         fontSize: 16,
@@ -170,236 +295,505 @@ const getProposeName = (item: VisitsData) => {
       };
     }
   };
+  // const fetchVisits = async () => {
+  //   try {
+  //     const token = await AsyncStorage.getItem("token");
 
+  //     if (token) {
+  //       const response = await axios.get(
+  //         `${environment.API_BASE_URL}api/officer/officer-visits`,
+  //         {
+  //           headers: { Authorization: `Bearer ${token}` },
+  //         }
+  //       );
+  //       setVisitsData(response.data.data);
 
+  //     }
+  //   } catch (error) {
+  //     console.error("Failed to fetch officer visits:", error);
+  //   } finally {
+  //     setRefreshing(false);
 
-const screenWidth = Dimensions.get("window").width;
+  //   }
+  // };
 
-     const fetchVisits = async () => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-      if (token) {
-        const response = await axios.get(
-          `${environment.API_BASE_URL}api/officer/officer-visits`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        setVisitsData(response.data.data)
+  //   const fetchVisitsDraft = async () => {
+  //     console.log("hitt")
+  //   try {
+  //     const token = await AsyncStorage.getItem("token");
+  //     if (token) {
+  //       const response = await axios.get(
+  //         `${environment.API_BASE_URL}api/officer/officer-visits-draft`,
+  //         {
+  //           headers: { Authorization: `Bearer ${token}` },
+  //         }
+  //       );
+  //       setDraftVisits(response.data.data || []);
+  //           console.log(response.data.data)
+  //     }
+  //   } catch (error) {
+  //     console.error("Failed to fetch officer visits:", error);
+  //   } finally {
+  //     setRefreshing(false);
+
+  //   }
+  // };
+  useEffect(() => {
+    console.log("🎯 Loading States:", { loadingVisitsdrafts });
+  }, [loadingVisitsdrafts]);
+
+  useEffect(() => {
+    const backAction = () => {
+      if (showPopup) {
+        setShowPopup(false);
+        return true;
       }
-    } catch (error) {
-      console.error("Failed to fetch officer visits:", error);
-    }
+      return false;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    return () => backHandler.remove();
+  }, [showPopup]);
+
+  const handleDial = (farmerMobile: string) => {
+    const phoneUrl = `tel:${farmerMobile}`;
+    Linking.openURL(phoneUrl).catch((err) =>
+      console.error("Failed to open dial pad:", err)
+    );
   };
 
+  const fetchAllVisits = async () => {
+    try {
+      setLoadingVisitsdrafts(true);
+      const token = await AsyncStorage.getItem("token");
+      if (!token) return;
+
+      const response = await axios.get(
+        `${environment.API_BASE_URL}api/officer/visits`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      const { visits, draftVisits } = response.data.data;
+      console.log("Fetched visits:", visits, draftVisits);
+
+      setVisitsData(visits || []);
+      setDraftVisits(draftVisits || []);
+    } catch (error) {
+      console.error("Failed to fetch officer visits:", error);
+    } finally {
+      setLoadingVisitsdrafts(false);
+    }
+  };
+  
+  const truncateText = (text: string, maxLength = 30) => {
+  if (!text) return "";
+  return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
+};
+
+  const truncateTextDraft = (text: string, maxLength = 20) => {
+  if (!text) return "";
+  return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
+};
   return (
     <ScrollView
-      className ={`flex-1 bg-white p-3 ${showPopup? "bg-black/20" : "bg-white"} `}
+      className={`flex-1 bg-white p-3  `}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
     >
-        <View className="flex flex-row ">
-      <TouchableOpacity
-        className="flex-row items-center mb-4 p-4"
-        onPress={openDrawer}
-      >
-        <Image
-          source={
-            profile?.profileImg
-              ? {uri: profile.profileImg}
-              : require("../../assets/myprofile.webp")
-          }
-          className="w-16 h-16 rounded-full mr-3"
-        />
-        
-        <View>
-               <Text    style={[{ fontSize: 16 }, getTextStyle()]}
-            className="text-lg font-bold">
-         {t("Dashboard.Hello")}, {getName()}
-
-        </Text>
-               <Text
-            className="text-[#6E7F96] text-lg"
-          >
-            {profile?.empId}
-          </Text>
-          </View>
-      </TouchableOpacity>
-      <View>
- 
-      </View>
-</View>
-
-
-   <View className="p-2 mt-4">
-        <View className="flex-row justify-between items-center mb-1">
-          <Text className="text-base font-bold">{t("Dashboard.Today Visits")} <Text className="text-[#4E6393]">({visitsData.length.toString().padStart(2,'0')})</Text></Text>
-          <Pressable>
-            <Text className="text-pink-500 font-semibold">{t("Dashboard.View All")}</Text>
-          </Pressable>
-        </View>
-
-      </View>
-{visitsData.length > 0 ? (
-  <View className="flex-row items-center">
-            
-        {/* <TouchableOpacity
-          disabled={currentIndex === 0}
-          onPress={() => scrollToIndex(currentIndex - 1)}
-          className="p-1"
-        >
-          <AntDesign
-            name="left"
-            size={24}
-            color={currentIndex === 0 ? "#ccc" : "#FF1D85"}
-          />
-        </TouchableOpacity> */}
+      <View className="flex flex-row ">
         <TouchableOpacity
-  disabled={!visitsData || currentIndex <= 0}
-  onPress={() => scrollToIndex(currentIndex - 1)}
-  className="p-1"
->
-  <AntDesign
-    name="left"
-    size={24}
-    color={!visitsData || currentIndex <= 0 ? "#ccc" : "#FF1D85"}
-  />
-</TouchableOpacity>
+          className="flex-row items-center mb-4 p-4"
+          onPress={openDrawer}
+        >
+          <Image
+            source={
+              profile?.profileImg
+                ? { uri: profile.profileImg }
+                : require("../../assets/myprofile.webp")
+            }
+            className="w-16 h-16 rounded-full mr-3"
+          />
 
-        <FlatList
-          ref={flatListRef}
-          horizontal
-          data={visitsData}
-          keyExtractor={(item) => item.id}
-          showsHorizontalScrollIndicator={false}
-          renderItem={({ item }) => (
-            // <View className="border border-[#FF1D85] rounded-lg p-3 mr-4 w-[304px]">
-            //   <Text className="text-black text-sm font-medium">{item.id}</Text>
-            //   <Text className="text-base font-bold mt-1">{item.name}</Text>
-            //   <Text className="text-[#4E6393] text-base mt-1">{item.type}</Text>
-            // </View>
-                <TouchableOpacity
-      activeOpacity={0.8}
-      onPress={() => {
-        if (item.type === "Consultation") {
-          setSelectedItem(item);
-          setShowPopup(true);
-        }
-      }}
-    >
-      <View className="border border-[#FF1D85] rounded-lg p-3 mr-4 w-[304px]">
-        <Text className="text-black text-sm font-medium">#{item.jobId}</Text>
-        {item.farmerName? (
-                <Text className="text-base font-bold mt-1">{item.farmerName}</Text>
-        ): null
-        }
-        {item.propose? (
-        <Text className="text-[#4E6393] text-base mt-1">
-  {(() => {
-    if (item.propose === "Cluster") {
-      switch (i18n.language) {
-        case "si":
-          return "ගොවි සමූහ විගණනය"; // Sinhala translation
-        case "ta":
-          return "உழவர் குழு தணிக்கை"; // Tamil translation
-        default:
-          return "Farm Cluster Audit";
-      }
-    } else if (item.propose === "Individual") {
-      switch (i18n.language) {
-        case "si":
-          return "තනි ගොවි විගණනය"; // Sinhala translation
-        case "ta":
-          return "தனிப்பட்ட விவசாயி தணிக்கை"; // Tamil translation
-        default:
-          return "Individual Farmer Audit";
-      }
-    } else {
-      switch (i18n.language) {
-        case "si":
-          return item.sinhalaName || "";
-        case "ta":
-          return item.tamilName || "";
-        default:
-          return item.englishName || "";
-      }
-    }
-  })()}
-</Text>
-
-        ): null}
-             {item.englishName || item.sinhalaName || item.tamilName? (
-        <Text className="text-[#4E6393] text-base mt-1">{getProposeName(item)}</Text>
-
-        ): null}
+          <View>
+            <Text
+              style={[{ fontSize: 16 }, getTextStyle()]}
+              className="text-lg font-bold"
+            >
+              {t("Dashboard.Hello")}, {getName()}
+            </Text>
+            <Text className="text-[#6E7F96] text-lg">{profile?.empId}</Text>
+          </View>
+        </TouchableOpacity>
+        <View></View>
       </View>
-    </TouchableOpacity>
-          )}
-        />
-
-<TouchableOpacity
-  disabled={!visitsData || currentIndex >= visitsData.length - 1}
-  onPress={() => scrollToIndex(currentIndex + 1)}
-  className="p-1"
->
-  <AntDesign
-    name="right"
-    size={24}
-    color={
-      !visitsData || currentIndex >= visitsData.length - 1 ? "#ccc" : "#FF1D85"
-    }
-  />
-</TouchableOpacity>
-      </View>
-): 
-(
-  <View className=" justify-center items-center mt-4">
-    <Image source={require('../../assets/no tasks.webp')}
-           style={{
-            width: 140,
-            height: 100,
-          }}
-          resizeMode="contain" />
-          <Text className="italic text-[#787878]">{t("Dashboard.No Jobs for Today")}</Text>
-  </View>
-)
-}
-        
-
-<View className="p-2 mt-10">
-        <Text className="text-base font-bold mb-3">{t("Dashboard.Saved Draft")}</Text>
-
-</View>
-
-      <View className="p-8 -mt-10">
-            <View className="border border-[#FF1D85] rounded-lg p-3 mr-4 w-full flex-row justify-between items-center">
-              <View>
-                <Text className="text-black text-sm font-medium">#20251012001</Text>
-                <Text className="text-base font-bold mt-1">Ravin Kaluhennadige</Text>
-                <Text className="text-[#4E6393] text-base mt-1">Consultation</Text>
-              </View>
-             
-<AnimatedCircularProgress
-  size={70}
-  width={6}
-  fill={85}
-  tintColor="#FF6B6B"
-  backgroundColor="#E8DEF8"
-  onAnimationComplete={() => console.log('Animation complete')}
->
-  {(fill: number) => (
-    <Text className="text-black text-base font-semibold">
-      {Math.round(fill)}%
-    </Text>
-  )}
-</AnimatedCircularProgress>
-
+      {loadingVisitsdrafts ? (
+        <LoadingSkeleton />
+      ) : (
+        <>
+          <View className="p-2 mt-4">
+            <View className="flex-row justify-between items-center mb-1">
+              <Text className="text-base font-bold">
+                {t("Dashboard.Today Visits")}{" "}
+                <Text className="text-[#4E6393]">
+                  ({visitsData.length.toString().padStart(2, "0")})
+                </Text>
+              </Text>
+              <TouchableOpacity
+                onPress={() => navigation.navigate("ViewAllVisits")}
+              >
+                <Text className="text-pink-500 font-semibold">
+                  {t("Dashboard.View All")}
+                </Text>
+              </TouchableOpacity>
             </View>
-      </View>
+          </View>
+          {visitsData.length > 0 ? (
+            <View className="flex-row items-center">
+              <TouchableOpacity
+                disabled={!visitsData || currentIndex <= 0}
+                onPress={() => scrollToIndex(currentIndex - 1)}
+                className="p-1"
+              >
+                <AntDesign
+                  name="left"
+                  size={24}
+                  color={!visitsData || currentIndex <= 0 ? "#ccc" : "#FF1D85"}
+                />
+              </TouchableOpacity>
 
-        <View className="p-8  -mt-4">
+              <FlatList
+                ref={flatListRef}
+                horizontal
+                data={visitsData}
+                keyExtractor={(item, index) => `${item.jobId}-${index}`}
+                showsHorizontalScrollIndicator={false}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    className="border border-[#FF1D85] rounded-lg p-3 mr-4 "
+                       style={{ width: wp("77%") }}
+                    activeOpacity={0.8}
+                    onPress={() => {
+                      //requested comes from govilinkjobs , individual comes from farmaudits
+                      if (
+                        item.propose === "Individual" ||
+                        item.propose === "Requested"
+                      ) {
+                        setSelectedItem(item);
+                        setShowPopup(true);
+                      } else {
+                        navigation.navigate("ViewFarmsCluster", {
+                          jobId: item.jobId,
+                          feildauditId: item.id,
+                          farmName: item.farmerName,
+                        });
+                        {
+                          /*if cluster need send  clusterID , jobId    */
+                        }
+                      }
+                    }}
+                  >
+                    <View>
+                      <Text className="text-black text-sm font-medium">
+                        #{item.jobId}
+                      </Text>
+                      {item.farmerName ? (
+                        <Text className="text-base font-bold mt-1">
+                          {item.farmerName}
+                        </Text>
+                      ) : null}
+                      {/* {item.propose ? (
+                        <Text className="text-[#4E6393] text-base mt-1">
+                          {(() => {
+                            if (item.propose === "Cluster") {
+                              switch (i18n.language) {
+                                case "si":
+                                  return "ගොවි සමූහ විගණනය";
+                                case "ta":
+                                  return "உழவர் குழு தணிக்கை";
+                                default:
+                                  return "Farm Cluster Audit";
+                              }
+                            } else if (item.propose === "Individual") {
+                              switch (i18n.language) {
+                                case "si":
+                                  return "තනි ගොවි විගණනය";
+                                case "ta":
+                                  return "தனிப்பட்ட விவசாயி தணிக்கை";
+                                default:
+                                  return "Individual Farmer Audit";
+                              }
+                            } else {
+                              switch (i18n.language) {
+                                case "si":
+                                  return item.servicesinhalaName || "";
+                                case "ta":
+                                  return item.servicetamilName || "";
+                                default:
+                                  return item.serviceenglishName || "";
+                              }
+                            }
+                          })()}
+                        </Text>
+                      ) : null}
+                      {item.englishName ||
+                      item.sinhalaName ||
+                      item.tamilName ? (
+                        <Text className="text-[#4E6393] text-base mt-1">
+                          {getProposeName(item)}
+                        </Text>
+                      ) : null} */}
+                       <Text className="text-[#4E6393] text-sm mt-1">
+  {truncateText(
+    (() => {
+      if (item.propose === "Cluster") {
+        switch (i18n.language) {
+          case "si":
+            return "ගොවි සමූහ විගණනය";
+          case "ta":
+            return "உழவர் குழு தணிக்கை";
+          default:
+            return "Farm Cluster Audit";
+        }
+      } else if (item.propose === "Individual") {
+        switch (i18n.language) {
+          case "si":
+            return "තනි ගොවි විගණනය";
+          case "ta":
+            return "தனிப்பட்ட விவசாயி தணிக்கை";
+          default:
+            return "Individual Farmer Audit";
+        }
+      } else {
+        switch (i18n.language) {
+          case "si":
+            return item.servicesinhalaName || "";
+          case "ta":
+            return item.servicetamilName || "";
+          default:
+            return item.serviceenglishName || "";
+        }
+      }
+    })()
+  )}
+</Text>
+                    </View>
+                  </TouchableOpacity>
+                )}
+              />
+
+              <TouchableOpacity
+                disabled={!visitsData || currentIndex >= visitsData.length - 1}
+                onPress={() => scrollToIndex(currentIndex + 1)}
+                className="p-1"
+              >
+                <AntDesign
+                  name="right"
+                  size={24}
+                  color={
+                    !visitsData || currentIndex >= visitsData.length - 1
+                      ? "#ccc"
+                      : "#FF1D85"
+                  }
+                />
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View className=" justify-center items-center mt-4">
+              <Image
+                source={require("../../assets/no tasks.webp")}
+                style={{
+                  width: 140,
+                  height: 100,
+                }}
+                resizeMode="contain"
+              />
+              <Text className="italic text-[#787878] mt-2 text-center">
+                {t("Dashboard.No Jobs for Today")}
+              </Text>
+            </View>
+          )}
+
+          <View className="p-2 mt-10">
+            <Text className="text-base font-bold mb-3">
+              {t("Dashboard.Saved Draft")}
+            </Text>
+          </View>
+
+          <View className="">
+            {/* Drafts done for only individual audit */}
+            {draftVisits.length > 0 ? (
+              <View className="flex-row items-center">
+                {/* Left Arrow */}
+                <TouchableOpacity
+                  disabled={currentDraftIndex <= 0}
+                  onPress={() => scrollDraftToIndex(currentDraftIndex - 1)}
+                  className="p-1"
+                >
+                  <AntDesign
+                    name="left"
+                    size={24}
+                    color={currentDraftIndex <= 0 ? "#ccc" : "#FF1D85"}
+                  />
+                </TouchableOpacity>
+
+                {/* Drafts FlatList */}
+                <FlatList
+                  ref={draftFlatListRef}
+                  horizontal
+                  data={draftVisits}
+                  keyExtractor={(item, index) => `${item.jobId}-${index}`}
+                  showsHorizontalScrollIndicator={false}
+                  renderItem={({ item }) => (
+                    <TouchableOpacity
+                      onPress={() => {
+                        if (
+                          item.propose === "Individual" ||
+                          item.propose === "Cluster"
+                        ) {
+                          navigation.navigate("CertificateQuesanory", {
+                            auditId: item.id,
+                            jobId: item.jobId,
+                            certificationpaymentId: item.certificationpaymentId,
+                            farmerMobile: item.farmerMobile,
+                            clusterId: item.clusterId,
+                            farmId: item.farmId,
+                            isClusterAudit: !!item.clusterId,
+                          });
+                        } else {
+                          navigation.navigate("RequestProblem", {
+                            jobId: item.jobId,
+                            farmerId: item.farmerId,
+                            govilinkjobid: item.id,
+                            farmerMobile: item.farmerMobile,
+                          });
+                        }
+                      }}
+                    >
+                      <View className="border border-[#FF1D85] rounded-lg p-3 mb-4 flex-row justify-between items-center mr-4"
+                         style={{ width: wp("77%") }}
+                         >
+                        <View>
+                          <Text className="text-black text-sm font-medium">
+                            #{item.jobId}
+                          </Text>
+                          <Text className="text-base font-bold mt-1">
+                            {item.farmerName}
+                          </Text>
+                          <Text className="text-[#4E6393] text-sm mt-1">
+                            {/* {item.propose === "Cluster"
+                              ? i18n.language === "si"
+                                ? "ගොවි සමූහ විගණනය"
+                                : i18n.language === "ta"
+                                ? "உழவர் குழு தணிக்கை"
+                                : "Farm Cluster Audit"
+                              : item.propose === "Requested"
+                              ? i18n.language === "si"
+                                ? item.servicesinhalaName
+                                : i18n.language === "ta"
+                                ? item.servicetamilName
+                                : item.serviceenglishName
+                              : item.propose === "Individual"
+                              ? "Farmer Service Request"
+                              : i18n.language === "si"
+                              ? "තනි ගොවි විගණනය"
+                              : i18n.language === "ta"
+                              ? "தனிப்பட்ட விவசாயி தணிக்கை"
+                              : "Individual Farmer Audit"} */}
+                                   {truncateTextDraft(
+    (() => {
+      if (item.propose === "Cluster") {
+        switch (i18n.language) {
+          case "si":
+            return "ගොවි සමූහ විගණනය";
+          case "ta":
+            return "உழவர் குழு தணிக்கை";
+          default:
+            return "Farm Cluster Audit";
+        }
+      } else if (item.propose === "Individual") {
+        switch (i18n.language) {
+          case "si":
+            return "තනි ගොවි විගණනය";
+          case "ta":
+            return "தனிப்பட்ட விவசாயி தணிக்கை";
+          default:
+            return "Individual Farmer Audit";
+        }
+      } else {
+        switch (i18n.language) {
+          case "si":
+            return item.servicesinhalaName || "";
+          case "ta":
+            return item.servicetamilName || "";
+          default:
+            return item.serviceenglishName || "";
+        }
+      }
+    })()
+  )}
+                          </Text>
+                        </View>
+
+                        <AnimatedCircularProgress
+                          size={70}
+                          width={6}
+                          fill={item.completionPercentage || 0}
+                          tintColor="#FF6B6B"
+                          backgroundColor="#E8DEF8"
+                        >
+                          {(fill: number) => (
+                            <Text className="text-black text-base font-semibold">
+                              {Math.round(fill)}%
+                            </Text>
+                          )}
+                        </AnimatedCircularProgress>
+                      </View>
+                    </TouchableOpacity>
+                  )}
+                />
+
+                {/* Right Arrow */}
+                <TouchableOpacity
+                  disabled={currentDraftIndex >= draftVisits.length - 1}
+                  onPress={() => scrollDraftToIndex(currentDraftIndex + 1)}
+                  className="p-1"
+                >
+                  <AntDesign
+                    name="right"
+                    size={24}
+                    color={
+                      currentDraftIndex >= draftVisits.length - 1
+                        ? "#ccc"
+                        : "#FF1D85"
+                    }
+                  />
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <View className="items-center justify-center mt-2">
+                <Image
+                  source={require("../../assets/no drafts.webp")}
+                  style={{ width: 110, height: 80 }}
+                  resizeMode="contain"
+                />
+                <Text className="italic text-[#787878] mt-4 text-center">
+                  {t("Dashboard.No Saved Drafts for Today")}
+                </Text>
+              </View>
+            )}
+          </View>
+        </>
+      )}
+        <View className="p-8  ">
           <TouchableOpacity
+          onPress={()=> navigation.navigate("ViewAllVisits")}
           className="bg-[#FFE5D6] rounded-lg p-3 h-28 mr-4 w-full flex-row justify-between items-center"
               style={{
     shadowColor: "#000",
@@ -426,60 +820,214 @@ const screenWidth = Dimensions.get("window").width;
 
             </TouchableOpacity>
       </View>
-
-            <Modal transparent visible={showPopup} animationType="slide">
-     <View className="absolute bottom-0  flex-1 w-full ">
-    <View className="bg-white rounded-t-3xl p-5 w-full ">
-      <Text className="text-lg font-bold text-[#434343] mb-2">
-        {t("Dashboard.Assigned Target")}
-      </Text>
-
-      <Text className="text-sm text-[#555]">
-        Target details or progress will appear here.
-      </Text>
-
-      <View className="items-center mt-4">
-        {/* <View className="flex flex-row gap-10">
-        <Text className="rounded-full text-base border font-normal border-[#9DB2CE] px-10 py-1">
-          Location
-        </Text>
-          <Text className="rounded-full text-base border font-normal border-[#F83B4F] px-10 py-1">
-          Get Call
-        </Text>
-        </View> */}
-                <View className="flex flex-row justify-center gap-10 mb-6">
-          {/* Location Button */}
-          <View className="flex-row items-center border border-[#9DB2CE] rounded-full px-6 py-2">
-            <Ionicons name="location-outline" size={20} color="#9DB2CE" />
-            <Text className="text-base font-normal text-[#434343] ml-2">
-              Location
-            </Text>
-          </View>
-
-          {/* Call Button */}
-          <View className="flex-row items-center border border-[#F83B4F] rounded-full px-6 py-2">
-            <Feather name="phone-call" size={18} color="#F83B4F" />
-            <Text className="text-base font-normal text-[#434343] ml-2 text-center">
-              Get Call
-            </Text>
-          </View>
-        </View>
-
-        <TouchableOpacity onPress={() => setShowPopup(false)}>
-          <LinearGradient
-            colors={["#F2561D", "#FF1D85"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            className="py-2 px-[40%] items-center justify-center rounded-full"
+      <Modal
+        transparent
+        visible={showPopup}
+        animationType="slide"
+        onRequestClose={() => {
+          console.log("hitt");
+          setShowPopup(false);
+          setSelectedItem(null);
+        }}
+      >
+        <TouchableWithoutFeedback
+          onPress={() => {
+            setShowPopup(false);
+            setSelectedItem(null);
+          }}
+        >
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: "rgba(0,0,0,0.3)",
+              justifyContent: "flex-end",
+            }}
           >
-            <Text className="text-white text-lg font-semibold">Start</Text>
-          </LinearGradient>
-        </TouchableOpacity>
-      </View>
-    </View>
-  </View>
-      </Modal>
+            <TouchableWithoutFeedback>
+              <View className="bg-white rounded-t-3xl p-5 w-full ">
+                <View className="items-center mt-4">
+                  <TouchableOpacity
+                    className="z-50 justify-center items-center"
+                    onPress={() => {
+                      setShowPopup(false);
+                      setSelectedItem(null);
+                    }}
+                  >
+                    <View className="bg-[#D9D9D9] w-20 py-0.5 rounded-full -mt-6" />
+                    <View className="bg-[#D9D9D9] w-8 py-0.5 rounded-full mt-1 mb-6" />
+                  </TouchableOpacity>
 
+                  {selectedItem && (
+                    <>
+                      <Text className="text-base font-semibold text-[#747474]">
+                        #{selectedItem.jobId || "N/A"}
+                      </Text>
+                      <Text className="text-lg font-bold mt-2">
+                        {selectedItem.farmerName || "N/A"}
+                      </Text>
+                      <Text className="text-base font-semibold mt-1">
+                        {(() => {
+                          if (selectedItem.propose === "Individual") {
+                            switch (i18n.language) {
+                              case "si":
+                                return "තනි ගොවි විගණනය";
+                              case "ta":
+                                return "தனிப்பட்ட விவசாயி தணிக்கை";
+                              default:
+                                return "Individual Farmer Audit";
+                            }
+                          } else {
+                            switch (i18n.language) {
+                              case "si":
+                                return selectedItem.servicesinhalaName || "";
+                              case "ta":
+                                return selectedItem.servicetamilName || "";
+                              default:
+                                return selectedItem.serviceenglishName || "";
+                            }
+                          }
+                        })()}
+                      </Text>
+
+                      <Text className="text-sm font-medium text-[#4E6393] mt-1">
+                        {t(`Districts.${selectedItem.district}`)}{" "}
+                        {t("VisitPopup.District")}
+                      </Text>
+                      <View className="flex flex-row justify-center gap-x-2 mb-4 mt-6 px-4">
+                        <TouchableOpacity
+                          className="flex-1"
+                          disabled={
+                            !selectedItem?.latitude || !selectedItem?.longitude
+                          }
+                          onPress={() => {
+                            if (
+                              selectedItem?.latitude &&
+                              selectedItem?.longitude
+                            ) {
+                              const lat = selectedItem.latitude;
+                              const lon = selectedItem.longitude;
+                              const url = `https://www.google.com/maps?q=${lat},${lon}`;
+                              Linking.openURL(url);
+                            }
+                          }}
+                        >
+                          <View
+                            className={`flex flex-row items-center justify-center rounded-full py-2 border ${
+                              selectedItem?.latitude && selectedItem?.longitude
+                                ? "border-[#F83B4F]"
+                                : "border-[#9DB2CE]"
+                            }`}
+                          >
+                            <FontAwesome6
+                              name="location-dot"
+                              size={20}
+                              color={
+                                selectedItem?.latitude &&
+                                selectedItem?.longitude
+                                  ? "#F83B4F"
+                                  : "#9DB2CE"
+                              }
+                            />
+                            <Text
+                              className={`text-base font-semibold ml-2 ${
+                                selectedItem?.latitude &&
+                                selectedItem?.longitude
+                                  ? "text-[#000000]"
+                                  : "text-[#9DB2CE]"
+                              }`}
+                            >
+                              {t("VisitPopup.Location")}
+                            </Text>
+                          </View>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                          className="flex "
+                          onPress={() => handleDial(selectedItem.farmerMobile)}
+                        >
+                          <View className="flex-row items-center justify-center border border-[#F83B4F] rounded-full px-6 py-2">
+                            <Ionicons name="call" size={20} color="#F83B4F" />
+                            <Text className="text-base font-semibold  ml-2">
+                              {t("VisitPopup.Get Call")}
+                            </Text>
+                          </View>
+                        </TouchableOpacity>
+                      </View>
+                      {selectedItem.city ||
+                      selectedItem.plotNo ||
+                      selectedItem.street ? (
+                        <View className="flex text-center justify-center items-center ">
+                          <Text className="text-sm font-semibold text-[#4E6393] mb-2">
+                            {t("VisitPopup.Address")}
+                          </Text>
+
+                          <Text className="text-base font-medium text-[#434343]">
+                            {selectedItem.plotNo}, {selectedItem.street},
+                          </Text>
+
+                          <Text className="text-base  font-medium text-[#434343]">
+                            {selectedItem.city}
+                          </Text>
+                        </View>
+                      ) : null}
+                    </>
+                  )}
+
+                  <TouchableOpacity
+                    onPress={() => {
+                      setShowPopup(false);
+                      if (
+                        selectedItem?.farmerId &&
+                        selectedItem?.propose === "Individual"
+                      ) {
+                        navigation.navigate("QRScanner", {
+                          farmerId: selectedItem.farmerId,
+                          jobId: selectedItem.jobId,
+                          certificationpaymentId:
+                            selectedItem.certificationpaymentId,
+                          farmerMobile: selectedItem.farmerMobile,
+                          farmId: selectedItem.farmId,
+                          clusterId: selectedItem.clusterID,
+                          isClusterAudit: false,
+                          auditId: selectedItem.id,
+                        });
+                      } else if (selectedItem?.propose === "Requested") {
+                        console.log("hitt Request");
+                        navigation.navigate("QRScaneerRequstAudit", {
+                          farmerId: selectedItem.farmerId,
+                          govilinkjobid: selectedItem.id,
+                          jobId: selectedItem.jobId,
+                          farmerMobile: selectedItem.farmerMobile,
+                        });
+                      }
+                    }}
+                  >
+                    <LinearGradient
+                      colors={["#F2561D", "#FF1D85"]}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 0 }}
+                      className={`py-2 items-center justify-center rounded-full mt-4 ${
+                        i18n.language === "si"
+                          ? "px-24"
+                          : i18n.language === "ta"
+                          ? "px-24"
+                          : "px-[40%]"
+                      }`}
+                           style={{
+                        marginBottom:30
+                      }}
+                    >
+                      <Text className="text-white text-lg font-semibold">
+                        {t("VisitPopup.Start")}
+                      </Text>
+                    </LinearGradient>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
     </ScrollView>
   );
 };

@@ -50,7 +50,7 @@ const Splash: React.FC = () => {
 
   const animation = Animated.timing(progressAnim, {
     toValue: 1,
-    duration: 5000,
+    duration: 2000,
     useNativeDriver: false,
   });
 

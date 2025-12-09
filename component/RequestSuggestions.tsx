@@ -12,7 +12,7 @@ import {
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "./types";
-import { AntDesign, Entypo, FontAwesome5 } from "@expo/vector-icons";
+import { AntDesign, Entypo, FontAwesome, FontAwesome5, FontAwesome6 } from "@expo/vector-icons";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -23,18 +23,18 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-type CertificateSuggestionsNavigationProp = StackNavigationProp<
+type RequestSuggestionsNavigationProp = StackNavigationProp<
   RootStackParamList,
-  "CertificateSuggestions"
+  "RequestSuggestions"
 >;
 
-type CertificateSuggestionsRouteProp = RouteProp<
+type RequestSuggestionsRouteProp = RouteProp<
   RootStackParamList,
-  "CertificateSuggestions"
+  "RequestSuggestions"
 >;
 
-interface CertificateSuggestionsProps {
-  navigation: CertificateSuggestionsNavigationProp;
+interface RequestSuggestionsProps {
+  navigation: RequestSuggestionsNavigationProp;
 }
 
 interface ProblemItem {
@@ -72,11 +72,11 @@ const LoadingSkeleton = () => {
     </View>
   );
 };
-const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
+const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
   navigation,
 }) => {
-  const route = useRoute<CertificateSuggestionsRouteProp>();
-  const { jobId, certificationpaymentId, slavequestionnaireId, farmerMobile,isClusterAudit ,farmId, auditId} = route.params;
+  const route = useRoute<RequestSuggestionsRouteProp>();
+  const { farmerId, govilinkjobid, jobId, farmerMobile} = route.params;
   console.log(farmerMobile)
   const { t, i18n } = useTranslation();
   const [problems, setProblems] = useState<ProblemItem[]>([
@@ -101,22 +101,34 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
     setEditingId(id);
   };
 
-  const handleChangeProblem = (
-    id: number,
-    field: "problem" | "solution",
-    value: string
-  ) => {
-      if (value.length === 1 && value[0] === " ") return;
+  // const handleChangeProblem = (
+  //   id: number,
+  //   field: "problem" | "solution",
+  //   value: string
+  // ) => {
+  //   setProblems((prev) =>
+  //     prev.map((item) => (item.id === id ? { ...item, [field]: value } : item))
+  //   );
+  // };
+const handleChangeProblem = (
+  id: number,
+  field: "problem" | "solution",
+  value: string
+) => {
+  // Block single leading space
+  if (value.length === 1 && value[0] === " ") return;
 
   // Capitalize first letter if lowercase
   if (value.length > 0 && value[0] === value[0].toLowerCase()) {
     value = value.charAt(0).toUpperCase() + value.slice(1);
   }
 
-    setProblems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, [field]: value } : item))
-    );
-  };
+  setProblems((prev) =>
+    prev.map((item) =>
+      item.id === id ? { ...item, [field]: value } : item
+    )
+  );
+};
 
   const handleSaveProblem = async (item: ProblemItem) => {
     if (!item.problem.trim() || !item.solution.trim()) {
@@ -125,7 +137,7 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
     }
 
     try {
-          setLoading(true);
+      setLoading(true)
       const token = await AsyncStorage.getItem("token");
       if (!token) {
         Alert.alert(
@@ -138,7 +150,7 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
       let response;
       if (item.saved) {
         response = await axios.put(
-          `${environment.API_BASE_URL}api/officer/update-problem/${item.id}`,
+          `${environment.API_BASE_URL}api/request-audit/update-identifyproblem/${item.id}`,
           {
             problem: item.problem,
             solution: item.solution,
@@ -147,11 +159,11 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
         );
       } else {
         response = await axios.post(
-          `${environment.API_BASE_URL}api/officer/save-problem`,
+          `${environment.API_BASE_URL}api/request-audit/save-identifyproblem`,
           {
             problem: item.problem,
             solution: item.solution,
-            slavequestionnaireId,
+            govilinkjobid,
           },
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -172,10 +184,10 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
       }
     } catch (err) {
       console.error("❌ Error saving/updating problem:", err);
-      Alert.alert(t("Error.Sorry"), t("Main.somethingWentWrong"));
-
+      Alert.alert(t("Error.Sorry"), t("Something went wrong while saving. try again later"));
     }finally{
-      setLoading(false);
+            setLoading(false)
+
     }
   };
 
@@ -183,81 +195,48 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
     fetchProblems();
   }, []);
 
-  // const fetchProblems = async () => {
-  //   try {
-  //     setLoading(true);
-  //     const token = await AsyncStorage.getItem("token");
-  //     if (!token) {
-  //          Alert.alert(
-  //         t("Error.Sorry"),
-  //         t("Error.Your login session has expired. Please log in again to continue.")
-  //       );
-  //       return;
-  //     }
+  const fetchProblems = async () => {
+    try {
+      setLoading(true);
+      const token = await AsyncStorage.getItem("token");
+      if (!token) {
+           Alert.alert(
+          t("Error.Sorry"),
+          t("Error.Your login session has expired. Please log in again to continue.")
+        );
+        return;
+      }
 
-  //     const response = await axios.get(
-  //       `${environment.API_BASE_URL}api/officer/get-problems/${slavequestionnaireId}`,
-  //       { headers: { Authorization: `Bearer ${token}` } }
-  //     );
-
-  //     if (response.data.success) {
-  //       const fetchedProblems = response.data.data.map((p: any) => ({
-  //         id: p.id,
-  //         problem: p.problem,
-  //         solution: p.solution,
-  //         saved: true,
-  //       }));
-  //       setProblems(fetchedProblems);
-  //       console.log("fetch problmes", fetchedProblems);
-  //     } else {
-
-  //     }
-  //   } catch (err) {
-  //     console.error("❌ Error fetching problems:", err);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-const fetchProblems = async () => {
-  try {
-    setLoading(true);
-    const token = await AsyncStorage.getItem("token");
-    if (!token) {
-      Alert.alert(
-        t("Error.Sorry"),
-        t("Error.Your login session has expired. Please log in again to continue.")
+      const response = await axios.get(
+        `${environment.API_BASE_URL}api/request-audit/get-identifyproblems/${govilinkjobid}`,
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-      return;
-    }
 
-    const response = await axios.get(
-      `${environment.API_BASE_URL}api/officer/get-problems/${slavequestionnaireId}`,
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-
-    if (response.data.success) {
-      const fetchedProblems = response.data.data.map((p: any) => ({
-        id: p.id,
-        problem: p.problem,
-        solution: p.solution,
-        saved: true,
-      }));
-
-      // If no fetched problems, keep initial empty problem
-      if (fetchedProblems.length === 0) {
+      if (response.data.success) {
+        const fetchedProblems = response.data.data.map((p: any) => ({
+          id: p.id,
+          problem: p.problem,
+          solution: p.solution,
+          saved: true,
+        }));
+        // setProblems(fetchedProblems);
+              if (fetchedProblems.length === 0) {
         setProblems([
           { id: Date.now(), problem: "", solution: "", saved: false },
         ]);
       } else {
         setProblems(fetchedProblems);
       }
+        console.log("fetch problmes", fetchedProblems);
+      } else {
+
+      }
+    } catch (err) {
+      console.error("❌ Error fetching problems:", err);
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    console.error("❌ Error fetching problems:", err);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   const handleCancelEdit = (id: number) => {
     fetchProblems();
@@ -300,24 +279,24 @@ const fetchProblems = async () => {
               otpResponse.data.referenceId
             );
 
-            navigation.navigate("Otpverification", {
+            navigation.navigate("OtpverificationRequestAudit", {
               farmerMobile: farmerMobile,
               jobId:jobId,
-              farmId,
-              auditId,
-              isClusterAudit
+                govilinkjobid:govilinkjobid
             });
             setIsButtonDisabled(false);
              setOtpSendLoading(false);
-          }  catch (error) {
-                      Alert.alert(t("Main.error"), t("SignupForum.otpSendFailed"), [{
-                        text: t("PublicForum.OK"),
-                      }]);
-                      setOtpSendLoading(false);
-                    }finally{
-                      setOtpSendLoading(false);
-                    }
+          } catch (error) {
+            Alert.alert(t("Main.error"), t("SignupForum.otpSendFailed"), [{
+              text: t("PublicForum.OK"),
+            }]);
+            setOtpSendLoading(false);
+          }finally{
+            setOtpSendLoading(false);
+          }
   }
+
+  
   return (
     <KeyboardAvoidingView
       className="flex-1 bg-white"
@@ -442,7 +421,7 @@ const fetchProblems = async () => {
           ))}
           <View className="items-center mt-2">
             <TouchableOpacity
-              className={`bg-[#1A1A1A] p-4 flex-row rounded-3xl flex justify-center items-center ${
+              className={`bg-[#1A1A1A] p-4 rounded-3xl flex justify-center items-center flex-row ${
                 editingId !== null || problems.some((p) => !p.saved)
                   ? "opacity-50"
                   : ""
@@ -450,9 +429,8 @@ const fetchProblems = async () => {
               onPress={handleAddProblem}
               disabled={editingId !== null || problems.some((p) => !p.saved)}
             >
-                            <Entypo name="plus" size={30} color="white" />
-
-              <Text className="text-white text-center font-semibold text-base">
+              <Entypo name="plus" size={30} color="white" />
+              <Text className="text-white text-center font-semibold text-base ml-1">
                 {t("CertificateSuggestions.Add more")}
               </Text>
             </TouchableOpacity>
@@ -461,7 +439,7 @@ const fetchProblems = async () => {
       )}
       <View className="flex-row justify-between p-4 border-t border-gray-200">
         <TouchableOpacity
-          className="flex-row items-center bg-[#444444] px-12 py-3 rounded-full "
+          className="flex-row items-center bg-[#444444] px-12 py-3 rounded-full"
           onPress={() => navigation.goBack()}
         >
           <AntDesign name="arrow-left" size={20} color="#fff" />
@@ -470,7 +448,7 @@ const fetchProblems = async () => {
           </Text>
         </TouchableOpacity>
             {loading || editingId !== null  ? (
-                <View className="flex-row items-center px-12 py-3 rounded-full bg-[#C4C4C4] ">
+                <View className="flex-row items-center px-12 py-3 rounded-full bg-[#C4C4C4]">
           <Text className="mr-2 text-white font-semibold text-base">{t("CertificateQuesanory.Next")}</Text>
           <AntDesign name="arrow-right" size={20} color="#fff" />
         </View>
@@ -532,4 +510,4 @@ const fetchProblems = async () => {
   );
 };
 
-export default CertificateSuggestions;
+export default RequestSuggestions;

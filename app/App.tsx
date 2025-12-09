@@ -31,6 +31,20 @@ import CertificateSuggestions from "@/component/CertificateSuggestions"
 import Otpverification from "@/component/Otpverification";
 import OtpverificationSuccess from "@/component/OtpverificationSuccess";
 import ViewFarmsCluster from "@/component/ViewFarmsCluster";
+import QRScaneerRequstAudit from "@/component/QRScaneerRequstAudit";
+import RequestSuggestions from "@/component/RequestSuggestions";
+import RequestProblem from "@/component/RequestProblem";
+import ManageOfficers from "@/component/ChiefFieldOfficer/ManageOfficers";
+import AddOfficerStep1 from "@/component/ChiefFieldOfficer/AddOfficerStep1";
+import AddOfficerStep2 from "@/component/ChiefFieldOfficer/AddOfficerStep2";
+import AddOfficerStep3 from "@/component/ChiefFieldOfficer/AddOfficerStep3";
+import OtpverificationRequestAudit from "@/component/OtpverificationRequestAudit";
+import ChangePassword from "@/component/ChangePassword";
+import ComplainHistory from "@/component/ComplainHistory";
+import AssignJobs from "@/component/AssignJobs";
+import CapitalRequests from "@/component/ChiefFieldOfficer/CapitalRequests";
+import RequestDetails from "@/component/ChiefFieldOfficer/RequestDetails";
+import AssignJobOfficerList from "@/component/AssignJobOfficerList";
 
 LogBox.ignoreAllLogs(true);
 NativeWindStyleSheet.setOutput({ default: "native" });
@@ -82,8 +96,16 @@ function MainTabs() {
         <>
           <Tab.Screen name="Dashboard" component={Dashboard} />
           <Tab.Screen name="Profile" component={ProfileScreen} />
-            <Tab.Screen name="ViewAllVisits" component={ViewAllVisits} />
-            <Tab.Screen name="QRScanner" component={QRScanner} />
+          <Tab.Screen name="ViewAllVisits" component={ViewAllVisits} />
+
+          <Tab.Screen name="ManageOfficers" component={ManageOfficers} />
+          <Tab.Screen name="AddOfficerStep1" component={AddOfficerStep1} />
+          <Tab.Screen name="AddOfficerStep2" component={AddOfficerStep2} />
+          <Tab.Screen name="AddOfficerStep3" component={AddOfficerStep3} />
+          <Tab.Screen name="AssignJobs" component={AssignJobs} />
+          <Tab.Screen name="CapitalRequests" component={CapitalRequests} />
+          <Tab.Screen name="RequestDetails" component={RequestDetails} />
+          <Tab.Screen name="AssignJobOfficerList" component={AssignJobOfficerList} />
         </>
       ) : (
         <>
@@ -93,6 +115,9 @@ function MainTabs() {
           />
           <Tab.Screen name="Profile" component={ProfileScreen} />
             <Tab.Screen name="ViewAllVisits" component={ViewAllVisits} />
+                      <Tab.Screen name="QRScanner" component={QRScanner} />
+          <Tab.Screen name="QRScaneerRequstAudit" component={QRScaneerRequstAudit} />
+
         </>
       )}
     </Tab.Navigator>
@@ -182,6 +207,13 @@ function AppContent() {
             <Stack.Screen name="Otpverification" component={Otpverification} />
             <Stack.Screen name="OtpverificationSuccess" component={OtpverificationSuccess} />
             <Stack.Screen name="ViewFarmsCluster" component={ViewFarmsCluster} />
+            <Stack.Screen name="RequestSuggestions" component={RequestSuggestions} />
+            <Stack.Screen name="RequestProblem" component={RequestProblem} />
+            <Stack.Screen name="OtpverificationRequestAudit" component={OtpverificationRequestAudit} />
+            <Stack.Screen name="ChangePassword" component={ChangePassword} />
+            <Stack.Screen name="ComplainHistory" component={ComplainHistory} />
+                      <Stack.Screen name="QRScanner" component={QRScanner} />
+          <Stack.Screen name="QRScaneerRequstAudit" component={QRScaneerRequstAudit} />
           </Stack.Navigator>
         </NavigationContainer>
       </SafeAreaView>

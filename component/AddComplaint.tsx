@@ -8,6 +8,7 @@ import {
   Image,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "./types";
@@ -39,19 +40,15 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({ navigation }) =
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
     const [category, setCategory] = useState<any[]>([]);
     const [open, setOpen] = useState(false);
-  
+    const [loading, setLoading] = useState(false);
     const [searchValue, setSearchValue] = useState('');
 const [filteredCategory, setFilteredCategory] = useState<any[]>([]);
   const { t } = useTranslation();
     useEffect(() => {
-      let appName = "GoviLink";
-
-  
-      console.log("appName", appName);
       const fetchComplainCategory = async () => {
         try {
           const response = await axios.get(
-            `${environment.API_BASE_URL}api/complain/get-complain/category/${appName}`
+            `${environment.API_BASE_URL}api/complaint/get-complain-category`
           );
           console.log("response", response.data);
         if (response.data.status === "success") {
@@ -80,15 +77,18 @@ const [filteredCategory, setFilteredCategory] = useState<any[]>([]);
       }
     
       try {
-        const storedToken = await AsyncStorage.getItem("authToken");
+        const storedToken = await AsyncStorage.getItem("token");
         if (!storedToken) {
-          Alert.alert(t("Error.error"), "No authentication token found");
-          return;
+       Alert.alert(
+                t("Error.Sorry"),
+                t("Error.Your login session has expired. Please log in again to continue.")
+              );
+                        return;
         }
     
         console.log(selectedCategory, complaintText);     
-    
-        const apiUrl = `${environment.API_BASE_URL}api/complain/add-complain`;
+    setLoading(true); 
+        const apiUrl = `${environment.API_BASE_URL}api/complaint/add-complaint`;
     
         const response = await axios.post(
           apiUrl,
@@ -111,11 +111,13 @@ const [filteredCategory, setFilteredCategory] = useState<any[]>([]);
        } catch (error: unknown) {
         if (error instanceof Error) {
           console.error("Error message:", error.message);
-          alert(t("AddComplaint.Failed to submit complaint. Please try again."));
+         Alert.alert(t("Error.Sorry"), t("AddComplaint.Failed to submit complaint. Please try again."));
         } else {
           console.error("An unknown error occurred.");
-          alert(t("Main.somethingWentWrong"));
+          Alert.alert(t("Error.Sorry"), t("Main.somethingWentWrong"));
         }
+      } finally {
+        setLoading(false);
       }
     }
 
@@ -178,10 +180,10 @@ const handleSearchChange = (text: string) => {
 
 </View>
             <View className="flex-1 p-4">
-                <View className="items-center mb-6 -mt-10">
+                <View className="items-center mb-6 -mt-12">
                   <Image source={require("../assets/add complaint.webp")} 
                   style={{
-                    width:300,
+                    width:280,
                     height: 200
                   }}
                 resizeMode="contain" />
@@ -204,7 +206,7 @@ const handleSearchChange = (text: string) => {
   placeholder={t("AddComplaint.Select Complaint Category")}
   style={{
     borderColor: "#fff",
-    borderRadius: 30,
+    borderRadius: 15,
     height: 50,
     backgroundColor: "#F6F6F6",
   }}
@@ -236,10 +238,6 @@ const handleSearchChange = (text: string) => {
     value: searchValue,
   }}
 />
-              
-
-                
-
                 <Text className="text-center text-black mb-4 mt-4">
                   -- {t("AddComplaint.We will get back to you within 2 days")} --
                 </Text>
@@ -279,15 +277,20 @@ const handleSearchChange = (text: string) => {
   />
 </View>
 
-                <TouchableOpacity onPress={handleSubmit} className="mx-auto shadow-lg px-4 w-full pb-8 ">
+                <TouchableOpacity onPress={handleSubmit} className="mx-auto shadow-lg px-4 w-full pb-8 "
+                disabled={loading} 
+                >
   <LinearGradient
     colors={["#F2561D", "#FF1D85"]}
     start={{ x: 0, y: 0 }}
     end={{ x: 1, y: 1 }}
     className="py-3 rounded-full items-center"
   >
-    <Text className="text-white text-lg font-bold">{t("AddComplaint.Submit")}</Text>
-  </LinearGradient>
+        {loading ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <Text className="text-white text-lg font-bold">{t("AddComplaint.Submit")}</Text>
+              )}  </LinearGradient>
 </TouchableOpacity>
 
             </View>

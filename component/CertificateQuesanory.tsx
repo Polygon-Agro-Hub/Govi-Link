@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, ScrollView, TouchableOpacity, Image, Alert, ActivityIndicator, Modal } from "react-native";
+import React, { useEffect, useState, useCallback } from "react";
+import { View, Text, ScrollView, TouchableOpacity, Image, Alert, ActivityIndicator, Modal, BackHandler } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RouteProp, useRoute } from "@react-navigation/native";
+import { RouteProp, useRoute , useFocusEffect} from "@react-navigation/native";
 import { RootStackParamList } from "./types";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -73,7 +73,7 @@ const LoadingSkeleton = () => {
 
 const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({ navigation }) => {
   const route = useRoute<GapCertificationRouteProp>();
-  const { jobId, certificationpaymentId,farmerMobile, clusterId, farmId, isClusterAudit,auditId} = route.params; 
+  const { jobId, certificationpaymentId,farmerMobile, clusterId, farmId, isClusterAudit,auditId, screenName} = route.params; 
   const {t,  i18n} = useTranslation();
     const [questions, setQuestions] = useState<Question[]>([]);
 const [CertificateData, setCertificateData] = useState< CertificateData | null>(null);
@@ -124,7 +124,6 @@ useEffect(() => {
           },
           }
         );
-        console.log(response.data.data.logo)
              setQuestions(response.data.data.questions);
          
                 setCertificateData(response.data.data.certificate);
@@ -333,6 +332,24 @@ const handleCameraClose = (imageUri: string | null) => {
   }
 };
 
+useFocusEffect(
+  useCallback(() => {
+    const onBackPress = () => {
+      // Navigate to screenName with params
+      navigation.navigate("Main", {screen:screenName})
+      return true; // prevent default back behavior
+    };
+
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      onBackPress
+    );
+
+    // Cleanup
+    return () => subscription.remove();
+  }, [ screenName])
+);
+
   return (
     <View className="flex-1 bg-white">
       <View className="flex-row items-center px-4 py-4 bg-white shadow-sm border-b border-[#E5E5E5]">
@@ -355,34 +372,42 @@ const handleCameraClose = (imageUri: string | null) => {
 ):(
   <>
   <ScrollView className="p-6">
-        <View className="mb-10">
-        <View className=" items-center mb-8 flex-row justify-center ">
-{CertificateData?.logo && (
-  <Image 
-    source={{ uri: CertificateData.logo }}
-    style={{ width: 140, height: 100 }}
-    resizeMode="contain"
-  />
-)}
-            <View className=" items-start ml-4">
-                  <Text className="text-lg font-semibold  text-center">
-          {CertificateData?.srtName}
-        </Text>
-  <Text className="text-[#555555] text-center">
-  {t("CertificateQuesanory.Started on")} :{" "}
-  {CertificateData?.createdAt
-    ? new Date(CertificateData.createdAt).toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      })
-    : ""}
-</Text>
+        <View className="mb-10 ">
+  <View className="w-full items-center mb-8">
+      {/* Inner row: logo + text */}
+      <View className="flex-row items-center justify-center max-w-[240px]">
+        {/* {CertificateData?.logo && (
+          <Image
+            source={{ uri: CertificateData.logo }}
+            style={{ width: 100, height: 100 }}
+            resizeMode="contain"
+          />
+        )} */}
 
-            </View>
+        <Image 
+          source={require("../assets/staraward.png")}
+          style={{ width: 40, height: 100 }}
+          resizeMode="contain"
+        />
 
+        <View className="ml-4 ">
+          <Text className="text-lg font-semibold text-left">
+            {CertificateData?.srtName} 
+          </Text>
+
+          <Text className="text-[#555555] text-left mt-1">
+            {t("CertificateQuesanory.Started on")} :{" "}
+            {CertificateData?.createdAt
+              ? new Date(CertificateData.createdAt).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                })
+              : ""}
+          </Text>
         </View>
-
+      </View>
+    </View>
 
         {questions.map((q, i) => (
 <View
@@ -398,7 +423,7 @@ const handleCameraClose = (imageUri: string | null) => {
 >
    
 <TouchableOpacity
-  className={`absolute top-4 right-4 border border-black p-1 rounded-full ${
+  className={`absolute top-4  right-4 border border-black p-1 rounded-full ${
     q.officerTickResult === 1 || q.officerUploadImage != null? "bg-black" : "bg-white"
   }`}
   onPress={() => handleCheck(q)}
@@ -429,7 +454,10 @@ const handleCameraClose = (imageUri: string | null) => {
       
 
       <View className="flex-row justify-between p-4 border-t border-gray-200">
-        <TouchableOpacity className="flex-row items-center bg-[#444444] px-12 py-3 rounded-full ml-2"
+        <TouchableOpacity className="flex-row items-center bg-[#444444] px-12 py-3 rounded-full"
+onPress={() => {
+navigation.navigate("Main", {screen: screenName})
+}}
         >
           <AntDesign name="arrow-left" size={20} color="#fff" />
           <Text className="ml-4 text-white font-semibold text-base">{t("CertificateQuesanory.Exit")}</Text>
@@ -454,7 +482,7 @@ const handleCameraClose = (imageUri: string | null) => {
     </LinearGradient>
   </TouchableOpacity>
 ) : (
-  <View className="flex-row items-center px-12 py-3 rounded-full bg-[#C4C4C4] mr-2">
+  <View className="flex-row items-center px-12 py-3 rounded-full bg-[#C4C4C4] ">
     <Text className="mr-2 text-white font-semibold text-base">{t("CertificateQuesanory.Next")}</Text>
     <AntDesign name="arrow-right" size={20} color="#fff" />
   </View>

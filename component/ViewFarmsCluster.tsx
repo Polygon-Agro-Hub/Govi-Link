@@ -129,7 +129,7 @@ const LoadingSkeleton = () => {
 
 const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
   const route = useRoute<ViewFarmsClusterProp>();
-  const { jobId, farmName, feildauditId } = route.params;
+  const { jobId, farmName, feildauditId, screenName } = route.params;
   console.log(jobId, farmName, feildauditId);
   const { t, i18n } = useTranslation();
   const [visitsData, setVisitsData] = useState<VisitsData[]>([]);
@@ -198,8 +198,9 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
         <LoadingSkeleton />
       ) : (
         <>
-          <View className="mt-2 p-2">
+          <View className="flex-1 mt-2 p-2">
             <FlatList
+            className=""
               data={visitsData}
               keyExtractor={(item) => item.id.toString()}
               showsVerticalScrollIndicator={false}
@@ -229,6 +230,7 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
                           clusterId: item.clusterId,
                           farmId: item.farmId,
                           isClusterAudit: !!item.clusterId,
+                          screenName: screenName
                         })
                       }
                     >
@@ -239,14 +241,14 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
                         className="rounded-full px-6 py-2"
                       >
                         <Text className="text-white text-base font-semibold text-center">
-                          {item.jobStatus}
+                          Open
                         </Text>
                       </LinearGradient>
                     </TouchableOpacity>
                   ) : (
                     item.jobStatus === "Start" && (
                       <TouchableOpacity
-                        className="bg-black rounded-full px-6 py-1.5"
+                        className="bg-black rounded-full px-7 py-1.5"
                         onPress={() => {
                           setSelectedItem(item);
                           setShowPopup(true);
@@ -413,11 +415,7 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
                       setShowPopup(false);
 
                       if (selectedItem?.farmerId) {
-                        navigation.navigate("Main" as any, {
-                          screen: "MainTabs",
-                          params: {
-                            screen: "QRScanner",
-                            params: {
+                        navigation.navigate("QRScanner",{
                               farmerId: selectedItem.farmerId,
                               jobId: selectedItem.jobId,
                               certificationpaymentId:
@@ -427,9 +425,10 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
                               clusterId: selectedItem.clusterId,
                               isClusterAudit: true,
                               auditId: selectedItem.feildauditId,
-                            },
-                          },
-                        });
+                               screenName: screenName,
+                            }
+                          
+                        );
                       }
                     }}
                   >
@@ -444,6 +443,9 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
                           ? "px-24"
                           : "px-[40%]"
                       }`}
+                                    style={{
+                        marginBottom:30
+                      }}
                     >
                       <Text className="text-white text-lg font-semibold">
                         {t("VisitPopup.Start")}

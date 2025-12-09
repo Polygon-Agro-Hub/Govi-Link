@@ -118,7 +118,7 @@ export default function CustomDrawerContent(props: any) {
     if (complaint === t("Drawer.Report Complaint")) {
       navigation.navigate("AddComplaint");
     } else if (complaint === t("Drawer.View Complaint History")) {
-      // navigation.navigate("Main", { screen: "ComplainHistory" ,params: {fullname: getFullName }} );
+      navigation.navigate("ComplainHistory");
     }
   };
 
@@ -249,7 +249,7 @@ export default function CustomDrawerContent(props: any) {
             <TouchableOpacity
               className="flex-row items-center py-5"
               onPress={() =>
-                navigation.navigate("Login")}
+                navigation.navigate("ChangePassword", { passwordUpdate: 1 })}
             >
               <View className="bg-[#F4F9FB] rounded-full p-1">
                 <Entypo name="lock" size={20} color="#999999" />

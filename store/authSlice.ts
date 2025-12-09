@@ -48,3 +48,4 @@ const authSlice = createSlice({
 
 export const { setUser, logoutUser, setUserProfile } = authSlice.actions;
 export default authSlice.reducer;
+export const selectUserPersonal = (state: { auth: AuthState }) => state.auth.userProfile;
