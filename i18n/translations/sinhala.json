@@ -108,7 +108,9 @@
     "Other": "වෙනත්",
     "Please fill out all fields.": "කරුණාකර සියලු විස්තර පුරවන්න.",
     "Complaint submitted successfully!": "පැමිණිල්ල එක් කිරීම සාර්ථකයි!",
-    "Failed to submit complaint. Please try again.": "පැමිණිල්ල එක් කිරීම අසාර්ථකයි. කරුණාකර නැවත උත්සාහ කරන්න."
+    "Failed to submit complaint. Please try again.": "පැමිණිල්ල එක් කිරීම අසාර්ථකයි. කරුණාකර නැවත උත්සාහ කරන්න.",
+      "Please select a category.":"කරුණාකර කාණ්ඩයක් තෝරන්න.",
+    "Please enter your complaint.":"කරුණාකර ඔබේ පැමිණිල්ල ඇතුළත් කරන්න."
   },
   "Profile": {
     "Employee ID": "පරිශීලක අංකය",
@@ -355,12 +357,14 @@
     "No Reply": "ප්‍රතිචාරයක් නැත",
     "OK": "හරි",
     "Complaint History": "පැමිණිලි ඉතිහාසය",
-    "No Data": "දත්ත නැත",
+    "No Data": "මෙහි පැමිණිලි නැත!",
     "RefNo": "යොමු අංකය",
     "Sent": "යවන ලදී",
     "View Response": "ප්‍රතිචාරය බලන්න",
     "Opened": "විවෘත කළා",
-    "Closed": "වසා දමන ලදී"
+    "Closed": "වසා දමන ලදී",
+    "See more...":"තවත් බලන්න...",
+    "See less":"අඩුවෙන් බලන්න..."
   },
   "CapitalRequests": {
     "CapitalRequests": "මූල්‍ය ඉල්ලීම්",

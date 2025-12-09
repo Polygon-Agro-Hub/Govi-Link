@@ -122,7 +122,7 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({
     } 
   );
 
-      Alert.alert(t("Error.Success"), t("ChangePassword.Password updated successfully"));
+      Alert.alert(t("Main.Success"), t("ChangePassword.Password updated successfully"));
       navigation.navigate("Login");
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {

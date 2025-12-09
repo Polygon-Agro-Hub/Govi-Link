@@ -14,6 +14,7 @@ import {
   TouchableWithoutFeedback,
   Linking,
   Alert,
+  Dimensions,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
@@ -140,6 +141,14 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
   const openDrawer = () => {
     navigation.dispatch(DrawerActions.openDrawer());
   };
+  const { width, height } = Dimensions.get('window');
+  const screenWidth = width;
+  const dynamicStyles = {
+    cropcardPadding: screenWidth < width ? 0 : 25,
+    dynamicMarginLeft: screenWidth < 376 ? "-ml-5" : "",
+
+  };
+
 
   const scrollToIndex = (index: number) => {
     if (!flatListRef.current || !visitsData || visitsData.length === 0) return;
@@ -450,13 +459,20 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                 onPress={() => navigation.navigate("ViewAllVisits")}
               >
                 <Text className="text-pink-500 font-semibold">
-                  {t("Dashboard.View All")}
+                   {t("Dashboard.View All")}
                 </Text>
               </TouchableOpacity>
             </View>
           </View>
+
           {visitsData.length > 0 ? (
-            <View className="flex-row items-center">
+            <View className="flex-row"
+            style={{
+              flex :1,
+              justifyContent:'center',
+              alignItems:'center'
+            }}
+            >
               <TouchableOpacity
                 disabled={!visitsData || currentIndex <= 0}
                 onPress={() => scrollToIndex(currentIndex - 1)}
@@ -470,6 +486,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
               </TouchableOpacity>
 
               <FlatList
+              className=""
                 ref={flatListRef}
                 horizontal
                 data={visitsData}
@@ -477,8 +494,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                 showsHorizontalScrollIndicator={false}
                 renderItem={({ item }) => (
                   <TouchableOpacity
-                   style={{ width: wp("77%") }}
-                    className="border border-[#FF1D85] rounded-lg p-3 mr-4 "
+style={{ marginHorizontal: 10, padding: dynamicStyles.cropcardPadding, width: wp("72%") }}                    className="border border-[#FF1D85] rounded-lg p-3 mr-4"
                     activeOpacity={0.8}
                     onPress={() => {
                       //requested comes from govilinkjobs , individual comes from farmaudits
@@ -510,47 +526,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                           {item.farmerName}
                         </Text>
                       ) : null}
-                      {/* {item.propose ? (
-                        <Text className="text-[#4E6393] text-base mt-1">
-                          {(() => {
-                            if (item.propose === "Cluster") {
-                              switch (i18n.language) {
-                                case "si":
-                                  return "ගොවි සමූහ විගණනය";
-                                case "ta":
-                                  return "உழவர் குழு தணிக்கை";
-                                default:
-                                  return "Farm Cluster Audit";
-                              }
-                            } else if (item.propose === "Individual") {
-                              switch (i18n.language) {
-                                case "si":
-                                  return "තනි ගොවි විගණනය";
-                                case "ta":
-                                  return "தனிப்பட்ட விவசாயி தணிக்கை";
-                                default:
-                                  return "Individual Farmer Audit";
-                              }
-                            } else {
-                              switch (i18n.language) {
-                                case "si":
-                                  return item.servicesinhalaName || "";
-                                case "ta":
-                                  return item.servicetamilName || "";
-                                default:
-                                  return item.serviceenglishName || "";
-                              }
-                            }
-                          })()}
-                        </Text>
-                      ) : null}
-                      {item.englishName ||
-                      item.sinhalaName ||
-                      item.tamilName ? (
-                        <Text className="text-[#4E6393] text-base mt-1">
-                          {getProposeName(item)}
-                        </Text>
-                      ) : null} */}
+
                       <Text className="text-[#4E6393] text-sm mt-1">
   {truncateText(
     (() => {
@@ -629,10 +605,17 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
             </Text>
           </View>
 
-          <View className="">
+              <View>
             {/* Drafts done for only individual audit */}
             {draftVisits.length > 0 ? (
-              <View className="flex-row items-center">
+              // <View className="flex-row items-center">
+                      <View className="flex-row"
+            style={{
+              flex :1,
+              justifyContent:'center',
+              alignItems:'center'
+            }}
+            >
                 {/* Left Arrow */}
                 <TouchableOpacity
                   disabled={currentDraftIndex <= 0}
@@ -649,12 +632,15 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                 {/* Drafts FlatList */}
                 <FlatList
                   ref={draftFlatListRef}
+                  
                   horizontal
                   data={draftVisits}
                   keyExtractor={(item, index) => `${item.jobId}-${index}`}
                   showsHorizontalScrollIndicator={false}
                   renderItem={({ item }) => (
                     <TouchableOpacity
+
+                       
                       onPress={() => {
                         if (
                           item.propose === "Individual" ||
@@ -681,8 +667,8 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                         }
                       }}
                     >
-                      <View className="border border-[#FF1D85] rounded-lg p-3 mb-4 flex-row justify-between items-center mr-4"
-                        style={{ width: wp("77%") }}
+                      <View 
+                     style={{ marginHorizontal: 10, padding: dynamicStyles.cropcardPadding, width: wp("72%") }}                    className="border border-[#FF1D85] rounded-lg p-3 mr-4 flex-row justify-between"
                       >
                         <View>
                           <Text className="text-black text-sm font-medium">
