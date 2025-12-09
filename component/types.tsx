@@ -17,12 +17,14 @@ export type RootStackParamList = {
     farmId: number;
     isClusterAudit: boolean;
     auditId: number;
+    screenName:any
   };
   QRScaneerRequstAudit: {
     farmerId?: number;
     govilinkjobid?: number;
     jobId?: string;
     farmerMobile?: number;
+    screenName: any
   };
   CertificateQuesanory: {
     jobId?: string;
@@ -32,6 +34,7 @@ export type RootStackParamList = {
     farmId: number;
     isClusterAudit: boolean;
     auditId: number;
+    screenName: any
   };
   CertificateSuggestions: {
     jobId?: string;
@@ -49,7 +52,7 @@ export type RootStackParamList = {
     farmId: number;
     auditId: number;
   };
-  ViewFarmsCluster: { jobId?: string; farmName: string; feildauditId: number };
+  ViewFarmsCluster: { jobId?: string; farmName: string; feildauditId: number, screenName: any };
   RequestSuggestions: {
     farmerId?: number;
     govilinkjobid?: number;
@@ -61,6 +64,7 @@ export type RootStackParamList = {
     govilinkjobid?: number;
     jobId?: string;
     farmerMobile?: number;
+    screenName:any
   };
   OtpverificationRequestAudit: {
     farmerId?: number;

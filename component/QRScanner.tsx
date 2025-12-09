@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -7,14 +7,16 @@ import {
   Animated,
   Image,
   Dimensions,
+  BackHandler
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "./types";
 import { CameraView, Camera } from "expo-camera";
 import { useTranslation } from "react-i18next";
 import {AntDesign} from "@expo/vector-icons";
-import { useRoute, RouteProp } from "@react-navigation/native";
+import { useRoute, RouteProp, useFocusEffect } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
+
 
 type QRScannerNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -31,8 +33,8 @@ const scanningAreaSize = width * 0.8;
 const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
 
     const route = useRoute<QRScannerRouteProp>();
-  const { farmerId, jobId, certificationpaymentId, farmerMobile, clusterId, farmId, isClusterAudit, auditId } = route.params;  
-  console.log("farmerID", farmerId,jobId, certificationpaymentId, farmerMobile, clusterId, farmId, isClusterAudit, auditId )
+  const { farmerId, jobId, certificationpaymentId, farmerMobile, clusterId, farmId, isClusterAudit, auditId, screenName } = route.params;  
+  console.log("farmerID", farmerId,jobId, certificationpaymentId, farmerMobile, clusterId, farmId, isClusterAudit, auditId, screenName )
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanned, setScanned] = useState<boolean>(false);
   const [showPermissionModal, setShowPermissionModal] =
@@ -96,7 +98,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
       throw new Error(t("QRScanner.Wrong QR code"));
     }
         if (userId == farmerId) {
-      navigation.navigate("CertificateQuesanory", { jobId, certificationpaymentId, farmerMobile , clusterId, farmId, isClusterAudit ,  auditId})
+      navigation.navigate("CertificateQuesanory", { jobId, certificationpaymentId, farmerMobile , clusterId, farmId, isClusterAudit ,  auditId, screenName: screenName})
     }
 
 
@@ -129,6 +131,29 @@ const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
   const handleError = (err: any) => {
     console.error("QR Reader Error:", err);
   };
+useFocusEffect(
+  useCallback(() => {
+    const onBackPress = () => {
+      // Navigate to screenName with params
+      if( screenName === "AssignJobs"){
+      navigation.goBack()
+}
+
+      else{
+      navigation.navigate("Main", {screen:screenName})
+      }
+      return true; // prevent default back behavior
+    };
+
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      onBackPress
+    );
+
+    // Cleanup
+    return () => subscription.remove();
+  }, [ screenName])
+);
 
   if (hasPermission === null) {
     return (
@@ -200,7 +225,14 @@ const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
   return (
     <View style={{ flex: 1, position: "relative" }}>
                     <View className="flex-row items-center px-4 py-4 bg-white shadow-sm">
-                      <TouchableOpacity  className="bg-[#F6F6F680] rounded-full p-2 justify-center w-10 z-20 " onPress={() => navigation.goBack()}>
+                      <TouchableOpacity  className="bg-[#F6F6F680] rounded-full p-2 justify-center w-10 z-20 " 
+  onPress={() => {
+    if (screenName === "AssignJobs") {
+      navigation.goBack();
+    } else {
+      navigation.navigate("Main", { screen: screenName });
+    }
+  }}                      >
                         <AntDesign name="left" size={22} color="#000" />
                       </TouchableOpacity>
        

@@ -69,7 +69,7 @@ console.log("Today date:", currentDay);
 const [isOverdueSelected, setIsOverdueSelected] = useState(false);
 const [loading, setLoading] = useState(false);
 
-  const dates = Array.from({ length: 8 }, (_, i) => today.add(i, "day"));
+  const dates = Array.from({ length: 14 }, (_, i) => today.add(i, "day"));
 const [visits, setVisits] = useState<VisitItem[]>([]);
 
 
@@ -260,7 +260,9 @@ const pendingCount = filteredVisits.filter((item) => {
     </View>
 ):
 (
-<ScrollView className="mt-6 px-4 bg-white rounded-t-3xl">
+<ScrollView className="mt-6 px-4 bg-white rounded-t-3xl"
+  contentContainerStyle={{ paddingBottom: 80 }}
+  >
   {filteredVisits.length > 0 ? (
     [...filteredVisits]
       .sort((a, b) => {
@@ -306,6 +308,7 @@ const pendingCount = filteredVisits.filter((item) => {
                   jobId: item.jobId,
                   feildauditId: item.id,
                   farmName: item.farmerName || "",
+                  screenName: "ViewAllVisits"
                 });
               }
             }}
@@ -545,16 +548,19 @@ const pendingCount = filteredVisits.filter((item) => {
                     onPress={() => {
     setShowPopup(false);
     if (selectedItem?.farmerId && selectedItem?.propose === "Individual") {
-      navigation.navigate("QRScanner", { farmerId: selectedItem.farmerId, jobId: selectedItem.jobId , certificationpaymentId: selectedItem.certificationpaymentId, farmerMobile:selectedItem.farmerMobile, farmId:selectedItem.farmId, clusterId:selectedItem.clusterID , isClusterAudit:false,  auditId:selectedItem.id });
+      navigation.navigate("QRScanner", { farmerId: selectedItem.farmerId, jobId: selectedItem.jobId , certificationpaymentId: selectedItem.certificationpaymentId, farmerMobile:selectedItem.farmerMobile, farmId:selectedItem.farmId, clusterId:selectedItem.clusterID , isClusterAudit:false,  auditId:selectedItem.id,  screenName: "ViewAllVisits" });
     } else if (selectedItem?.propose === "Requested") {
        console.log("hitt Request")
-       navigation.navigate("QRScaneerRequstAudit", { farmerId: selectedItem.farmerId, govilinkjobid: selectedItem.id , jobId: selectedItem.jobId, farmerMobile:selectedItem.farmerMobile  });
+       navigation.navigate("QRScaneerRequstAudit", { farmerId: selectedItem.farmerId, govilinkjobid: selectedItem.id , jobId: selectedItem.jobId, farmerMobile:selectedItem.farmerMobile, screenName: "ViewAllVisits"  });
     }
   }}>
                     <LinearGradient
                       colors={["#F2561D", "#FF1D85"]}
                       start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 0 }}
+                                    style={{
+                        marginBottom:30
+                      }}
                       className= {`py-2 items-center justify-center rounded-full mt-4 ${i18n.language==="si"? "px-24": i18n.language === "ta"? "px-24": "px-[40%]"}`}
                     >
                       <Text className="text-white text-lg font-semibold">

@@ -362,7 +362,7 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
           </View>
         ) : officers.length > 0 ? (
           <ScrollView
-            className="flex-1 bg-white"
+            className="flex-1 bg-white mb-10"
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: 20 }}
           >

@@ -67,7 +67,7 @@
 "Password updated successfully":"Password updated successfully"
   },
   "Login": {
-    "Welcome": "Welcome",
+    "Welcome": "Welcome!",
     "Please Sign in to login": "Please Sign in to login",
     "Employee ID": "Employee ID",
     "Password": "Password",
@@ -210,8 +210,9 @@
     "Cancel": "Cancel",
     "Verification Successful": "Verification Successful",
     "Your phone number has been verified successfully.": "Your phone number has been verified successfully.",
-    "Invalid OTP": "Invalid OTP",
-    "Your OTP is invalid or expired.": "Your OTP is invalid or expired.",
+    "Invalid OTP": "OTP Expired",
+    "OTP Expired":"OTP Expired",
+    "Your OTP is invalid or expired.": "Your OTP has expired. Please request a new one to continue.",
     "Try Again": "Try Again",
     "The OTP you entered is incorrect. Please try again.": "The OTP you entered is incorrect. Please try again.",
     "Success": "Success",
@@ -239,7 +240,7 @@
     "The scanned QR code does not contain a valid user ID or is damaged.": "The scanned QR code does not contain a valid user ID or is damaged."
   },
   "RequestProblem": {
-    "Farmer’s Say": "Farmer’s Say",
+    "FarmerSay": "Farmer’s Say",
     "Advice Given": "Advice Given",
     "Type here...": "Type here...",
     "Photo": "Photo",

@@ -12,7 +12,7 @@ import {
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "./types";
-import { AntDesign, FontAwesome5 } from "@expo/vector-icons";
+import { AntDesign, Entypo, FontAwesome5 } from "@expo/vector-icons";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -106,6 +106,13 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
     field: "problem" | "solution",
     value: string
   ) => {
+      if (value.length === 1 && value[0] === " ") return;
+
+  // Capitalize first letter if lowercase
+  if (value.length > 0 && value[0] === value[0].toLowerCase()) {
+    value = value.charAt(0).toUpperCase() + value.slice(1);
+  }
+
     setProblems((prev) =>
       prev.map((item) => (item.id === id ? { ...item, [field]: value } : item))
     );
@@ -118,6 +125,7 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
     }
 
     try {
+          setLoading(true);
       const token = await AsyncStorage.getItem("token");
       if (!token) {
         Alert.alert(
@@ -165,6 +173,9 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
     } catch (err) {
       console.error("❌ Error saving/updating problem:", err);
       Alert.alert(t("Error.Sorry"), t("Main.somethingWentWrong"));
+
+    }finally{
+      setLoading(false);
     }
   };
 
@@ -172,41 +183,81 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
     fetchProblems();
   }, []);
 
-  const fetchProblems = async () => {
-    try {
-      setLoading(true);
-      const token = await AsyncStorage.getItem("token");
-      if (!token) {
-           Alert.alert(
-          t("Error.Sorry"),
-          t("Error.Your login session has expired. Please log in again to continue.")
-        );
-        return;
-      }
+  // const fetchProblems = async () => {
+  //   try {
+  //     setLoading(true);
+  //     const token = await AsyncStorage.getItem("token");
+  //     if (!token) {
+  //          Alert.alert(
+  //         t("Error.Sorry"),
+  //         t("Error.Your login session has expired. Please log in again to continue.")
+  //       );
+  //       return;
+  //     }
 
-      const response = await axios.get(
-        `${environment.API_BASE_URL}api/officer/get-problems/${slavequestionnaireId}`,
-        { headers: { Authorization: `Bearer ${token}` } }
+  //     const response = await axios.get(
+  //       `${environment.API_BASE_URL}api/officer/get-problems/${slavequestionnaireId}`,
+  //       { headers: { Authorization: `Bearer ${token}` } }
+  //     );
+
+  //     if (response.data.success) {
+  //       const fetchedProblems = response.data.data.map((p: any) => ({
+  //         id: p.id,
+  //         problem: p.problem,
+  //         solution: p.solution,
+  //         saved: true,
+  //       }));
+  //       setProblems(fetchedProblems);
+  //       console.log("fetch problmes", fetchedProblems);
+  //     } else {
+
+  //     }
+  //   } catch (err) {
+  //     console.error("❌ Error fetching problems:", err);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+const fetchProblems = async () => {
+  try {
+    setLoading(true);
+    const token = await AsyncStorage.getItem("token");
+    if (!token) {
+      Alert.alert(
+        t("Error.Sorry"),
+        t("Error.Your login session has expired. Please log in again to continue.")
       );
-
-      if (response.data.success) {
-        const fetchedProblems = response.data.data.map((p: any) => ({
-          id: p.id,
-          problem: p.problem,
-          solution: p.solution,
-          saved: true,
-        }));
-        setProblems(fetchedProblems);
-        console.log("fetch problmes", fetchedProblems);
-      } else {
-
-      }
-    } catch (err) {
-      console.error("❌ Error fetching problems:", err);
-    } finally {
-      setLoading(false);
+      return;
     }
-  };
+
+    const response = await axios.get(
+      `${environment.API_BASE_URL}api/officer/get-problems/${slavequestionnaireId}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    if (response.data.success) {
+      const fetchedProblems = response.data.data.map((p: any) => ({
+        id: p.id,
+        problem: p.problem,
+        solution: p.solution,
+        saved: true,
+      }));
+
+      // If no fetched problems, keep initial empty problem
+      if (fetchedProblems.length === 0) {
+        setProblems([
+          { id: Date.now(), problem: "", solution: "", saved: false },
+        ]);
+      } else {
+        setProblems(fetchedProblems);
+      }
+    }
+  } catch (err) {
+    console.error("❌ Error fetching problems:", err);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleCancelEdit = (id: number) => {
     fetchProblems();
@@ -391,7 +442,7 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
           ))}
           <View className="items-center mt-2">
             <TouchableOpacity
-              className={`bg-[#1A1A1A] p-4 rounded-3xl w-[50%] flex justify-center items-center ${
+              className={`bg-[#1A1A1A] p-4 flex-row rounded-3xl flex justify-center items-center ${
                 editingId !== null || problems.some((p) => !p.saved)
                   ? "opacity-50"
                   : ""
@@ -399,6 +450,8 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
               onPress={handleAddProblem}
               disabled={editingId !== null || problems.some((p) => !p.saved)}
             >
+                            <Entypo name="plus" size={30} color="white" />
+
               <Text className="text-white text-center font-semibold text-base">
                 {t("CertificateSuggestions.Add more")}
               </Text>
@@ -408,7 +461,7 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
       )}
       <View className="flex-row justify-between p-4 border-t border-gray-200">
         <TouchableOpacity
-          className="flex-row items-center bg-[#444444] px-12 py-3 rounded-full ml-2"
+          className="flex-row items-center bg-[#444444] px-12 py-3 rounded-full "
           onPress={() => navigation.goBack()}
         >
           <AntDesign name="arrow-left" size={20} color="#fff" />
@@ -416,8 +469,8 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
             {t("CertificateQuesanory.Back")}
           </Text>
         </TouchableOpacity>
-            {loading ? (
-                <View className="flex-row items-center px-12 py-3 rounded-full bg-[#C4C4C4] mr-2">
+            {loading || editingId !== null  ? (
+                <View className="flex-row items-center px-12 py-3 rounded-full bg-[#C4C4C4] ">
           <Text className="mr-2 text-white font-semibold text-base">{t("CertificateQuesanory.Next")}</Text>
           <AntDesign name="arrow-right" size={20} color="#fff" />
         </View>

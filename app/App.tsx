@@ -97,8 +97,7 @@ function MainTabs() {
           <Tab.Screen name="Dashboard" component={Dashboard} />
           <Tab.Screen name="Profile" component={ProfileScreen} />
           <Tab.Screen name="ViewAllVisits" component={ViewAllVisits} />
-          <Tab.Screen name="QRScanner" component={QRScanner} />
-          <Tab.Screen name="QRScaneerRequstAudit" component={QRScaneerRequstAudit} />
+
           <Tab.Screen name="ManageOfficers" component={ManageOfficers} />
           <Tab.Screen name="AddOfficerStep1" component={AddOfficerStep1} />
           <Tab.Screen name="AddOfficerStep2" component={AddOfficerStep2} />
@@ -213,6 +212,8 @@ function AppContent() {
             <Stack.Screen name="OtpverificationRequestAudit" component={OtpverificationRequestAudit} />
             <Stack.Screen name="ChangePassword" component={ChangePassword} />
             <Stack.Screen name="ComplainHistory" component={ComplainHistory} />
+                      <Stack.Screen name="QRScanner" component={QRScanner} />
+          <Stack.Screen name="QRScaneerRequstAudit" component={QRScaneerRequstAudit} />
           </Stack.Navigator>
         </NavigationContainer>
       </SafeAreaView>

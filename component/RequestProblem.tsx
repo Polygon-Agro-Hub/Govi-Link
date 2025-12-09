@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect , useCallback} from "react";
 import {
   View,
   Text,
@@ -9,12 +9,14 @@ import {
   Platform,
   Alert,
   Image,
-  Modal
+  Modal,
+  BackHandler,
+  ActivityIndicator
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RouteProp, useRoute } from "@react-navigation/native";
+import { RouteProp, useRoute, useFocusEffect } from "@react-navigation/native";
 import { RootStackParamList } from "./types";
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, FontAwesome5, FontAwesome6 } from "@expo/vector-icons";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
@@ -25,6 +27,7 @@ import {
 } from "react-native-responsive-screen";
 import { environment } from "@/environment/environment";
 import { CameraScreen } from "@/Items/CameraScreen";
+import { Icon } from "react-native-paper";
 
 type RequestProblemNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -38,7 +41,7 @@ interface RequestProblemProps {
 
 const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
   const route = useRoute<RequestProblemRouteProp>();
-  const { govilinkjobid, jobId, farmerId, farmerMobile } = route.params;
+  const { govilinkjobid, jobId, farmerId, farmerMobile, screenName } = route.params;
   console.log("RequestProblem Params:", govilinkjobid, jobId);
   const { t } = useTranslation();
 
@@ -225,6 +228,43 @@ const imageChanged =
   }
 };
 
+useFocusEffect(
+  useCallback(() => {
+    const onBackPress = () => {
+      // Navigate to screenName with params
+      navigation.navigate("Main", {screen:screenName})
+      return true; // prevent default back behavior
+    };
+
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      onBackPress
+    );
+
+    // Cleanup
+    return () => subscription.remove();
+  }, [ screenName])
+);
+
+const handleFarmerFeedbackChange = (text: string) => {
+  // Block leading spaces
+  if (text.length === 1 && text[0] === ' ') return;
+  // Capitalize first letter if first char is lowercase
+  if (text.length > 0 && text[0] === text[0].toLowerCase()) {
+    text = text.charAt(0).toUpperCase() + text.slice(1);
+  }
+  setFarmerFeedback(text);
+};
+
+const handleAdviceChange = (text: string) => {
+  if (text.length === 1 && text[0] === ' ') return;
+  if (text.length > 0 && text[0] === text[0].toLowerCase()) {
+    text = text.charAt(0).toUpperCase() + text.slice(1);
+  }
+  setAdvice(text);
+};
+
+
   return (
     <KeyboardAvoidingView
       className="flex-1 bg-white"
@@ -258,7 +298,7 @@ const imageChanged =
         contentContainerStyle={{ paddingBottom: 120 }}
       >
                <Text className="text-base font-semibold mb-2 mt-1">
-                      {t("RequestProblem.Farmer’s Say")}
+                      {t("RequestProblem.FarmerSay")}
                     </Text>
         <TextInput
           className="border border-[#9DB2CE] rounded-md p-2 mb-4"
@@ -266,21 +306,23 @@ const imageChanged =
           placeholder={t("CertificateSuggestions.Type here...")}
           textAlignVertical="top"
           value={farmerFeedback}
-          onChangeText={setFarmerFeedback}
+          // onChangeText={setFarmerFeedback}
+           onChangeText={handleFarmerFeedbackChange}
           style={{ minHeight: 130 }}
         />
 
         <Text className="text-base font-semibold mb-2">
-          {t("RequestProblem..Advice Given")}
+          {t("RequestProblem.Advice Given")}
         </Text>
 
         <TextInput
-          className="border border-[#9DB2CE] rounded-md p-2 mb-4"
+          className="border border-[#9DB2CE] rounded-md p-2 mb-6"
           multiline
           placeholder={t("CertificateSuggestions.Type here...")}
           textAlignVertical="top"
           value={advice}
-          onChangeText={setAdvice}
+          // onChangeText={setAdvice}
+            onChangeText={handleAdviceChange}
           style={{ minHeight: 130 }}
         />
 
@@ -295,9 +337,10 @@ const imageChanged =
         </TouchableOpacity> */}
           <TouchableOpacity
             onPress={() => setShowCamera(true)}
-            className="bg-black rounded-3xl w-full py-3 items-center justify-center"
+            className="bg-black rounded-3xl w-[50%] self-center py-3 items-center justify-center flex-row space-x-4"
           >
-            <Text className="text-white font-semibold text-base">
+ <FontAwesome6 name="camera" size={24} color="white" />
+             <Text className="text-white font-semibold text-sm">
               {t("RequestProblem.Photo")}
             </Text>
           </TouchableOpacity>
@@ -309,10 +352,10 @@ const imageChanged =
       </ScrollView>
 
       {/* Footer */}
-      <View className="flex-row justify-between p-4 border-t border-gray-200">
+      <View className="flex-row justify-between p-4 border-t border-gray-200 ">
         <TouchableOpacity
-          className="flex-row items-center bg-[#444444] px-12 py-3 rounded-full ml-2"
-          onPress={() => navigation.navigate("Main", {screen: "Dashboard"})}
+          className="flex-row items-center bg-[#444444] px-12 py-3 rounded-full "
+          onPress={() =>   navigation.navigate("Main", {screen:screenName})}
         >
           <AntDesign name="arrow-left" size={20} color="#fff" />
           <Text className="ml-4 text-white font-semibold text-base">
@@ -331,9 +374,14 @@ const imageChanged =
             end={{ x: 1, y: 0 }}
             className="flex-row items-center px-12 py-3 rounded-full"
           >
-            <Text className="mr-4 text-white font-semibold text-base">
+            {loading ?
+            <ActivityIndicator  size="small" color="#fff" style={{ marginRight: 8 }} />
+            : 
+                    <Text className="mr-4 text-white font-semibold text-base">
                 {t("CertificateQuesanory.Next")}
             </Text>
+            }
+    
             <AntDesign name="arrow-right" size={20} color="#fff" />
           </LinearGradient>
         </TouchableOpacity>

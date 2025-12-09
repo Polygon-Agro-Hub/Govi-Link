@@ -104,6 +104,7 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
   useFocusEffect(
     useCallback(() => {
       fetchVisits();
+      setSelectedJobs([])
     }, [selectedDate, isOverdueSelected])
   );
 
@@ -179,6 +180,7 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
         jobId: selectedJob.jobId,
         feildauditId: selectedJob.id,
         farmName: selectedJob.farmerName ?? "",
+        screenName:"AssignJobs"
       });
     }
   };
@@ -188,6 +190,7 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
 
     // Handle navigation based on propose type when Start is pressed in modal
     if (selectedItem.propose === "Individual") {
+      console.log("hit assign jobs")
       navigation.navigate("QRScanner", {
         farmerId: selectedItem.farmerId,
         jobId: selectedItem.jobId,
@@ -197,6 +200,7 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
         clusterId: selectedItem.clusterId,
         isClusterAudit: false,
         auditId: selectedItem.id,
+        screenName:"AssignJobs"
       });
     } else if (selectedItem.propose === "Requested") {
       navigation.navigate("QRScaneerRequstAudit", {
@@ -204,6 +208,7 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
         govilinkjobid: selectedItem.id,
         jobId: selectedItem.jobId,
         farmerMobile: selectedItem.farmerMobile,
+        screenName:"AssignJobs"
       });
     }
 
@@ -399,7 +404,8 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
           <ActivityIndicator size="large" color="#FF1D85" />
         </View>
       ) : visits.length > 0 ? (
-        <ScrollView className="flex-1 mt-4 px-4 bg-white rounded-t-3xl">
+        <ScrollView className="flex-1 mt-4 px-4 bg-white rounded-t-3xl mb-20"
+        >
           {visits.map((item) => (
             <TouchableOpacity
               key={item.jobId}
@@ -442,9 +448,9 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
                       {t(`Districts.${item.district}`)}{" "}
                       {t("VisitPopup.District")}
                     </Text>
-                    <Text className="text-[12px] font-medium text-[#4E6393] mt-1">
+                    {/* <Text className="text-[12px] font-medium text-[#4E6393] mt-1">
                       {item.status}
-                    </Text>
+                    </Text> */}
                   </View>
                 </View>
               </View>
