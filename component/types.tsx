@@ -17,14 +17,14 @@ export type RootStackParamList = {
     farmId: number;
     isClusterAudit: boolean;
     auditId: number;
-    screenName:any
+    screenName: any;
   };
   QRScaneerRequstAudit: {
     farmerId?: number;
     govilinkjobid?: number;
     jobId?: string;
     farmerMobile?: number;
-    screenName: any
+    screenName: any;
   };
   CertificateQuesanory: {
     jobId?: string;
@@ -34,7 +34,7 @@ export type RootStackParamList = {
     farmId: number;
     isClusterAudit: boolean;
     auditId: number;
-    screenName: any
+    screenName: any;
   };
   CertificateSuggestions: {
     jobId?: string;
@@ -52,7 +52,12 @@ export type RootStackParamList = {
     farmId: number;
     auditId: number;
   };
-  ViewFarmsCluster: { jobId?: string; farmName: string; feildauditId: number, screenName: any };
+  ViewFarmsCluster: {
+    jobId?: string;
+    farmName: string;
+    feildauditId: number;
+    screenName: any;
+  };
   RequestSuggestions: {
     farmerId?: number;
     govilinkjobid?: number;
@@ -64,7 +69,7 @@ export type RootStackParamList = {
     govilinkjobid?: number;
     jobId?: string;
     farmerMobile?: number;
-    screenName:any
+    screenName: any;
   };
   OtpverificationRequestAudit: {
     farmerId?: number;
@@ -85,7 +90,10 @@ export type RootStackParamList = {
     selectedJobIds: string[];
     selectedDate: string;
     isOverdueSelected: boolean;
-    propose?: string;
+    propose: string;
     fieldAuditId?: number;
+    fieldAuditIds?: number[];
+    govilinkJobIds?: number[];
+    auditType?: "feildaudits" | "govilinkjobs";
   };
 };
