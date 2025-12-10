@@ -263,46 +263,108 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
   };
 
   // Filter data based on search
+  // const getFilteredCountries = () => {
+  //   if (!countrySearch) return countryData;
+  //   return countryData.filter((country) =>
+  //     getTranslatedCountry(country)
+  //       .toLowerCase()
+  //       .includes(countrySearch.toLowerCase())
+  //   );
+  // };
   const getFilteredCountries = () => {
-    if (!countrySearch) return countryData;
-    return countryData.filter((country) =>
+  if (!countrySearch) return sortCountriesAlphabetically(countryData);
+  return sortCountriesAlphabetically(
+    countryData.filter((country) =>
       getTranslatedCountry(country)
         .toLowerCase()
         .includes(countrySearch.toLowerCase())
-    );
-  };
+    )
+  );
+};
 
-  const getFilteredProvinces = () => {
-    if (!provinceSearch) return availableProvinces;
-    return availableProvinces.filter((province) =>
+const getFilteredProvinces = () => {
+  if (!provinceSearch) return sortProvincesAlphabetically(availableProvinces);
+  return sortProvincesAlphabetically(
+    availableProvinces.filter((province) =>
       getTranslatedProvince(province)
         .toLowerCase()
         .includes(provinceSearch.toLowerCase())
-    );
-  };
+    )
+  );
+};
 
-  const getFilteredDistricts = () => {
-    if (!districtSearch) return availableDistricts;
-    return availableDistricts.filter((district) =>
+const getFilteredDistricts = () => {
+  if (!districtSearch) return sortDistrictsAlphabetically(availableDistricts);
+  return sortDistrictsAlphabetically(
+    availableDistricts.filter((district) =>
       getTranslatedDistrict(district)
         .toLowerCase()
         .includes(districtSearch.toLowerCase())
-    );
-  };
+    )
+  );
+};
 
   const getFilteredBanks = () => {
-    if (!bankSearch) return banks;
-    return banks.filter((bank) =>
+  if (!bankSearch) return sortBanksAlphabetically(banks);
+  return sortBanksAlphabetically(
+    banks.filter((bank) =>
       bank.name.toLowerCase().includes(bankSearch.toLowerCase())
-    );
-  };
+    )
+  );
+};
 
-  const getFilteredBranches = () => {
-    if (!branchSearch) return availableBranches;
-    return availableBranches.filter((branch) =>
+const getFilteredBranches = () => {
+  if (!branchSearch) return sortBranchesAlphabetically(availableBranches);
+  return sortBranchesAlphabetically(
+    availableBranches.filter((branch) =>
       branch.name.toLowerCase().includes(branchSearch.toLowerCase())
-    );
-  };
+    )
+  );
+};
+
+const sortCountriesAlphabetically = (countries: any[]) => {
+  return [...countries].sort((a, b) => {
+    const nameA = getTranslatedCountry(a).toLowerCase();
+    const nameB = getTranslatedCountry(b).toLowerCase();
+    return nameA.localeCompare(nameB);
+  });
+};
+
+// Sort provinces by translated name
+const sortProvincesAlphabetically = (provinces: Array<{ name: { en: string; si: string; ta: string } }>) => {
+  return [...provinces].sort((a, b) => {
+    const nameA = getTranslatedProvince(a).toLowerCase();
+    const nameB = getTranslatedProvince(b).toLowerCase();
+    return nameA.localeCompare(nameB);
+  });
+};
+
+// Sort districts by translated name
+const sortDistrictsAlphabetically = (districts: Array<{ en: string; si: string; ta: string }>) => {
+  return [...districts].sort((a, b) => {
+    const nameA = getTranslatedDistrict(a).toLowerCase();
+    const nameB = getTranslatedDistrict(b).toLowerCase();
+    return nameA.localeCompare(nameB);
+  });
+};
+
+// Sort banks by name
+const sortBanksAlphabetically = (banks: Array<{ id: number; name: string }>) => {
+  return [...banks].sort((a, b) => {
+    const nameA = a.name.toLowerCase();
+    const nameB = b.name.toLowerCase();
+    return nameA.localeCompare(nameB);
+  });
+};
+
+// Sort branches by name
+const sortBranchesAlphabetically = (branches: Array<{ ID: number; name: string }>) => {
+  return [...branches].sort((a, b) => {
+    const nameA = a.name.toLowerCase();
+    const nameB = b.name.toLowerCase();
+    return nameA.localeCompare(nameB);
+  });
+};
 
   // Update display values when language changes
   useEffect(() => {

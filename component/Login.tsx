@@ -188,7 +188,7 @@ if (!response.ok || !data.success) {
   } else {
     Alert.alert(
       t("Error.error"),
-      t("Error.somethingWentWrong")
+      t("Main.somethingWentWrong")
     );
   }
 
