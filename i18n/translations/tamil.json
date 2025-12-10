@@ -108,7 +108,9 @@
     "Other": "மற்றவை",
     "Please fill out all fields.": "தயவுசெய்து அனைத்து புலங்களையும் நிரப்பவும்.",
     "Complaint submitted successfully!": "புகார் வெற்றிகரமாக சேர்க்கப்பட்டது!",
-    "Failed to submit complaint. Please try again.": "புகாரை சேர்க்க முடியவில்லை. தயவுசெய்து மீண்டும் முயற்சிக்கவும்."
+    "Failed to submit complaint. Please try again.": "புகாரை சேர்க்க முடியவில்லை. தயவுசெய்து மீண்டும் முயற்சிக்கவும்.",
+    "Please select a category.":"ஒரு வகையைத் தேர்ந்தெடுக்கவும்.",
+    "Please enter your complaint.":"உங்கள் புகாரை உள்ளிடவும்."
   },
   "Profile": {
     "Employee ID": "பணியாளர் அடையாள எண்",
@@ -354,12 +356,14 @@
     "No Reply": "No Reply", 
     "OK": "சரி",
     "Complaint History": "வரலாற்றைப் காட்டவும்",
-    "No Data": "புகார்கள் எதுவும் கிடைக்கவில்லை.",
+    "No Data": "இங்கே புகார்கள் இல்லை!",
     "RefNo": "RefNoகுறிப்பு எண்",
     "Sent": "அனுப்பப்பட்டது",
     "View Response": "பதிலைக் காண்க",
     "Opened": "திறக்கப்பட்டது",
-    "Closed": "மூடப்பட்டது"
+    "Closed": "மூடப்பட்டது",
+    "See more...":"மேலும் காண்க...",
+    "See less":"குறைவாகப் பாருங்கள்..."
   },
   "CapitalRequests": {
     "CapitalRequests": "Capital Requests",
