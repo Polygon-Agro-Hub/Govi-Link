@@ -97,7 +97,7 @@
     "Complaints": "Complaints",
     "Change Password": "Change Password",
     "Logout": "Logout",
-    "Report Complaint": "Report Complaint",
+    "Report Complaint": "Report a Complaint",
     "View Complaint History": "View Complaint History"
   },
   "AddComplaint": {
@@ -109,7 +109,9 @@
     "Other": "Other",
     "Please fill out all fields.": "Please fill out all fields.",
     "Complaint submitted successfully!": "Complaint submitted successfully!",
-    "Failed to submit complaint. Please try again.": "Failed to submit complaint. Please try again."
+    "Failed to submit complaint. Please try again.": "Failed to submit complaint. Please try again.",
+    "Please select a category.":"Please select a category.",
+    "Please enter your complaint.":"Please enter your complaint."
   },
   "Profile": {
     "Employee ID": "Employee ID",
@@ -355,12 +357,14 @@
     "No Reply": "No Reply",
     "OK": "OK",
     "Complaint History": "Complaint History",
-    "No Data": "No Data",
+    "No Data": "No Complaints Here !",
     "RefNo": "RefNo",
     "Sent": "Sent",
     "View Response": "View Response",
     "Opened": "Opened",
-    "Closed": "Closed"
+    "Closed": "Closed",
+    "See more":"See more...",
+    "See less":"See less..."
   },
   "CapitalRequests": {
     "CapitalRequests": "Capital Requests",

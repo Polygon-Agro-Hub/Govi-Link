@@ -14,6 +14,7 @@ import {
   TouchableWithoutFeedback,
   Linking,
   Alert,
+  Dimensions,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
@@ -139,6 +140,14 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({ navigatio
   const openDrawer = () => {
     navigation.dispatch(DrawerActions.openDrawer());
   };
+    const { width, height } = Dimensions.get('window');
+    const screenWidth = width;
+    const dynamicStyles = {
+      cropcardPadding: screenWidth < width ? 0 : 25,
+      dynamicMarginLeft: screenWidth < 376 ? "-ml-5" : "",
+  
+    };
+  
 
   const scrollToIndex = (index: number) => {
     if (!flatListRef.current || !visitsData || visitsData.length === 0) return;
@@ -455,7 +464,14 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({ navigatio
             </View>
           </View>
           {visitsData.length > 0 ? (
-            <View className="flex-row items-center">
+            // <View className="flex-row items-center">
+              <View className="flex-row"
+                        style={{
+                          flex :1,
+                          justifyContent:'center',
+                          alignItems:'center'
+                        }}
+                        >
               <TouchableOpacity
                 disabled={!visitsData || currentIndex <= 0}
                 onPress={() => scrollToIndex(currentIndex - 1)}
@@ -476,8 +492,7 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({ navigatio
                 showsHorizontalScrollIndicator={false}
                 renderItem={({ item }) => (
                   <TouchableOpacity
-                    className="border border-[#FF1D85] rounded-lg p-3 mr-4 "
-                       style={{ width: wp("77%") }}
+                    style={{ marginHorizontal: 10, padding: dynamicStyles.cropcardPadding, width: wp("72%") }}                    className="border border-[#FF1D85] rounded-lg p-3 mr-4"
                     activeOpacity={0.8}
                     onPress={() => {
                       //requested comes from govilinkjobs , individual comes from farmaudits
@@ -492,6 +507,7 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({ navigatio
                           jobId: item.jobId,
                           feildauditId: item.id,
                           farmName: item.farmerName,
+                          screenName: "Dashboard"
                         });
                         {
                           /*if cluster need send  clusterID , jobId    */
@@ -629,7 +645,14 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({ navigatio
           <View className="">
             {/* Drafts done for only individual audit */}
             {draftVisits.length > 0 ? (
-              <View className="flex-row items-center">
+              // <View className="flex-row items-center">
+                  <View className="flex-row"
+                          style={{
+                            flex :1,
+                            justifyContent:'center',
+                            alignItems:'center'
+                          }}
+                          >
                 {/* Left Arrow */}
                 <TouchableOpacity
                   disabled={currentDraftIndex <= 0}
@@ -665,6 +688,7 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({ navigatio
                             clusterId: item.clusterId,
                             farmId: item.farmId,
                             isClusterAudit: !!item.clusterId,
+                            screenName: "Dashboard"
                           });
                         } else {
                           navigation.navigate("RequestProblem", {
@@ -672,13 +696,17 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({ navigatio
                             farmerId: item.farmerId,
                             govilinkjobid: item.id,
                             farmerMobile: item.farmerMobile,
+                            screenName: "Dashboard"
                           });
                         }
                       }}
                     >
-                      <View className="border border-[#FF1D85] rounded-lg p-3 mb-4 flex-row justify-between items-center mr-4"
+                      {/* <View className="border border-[#FF1D85] rounded-lg p-3 mb-4 flex-row justify-between items-center mr-4"
                          style={{ width: wp("77%") }}
-                         >
+                         > */}
+                          <View 
+                                              style={{ marginHorizontal: 10, padding: dynamicStyles.cropcardPadding, width: wp("72%") }}                    className="border border-[#FF1D85] rounded-lg p-3 mr-4 flex-row justify-between"
+                                               >
                         <View>
                           <Text className="text-black text-sm font-medium">
                             #{item.jobId}
@@ -990,6 +1018,7 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({ navigatio
                           clusterId: selectedItem.clusterID,
                           isClusterAudit: false,
                           auditId: selectedItem.id,
+                          screenName: "Dashboard"
                         });
                       } else if (selectedItem?.propose === "Requested") {
                         console.log("hitt Request");
@@ -998,6 +1027,7 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({ navigatio
                           govilinkjobid: selectedItem.id,
                           jobId: selectedItem.jobId,
                           farmerMobile: selectedItem.farmerMobile,
+                          screenName: "Dashboard"
                         });
                       }
                     }}
