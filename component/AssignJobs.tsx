@@ -60,6 +60,8 @@ interface VisitItem {
   city?: string;
   plotNo?: string;
   street?: string;
+  auditType: "feildaudits" | "govilinkjobs";
+  certificateId?: number;
 }
 
 const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
@@ -104,7 +106,7 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
   useFocusEffect(
     useCallback(() => {
       fetchVisits();
-      setSelectedJobs([])
+      setSelectedJobs([]);
     }, [selectedDate, isOverdueSelected])
   );
 
@@ -180,7 +182,7 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
         jobId: selectedJob.jobId,
         feildauditId: selectedJob.id,
         farmName: selectedJob.farmerName ?? "",
-        screenName:"AssignJobs"
+        screenName: "AssignJobs",
       });
     }
   };
@@ -190,7 +192,7 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
 
     // Handle navigation based on propose type when Start is pressed in modal
     if (selectedItem.propose === "Individual") {
-      console.log("hit assign jobs")
+      console.log("hit assign jobs");
       navigation.navigate("QRScanner", {
         farmerId: selectedItem.farmerId,
         jobId: selectedItem.jobId,
@@ -200,7 +202,7 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
         clusterId: selectedItem.clusterId,
         isClusterAudit: false,
         auditId: selectedItem.id,
-        screenName:"AssignJobs"
+        screenName: "AssignJobs",
       });
     } else if (selectedItem.propose === "Requested") {
       navigation.navigate("QRScaneerRequstAudit", {
@@ -208,7 +210,7 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
         govilinkjobid: selectedItem.id,
         jobId: selectedItem.jobId,
         farmerMobile: selectedItem.farmerMobile,
-        screenName:"AssignJobs"
+        screenName: "AssignJobs",
       });
     }
 
@@ -231,13 +233,62 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
     );
 
     if (firstSelectedJob) {
-      navigation.navigate("AssignJobOfficerList", {
-        selectedJobIds: selectedJobs,
-        selectedDate: selectedDate,
-        isOverdueSelected: isOverdueSelected,
-        propose: firstSelectedJob.propose,
-        fieldAuditId: firstSelectedJob.id,
+      // Prepare the IDs based on auditType
+      const fieldAuditIds: number[] = [];
+      const govilinkJobIds: number[] = [];
+
+      // Get all selected jobs
+      const selectedJobItems = visits.filter((item) =>
+        selectedJobs.includes(item.jobId)
+      );
+
+      // Separate IDs based on auditType
+      selectedJobItems.forEach((job) => {
+        if (job.auditType === "feildaudits") {
+          // For feildaudits, use the id as fieldAuditId
+          fieldAuditIds.push(job.id);
+        } else if (job.auditType === "govilinkjobs") {
+          // For govilinkjobs, use the id as govilinkJobId
+          govilinkJobIds.push(job.id);
+        }
       });
+
+      // Only one type of jobs should be selected at a time
+      // (as per your single selection logic)
+      if (fieldAuditIds.length > 0 && govilinkJobIds.length > 0) {
+        Alert.alert(
+          "Mixed Job Types",
+          "Cannot assign mixed job types at once. Please select jobs of the same type."
+        );
+        return;
+      }
+
+      // Determine which ID to send based on the first selected job
+      let paramsToSend;
+
+      if (firstSelectedJob.auditType === "feildaudits") {
+        paramsToSend = {
+          selectedJobIds: selectedJobs,
+          selectedDate: selectedDate,
+          isOverdueSelected: isOverdueSelected,
+          propose: firstSelectedJob.propose,
+          fieldAuditIds: fieldAuditIds,
+          auditType: firstSelectedJob.auditType,
+        };
+      } else {
+        // For govilinkjobs type
+        paramsToSend = {
+          selectedJobIds: selectedJobs,
+          selectedDate: selectedDate,
+          isOverdueSelected: isOverdueSelected,
+          propose: firstSelectedJob.propose,
+          govilinkJobIds: govilinkJobIds,
+          auditType: firstSelectedJob.auditType,
+        };
+      }
+
+      console.log("Navigating with params:", paramsToSend);
+      navigation.navigate("AssignJobOfficerList", paramsToSend);
     } else {
       Alert.alert(
         "Error",
@@ -404,8 +455,7 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
           <ActivityIndicator size="large" color="#FF1D85" />
         </View>
       ) : visits.length > 0 ? (
-        <ScrollView className="flex-1 mt-4 px-4 bg-white rounded-t-3xl mb-20"
-        >
+        <ScrollView className="flex-1 mt-4 px-4 bg-white rounded-t-3xl mb-20">
           {visits.map((item) => (
             <TouchableOpacity
               key={item.jobId}
@@ -448,9 +498,6 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
                       {t(`Districts.${item.district}`)}{" "}
                       {t("VisitPopup.District")}
                     </Text>
-                    {/* <Text className="text-[12px] font-medium text-[#4E6393] mt-1">
-                      {item.status}
-                    </Text> */}
                   </View>
                 </View>
               </View>
