@@ -179,7 +179,8 @@
     "Something went wrong while updating question.": "Something went wrong while updating question.",
     "Success": "Success",
     "Task complete successfully!": "Task complete successfully!",
-    "Failed to complete task, Please try again": "Failed to complete task, Please try again"
+    "Failed to complete task, Please try again": "Failed to complete task, Please try again",
+    "Are you sure you want to mark this task as incomplete?":"Are you sure you want to mark this task as incomplete?"
   },
   "CertificateSuggestions": {
     "Please mention identified problems and suggestions you made below.": "Please mention identified problems and suggestions you made below.",
