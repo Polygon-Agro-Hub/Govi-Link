@@ -109,7 +109,9 @@
     "Other": "වෙනත්",
     "Please fill out all fields.": "කරුණාකර සියලු විස්තර පුරවන්න.",
     "Complaint submitted successfully!": "පැමිණිල්ල එක් කිරීම සාර්ථකයි!",
-    "Failed to submit complaint. Please try again.": "පැමිණිල්ල එක් කිරීම අසාර්ථකයි. කරුණාකර නැවත උත්සාහ කරන්න."
+    "Failed to submit complaint. Please try again.": "පැමිණිල්ල එක් කිරීම අසාර්ථකයි. කරුණාකර නැවත උත්සාහ කරන්න.",
+      "Please select a category.":"කරුණාකර කාණ්ඩයක් තෝරන්න.",
+    "Please enter your complaint.":"කරුණාකර ඔබේ පැමිණිල්ල ඇතුළත් කරන්න."
   },
   "Profile": {
     "Employee ID": "පරිශීලක අංකය",
@@ -177,7 +179,8 @@
     "Something went wrong while updating question.": "ප්‍රශ්නය යාවත්කාලීන කිරීමේදී දෝෂයක් ඇතිවිය.",
     "Success": "සාර්ථකයි",
     "Task complete successfully!": "කාර්යය සාර්ථකව සම්පූර්ණ විය!",
-    "Failed to complete task, Please try again": "කාර්යය සම්පූර්ණ කිරීම අසාර්ථක විය, කරුණාකර නැවත උත්සාහ කරන්න"
+    "Failed to complete task, Please try again": "කාර්යය සම්පූර්ණ කිරීම අසාර්ථක විය, කරුණාකර නැවත උත්සාහ කරන්න",
+    "Are you sure you want to mark this task as incomplete?":"මෙම කාර්යය අසම්පූර්ණ ලෙස සලකුණු කිරීමට ඔබට අවශ්‍ය බව ඔබට විශ්වාසද?"
   },
   "CertificateSuggestions": {
     "Please mention identified problems and suggestions you made below.": "කරුණාකර හඳුනාගත් ගැටලු සහ ඔබ කළ යෝජනා පහත සඳහන් කරන්න.",
@@ -356,12 +359,14 @@
     "No Reply": "ප්‍රතිචාරයක් නැත",
     "OK": "හරි",
     "Complaint History": "පැමිණිලි ඉතිහාසය",
-    "No Data": "දත්ත නැත",
+    "No Data": "මෙහි පැමිණිලි නැත!",
     "RefNo": "යොමු අංකය",
     "Sent": "යවන ලදී",
     "View Response": "ප්‍රතිචාරය බලන්න",
     "Opened": "විවෘත කළා",
-    "Closed": "වසා දමන ලදී"
+    "Closed": "වසා දමන ලදී",
+    "See more...":"තවත් බලන්න...",
+    "See less":"අඩුවෙන් බලන්න..."
   },
   "CapitalRequests": {
     "CapitalRequests": "මූල්‍ය ඉල්ලීම්",

@@ -239,18 +239,71 @@ const handleCheck = async (q: Question) => {
 
     setLoadingQuestionId(q.id);
     const newTickResult = q.officerTickResult === 1 ? 0 : 1;
+    if (newTickResult === 0) {
+  Alert.alert(
+    t("CertificateQuesanory.Confirm Untick"),
+    t("CertificateQuesanory.Are you sure you want to mark this task as incomplete?"),
+    [
+      { text: t("CertificateQuesanory.Cancel"), style: "cancel" },
+      {
+        text: t("CertificateQuesanory.OK"),
+        onPress: async () => {
+          setLoadingQuestionId(q.id)
+          await updateTickResult(q, newTickResult, token);
+        },
+      },
+    ]
+  );
+  setLoadingQuestionId(null);
+  return;
+}
+
+await updateTickResult(q, newTickResult, token);
+
+    // const response = await axios.put(
+    //   `${environment.API_BASE_URL}api/officer/check-question/${q.id}`,
+    //   { officerTickResult: newTickResult },
+    //   { headers: { Authorization: `Bearer ${token}` } }
+    // );
+
+    // if (response.data?.success || response.status === 200) {
+    //   setQuestions((prev) =>
+    //     prev.map((item) =>
+    //       item.id === q.id ? { ...item, officerTickResult: newTickResult } : item
+    //     )
+    //   );
+    // }
+
+  } catch (err) {
+    console.error("❌ Error updating tickResult:", err);
+    Alert.alert(t("Error.error"), t("CertificateQuesanory.Something went wrong while updating question."));
+  } finally {
+    setLoadingQuestionId(null);
+  }
+};
+
+const updateTickResult = async (q: Question, newValue: number, token: string) => {
+  try {
     const response = await axios.put(
       `${environment.API_BASE_URL}api/officer/check-question/${q.id}`,
-      { officerTickResult: newTickResult },
+      { officerTickResult: newValue },
       { headers: { Authorization: `Bearer ${token}` } }
     );
 
     if (response.data?.success || response.status === 200) {
       setQuestions((prev) =>
         prev.map((item) =>
-          item.id === q.id ? { ...item, officerTickResult: newTickResult } : item
+          item.id === q.id ? { ...item, officerTickResult: newValue } : item
         )
       );
+
+      // Success alert only when ticking
+      if (newValue === 1) {
+        Alert.alert(
+          t("CertificateQuesanory.Success"),
+          t("CertificateQuesanory.Task complete successfully!")
+        );
+      }
     }
   } catch (err) {
     console.error("❌ Error updating tickResult:", err);
@@ -355,7 +408,7 @@ useFocusEffect(
       <View className="flex-row items-center px-4 py-4 bg-white shadow-sm border-b border-[#E5E5E5]">
         <TouchableOpacity
           className="bg-[#F6F6F680] rounded-full p-2 justify-center w-10 z-20"
-          onPress={() => navigation.goBack()}
+          onPress={() =>  navigation.navigate("Main", {screen:screenName})}
         >
           <AntDesign name="left" size={22} color="#000" />
         </TouchableOpacity>

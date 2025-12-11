@@ -347,89 +347,181 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
   };
 
   // API validation checks
-  const checkNICExists = async (nicNumber: string) => {
-    try {
-      setIsValidating(true);
-      const token = await AsyncStorage.getItem("token");
-      const response = await axios.get(
-        `${environment.API_BASE_URL}api/officer/field-officers/check-nic/${nicNumber}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+  // const checkNICExists = async (nicNumber: string) => {
+  //   try {
+  //     setIsValidating(true);
+  //     const token = await AsyncStorage.getItem("token");
+  //     const response = await axios.get(
+  //       `${environment.API_BASE_URL}api/officer/field-officers/check-nic/${nicNumber}`,
+  //       {
+  //         headers: { Authorization: `Bearer ${token}` },
+  //       }
+  //     );
 
-      if (response.data.exists) {
-        setErrors((prev) => ({ ...prev, nic: t("Error.NIC already exists") }));
+  //     if (response.data.exists) {
+  //       setErrors((prev) => ({ ...prev, nic: t("Error.NIC already exists") }));
+  //     }
+  //   } catch (error) {
+  //     console.error("Error checking NIC:", error);
+  //   } finally {
+  //     setIsValidating(false);
+  //   }
+  // };
+  
+
+  // const checkEmailExists = async (email: string) => {
+  //   try {
+  //     setIsValidating(true);
+  //     const token = await AsyncStorage.getItem("token");
+  //     const response = await axios.get(
+  //       `${environment.API_BASE_URL}api/officer/field-officers/check-email/${email}`,
+  //       {
+  //         headers: { Authorization: `Bearer ${token}` },
+  //       }
+  //     );
+
+  //     if (response.data.exists) {
+  //       setErrors((prev) => ({
+  //         ...prev,
+  //         email: t("Error.Email already exists"),
+  //       }));
+  //     }
+  //   } catch (error) {
+  //     console.error("Error checking email:", error);
+  //   } finally {
+  //     setIsValidating(false);
+  //   }
+  // };
+
+  // const checkPhoneExists = async (
+  //   phoneCode: string,
+  //   phoneNumber: string,
+  //   field: string
+  // ) => {
+  //   // Don't check if phone number is empty (for optional phone2)
+  //   if (!phoneNumber.trim()) {
+  //     return;
+  //   }
+
+  //   try {
+  //     setIsValidating(true);
+  //     const token = await AsyncStorage.getItem("token");
+  //     const response = await axios.get(
+  //       `${environment.API_BASE_URL}api/officer/field-officers/check-phone/${phoneCode}/${phoneNumber}`,
+  //       {
+  //         headers: { Authorization: `Bearer ${token}` },
+  //       }
+  //     );
+
+  //     if (response.data.exists) {
+  //       setErrors((prev) => ({
+  //         ...prev,
+  //         [field]:
+  //           field === "phone1"
+  //             ? t("Error.Phone already exists")
+  //             : t("Error.Phone 2 already exists"),
+  //       }));
+  //     } else {
+  //       // Clear the error if phone doesn't exist
+  //       clearFieldError(field);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error checking phone:", error);
+  //   } finally {
+  //     setIsValidating(false);
+  //   }
+  // };
+
+  const checkNICExists = async (nicNumber: string): Promise<boolean> => {
+  try {
+    setIsValidating(true);
+    const token = await AsyncStorage.getItem("token");
+    const response = await axios.get(
+      `${environment.API_BASE_URL}api/officer/field-officers/check-nic/${nicNumber}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
       }
-    } catch (error) {
-      console.error("Error checking NIC:", error);
-    } finally {
-      setIsValidating(false);
+    );
+
+    if (response.data.exists) {
+      setErrors((prev) => ({ ...prev, nic: t("Error.NIC already exists") }));
+      return true; // Error found
     }
-  };
+    return false; // No error
+  } catch (error) {
+    console.error("Error checking NIC:", error);
+    return false;
+  } finally {
+    setIsValidating(false);
+  }
+};
 
-  const checkEmailExists = async (email: string) => {
-    try {
-      setIsValidating(true);
-      const token = await AsyncStorage.getItem("token");
-      const response = await axios.get(
-        `${environment.API_BASE_URL}api/officer/field-officers/check-email/${email}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-      if (response.data.exists) {
-        setErrors((prev) => ({
-          ...prev,
-          email: t("Error.Email already exists"),
-        }));
+const checkEmailExists = async (email: string): Promise<boolean> => {
+  try {
+    setIsValidating(true);
+    const token = await AsyncStorage.getItem("token");
+    const response = await axios.get(
+      `${environment.API_BASE_URL}api/officer/field-officers/check-email/${email}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
       }
-    } catch (error) {
-      console.error("Error checking email:", error);
-    } finally {
-      setIsValidating(false);
+    );
+
+    if (response.data.exists) {
+      setErrors((prev) => ({
+        ...prev,
+        email: t("Error.Email already exists"),
+      }));
+      return true; // Error found
     }
-  };
+    return false; // No error
+  } catch (error) {
+    console.error("Error checking email:", error);
+    return false;
+  } finally {
+    setIsValidating(false);
+  }
+};
 
-  const checkPhoneExists = async (
-    phoneCode: string,
-    phoneNumber: string,
-    field: string
-  ) => {
-    // Don't check if phone number is empty (for optional phone2)
-    if (!phoneNumber.trim()) {
-      return;
-    }
+const checkPhoneExists = async (
+  phoneCode: string,
+  phoneNumber: string,
+  field: string
+): Promise<boolean> => {
+  if (!phoneNumber.trim()) {
+    return false;
+  }
 
-    try {
-      setIsValidating(true);
-      const token = await AsyncStorage.getItem("token");
-      const response = await axios.get(
-        `${environment.API_BASE_URL}api/officer/field-officers/check-phone/${phoneCode}/${phoneNumber}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-      if (response.data.exists) {
-        setErrors((prev) => ({
-          ...prev,
-          [field]:
-            field === "phone1"
-              ? t("Error.Phone already exists")
-              : t("Error.Phone 2 already exists"),
-        }));
-      } else {
-        // Clear the error if phone doesn't exist
-        clearFieldError(field);
+  try {
+    setIsValidating(true);
+    const token = await AsyncStorage.getItem("token");
+    const response = await axios.get(
+      `${environment.API_BASE_URL}api/officer/field-officers/check-phone/${phoneCode}/${phoneNumber}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
       }
-    } catch (error) {
-      console.error("Error checking phone:", error);
-    } finally {
-      setIsValidating(false);
+    );
+
+    if (response.data.exists) {
+      setErrors((prev) => ({
+        ...prev,
+        [field]:
+          field === "phone1"
+            ? t("Error.Phone already exists")
+            : t("Error.Phone 2 already exists"),
+      }));
+      return true; // Error found
+    } else {
+      clearFieldError(field);
+      return false; // No error
     }
-  };
+  } catch (error) {
+    console.error("Error checking phone:", error);
+    return false;
+  } finally {
+    setIsValidating(false);
+  }
+};
 
   const toggleLanguage = (lang: keyof typeof languages) => {
     clearFieldError("languages");
@@ -621,31 +713,177 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     navigation.navigate("ManageOfficers");
   };
 
-  const handleNext = () => {
-    // Mark all fields as touched to show all errors
-    const allFields = [
-      "firstNameEN",
-      "lastNameEN",
-      "firstNameSI",
-      "lastNameSI",
-      "firstNameTA",
-      "lastNameTA",
-      "phone1",
-      "nic",
-      "email",
-      "districts",
-    ];
-    allFields.forEach((field) => markFieldAsTouched(field));
+  // const handleNext = () => {
+  //   // Mark all fields as touched to show all errors
+  //   const allFields = [
+  //     "firstNameEN",
+  //     "lastNameEN",
+  //     "firstNameSI",
+  //     "lastNameSI",
+  //     "firstNameTA",
+  //     "lastNameTA",
+  //     "phone1",
+  //     "nic",
+  //     "email",
+  //     "districts",
+  //   ];
+  //   allFields.forEach((field) => markFieldAsTouched(field));
 
-    if (!validateStep1()) {
+  //   if (!validateStep1()) {
+  //     Alert.alert(
+  //       t("Error.Validation Error"),
+  //       t("Error.Please fix all errors before proceeding")
+  //     );
+  //     return;
+  //   }
+
+  //   // Prepare form data for next step
+  //   const formData = {
+  //     empType: type,
+  //     languages,
+  //     assignDistrict: selectedDistricts,
+  //     firstName: firstNameEN,
+  //     lastName: lastNameEN,
+  //     firstNameSinhala: firstNameSI,
+  //     lastNameSinhala: lastNameSI,
+  //     firstNameTamil: firstNameTA,
+  //     lastNameTamil: lastNameTA,
+  //     phoneCode1: selectedCountryCode1,
+  //     phoneNumber1: phone1,
+  //     phoneCode2: selectedCountryCode2,
+  //     phoneNumber2: phone2,
+  //     nic,
+  //     email,
+  //     profileImage,
+  //   };
+
+  //   navigation.navigate("AddOfficerStep2", { formData });
+  // };
+
+  // Update the handleNext function to check for existing errors
+
+// const handleNext = () => {
+//   // Mark all fields as touched to show all errors
+//   const allFields = [
+//     "firstNameEN",
+//     "lastNameEN",
+//     "firstNameSI",
+//     "lastNameSI",
+//     "firstNameTA",
+//     "lastNameTA",
+//     "phone1",
+//     "nic",
+//     "email",
+//     "districts",
+//   ];
+//   allFields.forEach((field) => markFieldAsTouched(field));
+
+//   // First validate the form structure
+//   if (!validateStep1()) {
+//     Alert.alert(
+//       t("Error.Validation Error"),
+//       t("Error.Please fix all errors before proceeding")
+//     );
+//     return;
+//   }
+
+//   // Check if validation is still in progress
+//   if (isValidating) {
+//     Alert.alert(
+//       t("Error.Please Wait"),
+//       t("Error.Validating your information, please wait...")
+//     );
+//     return;
+//   }
+
+//   // Check if there are any existing validation errors (NIC, email, phone already exists)
+//   if (Object.keys(errors).length > 0) {
+//     // Get the specific error messages
+//     const errorMessages = Object.values(errors).filter(Boolean);
+    
+//     Alert.alert(
+//       t("Error.Validation Error"),
+//       errorMessages.join("\n") || t("Error.Please fix all errors before proceeding")
+//     );
+//     return;
+//   }
+
+//   // Prepare form data for next step
+//   const formData = {
+//     empType: type,
+//     languages,
+//     assignDistrict: selectedDistricts,
+//     firstName: firstNameEN,
+//     lastName: lastNameEN,
+//     firstNameSinhala: firstNameSI,
+//     lastNameSinhala: lastNameSI,
+//     firstNameTamil: firstNameTA,
+//     lastNameTamil: lastNameTA,
+//     phoneCode1: selectedCountryCode1,
+//     phoneNumber1: phone1,
+//     phoneCode2: selectedCountryCode2,
+//     phoneNumber2: phone2,
+//     nic,
+//     email,
+//     profileImage,
+//   };
+
+//   navigation.navigate("AddOfficerStep2", { formData });
+// };
+
+const handleNext = async () => {
+  const allFields = [
+    "firstNameEN",
+    "lastNameEN",
+    "firstNameSI",
+    "lastNameSI",
+    "firstNameTA",
+    "lastNameTA",
+    "phone1",
+    "nic",
+    "email",
+    "districts",
+  ];
+  allFields.forEach((field) => markFieldAsTouched(field));
+
+  if (!validateStep1()) {
+    Alert.alert(
+      t("Error.Validation Error"),
+      t("Error.Please fix all errors before proceeding")
+    );
+    return;
+  }
+
+  if (isValidating) {
+    Alert.alert(
+      t("Error.Please Wait"),
+      t("Error.Validating your information, please wait...")
+    );
+    return;
+  }
+
+  setLoading(true);
+  
+  try {
+    // Perform all API validations and collect results
+    const hasNicError = await checkNICExists(nic);
+    const hasEmailError = await checkEmailExists(email);
+    const hasPhone1Error = await checkPhoneExists(selectedCountryCode1, phone1, "phone1");
+    const hasPhone2Error = phone2.trim() 
+      ? await checkPhoneExists(selectedCountryCode2, phone2, "phone2")
+      : false;
+
+    // If any API validation failed, show error and stop
+    if (hasNicError || hasEmailError || hasPhone1Error || hasPhone2Error) {
       Alert.alert(
         t("Error.Validation Error"),
         t("Error.Please fix all errors before proceeding")
       );
+      setLoading(false);
       return;
     }
 
-    // Prepare form data for next step
+    // All validations passed
     const formData = {
       empType: type,
       languages,
@@ -665,8 +903,17 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
       profileImage,
     };
 
+    setLoading(false);
     navigation.navigate("AddOfficerStep2", { formData });
-  };
+  } catch (error) {
+    console.error("Validation error:", error);
+    setLoading(false);
+    Alert.alert(
+      t("Error.Error"),
+      t("Error.An error occurred during validation")
+    );
+  }
+};
 
   const renderDistrictItem = ({
     item,
@@ -790,9 +1037,9 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
         </View>
 
         {/* Type */}
-        <View className="p-4">
-          <View className="px-6 mt-6">
-            <View className="flex flex-row items-center space-x-6 justify-between">
+        <View className="p-4 ">
+          <View className="px-6 mt-6 items-center ">
+            <View className="flex flex-row items-center space-x-2 justify-between">
               <Text className="text-base font-medium">
                 {t("AddOfficer.Type")}:
               </Text>

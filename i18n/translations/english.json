@@ -97,7 +97,7 @@
     "Complaints": "Complaints",
     "Change Password": "Change Password",
     "Logout": "Logout",
-    "Report Complaint": "Report Complaint",
+    "Report Complaint": "Report a Complaint",
     "View Complaint History": "View Complaint History"
   },
   "AddComplaint": {
@@ -109,7 +109,9 @@
     "Other": "Other",
     "Please fill out all fields.": "Please fill out all fields.",
     "Complaint submitted successfully!": "Complaint submitted successfully!",
-    "Failed to submit complaint. Please try again.": "Failed to submit complaint. Please try again."
+    "Failed to submit complaint. Please try again.": "Failed to submit complaint. Please try again.",
+    "Please select a category.":"Please select a category.",
+    "Please enter your complaint.":"Please enter your complaint."
   },
   "Profile": {
     "Employee ID": "Employee ID",
@@ -177,7 +179,8 @@
     "Something went wrong while updating question.": "Something went wrong while updating question.",
     "Success": "Success",
     "Task complete successfully!": "Task complete successfully!",
-    "Failed to complete task, Please try again": "Failed to complete task, Please try again"
+    "Failed to complete task, Please try again": "Failed to complete task, Please try again",
+    "Are you sure you want to mark this task as incomplete?":"Are you sure you want to mark this task as incomplete?"
   },
   "CertificateSuggestions": {
     "Please mention identified problems and suggestions you made below.": "Please mention identified problems and suggestions you made below.",
@@ -355,12 +358,14 @@
     "No Reply": "No Reply",
     "OK": "OK",
     "Complaint History": "Complaint History",
-    "No Data": "No Data",
+    "No Data": "No Complaints Here !",
     "RefNo": "RefNo",
     "Sent": "Sent",
     "View Response": "View Response",
     "Opened": "Opened",
-    "Closed": "Closed"
+    "Closed": "Closed",
+    "See more":"See more...",
+    "See less":"See less..."
   },
   "CapitalRequests": {
     "CapitalRequests": "Capital Requests",
