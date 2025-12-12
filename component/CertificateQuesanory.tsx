@@ -388,9 +388,13 @@ const handleCameraClose = (imageUri: string | null) => {
 useFocusEffect(
   useCallback(() => {
     const onBackPress = () => {
-      // Navigate to screenName with params
-      navigation.navigate("Main", {screen:screenName})
-      return true; // prevent default back behavior
+      navigation.navigate("Main", {
+        screen: "MainTabs",
+        params: {
+          screen: screenName
+        }
+      });     
+       return true; // prevent default back behavior
     };
 
     const subscription = BackHandler.addEventListener(
@@ -408,7 +412,14 @@ useFocusEffect(
       <View className="flex-row items-center px-4 py-4 bg-white shadow-sm border-b border-[#E5E5E5]">
         <TouchableOpacity
           className="bg-[#F6F6F680] rounded-full p-2 justify-center w-10 z-20"
-          onPress={() =>  navigation.navigate("Main", {screen:screenName})}
+          // onPress={() =>  navigation.navigate("Main", {screen:screenName})}
+                onPress={() =>             
+                      navigation.navigate("Main", {
+        screen: "MainTabs",
+        params: {
+          screen: screenName
+        }
+      }) }
         >
           <AntDesign name="left" size={22} color="#000" />
         </TouchableOpacity>

@@ -115,9 +115,6 @@ function MainTabs() {
           />
           <Tab.Screen name="Profile" component={ProfileScreen} />
             <Tab.Screen name="ViewAllVisits" component={ViewAllVisits} />
-                      <Tab.Screen name="QRScanner" component={QRScanner} />
-          <Tab.Screen name="QRScaneerRequstAudit" component={QRScaneerRequstAudit} />
-
         </>
       )}
     </Tab.Navigator>

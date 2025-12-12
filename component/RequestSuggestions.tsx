@@ -115,14 +115,16 @@ const handleChangeProblem = (
   field: "problem" | "solution",
   value: string
 ) => {
-  // Block single leading space
-  if (value.length === 1 && value[0] === " ") return;
+  // if (value.length === 1 && value[0] === " ") return;
+  // if (value.length > 0 && value[0] === value[0].toLowerCase()) {
+  //   value = value.charAt(0).toUpperCase() + value.slice(1);
+  // }
+  value = value.replace(/^\s+/, "");
 
-  // Capitalize first letter if lowercase
-  if (value.length > 0 && value[0] === value[0].toLowerCase()) {
+  // Capitalize first letter
+  if (value.length > 0) {
     value = value.charAt(0).toUpperCase() + value.slice(1);
   }
-
   setProblems((prev) =>
     prev.map((item) =>
       item.id === id ? { ...item, [field]: value } : item
@@ -437,9 +439,9 @@ const handleChangeProblem = (
           </View>
         </ScrollView>
       )}
-      <View className="flex-row justify-between p-4 border-t border-gray-200">
+    {/* */ }  <View className="flex-row justify-between p-4 border-t border-gray-200">
         <TouchableOpacity
-          className="flex-row items-center bg-[#444444] px-12 py-3 rounded-full"
+          className="flex-row items-center bg-[#444444] px-10 py-3 rounded-full"
           onPress={() => navigation.goBack()}
         >
           <AntDesign name="arrow-left" size={20} color="#fff" />

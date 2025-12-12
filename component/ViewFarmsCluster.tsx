@@ -130,6 +130,8 @@ const LoadingSkeleton = () => {
 const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
   const route = useRoute<ViewFarmsClusterProp>();
   const { jobId, farmName, feildauditId, screenName } = route.params;
+    console.log("indi or clus", screenName)
+
   console.log(jobId, farmName, feildauditId);
   const { t, i18n } = useTranslation();
   const [visitsData, setVisitsData] = useState<VisitsData[]>([]);

@@ -136,7 +136,13 @@ useFocusEffect(
   useCallback(() => {
     const onBackPress = () => {
       // Navigate to screenName with params
-      navigation.navigate("Main", {screen:screenName})
+      // navigation.navigate("Main", {screen:screenName})
+                  navigation.navigate("Main", {
+        screen: "MainTabs",
+        params: {
+          screen: screenName
+        }
+      });   
       return true; // prevent default back behavior
     };
 
@@ -222,7 +228,15 @@ useFocusEffect(
   return (
     <View style={{ flex: 1, position: "relative" }}>
                     <View className="flex-row items-center px-4 py-4 bg-white shadow-sm">
-                      <TouchableOpacity  className="bg-[#F6F6F680] rounded-full p-2 justify-center w-10 z-20 " onPress={() => navigation.navigate("Main", {screen:screenName})}>
+                      <TouchableOpacity  className="bg-[#F6F6F680] rounded-full p-2 justify-center w-10 z-20 " 
+                      onPress={() =>             
+                      navigation.navigate("Main", {
+        screen: "MainTabs",
+        params: {
+          screen: screenName
+        }
+      }) }
+      >
                         <AntDesign name="left" size={22} color="#000" />
                       </TouchableOpacity>
        

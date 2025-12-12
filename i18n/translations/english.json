@@ -214,7 +214,7 @@
     "Cancel": "Cancel",
     "Verification Successful": "Verification Successful",
     "Your phone number has been verified successfully.": "Your phone number has been verified successfully.",
-    "Invalid OTP": "OTP Expired",
+    "Invalid OTP": "Invalid OTP",
     "OTP Expired": "OTP Expired",
     "Your OTP is invalid or expired.": "Your OTP has expired. Please request a new one to continue.",
     "Try Again": "Try Again",

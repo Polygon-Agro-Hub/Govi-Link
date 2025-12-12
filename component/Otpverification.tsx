@@ -140,7 +140,7 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
   if (isOtpExpired) {
     Alert.alert(
       t("Error.Sorry"),
-      t("Otpverification.our OTP is invalid or expired."),
+      t("Otpverification.Your OTP is invalid or expired."),
       [
         { text: t("Otpverification.Resend OTP"), onPress: handleResendOTP },
         { text: t("Otpverification.Cancel", "Cancel"), style: "cancel" }

@@ -106,13 +106,14 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
     field: "problem" | "solution",
     value: string
   ) => {
-      if (value.length === 1 && value[0] === " ") return;
-
-  // Capitalize first letter if lowercase
-  if (value.length > 0 && value[0] === value[0].toLowerCase()) {
+  //     if (value.length === 1 && value[0] === " ") return;
+  // if (value.length > 0 && value[0] === value[0].toLowerCase()) {
+  //   value = value.charAt(0).toUpperCase() + value.slice(1);
+  // }
+  value = value.replace(/^\s+/, "");
+  if (value.length > 0) {
     value = value.charAt(0).toUpperCase() + value.slice(1);
   }
-
     setProblems((prev) =>
       prev.map((item) => (item.id === id ? { ...item, [field]: value } : item))
     );

@@ -8,7 +8,8 @@ import {
   Modal,
   TouchableWithoutFeedback,
   Linking,
-  ActivityIndicator
+  ActivityIndicator,
+  RefreshControl
 } from "react-native";
 import { RootStackParamList } from "@/component/types";
 import { useTranslation } from "react-i18next";
@@ -142,6 +143,15 @@ const pendingCount = filteredVisits.filter((item) => {
   }
 }).length;
 
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+
+    // 🔥 Your API call / re-fetch function here
+    fetchVisits().finally(() => setRefreshing(false));
+  };
+
   const handleDial = (farmerMobile: string) => {
     const phoneUrl = `tel:${farmerMobile}`;
     Linking.openURL(phoneUrl).catch((err) =>
@@ -190,7 +200,7 @@ const pendingCount = filteredVisits.filter((item) => {
 
       {/* Horizontal Date Selector */}
       <ScrollView
-       ref={scrollRef}
+      ref={scrollRef}
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: 4 }}
@@ -261,6 +271,9 @@ const pendingCount = filteredVisits.filter((item) => {
 ):
 (
 <ScrollView className="mt-6 px-4 bg-white rounded-t-3xl"
+     refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      } 
   contentContainerStyle={{ paddingBottom: 80 }}
   >
   {filteredVisits.length > 0 ? (
@@ -289,8 +302,10 @@ const pendingCount = filteredVisits.filter((item) => {
         if (item.propose === "Cluster" && item.totalClusterCount) {
           if (item.completedClusterCount === item.totalClusterCount) {
             displayStatus = t("Visits.Completed");
-          } else if (item.completedClusterCount && item.completedClusterCount > 0) {
+          }  else if (item.completedClusterCount && item.completedClusterCount > 0 && item.completionPercentage >= "20") {
             displayStatus = `${t("Visits.Completed")} (${item.completedClusterCount}/${item.totalClusterCount})`;
+          }else if (item.completedClusterCount && item.completedClusterCount > 0 && item.completionPercentage < "20") {
+            displayStatus = `${t("Visits.Pending")} (${item.completedClusterCount}/${item.totalClusterCount})`;
           } else {
             displayStatus = `${t("Visits.Pending")} (0/${item.totalClusterCount})`;
           }
@@ -314,7 +329,7 @@ const pendingCount = filteredVisits.filter((item) => {
             }}
             disabled={
               (item.propose === "Cluster" && item.completedClusterCount === item.totalClusterCount) ||
-              item.completionPercentage === "20" ||
+              item.completionPercentage >= "20" ||
               item.status === "Completed" ||
               item.status === "Finished" ||
               dayjs(item.sheduleDate).isAfter(today, "day")
@@ -324,7 +339,7 @@ const pendingCount = filteredVisits.filter((item) => {
               key={item.id}
               className={`bg-white border ${
                 (item.propose === "Cluster" && item.completedClusterCount === item.totalClusterCount) ||
-                item.completionPercentage === "20" ||
+                item.completionPercentage >= "20" ||
                 item.status === "Completed" ||
                 item.status === "Finished" ||
                 dayjs(item.sheduleDate).isAfter(today, "day")

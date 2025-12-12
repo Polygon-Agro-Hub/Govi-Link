@@ -140,9 +140,15 @@ useFocusEffect(
 }
 
       else{
-      navigation.navigate("Main", {screen:screenName})
+      // navigation.navigate("Main", {screen:screenName})
+            navigation.navigate("Main", {
+        screen: "MainTabs",
+        params: {
+          screen: screenName
+        }
+      });   
       }
-      return true; // prevent default back behavior
+      return true;
     };
 
     const subscription = BackHandler.addEventListener(
@@ -230,7 +236,13 @@ useFocusEffect(
     if (screenName === "AssignJobs") {
       navigation.goBack();
     } else {
-      navigation.navigate("Main", { screen: screenName });
+      // navigation.navigate("Main", { screen: screenName });
+                  navigation.navigate("Main", {
+        screen: "MainTabs",
+        params: {
+          screen: screenName
+        }
+      });   
     }
   }}                      >
                         <AntDesign name="left" size={22} color="#000" />
