@@ -425,7 +425,7 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
 
       {/* Action Buttons - Only show when at least one job is selected */}
       {selectedJobs.length > 0 && (
-        <View className="flex-row p-4 justify-between items-center">
+        <View className="flex-row p-4 justify-between items-center space-x-6">
           <View className="flex-1"></View>
           <View className="flex-1 items-center">
             <TouchableOpacity onPress={handleStartJob}>
@@ -433,18 +433,18 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
                 colors={["#F2561D", "#FF1D85"]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
-                className="flex-row px-6 h-10 rounded-full items-center justify-center"
+className="flex-row p-3 rounded-full items-center justify-center min-w-[120px]"
               >
-                <Text className="text-white font-bold text-lg">Start</Text>
+                <Text className="text-white font-bold text-lg">{t("AssignJobOfficerList.Start")}</Text>
               </LinearGradient>
             </TouchableOpacity>
           </View>
-          <View className="flex-1 items-end">
+          <View className="flex-1 pr-6">
             <TouchableOpacity
               onPress={handleAssignJobs}
-              className="bg-black px-5 py-1.5 rounded-3xl"
+              className=" bg-black px-auto p-3 min-w-[120px] rounded-3xl items-center justify-center"
             >
-              <Text className="font-bold text-white text-lg">Assign</Text>
+              <Text className="font-bold text-white text-lg">{t("AssignJobOfficerList.AssignButton")}</Text>
             </TouchableOpacity>
           </View>
         </View>

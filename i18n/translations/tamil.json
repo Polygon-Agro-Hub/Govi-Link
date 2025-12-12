@@ -65,7 +65,15 @@
 "Your password must contain":"உங்கள் கடவுச்சொல்லில் குறைந்தபட்சம் 8 எழுத்துகள் இருக்க வேண்டும், அதில் ஒரு பெரிய எழுத்து, எண்கள் மற்றும் சிறப்பு எழுத்துகள் இருக்க வேண்டும்.",
 "Your password must contain a minimum":"உங்கள் கடவுச்சொல்லில் குறைந்தபட்சம் 8 எழுத்துகள் இருக்க வேண்டும், அதில் ஒரு பெரிய எழுத்து, எண்கள் மற்றும் சிறப்பு எழுத்துகள் இருக்க வேண்டும்.",
 "New password and confirm password do not match":"புதிய கடவுச்சொல் மற்றும் உறுதிப்படுத்தல் கடவுச்சொல் பொருந்தவில்லை.",
-"Password updated successfully":"கடவுச்சொல் வெற்றிகரமாக புதுப்பிக்கப்பட்டது"
+"Password updated successfully":"கடவுச்சொல் வெற்றிகரமாக புதுப்பிக்கப்பட்டது",
+    "Phone numbers cannot be the same":"Phone numbers cannot be the same",
+    "Phone number must be 9 digits long":"Phone number must be 9 digits long",
+        "NIC Number must be 9 digits followed by 'V' or 12 digits.": "NIC Number must be 9 digits followed by 'V' or 12 digits.",
+    "This NIC is already registered in the system.": "This NIC is already registered in the system.",
+   "This Email is already registered in the system.": "This Email is already registered in the system.",
+   "Invalid Gmail address":"Invalid Gmail address. Gmail addresses cannot have consecutive dots (.), leading/trailing dots, or special characters except + and .",
+"Invalid email address Example":"Invalid email address. Please enter a valid email format (e.g. example@domain.com)."
+
   },
   "Login": {
     "Welcome": "வரவேற்கிறோம்",
@@ -401,6 +409,7 @@
     "AssignConfirmTitle": "Assign Jobs",
     "AssignConfirmMessage": "Assign {{count}} job(s) to this officer?",
     "NoJobsSelected": "No Jobs Selected",
-    "SelectAtLeastOneJob": "Please select at least one job to assign."
+    "SelectAtLeastOneJob": "Please select at least one job to assign.",
+      "Start":"Start"
   }
 }

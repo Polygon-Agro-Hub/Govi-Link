@@ -26,6 +26,7 @@ import axios from "axios";
 import { environment } from "@/environment/environment";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
+import { useFocusEffect } from "@react-navigation/native";
 
 type AddOfficerStep1NavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -77,7 +78,8 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     useState(false);
   const [showCountryCodeDropdown2, setShowCountryCodeDropdown2] =
     useState(false);
-
+const [cfoDistricts, setCfoDistricts] = useState<string[]>([]);
+console.log(cfoDistricts)
   // Sri Lanka districts with translations
   const districts = [
     { en: "Ampara", si: "අම්පාර", ta: "அம்பாறை" },
@@ -102,10 +104,68 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     { en: "Nuwara Eliya", si: "නුවරඑළිය", ta: "நுவரெலியா" },
     { en: "Polonnaruwa", si: "පොලොන්නරුව", ta: "பொலன்னறுவை" },
     { en: "Puttalam", si: "පුත්තලම", ta: "புத்தளம்" },
-    { en: "Ratnapura", si: "රත්නපුර", ta: "இரத்தினபுரி" },
+    { en: "Rathnapura", si: "රත්නපුර", ta: "இரத்தினபுரி" },
     { en: "Trincomalee", si: "ත්‍රිකුණාමලය", ta: "திருகோணமலை" },
     { en: "Vavuniya", si: "වවුනියාව", ta: "வவுனியா" },
   ];
+
+    useFocusEffect(
+      React.useCallback(() => {
+       
+ fetchCFOdistricts()
+      }, [])
+    );
+  
+
+  const fetchCFOdistricts = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      if (!token) {
+        Alert.alert(
+          t("Error.Sorry"),
+          t(
+            "Error.Your login session has expired. Please log in again to continue."
+          )
+        );
+        return;
+      }
+      if (token) {
+        const response = await axios.get(
+          `${environment.API_BASE_URL}api/auth/user-districts`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+     if (Array.isArray(response.data.data)) {
+      setCfoDistricts(response.data.data);
+    } else {
+      console.warn("Unexpected districts format:", response.data);
+    }
+
+      }
+    } catch (error: any) {
+      console.error("Failed to fetch user profile:", error);
+    } 
+  };
+
+
+const getFilteredCFODistricts = () => {
+  if (!cfoDistricts || cfoDistricts.length === 0) return [];
+
+  let filtered = districts.filter((d) => cfoDistricts.includes(d.en));
+
+  if (districtSearch) {
+    const searchTerm = districtSearch.toLowerCase();
+    filtered = filtered.filter(
+      (d) =>
+        d.en.toLowerCase().includes(searchTerm) ||
+        d.si.includes(districtSearch) ||
+        d.ta.includes(districtSearch)
+    );
+  }
+
+  return filtered;
+};
 
   // Mark field as touched
   const markFieldAsTouched = (fieldName: string) => {
@@ -120,11 +180,55 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
       return newErrors;
     });
   };
+  const validateGmailLocalPart = (localPart: string): boolean => {
+    const validCharsRegex = /^[a-zA-Z0-9.+]+$/;
+    if (!validCharsRegex.test(localPart)) {
+      return false;
+    }
 
+    if (localPart.startsWith('.') || localPart.endsWith('.')) {
+      return false;
+    }
+
+    if (localPart.includes('..')) {
+      return false;
+    }
+
+    if (localPart.length === 0) {
+      return false;
+    }
+
+    return true;
+  };
   // Validation functions
   const validateEmail = (email: string): boolean => {
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    return emailRegex.test(email);
+    const generalEmailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    if (!generalEmailRegex.test(email)) {
+      return false;
+    }
+
+    const emailLower = email.toLowerCase();
+    const [localPart, domain] = emailLower.split('@');
+
+    const allowedSpecificDomains = ['gmail.com', 'googlemail.com', 'yahoo.com'];
+    const allowedTLDs = ['.com', '.gov', '.lk'];
+
+    if (domain === 'gmail.com' || domain === 'googlemail.com') {
+      return validateGmailLocalPart(localPart);
+    }
+
+    if (domain === 'yahoo.com') {
+      return true;
+    }
+
+    for (const tld of allowedTLDs) {
+      if (domain.endsWith(tld)) {
+        return true;
+      }
+    }
+
+    return false;
   };
 
   const validateNIC = (nic: string): boolean => {
@@ -175,96 +279,207 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
   };
 
   const handlePhone1Change = (input: string) => {
+          clearFieldError("phone1");
+  markFieldAsTouched("phone1");
     let numbersOnly = input.replace(/[^0-9]/g, "");
     if (numbersOnly.startsWith("0")) {
       numbersOnly = numbersOnly.replace(/^0+/, "");
     }
     setPhone1(numbersOnly);
-  };
 
-  const handlePhone1Blur = () => {
-    markFieldAsTouched("phone1");
-    if (!phone1.trim()) {
-      setErrors((prev) => ({
-        ...prev,
-        phone1: t("Error.Phone number is required"),
-      }));
-    } else if (!validatePhoneNumber(phone1)) {
-      setErrors((prev) => ({
-        ...prev,
-        phone1: t("Error.Invalid phone number"),
-      }));
+
+ if (numbersOnly.length === 0) {
+        setErrors((prev) => ({
+            ...prev,
+            phone1: "",
+        }));
+    }       else if (numbersOnly && numbersOnly === phone2) {
+        setErrors((prev) => ({
+            ...prev,
+            phone1: t("Error.Phone number cannot be the same"),
+        }));
+        return;
+    }else if (!numbersOnly.startsWith("7")) {
+        setErrors((prev) => ({
+            ...prev,
+            phone1: t("Error.Invalid phone number"),
+        }));
+    } else if (numbersOnly.length < 9) {
+      console.log("hit 4")
+        setErrors((prev) => ({
+            ...prev,
+            phone1: t("Error.Phone number must be 9 digits long"),
+        }));
+    } else if (!validatePhoneNumber(numbersOnly)) {
+        setErrors((prev) => ({
+            ...prev,
+            phone1: t("Error.Invalid phone number"),
+        }));
     } else {
-      clearFieldError("phone1");
-      checkPhoneExists(selectedCountryCode1, phone1, "phone1");
+            console.log("hit")
+
+        // Clear errors if valid
+        setErrors((prev) => ({
+            ...prev,
+            phone1: "",
+        }));
+              checkPhoneExists(selectedCountryCode1, numbersOnly, "phone1");
+
     }
   };
+
+  // const handlePhone1Blur = () => {
+  //   markFieldAsTouched("phone1");
+  //   if (!phone1.trim()) {
+  //     setErrors((prev) => ({
+  //       ...prev,
+  //       phone1: t("Error.Phone number is required"),
+  //     }));
+  //   } else if (!validatePhoneNumber(phone1)) {
+  //     setErrors((prev) => ({
+  //       ...prev,
+  //       phone1: t("Error.Invalid phone number"),
+  //     }));
+  //   } else {
+  //     clearFieldError("phone1");
+  //     checkPhoneExists(selectedCountryCode1, phone1, "phone1");
+  //   }
+  // };
 
   const handlePhone2Change = (input: string) => {
     let numbersOnly = input.replace(/[^0-9]/g, "");
     if (numbersOnly.startsWith("0")) {
       numbersOnly = numbersOnly.replace(/^0+/, "");
     }
+      markFieldAsTouched("phone2");
     setPhone2(numbersOnly);
-  };
-
-  const handlePhone2Blur = () => {
-    markFieldAsTouched("phone2");
-
-    if (phone2) {
-      if (!validatePhoneNumber(phone2)) {
+     if (numbersOnly.length === 0) {
         setErrors((prev) => ({
-          ...prev,
-          phone2: t("Error.Invalid phone number"),
+            ...prev,
+            phone2: "",
         }));
-      } else {
-        clearFieldError("phone2");
-        // Check if phone2 exists in backend only if it's provided
-        checkPhoneExists(selectedCountryCode2, phone2, "phone2");
+    }  else if (numbersOnly && numbersOnly === phone1) {
+        setErrors((prev) => ({
+            ...prev,
+            phone2: t("Error.Phone numbers cannot be the same"),
+        }));
+        return;
       }
+      else if (!numbersOnly.startsWith("7")) {
+        setErrors((prev) => ({
+            ...prev,
+            phone2: t("Error.Invalid phone number"),
+        }));
+    } else if (numbersOnly.length < 9) {
+        setErrors((prev) => ({
+            ...prev,
+            phone2: t("Error.Phone number must be 9 digits long"),
+        }));
+    } else if (!validatePhoneNumber(numbersOnly)) {
+        setErrors((prev) => ({
+            ...prev,
+            phone2: t("Error.Invalid phone number"),
+        }));
     } else {
-      // Phone 2 is optional, so clear any errors if empty
-      clearFieldError("phone2");
+        // Clear errors if valid
+        setErrors((prev) => ({
+            ...prev,
+            phone2: "",
+        }));
+              checkPhoneExists(selectedCountryCode2, numbersOnly, "phone2");
+
     }
   };
 
+  // const handlePhone2Blur = () => {
+  //   markFieldAsTouched("phone2");
+
+  //   if (phone2) {
+  //     if (!validatePhoneNumber(phone2)) {
+  //       setErrors((prev) => ({
+  //         ...prev,
+  //         phone2: t("Error.Invalid phone number"),
+  //       }));
+  //     } else {
+  //       clearFieldError("phone2");
+  //       // Check if phone2 exists in backend only if it's provided
+  //       checkPhoneExists(selectedCountryCode2, phone2, "phone2");
+  //     }
+  //   } else {
+  //     // Phone 2 is optional, so clear any errors if empty
+  //     clearFieldError("phone2");
+  //   }
+  // };
+
+  const validateNicNumber = (input: string) =>
+    /^[0-9]{9}V$|^[0-9]{12}$/.test(input);
   const handleNICChange = (input: string) => {
     const filteredInput = input.replace(/[^0-9Vv]/g, "");
     const normalizedInput = filteredInput.replace(/[vV]/g, "V");
     setNic(normalizedInput);
-  };
-
-  const handleNICBlur = () => {
-    markFieldAsTouched("nic");
-    if (!nic.trim()) {
-      setErrors((prev) => ({ ...prev, nic: t("Error.NIC is required") }));
-    } else if (!validateNIC(nic)) {
-      setErrors((prev) => ({ ...prev, nic: t("Error.Invalid NIC format") }));
+      markFieldAsTouched("nic");
+    if (normalizedInput.length === 0) {
+        setErrors((prev) => ({
+            ...prev,
+            nic: "",
+        }));
+    } else if (!validateNicNumber(normalizedInput)) {
+      setErrors((prev) => ({ ...prev, nic: t("Error.NIC Number must be 9 digits followed by 'V' or 12 digits.")}))
     } else {
-      clearFieldError("nic");
-      checkNICExists(nic);
+              setErrors((prev) => ({
+            ...prev,
+            nic: "",
+        }));
+      checkNICExists(normalizedInput);
     }
   };
+
+  // const handleNICBlur = () => {
+  //   markFieldAsTouched("nic");
+  //   if (!nic.trim()) {
+  //     setErrors((prev) => ({ ...prev, nic: t("Error.NIC is required") }));
+  //   } else if (!validateNIC(nic)) {
+  //     setErrors((prev) => ({ ...prev, nic: t("Error.Invalid NIC format") }));
+  //   } else {
+  //     clearFieldError("nic");
+  //     checkNICExists(nic);
+  //   }
+  // };
 
   const handleEmailChange = (input: string) => {
+        clearFieldError('email');
+        markFieldAsTouched("email");
     const trimmedInput = input.trim();
     setEmail(trimmedInput);
+        if (!validateEmail(trimmedInput)) {
+      const emailLower = trimmedInput.toLowerCase();
+      const domain = emailLower.split('@')[1];
+
+      if (domain === 'gmail.com' || domain === 'googlemail.com') {
+         setErrors((prev) => ({ ...prev, email: t("Error.Invalid Gmail address")}))
+      } else {
+       setErrors((prev) => ({ ...prev, email: t("Error.Invalid email address Example")}))
+
+      }
+      return;
+    }
+ checkEmailExists(trimmedInput);
   };
 
-  const handleEmailBlur = () => {
-    markFieldAsTouched("email");
-    if (!email.trim()) {
-      setErrors((prev) => ({ ...prev, email: t("Error.Email is required") }));
-    } else if (!validateEmail(email)) {
-      setErrors((prev) => ({
-        ...prev,
-        email: t("Error.Invalid email address"),
-      }));
-    } else {
-      clearFieldError("email");
-      checkEmailExists(email);
-    }
-  };
+  // const handleEmailBlur = () => {
+  //   markFieldAsTouched("email");
+  //   if (!email.trim()) {
+  //     setErrors((prev) => ({ ...prev, email: t("Error.Email is required") }));
+  //   } else if (!validateEmail(email)) {
+  //     setErrors((prev) => ({
+  //       ...prev,
+  //       email: t("Error.Invalid email address"),
+  //     }));
+  //   } else {
+  //     clearFieldError("email");
+  //     checkEmailExists(email);
+  //   }
+  // };
 
   // Handle blur for other fields
   const handleFirstNameSIBlur = () => {
@@ -346,93 +561,9 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     }
   };
 
-  // API validation checks
-  // const checkNICExists = async (nicNumber: string) => {
-  //   try {
-  //     setIsValidating(true);
-  //     const token = await AsyncStorage.getItem("token");
-  //     const response = await axios.get(
-  //       `${environment.API_BASE_URL}api/officer/field-officers/check-nic/${nicNumber}`,
-  //       {
-  //         headers: { Authorization: `Bearer ${token}` },
-  //       }
-  //     );
-
-  //     if (response.data.exists) {
-  //       setErrors((prev) => ({ ...prev, nic: t("Error.NIC already exists") }));
-  //     }
-  //   } catch (error) {
-  //     console.error("Error checking NIC:", error);
-  //   } finally {
-  //     setIsValidating(false);
-  //   }
-  // };
-  
-
-  // const checkEmailExists = async (email: string) => {
-  //   try {
-  //     setIsValidating(true);
-  //     const token = await AsyncStorage.getItem("token");
-  //     const response = await axios.get(
-  //       `${environment.API_BASE_URL}api/officer/field-officers/check-email/${email}`,
-  //       {
-  //         headers: { Authorization: `Bearer ${token}` },
-  //       }
-  //     );
-
-  //     if (response.data.exists) {
-  //       setErrors((prev) => ({
-  //         ...prev,
-  //         email: t("Error.Email already exists"),
-  //       }));
-  //     }
-  //   } catch (error) {
-  //     console.error("Error checking email:", error);
-  //   } finally {
-  //     setIsValidating(false);
-  //   }
-  // };
-
-  // const checkPhoneExists = async (
-  //   phoneCode: string,
-  //   phoneNumber: string,
-  //   field: string
-  // ) => {
-  //   // Don't check if phone number is empty (for optional phone2)
-  //   if (!phoneNumber.trim()) {
-  //     return;
-  //   }
-
-  //   try {
-  //     setIsValidating(true);
-  //     const token = await AsyncStorage.getItem("token");
-  //     const response = await axios.get(
-  //       `${environment.API_BASE_URL}api/officer/field-officers/check-phone/${phoneCode}/${phoneNumber}`,
-  //       {
-  //         headers: { Authorization: `Bearer ${token}` },
-  //       }
-  //     );
-
-  //     if (response.data.exists) {
-  //       setErrors((prev) => ({
-  //         ...prev,
-  //         [field]:
-  //           field === "phone1"
-  //             ? t("Error.Phone already exists")
-  //             : t("Error.Phone 2 already exists"),
-  //       }));
-  //     } else {
-  //       // Clear the error if phone doesn't exist
-  //       clearFieldError(field);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error checking phone:", error);
-  //   } finally {
-  //     setIsValidating(false);
-  //   }
-  // };
 
   const checkNICExists = async (nicNumber: string): Promise<boolean> => {
+    console.log(nicNumber)
   try {
     setIsValidating(true);
     const token = await AsyncStorage.getItem("token");
@@ -444,7 +575,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     );
 
     if (response.data.exists) {
-      setErrors((prev) => ({ ...prev, nic: t("Error.NIC already exists") }));
+      setErrors((prev) => ({ ...prev, nic: t("Error.This NIC is already registered in the system.") }));
       return true; // Error found
     }
     return false; // No error
@@ -491,7 +622,7 @@ const checkPhoneExists = async (
   if (!phoneNumber.trim()) {
     return false;
   }
-
+console.log("hit 2")
   try {
     setIsValidating(true);
     const token = await AsyncStorage.getItem("token");
@@ -512,6 +643,8 @@ const checkPhoneExists = async (
       }));
       return true; // Error found
     } else {
+            console.log("hit3")
+
       clearFieldError(field);
       return false; // No error
     }
@@ -712,124 +845,6 @@ const checkPhoneExists = async (
     clearFormData();
     navigation.navigate("ManageOfficers");
   };
-
-  // const handleNext = () => {
-  //   // Mark all fields as touched to show all errors
-  //   const allFields = [
-  //     "firstNameEN",
-  //     "lastNameEN",
-  //     "firstNameSI",
-  //     "lastNameSI",
-  //     "firstNameTA",
-  //     "lastNameTA",
-  //     "phone1",
-  //     "nic",
-  //     "email",
-  //     "districts",
-  //   ];
-  //   allFields.forEach((field) => markFieldAsTouched(field));
-
-  //   if (!validateStep1()) {
-  //     Alert.alert(
-  //       t("Error.Validation Error"),
-  //       t("Error.Please fix all errors before proceeding")
-  //     );
-  //     return;
-  //   }
-
-  //   // Prepare form data for next step
-  //   const formData = {
-  //     empType: type,
-  //     languages,
-  //     assignDistrict: selectedDistricts,
-  //     firstName: firstNameEN,
-  //     lastName: lastNameEN,
-  //     firstNameSinhala: firstNameSI,
-  //     lastNameSinhala: lastNameSI,
-  //     firstNameTamil: firstNameTA,
-  //     lastNameTamil: lastNameTA,
-  //     phoneCode1: selectedCountryCode1,
-  //     phoneNumber1: phone1,
-  //     phoneCode2: selectedCountryCode2,
-  //     phoneNumber2: phone2,
-  //     nic,
-  //     email,
-  //     profileImage,
-  //   };
-
-  //   navigation.navigate("AddOfficerStep2", { formData });
-  // };
-
-  // Update the handleNext function to check for existing errors
-
-// const handleNext = () => {
-//   // Mark all fields as touched to show all errors
-//   const allFields = [
-//     "firstNameEN",
-//     "lastNameEN",
-//     "firstNameSI",
-//     "lastNameSI",
-//     "firstNameTA",
-//     "lastNameTA",
-//     "phone1",
-//     "nic",
-//     "email",
-//     "districts",
-//   ];
-//   allFields.forEach((field) => markFieldAsTouched(field));
-
-//   // First validate the form structure
-//   if (!validateStep1()) {
-//     Alert.alert(
-//       t("Error.Validation Error"),
-//       t("Error.Please fix all errors before proceeding")
-//     );
-//     return;
-//   }
-
-//   // Check if validation is still in progress
-//   if (isValidating) {
-//     Alert.alert(
-//       t("Error.Please Wait"),
-//       t("Error.Validating your information, please wait...")
-//     );
-//     return;
-//   }
-
-//   // Check if there are any existing validation errors (NIC, email, phone already exists)
-//   if (Object.keys(errors).length > 0) {
-//     // Get the specific error messages
-//     const errorMessages = Object.values(errors).filter(Boolean);
-    
-//     Alert.alert(
-//       t("Error.Validation Error"),
-//       errorMessages.join("\n") || t("Error.Please fix all errors before proceeding")
-//     );
-//     return;
-//   }
-
-//   // Prepare form data for next step
-//   const formData = {
-//     empType: type,
-//     languages,
-//     assignDistrict: selectedDistricts,
-//     firstName: firstNameEN,
-//     lastName: lastNameEN,
-//     firstNameSinhala: firstNameSI,
-//     lastNameSinhala: lastNameSI,
-//     firstNameTamil: firstNameTA,
-//     lastNameTamil: lastNameTA,
-//     phoneCode1: selectedCountryCode1,
-//     phoneNumber1: phone1,
-//     phoneCode2: selectedCountryCode2,
-//     phoneNumber2: phone2,
-//     nic,
-//     email,
-//     profileImage,
-//   };
-
-//   navigation.navigate("AddOfficerStep2", { formData });
-// };
 
 const handleNext = async () => {
   const allFields = [
@@ -1293,7 +1308,7 @@ const handleNext = async () => {
                     }`}
                     value={phone1}
                     onChangeText={handlePhone1Change}
-                    onBlur={handlePhone1Blur}
+                    // onBlur={handlePhone1Blur}
                     keyboardType="phone-pad"
                     underlineColorAndroid="transparent"
                     maxLength={9}
@@ -1333,7 +1348,7 @@ const handleNext = async () => {
                     }`}
                     value={phone2}
                     onChangeText={handlePhone2Change}
-                    onBlur={handlePhone2Blur}
+                    // onBlur={handlePhone2Blur}
                     keyboardType="phone-pad"
                     underlineColorAndroid="transparent"
                     maxLength={9}
@@ -1356,7 +1371,7 @@ const handleNext = async () => {
                 }`}
                 value={nic}
                 onChangeText={handleNICChange}
-                onBlur={handleNICBlur}
+                // onBlur={handleNICBlur}
                 underlineColorAndroid="transparent"
                 maxLength={12}
                 autoCapitalize="characters"
@@ -1377,7 +1392,7 @@ const handleNext = async () => {
                 }`}
                 value={email}
                 onChangeText={handleEmailChange}
-                onBlur={handleEmailBlur}
+                // onBlur={handleEmailBlur}
                 keyboardType="email-address"
                 autoCapitalize="none"
                 underlineColorAndroid="transparent"
@@ -1455,9 +1470,12 @@ const handleNext = async () => {
             {renderDistrictSearchInput()}
 
             <FlatList
-              data={getFilteredDistricts()}
-              renderItem={renderDistrictItem}
-              keyExtractor={(item) => item.en}
+              // data={getFilteredDistricts()}
+              // renderItem={renderDistrictItem}
+              // keyExtractor={(item) => item.en}
+                  data={getFilteredCFODistricts()}
+    keyExtractor={(item) => item.en}
+    renderItem={renderDistrictItem}
               showsVerticalScrollIndicator={false}
               className="max-h-64"
               ListEmptyComponent={
