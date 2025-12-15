@@ -480,7 +480,7 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({ navigatio
                 <AntDesign
                   name="left"
                   size={24}
-                  color={!visitsData || currentIndex <= 0 ? "#ccc" : "#FF1D85"}
+                  color={!visitsData || currentIndex <= 0 ? "#ccc" : "#00000"}
                 />
               </TouchableOpacity>
 
@@ -615,7 +615,7 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({ navigatio
                   color={
                     !visitsData || currentIndex >= visitsData.length - 1
                       ? "#ccc"
-                      : "#FF1D85"
+                      : "#00000"
                   }
                 />
               </TouchableOpacity>
@@ -662,7 +662,7 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({ navigatio
                   <AntDesign
                     name="left"
                     size={24}
-                    color={currentDraftIndex <= 0 ? "#ccc" : "#FF1D85"}
+                    color={currentDraftIndex <= 0 ? "#ccc" : "#00000"}
                   />
                 </TouchableOpacity>
 
@@ -799,7 +799,7 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({ navigatio
                     color={
                       currentDraftIndex >= draftVisits.length - 1
                         ? "#ccc"
-                        : "#FF1D85"
+                        : "#00000"
                     }
                   />
                 </TouchableOpacity>

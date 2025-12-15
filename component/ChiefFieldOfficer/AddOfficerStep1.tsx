@@ -13,6 +13,7 @@ import {
   Alert,
   ActivityIndicator,
   Image,
+  Keyboard,
 } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { RadioButton } from "react-native-paper";
@@ -26,20 +27,24 @@ import axios from "axios";
 import { environment } from "@/environment/environment";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, RouteProp, useRoute } from "@react-navigation/native";
 
 type AddOfficerStep1NavigationProp = StackNavigationProp<
   RootStackParamList,
   "AddOfficerStep1"
 >;
+type AddOfficerStep1RouteProp = RouteProp<RootStackParamList, "AddOfficerStep1">;
 
 interface AddOfficerStep1ScreenProps {
   navigation: AddOfficerStep1NavigationProp;
+  // route: { params: { isnew?: boolean } };
 }
 
 const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
-  navigation,
-}) => {
+  navigation}) => {
+      const route = useRoute<AddOfficerStep1RouteProp>();
+    
+  const { isnew } = route.params;
   const { t } = useTranslation();
   const [type, setType] = useState<"Permanent" | "Temporary">("Permanent");
   const [languages, setLanguages] = useState({
@@ -111,9 +116,24 @@ console.log(cfoDistricts)
 
     useFocusEffect(
       React.useCallback(() => {
-       
  fetchCFOdistricts()
-      }, [])
+ console.log("focus effect step 1", isnew)
+      if(isnew===true){
+        setFirstNameEN("")
+        setLastNameEN("")
+        setFirstNameSI("")
+        setLastNameSI("")
+        setFirstNameTA("")
+        setLastNameTA("")
+        setPhone1("")
+        setPhone2("")
+        setNic("")
+        setEmail("")
+               setSelectedDistricts([])
+setProfileImage(null)
+      }
+
+      }, [isnew])
     );
   
 
@@ -136,8 +156,15 @@ console.log(cfoDistricts)
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-     if (Array.isArray(response.data.data)) {
-      setCfoDistricts(response.data.data);
+         const districts = response.data?.data;
+    //  if (Array.isArray(response.data.data)) {
+    //   setCfoDistricts(response.data.data);
+        if (Array.isArray(districts)) {
+      setCfoDistricts(districts);
+      // ✅ If only one district, auto select it
+      if (districts.length === 1) {
+        setSelectedDistricts(districts);
+      }
     } else {
       console.warn("Unexpected districts format:", response.data);
     }
@@ -847,6 +874,7 @@ console.log("hit 2")
   };
 
 const handleNext = async () => {
+  Keyboard.dismiss()
   const allFields = [
     "firstNameEN",
     "lastNameEN",
@@ -917,9 +945,9 @@ const handleNext = async () => {
       email,
       profileImage,
     };
-
+console.log("Form Data:", formData);
     setLoading(false);
-    navigation.navigate("AddOfficerStep2", { formData });
+    navigation.navigate("AddOfficerStep2", { formData, isnewsecondstep:isnew });
   } catch (error) {
     console.error("Validation error:", error);
     setLoading(false);

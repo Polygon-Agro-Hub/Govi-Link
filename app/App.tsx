@@ -136,7 +136,7 @@ function MainDrawer() {
     >
       <Drawer.Screen name="MainTabs" component={MainTabs} options={{ drawerItemStyle: { display: "none" } }}/>
       <Drawer.Screen  name="FieldOfficerDashboard" component={FieldOfficerDashboard} options={{ drawerItemStyle: { display: "none" } }} />
-      <Drawer.Screen name="AddComplaint" component={AddComplaintScreen} options={{ drawerItemStyle: { display: "none" } }}/>
+      {/* <Drawer.Screen name="AddComplaint" component={AddComplaintScreen} options={{ drawerItemStyle: { display: "none" } }}/> */}
       <Drawer.Screen name="ViewAllVisits" component={ViewAllVisits} options={{ drawerItemStyle: { display: "none" } }}/>
 
     </Drawer.Navigator>
@@ -209,6 +209,8 @@ function AppContent() {
             <Stack.Screen name="OtpverificationRequestAudit" component={OtpverificationRequestAudit} />
             <Stack.Screen name="ChangePassword" component={ChangePassword} />
             <Stack.Screen name="ComplainHistory" component={ComplainHistory} />
+                  <Stack.Screen name="AddComplaint" component={AddComplaintScreen}/>
+
                       <Stack.Screen name="QRScanner" component={QRScanner} />
           <Stack.Screen name="QRScaneerRequstAudit" component={QRScaneerRequstAudit} />
           </Stack.Navigator>

@@ -156,7 +156,7 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({ navigation }) =
       );
 
       Alert.alert(
-        t("AddComplaint.Success"),
+        t("Main.Success"),
         t("AddComplaint.Complaint submitted successfully!")
       );
       resetForm(); // Use resetForm instead of individual setters

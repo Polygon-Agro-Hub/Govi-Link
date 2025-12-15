@@ -72,9 +72,11 @@
     "This NIC is already registered in the system.": "මෙම ජාතික හැඳුනුම්පත් අංකය දැනටමත් පද්ධතිය තුළ පවතී.",
 "This Email is already registered in the system.": "මෙම විද්‍යුත් තැපෑල දැනටමත් පද්ධතිය තුළ පවතී.",
 "Invalid Gmail address":"අවලංගු Gmail ලිපිනයකි. Gmail ලිපිනවල තිත් (.), තිත් පේලි හෝ + හැර විශේෂ අක්ෂර තිබිය නොහැක.",
-"Invalid email address Example":"අවලංගු විද්‍යුත් තැපැල් ලිපිනයකි. කරුණාකර වලංගු විද්‍යුත් තැපැල් ආකෘතියක් ඇතුළත් කරන්න (උදා: example@domain.com)."
-
-
+"Invalid email address Example":"අවලංගු විද්‍යුත් තැපැල් ලිපිනයකි. කරුණාකර වලංගු විද්‍යුත් තැපැල් ආකෘතියක් ඇතුළත් කරන්න (උදා: example@domain.com).",
+"Commission amount cannot exceed 100":"කොමිස් ප්‍රමාණය 100 ට වැඩි විය නොහැක.",
+"Unauthorized Access":"අනවසර ප්‍රවේශය",
+"You are not authorized to access this system. Please use a valid Employee ID":"ඔබ මෙම පද්ධතියට ප්‍රවේශ වීමට අවසර නොමැත. කරුණාකර වලංගු සේවක හැඳුනුම්පතක් භාවිතා කරන්න.",
+"This EMP ID is not approved.":"මෙම සේවක හැඳුනුම්පත අනුමත කර නොමැත."
   },
   "Login": {
     "Welcome": "සාදරයෙන් පිළිගනිමු!",

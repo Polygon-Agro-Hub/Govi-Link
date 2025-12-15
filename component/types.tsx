@@ -80,9 +80,9 @@ export type RootStackParamList = {
     farmerMobile?: number;
   };
   ManageOfficers: undefined;
-  AddOfficerStep1: undefined;
-  AddOfficerStep2: { formData: any };
-  AddOfficerStep3: { formData: any };
+  AddOfficerStep1: {isnew?:boolean};
+  AddOfficerStep2: { formData: any , isnewsecondstep?:boolean};
+  AddOfficerStep3: { formData: any, isnewthirdstep?:boolean};
   ChangePassword: { passwordUpdate: number };
   ComplainHistory: undefined;
   AssignJobs: undefined;

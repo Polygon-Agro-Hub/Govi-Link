@@ -18,7 +18,7 @@ import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { RouteProp, useRoute } from "@react-navigation/native";
+import { RouteProp, useRoute,useFocusEffect } from "@react-navigation/native";
 
 type AddOfficerStep3NavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -31,12 +31,13 @@ interface AddOfficerStep3Props {
 
 interface RouteParams {
   formData: any;
+  isnewthirdstep?: boolean;
 }
 
 const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
   const { t } = useTranslation();
   const route = useRoute<RouteProp<RootStackParamList, "AddOfficerStep3">>();
-  const { formData } = route.params as RouteParams;
+  const { formData , isnewthirdstep} = route.params as RouteParams;
 
   // State for uploaded images
   const [nicFrontImage, setNicFrontImage] = useState<string | null>(null);
@@ -53,6 +54,22 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+        useFocusEffect(
+          React.useCallback(() => {
+     console.log("focus effect third", isnewthirdstep)
+          if(isnewthirdstep===true){
+            setNicFrontImage(null)
+            setNicBackImage(null)
+            setPassbookImage(null)
+            setContractImage(null)
+            setNicFrontFileName(null)
+            setNicBackFileName(null)
+            setPassbookFileName(null)
+            setContractFileName(null)
+          }
+    
+          }, [isnewthirdstep])
+        );
   const pickImage = async (type: string) => {
     // Request permission
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -339,7 +356,7 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
           <Text className="text-sm text-black font-semibold mr-2">
             {t("AddOfficer.Attached")}:
           </Text>
-          <Text className="text-sm text-[#415CFF] font-medium">{fileName}</Text>
+          <Text className="text-sm text-[#415CFF] font-medium w-[70%]">{fileName}</Text>
         </View>
       )}
 
@@ -350,7 +367,7 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
 
   // Add back button functionality
   const handleGoBack = () => {
-    navigation.navigate("AddOfficerStep2", { formData });
+    navigation.navigate("AddOfficerStep2", { formData, isnewsecondstep:false });
   };
 
   return (

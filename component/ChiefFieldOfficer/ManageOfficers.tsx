@@ -303,7 +303,7 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
           elevation: 50,
         }}
         onPress={() => {
-          navigation.navigate("AddOfficerStep1");
+          navigation.navigate("AddOfficerStep1", {isnew:true});
         }}
       >
         <Ionicons name="add" size={50} color="#fff" />
