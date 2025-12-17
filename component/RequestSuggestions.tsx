@@ -134,7 +134,7 @@ const handleChangeProblem = (
 
   const handleSaveProblem = async (item: ProblemItem) => {
     if (!item.problem.trim() || !item.solution.trim()) {
-      Alert.alert(t("Error.Sorry"), t("CertificateSuggestions.Both problem and solution must be filled."));
+      Alert.alert(t("Error.Sorry"), t("CertificateSuggestions.Both problem and solution must be filled."), [{ text: t("MAIN.OK") }]);
       return;
     }
 
@@ -144,7 +144,8 @@ const handleChangeProblem = (
       if (!token) {
         Alert.alert(
           t("Error.Sorry"),
-          t("Error.Your login session has expired. Please log in again to continue.")
+          t("Error.Your login session has expired. Please log in again to continue."),
+          [{ text: t("MAIN.OK") }]
         );
         return;
       }
@@ -181,12 +182,13 @@ const handleChangeProblem = (
       } else {
         Alert.alert(
           t("Error.Sorry"),
-          t("CertificateSuggestions.Failed to save problem.")
+          t("CertificateSuggestions.Failed to save problem."),
+          [{ text: t("MAIN.OK") }]
         );
       }
     } catch (err) {
       console.error("❌ Error saving/updating problem:", err);
-      Alert.alert(t("Error.Sorry"), t("Something went wrong while saving. try again later"));
+      Alert.alert(t("Error.Sorry"), t("Something went wrong while saving. try again later"), [{ text: t("MAIN.OK") }]);
     }finally{
             setLoading(false)
 
@@ -204,7 +206,8 @@ const handleChangeProblem = (
       if (!token) {
            Alert.alert(
           t("Error.Sorry"),
-          t("Error.Your login session has expired. Please log in again to continue.")
+          t("Error.Your login session has expired. Please log in again to continue."),
+          [{ text: t("MAIN.OK") }]
         );
         return;
       }
@@ -289,9 +292,7 @@ const handleChangeProblem = (
             setIsButtonDisabled(false);
              setOtpSendLoading(false);
           } catch (error) {
-            Alert.alert(t("Main.error"), t("SignupForum.otpSendFailed"), [{
-              text: t("PublicForum.OK"),
-            }]);
+            Alert.alert(t("Main.error"), t("SignupForum.otpSendFailed"), [{ text: t("MAIN.OK") }]);
             setOtpSendLoading(false);
           }finally{
             setOtpSendLoading(false);

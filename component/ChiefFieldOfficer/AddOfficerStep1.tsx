@@ -129,6 +129,7 @@ console.log(cfoDistricts)
         setPhone2("")
         setNic("")
         setEmail("")
+        setErrors({})
                setSelectedDistricts([])
 setProfileImage(null)
       }
@@ -145,7 +146,8 @@ setProfileImage(null)
           t("Error.Sorry"),
           t(
             "Error.Your login session has expired. Please log in again to continue."
-          )
+          ),
+                [{ text: t("MAIN.OK") }]
         );
         return;
       }
@@ -266,12 +268,67 @@ const getFilteredCFODistricts = () => {
     return /^7[0-9]{8}$/.test(phone);
   };
 
+const handleNameENChange = (text: string, fieldName: string) => {
+  const filteredText = text.replace(/[^a-zA-Z\s]/g, "");
+  const capitalizedText =
+    filteredText.charAt(0).toUpperCase() + filteredText.slice(1);
+let errorname = ""
+  // ---------- SET VALUE ----------
+  switch (fieldName) {
+    case "firstNameEN":
+      setFirstNameEN(capitalizedText);
+      errorname = "First name"
+      break;
+    case "lastNameEN":
+      setLastNameEN(capitalizedText);
+      errorname = "Last name"
+      break;
+    case "firstNameSI":
+      setFirstNameSI(capitalizedText);
+      errorname = "Sinhala first name"
+      break;
+    case "lastNameSI":
+      setLastNameSI(capitalizedText);
+      errorname = "Sinhala last name"
+      break;
+    case "firstNameTA":
+      setFirstNameTA(capitalizedText);
+      errorname = "Tamil first name"
+      break;
+    case "lastNameTA":
+      setLastNameTA(capitalizedText);
+      errorname = "Tamil last name"
+      break;
+  }
+
+  // ---------- VALIDATION ----------
+  if (capitalizedText.length === 0) {
+    setErrors((prev) => ({
+      ...prev,
+      [fieldName]: t(`Error.${errorname} is required`),
+    }));
+  } else {
+    setErrors((prev) => {
+      const updated = { ...prev };
+      delete updated[fieldName];
+      return updated;
+    });
+  }
+};
+
   // Field change handlers with validation on blur
   const handleFirstNameENChange = (text: string) => {
+    clearFieldError("firstNameEN");
     const filteredText = text.replace(/[^a-zA-Z\s]/g, "");
     const capitalizedText =
       filteredText.charAt(0).toUpperCase() + filteredText.slice(1);
     setFirstNameEN(capitalizedText);
+      if (capitalizedText.length === 0) {
+    setErrors((prev) => ({
+      ...prev,
+      firstNameEN: t("Error.First name is required"),
+    }));
+  }
   };
 
   const handleFirstNameENBlur = () => {
@@ -287,10 +344,17 @@ const getFilteredCFODistricts = () => {
   };
 
   const handleLastNameENChange = (text: string) => {
+    clearFieldError("lastNameEN");
     const filteredText = text.replace(/[^a-zA-Z\s]/g, "");
     const capitalizedText =
       filteredText.charAt(0).toUpperCase() + filteredText.slice(1);
     setLastNameEN(capitalizedText);
+      if (capitalizedText.length === 0) {
+    setErrors((prev) => ({
+      ...prev,
+      lastNameEN: t("Error.Last name is required"),
+    }));
+  }
   };
 
   const handleLastNameENBlur = () => {
@@ -323,7 +387,7 @@ const getFilteredCFODistricts = () => {
     }       else if (numbersOnly && numbersOnly === phone2) {
         setErrors((prev) => ({
             ...prev,
-            phone1: t("Error.Phone number cannot be the same"),
+            phone1: t("Error.Phone numbers cannot be the same"),
         }));
         return;
     }else if (!numbersOnly.startsWith("7")) {
@@ -566,7 +630,8 @@ const getFilteredCFODistricts = () => {
       if (status !== "granted") {
         Alert.alert(
           t("Error.Permission Denied"),
-          t("Error.Gallery permission is required")
+          t("Error.Gallery permission is required"),
+                [{ text: t("MAIN.OK") }]
         );
         return;
       }
@@ -584,7 +649,7 @@ const getFilteredCFODistricts = () => {
       }
     } catch (error) {
       console.error("Error picking image:", error);
-      Alert.alert(t("Error.Error"), t("Error.Failed to pick image"));
+      Alert.alert(t("Error.Error"), t("Error.Failed to pick image"),[{ text: t("MAIN.OK") }]);
     }
   };
 
@@ -804,39 +869,46 @@ console.log("hit 2")
 
   // Validate all fields before proceeding
   const validateStep1 = () => {
-    const newErrors: Record<string, string> = {};
+  const newErrors: Record<string, string> = {};
 
-    if (!firstNameEN.trim())
-      newErrors.firstNameEN = t("Error.First name is required");
-    if (!lastNameEN.trim())
-      newErrors.lastNameEN = t("Error.Last name is required");
-    if (!firstNameSI.trim())
-      newErrors.firstNameSI = t("Error.Sinhala first name is required");
-    if (!lastNameSI.trim())
-      newErrors.lastNameSI = t("Error.Sinhala last name is required");
-    if (!firstNameTA.trim())
-      newErrors.firstNameTA = t("Error.Tamil first name is required");
-    if (!lastNameTA.trim())
-      newErrors.lastNameTA = t("Error.Tamil last name is required");
-    if (!phone1.trim()) newErrors.phone1 = t("Error.Phone number is required");
-    if (!nic.trim()) newErrors.nic = t("Error.NIC is required");
-    if (!email.trim()) newErrors.email = t("Error.Email is required");
-    if (selectedDistricts.length === 0)
-      newErrors.districts = t("Error.At least one district is required");
-    if (Object.values(languages).every((val) => !val))
-      newErrors.languages = t("Error.At least one language is required");
+  if (!firstNameEN.trim())
+    newErrors.firstNameEN = t("Error.First name is required");
+  if (!lastNameEN.trim())
+    newErrors.lastNameEN = t("Error.Last name is required");
+  if (!firstNameSI.trim())
+    newErrors.firstNameSI = t("Error.Sinhala first name is required");
+  if (!lastNameSI.trim())
+    newErrors.lastNameSI = t("Error.Sinhala last name is required");
+  if (!firstNameTA.trim())
+    newErrors.firstNameTA = t("Error.Tamil first name is required");
+  if (!lastNameTA.trim())
+    newErrors.lastNameTA = t("Error.Tamil last name is required");
+  if (!phone1.trim())
+    newErrors.phone1 = t("Error.Phone number is required");
+  if (!nic.trim())
+    newErrors.nic = t("Error.NIC is required");
+  if (!email.trim())
+    newErrors.email = t("Error.Email is required");
+  if (selectedDistricts.length === 0)
+    newErrors.districts = t("Error.At least one district is required");
+  if (Object.values(languages).every((val) => !val))
+    newErrors.languages = t("Error.At least one language is required");
 
-    if (phone1 && !validatePhoneNumber(phone1))
-      newErrors.phone1 = t("Error.Invalid phone number");
-    if (phone2 && !validatePhoneNumber(phone2))
-      newErrors.phone2 = t("Error.Invalid phone number");
-    if (nic && !validateNIC(nic)) newErrors.nic = t("Error.Invalid NIC format");
-    if (email && !validateEmail(email))
-      newErrors.email = t("Error.Invalid email address");
+  if (phone1 && !validatePhoneNumber(phone1))
+    newErrors.phone1 = t("Error.Invalid phone number");
+  if (phone2 && !validatePhoneNumber(phone2))
+    newErrors.phone2 = t("Error.Invalid phone number");
+  if (nic && !validateNicNumber(nic))
+    newErrors.nic = t("Error.Invalid NIC format");
+  if (email && !validateEmail(email))
+    newErrors.email = t("Error.Invalid email address");
+  if (phone1 && phone2 && phone1 === phone2)
+    newErrors.phone2 = t("Error.Phone numbers cannot be the same");
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  setErrors(newErrors);
+  return newErrors; // ✅ return actual errors
+};
+
 
   // Clear all form data function
   const clearFormData = () => {
@@ -888,11 +960,15 @@ const handleNext = async () => {
     "districts",
   ];
   allFields.forEach((field) => markFieldAsTouched(field));
+  const validationErrors = validateStep1(); // ✅ use returned errors
 
-  if (!validateStep1()) {
-    Alert.alert(
+  if (Object.keys(validationErrors).length > 0) {
+    const errorMessage = Object.values(validationErrors).join("\n• ");
+
+       Alert.alert(
       t("Error.Validation Error"),
-      t("Error.Please fix all errors before proceeding")
+      `• ${errorMessage}`,
+      [{ text: t("MAIN.OK") }]
     );
     return;
   }
@@ -900,7 +976,8 @@ const handleNext = async () => {
   if (isValidating) {
     Alert.alert(
       t("Error.Please Wait"),
-      t("Error.Validating your information, please wait...")
+      t("Error.Validating your information, please wait..."),
+            [{ text: t("MAIN.OK") }]
     );
     return;
   }
@@ -920,7 +997,8 @@ const handleNext = async () => {
     if (hasNicError || hasEmailError || hasPhone1Error || hasPhone2Error) {
       Alert.alert(
         t("Error.Validation Error"),
-        t("Error.Please fix all errors before proceeding")
+        t("Error.Please fix all errors before proceeding"),
+              [{ text: t("MAIN.OK") }]
       );
       setLoading(false);
       return;
@@ -953,7 +1031,8 @@ console.log("Form Data:", formData);
     setLoading(false);
     Alert.alert(
       t("Error.Error"),
-      t("Error.An error occurred during validation")
+      t("Error.An error occurred during validation"),
+            [{ text: t("MAIN.OK") }]
     );
   }
 };
@@ -1190,7 +1269,7 @@ console.log("Form Data:", formData);
                     : ""
                 }`}
                 value={firstNameEN}
-                onChangeText={handleFirstNameENChange}
+                onChangeText={(text) => handleNameENChange(text, "firstNameEN")}
                 onBlur={handleFirstNameENBlur}
                 underlineColorAndroid="transparent"
               />
@@ -1211,7 +1290,7 @@ console.log("Form Data:", formData);
                     : ""
                 }`}
                 value={lastNameEN}
-                onChangeText={handleLastNameENChange}
+                onChangeText={(text) => handleNameENChange(text, "lastNameEN")}
                 onBlur={handleLastNameENBlur}
                 underlineColorAndroid="transparent"
               />
@@ -1232,7 +1311,9 @@ console.log("Form Data:", formData);
                     : ""
                 }`}
                 value={firstNameSI}
-                onChangeText={setFirstNameSI}
+                // onChangeText={setFirstNameSI}
+                                onChangeText={(text) => handleNameENChange(text, "firstNameSI")}
+
                 onBlur={handleFirstNameSIBlur}
                 underlineColorAndroid="transparent"
               />
@@ -1253,7 +1334,8 @@ console.log("Form Data:", formData);
                     : ""
                 }`}
                 value={lastNameSI}
-                onChangeText={setLastNameSI}
+                // onChangeText={setLastNameSI}
+                onChangeText={(text) => handleNameENChange(text, "lastNameSI")}
                 onBlur={handleLastNameSIBlur}
                 underlineColorAndroid="transparent"
               />
@@ -1274,7 +1356,8 @@ console.log("Form Data:", formData);
                     : ""
                 }`}
                 value={firstNameTA}
-                onChangeText={setFirstNameTA}
+                // onChangeText={setFirstNameTA}
+                onChangeText={(text) => handleNameENChange(text, "firstNameTA")}
                 onBlur={handleFirstNameTABlur}
                 underlineColorAndroid="transparent"
               />
@@ -1295,7 +1378,8 @@ console.log("Form Data:", formData);
                     : ""
                 }`}
                 value={lastNameTA}
-                onChangeText={setLastNameTA}
+                  onChangeText={(text) => handleNameENChange(text, "lastNameTA")}
+
                 onBlur={handleLastNameTABlur}
                 underlineColorAndroid="transparent"
               />

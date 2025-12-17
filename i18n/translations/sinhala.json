@@ -1,4 +1,7 @@
 {
+   "MAIN":{
+    "OK": "හරි"
+  },
   "Main": {
     "error": "සමාවන්න",
     "somethingWentWrong": "කිසියම් දෝෂයක් සිදුව ඇත. කරුණාකර නැවත උත්සාහ කරන්න.",
@@ -40,8 +43,8 @@
     "Phone already exists": "දුරකථන අංකය දැනටමත් පවතී",
     "Phone 2 already exists": "දුරකථන අංකය දැනටමත් පවතී",
     "Validation Error": "සත්‍යාපන දෝෂය",
-    "Please fix all errors before proceeding": "කරුණාකර ඉදිරියට යාමට පෙර සියලු දෝෂ නිවරුද්ධ කරන්න",
-    "House/Plot number is required": "ගෘහ / කුඹුරු අංකය අවශ්‍යයි",
+    "Please fix all errors before proceeding": "කරුණාකර ඉදිරියට යාමට පෙර සියලු දෝෂ නිවැරදි කරන්න",
+    "House/Plot number is required": "නිවසේ / බිම් කොටසේ අංකය අවශ්‍යයි",
     "Street name is required": "වීදියේ නම අවශ්‍යයි",
     "City is required": "නගරය අවශ්‍යයි",
     "Country is required": "රට අවශ්‍යයි",
@@ -122,7 +125,8 @@
     "Complaint submitted successfully!": "පැමිණිල්ල එක් කිරීම සාර්ථකයි!",
     "Failed to submit complaint. Please try again.": "පැමිණිල්ල එක් කිරීම අසාර්ථකයි. කරුණාකර නැවත උත්සාහ කරන්න.",
       "Please select a category.":"කරුණාකර කාණ්ඩයක් තෝරන්න.",
-    "Please enter your complaint.":"කරුණාකර ඔබේ පැමිණිල්ල ඇතුළත් කරන්න."
+    "Please enter your complaint.":"කරුණාකර ඔබේ පැමිණිල්ල ඇතුළත් කරන්න.",
+        "Add the Complaint here..": "පැමිණිල්ල මෙතනට එකතු කරන්න.."
   },
   "Profile": {
     "Employee ID": "පරිශීලක අංකය",
@@ -273,17 +277,17 @@
     "Type": "වර්ගය",
     "Permanent": "ස්ථිර",
     "Temporary": "තාවකාලික",
-    "PreferredLanguages": "වරම් ලද භාෂා",
+    "PreferredLanguages": "කැමති භාෂා",
     "Sinhala": "සිංහල",
     "English": "ඉංග්‍රීසි",
     "Tamil": "දෙමළ",
     "AssignedDistrict": "--නියෝජිත දිස්ත්‍රික්කය--",
     "more": "තවත්",
-    "FirstNameEnglish": "--ඉංග්‍රීසිෙන් පළමු නම--",
+    "FirstNameEnglish": "--ඉංග්‍රීසියෙන් මුල් නම--",
     "LastNameEnglish": "--ඉංග්‍රීසිෙන් අවසන් නම--",
-    "FirstNameSinhala": "--සිංහලෙන් පළමු නම--",
+    "FirstNameSinhala": "--සිංහලෙන් මුල් නම--",
     "LastNameSinhala": "--සිංහලෙන් අවසන් නම--",
-    "FirstNameTamil": "--දෙමළෙන් පළමු නම--",
+    "FirstNameTamil": "--දෙමළෙන් මුල් නම--",
     "LastNameTamil": "--දෙමළෙන් අවසන් නම--",
     "NICNumber": "--ජා.හැ.අ.--",
     "EmailAddress": "--විද්‍යුත් තැපැල් ලිපිනය--",
@@ -294,7 +298,7 @@
     "ClearAll": "සියල්ල මකන්න",
     "Done": "අවසන්",
     "SelectCountryCode": "රටේ කේතය තෝරන්න",
-    "HousePlotNumber": "--ගෘහ / කුඹුරු අංකය--",
+    "HousePlotNumber": "--නිවසේ / බිම් කොටසේ අංකය--",
     "StreetName": "--වීදියේ නම--",
     "City": "--නගරය--",
     "Country": "--රට--",
@@ -403,9 +407,9 @@
     "AssignButton": "පවරන්න",
     "UndoButton": "අහෝසි කරන්න",
     "ConfirmLeaveButton": "තහවුරු කර පිටවන්න",
-    "CountdownInstruction1": "කරුණාකර තහවුරු කරන්න",
-    "CountdownInstruction2": "තත්පර ඇතුළත.",
-    "CountdownInstruction3": "ඔබට අහෝසි කළ හැකිය; එසේ නොමැතිනම්, මෙම නිලධාරියාට ස්වයංක්‍රීයව පවරනු ඇත.",
+    "CountdownInstruction1": "කරුණාකර තත්පර",
+    "CountdownInstruction2": "ක් ඇතුළත තහවුරු කරන්න.",
+    "CountdownInstruction3": "ඔබට අවලංගු කළ හැකිය; එසේ නොමැතිනම්, මෙම නිලධාරියා ස්වයංක්‍රීයව පවරනු ලැබේ.",
     "NoOfficersAvailable": "නිලධාරීන් නොමැත",
     "OfficerAssignedJobs": "පවරන ලද",
     "AutoAssignedSuccess": "වැඩ ස්වයංක්‍රීයව පවරනු ඇත",
@@ -414,6 +418,8 @@
     "AssignConfirmMessage": "වැඩ {{count}} ක් මෙම නිලධාරියාට පැවරීම කරන්නද?",
     "NoJobsSelected": "වැඩ තෝරා නැත",
     "SelectAtLeastOneJob": "කරුණාකර පැවරීම සඳහා අවම වශයෙන් එක් වැඩයක් හෝ තෝරන්න.",
-    "Start":"අරබන්න"
+    "Start":"අරබන්න",
+           "FailedToAssignJobs":"වැඩ පැවරීම අසාර්ථක විය. කරුණාකර නැවත උත්සාහ කරන්න."
+
   }
 }

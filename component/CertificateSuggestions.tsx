@@ -121,7 +121,7 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
 
   const handleSaveProblem = async (item: ProblemItem) => {
     if (!item.problem.trim() || !item.solution.trim()) {
-      Alert.alert(t("Error.Sorry"), t("CertificateSuggestions.Both problem and solution must be filled."));
+      Alert.alert(t("Error.Sorry"), t("CertificateSuggestions.Both problem and solution must be filled."),[{ text: t("MAIN.OK") }]);
       return;
     }
 
@@ -131,7 +131,8 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
       if (!token) {
         Alert.alert(
           t("Error.Sorry"),
-          t("Error.Your login session has expired. Please log in again to continue.")
+          t("Error.Your login session has expired. Please log in again to continue."),
+          [{ text: t("MAIN.OK") }]
         );
         return;
       }
@@ -168,12 +169,13 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
       } else {
         Alert.alert(
           t("Error.Sorry"),
-          t("CertificateSuggestions.Failed to save problem.")
+          t("CertificateSuggestions.Failed to save problem."),
+          [{ text: t("MAIN.OK") }]
         );
       }
     } catch (err) {
       console.error("❌ Error saving/updating problem:", err);
-      Alert.alert(t("Error.Sorry"), t("Main.somethingWentWrong"));
+      Alert.alert(t("Error.Sorry"), t("Main.somethingWentWrong"), [{ text: t("MAIN.OK") }]);
 
     }finally{
       setLoading(false);
@@ -226,7 +228,8 @@ const fetchProblems = async () => {
     if (!token) {
       Alert.alert(
         t("Error.Sorry"),
-        t("Error.Your login session has expired. Please log in again to continue.")
+        t("Error.Your login session has expired. Please log in again to continue."),
+        [{ text: t("MAIN.OK") }]
       );
       return;
     }
@@ -312,7 +315,7 @@ const fetchProblems = async () => {
              setOtpSendLoading(false);
           }  catch (error) {
                       Alert.alert(t("Main.error"), t("SignupForum.otpSendFailed"), [{
-                        text: t("PublicForum.OK"),
+                         text: t("MAIN.OK") ,
                       }]);
                       setOtpSendLoading(false);
                     }finally{

@@ -116,7 +116,8 @@ const [existingProblemId, setExistingProblemId] = useState<string | null>(null);
   if (!farmerFeedback.trim() || !advice.trim()) {
     Alert.alert(
       t("Error.Sorry"),
-      t("CertificateSuggestions.Both problem and solution must be filled.")
+      t("CertificateSuggestions.Both problem and solution must be filled."),
+      [{ text: t("MAIN.OK") }]
     );
     return;
   }
@@ -139,7 +140,8 @@ const imageChanged =
     if (!token) {
       Alert.alert(
         t("Error.Sorry"),
-        t("Main.Your login session has expired. Please log in again to continue.")
+        t("Main.Your login session has expired. Please log in again to continue."),
+        [{ text: t("MAIN.OK") }]
       );
       return;
     }
@@ -208,12 +210,13 @@ const imageChanged =
     } else {
       Alert.alert(
         t("Error.Sorry"),
-        t("RequestProblem.Failed to save problem. Please try again.")
+        t("RequestProblem.Failed to save problem. Please try again."),
+        [{ text: t("MAIN.OK") }]
       );
     }
   } catch (err) {
     console.error("❌ Error saving/updating problem:", err);
-    Alert.alert(t("Error.Sorry"), t("Main.somethingWentWrong"));
+    Alert.alert(t("Error.Sorry"), t("Main.somethingWentWrong"), [{ text: t("MAIN.OK") }]);
   } finally {
     setLoading(false);
   }

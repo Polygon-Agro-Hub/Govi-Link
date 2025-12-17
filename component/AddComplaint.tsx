@@ -9,7 +9,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
-  Alert
+  Alert,
+  Keyboard
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "./types";
@@ -100,11 +101,13 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({ navigation }) =
   }, []);
 
   const handleSubmit = async () => {
+    Keyboard.dismiss()
     // Check if both fields are empty
     if (!selectedCategory && !complaintText.trim()) {
       Alert.alert(
         t("Error.error"),
-        t("AddComplaint.Please fill out all fields.")
+        t("AddComplaint.Please fill out all fields."),
+        [{ text: t("MAIN.OK") }]
       );
       return;
     }
@@ -113,7 +116,8 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({ navigation }) =
     if (!selectedCategory && complaintText.trim()) {
       Alert.alert(
         t("Error.error"),
-        t("AddComplaint.Please select a category.")
+        t("AddComplaint.Please select a category."),
+        [{ text: t("MAIN.OK") }]
       );
       return;
     }
@@ -122,7 +126,8 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({ navigation }) =
     if (selectedCategory && !complaintText.trim()) {
       Alert.alert(
         t("Error.error"),
-        t("AddComplaint.Please enter your complaint.")
+        t("AddComplaint.Please enter your complaint."),
+        [{ text: t("MAIN.OK") }]
       );
       return;
     }
@@ -132,7 +137,8 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({ navigation }) =
       if (!storedToken) {
         Alert.alert(
           t("Error.Sorry"),
-          t("Error.Your login session has expired. Please log in again to continue.")
+          t("Error.Your login session has expired. Please log in again to continue."),
+          [{ text: t("MAIN.OK") }]
         );
         return;
       }
@@ -157,20 +163,22 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({ navigation }) =
 
       Alert.alert(
         t("Main.Success"),
-        t("AddComplaint.Complaint submitted successfully!")
+        t("AddComplaint.Complaint submitted successfully!"),
+        [{ text: t("MAIN.OK") }]
       );
       resetForm(); // Use resetForm instead of individual setters
-      navigation.goBack(); // Navigate back after submitting
+      navigation.navigate("Main", { screen: "Dashboard" });
     } catch (error: unknown) {
       if (error instanceof Error) {
         console.error("Error message:", error.message);
         Alert.alert(
           t("Error.Sorry"),
-          t("AddComplaint.Failed to submit complaint. Please try again.")
+          t("AddComplaint.Failed to submit complaint. Please try again."),
+          [{ text: t("MAIN.OK") }]
         );
       } else {
         console.error("An unknown error occurred.");
-        Alert.alert(t("Error.Sorry"), t("Main.somethingWentWrong"));
+        Alert.alert(t("Error.Sorry"), t("Main.somethingWentWrong"), [{ text: t("MAIN.OK") }]);
       }
     } finally {
       setLoading(false);
@@ -305,7 +313,7 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({ navigation }) =
               multiline
               numberOfLines={6}
               textAlignVertical="top"
-              placeholder="Add the Complaint here.."
+              placeholder={t("AddComplaint.Add the Complaint here..")}
               placeholderTextColor="#808FA2"
               className="text-black bg-white border border-[#9DB2CE] rounded-lg p-4 min-h-[280px]"
               value={complaintText}

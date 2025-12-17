@@ -232,7 +232,8 @@ useEffect(() => {
           t("Error.Sorry"),
           t(
             "Error.Your login session has expired. Please log in again to continue."
-          )
+          ),
+          [{ text: t("MAIN.OK") }]
         );
         return;
       }
@@ -253,7 +254,8 @@ useEffect(() => {
           t("Error.Sorry"),
           t(
             "Error.Your login session has expired. Please log in again to continue."
-          )
+          ),
+          [{ text: t("MAIN.OK") }]
         );
         navigation.navigate("Login");
       }

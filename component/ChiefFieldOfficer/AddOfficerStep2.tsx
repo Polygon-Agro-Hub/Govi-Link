@@ -625,7 +625,8 @@ const sortBranchesAlphabetically = (branches: Array<{ ID: number; name: string }
     if (!validateStep2()) {
       Alert.alert(
         t("Error.Validation Error"),
-        t("Error.Please fix all errors before proceeding")
+        t("Error.Please fix all errors before proceeding"),
+        [{ text: t("MAIN.OK") }]
       );
       return;
     }

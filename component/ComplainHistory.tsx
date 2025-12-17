@@ -167,9 +167,7 @@ const ComplainHistory: React.FC<ComplainHistoryProps> = ({ navigation }) => {
       setSelectedComplain(complain);
       setModalVisible(true);
     } else {
-      Alert.alert(t("Main.Sorry"), t("ComplainHistory.No Reply"), [
-        { text: t("ComplainHistory.OK") },
-      ]);
+      Alert.alert(t("Main.Sorry"), t("ComplainHistory.No Reply"), [{ text: t("MAIN.OK") }])
     }
   };
 

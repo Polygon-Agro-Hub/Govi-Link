@@ -1,4 +1,6 @@
-{
+{ "MAIN":{
+    "OK": "OK"
+  },
   "Main": {
     "error": "மன்னிக்கவும்",
     "somethingWentWrong": "ஏதோ தவறாகிவிட்டது. பிறகு முயற்சிக்கவும்.",
@@ -122,7 +124,8 @@
     "Complaint submitted successfully!": "புகார் வெற்றிகரமாக சேர்க்கப்பட்டது!",
     "Failed to submit complaint. Please try again.": "புகாரை சேர்க்க முடியவில்லை. தயவுசெய்து மீண்டும் முயற்சிக்கவும்.",
     "Please select a category.":"ஒரு வகையைத் தேர்ந்தெடுக்கவும்.",
-    "Please enter your complaint.":"உங்கள் புகாரை உள்ளிடவும்."
+    "Please enter your complaint.":"உங்கள் புகாரை உள்ளிடவும்.",
+        "Add the Complaint here..": "Add the Complaint here.."
   },
   "Profile": {
     "Employee ID": "பணியாளர் அடையாள எண்",
@@ -413,6 +416,8 @@
     "AssignConfirmMessage": "Assign {{count}} job(s) to this officer?",
     "NoJobsSelected": "No Jobs Selected",
     "SelectAtLeastOneJob": "Please select at least one job to assign.",
-      "Start":"Start"
+      "Start":"Start",
+             "FailedToAssignJobs":"Failed to assign jobs. Please try again."
+
   }
 }
