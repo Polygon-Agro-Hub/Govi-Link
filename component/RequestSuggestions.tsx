@@ -101,24 +101,12 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
     setEditingId(id);
   };
 
-  // const handleChangeProblem = (
-  //   id: number,
-  //   field: "problem" | "solution",
-  //   value: string
-  // ) => {
-  //   setProblems((prev) =>
-  //     prev.map((item) => (item.id === id ? { ...item, [field]: value } : item))
-  //   );
-  // };
 const handleChangeProblem = (
   id: number,
   field: "problem" | "solution",
   value: string
 ) => {
-  // if (value.length === 1 && value[0] === " ") return;
-  // if (value.length > 0 && value[0] === value[0].toLowerCase()) {
-  //   value = value.charAt(0).toUpperCase() + value.slice(1);
-  // }
+
   value = value.replace(/^\s+/, "");
 
   // Capitalize first letter
@@ -399,16 +387,6 @@ const handleChangeProblem = (
                           : t("CertificateSuggestions.Save Problem")}
                       </Text>
                     </TouchableOpacity>
-                    {/* {item.saved && editingId === item.id && (
-                      <TouchableOpacity
-                        className="bg-[#C4C4C4] p-4 rounded-3xl w-full flex-1 justify-center items-center mt-2"
-                        onPress={() => handleCancelEdit(item.id)}
-                      >
-                        <Text className="text-white text-center font-semibold text-base">
-                          {t("CertificateQuesanory.Cancel")}
-                        </Text>
-                      </TouchableOpacity>
-                    )} */}
                       <TouchableOpacity
                         className="bg-[#C4C4C4] p-4 rounded-3xl w-full flex-1 justify-center items-center mt-2"
                         onPress={() => handleCancelEdit(item.id)}

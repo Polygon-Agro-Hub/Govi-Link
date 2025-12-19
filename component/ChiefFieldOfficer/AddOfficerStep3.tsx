@@ -185,15 +185,6 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
   };
 
   const handleSubmit = async () => {
-    // Validate that all required images are uploaded
-    // if (!validateStep3()) {
-    //   Alert.alert(
-    //     t("AddOfficer.Incomplete"),
-    //     t("AddOfficer.UploadAllDocuments"),
-    //     [{ text: t("MAIN.OK") }]
-    //   );
-    //   return;
-    // }
     const validationErrors = validateStep3();
   if (Object.keys(validationErrors).length > 0) {
     const errorMessage = Object.values(validationErrors).join("\n• ");

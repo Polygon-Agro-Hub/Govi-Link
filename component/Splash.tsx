@@ -22,26 +22,6 @@ const Splash: React.FC = () => {
   const progressAnim = useRef(new Animated.Value(0)).current;
   const [progress, setProgress] = useState(0);
    const dispatch = useDispatch();
-  // useEffect(() => {
-  //   const listenerId = progressAnim.addListener(({ value }) => {
-  //     setProgress(value);
-  //   });
-
-  //   // Animate progress from 0 → 1 smoothly in 5 seconds
-  //   Animated.timing(progressAnim, {
-  //     toValue: 1,
-  //     duration: 5000,
-  //     useNativeDriver: false,
-  //   }).start(() => {
-  //     // Navigate after progress completes
-  //     // navigation.navigate("Main", { screen: "Dashboard" });
-  //     navigation.navigate("Language" as any)
-  //   });
-
-  //   return () => {
-  //     progressAnim.removeListener(listenerId);
-  //   };
-  // }, [navigation, progressAnim]);
 
   useEffect(() => {
   const listenerId = progressAnim.addListener(({ value }) => {

@@ -106,10 +106,6 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
     field: "problem" | "solution",
     value: string
   ) => {
-  //     if (value.length === 1 && value[0] === " ") return;
-  // if (value.length > 0 && value[0] === value[0].toLowerCase()) {
-  //   value = value.charAt(0).toUpperCase() + value.slice(1);
-  // }
   value = value.replace(/^\s+/, "");
   if (value.length > 0) {
     value = value.charAt(0).toUpperCase() + value.slice(1);
@@ -186,41 +182,6 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
     fetchProblems();
   }, []);
 
-  // const fetchProblems = async () => {
-  //   try {
-  //     setLoading(true);
-  //     const token = await AsyncStorage.getItem("token");
-  //     if (!token) {
-  //          Alert.alert(
-  //         t("Error.Sorry"),
-  //         t("Error.Your login session has expired. Please log in again to continue.")
-  //       );
-  //       return;
-  //     }
-
-  //     const response = await axios.get(
-  //       `${environment.API_BASE_URL}api/officer/get-problems/${slavequestionnaireId}`,
-  //       { headers: { Authorization: `Bearer ${token}` } }
-  //     );
-
-  //     if (response.data.success) {
-  //       const fetchedProblems = response.data.data.map((p: any) => ({
-  //         id: p.id,
-  //         problem: p.problem,
-  //         solution: p.solution,
-  //         saved: true,
-  //       }));
-  //       setProblems(fetchedProblems);
-  //       console.log("fetch problmes", fetchedProblems);
-  //     } else {
-
-  //     }
-  //   } catch (err) {
-  //     console.error("❌ Error fetching problems:", err);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 const fetchProblems = async () => {
   try {
     setLoading(true);
@@ -421,16 +382,6 @@ const fetchProblems = async () => {
                           : t("CertificateSuggestions.Save Problem")}
                       </Text>
                     </TouchableOpacity>
-                    {/* {item.saved && editingId === item.id && (
-                      <TouchableOpacity
-                        className="bg-[#C4C4C4] p-4 rounded-3xl w-full flex-1 justify-center items-center mt-2"
-                        onPress={() => handleCancelEdit(item.id)}
-                      >
-                        <Text className="text-white text-center font-semibold text-base">
-                          {t("CertificateQuesanory.Cancel")}
-                        </Text>
-                      </TouchableOpacity>
-                    )} */}
                       <TouchableOpacity
                         className="bg-[#C4C4C4] p-4 rounded-3xl w-full flex-1 justify-center items-center mt-2"
                         onPress={() => handleCancelEdit(item.id)}
