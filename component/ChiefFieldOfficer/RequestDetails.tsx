@@ -91,6 +91,7 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
     } catch (error) {
       console.error("Failed to fetch request details:", error);
       Alert.alert("Error", "Failed to load request details");
+      
     } finally {
       setLoading(false);
     }

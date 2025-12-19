@@ -18,7 +18,7 @@ import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { RouteProp, useRoute } from "@react-navigation/native";
+import { RouteProp, useRoute,useFocusEffect } from "@react-navigation/native";
 
 type AddOfficerStep3NavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -31,12 +31,13 @@ interface AddOfficerStep3Props {
 
 interface RouteParams {
   formData: any;
+  isnewthirdstep?: boolean;
 }
 
 const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
   const { t } = useTranslation();
   const route = useRoute<RouteProp<RootStackParamList, "AddOfficerStep3">>();
-  const { formData } = route.params as RouteParams;
+  const { formData , isnewthirdstep} = route.params as RouteParams;
 
   // State for uploaded images
   const [nicFrontImage, setNicFrontImage] = useState<string | null>(null);
@@ -53,13 +54,30 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+        useFocusEffect(
+          React.useCallback(() => {
+     console.log("focus effect third", isnewthirdstep)
+          if(isnewthirdstep===true){
+            setNicFrontImage(null)
+            setNicBackImage(null)
+            setPassbookImage(null)
+            setContractImage(null)
+            setNicFrontFileName(null)
+            setNicBackFileName(null)
+            setPassbookFileName(null)
+            setContractFileName(null)
+          }
+    
+          }, [isnewthirdstep])
+        );
   const pickImage = async (type: string) => {
     // Request permission
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
       Alert.alert(
         t("AddOfficer.PermissionRequired"),
-        t("AddOfficer.PermissionRequiredMessage")
+        t("AddOfficer.PermissionRequiredMessage"),
+        [{ text: t("MAIN.OK") }]
       );
       return;
     }
@@ -139,8 +157,10 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
     if (!contractImage)
       newErrors.contract = t("Error.Contract image is required");
 
+    // setErrors(newErrors);
+    // return Object.keys(newErrors).length === 0;
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  return newErrors;
   };
 
   const convertImageToFormData = async (
@@ -166,14 +186,25 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
 
   const handleSubmit = async () => {
     // Validate that all required images are uploaded
-    if (!validateStep3()) {
-      Alert.alert(
-        t("AddOfficer.Incomplete"),
-        t("AddOfficer.UploadAllDocuments")
-      );
-      return;
-    }
+    // if (!validateStep3()) {
+    //   Alert.alert(
+    //     t("AddOfficer.Incomplete"),
+    //     t("AddOfficer.UploadAllDocuments"),
+    //     [{ text: t("MAIN.OK") }]
+    //   );
+    //   return;
+    // }
+    const validationErrors = validateStep3();
+  if (Object.keys(validationErrors).length > 0) {
+    const errorMessage = Object.values(validationErrors).join("\n• ");
 
+       Alert.alert(
+      t("Error.Validation Error"),
+      `• ${errorMessage}`,
+      [{ text: t("MAIN.OK") }]
+    );
+    return;
+  }
     try {
       setLoading(true);
 
@@ -181,7 +212,8 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
       if (!token) {
         Alert.alert(
           t("Error.Sorry"),
-          t("Error.Your login session has expired")
+          t("Error.Your login session has expired"),
+          [{ text: t("MAIN.OK") }]
         );
         navigation.navigate("Login");
         return;
@@ -276,7 +308,8 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
       if (response.data.status === "success" || response.data.id) {
         Alert.alert(
           t("AddOfficer.Success"),
-          t("AddOfficer.OfficerAddedSuccess")
+          t("AddOfficer.OfficerAddedSuccess"),
+          [{ text: t("MAIN.OK") }]
         );
 
         clearAllFormData();
@@ -300,7 +333,7 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
         errorMessage = t("Error.RequestTimeout");
       }
 
-      Alert.alert(t("Error.Error"), errorMessage);
+      Alert.alert(t("Error.Error"), t("Error.somethingWentWrong"),[{ text: t("MAIN.OK") }]);
     } finally {
       setLoading(false);
     }
@@ -339,7 +372,7 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
           <Text className="text-sm text-black font-semibold mr-2">
             {t("AddOfficer.Attached")}:
           </Text>
-          <Text className="text-sm text-[#415CFF] font-medium">{fileName}</Text>
+          <Text className="text-sm text-[#415CFF] font-medium w-[70%]">{fileName}</Text>
         </View>
       )}
 
@@ -350,7 +383,7 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
 
   // Add back button functionality
   const handleGoBack = () => {
-    navigation.navigate("AddOfficerStep2", { formData });
+    navigation.navigate("AddOfficerStep2", { formData, isnewsecondstep:false });
   };
 
   return (

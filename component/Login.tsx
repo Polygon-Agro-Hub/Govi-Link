@@ -56,7 +56,18 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
       setEmpIdError(t("Login.Please enter Employee ID in uppercase letters"));
       return false;
     }
-    
+      if (
+    !trimmedEmpId.startsWith("CFO") &&
+    !trimmedEmpId.startsWith("FIO")
+  ) {
+    Alert.alert(
+      t("Error.Unauthorized Access"),
+      t("Error.You are not authorized to access this system. Please use a valid Employee ID") ,
+      [{ text: t("MAIN.OK") }]
+    );
+    return false;
+  }
+
 
     setEmpIdError("");
     return true;
@@ -185,7 +196,14 @@ if (!response.ok || !data.success) {
       t("Error.error"),
       t("Login.Invalid EMP ID & Password")
     );
-  } else {
+  }   else if (message.includes("user not approved")) {
+    // Not approved
+    Alert.alert(
+      t("Error.error"),
+      t("Error.This EMP ID is not approved.")
+    );
+  }
+      else {
     Alert.alert(
       t("Error.error"),
       t("Main.somethingWentWrong")

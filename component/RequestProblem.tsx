@@ -42,7 +42,7 @@ interface RequestProblemProps {
 const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
   const route = useRoute<RequestProblemRouteProp>();
   const { govilinkjobid, jobId, farmerId, farmerMobile, screenName } = route.params;
-  console.log("RequestProblem Params:", govilinkjobid, jobId);
+  console.log("RequestProblem Params:", govilinkjobid, jobId, screenName);
   const { t } = useTranslation();
 
   const [farmerFeedback, setFarmerFeedback] = useState("");
@@ -116,7 +116,8 @@ const [existingProblemId, setExistingProblemId] = useState<string | null>(null);
   if (!farmerFeedback.trim() || !advice.trim()) {
     Alert.alert(
       t("Error.Sorry"),
-      t("CertificateSuggestions.Both problem and solution must be filled.")
+      t("CertificateSuggestions.Both problem and solution must be filled."),
+      [{ text: t("MAIN.OK") }]
     );
     return;
   }
@@ -139,7 +140,8 @@ const imageChanged =
     if (!token) {
       Alert.alert(
         t("Error.Sorry"),
-        t("Main.Your login session has expired. Please log in again to continue.")
+        t("Main.Your login session has expired. Please log in again to continue."),
+        [{ text: t("MAIN.OK") }]
       );
       return;
     }
@@ -208,12 +210,13 @@ const imageChanged =
     } else {
       Alert.alert(
         t("Error.Sorry"),
-        t("RequestProblem.Failed to save problem. Please try again.")
+        t("RequestProblem.Failed to save problem. Please try again."),
+        [{ text: t("MAIN.OK") }]
       );
     }
   } catch (err) {
     console.error("❌ Error saving/updating problem:", err);
-    Alert.alert(t("Error.Sorry"), t("Main.somethingWentWrong"));
+    Alert.alert(t("Error.Sorry"), t("Main.somethingWentWrong"), [{ text: t("MAIN.OK") }]);
   } finally {
     setLoading(false);
   }
@@ -232,7 +235,12 @@ useFocusEffect(
   useCallback(() => {
     const onBackPress = () => {
       // Navigate to screenName with params
-      navigation.navigate("Main", {screen:screenName})
+      // navigation.navigate("Main", {screen:screenName})
+                  navigation.navigate("Main", {
+        screen: "MainTabs",
+        params: {
+          screen: screenName
+        }})
       return true; // prevent default back behavior
     };
 
@@ -248,17 +256,25 @@ useFocusEffect(
 
 const handleFarmerFeedbackChange = (text: string) => {
   // Block leading spaces
-  if (text.length === 1 && text[0] === ' ') return;
-  // Capitalize first letter if first char is lowercase
-  if (text.length > 0 && text[0] === text[0].toLowerCase()) {
+  // if (text.length === 1 && text[0] === ' ') return;
+  // // Capitalize first letter if first char is lowercase
+  // if (text.length > 0 && text[0] === text[0].toLowerCase()) {
+  //   text = text.charAt(0).toUpperCase() + text.slice(1);
+  // }
+    text = text.replace(/^\s+/, "");
+  if (text.length > 0) {
     text = text.charAt(0).toUpperCase() + text.slice(1);
   }
   setFarmerFeedback(text);
 };
 
 const handleAdviceChange = (text: string) => {
-  if (text.length === 1 && text[0] === ' ') return;
-  if (text.length > 0 && text[0] === text[0].toLowerCase()) {
+  // if (text.length === 1 && text[0] === ' ') return;
+  // if (text.length > 0 && text[0] === text[0].toLowerCase()) {
+  //   text = text.charAt(0).toUpperCase() + text.slice(1);
+  // }
+    text = text.replace(/^\s+/, "");
+  if (text.length > 0) {
     text = text.charAt(0).toUpperCase() + text.slice(1);
   }
   setAdvice(text);
@@ -273,7 +289,14 @@ const handleAdviceChange = (text: string) => {
       <View className="flex-row items-center px-4 py-4 bg-white shadow-sm border-b border-[#E5E5E5]">
         <TouchableOpacity
           className="bg-[#F6F6F680] rounded-full p-2 justify-center w-10 z-20"
-          onPress={() => navigation.goBack()}
+          // onPress={() => navigation.navigate("Main", {screen:screenName})}
+                onPress={() =>             
+                      navigation.navigate("Main", {
+        screen: "MainTabs",
+        params: {
+          screen: screenName
+        }
+      }) }
         >
           <AntDesign name="left" size={22} color="#000" />
         </TouchableOpacity>

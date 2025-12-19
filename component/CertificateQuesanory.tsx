@@ -200,7 +200,8 @@ const handleCheck = async (q: Question) => {
       if (!token) {
            Alert.alert(
           t("Error.Sorry"),
-          t("Error.Your login session has expired. Please log in again to continue.")
+          t("Error.Your login session has expired. Please log in again to continue."),
+            [{ text: t("MAIN.OK") }]
         );
         return;
       }
@@ -276,7 +277,7 @@ await updateTickResult(q, newTickResult, token);
 
   } catch (err) {
     console.error("❌ Error updating tickResult:", err);
-    Alert.alert(t("Error.error"), t("CertificateQuesanory.Something went wrong while updating question."));
+    Alert.alert(t("Error.error"), t("CertificateQuesanory.Something went wrong while updating question."),[{ text: t("MAIN.OK") }]);
   } finally {
     setLoadingQuestionId(null);
   }
@@ -301,13 +302,14 @@ const updateTickResult = async (q: Question, newValue: number, token: string) =>
       if (newValue === 1) {
         Alert.alert(
           t("CertificateQuesanory.Success"),
-          t("CertificateQuesanory.Task complete successfully!")
+          t("CertificateQuesanory.Task complete successfully!"),
+          [{ text: t("MAIN.OK") }]
         );
       }
     }
   } catch (err) {
     console.error("❌ Error updating tickResult:", err);
-    Alert.alert(t("Error.error"), t("CertificateQuesanory.Something went wrong while updating question."));
+    Alert.alert(t("Error.error"), t("CertificateQuesanory.Something went wrong while updating question."), [{ text: t("MAIN.OK") }]);
   } finally {
     setLoadingQuestionId(null);
   }
@@ -323,7 +325,8 @@ const handleSubmitPhoto = async (q: Question) => {
       if (!token) {
            Alert.alert(
           t("Error.Sorry"),
-          t("Error.Your login session has expired. Please log in again to continue.")
+          t("Error.Your login session has expired. Please log in again to continue."),
+          [{ text: t("MAIN.OK") }]
         );
         return;
       }
@@ -354,7 +357,7 @@ const handleSubmitPhoto = async (q: Question) => {
     );
 
     if (response.data?.success || response.status === 200) {
-      Alert.alert(t("CertificateQuesanory.Success"), t("CertificateQuesanory.Task complete successfully!"));
+      Alert.alert(t("CertificateQuesanory.Success"), t("CertificateQuesanory.Task complete successfully!"), [{ text: t("MAIN.OK") }]);
       setQuestions((prev) =>
         prev.map((item) =>
           item.id === selectedQuestion.id
@@ -366,11 +369,11 @@ const handleSubmitPhoto = async (q: Question) => {
       setCapturedImage(null);
       setSelectedQuestion(null);
     } else {
-      Alert.alert(t("Error.error"), t("CertificateQuesanory.Failed to complete task, Please try again"));
+      Alert.alert(t("Error.error"), t("CertificateQuesanory.Failed to complete task, Please try again"), [{ text: t("MAIN.OK") }]);
     }
   } catch (err) {
     console.error("❌ Upload photo failed:", err);
-    Alert.alert(t("Error.error"), t("CertificateQuesanory.Failed to complete task, Please try again"));
+    Alert.alert(t("Error.error"), t("CertificateQuesanory.Failed to complete task, Please try again"),[{ text: t("MAIN.OK") }]);
   } finally {
     setLoadingQuestionId(null);
   }
@@ -388,9 +391,13 @@ const handleCameraClose = (imageUri: string | null) => {
 useFocusEffect(
   useCallback(() => {
     const onBackPress = () => {
-      // Navigate to screenName with params
-      navigation.navigate("Main", {screen:screenName})
-      return true; // prevent default back behavior
+      navigation.navigate("Main", {
+        screen: "MainTabs",
+        params: {
+          screen: screenName
+        }
+      });     
+       return true; // prevent default back behavior
     };
 
     const subscription = BackHandler.addEventListener(
@@ -408,7 +415,14 @@ useFocusEffect(
       <View className="flex-row items-center px-4 py-4 bg-white shadow-sm border-b border-[#E5E5E5]">
         <TouchableOpacity
           className="bg-[#F6F6F680] rounded-full p-2 justify-center w-10 z-20"
-          onPress={() =>  navigation.navigate("Main", {screen:screenName})}
+          // onPress={() =>  navigation.navigate("Main", {screen:screenName})}
+                onPress={() =>             
+                      navigation.navigate("Main", {
+        screen: "MainTabs",
+        params: {
+          screen: screenName
+        }
+      }) }
         >
           <AntDesign name="left" size={22} color="#000" />
         </TouchableOpacity>

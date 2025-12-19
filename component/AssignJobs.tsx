@@ -1,5 +1,5 @@
 import { StackNavigationProp } from "@react-navigation/stack";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   View,
   Text,
@@ -11,6 +11,8 @@ import {
   ActivityIndicator,
   Alert,
   BackHandler,
+    Animated, PanResponder,
+    Pressable
 } from "react-native";
 import { RootStackParamList } from "@/component/types";
 import { useTranslation } from "react-i18next";
@@ -74,6 +76,50 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
   const [visits, setVisits] = useState<VisitItem[]>([]);
   const [showPopup, setShowPopup] = useState(false);
   const [selectedItem, setSelectedItem] = useState<VisitItem | null>(null);
+
+  const translateY = useRef(new Animated.Value(0)).current;
+  const currentTranslateY = useRef(0);
+  console.log(translateY)
+  
+  const panResponder = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponderCapture: (_, g) => g.dy > 5,
+      onStartShouldSetPanResponder: () => true,
+  
+      onPanResponderMove: (_, g) => {
+        if (g.dy > 0) translateY.setValue(g.dy);
+      },
+  
+      onPanResponderRelease: (_, g) => {
+        if (g.dy > 120) {
+          console.log("hit1");
+                    setShowPopup(false);
+          Animated.timing(translateY, {
+            toValue: 600,
+            duration: 100,
+            useNativeDriver: true,
+          }).start(() => {
+            console.log("hit3");
+            translateY.setValue(0);
+            setShowPopup(false);
+            setSelectedItem(null);
+          });
+        } else {
+          console.log("hit4");
+          Animated.spring(translateY, {
+            toValue: 0,
+            useNativeDriver: true,
+          }).start();
+        }
+      },
+    })
+  ).current;
+  
+  useEffect(() => {
+    if (showPopup) {
+      translateY.setValue(0);
+    }
+  }, [showPopup]);
 
   useEffect(() => {
     const today = new Date().toISOString().split("T")[0];
@@ -425,7 +471,7 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
 
       {/* Action Buttons - Only show when at least one job is selected */}
       {selectedJobs.length > 0 && (
-        <View className="flex-row p-4 justify-between items-center">
+        <View className="flex-row p-4 justify-between items-center space-x-6">
           <View className="flex-1"></View>
           <View className="flex-1 items-center">
             <TouchableOpacity onPress={handleStartJob}>
@@ -433,18 +479,18 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
                 colors={["#F2561D", "#FF1D85"]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
-                className="flex-row px-6 h-10 rounded-full items-center justify-center"
+className="flex-row p-3 rounded-full items-center justify-center min-w-[120px]"
               >
-                <Text className="text-white font-bold text-lg">Start</Text>
+                <Text className={`text-white  font-bold ${i18n.language==="si"? "text-base": i18n.language === "ta"? "text-base": "text-lg"}`}>{t("AssignJobOfficerList.Start")}</Text>
               </LinearGradient>
             </TouchableOpacity>
           </View>
-          <View className="flex-1 items-end">
+          <View className="flex-1 pr-6">
             <TouchableOpacity
               onPress={handleAssignJobs}
-              className="bg-black px-5 py-1.5 rounded-3xl"
+              className=" bg-black px-auto p-3 min-w-[120px] rounded-3xl items-center justify-center"
             >
-              <Text className="font-bold text-white text-lg">Assign</Text>
+              <Text className={`text-white  font-bold ${i18n.language==="si"? "text-base": i18n.language === "ta"? "text-base": "text-lg"}`}>{t("AssignJobOfficerList.AssignButton")}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -518,8 +564,7 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
         </View>
       )}
 
-      {/* Modal Popup */}
-      <Modal
+      {/* <Modal
         transparent
         visible={showPopup}
         animationType="slide"
@@ -538,7 +583,6 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
             <TouchableWithoutFeedback>
               <View className="bg-white rounded-t-3xl p-5 w-full">
                 <View className="items-center mt-4">
-                  {/* Draggable Handle */}
                   <TouchableOpacity
                     className="z-50 justify-center items-center"
                     onPress={() => {
@@ -568,7 +612,6 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
                       </Text>
 
                       <View className="flex flex-row justify-center gap-x-2 mb-4 mt-6 px-4">
-                        {/* Location Button */}
                         <TouchableOpacity
                           className="flex-1"
                           disabled={
@@ -616,7 +659,6 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
                           </View>
                         </TouchableOpacity>
 
-                        {/* Call Button */}
                         <TouchableOpacity
                           className="flex"
                           onPress={() => handleDial(selectedItem.farmerMobile)}
@@ -630,7 +672,6 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
                         </TouchableOpacity>
                       </View>
 
-                      {/* Address Section */}
                       {(selectedItem.city ||
                         selectedItem.plotNo ||
                         selectedItem.street) && (
@@ -649,9 +690,7 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
                     </>
                   )}
 
-                  {/* Action Buttons in Modal */}
                   <View className="flex-row justify-between w-full mt-6 px-4 gap-x-4">
-                    {/* Start Button */}
                     <TouchableOpacity
                       className="flex-1"
                       onPress={handleStartJobFromModal}
@@ -673,6 +712,174 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
             </TouchableWithoutFeedback>
           </View>
         </TouchableWithoutFeedback>
+      </Modal> */}
+
+         <Modal
+        transparent
+        visible={showPopup}
+        animationType="none"
+        onRequestClose={() => {
+          setShowPopup(false);
+          setSelectedItem(null);
+        }}
+      >
+                  <View
+                    style={{
+                      flex: 1,
+                      backgroundColor: "rgba(0,0,0,0.3)",
+                    }}
+                  >
+                        <Pressable
+              style={{ flex: 1 }}
+              onPress={() => {
+                setShowPopup(false);
+                setSelectedItem(null);
+              }}
+            />
+                      <Animated.View
+          {...panResponder.panHandlers}
+          style={{
+            position: "absolute",
+            bottom: 0,
+            width: "100%",
+            transform: [{ translateY }],
+          }}
+          className="bg-white rounded-t-3xl p-5 w-full"
+        > 
+        
+                <View className="items-center mt-4">
+                  <TouchableOpacity
+                    className="z-50 justify-center items-center"
+                    onPress={() => {
+                      setShowPopup(false);
+                      setSelectedItem(null);
+                    }}
+                  >
+                    <View className="bg-[#D9D9D9] w-20 py-0.5 rounded-full -mt-6" />
+                    <View className="bg-[#D9D9D9] w-8 py-0.5 rounded-full mt-1 mb-6" />
+                  </TouchableOpacity>
+
+                  {selectedItem && (
+                    <>
+                      <Text className="text-base font-semibold text-[#747474]">
+                        #{selectedItem.jobId || "N/A"}
+                      </Text>
+                      <Text className="text-lg font-bold mt-2">
+                        {selectedItem.farmerName || "N/A"}
+                      </Text>
+                      <Text className="text-base font-semibold mt-1">
+                        {getServiceName(selectedItem)}
+                      </Text>
+
+                      <Text className="text-sm font-medium text-[#4E6393] mt-1">
+                        {t(`Districts.${selectedItem.district}`)}{" "}
+                        {t("VisitPopup.District")}
+                      </Text>
+
+                      <View className="flex flex-row justify-center gap-x-2 mb-4 mt-6 px-4">
+                        <TouchableOpacity
+                          className="flex-1"
+                          disabled={
+                            !selectedItem?.latitude || !selectedItem?.longitude
+                          }
+                          onPress={() => {
+                            if (
+                              selectedItem?.latitude &&
+                              selectedItem?.longitude
+                            ) {
+                              const lat = selectedItem.latitude;
+                              const lon = selectedItem.longitude;
+                              const url = `https://www.google.com/maps?q=${lat},${lon}`;
+                              Linking.openURL(url);
+                            }
+                          }}
+                        >
+                          <View
+                            className={`flex flex-row items-center justify-center rounded-full py-2 border ${
+                              selectedItem?.latitude && selectedItem?.longitude
+                                ? "border-[#F83B4F]"
+                                : "border-[#9DB2CE]"
+                            }`}
+                          >
+                            <FontAwesome6
+                              name="location-dot"
+                              size={20}
+                              color={
+                                selectedItem?.latitude &&
+                                selectedItem?.longitude
+                                  ? "#F83B4F"
+                                  : "#9DB2CE"
+                              }
+                            />
+                            <Text
+                              className={`text-base font-semibold ml-2 ${
+                                selectedItem?.latitude &&
+                                selectedItem?.longitude
+                                  ? "text-[#000000]"
+                                  : "text-[#9DB2CE]"
+                              }`}
+                            >
+                              {t("VisitPopup.Location")}
+                            </Text>
+                          </View>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                          className="flex"
+                          onPress={() => handleDial(selectedItem.farmerMobile)}
+                        >
+                          <View className="flex-row items-center justify-center border border-[#F83B4F] rounded-full px-6 py-2">
+                            <Ionicons name="call" size={20} color="#F83B4F" />
+                            <Text className="text-base font-semibold ml-2">
+                              {t("VisitPopup.Get Call")}
+                            </Text>
+                          </View>
+                        </TouchableOpacity>
+                      </View>
+
+                      {(selectedItem.city ||
+                        selectedItem.plotNo ||
+                        selectedItem.street) && (
+                        <View className="flex text-center justify-center items-center">
+                          <Text className="text-sm font-semibold text-[#4E6393] mb-2">
+                            {t("VisitPopup.Address")}
+                          </Text>
+                          <Text className="text-base font-medium text-[#434343]">
+                            {selectedItem.plotNo}, {selectedItem.street},
+                          </Text>
+                          <Text className="text-base font-medium text-[#434343]">
+                            {selectedItem.city}
+                          </Text>
+                        </View>
+                      )}
+                    </>
+                  )}
+
+                  <View className="flex-row justify-between w-full mt-6 px-4 gap-x-4">
+                    <TouchableOpacity
+                      className="flex-1"
+                      onPress={handleStartJobFromModal}
+                    >
+                      <LinearGradient
+                        colors={["#F2561D", "#FF1D85"]}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 0 }}
+                        className="py-3 items-center justify-center rounded-full"
+                      >
+                        {/* <Text className="text-white text-lg font-semibold">
+                          {t("VisitPopup.Start")}
+                        </Text> */}
+                                              <Text className={`text-white  font-semibold ${i18n.language==="si"? "text-base": i18n.language === "ta"? "text-base": "text-lg"}`}>
+                                                {t("VisitPopup.Start")}
+                                              </Text>
+                      </LinearGradient>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+                              </Animated.View>
+                
+              </View>
+
       </Modal>
     </View>
   );

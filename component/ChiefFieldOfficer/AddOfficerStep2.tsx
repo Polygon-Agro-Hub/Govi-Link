@@ -12,6 +12,7 @@ import {
   Platform,
   Alert,
   ActivityIndicator,
+  Keyboard,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -21,7 +22,7 @@ import banksData from "@/assets/json/banks.json";
 import branchesData from "@/assets/json/branches.json";
 import { useTranslation } from "react-i18next";
 import i18n from "@/i18n/i18n";
-import { RouteProp, useRoute } from "@react-navigation/native";
+import { RouteProp, useRoute,useFocusEffect } from "@react-navigation/native";
 
 type AddOfficerStep2NavigationProps = StackNavigationProp<
   RootStackParamList,
@@ -34,6 +35,7 @@ interface AddOfficerStep2Props {
 
 interface RouteParams {
   formData: any;
+  isnewsecondstep?: boolean;
 }
 
 // Sri Lanka provinces and districts data
@@ -96,7 +98,7 @@ const sriLankaData = {
       ],
     },
     {
-      name: { en: "Uva", si: "උව", ta: "உவா" },
+      name: { en: "Uva", si: "ඌව", ta: "உவா" },
       districts: [
         { en: "Badulla", si: "බදුල්ල", ta: "பதுளை" },
         { en: "Moneragala", si: "මොනරාගල", ta: "முனரகலை" },
@@ -115,8 +117,8 @@ const sriLankaData = {
 const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
   const { t } = useTranslation();
   const route = useRoute<RouteProp<RootStackParamList, "AddOfficerStep2">>();
-  const { formData: step1Data } = route.params as RouteParams;
-
+  // const { formData: step1Data, isnewsecondstep } = route.params as RouteParams;
+const { formData: step1Data, isnewsecondstep} = route.params ?? {};
   // Address states - store English values for backend
   const [housePlotNo, setHousePlotNo] = useState("");
   const [streetName, setStreetName] = useState("");
@@ -169,6 +171,33 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
     Array<{ ID: number; name: string }>
   >([]);
 
+
+      useFocusEffect(
+        React.useCallback(() => {
+   console.log("focus effect", isnewsecondstep)
+        if(isnewsecondstep===true){
+           setHousePlotNo("")
+           setStreetName("")
+           setCity("");
+           setSelectedProvince("")
+           setSelectedDistrict("")
+           setCommissionAmount("")
+           setAccountHolderName("")
+           setAccountNumber("")
+           setConfirmAccountNumber("")
+           setSelectedBank("")
+           setSelectedBranch("")
+           setShowCountryDropdown(false)
+           setShowProvinceDropdown(false)
+           setShowDistrictDropdown(false)
+           setShowBankDropdown(false)
+           setShowBranchDropdown(false)
+              setErrors({})
+        }
+  
+        }, [isnewsecondstep])
+      );
+    
   // Process banks data
   const banks = banksData.map((bank) => ({
     id: bank.ID,
@@ -220,30 +249,91 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
   // Field change handlers
   const handleHousePlotNoChange = (text: string) => {
     clearFieldError("housePlotNo");
+      if (text.length === 0) {
+    setErrors((prev) => ({
+      ...prev,
+      housePlotNo: t("Error.House/Plot number is required"),
+    }));
+  } 
     setHousePlotNo(text);
   };
 
   const handleStreetNameChange = (text: string) => {
     clearFieldError("streetName");
     const capitalizedText = text.charAt(0).toUpperCase() + text.slice(1);
+       if (text.length === 0) {
+    setErrors((prev) => ({
+      ...prev,
+      streetName: t("Error.Street name is required"),
+    }))
+  }
     setStreetName(capitalizedText);
   };
 
   const handleCityChange = (text: string) => {
     clearFieldError("city");
+           if (text.length === 0) {
+    setErrors((prev) => ({
+      ...prev,
+      city: t("Error.City is required"),
+    }))
+  }
     const capitalizedText = text.charAt(0).toUpperCase() + text.slice(1);
     setCity(capitalizedText);
   };
 
-  const handleCommissionAmountChange = (text: string) => {
-    clearFieldError("commissionAmount");
-    // Allow only numbers and decimal point
-    const filteredText = text.replace(/[^0-9.]/g, "");
-    setCommissionAmount(filteredText);
-  };
+  // const handleCommissionAmountChange = (text: string) => {
+  //   clearFieldError("commissionAmount");
+  //   // Allow only numbers and decimal point
+  //   const filteredText = text.replace(/[^0-9.]/g, "");
+  //   setCommissionAmount(filteredText);
+  // };
+const handleCommissionAmountChange = (text: string) => {
+  clearFieldError("commissionAmount");
+       if (text.length === 0) {
+    setErrors((prev) => ({
+      ...prev,
+      commissionAmount: t("Error.Commission amount is required"),
+    }))
+  }
+  // Allow only numbers and one dot
+  let filteredText = text.replace(/[^0-9.]/g, "");
+
+  // Prevent multiple dots
+  const dotCount = (filteredText.match(/\./g) || []).length;
+  if (dotCount > 1) return;
+
+  // Allow empty
+  if (filteredText === "") {
+    setCommissionAmount("");
+    return;
+  }
+
+  const value = Number(filteredText);
+
+  // ❌ If greater than 100 → show error and stop
+  if (!isNaN(value) && value > 100) {
+    setErrors((prev) => ({
+      ...prev,
+      commissionAmount: t("Error.Commission amount cannot exceed 100"),
+    }));
+    return;
+  }
+
+  // ❌ Prevent negative
+  if (value < 0) return;
+
+  setCommissionAmount(filteredText);
+};
 
   const handleAccountHolderNameChange = (text: string) => {
     clearFieldError("accountHolderName");
+           if (text.length === 0) {
+    setErrors((prev) => ({
+      ...prev,
+      accountHolderName: t("Error.Account holder name is required"),
+    }))
+  }
     const filteredText = text.replace(/[^a-zA-Z\s]/g, "");
     const capitalizedText =
       filteredText.charAt(0).toUpperCase() + filteredText.slice(1);
@@ -252,12 +342,29 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
 
   const handleAccountNumberChange = (text: string) => {
     clearFieldError("accountNumber");
+           if (text.length === 0) {
+    setErrors((prev) => ({
+      ...prev,
+      accountNumber: t("Error.Account number is required"),
+    }))
+  }
     const numbersOnly = text.replace(/[^0-9]/g, "");
     setAccountNumber(numbersOnly);
   };
 
   const handleConfirmAccountNumberChange = (text: string) => {
     clearFieldError("confirmAccountNumber");
+           if (text.length === 0) {
+    setErrors((prev) => ({
+      ...prev,
+      confirmAccountNumber: t("Error.Confirm account number is required"),
+    }))
+  }if (text.length !== 0 && accountNumber && text !== accountNumber) {
+      setErrors((prev) => ({
+        ...prev,
+        confirmAccountNumber: t("Error.Account numbers do not match"),
+      }) );
+  }
     const numbersOnly = text.replace(/[^0-9]/g, "");
     setConfirmAccountNumber(numbersOnly);
   };
@@ -534,36 +641,62 @@ const sortBranchesAlphabetically = (branches: Array<{ ID: number; name: string }
       newErrors.accountHolderName = t("Error.Account holder name is required");
     if (!accountNumber.trim())
       newErrors.accountNumber = t("Error.Account number is required");
-    if (!confirmAccountNumber.trim())
-      newErrors.confirmAccountNumber = t(
-        "Error.Confirm account number is required"
-      );
+if (!confirmAccountNumber.trim())
+  newErrors.confirmAccountNumber = t(
+    "Error.Confirm account number is required"
+  );
+
+if (
+  accountNumber.trim() &&
+  confirmAccountNumber.trim() &&
+  accountNumber !== confirmAccountNumber
+) {
+  newErrors.confirmAccountNumber = t(
+    "Error.Account numbers do not match"
+  );
+}
     if (!selectedBank) newErrors.bank = t("Error.Bank is required");
     if (!selectedBranch) newErrors.branch = t("Error.Branch is required");
-
-    if (accountNumber !== confirmAccountNumber) {
-      newErrors.confirmAccountNumber = t("Error.Account numbers do not match");
-    }
 
     if (commissionAmount && isNaN(parseFloat(commissionAmount))) {
       newErrors.commissionAmount = t(
         "Error.Commission amount must be a number"
       );
     }
+    if(commissionAmount && parseFloat(commissionAmount) > 100){
+      newErrors.commissionAmount = t(
+        "Error.Commission amount cannot exceed 100"
+      );
+    }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    // setErrors(newErrors);
+    // return Object.keys(newErrors).length === 0;
+     setErrors(newErrors);
+  return newErrors;
   };
 
   const handleNext = () => {
-    if (!validateStep2()) {
-      Alert.alert(
-        t("Error.Validation Error"),
-        t("Error.Please fix all errors before proceeding")
-      );
-      return;
-    }
+    Keyboard.dismiss();
+    // if (!validateStep2()) {
+    //   Alert.alert(
+    //     t("Error.Validation Error"),
+    //     t("Error.Please fix all errors before proceeding"),
+    //     [{ text: t("MAIN.OK") }]
+    //   );
+    //   return;
+    // }
+const validationErrors = validateStep2(); // ✅ use returned errors
 
+  if (Object.keys(validationErrors).length > 0) {
+    const errorMessage = Object.values(validationErrors).join("\n• ");
+
+       Alert.alert(
+      t("Error.Validation Error"),
+      `• ${errorMessage}`,
+      [{ text: t("MAIN.OK") }]
+    );
+    return;
+  }
     // Prepare form data for next step
     const step2Data = {
       house: housePlotNo,
@@ -585,7 +718,7 @@ const sortBranchesAlphabetically = (branches: Array<{ ID: number; name: string }
       ...step2Data,
     };
 
-    navigation.navigate("AddOfficerStep3", { formData: combinedData });
+    navigation.navigate("AddOfficerStep3", { formData: combinedData, isnewthirdstep:isnewsecondstep });
   };
 
   // Render functions for dropdown items
@@ -695,7 +828,7 @@ const sortBranchesAlphabetically = (branches: Array<{ ID: number; name: string }
         {/* Header */}
         <View className="flex-row items-center px-4 py-3">
           <TouchableOpacity
-            onPress={() => navigation.navigate("AddOfficerStep1")}
+            onPress={() => navigation.navigate("AddOfficerStep1", {isnew:false})}
             className="bg-[#F6F6F680] rounded-full py-4 px-3"
           >
             <MaterialIcons
@@ -992,7 +1125,7 @@ const sortBranchesAlphabetically = (branches: Array<{ ID: number; name: string }
           <View className="px-6 flex-col w-full gap-4 mt-4">
             <TouchableOpacity
               className="bg-[#D9D9D9] rounded-3xl px-6 py-4 w-full items-center"
-              onPress={() => navigation.navigate("AddOfficerStep1")}
+              onPress={() => navigation.navigate("AddOfficerStep1",{isnew:false})}
             >
               <Text className="text-[#686868] font-semibold">
                 {t("AddOfficer.GoBack")}
