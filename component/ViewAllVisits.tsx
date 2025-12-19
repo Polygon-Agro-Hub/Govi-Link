@@ -356,17 +356,17 @@ const pendingCount = filteredVisits.filter((item) => {
           .sort((a, b) => {
       const getStatusRank = (item: VisitItem) => {
         // ---------- CLUSTER LOGIC ----------
-        if (item.propose === "Cluster" && item.totalClusterCount) {
-          if (item.completedClusterCount === item.totalClusterCount) {
-            return 3; // Completed → bottom
-          }
+  if (item.propose === "Cluster" && item.totalClusterCount) {
+      if (item.completedClusterCount === item.totalClusterCount) {
+        return 4;
+      }
 
-          if (item.completedClusterCount && item.completedClusterCount > 0) {
-            return 2; // Partial → middle
-          }
+      if (item.completedClusterCount !== undefined && item.completedClusterCount > 0) {
+        return item.completionPercentage < "20" ? 2 : 3; 
+      }
 
-          return 1; // Pending → top
-        }
+      return 1;
+    }
 
         // ---------- NON-CLUSTER LOGIC ----------
         if (item.status === "Completed" || item.status === "Finished") {

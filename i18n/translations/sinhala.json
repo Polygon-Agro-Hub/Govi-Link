@@ -26,8 +26,8 @@
     "Your login session has expired. Please log in again to continue.": "ඔබගේ පුරනය වීමේ සැසිය කල් ඉකුත් වී ඇත. කරුණාකර නැවත පුරනය වන්න.",
     "First name is required": "ඉංග්‍රීසියෙන් මුල් නම අවශ්‍යයි.",
     "Last name is required": "ඉංග්‍රීසියෙන් අවසාන නම අවශ්‍යයි.",
-    "Sinhala first name is required": "සිංහලෙ භාෂාවෙන් පළමු නම අවශ්‍යයි",
-    "Sinhala last name is required": "සිංහලෙ භාෂාවෙන් අවසන් නම අවශ්‍යයි",
+    "Sinhala first name is required": "සිංහල භාෂාවෙන් පළමු නම අවශ්‍යයි",
+    "Sinhala last name is required": "සිංහල භාෂාවෙන් අවසන් නම අවශ්‍යයි",
     "Tamil first name is required": "දෙමළ භාෂාවෙන් මුල් නම අවශ්‍යයි.",
     "Tamil last name is required": "දෙමළ භාෂාවෙන් අවසන් නම අවශ්‍යයි",
     "Phone number is required": "දුරකථන අංකය අවශ්‍යයි",
@@ -79,7 +79,9 @@
 "Commission amount cannot exceed 100":"කොමිස් ප්‍රමාණය 100 ට වැඩි විය නොහැක.",
 "Unauthorized Access":"අනවසර ප්‍රවේශය",
 "You are not authorized to access this system. Please use a valid Employee ID":"ඔබ මෙම පද්ධතියට ප්‍රවේශ වීමට අවසර නොමැත. කරුණාකර වලංගු සේවක හැඳුනුම්පතක් භාවිතා කරන්න.",
-"This EMP ID is not approved.":"මෙම සේවක හැඳුනුම්පත අනුමත කර නොමැත."
+"This EMP ID is not approved.":"මෙම සේවක හැඳුනුම්පත අනුමත කර නොමැත.",
+"Please Wait":"කරුණාකර රැඳී සිටින්න",
+"Validating your information, please wait...":"ඔබගේ තොරතුරු තහවුරු කරන තෙක් රැඳී සිටින්න..."
   },
   "Login": {
     "Welcome": "සාදරයෙන් පිළිගනිමු!",
@@ -320,7 +322,7 @@
     "NICBackImage": "ජා.හැ.අ. පසුපස ඡායාරූපය",
     "PassbookImage": "පාස්බුක් ඡායාරූපය",
     "ContractImage": "ගිවිසුම් ඡායාරූපය",
-    "Attached": "ඇමුණුණු",
+    "Attached": "ඇමුණුම",
     "Submit": "ඉදිරිපත් කරන්න",
     "PermissionRequired": "අවසරය අවශ්‍යයි",
     "PermissionRequiredMessage": "සමාවන්න, මෙය ක්‍රියාත්මක කිරීම සඳහා අපට කැමරා රෝල් අවසර අවශ්‍යය!",

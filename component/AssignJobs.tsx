@@ -866,9 +866,12 @@ className="flex-row p-3 rounded-full items-center justify-center min-w-[120px]"
                         end={{ x: 1, y: 0 }}
                         className="py-3 items-center justify-center rounded-full"
                       >
-                        <Text className="text-white text-lg font-semibold">
+                        {/* <Text className="text-white text-lg font-semibold">
                           {t("VisitPopup.Start")}
-                        </Text>
+                        </Text> */}
+                                              <Text className={`text-white  font-semibold ${i18n.language==="si"? "text-base": i18n.language === "ta"? "text-base": "text-lg"}`}>
+                                                {t("VisitPopup.Start")}
+                                              </Text>
                       </LinearGradient>
                     </TouchableOpacity>
                   </View>

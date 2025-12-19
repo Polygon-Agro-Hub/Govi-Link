@@ -369,6 +369,25 @@ let errorname = ""
     }
   };
 
+const clearSamePhoneErrors = (p1: string, p2: string) => {
+  console.log("clearsamephone", p1, p2)
+  if (p1 && p2 && p1 !== p2) {
+    console.log("clearsamephone inside", p1, p2)
+    setErrors((prev) => ({
+      ...prev,
+      phone1:
+        prev.phone1 === t("Error.Phone numbers cannot be the same")
+          ? ""
+          : prev.phone1,
+      phone2:
+        prev.phone2 === t("Error.Phone numbers cannot be the same")
+          ? ""
+          : prev.phone2,
+    }));
+  }
+};
+
+
   const handlePhone1Change = (input: string) => {
           clearFieldError("phone1");
   markFieldAsTouched("phone1");
@@ -378,13 +397,14 @@ let errorname = ""
     }
     setPhone1(numbersOnly);
 
+  clearSamePhoneErrors(numbersOnly, phone1);
 
  if (numbersOnly.length === 0) {
         setErrors((prev) => ({
             ...prev,
             phone1: "",
         }));
-    }       else if (numbersOnly && numbersOnly === phone2) {
+    }       else if (numbersOnly.startsWith("7") && numbersOnly && numbersOnly === phone2) {
         setErrors((prev) => ({
             ...prev,
             phone1: t("Error.Phone numbers cannot be the same"),
@@ -438,18 +458,22 @@ let errorname = ""
   // };
 
   const handlePhone2Change = (input: string) => {
+       clearFieldError("phone2");
     let numbersOnly = input.replace(/[^0-9]/g, "");
     if (numbersOnly.startsWith("0")) {
       numbersOnly = numbersOnly.replace(/^0+/, "");
     }
       markFieldAsTouched("phone2");
+        clearSamePhoneErrors(numbersOnly, phone1);
+
     setPhone2(numbersOnly);
      if (numbersOnly.length === 0) {
         setErrors((prev) => ({
             ...prev,
             phone2: "",
         }));
-    }  else if (numbersOnly && numbersOnly === phone1) {
+
+    }  else if (numbersOnly.startsWith("7") && numbersOnly && numbersOnly === phone1) {
         setErrors((prev) => ({
             ...prev,
             phone2: t("Error.Phone numbers cannot be the same"),

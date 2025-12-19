@@ -693,9 +693,12 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
                         marginBottom:30
                       }}
                     >
-                      <Text className="text-white text-lg font-semibold">
+                      {/* <Text className="text-white text-lg font-semibold">
                         {t("VisitPopup.Start")}
-                      </Text>
+                      </Text> */}
+                                            <Text className={`text-white  font-semibold ${i18n.language==="si"? "text-base": i18n.language === "ta"? "text-base": "text-lg"}`}>
+                                              {t("VisitPopup.Start")}
+                                            </Text>
                     </LinearGradient>
                   </TouchableOpacity>
                 </View>

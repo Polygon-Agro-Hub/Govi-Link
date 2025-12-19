@@ -98,7 +98,7 @@ const sriLankaData = {
       ],
     },
     {
-      name: { en: "Uva", si: "උව", ta: "உவா" },
+      name: { en: "Uva", si: "ඌව", ta: "உவா" },
       districts: [
         { en: "Badulla", si: "බදුල්ල", ta: "பதுளை" },
         { en: "Moneragala", si: "මොනරාගල", ta: "முனரகலை" },
@@ -192,6 +192,7 @@ const { formData: step1Data, isnewsecondstep} = route.params ?? {};
            setShowDistrictDropdown(false)
            setShowBankDropdown(false)
            setShowBranchDropdown(false)
+              setErrors({})
         }
   
         }, [isnewsecondstep])
@@ -248,17 +249,35 @@ const { formData: step1Data, isnewsecondstep} = route.params ?? {};
   // Field change handlers
   const handleHousePlotNoChange = (text: string) => {
     clearFieldError("housePlotNo");
+      if (text.length === 0) {
+    setErrors((prev) => ({
+      ...prev,
+      housePlotNo: t("Error.House/Plot number is required"),
+    }));
+  } 
     setHousePlotNo(text);
   };
 
   const handleStreetNameChange = (text: string) => {
     clearFieldError("streetName");
     const capitalizedText = text.charAt(0).toUpperCase() + text.slice(1);
+       if (text.length === 0) {
+    setErrors((prev) => ({
+      ...prev,
+      streetName: t("Error.Street name is required"),
+    }))
+  }
     setStreetName(capitalizedText);
   };
 
   const handleCityChange = (text: string) => {
     clearFieldError("city");
+           if (text.length === 0) {
+    setErrors((prev) => ({
+      ...prev,
+      city: t("Error.City is required"),
+    }))
+  }
     const capitalizedText = text.charAt(0).toUpperCase() + text.slice(1);
     setCity(capitalizedText);
   };
@@ -271,7 +290,12 @@ const { formData: step1Data, isnewsecondstep} = route.params ?? {};
   // };
 const handleCommissionAmountChange = (text: string) => {
   clearFieldError("commissionAmount");
-
+       if (text.length === 0) {
+    setErrors((prev) => ({
+      ...prev,
+      commissionAmount: t("Error.Commission amount is required"),
+    }))
+  }
   // Allow only numbers and one dot
   let filteredText = text.replace(/[^0-9.]/g, "");
 
@@ -304,6 +328,12 @@ const handleCommissionAmountChange = (text: string) => {
 
   const handleAccountHolderNameChange = (text: string) => {
     clearFieldError("accountHolderName");
+           if (text.length === 0) {
+    setErrors((prev) => ({
+      ...prev,
+      accountHolderName: t("Error.Account holder name is required"),
+    }))
+  }
     const filteredText = text.replace(/[^a-zA-Z\s]/g, "");
     const capitalizedText =
       filteredText.charAt(0).toUpperCase() + filteredText.slice(1);
@@ -312,12 +342,29 @@ const handleCommissionAmountChange = (text: string) => {
 
   const handleAccountNumberChange = (text: string) => {
     clearFieldError("accountNumber");
+           if (text.length === 0) {
+    setErrors((prev) => ({
+      ...prev,
+      accountNumber: t("Error.Account number is required"),
+    }))
+  }
     const numbersOnly = text.replace(/[^0-9]/g, "");
     setAccountNumber(numbersOnly);
   };
 
   const handleConfirmAccountNumberChange = (text: string) => {
     clearFieldError("confirmAccountNumber");
+           if (text.length === 0) {
+    setErrors((prev) => ({
+      ...prev,
+      confirmAccountNumber: t("Error.Confirm account number is required"),
+    }))
+  }if (text.length !== 0 && accountNumber && text !== accountNumber) {
+      setErrors((prev) => ({
+        ...prev,
+        confirmAccountNumber: t("Error.Account numbers do not match"),
+      }) );
+  }
     const numbersOnly = text.replace(/[^0-9]/g, "");
     setConfirmAccountNumber(numbersOnly);
   };
@@ -594,16 +641,22 @@ const sortBranchesAlphabetically = (branches: Array<{ ID: number; name: string }
       newErrors.accountHolderName = t("Error.Account holder name is required");
     if (!accountNumber.trim())
       newErrors.accountNumber = t("Error.Account number is required");
-    if (!confirmAccountNumber.trim())
-      newErrors.confirmAccountNumber = t(
-        "Error.Confirm account number is required"
-      );
+if (!confirmAccountNumber.trim())
+  newErrors.confirmAccountNumber = t(
+    "Error.Confirm account number is required"
+  );
+
+if (
+  accountNumber.trim() &&
+  confirmAccountNumber.trim() &&
+  accountNumber !== confirmAccountNumber
+) {
+  newErrors.confirmAccountNumber = t(
+    "Error.Account numbers do not match"
+  );
+}
     if (!selectedBank) newErrors.bank = t("Error.Bank is required");
     if (!selectedBranch) newErrors.branch = t("Error.Branch is required");
-
-    if (accountNumber !== confirmAccountNumber) {
-      newErrors.confirmAccountNumber = t("Error.Account numbers do not match");
-    }
 
     if (commissionAmount && isNaN(parseFloat(commissionAmount))) {
       newErrors.commissionAmount = t(
@@ -616,21 +669,34 @@ const sortBranchesAlphabetically = (branches: Array<{ ID: number; name: string }
       );
     }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    // setErrors(newErrors);
+    // return Object.keys(newErrors).length === 0;
+     setErrors(newErrors);
+  return newErrors;
   };
 
   const handleNext = () => {
     Keyboard.dismiss();
-    if (!validateStep2()) {
-      Alert.alert(
-        t("Error.Validation Error"),
-        t("Error.Please fix all errors before proceeding"),
-        [{ text: t("MAIN.OK") }]
-      );
-      return;
-    }
+    // if (!validateStep2()) {
+    //   Alert.alert(
+    //     t("Error.Validation Error"),
+    //     t("Error.Please fix all errors before proceeding"),
+    //     [{ text: t("MAIN.OK") }]
+    //   );
+    //   return;
+    // }
+const validationErrors = validateStep2(); // ✅ use returned errors
 
+  if (Object.keys(validationErrors).length > 0) {
+    const errorMessage = Object.values(validationErrors).join("\n• ");
+
+       Alert.alert(
+      t("Error.Validation Error"),
+      `• ${errorMessage}`,
+      [{ text: t("MAIN.OK") }]
+    );
+    return;
+  }
     // Prepare form data for next step
     const step2Data = {
       house: housePlotNo,

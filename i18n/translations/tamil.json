@@ -78,7 +78,9 @@
 "Commission amount cannot exceed 100":"Commission amount cannot exceed 100",
 "Unauthorized Access":"Unauthorized Access",
 "You are not authorized to access this system. Please use a valid Employee ID":"You are not authorized to access this system. Please use a valid Employee ID",
-"This EMP ID is not approved.":"This EMP ID is not approved."
+"This EMP ID is not approved.":"This EMP ID is not approved.",
+"Please Wait":"Please Wait",
+"Validating your information, please wait...":"Validating your information, please wait..."
   },
   "Login": {
     "Welcome": "வரவேற்கிறோம்",
