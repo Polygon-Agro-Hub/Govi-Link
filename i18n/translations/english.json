@@ -51,7 +51,7 @@
     "Province is required": "Province is required",
     "District is required": "District is required",
     "Commission amount is required": "Commission amount is required",
-    "Account holder name is required": "Account holder name is required",
+    "Account holder name is required": "Account holder's name is required",
     "Account number is required": "Account number is required",
     "Confirm account number is required": "Confirm account number is required",
     "Bank is required": "Bank is required",
@@ -421,5 +421,41 @@
     "SelectAtLeastOneJob": "Please select at least one job to assign.",
        "Start":"Start",
        "FailedToAssignJobs":"Failed to assign jobs. Please try again."
-  }
+  },
+  "RequestLetter":{
+    "Request Letter":"Request Letter",
+    "District":"District",
+    "Crop":"Crop",
+    "Variety":"Variety",
+    "Certification":"Certification",
+    "Extent":"Extent",
+    "Expected Investment":"Expected Investment",
+    "Expected Yield":"Expected Yield",
+    "Cultivation Start Date":"Cultivation Start Date",
+    "Start":"Start"
+   },
+   "InspectionForm": {
+    "Inspection Form":"Inspection Form",
+    "First Name":"First Name",
+    "Last Name":"Last Name",
+    "Other Names":"Other Names",
+    "Call Name":"Call Name",
+    "Sri Lanka":"Sri Lanka",
+    "-- Select District --":"-- Select District --",
+    "-- Select Province --":"-- Select Province --",
+    "Mobile Number - 1":"Mobile Number - 1",
+    "Mobile Number - 2":"Mobile Number - 2",
+    "Phone Number of a family member": "Phone Number of a family member",
+    "Land Phone Number - Home":"Land Phone Number - Home",
+    "Land Phone Number - Work":"Land Phone Number - Work",
+    "Email Address - 1":"Email Address - 1",
+    "Email Address - 2":"Email Address - 2",
+    "House / Plot Number":"House / Plot Number",
+    "Street Name":"Street Name",
+    "City / Town Name":"City / Town Name",
+    "District":"District",
+    "Province":"Province",
+    "Country":"Country",
+    "-- Select Country --":"-- Select Country --"
+   }
 }
