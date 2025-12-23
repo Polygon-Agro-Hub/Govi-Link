@@ -243,7 +243,7 @@
   },
   "OtpverificationSuccess": {
     "Well Done": "Well Done!",
-    "You have successfully completed the job": "You have successfully completed the job!",
+    "You have successfully completed the job": "You have successfully completed the job",
     "Go Forward": "Go Forward"
   },
   "QRScanner": {
@@ -357,7 +357,12 @@
     "Finished": "Finished",
     "Over Due": "Over Due",
     "No Jobs Available": "No Jobs Available",
-    "Today": "Today"
+    "Today": "Today",
+    "Start": "Start",
+    "Open": "Open",
+    "ID":"ID",
+    "farms left to finish":"{{count}} farms left to finish",
+    "1 farm left to finish":"1 farm left to finish"
   },
   "ChangePassword": {
     "ChoosePassword": "கடவுச்சொல்லை மாற்றவும்",

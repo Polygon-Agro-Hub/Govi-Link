@@ -296,13 +296,6 @@ const pendingCount = filteredVisits.filter((item) => {
                       </Text>
                     </View>
                   )}
-                  {/* <Text className="text-[10px] text-[#666] mt-1">
-                    {dateObj.isSame(today, "day")
-                      ? "Today"
-                      : dateObj.isSame(today.add(1, "day"), "day")
-                      ? "Tomorrow"
-                      : dateObj.format("ddd")}
-                  </Text> */}
                 </View>
               </TouchableOpacity>
             );
@@ -314,15 +307,6 @@ const pendingCount = filteredVisits.filter((item) => {
 {loading ?
 (
       <View className="flex-1 justify-center items-center mt-6 px-4 bg-white rounded-t-3xl">
-      {/* If you want to use Lottie again, uncomment */}
-      {/* 
-      <LottieView
-        source={require('../assets/jsons/loader.json')}
-        autoPlay
-        loop
-        style={{ width: 300, height: 300 }}
-      />
-      */}
       <ActivityIndicator size="large" color="#FF1D85" />
     </View>
 ):
@@ -335,24 +319,6 @@ const pendingCount = filteredVisits.filter((item) => {
   >
   {filteredVisits.length > 0 ? (
     [...filteredVisits]
-      // .sort((a, b) => {
-      //   const getStatus = (item: VisitItem) => {
-      //     if (item.propose === "Cluster" && item.totalClusterCount) {
-      //       if (item.completedClusterCount === item.totalClusterCount) return "Completed";
-      //       if (item.completedClusterCount && item.completedClusterCount > 0) return "Partial";
-      //       return "Pending";
-      //     }
-      //     return item.status;
-      //   };
-
-      //   const statusA = getStatus(a);
-      //   const statusB = getStatus(b);
-
-      //   // Pending first, then others
-      //   if (statusA === "Pending" && statusB !== "Pending") return -1;
-      //   if (statusA !== "Pending" && statusB === "Pending") return 1;
-      //   return 0; // keep original order otherwise
-      // })
           .sort((a, b) => {
       const getStatusRank = (item: VisitItem) => {
         // ---------- CLUSTER LOGIC ----------
@@ -496,185 +462,6 @@ const pendingCount = filteredVisits.filter((item) => {
 </ScrollView>
 
 )}
-
-          {/* <Modal transparent visible={showPopup} animationType="slide"
-        onRequestClose={() => {
-    console.log("hitt");
-    setShowPopup(false);
-    setSelectedItem(null);
-  }}
-      >
-        <TouchableWithoutFeedback
-          onPress={() => {
-            setShowPopup(false);
-            setSelectedItem(null);
-          }}
-        >
-          <View
-            style={{
-              flex: 1,
-              backgroundColor: "rgba(0,0,0,0.3)",
-              justifyContent: "flex-end",
-            }}
-          >
-            <TouchableWithoutFeedback>
-              <View className="bg-white rounded-t-3xl p-5 w-full ">
-                <View className="items-center mt-4">
-                  <TouchableOpacity
-                    className="z-50 justify-center items-center"
-                    onPress={() => {
-                      setShowPopup(false);
-                      setSelectedItem(null);
-                    }}
-                  >
-                    <View className="bg-[#D9D9D9] w-20 py-0.5 rounded-full -mt-6" />
-                    <View className="bg-[#D9D9D9] w-8 py-0.5 rounded-full mt-1 mb-6" />
-                  </TouchableOpacity>
-
-                  {selectedItem && (
-                    <>
-                      <Text className="text-base font-semibold text-[#747474]">
-                        #{selectedItem.jobId || "N/A"}
-                      </Text>
-                      <Text className="text-lg font-bold mt-2">
-                        {selectedItem.farmerName || "N/A"}
-                      </Text>
-                      <Text className="text-base font-semibold mt-1">
-                        {(() => {
-                          if (selectedItem.propose === "Individual") {
-                            switch (i18n.language) {
-                              case "si":
-                                return "තනි ගොවි විගණනය";
-                              case "ta":
-                                return "தனிப்பட்ட விவசாயி தணிக்கை";
-                              default:
-                                return "Individual Farmer Audit";
-                            }
-                          } else {
-                            switch (i18n.language) {
-                              case "si":
-                                return selectedItem.servicesinhalaName || "";
-                              case "ta":
-                                return selectedItem.servicetamilName || "";
-                              default:
-                                return selectedItem.serviceenglishName || "";
-                            }
-                          }
-                        })()}
-                      </Text>
-
-                      <Text className="text-sm font-medium text-[#4E6393] mt-1">
-                         {t(`Districts.${selectedItem.district}`)} {t("VisitPopup.District")}
-                      </Text>
-                      <View className="flex flex-row justify-center gap-x-2 mb-4 mt-6 px-4">
-                        <TouchableOpacity
-                          className="flex-1"
-                          disabled={
-                            !selectedItem?.latitude || !selectedItem?.longitude
-                          }
-                          onPress={() => {
-                            if (
-                              selectedItem?.latitude &&
-                              selectedItem?.longitude
-                            ) {
-                              const lat = selectedItem.latitude;
-                              const lon = selectedItem.longitude;
-                              const url = `https://www.google.com/maps?q=${lat},${lon}`;
-                              Linking.openURL(url);
-                            }
-                          }}
-                        >
-                          <View
-                            className={`flex flex-row items-center justify-center rounded-full py-2 border ${
-                              selectedItem?.latitude && selectedItem?.longitude
-                                ? "border-[#F83B4F]"
-                                : "border-[#9DB2CE]"
-                            }`}
-                          >
-                            <FontAwesome6
-                              name="location-dot"
-                              size={20}
-                              color={
-                                selectedItem?.latitude &&
-                                selectedItem?.longitude
-                                  ? "#F83B4F"
-                                  : "#9DB2CE"
-                              }
-                            />
-                            <Text
-                              className={`text-base font-semibold ml-2 ${
-                                selectedItem?.latitude &&
-                                selectedItem?.longitude
-                                  ? "text-[#000000]"
-                                  : "text-[#9DB2CE]"
-                              }`}
-                            >
-                              {t("VisitPopup.Location")}
-                            </Text>
-                          </View>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity className="flex "
-                        onPress={() => handleDial(selectedItem.farmerMobile)}
-                        >
-                          <View className="flex-row items-center justify-center border border-[#F83B4F] rounded-full px-6 py-2">
-                            <Ionicons name="call" size={20} color="#F83B4F" />
-                            <Text className="text-base font-semibold  ml-2">
-                              {t("VisitPopup.Get Call")}
-                            </Text>
-                          </View>
-                        </TouchableOpacity>
-                      </View>
-                      {selectedItem.city ||
-                      selectedItem.plotNo ||
-                      selectedItem.street ? (
-                        <View className="flex text-center justify-center items-center ">
-                          <Text className="text-sm font-semibold text-[#4E6393] mb-2">
-                            {t("VisitPopup.Address")}
-                          </Text>
-
-                          <Text className="text-base font-medium text-[#434343]">
-                            {selectedItem.plotNo}, {selectedItem.street},
-                          </Text>
-
-                          <Text className="text-base  font-medium text-[#434343]">
-                            {selectedItem.city}
-                          </Text>
-                        </View>
-                      ) : null}
-                    </>
-                  )}
-
-                  <TouchableOpacity 
-                    onPress={() => {
-    setShowPopup(false);
-    if (selectedItem?.farmerId && selectedItem?.propose === "Individual") {
-      navigation.navigate("QRScanner", { farmerId: selectedItem.farmerId, jobId: selectedItem.jobId , certificationpaymentId: selectedItem.certificationpaymentId, farmerMobile:selectedItem.farmerMobile, farmId:selectedItem.farmId, clusterId:selectedItem.clusterID , isClusterAudit:false,  auditId:selectedItem.id,  screenName: "ViewAllVisits" });
-    } else if (selectedItem?.propose === "Requested") {
-       console.log("hitt Request")
-       navigation.navigate("QRScaneerRequstAudit", { farmerId: selectedItem.farmerId, govilinkjobid: selectedItem.id , jobId: selectedItem.jobId, farmerMobile:selectedItem.farmerMobile, screenName: "ViewAllVisits"  });
-    }
-  }}>
-                    <LinearGradient
-                      colors={["#F2561D", "#FF1D85"]}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 0 }}
-                                    style={{
-                        marginBottom:30
-                      }}
-                      className= {`py-2 items-center justify-center rounded-full mt-4 ${i18n.language==="si"? "px-24": i18n.language === "ta"? "px-24": "px-[40%]"}`}
-                    >
-                      <Text className="text-white text-lg font-semibold">
-                        {t("VisitPopup.Start")}
-                      </Text>
-                    </LinearGradient>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal> */}
 
         <Modal transparent visible={showPopup} animationType="none"
       >

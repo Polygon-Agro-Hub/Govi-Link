@@ -150,48 +150,7 @@ useEffect(() => {
     }
   };
 
-// const handleCheck = async (q: Question) => {
-//   console.log("Toggle check for question:", q.id);
 
-//   try {
-//     if (q.type === "Photo Proof") {
-//         setSelectedQuestion(q);
-//       setShowCameraModal(true);
-//       return;
-//     }
-
-//     const token = await AsyncStorage.getItem("token");
-//     if (!token) {
-//       Alert.alert("Error", "Authentication token missing. Please log in again.");
-//       return;
-//     }
-// setLoadingQuestionId(q.id);
-//     // Toggle value: if it's 1, set to 0; if 0, set to 1
-//     const newTickResult = q.tickResult === 1 ? 0 : 1;
-
-//     const response = await axios.put(
-//       `${environment.API_BASE_URL}api/officer/check-question/${q.id}`,
-//       { tickResult: newTickResult }, // send new state
-//       { headers: { Authorization: `Bearer ${token}` } }
-//     );
-
-//     if (response.data?.success || response.status === 200) {
-//       setQuestions((prev) =>
-//         prev.map((item) =>
-//           item.id === q.id ? { ...item, tickResult: newTickResult } : item
-//         )
-//       );
-//       console.log("✅ Question tick toggled:", q.id, "→", newTickResult);
-//     } else {
-//       Alert.alert("Error", response.data?.message || "Failed to update question status.");
-//     }
-//   } catch (err: any) {
-//     console.error("❌ Error updating tickResult:", err);
-//     Alert.alert("Error", "Something went wrong while updating question.");
-//   }finally{
-//     setLoadingQuestionId(null);
-//   }
-// };
 const handleCheck = async (q: Question) => {
   console.log("Toggle check for question:", q.id);
 
@@ -260,20 +219,6 @@ const handleCheck = async (q: Question) => {
 }
 
 await updateTickResult(q, newTickResult, token);
-
-    // const response = await axios.put(
-    //   `${environment.API_BASE_URL}api/officer/check-question/${q.id}`,
-    //   { officerTickResult: newTickResult },
-    //   { headers: { Authorization: `Bearer ${token}` } }
-    // );
-
-    // if (response.data?.success || response.status === 200) {
-    //   setQuestions((prev) =>
-    //     prev.map((item) =>
-    //       item.id === q.id ? { ...item, officerTickResult: newTickResult } : item
-    //     )
-    //   );
-    // }
 
   } catch (err) {
     console.error("❌ Error updating tickResult:", err);
@@ -443,13 +388,6 @@ useFocusEffect(
   <View className="w-full items-center mb-8">
       {/* Inner row: logo + text */}
       <View className="flex-row items-center justify-center max-w-[240px]">
-        {/* {CertificateData?.logo && (
-          <Image
-            source={{ uri: CertificateData.logo }}
-            style={{ width: 100, height: 100 }}
-            resizeMode="contain"
-          />
-        )} */}
 
         <Image 
           source={require("../assets/staraward.png")}
@@ -609,7 +547,7 @@ navigation.navigate("Main", {screen: screenName})
               onPress={() => setShowCamera(true)}
               className=" border border-black rounded-3xl  py-3 items-center "
             >
-              <Text className="text-black font-semibold text-base">{t("Retake Previous Photo")}</Text>
+              <Text className="text-black font-semibold text-base">{t("CertificateQuesanory.Retake Previous Photo")}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -638,7 +576,7 @@ navigation.navigate("Main", {screen: screenName})
         }}
         className="mt-4"
       >
-        <Text className="text-gray-400 text-sm">{("Cancel")}</Text>
+        <Text className="text-gray-400 text-sm">{t("CertificateQuesanory.Cancel")}</Text>
       </TouchableOpacity>
     </View>
   </View>

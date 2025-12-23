@@ -45,6 +45,32 @@ interface RequestDetailsData {
   status: "pending" | "approved" | "rejected";
 }
 
+
+type ProjectDetailsProps = {
+  label: string;
+  value: string;
+};
+
+const ProjectDetails: React.FC<ProjectDetailsProps> = ({ label, value }) => {
+  return (
+    <View className="flex-row mb-3">
+      <View className="mr-2">
+        <Text className="text-base text-[#070707]">●</Text>
+      </View>
+
+      <View className="flex-1">
+        <Text className="text-base text-[#070707]">
+          {label} :
+        </Text>
+        <Text className="text-base text-[#070707]">
+          {value}
+        </Text>
+      </View>
+    </View>
+  );
+};
+
+
 const RequestDetails: React.FC<RequestDetailsProps> = ({
   navigation,
 }) => {
@@ -54,6 +80,7 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
   const [requestData, setRequestData] = useState<RequestDetailsData | null>(
     null
   );
+  const {t} = useTranslation();
 
   // Mock data - replace with actual API call
   const mockRequestData: RequestDetailsData = {
@@ -139,6 +166,8 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
     );
   };
 
+
+  
   if (loading) {
     return (
       <View className="flex-1 bg-white justify-center items-center">
@@ -174,7 +203,7 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
           />
         </TouchableOpacity>
         <Text className="text-lg font-bold text-black text-center flex-1">
-          Request Letter
+          {t("RequestLetter.Request Letter")}
         </Text>
         <View style={{ width: 55 }} />
       </View>
@@ -185,7 +214,7 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
         contentContainerStyle={{ paddingBottom: 20 }}
       >
         {/* Request Letter Content */}
-        <View className="mx-6 my-4 bg-white rounded-lg p-6">
+        <View className="mx-6 my-4 bg-white rounded-lg p-2">
           {/* Letter Content */}
           <Text className="text-base mb-4 text-[#070707] leading-6">
             Dear Sir/Madam,
@@ -204,83 +233,42 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
             high-quality and sustainable output.
           </Text>
 
-          <Text className="text-lg mb-4 text-[#070707]">
+          <Text className="text-base mb-4 text-[#070707]">
             The project details are as follows:
           </Text>
 
           {/* Project Details */}
           <View className="space-y-3 mb-6">
-            <View className="flex-row">
-              <Text className="text-base text-[#070707] w-32">District :</Text>
-              <Text className="text-base text-[#070707] flex-1">
-                {requestData.district}
-              </Text>
-            </View>
+<View className="">
+  <ProjectDetails
+    label={t("RequestLetter.District")}
+    value={requestData.district}
+  />
+ <ProjectDetails
+    label={t("RequestLetter.Crop")}
+    value={requestData.crop}
+  />
 
-            <View className="flex-row">
-              <Text className="text-base text-[#070707] w-32">
-                Crop :
-              </Text>
-              <Text className="text-base text-[#070707] flex-1">
-                {requestData.crop}
-              </Text>
-            </View>
+  <ProjectDetails
+    label={t("RequestLetter.Extent")}
+    value={`${requestData.extent.hectares} hectare, ${requestData.extent.acres} acres, ${requestData.extent.perches} perches`}
+  />
 
-            <View className="flex-row">
-              <Text className="text-base text-[#070707] w-32">
-                Variety :
-              </Text>
-              <Text className="text-base text-[#070707] flex-1">
-                {requestData.variety}
-              </Text>
-            </View>
+  <ProjectDetails
+    label={t("RequestLetter.Expected Investment")}
+    value={`Rs. ${requestData.expectedInvestment}`}
+  />
 
-            <View className="flex-row">
-              <Text className="text-base text-[#070707] w-32">
-                Certification :
-              </Text>
-              <Text className="text-base text-[#070707] flex-1">
-                {requestData.certification}
-              </Text>
-            </View>
+  <ProjectDetails
+    label={t("RequestLetter.Expected Yield")}
+    value={`${requestData.expectedYield} kg`}
+  />
 
-            <View className="flex-row">
-              <Text className="text-base text-[#070707] w-32">
-                Extent :
-              </Text>
-              <Text className="text-base text-[#070707] flex-1">
-                {requestData.extent.hectares} hectare,{" "}
-                {requestData.extent.acres} acres, and{" "}
-                {requestData.extent.perches} perches
-              </Text>
-            </View>
-
-            <View className="flex-row">
-              <Text className="text-base text-black w-32">
-                Expected Investment :
-              </Text>
-              <Text className="text-base text-black flex-1">
-                Rs. {requestData.expectedInvestment}
-              </Text>
-            </View>
-
-            <View className="flex-row">
-              <Text className="text-base text-black w-32">
-                Expected Yield :
-              </Text>
-              <Text className="text-base text-black flex-1">
-                {requestData.expectedYield}kg
-              </Text>
-            </View>
-
-            <View className="flex-row">
-              <Text className="text-base text-black w-32">
-                Cultivation Start Date :
-              </Text>
-              <Text className="text-base text-black flex-1">
-                {requestData.cultivationStartDate}
-              </Text>
-            </View>
+  <ProjectDetails
+    label={t("RequestLetter.Cultivation Start Date")}
+    value={requestData.cultivationStartDate}
+  />
+  </View>
           </View>
 
           <Text className="text-base mb-4 text-black leading-6">
@@ -297,9 +285,9 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
 
           {/* Sample Images */}
           <View className="my-4">
-            <Text className="text-base text-black mb-2">
+            {/* <Text className="text-base text-black mb-2">
               Attached Documents:
-            </Text>
+            </Text> */}
             <View className="flex-row justify-between w-full">
               <Image
                 source={require("../../assets/request-letter.png")}
@@ -314,15 +302,15 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
             </View>
           </View>
 
-          <Text className="text-base mb-6 text-black leading-6">
+          <Text className="text-base  mt-2 text-black leading-6">
             I am confident in the success of this venture and request you to
             kindly approve my loan application at the earliest. Thank you for
             your time and consideration.
           </Text>
 
           {/* Signature */}
-          <View className="mt-8">
-            <Text className="text-base text-black mb-2">Sincerely,</Text>
+          <View className="mt-8 mb-8">
+            <Text className="text-base text-black ">Sincerely,</Text>
             <Text className="text-base text-black">
               {requestData.customerName}
             </Text>
@@ -333,8 +321,7 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
         </View>
 
         {/* Action Buttons */}
-        <View className="mb-20">
-          {/* Shadow Line */}
+        {/* <View className="mb-20">
           <View
             style={{
               height: 1,
@@ -347,7 +334,6 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
             }}
           />
 
-          {/* Buttons Section */}
           <View className="px-12 flex-col w-full gap-4 mt-4">
             <TouchableOpacity
               onPress={handleReject}
@@ -383,8 +369,40 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
               </LinearGradient>
             </TouchableOpacity>
           </View>
-        </View>
+        </View> */}
       </ScrollView>
+      <View className=" bottom-4 bg-white " >
+                  <View
+            style={{
+              height: 1,
+              backgroundColor: "#fff",
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.1,
+              shadowRadius: 3,
+              elevation: 3,
+            }}
+          />
+              <TouchableOpacity onPress={() => navigation.navigate("PersonalInfo")} className="w-[80%] mt-6 self-center">
+              <LinearGradient
+                colors={["#F35125", "#FF1D85"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                className="rounded-full px-6 py-3 w-full items-center"
+                style={{
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 3 },
+                  shadowOpacity: 0.25,
+                  shadowRadius: 5,
+                  elevation: 6,
+                }}
+              >
+                <Text className="text-white text-lg font-semibold">
+                  {t("RequestLetter.Start")}
+                </Text>
+              </LinearGradient>
+            </TouchableOpacity>
+</View>
     </View>
   );
 };

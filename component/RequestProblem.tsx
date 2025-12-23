@@ -255,12 +255,6 @@ useFocusEffect(
 );
 
 const handleFarmerFeedbackChange = (text: string) => {
-  // Block leading spaces
-  // if (text.length === 1 && text[0] === ' ') return;
-  // // Capitalize first letter if first char is lowercase
-  // if (text.length > 0 && text[0] === text[0].toLowerCase()) {
-  //   text = text.charAt(0).toUpperCase() + text.slice(1);
-  // }
     text = text.replace(/^\s+/, "");
   if (text.length > 0) {
     text = text.charAt(0).toUpperCase() + text.slice(1);
@@ -269,10 +263,6 @@ const handleFarmerFeedbackChange = (text: string) => {
 };
 
 const handleAdviceChange = (text: string) => {
-  // if (text.length === 1 && text[0] === ' ') return;
-  // if (text.length > 0 && text[0] === text[0].toLowerCase()) {
-  //   text = text.charAt(0).toUpperCase() + text.slice(1);
-  // }
     text = text.replace(/^\s+/, "");
   if (text.length > 0) {
     text = text.charAt(0).toUpperCase() + text.slice(1);
@@ -348,16 +338,6 @@ const handleAdviceChange = (text: string) => {
             onChangeText={handleAdviceChange}
           style={{ minHeight: 130 }}
         />
-
-        {/* Image Upload */}
-        {/* <TouchableOpacity
-          // onPress={handlePickImage}
-          className="bg-[#1A1A1A] p-4 rounded-full w-[60%] self-center mt-4"
-        >
-          <Text className="text-white text-center font-semibold">
-            {t("CertificateSuggestions.Photo")}
-          </Text>
-        </TouchableOpacity> */}
           <TouchableOpacity
             onPress={() => setShowCamera(true)}
             className="bg-black rounded-3xl w-[50%] self-center py-3 items-center justify-center flex-row space-x-4"

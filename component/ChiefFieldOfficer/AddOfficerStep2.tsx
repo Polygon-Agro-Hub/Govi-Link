@@ -369,15 +369,6 @@ const handleCommissionAmountChange = (text: string) => {
     setConfirmAccountNumber(numbersOnly);
   };
 
-  // Filter data based on search
-  // const getFilteredCountries = () => {
-  //   if (!countrySearch) return countryData;
-  //   return countryData.filter((country) =>
-  //     getTranslatedCountry(country)
-  //       .toLowerCase()
-  //       .includes(countrySearch.toLowerCase())
-  //   );
-  // };
   const getFilteredCountries = () => {
   if (!countrySearch) return sortCountriesAlphabetically(countryData);
   return sortCountriesAlphabetically(
@@ -677,14 +668,6 @@ if (
 
   const handleNext = () => {
     Keyboard.dismiss();
-    // if (!validateStep2()) {
-    //   Alert.alert(
-    //     t("Error.Validation Error"),
-    //     t("Error.Please fix all errors before proceeding"),
-    //     [{ text: t("MAIN.OK") }]
-    //   );
-    //   return;
-    // }
 const validationErrors = validateStep2(); // ✅ use returned errors
 
   if (Object.keys(validationErrors).length > 0) {

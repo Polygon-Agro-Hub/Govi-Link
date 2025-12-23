@@ -148,7 +148,7 @@
     "Location": "ස්ථානය",
     "Get Call": "ඇමතුම ගන්න",
     "Address": "ලිපිනය :",
-    "Start": "ආරම්භ කරන්න"
+    "Start": "අරඹන්න"
   },
   "Districts": {
     "Ampara": "අම්පාර",
@@ -219,11 +219,11 @@
   },
   "Otpverification": {
     "Enter Verification Code": "තහවුරු කිරීමේ කේතය ඇතුළත් කරන්න",
-    "We have sent a Verification Code to Farmer's mobile number": "අපි විලාසිත සත්‍යාපන කේතයක් ගොවියාගේ දුරකථන අංකයට යවා ඇත",
+    "We have sent a Verification Code to Farmer’s mobile number": "අපි ගොවියාගේ ජංගම දුරකථන අංකයට සත්‍යාපන කේතයක් යවා ඇත.",
     "Verify": "තහවුරු කරන්න",
     "Resend in": "නැවත යවන්න",
     "RESEND OTP": "OTP නැවත යවන්න",
-    "Didn't receive the OTP ?": "OTP ලැබුණේ නැතිද?",
+    "Didn’t receive the OTP ?": "OTP ලැබුණේ නැතිද?",
     "Go Back": "ආපසු යන්න",
     "Please enter the 5-digit OTP sent to your phone.": "කරුණාකර ඔබගේ දුරකථනයට යවන ලද අංක 5ක OTP කේතය ඇතුළත් කරන්න.",
     "Your OTP has expired. Please request a new one.": "ඔබගේ OTP කල් ඉකුත් වී ඇත. කරුණාකර නව OTP කේතයක් ඉල්ලන්න.",
@@ -243,8 +243,8 @@
     "Audit completion failed. Please try again.": "ලේඛන පරීක්ෂණය සම්පූර්ණ කිරීම අසාර්ථක විය. කරුණාකර නැවත උත්සාහ කරන්න."
   },
   "OtpverificationSuccess": {
-    "Well Done": "හොඳට කලා!",
-    "You have successfully completed the job": "ඔබ වැඩය සාර්ථකව සම්පූර්ණ කර ඇත!",
+    "Well Done": "තහවුරු කර ඇත!",
+    "You have successfully completed the job": "ඔබ ඔබේ වැඩ කටයුතු සම්පූර්ණ කර ඇත.",
     "Go Forward": "ඉදිරියට යන්න"
   },
   "QRScanner": {
@@ -286,7 +286,7 @@
     "AssignedDistrict": "--නියෝජිත දිස්ත්‍රික්කය--",
     "more": "තවත්",
     "FirstNameEnglish": "--ඉංග්‍රීසියෙන් මුල් නම--",
-    "LastNameEnglish": "--ඉංග්‍රීසිෙන් අවසන් නම--",
+    "LastNameEnglish": "--ඉංග්‍රීසියෙන් අවසන් නම--",
     "FirstNameSinhala": "--සිංහලෙන් මුල් නම--",
     "LastNameSinhala": "--සිංහලෙන් අවසන් නම--",
     "FirstNameTamil": "--දෙමළෙන් මුල් නම--",
@@ -359,7 +359,12 @@
     "Finished": "අවසන් කළා",
     "Over Due": "කල් ඉකුත් විය",
     "No Jobs Available": "වැඩ නොමැත",
-    "Today": "අද"
+    "Today": "අද",
+    "Start": "අරඹන්න",
+    "Open": "විවෘත",
+    "ID": "අංක",
+    "farms left to finish":"ගොවිපල {{count}} ක් අවසන් කිරීමට ඉතිරිව ඇත",
+    "1 farm left to finish":"ගොවිපල 1 ක් අවසන් කිරීමට ඉතිරිව ඇත"
   },
   "ChangePassword": {
     "ChoosePassword": "මුරපදය වෙනස් කරන්න",

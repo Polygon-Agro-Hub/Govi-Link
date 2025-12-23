@@ -1,0 +1,74 @@
+{
+  "provinces": [
+    {
+      "name": { "en": "Western", "si": "බටහිර", "ta": "மேற்கு" },
+      "districts": [
+        { "en": "Colombo", "si": "කොළඹ", "ta": "கொழும்பு" },
+        { "en": "Gampaha", "si": "ගම්පහ", "ta": "கம்பஹா" },
+        { "en": "Kalutara", "si": "කළුතර", "ta": "களுத்துறை" }
+      ]
+    },
+    {
+      "name": { "en": "Central", "si": "මධ්‍යම", "ta": "மத்திய" },
+      "districts": [
+        { "en": "Kandy", "si": "මහනුවර", "ta": "கண்டி" },
+        { "en": "Matale", "si": "මාතලේ", "ta": "மாதளை" },
+        { "en": "Nuwara Eliya", "si": "නුවරඑළිය", "ta": "நுவரேலியா" }
+      ]
+    },
+    {
+      "name": { "en": "Southern", "si": "දකුණ", "ta": "தெற்கு" },
+      "districts": [
+        { "en": "Galle", "si": "ගාල්ල", "ta": "காலி" },
+        { "en": "Matara", "si": "මාතර", "ta": "மாத்தறை" },
+        { "en": "Hambantota", "si": "හම්බන්තොට", "ta": "ஹம்பாந்தோட்டை" }
+      ]
+    },
+    {
+      "name": { "en": "Eastern", "si": "නැගෙනහිර", "ta": "கிழக்கு" },
+      "districts": [
+        { "en": "Ampara", "si": "අම්පාර", "ta": "அம்பாறை" },
+        { "en": "Batticaloa", "si": "මඩකලපුව", "ta": "பாட்டிக்கோடை" },
+        { "en": "Trincomalee", "si": "ත්‍රිකුණාමලය", "ta": "திருகோணமலை" }
+      ]
+    },
+    {
+      "name": { "en": "Northern", "si": " උතුරු", "ta": "வடக்கு" },
+      "districts": [
+        { "en": "Jaffna", "si": "යාපනය", "ta": "யாழ்ப்பாணம்" },
+        { "en": "Kilinochchi", "si": "කිලිනොච්චි", "ta": "கில்லினோச்சி" },
+        { "en": "Mullaitivu", "si": "මුල්ලිතිවු", "ta": "முல்லைத்தீவு" },
+        { "en": "Vavuniya", "si": "වවුනියාව", "ta": "வவுனியா" },
+        { "en": "Mannar", "si": "මන්නාරම", "ta": "மன்னார்" }
+      ]
+    },
+    {
+      "name": { "en": "North Western", "si": "උතුරු මැද", "ta": "வடமேல்" },
+      "districts": [
+        { "en": "Kurunegala", "si": "කුරුණෑගල", "ta": "குருநாகல்" },
+        { "en": "Puttalam", "si": "පුත්තලම", "ta": "புத்தளம்" }
+      ]
+    },
+    {
+      "name": { "en": "North Central", "si": "උතුරු මධ්‍යම", "ta": "வட மத்திய" },
+      "districts": [
+        { "en": "Anuradhapura", "si": "අනුරාධපුර", "ta": "அனுராதபுரம்" },
+        { "en": "Polonnaruwa", "si": "පොලොන්නරුව", "ta": "பொலன்னருவ" }
+      ]
+    },
+    {
+      "name": { "en": "Uva", "si": "ඌව", "ta": "உவா" },
+      "districts": [
+        { "en": "Badulla", "si": "බදුල්ල", "ta": "பதுளை" },
+        { "en": "Moneragala", "si": "මොනරාගල", "ta": "முனரகலை" }
+      ]
+    },
+    {
+      "name": { "en": "Sabaragamuwa", "si": "සබරගමුව", "ta": "சபரகமுவ" },
+      "districts": [
+        { "en": "Ratnapura", "si": "රත්නපුර", "ta": "ரத்நாபுர" },
+        { "en": "Kegalle", "si": "කැගල්ල", "ta": "கெகலே" }
+      ]
+    }
+  ]
+}

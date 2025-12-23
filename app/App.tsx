@@ -45,6 +45,7 @@ import AssignJobs from "@/component/AssignJobs";
 import CapitalRequests from "@/component/ChiefFieldOfficer/CapitalRequests";
 import RequestDetails from "@/component/ChiefFieldOfficer/RequestDetails";
 import AssignJobOfficerList from "@/component/AssignJobOfficerList";
+import PersonalInfo from "@/component/CapitalRequest/PersonalInfo";
 
 LogBox.ignoreAllLogs(true);
 NativeWindStyleSheet.setOutput({ default: "native" });
@@ -104,7 +105,6 @@ function MainTabs() {
           <Tab.Screen name="AddOfficerStep3" component={AddOfficerStep3} />
           <Tab.Screen name="AssignJobs" component={AssignJobs} />
           <Tab.Screen name="CapitalRequests" component={CapitalRequests} />
-          <Tab.Screen name="RequestDetails" component={RequestDetails} />
           <Tab.Screen name="AssignJobOfficerList" component={AssignJobOfficerList} />
         </>
       ) : (
@@ -213,6 +213,9 @@ function AppContent() {
 
                       <Stack.Screen name="QRScanner" component={QRScanner} />
           <Stack.Screen name="QRScaneerRequstAudit" component={QRScaneerRequstAudit} />
+                    <Stack.Screen name="RequestDetails" component={RequestDetails} />
+                    <Stack.Screen name="PersonalInfo" component={PersonalInfo} />
+
           </Stack.Navigator>
         </NavigationContainer>
       </SafeAreaView>

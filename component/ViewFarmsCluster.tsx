@@ -233,7 +233,7 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
           <Text className="text-base font-semibold text-center">#{jobId}</Text>
         </View>
       </View>
-      <View className="mt-4">
+      {/* <View className="mt-4">
         <Text className="text-xl font-semibold text-center">{farmName}</Text>
         {visitsData.length > 0 && (
           <Text className="text-base text-center text-gray-500 mt-1">
@@ -241,7 +241,24 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
             finish
           </Text>
         )}
-      </View>
+      </View> */}
+      <View className="mt-4">
+  <Text className="text-xl font-semibold text-center">{farmName}</Text>
+
+  {visitsData.length > 0 && (() => {
+    const farmsLeft = visitsData.filter(v => v.isCompleted !== 1).length;
+    console.log("Farms left:", farmsLeft);
+
+    return (
+      <Text className="text-base text-center text-gray-500 mt-1">
+        {farmsLeft === 1
+          ? t("Visits.1 farm left to finish")
+          : t("Visits.farms left to finish", { count: farmsLeft })}
+      </Text>
+    );
+  })()}
+</View>
+
       {loaingCertificate ? (
         <LoadingSkeleton />
       ) : (
@@ -258,9 +275,15 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
                   className="bg-white border border-[#9DB2CE] rounded-xl px-5 py-4 mb-3 mx-3 flex-row justify-between items-center"
                 >
                   {/* Left side — ID */}
-                  <Text className="text-black text-lg font-semibold">
-                    ID : {item.regCode}
+                
+                  <View className="flex-row">
+                      <Text className={`text-black font-semibold ${i18n.language==="si"? "text-base": i18n.language === "ta"? "text-base": "text-lg"}`}>
+                    {t("Visits.ID")} :
                   </Text>
+                    <Text className="text-black text-lg font-semibold ml-2">
+                     {item.regCode}
+                  </Text>
+                  </View>
 
                   {/* Right side — Button / Status */}
                   {item.isCompleted === 1 ? (
@@ -286,24 +309,24 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
                         colors={["#FF416C", "#FF4B2B"]}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 0 }}
-                        className="rounded-full px-6 py-2"
+                        className="rounded-full w-24 py-1.5"
                       >
                         <Text className="text-white text-base font-semibold text-center">
-                          Open
+                          {t("Visits.Open")}
                         </Text>
                       </LinearGradient>
                     </TouchableOpacity>
                   ) : (
                     item.jobStatus === "Start" && (
                       <TouchableOpacity
-                        className="bg-black rounded-full px-7 py-1.5"
+                        className="bg-black rounded-full w-24 py-1.5"
                         onPress={() => {
                           setSelectedItem(item);
                           setShowPopup(true);
                         }}
                       >
                         <Text className="text-white text-base font-semibold text-center">
-                          {item.jobStatus}
+                          {t("Visits.Start")}
                         </Text>
                       </TouchableOpacity>
                     )
@@ -314,198 +337,6 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
           </View>
         </>
       )}
-
-      {/* <Modal transparent visible={showPopup} animationType="slide"
-              onRequestClose={() => {
-    console.log("hitt");
-    setShowPopup(false);
-    setSelectedItem(null);
-  }}
-      >
-        <TouchableWithoutFeedback
-          onPress={() => {
-            setShowPopup(false);
-            setSelectedItem(null);
-          }}
-        >
-          <View
-            style={{
-              flex: 1,
-              backgroundColor: "rgba(0,0,0,0.3)",
-              justifyContent: "flex-end",
-            }}
-          >
-            <TouchableWithoutFeedback>
-              <View className="bg-white rounded-t-3xl p-5 w-full ">
-                <View className="items-center mt-4">
-                  <TouchableOpacity
-                    className="z-50 justify-center items-center"
-                    onPress={() => {
-                      setShowPopup(false);
-                      setSelectedItem(null);
-                    }}
-                  >
-                    <View className="bg-[#D9D9D9] w-20 py-0.5 rounded-full -mt-6" />
-                    <View className="bg-[#D9D9D9] w-8 py-0.5 rounded-full mt-1 mb-6" />
-                  </TouchableOpacity>
-
-                  {selectedItem && (
-                    <>
-                      <Text className="text-base font-semibold text-[#747474]">
-                        #{selectedItem.jobId || "N/A"}
-                      </Text>
-                      <Text className="text-lg font-bold mt-2">
-                        {selectedItem.farmerName || "N/A"}
-                      </Text>
-                      <Text className="text-base font-semibold mt-1">
-                        {(() => {
-                          if (selectedItem.propose === "Cluster") {
-                            return i18n.language === "si"
-                              ? "ගොවි සමූහ විගණනය"
-                              : i18n.language === "ta"
-                              ? "உழவர் குழு தணிக்கை"
-                              : "Farm Cluster Audit";
-                          } else {
-                            return i18n.language === "si"
-                              ? "තනි ගොවි විගණනය"
-                              : i18n.language === "ta"
-                              ? "தனிப்பட்ட விவசாயி தணிக்கை"
-                              : "Individual Farmer Audit";
-                          }
-                        })()}
-                      </Text>
-
-                      <Text className="text-sm font-medium text-[#4E6393] mt-1">
-                        {t(`Districts.${selectedItem.district}`)}{" "}
-                        {t("VisitPopup.District")}
-                      </Text>
-                      <View className="flex flex-row justify-center gap-x-2 mb-4 mt-6 px-4">
-                        <TouchableOpacity
-                          className="flex-1"
-                          disabled={
-                            !selectedItem?.latitude || !selectedItem?.longitude
-                          }
-                          onPress={() => {
-                            if (
-                              selectedItem?.latitude &&
-                              selectedItem?.longitude
-                            ) {
-                              const lat = selectedItem.latitude;
-                              const lon = selectedItem.longitude;
-                              const url = `https://www.google.com/maps?q=${lat},${lon}`;
-                              Linking.openURL(url);
-                            }
-                          }}
-                        >
-                          <View
-                            className={`flex flex-row items-center justify-center rounded-full py-2 border ${
-                              selectedItem?.latitude && selectedItem?.longitude
-                                ? "border-[#F83B4F]"
-                                : "border-[#9DB2CE]"
-                            }`}
-                          >
-                            <FontAwesome6
-                              name="location-dot"
-                              size={20}
-                              color={
-                                selectedItem?.latitude &&
-                                selectedItem?.longitude
-                                  ? "#F83B4F"
-                                  : "#9DB2CE"
-                              }
-                            />
-                            <Text
-                              className={`text-base font-semibold ml-2 ${
-                                selectedItem?.latitude &&
-                                selectedItem?.longitude
-                                  ? "text-[#000000]"
-                                  : "text-[#9DB2CE]"
-                              }`}
-                            >
-                              {t("VisitPopup.Location")}
-                            </Text>
-                          </View>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity className="flex "
-                           onPress={() => handleDial(selectedItem.farmerMobile)}
-                        >
-                          <View className="flex-row items-center justify-center border border-[#F83B4F] rounded-full px-6 py-2">
-                            <Ionicons name="call" size={20} color="#F83B4F" />
-                            <Text className="text-base font-semibold  ml-2">
-                              {t("VisitPopup.Get Call")}
-                            </Text>
-                          </View>
-                        </TouchableOpacity>
-                      </View>
-                      {selectedItem.city ||
-                      selectedItem.plotNo ||
-                      selectedItem.street ? (
-                        <View className="flex text-center justify-center items-center ">
-                          <Text className="text-sm font-semibold text-[#4E6393] mb-2">
-                            {t("VisitPopup.Address")}
-                          </Text>
-
-                          <Text className="text-base font-medium text-[#434343]">
-                            {selectedItem.plotNo}, {selectedItem.street},
-                          </Text>
-
-                          <Text className="text-base  font-medium text-[#434343]">
-                            {selectedItem.city}
-                          </Text>
-                        </View>
-                      ) : null}
-                    </>
-                  )}
-
-                  <TouchableOpacity
-                    onPress={() => {
-                      setShowPopup(false);
-
-                      if (selectedItem?.farmerId) {
-                        navigation.navigate("QRScanner",{
-                              farmerId: selectedItem.farmerId,
-                              jobId: selectedItem.jobId,
-                              certificationpaymentId:
-                                selectedItem.certificationpaymentId,
-                              farmerMobile: selectedItem.farmerMobile,
-                              farmId: selectedItem.farmId,
-                              clusterId: selectedItem.clusterId,
-                              isClusterAudit: true,
-                              auditId: selectedItem.feildauditId,
-                               screenName: screenName,
-                            }
-                          
-                        );
-                      }
-                    }}
-                  >
-                    <LinearGradient
-                      colors={["#F2561D", "#FF1D85"]}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 0 }}
-                      className={`py-2 items-center justify-center rounded-full mt-4 ${
-                        i18n.language === "si"
-                          ? "px-24"
-                          : i18n.language === "ta"
-                          ? "px-24"
-                          : "px-[40%]"
-                      }`}
-                                    style={{
-                        marginBottom:30
-                      }}
-                    >
-                      <Text className="text-white text-lg font-semibold">
-                        {t("VisitPopup.Start")}
-                      </Text>
-                    </LinearGradient>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal> */}
 
         <Modal transparent visible={showPopup} animationType="none"
         

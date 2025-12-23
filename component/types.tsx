@@ -98,4 +98,6 @@ export type RootStackParamList = {
     govilinkJobIds?: number[];
     auditType?: "feildaudits" | "govilinkjobs";
   };
+
+  PersonalInfo:undefined
 };

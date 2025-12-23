@@ -439,24 +439,6 @@ const clearSamePhoneErrors = (p1: string, p2: string) => {
     }
   };
 
-  // const handlePhone1Blur = () => {
-  //   markFieldAsTouched("phone1");
-  //   if (!phone1.trim()) {
-  //     setErrors((prev) => ({
-  //       ...prev,
-  //       phone1: t("Error.Phone number is required"),
-  //     }));
-  //   } else if (!validatePhoneNumber(phone1)) {
-  //     setErrors((prev) => ({
-  //       ...prev,
-  //       phone1: t("Error.Invalid phone number"),
-  //     }));
-  //   } else {
-  //     clearFieldError("phone1");
-  //     checkPhoneExists(selectedCountryCode1, phone1, "phone1");
-  //   }
-  // };
-
   const handlePhone2Change = (input: string) => {
        clearFieldError("phone2");
     let numbersOnly = input.replace(/[^0-9]/g, "");
@@ -506,25 +488,6 @@ const clearSamePhoneErrors = (p1: string, p2: string) => {
     }
   };
 
-  // const handlePhone2Blur = () => {
-  //   markFieldAsTouched("phone2");
-
-  //   if (phone2) {
-  //     if (!validatePhoneNumber(phone2)) {
-  //       setErrors((prev) => ({
-  //         ...prev,
-  //         phone2: t("Error.Invalid phone number"),
-  //       }));
-  //     } else {
-  //       clearFieldError("phone2");
-  //       // Check if phone2 exists in backend only if it's provided
-  //       checkPhoneExists(selectedCountryCode2, phone2, "phone2");
-  //     }
-  //   } else {
-  //     // Phone 2 is optional, so clear any errors if empty
-  //     clearFieldError("phone2");
-  //   }
-  // };
 
   const validateNicNumber = (input: string) =>
     /^[0-9]{9}V$|^[0-9]{12}$/.test(input);
@@ -549,18 +512,6 @@ const clearSamePhoneErrors = (p1: string, p2: string) => {
     }
   };
 
-  // const handleNICBlur = () => {
-  //   markFieldAsTouched("nic");
-  //   if (!nic.trim()) {
-  //     setErrors((prev) => ({ ...prev, nic: t("Error.NIC is required") }));
-  //   } else if (!validateNIC(nic)) {
-  //     setErrors((prev) => ({ ...prev, nic: t("Error.Invalid NIC format") }));
-  //   } else {
-  //     clearFieldError("nic");
-  //     checkNICExists(nic);
-  //   }
-  // };
-
   const handleEmailChange = (input: string) => {
         clearFieldError('email');
         markFieldAsTouched("email");
@@ -581,20 +532,6 @@ const clearSamePhoneErrors = (p1: string, p2: string) => {
  checkEmailExists(trimmedInput);
   };
 
-  // const handleEmailBlur = () => {
-  //   markFieldAsTouched("email");
-  //   if (!email.trim()) {
-  //     setErrors((prev) => ({ ...prev, email: t("Error.Email is required") }));
-  //   } else if (!validateEmail(email)) {
-  //     setErrors((prev) => ({
-  //       ...prev,
-  //       email: t("Error.Invalid email address"),
-  //     }));
-  //   } else {
-  //     clearFieldError("email");
-  //     checkEmailExists(email);
-  //   }
-  // };
 
   // Handle blur for other fields
   const handleFirstNameSIBlur = () => {
@@ -1579,23 +1516,8 @@ console.log("Form Data:", formData);
                 <Text className="text-lg font-semibold">
                   {t("AddOfficer.SelectDistricts")}
                 </Text>
-                {/* {selectedDistricts.length > 0 && (
-                  <Text className="text-sm text-green-600">
-                    {selectedDistricts.length} {t("AddOfficer.selected")}
-                  </Text>
-                )} */}
               </View>
               <View className="flex-row items-center">
-                {/* {selectedDistricts.length > 0 && (
-                  <TouchableOpacity
-                    onPress={clearAllDistricts}
-                    className="mr-3"
-                  >
-                    <Text className="text-red-500 text-sm font-medium">
-                      {t("AddOfficer.ClearAll")}
-                    </Text>
-                  </TouchableOpacity>
-                )} */}
                 <TouchableOpacity onPress={handleDistrictModalClose}>
                   <MaterialIcons name="close" size={24} color="#666" />
                 </TouchableOpacity>
@@ -1606,9 +1528,6 @@ console.log("Form Data:", formData);
             {renderDistrictSearchInput()}
 
             <FlatList
-              // data={getFilteredDistricts()}
-              // renderItem={renderDistrictItem}
-              // keyExtractor={(item) => item.en}
                   data={getFilteredCFODistricts()}
     keyExtractor={(item) => item.en}
     renderItem={renderDistrictItem}

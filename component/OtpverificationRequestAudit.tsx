@@ -409,21 +409,10 @@ const handleComplete = async (): Promise<boolean> => {
           </Text>
         </View>
 
-{/* 
-          <View className="mt-2">
-            <Text className="text-md text-[#FF1D85] text-center ">
-              {farmerMobile}
-            </Text>
-          </View> */}
-
-
-       
-
         <View className="flex-row justify-center gap-3 mt-4 px-4">
           {Array.from({ length: 5 }).map((_, index) => (
             <TextInput
               key={index}
-              // ref={(el) => (inputRefs.current[index] = el as TextInput)}
                  ref={(el: TextInput | null) => {
         inputRefs.current[index] = el; // assign to array
       }}
@@ -436,7 +425,6 @@ const handleComplete = async (): Promise<boolean> => {
               maxLength={1}
               value={otpCode[index] || ""}
               onChangeText={(text) => handleOtpChange(text, index)}
-              // placeholder={maskedCode[index] || "_"}
               placeholderTextColor="lightgray"
        
             />
