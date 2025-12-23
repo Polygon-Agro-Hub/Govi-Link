@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   View,
   Text,
@@ -11,6 +11,9 @@ import {
   FlatList,
   TouchableWithoutFeedback,
   Linking,
+    Animated, PanResponder,
+    Pressable
+
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp, useRoute } from "@react-navigation/native";
@@ -130,6 +133,8 @@ const LoadingSkeleton = () => {
 const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
   const route = useRoute<ViewFarmsClusterProp>();
   const { jobId, farmName, feildauditId, screenName } = route.params;
+    console.log("indi or clus", screenName)
+
   console.log(jobId, farmName, feildauditId);
   const { t, i18n } = useTranslation();
   const [visitsData, setVisitsData] = useState<VisitsData[]>([]);
@@ -140,6 +145,49 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
   const [showPopup, setShowPopup] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
 
+  const translateY = useRef(new Animated.Value(0)).current;
+  const currentTranslateY = useRef(0);
+  console.log(translateY)
+  
+  const panResponder = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponderCapture: (_, g) => g.dy > 5,
+      onStartShouldSetPanResponder: () => true,
+  
+      onPanResponderMove: (_, g) => {
+        if (g.dy > 0) translateY.setValue(g.dy);
+      },
+  
+      onPanResponderRelease: (_, g) => {
+        if (g.dy > 120) {
+          console.log("hit1");
+                    setShowPopup(false);
+          Animated.timing(translateY, {
+            toValue: 600,
+            duration: 100,
+            useNativeDriver: true,
+          }).start(() => {
+            console.log("hit3");
+            translateY.setValue(0);
+            setShowPopup(false);
+            setSelectedItem(null);
+          });
+        } else {
+          console.log("hit4");
+          Animated.spring(translateY, {
+            toValue: 0,
+            useNativeDriver: true,
+          }).start();
+        }
+      },
+    })
+  ).current;
+  
+  useEffect(() => {
+    if (showPopup) {
+      translateY.setValue(0);
+    }
+  }, [showPopup]);
   const fetchclusteVisits = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
@@ -185,7 +233,7 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
           <Text className="text-base font-semibold text-center">#{jobId}</Text>
         </View>
       </View>
-      <View className="mt-4">
+      {/* <View className="mt-4">
         <Text className="text-xl font-semibold text-center">{farmName}</Text>
         {visitsData.length > 0 && (
           <Text className="text-base text-center text-gray-500 mt-1">
@@ -193,7 +241,24 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
             finish
           </Text>
         )}
-      </View>
+      </View> */}
+      <View className="mt-4">
+  <Text className="text-xl font-semibold text-center">{farmName}</Text>
+
+  {visitsData.length > 0 && (() => {
+    const farmsLeft = visitsData.filter(v => v.isCompleted !== 1).length;
+    console.log("Farms left:", farmsLeft);
+
+    return (
+      <Text className="text-base text-center text-gray-500 mt-1">
+        {farmsLeft === 1
+          ? t("Visits.1 farm left to finish")
+          : t("Visits.farms left to finish", { count: farmsLeft })}
+      </Text>
+    );
+  })()}
+</View>
+
       {loaingCertificate ? (
         <LoadingSkeleton />
       ) : (
@@ -210,9 +275,15 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
                   className="bg-white border border-[#9DB2CE] rounded-xl px-5 py-4 mb-3 mx-3 flex-row justify-between items-center"
                 >
                   {/* Left side — ID */}
-                  <Text className="text-black text-lg font-semibold">
-                    ID : {item.regCode}
+                
+                  <View className="flex-row">
+                      <Text className={`text-black font-semibold ${i18n.language==="si"? "text-base": i18n.language === "ta"? "text-base": "text-lg"}`}>
+                    {t("Visits.ID")} :
                   </Text>
+                    <Text className="text-black text-lg font-semibold ml-2">
+                     {item.regCode}
+                  </Text>
+                  </View>
 
                   {/* Right side — Button / Status */}
                   {item.isCompleted === 1 ? (
@@ -238,24 +309,24 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
                         colors={["#FF416C", "#FF4B2B"]}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 0 }}
-                        className="rounded-full px-6 py-2"
+                        className="rounded-full w-24 py-1.5"
                       >
                         <Text className="text-white text-base font-semibold text-center">
-                          Open
+                          {t("Visits.Open")}
                         </Text>
                       </LinearGradient>
                     </TouchableOpacity>
                   ) : (
                     item.jobStatus === "Start" && (
                       <TouchableOpacity
-                        className="bg-black rounded-full px-7 py-1.5"
+                        className="bg-black rounded-full w-24 py-1.5"
                         onPress={() => {
                           setSelectedItem(item);
                           setShowPopup(true);
                         }}
                       >
                         <Text className="text-white text-base font-semibold text-center">
-                          {item.jobStatus}
+                          {t("Visits.Start")}
                         </Text>
                       </TouchableOpacity>
                     )
@@ -267,28 +338,34 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
         </>
       )}
 
-      <Modal transparent visible={showPopup} animationType="slide"
-              onRequestClose={() => {
-    console.log("hitt");
-    setShowPopup(false);
-    setSelectedItem(null);
-  }}
+        <Modal transparent visible={showPopup} animationType="none"
+        
       >
-        <TouchableWithoutFeedback
-          onPress={() => {
-            setShowPopup(false);
-            setSelectedItem(null);
-          }}
-        >
+
           <View
             style={{
               flex: 1,
               backgroundColor: "rgba(0,0,0,0.3)",
-              justifyContent: "flex-end",
             }}
           >
-            <TouchableWithoutFeedback>
-              <View className="bg-white rounded-t-3xl p-5 w-full ">
+                            <Pressable
+                  style={{ flex: 1 }}
+                  onPress={() => {
+                    setShowPopup(false);
+                    setSelectedItem(null);
+                  }}
+                />
+                          <Animated.View
+              {...panResponder.panHandlers}
+              style={{
+                position: "absolute",
+                bottom: 0,
+                width: "100%",
+                transform: [{ translateY }],
+              }}
+              className="bg-white rounded-t-3xl p-5 w-full"
+            > 
+            
                 <View className="items-center mt-4">
                   <TouchableOpacity
                     className="z-50 justify-center items-center"
@@ -447,16 +524,18 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
                         marginBottom:30
                       }}
                     >
-                      <Text className="text-white text-lg font-semibold">
+                      {/* <Text className="text-white text-lg font-semibold">
                         {t("VisitPopup.Start")}
-                      </Text>
+                      </Text> */}
+                                            <Text className={`text-white  font-semibold ${i18n.language==="si"? "text-base": i18n.language === "ta"? "text-base": "text-lg"}`}>
+                                              {t("VisitPopup.Start")}
+                                            </Text>
                     </LinearGradient>
                   </TouchableOpacity>
                 </View>
+                  </Animated.View>
               </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
+
       </Modal>
     </View>
   );

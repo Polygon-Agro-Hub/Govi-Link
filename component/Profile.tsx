@@ -215,12 +215,6 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   if (loading) {
     return (
       <View className="flex-1 bg-white justify-center items-center">
-        {/* <LottieView
-          source={require("../assets/images/loading.json")}
-          autoPlay
-          loop
-          style={{ width: wp(25), height: hp(12) }}
-        /> */}
         <ActivityIndicator></ActivityIndicator>
         <Text className="text-[#6839CF]  font-semibold mt-4">
           Loading Profile...
@@ -334,12 +328,6 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                     <Text className="text-black mb-1">
                       {t("Profile.First Name")}
                     </Text>
-                    {/* <TextInput
-                  className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-full px-3 py-2"
-                  value={formData.firstName}
-                  onChangeText={(text) => handleInputChange("firstName", text)}
-                  placeholder="Enter First Name"
-                /> */}
                     <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-2xl px-4 py-3 text-[#8492A3]">
                       {i18n.language === "si"
                         ? formData.firstNameSinhala
@@ -353,12 +341,6 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                     <Text className="text-black mb-1">
                       {t("Profile.Last Name")}
                     </Text>
-                    {/* <TextInput
-                  className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-full px-3 py-2"
-                  value={formData.lastName}
-                  onChangeText={(text) => handleInputChange("lastName", text)}
-                  placeholder="Enter Last Name"
-                /> */}
                     <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-2xl px-4 py-3 text-[#8492A3]">
                       {i18n.language === "si"
                         ? formData.lastNameSinhala
@@ -409,12 +391,6 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                     <Text className="text-black mb-1">
                       {t("Profile.Building / House No")}
                     </Text>
-                    {/* <TextInput
-                  className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-full px-3 py-2"
-                  value={formData.houseNumber}
-                  onChangeText={(text) => handleInputChange("houseNumber", text)}
-                  placeholder="Enter Building Number"
-                /> */}
                     <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-2xl px-4 py-3 text-[#8492A3]">
                       {formData.house}
                     </Text>
@@ -424,12 +400,6 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                     <Text className="text-black mb-1">
                       {t("Profile.Street Name")}
                     </Text>
-                    {/* <TextInput
-                  className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-full px-3 py-2"
-                  value={formData.streetName}
-                  onChangeText={(text) => handleInputChange("streetName", text)}
-                  placeholder="Enter Street Name"
-                /> */}
                     <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-2xl px-4 py-3 text-[#8492A3]">
                       {formData.street}
                     </Text>
@@ -437,34 +407,11 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 
                   <View className="mb-14">
                     <Text className="text-black mb-1">{t("Profile.City")}</Text>
-                    {/* <TextInput
-                  className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-full px-3 py-2"
-                  value={formData.city}
-                  onChangeText={(text) => handleInputChange("city", text)}
-                  placeholder="Enter City"
-                /> */}
                     <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-2xl px-4 py-3 text-[#8492A3]">
                       {formData.city}
                     </Text>
                   </View>
                 </View>
-                {/* <View className="">
-              <TouchableOpacity  onPress={handleUpdate} >
-
-                 <LinearGradient colors={["#F2561D", "#FF1D85"]}   
-                 start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }} className="py-3   items-center  mb-[40%] mr-[6%] ml-[6%] rounded-3xl ">
-                   {isSubmitting || loading ? (
-                        <ActivityIndicator color="#FFFFFF" />
-                      ) : (
-                              
-                                  <Text className="text-center text-white text-lg font-bold">{t("Profile.Update")}</Text>
-                      )}
-                              </LinearGradient>
-                              </TouchableOpacity>
-
-            
-              </View> */}
               </View>
             </View>
           </LinearGradient>

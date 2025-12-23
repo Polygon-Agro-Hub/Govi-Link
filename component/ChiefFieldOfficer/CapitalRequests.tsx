@@ -92,7 +92,7 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
       setRequests(filteredRequests);
     } catch (error: any) {
       console.error("Failed to fetch capital requests:", error);
-      Alert.alert(t("Error.Error"), t("Error.FailedToLoadRequests"));
+      Alert.alert(t("Error.Error"), t("Error.FailedToLoadRequests"),[{ text: t("MAIN.OK") }]);
     } finally {
       setLoading(false);
       setRefreshing(false);

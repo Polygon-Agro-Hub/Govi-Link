@@ -21,12 +21,13 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import {AntDesign} from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
 import LottieView from "lottie-react-native";
 import { useSelector } from "react-redux";
-import { selectUserPersonal} from "@/store/authSlice";
-import { useFocusEffect } from "@react-navigation/native"
+import { selectUserPersonal } from "@/store/authSlice";
+import { useFocusEffect } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
+import { t } from "i18next";
 
 interface complainItem {
   id: number;
@@ -49,43 +50,66 @@ interface ComplainHistoryProps {
   navigation: ComplainHistoryNavigationProp;
 }
 
+// Component to handle truncated text with See More/See Less
+const ExpandableText: React.FC<{ text: string; maxLength?: number }> = ({
+  text,
+  maxLength = 150, // Default max length before truncating
+}) => {
+  const [expanded, setExpanded] = useState(false);
+
+  if (!text) return null;
+
+  const shouldTruncate = text.length > maxLength;
+  const displayText = expanded || !shouldTruncate ? text : `${text.substring(0, maxLength)}...`;
+
+  return (
+    <Text className="self-start mb-4">
+      {displayText}
+      {shouldTruncate && (
+        <TouchableOpacity onPress={() => setExpanded(!expanded)}>
+          <Text className="text-blue-500 font-semibold ml-1 mb-[-4]">
+            {expanded ? t("ComplainHistory.See less"): t("ComplainHistory.See more")}
+          </Text>
+        </TouchableOpacity>
+      )}
+    </Text>
+  );
+};
+
 const ComplainHistory: React.FC<ComplainHistoryProps> = ({ navigation }) => {
   const [complains, setComplains] = useState<complainItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [complainReply, setComplainReply] = useState<string | null>(null);
   const [selectedComplain, setSelectedComplain] = useState<complainItem | null>(null);
-  const { t , i18n} = useTranslation();
+  const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
   const userPersonalData = useSelector(selectUserPersonal);
-  console.log(userPersonalData)
-  
+  console.log(userPersonalData);
+
   const [profile, setProfile] = useState<{
     firstName: string;
     lastName: string;
-    firstNameSinhala:string;
-    firstNameTamil:string;
-    lastNameSinhala:string;
-    lastNameTamil:string
+    firstNameSinhala: string;
+    firstNameTamil: string;
+    lastNameSinhala: string;
+    lastNameTamil: string;
   } | null>(null);
 
-useFocusEffect(
-  React.useCallback(() => {
-    if (userPersonalData) {
-      setProfile({
-        firstName: userPersonalData.firstName || "",
-        lastName: userPersonalData.lastName || "",
-        firstNameSinhala: userPersonalData.firstNameSinhala || "",
-        lastNameSinhala: userPersonalData.lastNameSinhala || "",
-        firstNameTamil: userPersonalData.firstNameTamil || "",
-        lastNameTamil: userPersonalData.lastNameTamil || "",
-      });
-    }
-  }, [userPersonalData])
-);
-
-
-
+  useFocusEffect(
+    React.useCallback(() => {
+      if (userPersonalData) {
+        setProfile({
+          firstName: userPersonalData.firstName || "",
+          lastName: userPersonalData.lastName || "",
+          firstNameSinhala: userPersonalData.firstNameSinhala || "",
+          lastNameSinhala: userPersonalData.lastNameSinhala || "",
+          firstNameTamil: userPersonalData.firstNameTamil || "",
+          lastNameTamil: userPersonalData.lastNameTamil || "",
+        });
+      }
+    }, [userPersonalData])
+  );
 
   const fetchOngoingCultivations = async () => {
     try {
@@ -100,9 +124,9 @@ useFocusEffect(
         }
       );
       setComplains(res.data);
-      console.log("responted data......",res.data)
+      console.log("responted data......", res.data);
     } catch (err) {
-console.error("Error fetching complains:", err);
+      console.error("Error fetching complains:", err);
     } finally {
       setLoading(false);
     }
@@ -143,7 +167,7 @@ console.error("Error fetching complains:", err);
       setSelectedComplain(complain);
       setModalVisible(true);
     } else {
-      Alert.alert(t("Main.Sorry"), t("ComplainHistory.No Reply"), [{ text:  t("ComplainHistory.OK") }]);
+      Alert.alert(t("Main.Sorry"), t("ComplainHistory.No Reply"), [{ text: t("MAIN.OK") }])
     }
   };
 
@@ -154,9 +178,22 @@ console.error("Error fetching complains:", err);
       style={{ flex: 1, backgroundColor: "#F9F9FA" }}
     >
       <View className="flex-1 bg-white">
-        <View className="flex-row items-center justify-between" style={{ paddingHorizontal: wp(4), paddingVertical: hp(2) }}>
+        <View
+          className="flex-row items-center justify-between"
+          style={{ paddingHorizontal: wp(4), paddingVertical: hp(2) }}
+        >
           <TouchableOpacity onPress={() => navigation.goBack()}>
-            <AntDesign name="left" size={24} color="#000502" style={{ paddingHorizontal: wp(3), paddingVertical: hp(1.5), backgroundColor: "#F6F6F680", borderRadius: 50 }}/>
+            <AntDesign
+              name="left"
+              size={24}
+              color="#000502"
+              style={{
+                paddingHorizontal: wp(3),
+                paddingVertical: hp(1.5),
+                backgroundColor: "#F6F6F680",
+                borderRadius: 50,
+              }}
+            />
           </TouchableOpacity>
           <Text className="font-bold text-lg">
             {t("ComplainHistory.Complaint History")}
@@ -166,12 +203,6 @@ console.error("Error fetching complains:", err);
 
         {loading ? (
           <View className="flex-1 justify-center items-center">
-            {/* <LottieView
-              source={require('../assets/jsons/loader.json')}
-              autoPlay
-              loop
-              style={{ width: 300, height: 300 }}
-            /> */}
             <ActivityIndicator size="large" color="#FF1D85" />
           </View>
         ) : complains.length === 0 ? (
@@ -203,9 +234,9 @@ console.error("Error fetching complains:", err);
                   {t("ComplainHistory.Sent")} {formatDateTime(complain.createdAt)}
                 </Text>
 
-                <Text className="self-start mb-4">
-                  {complain.complain || ""}
-                </Text>
+                {/* Use ExpandableText component here */}
+                <ExpandableText text={complain.complain || ""} />
+
                 <View className="flex-row justify-between items-center">
                   {complain.status === "Closed" && (
                     <TouchableOpacity
@@ -226,8 +257,8 @@ console.error("Error fetching complains:", err);
                       }`}
                     >
                       {complain.status === "Opened"
-                        ? (t("ComplainHistory.Opened"))
-                        : (t("ComplainHistory.Closed"))}
+                        ? t("ComplainHistory.Opened")
+                        : t("ComplainHistory.Closed")}
                     </Text>
                   </View>
                 </View>
@@ -243,41 +274,35 @@ console.error("Error fetching complains:", err);
           onRequestClose={() => setModalVisible(false)}
           statusBarTranslucent={false}
         >
-          <View 
+          <View
             className="flex-1 items-center bg-white bg-opacity-50"
-            style={{ 
-              paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight || 0 : 0
+            style={{
+              paddingTop: Platform.OS === "android" ? StatusBar.currentHeight || 0 : 0,
             }}
           >
-            <ScrollView 
+            <ScrollView
               className="bg-white rounded-lg shadow-lg w-full max-w-md"
               contentContainerStyle={{ padding: 24, paddingBottom: 70 }}
               showsVerticalScrollIndicator={false}
             >
               {/* Close Button */}
-              <TouchableOpacity 
-                className="absolute top-1 right-4 bg-gray-200 p-2 rounded-full" 
+              <TouchableOpacity
+                className="absolute top-1 right-4 bg-gray-200 p-2 rounded-full"
                 onPress={() => setModalVisible(false)}
               >
                 <AntDesign name="close" size={18} color="gray" />
               </TouchableOpacity>
 
-
               <View className="mt-4">
-               
                 <Text className="text-gray-800 text-base leading-relaxed text-left">
-                  {i18n.language === "si" ? 
-                    `හිතවත් ${profile?.firstNameSinhala || ""} ${profile?.lastNameSinhala || ""},\n\nඔබගේ පැමිණිල්ල විසඳා ඇති බව අපි ඔබට සතුටින් දැනුම් දෙමු.\n\n${complainReply || "Loading..."}\n\nඔබට තවත් ගැටළු හෝ ප්‍රශ්න තිබේ නම්, අප හා සම්බන්ධ වන්න. ඔබගේ ඉවසීම සහ අවබෝධය සඳහා ස්තූතියි.\n\nමෙයට,\nPolygon පාරිභෝගික සහාය කණ්ඩායම`
-                    : i18n.language === "ta" ?
-                    `நம்பிக்கை  ${profile?.firstNameTamil || ""} ${profile?.lastNameTamil || ""},\n\nஉங்களால் தீர்க்கப்பட்டதாக நாங்கள் உங்களுக்கு மகிழ்ச்சியுடன் தெரிவிக்கிறோம்.\n\n${complainReply || "Loading..."}\n\nஉங்களுக்கு மேலும் சிக்கல்கள் அல்லது பிரச்சனைகள் இருந்தால், நீங்கள் தொடர்பு கொள்ள வேண்டும். உங்கள் பொறுமை மற்றும் புரிதலுக்கு நன்றி.\n\nஇதற்கு,\nஇதற்கு, பாலிகோன் ஆதரவு குழு`
-                    :
-                    `Dear ${profile?.firstName || ""} ${profile?.lastName || ""},\n\nWe are pleased to inform you that your complaint has been resolved.\n\n${complainReply || "Loading..."}\n\nIf you have any further concerns or questions, feel free to reach out.\nThank you for your patience and understanding.\n\nSincerely,\nPolygon Agro Customer Support Team`
-                  }
+                  {i18n.language === "si"
+                    ? `හිතවත් ${profile?.firstNameSinhala || ""} ${profile?.lastNameSinhala || ""},\n\nඔබගේ පැමිණිල්ල විසඳා ඇති බව අපි ඔබට සතුටින් දැනුම් දෙමු.\n\n${complainReply || "Loading..."}\n\nඔබට තවත් ගැටළු හෝ ප්‍රශ්න තිබේ නම්, අප හා සම්බන්ධ වන්න. ඔබගේ ඉවසීම සහ අවබෝධය සඳහා ස්තූතියි.\n\nමෙයට,\nPolygon පාරිභෝගික සහාය කණ්ඩායම`
+                    : i18n.language === "ta"
+                    ? `நம்பிக்கை  ${profile?.firstNameTamil || ""} ${profile?.lastNameTamil || ""},\n\nஉங்களால் தீர்க்கப்பட்டதாக நாங்கள் உங்களுக்கு மகிழ்ச்சியுடன் தெரிவிக்கிறோம்.\n\n${complainReply || "Loading..."}\n\nஉங்களுக்கு மேலும் சிக்கல்கள் அல்லது பிரச்சனைகள் இருந்தால், நீங்கள் தொடர்பு கொள்ள வேண்டும். உங்கள் பொறுமை மற்றும் புரிதலுக்கு நன்றி.\n\nஇதற்கு,\nஇதற்கு, பாலிகோன் ஆதரவு குழு`
+                    : `Dear ${profile?.firstName || ""} ${profile?.lastName || ""},\n\nWe are pleased to inform you that your complaint has been resolved.\n\n${complainReply || "Loading..."}\n\nIf you have any further concerns or questions, feel free to reach out.\nThank you for your patience and understanding.\n\nSincerely,\nPolygon Agro Customer Support Team`}
                 </Text>
-                 {selectedComplain?.replyTime && (
-                  <Text className="  mb-3 mt-1 ">
-                    {formatDate(selectedComplain.replyTime)}
-                  </Text>
+                {selectedComplain?.replyTime && (
+                  <Text className="mb-3 mt-1">{formatDate(selectedComplain.replyTime)}</Text>
                 )}
               </View>
             </ScrollView>

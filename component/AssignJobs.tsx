@@ -1,5 +1,5 @@
 import { StackNavigationProp } from "@react-navigation/stack";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   View,
   Text,
@@ -11,6 +11,8 @@ import {
   ActivityIndicator,
   Alert,
   BackHandler,
+    Animated, PanResponder,
+    Pressable
 } from "react-native";
 import { RootStackParamList } from "@/component/types";
 import { useTranslation } from "react-i18next";
@@ -60,6 +62,8 @@ interface VisitItem {
   city?: string;
   plotNo?: string;
   street?: string;
+  auditType: "feildaudits" | "govilinkjobs";
+  certificateId?: number;
 }
 
 const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
@@ -72,6 +76,50 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
   const [visits, setVisits] = useState<VisitItem[]>([]);
   const [showPopup, setShowPopup] = useState(false);
   const [selectedItem, setSelectedItem] = useState<VisitItem | null>(null);
+
+  const translateY = useRef(new Animated.Value(0)).current;
+  const currentTranslateY = useRef(0);
+  console.log(translateY)
+  
+  const panResponder = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponderCapture: (_, g) => g.dy > 5,
+      onStartShouldSetPanResponder: () => true,
+  
+      onPanResponderMove: (_, g) => {
+        if (g.dy > 0) translateY.setValue(g.dy);
+      },
+  
+      onPanResponderRelease: (_, g) => {
+        if (g.dy > 120) {
+          console.log("hit1");
+                    setShowPopup(false);
+          Animated.timing(translateY, {
+            toValue: 600,
+            duration: 100,
+            useNativeDriver: true,
+          }).start(() => {
+            console.log("hit3");
+            translateY.setValue(0);
+            setShowPopup(false);
+            setSelectedItem(null);
+          });
+        } else {
+          console.log("hit4");
+          Animated.spring(translateY, {
+            toValue: 0,
+            useNativeDriver: true,
+          }).start();
+        }
+      },
+    })
+  ).current;
+  
+  useEffect(() => {
+    if (showPopup) {
+      translateY.setValue(0);
+    }
+  }, [showPopup]);
 
   useEffect(() => {
     const today = new Date().toISOString().split("T")[0];
@@ -104,7 +152,7 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
   useFocusEffect(
     useCallback(() => {
       fetchVisits();
-      setSelectedJobs([])
+      setSelectedJobs([]);
     }, [selectedDate, isOverdueSelected])
   );
 
@@ -180,7 +228,7 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
         jobId: selectedJob.jobId,
         feildauditId: selectedJob.id,
         farmName: selectedJob.farmerName ?? "",
-        screenName:"AssignJobs"
+        screenName: "AssignJobs",
       });
     }
   };
@@ -190,7 +238,7 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
 
     // Handle navigation based on propose type when Start is pressed in modal
     if (selectedItem.propose === "Individual") {
-      console.log("hit assign jobs")
+      console.log("hit assign jobs");
       navigation.navigate("QRScanner", {
         farmerId: selectedItem.farmerId,
         jobId: selectedItem.jobId,
@@ -200,7 +248,7 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
         clusterId: selectedItem.clusterId,
         isClusterAudit: false,
         auditId: selectedItem.id,
-        screenName:"AssignJobs"
+        screenName: "AssignJobs",
       });
     } else if (selectedItem.propose === "Requested") {
       navigation.navigate("QRScaneerRequstAudit", {
@@ -208,7 +256,7 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
         govilinkjobid: selectedItem.id,
         jobId: selectedItem.jobId,
         farmerMobile: selectedItem.farmerMobile,
-        screenName:"AssignJobs"
+        screenName: "AssignJobs",
       });
     }
 
@@ -231,13 +279,62 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
     );
 
     if (firstSelectedJob) {
-      navigation.navigate("AssignJobOfficerList", {
-        selectedJobIds: selectedJobs,
-        selectedDate: selectedDate,
-        isOverdueSelected: isOverdueSelected,
-        propose: firstSelectedJob.propose,
-        fieldAuditId: firstSelectedJob.id,
+      // Prepare the IDs based on auditType
+      const fieldAuditIds: number[] = [];
+      const govilinkJobIds: number[] = [];
+
+      // Get all selected jobs
+      const selectedJobItems = visits.filter((item) =>
+        selectedJobs.includes(item.jobId)
+      );
+
+      // Separate IDs based on auditType
+      selectedJobItems.forEach((job) => {
+        if (job.auditType === "feildaudits") {
+          // For feildaudits, use the id as fieldAuditId
+          fieldAuditIds.push(job.id);
+        } else if (job.auditType === "govilinkjobs") {
+          // For govilinkjobs, use the id as govilinkJobId
+          govilinkJobIds.push(job.id);
+        }
       });
+
+      // Only one type of jobs should be selected at a time
+      // (as per your single selection logic)
+      if (fieldAuditIds.length > 0 && govilinkJobIds.length > 0) {
+        Alert.alert(
+          "Mixed Job Types",
+          "Cannot assign mixed job types at once. Please select jobs of the same type."
+        );
+        return;
+      }
+
+      // Determine which ID to send based on the first selected job
+      let paramsToSend;
+
+      if (firstSelectedJob.auditType === "feildaudits") {
+        paramsToSend = {
+          selectedJobIds: selectedJobs,
+          selectedDate: selectedDate,
+          isOverdueSelected: isOverdueSelected,
+          propose: firstSelectedJob.propose,
+          fieldAuditIds: fieldAuditIds,
+          auditType: firstSelectedJob.auditType,
+        };
+      } else {
+        // For govilinkjobs type
+        paramsToSend = {
+          selectedJobIds: selectedJobs,
+          selectedDate: selectedDate,
+          isOverdueSelected: isOverdueSelected,
+          propose: firstSelectedJob.propose,
+          govilinkJobIds: govilinkJobIds,
+          auditType: firstSelectedJob.auditType,
+        };
+      }
+
+      console.log("Navigating with params:", paramsToSend);
+      navigation.navigate("AssignJobOfficerList", paramsToSend);
     } else {
       Alert.alert(
         "Error",
@@ -374,7 +471,7 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
 
       {/* Action Buttons - Only show when at least one job is selected */}
       {selectedJobs.length > 0 && (
-        <View className="flex-row p-4 justify-between items-center">
+        <View className="flex-row p-4 justify-between items-center space-x-6">
           <View className="flex-1"></View>
           <View className="flex-1 items-center">
             <TouchableOpacity onPress={handleStartJob}>
@@ -382,18 +479,18 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
                 colors={["#F2561D", "#FF1D85"]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
-                className="flex-row px-6 h-10 rounded-full items-center justify-center"
+className="flex-row p-3 rounded-full items-center justify-center min-w-[120px]"
               >
-                <Text className="text-white font-bold text-lg">Start</Text>
+                <Text className={`text-white  font-bold ${i18n.language==="si"? "text-base": i18n.language === "ta"? "text-base": "text-lg"}`}>{t("AssignJobOfficerList.Start")}</Text>
               </LinearGradient>
             </TouchableOpacity>
           </View>
-          <View className="flex-1 items-end">
+          <View className="flex-1 pr-6">
             <TouchableOpacity
               onPress={handleAssignJobs}
-              className="bg-black px-5 py-1.5 rounded-3xl"
+              className=" bg-black px-auto p-3 min-w-[120px] rounded-3xl items-center justify-center"
             >
-              <Text className="font-bold text-white text-lg">Assign</Text>
+              <Text className={`text-white  font-bold ${i18n.language==="si"? "text-base": i18n.language === "ta"? "text-base": "text-lg"}`}>{t("AssignJobOfficerList.AssignButton")}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -404,8 +501,7 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
           <ActivityIndicator size="large" color="#FF1D85" />
         </View>
       ) : visits.length > 0 ? (
-        <ScrollView className="flex-1 mt-4 px-4 bg-white rounded-t-3xl mb-20"
-        >
+        <ScrollView className="flex-1 mt-4 px-4 bg-white rounded-t-3xl mb-20">
           {visits.map((item) => (
             <TouchableOpacity
               key={item.jobId}
@@ -448,9 +544,6 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
                       {t(`Districts.${item.district}`)}{" "}
                       {t("VisitPopup.District")}
                     </Text>
-                    {/* <Text className="text-[12px] font-medium text-[#4E6393] mt-1">
-                      {item.status}
-                    </Text> */}
                   </View>
                 </View>
               </View>
@@ -471,27 +564,40 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
         </View>
       )}
 
-      {/* Modal Popup */}
-      <Modal
+         <Modal
         transparent
         visible={showPopup}
-        animationType="slide"
+        animationType="none"
         onRequestClose={() => {
           setShowPopup(false);
           setSelectedItem(null);
         }}
       >
-        <TouchableWithoutFeedback
-          onPress={() => {
-            setShowPopup(false);
-            setSelectedItem(null);
+                  <View
+                    style={{
+                      flex: 1,
+                      backgroundColor: "rgba(0,0,0,0.3)",
+                    }}
+                  >
+                        <Pressable
+              style={{ flex: 1 }}
+              onPress={() => {
+                setShowPopup(false);
+                setSelectedItem(null);
+              }}
+            />
+                      <Animated.View
+          {...panResponder.panHandlers}
+          style={{
+            position: "absolute",
+            bottom: 0,
+            width: "100%",
+            transform: [{ translateY }],
           }}
-        >
-          <View className="flex-1 justify-end bg-black/50">
-            <TouchableWithoutFeedback>
-              <View className="bg-white rounded-t-3xl p-5 w-full">
+          className="bg-white rounded-t-3xl p-5 w-full"
+        > 
+        
                 <View className="items-center mt-4">
-                  {/* Draggable Handle */}
                   <TouchableOpacity
                     className="z-50 justify-center items-center"
                     onPress={() => {
@@ -521,7 +627,6 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
                       </Text>
 
                       <View className="flex flex-row justify-center gap-x-2 mb-4 mt-6 px-4">
-                        {/* Location Button */}
                         <TouchableOpacity
                           className="flex-1"
                           disabled={
@@ -569,7 +674,6 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
                           </View>
                         </TouchableOpacity>
 
-                        {/* Call Button */}
                         <TouchableOpacity
                           className="flex"
                           onPress={() => handleDial(selectedItem.farmerMobile)}
@@ -583,7 +687,6 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
                         </TouchableOpacity>
                       </View>
 
-                      {/* Address Section */}
                       {(selectedItem.city ||
                         selectedItem.plotNo ||
                         selectedItem.street) && (
@@ -602,9 +705,7 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
                     </>
                   )}
 
-                  {/* Action Buttons in Modal */}
                   <View className="flex-row justify-between w-full mt-6 px-4 gap-x-4">
-                    {/* Start Button */}
                     <TouchableOpacity
                       className="flex-1"
                       onPress={handleStartJobFromModal}
@@ -615,17 +716,20 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
                         end={{ x: 1, y: 0 }}
                         className="py-3 items-center justify-center rounded-full"
                       >
-                        <Text className="text-white text-lg font-semibold">
+                        {/* <Text className="text-white text-lg font-semibold">
                           {t("VisitPopup.Start")}
-                        </Text>
+                        </Text> */}
+                                              <Text className={`text-white  font-semibold ${i18n.language==="si"? "text-base": i18n.language === "ta"? "text-base": "text-lg"}`}>
+                                                {t("VisitPopup.Start")}
+                                              </Text>
                       </LinearGradient>
                     </TouchableOpacity>
                   </View>
                 </View>
+                              </Animated.View>
+                
               </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
+
       </Modal>
     </View>
   );

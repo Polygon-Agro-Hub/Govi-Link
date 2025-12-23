@@ -45,6 +45,7 @@ import AssignJobs from "@/component/AssignJobs";
 import CapitalRequests from "@/component/ChiefFieldOfficer/CapitalRequests";
 import RequestDetails from "@/component/ChiefFieldOfficer/RequestDetails";
 import AssignJobOfficerList from "@/component/AssignJobOfficerList";
+import PersonalInfo from "@/component/CapitalRequest/PersonalInfo";
 
 LogBox.ignoreAllLogs(true);
 NativeWindStyleSheet.setOutput({ default: "native" });
@@ -104,7 +105,6 @@ function MainTabs() {
           <Tab.Screen name="AddOfficerStep3" component={AddOfficerStep3} />
           <Tab.Screen name="AssignJobs" component={AssignJobs} />
           <Tab.Screen name="CapitalRequests" component={CapitalRequests} />
-          <Tab.Screen name="RequestDetails" component={RequestDetails} />
           <Tab.Screen name="AssignJobOfficerList" component={AssignJobOfficerList} />
         </>
       ) : (
@@ -115,9 +115,6 @@ function MainTabs() {
           />
           <Tab.Screen name="Profile" component={ProfileScreen} />
             <Tab.Screen name="ViewAllVisits" component={ViewAllVisits} />
-                      <Tab.Screen name="QRScanner" component={QRScanner} />
-          <Tab.Screen name="QRScaneerRequstAudit" component={QRScaneerRequstAudit} />
-
         </>
       )}
     </Tab.Navigator>
@@ -139,7 +136,7 @@ function MainDrawer() {
     >
       <Drawer.Screen name="MainTabs" component={MainTabs} options={{ drawerItemStyle: { display: "none" } }}/>
       <Drawer.Screen  name="FieldOfficerDashboard" component={FieldOfficerDashboard} options={{ drawerItemStyle: { display: "none" } }} />
-      <Drawer.Screen name="AddComplaint" component={AddComplaintScreen} options={{ drawerItemStyle: { display: "none" } }}/>
+      {/* <Drawer.Screen name="AddComplaint" component={AddComplaintScreen} options={{ drawerItemStyle: { display: "none" } }}/> */}
       <Drawer.Screen name="ViewAllVisits" component={ViewAllVisits} options={{ drawerItemStyle: { display: "none" } }}/>
 
     </Drawer.Navigator>
@@ -212,8 +209,13 @@ function AppContent() {
             <Stack.Screen name="OtpverificationRequestAudit" component={OtpverificationRequestAudit} />
             <Stack.Screen name="ChangePassword" component={ChangePassword} />
             <Stack.Screen name="ComplainHistory" component={ComplainHistory} />
+                  <Stack.Screen name="AddComplaint" component={AddComplaintScreen}/>
+
                       <Stack.Screen name="QRScanner" component={QRScanner} />
           <Stack.Screen name="QRScaneerRequstAudit" component={QRScaneerRequstAudit} />
+                    <Stack.Screen name="RequestDetails" component={RequestDetails} />
+                    <Stack.Screen name="PersonalInfo" component={PersonalInfo} />
+
           </Stack.Navigator>
         </NavigationContainer>
       </SafeAreaView>

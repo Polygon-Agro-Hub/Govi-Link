@@ -1,5 +1,5 @@
 import { StackNavigationProp } from "@react-navigation/stack";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   View,
   Text,
@@ -8,7 +8,11 @@ import {
   Modal,
   TouchableWithoutFeedback,
   Linking,
-  ActivityIndicator
+  ActivityIndicator,
+  RefreshControl,
+    Animated, PanResponder,
+    Pressable
+
 } from "react-native";
 import { RootStackParamList } from "@/component/types";
 import { useTranslation } from "react-i18next";
@@ -65,7 +69,17 @@ const currentDay = today.date(); // 31
 console.log("Today date:", currentDay);
 
   const [selectedDate, setSelectedDate] = useState(dayjs());
-  const [selectedMonth] = useState(today.format("MMMM, YYYY"));
+  // const [selectedMonth] = useState(today.format("MMMM, YYYY"));
+  const monthNames: Record<string, string[]> = {
+  en: ["January","February","March","April","May","June","July","August","September","October","November","December"],
+  si: ["ජනවාරි","පෙබරවාරි","මාර්තු","අප්‍රේල්","මැයි","ජූනි","ජූලි","අගෝස්තු","සැප්තැම්බර්","ඔක්තෝබර්","නොවැම්බර්","දෙසැම්බර්"],
+  ta: ["ஜனவரி","பிப்ரவரி","மார்ச்","ஏப்ரல்","மே","ஜூன்","ஜூலை","ஆகஸ்ட்","செப்டம்பர்","அக்டோபர்","நவம்பர்","டிசம்பர்"]
+};
+const lang = i18n.language;
+const month = monthNames[lang]?.[today.month()] || monthNames["en"][today.month()];
+const selectedMonth = `${month}, ${today.year()}`;
+
+  
 const [isOverdueSelected, setIsOverdueSelected] = useState(false);
 const [loading, setLoading] = useState(false);
 
@@ -87,6 +101,50 @@ const filteredVisits = visits.filter((v) => {
   const scrollRef = React.useRef<ScrollView>(null);
 
 const ITEM_WIDTH = 0; // width + margin of each date item, adjust if neede
+
+const translateY = useRef(new Animated.Value(0)).current;
+const currentTranslateY = useRef(0);
+console.log(translateY)
+
+const panResponder = useRef(
+  PanResponder.create({
+    onMoveShouldSetPanResponderCapture: (_, g) => g.dy > 5,
+    onStartShouldSetPanResponder: () => true,
+
+    onPanResponderMove: (_, g) => {
+      if (g.dy > 0) translateY.setValue(g.dy);
+    },
+
+    onPanResponderRelease: (_, g) => {
+      if (g.dy > 120) {
+        console.log("hit1");
+                  setShowPopup(false);
+        Animated.timing(translateY, {
+          toValue: 600,
+          duration: 100,
+          useNativeDriver: true,
+        }).start(() => {
+          console.log("hit3");
+          translateY.setValue(0);
+          setShowPopup(false);
+          setSelectedItem(null);
+        });
+      } else {
+        console.log("hit4");
+        Animated.spring(translateY, {
+          toValue: 0,
+          useNativeDriver: true,
+        }).start();
+      }
+    },
+  })
+).current;
+
+useEffect(() => {
+  if (showPopup) {
+    translateY.setValue(0);
+  }
+}, [showPopup]);
 
 useFocusEffect(
     useCallback(() => {
@@ -142,6 +200,15 @@ const pendingCount = filteredVisits.filter((item) => {
   }
 }).length;
 
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+
+    // 🔥 Your API call / re-fetch function here
+    fetchVisits().finally(() => setRefreshing(false));
+  };
+
   const handleDial = (farmerMobile: string) => {
     const phoneUrl = `tel:${farmerMobile}`;
     Linking.openURL(phoneUrl).catch((err) =>
@@ -190,7 +257,7 @@ const pendingCount = filteredVisits.filter((item) => {
 
       {/* Horizontal Date Selector */}
       <ScrollView
-       ref={scrollRef}
+      ref={scrollRef}
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: 4 }}
@@ -229,13 +296,6 @@ const pendingCount = filteredVisits.filter((item) => {
                       </Text>
                     </View>
                   )}
-                  {/* <Text className="text-[10px] text-[#666] mt-1">
-                    {dateObj.isSame(today, "day")
-                      ? "Today"
-                      : dateObj.isSame(today.add(1, "day"), "day")
-                      ? "Tomorrow"
-                      : dateObj.format("ddd")}
-                  </Text> */}
                 </View>
               </TouchableOpacity>
             );
@@ -247,50 +307,57 @@ const pendingCount = filteredVisits.filter((item) => {
 {loading ?
 (
       <View className="flex-1 justify-center items-center mt-6 px-4 bg-white rounded-t-3xl">
-      {/* If you want to use Lottie again, uncomment */}
-      {/* 
-      <LottieView
-        source={require('../assets/jsons/loader.json')}
-        autoPlay
-        loop
-        style={{ width: 300, height: 300 }}
-      />
-      */}
       <ActivityIndicator size="large" color="#FF1D85" />
     </View>
 ):
 (
 <ScrollView className="mt-6 px-4 bg-white rounded-t-3xl"
+     refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      } 
   contentContainerStyle={{ paddingBottom: 80 }}
   >
   {filteredVisits.length > 0 ? (
     [...filteredVisits]
-      .sort((a, b) => {
-        const getStatus = (item: VisitItem) => {
-          if (item.propose === "Cluster" && item.totalClusterCount) {
-            if (item.completedClusterCount === item.totalClusterCount) return "Completed";
-            if (item.completedClusterCount && item.completedClusterCount > 0) return "Partial";
-            return "Pending";
-          }
-          return item.status;
-        };
+          .sort((a, b) => {
+      const getStatusRank = (item: VisitItem) => {
+        // ---------- CLUSTER LOGIC ----------
+  if (item.propose === "Cluster" && item.totalClusterCount) {
+      if (item.completedClusterCount === item.totalClusterCount) {
+        return 4;
+      }
 
-        const statusA = getStatus(a);
-        const statusB = getStatus(b);
+      if (item.completedClusterCount !== undefined && item.completedClusterCount > 0) {
+        return item.completionPercentage < "20" ? 2 : 3; 
+      }
 
-        // Pending first, then others
-        if (statusA === "Pending" && statusB !== "Pending") return -1;
-        if (statusA !== "Pending" && statusB === "Pending") return 1;
-        return 0; // keep original order otherwise
-      })
+      return 1;
+    }
+
+        // ---------- NON-CLUSTER LOGIC ----------
+        if (item.status === "Completed" || item.status === "Finished") {
+          return 3; // bottom
+        }
+
+        if (item.status === "Pending") {
+          return 1; // top
+        }
+
+        return 2; // middle
+      };
+
+      return getStatusRank(a) - getStatusRank(b);
+    })
       .map((item) => {
 
         let displayStatus = t(`Visits.${item.status}`);
         if (item.propose === "Cluster" && item.totalClusterCount) {
           if (item.completedClusterCount === item.totalClusterCount) {
             displayStatus = t("Visits.Completed");
-          } else if (item.completedClusterCount && item.completedClusterCount > 0) {
+          }  else if (item.completedClusterCount && item.completedClusterCount > 0 && item.completionPercentage >= "20") {
             displayStatus = `${t("Visits.Completed")} (${item.completedClusterCount}/${item.totalClusterCount})`;
+          }else if (item.completedClusterCount && item.completedClusterCount > 0 && item.completionPercentage < "20") {
+            displayStatus = `${t("Visits.Pending")} (${item.completedClusterCount}/${item.totalClusterCount})`;
           } else {
             displayStatus = `${t("Visits.Pending")} (0/${item.totalClusterCount})`;
           }
@@ -314,7 +381,7 @@ const pendingCount = filteredVisits.filter((item) => {
             }}
             disabled={
               (item.propose === "Cluster" && item.completedClusterCount === item.totalClusterCount) ||
-              item.completionPercentage === "20" ||
+              item.completionPercentage >= "20" ||
               item.status === "Completed" ||
               item.status === "Finished" ||
               dayjs(item.sheduleDate).isAfter(today, "day")
@@ -324,7 +391,7 @@ const pendingCount = filteredVisits.filter((item) => {
               key={item.id}
               className={`bg-white border ${
                 (item.propose === "Cluster" && item.completedClusterCount === item.totalClusterCount) ||
-                item.completionPercentage === "20" ||
+                item.completionPercentage >= "20" ||
                 item.status === "Completed" ||
                 item.status === "Finished" ||
                 dayjs(item.sheduleDate).isAfter(today, "day")
@@ -396,28 +463,32 @@ const pendingCount = filteredVisits.filter((item) => {
 
 )}
 
-          <Modal transparent visible={showPopup} animationType="slide"
-        onRequestClose={() => {
-    console.log("hitt");
-    setShowPopup(false);
-    setSelectedItem(null);
-  }}
+        <Modal transparent visible={showPopup} animationType="none"
       >
-        <TouchableWithoutFeedback
-          onPress={() => {
-            setShowPopup(false);
-            setSelectedItem(null);
-          }}
-        >
           <View
             style={{
               flex: 1,
               backgroundColor: "rgba(0,0,0,0.3)",
-              justifyContent: "flex-end",
             }}
           >
-            <TouchableWithoutFeedback>
-              <View className="bg-white rounded-t-3xl p-5 w-full ">
+                            <Pressable
+                  style={{ flex: 1 }}
+                  onPress={() => {
+                    setShowPopup(false);
+                    setSelectedItem(null);
+                  }}
+                />
+                          <Animated.View
+              {...panResponder.panHandlers}
+              style={{
+                position: "absolute",
+                bottom: 0,
+                width: "100%",
+                transform: [{ translateY }],
+              }}
+              className="bg-white rounded-t-3xl p-5 w-full"
+            > 
+
                 <View className="items-center mt-4">
                   <TouchableOpacity
                     className="z-50 justify-center items-center"
@@ -563,16 +634,15 @@ const pendingCount = filteredVisits.filter((item) => {
                       }}
                       className= {`py-2 items-center justify-center rounded-full mt-4 ${i18n.language==="si"? "px-24": i18n.language === "ta"? "px-24": "px-[40%]"}`}
                     >
-                      <Text className="text-white text-lg font-semibold">
+                      <Text className={`text-white  font-semibold ${i18n.language==="si"? "text-base": i18n.language === "ta"? "text-base": "text-lg"}`}>
                         {t("VisitPopup.Start")}
                       </Text>
                     </LinearGradient>
                   </TouchableOpacity>
                 </View>
+                              </Animated.View>
+                
               </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
       </Modal>
     </View>
   );

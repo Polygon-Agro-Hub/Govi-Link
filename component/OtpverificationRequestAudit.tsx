@@ -119,7 +119,8 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
   if (code.length !== 5) {
     Alert.alert(
       t("Error.Sorry"),
-      t("Otpverification.Please enter the 5-digit OTP sent to your phone.")
+      t("Otpverification.Please enter the 5-digit OTP sent to your phone."),
+      [{ text: t("MAIN.OK") }]
     );
     return;
   }
@@ -127,7 +128,7 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
   if (isOtpExpired) {
     Alert.alert(
       t("Error.Sorry"),
-      t("Otpverification.our OTP is invalid or expired."),
+      t("Otpverification.Your OTP is invalid or expired."),
       [
         { text: t("Otpverification.Resend OTP"), onPress: handleResendOTP },
         { text: t("Otpverification.Cancel", "Cancel"), style: "cancel" }
@@ -157,7 +158,8 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
     if (!netState.isConnected) {
       Alert.alert(
         t("Main.No Internet Connection"),
-        t("Main.Please turn on Mobile Data or Wi-Fi to continue.")
+        t("Main.Please turn on Mobile Data or Wi-Fi to continue."),
+        [{ text: t("MAIN.OK") }]
       );
       return;
     }
@@ -172,7 +174,8 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
         } else {
           Alert.alert(
             t("Error.Sorry"),
-            t("Otpverification.Audit completion failed. Please try again.")
+            t("Otpverification.Audit completion failed. Please try again."),
+            [{ text: t("MAIN.OK") }]
           );
         }
         break;
@@ -200,7 +203,8 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
           } else {
                       Alert.alert(
             t("Otpverification.Invalid OTP"),
-            t("Otpverification.The OTP you entered is incorrect. Please try again.")
+            t("Otpverification.The OTP you entered is incorrect. Please try again."),
+            [{ text: t("MAIN.OK") }]
           );
         }
         break;
@@ -216,7 +220,8 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
       default:
         Alert.alert(
           t("Error.Sorry"),
-           t("Main.somethingWentWrong")
+           t("Main.somethingWentWrong"),
+           [{ text: t("MAIN.OK") }]
         );
       }
     } catch (error: any) {
@@ -232,12 +237,14 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
     } else if (error.response?.data?.statusCode === "1001") {
       Alert.alert(
         t("Error.Sorry"),
-        t("Otpverification.Your OTP is invalid or expired.")
+        t("Otpverification.Your OTP is invalid or expired."),
+        [{ text: t("MAIN.OK") }]
       );
     } else {
       Alert.alert(
                  t("Error.Sorry"),
-           t("Main.somethingWentWrong")
+           t("Main.somethingWentWrong"),
+           [{ text: t("MAIN.OK") }]
       );
     }
   }
@@ -280,7 +287,8 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
       setIsOtpExpired(false);
       Alert.alert(
         t("Otpverification.Success"),
-        t("Otpverification.A new OTP has been sent to your mobile number.")
+        t("Otpverification.A new OTP has been sent to your mobile number."),
+        [{ text: t("MAIN.OK") }]
       );
       setTimer(240);
       setDisabledResend(true);
@@ -288,12 +296,14 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
       Alert.alert(
         t("Error.Sorry"),
         t("Otpverification.We couldn’t send the OTP. Please try again later."),
+        [{ text: t("MAIN.OK") }]
       );
     }
   } catch (error) {
     Alert.alert(
            t("Error.Sorry"),
-           t("Main.somethingWentWrong")
+           t("Main.somethingWentWrong"),
+           [{ text: t("MAIN.OK") }]
     );
   }
 };
@@ -305,7 +315,8 @@ const handleComplete = async (): Promise<boolean> => {
     if (!token) {
              Alert.alert(
                 t("Error.Sorry"),
-                t("Error.Your login session has expired. Please log in again to continue.")
+                t("Error.Your login session has expired. Please log in again to continue."),
+                [{ text: t("MAIN.OK") }]
               );
                     return false;
     }
@@ -398,21 +409,10 @@ const handleComplete = async (): Promise<boolean> => {
           </Text>
         </View>
 
-{/* 
-          <View className="mt-2">
-            <Text className="text-md text-[#FF1D85] text-center ">
-              {farmerMobile}
-            </Text>
-          </View> */}
-
-
-       
-
         <View className="flex-row justify-center gap-3 mt-4 px-4">
           {Array.from({ length: 5 }).map((_, index) => (
             <TextInput
               key={index}
-              // ref={(el) => (inputRefs.current[index] = el as TextInput)}
                  ref={(el: TextInput | null) => {
         inputRefs.current[index] = el; // assign to array
       }}
@@ -425,7 +425,6 @@ const handleComplete = async (): Promise<boolean> => {
               maxLength={1}
               value={otpCode[index] || ""}
               onChangeText={(text) => handleOtpChange(text, index)}
-              // placeholder={maskedCode[index] || "_"}
               placeholderTextColor="lightgray"
        
             />

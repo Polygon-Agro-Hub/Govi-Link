@@ -291,7 +291,10 @@ export default function CustomDrawerContent(props: any) {
                     }`}
                   >
                     <Text
-                      className={`text-base ${
+                    style={{
+                      fontSize:15
+                    }}
+                      className={` font-bold ${
                         selectedComplaint === complaint
                           ? "text-black"
                           : "#434343"

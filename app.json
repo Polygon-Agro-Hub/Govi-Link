@@ -1,14 +1,14 @@
 {
   "expo": {
-    "name": "GoviLink",
-    "slug": "GoviLink",
+    "name": "GoViLink",
+    "slug": "GoViLink",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/favicon-icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/favicon-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -84,7 +84,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": ""
+        "projectId": "0a815704-f2f6-42af-be4b-cd1a4bf98329"
       }
     },
     "expo-camera": {

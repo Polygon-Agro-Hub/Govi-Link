@@ -54,7 +54,9 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
     selectedDate,
     isOverdueSelected,
     propose,
-    fieldAuditId,
+    fieldAuditIds,
+    govilinkJobIds,
+    auditType,
   } = route.params;
   const { t, i18n } = useTranslation();
   const [loading, setLoading] = useState(false);
@@ -63,6 +65,7 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
   const [selectedOfficer, setSelectedOfficer] = useState<Officer | null>(null);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [countdown, setCountdown] = useState(30);
+  const [userInfo, setUserInfo] = useState<any>(null);
 
   // Animated values for smooth progress
   const progressAnim = useRef(new Animated.Value(100)).current;
@@ -70,6 +73,26 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
 
   const timerRef = useRef<number | null>(null);
   const animationRef = useRef<Animated.CompositeAnimation | null>(null);
+
+  // Get the single jobId (not array)
+  const singleJobId = Array.isArray(selectedJobIds)
+    ? selectedJobIds[0]
+    : selectedJobIds;
+
+  // Load user info on component mount
+  useEffect(() => {
+    const loadUserInfo = async () => {
+      try {
+        const userInfoStr = await AsyncStorage.getItem("userInfo");
+        if (userInfoStr) {
+          setUserInfo(JSON.parse(userInfoStr));
+        }
+      } catch (error) {
+        console.error("Failed to load user info:", error);
+      }
+    };
+    loadUserInfo();
+  }, []);
 
   // Get officer name based on current language
   const getOfficerName = (officer: Officer) => {
@@ -90,14 +113,33 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
   };
 
   // Format date to "On October 12" format
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const options: Intl.DateTimeFormatOptions = {
-      month: "long",
-      day: "numeric",
-    };
-    return `On ${date.toLocaleDateString("en-US", options)}`;
+  // const formatDate = (dateString: string) => {
+  //   const date = new Date(dateString);
+  //   const options: Intl.DateTimeFormatOptions = {
+  //     month: "long",
+  //     day: "numeric",
+  //   };
+  //   return `On ${date.toLocaleDateString("en-US", options)}`;
+  // };
+
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+
+  const options: Intl.DateTimeFormatOptions = {
+    month: "long",
+    day: "numeric",
   };
+
+  if( i18n.language === "si"){
+    return `${date.toLocaleDateString("si-LK", options)}`;
+  }
+  else if( i18n.language === "ta"){
+    return `${date.toLocaleDateString("ta-LK", options)}`;
+  }else{
+    return `On ${date.toLocaleDateString("en-US", options)}`;
+  }
+};
+
 
   // Start smooth countdown animation
   const startCountdownAnimation = () => {
@@ -164,18 +206,18 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
     try {
       const token = await AsyncStorage.getItem("token");
       if (!token) {
-        Alert.alert(t("Error.Error"), t("Error.AuthTokenNotFound"));
+        Alert.alert(t("Error.Error"), t("Error.AuthTokenNotFound"), [{ text: t("MAIN.OK") }]);
         return;
       }
 
-      const jobId = selectedJobIds[0];
-      if (!jobId) {
+      // Use the single jobId instead of array
+      if (!singleJobId) {
         Alert.alert(t("Error.Error"), t("AssignJobOfficerList.NoJobIdFound"));
         return;
       }
 
       const response = await axios.get(
-        `${environment.API_BASE_URL}api/assign-jobs/get-assign-officer-list/${jobId}/${selectedDate}`,
+        `${environment.API_BASE_URL}api/assign-jobs/get-assign-officer-list/${singleJobId}/${selectedDate}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -188,14 +230,16 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
       } else {
         Alert.alert(
           t("Error.Error"),
-          t("AssignJobOfficerList.FailedToFetchOfficers")
+          t("AssignJobOfficerList.FailedToFetchOfficers"),
+          [{ text: t("MAIN.OK") }]
         );
       }
     } catch (error) {
       console.error("Failed to fetch officers:", error);
       Alert.alert(
         t("Error.Error"),
-        t("AssignJobOfficerList.FailedToLoadOfficers")
+        t("AssignJobOfficerList.FailedToLoadOfficers"),
+        [{ text: t("MAIN.OK") }]
       );
     } finally {
       setLoading(false);
@@ -236,29 +280,37 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
     try {
       const token = await AsyncStorage.getItem("token");
       if (!token) {
-        Alert.alert(t("Error.Error"), t("Error.AuthTokenNotFound"));
+        Alert.alert(t("Error.Error"), t("Error.AuthTokenNotFound"), [{ text: t("MAIN.OK") }]);
         return;
       }
 
       console.log("Sending assignment request with:", {
         officerId: selectedOfficer.id,
-        jobIds: selectedJobIds,
         date: selectedDate,
         propose: propose,
-        fieldAuditId: fieldAuditId,
+        fieldAuditIds: fieldAuditIds || [],
+        govilinkJobIds: govilinkJobIds || [],
+        auditType: auditType,
       });
 
+      // IMPORTANT: Use the correct endpoint URL based on your backend
+      // The endpoint should match what's defined in your backend routes
       const response = await axios.post(
         `${environment.API_BASE_URL}api/assign-jobs/assign-officer-to-field-audits`,
         {
           officerId: selectedOfficer.id,
-          jobIds: selectedJobIds,
           date: selectedDate,
           propose: propose,
-          fieldAuditId: fieldAuditId,
+          fieldAuditIds: fieldAuditIds || [],
+          govilinkJobIds: govilinkJobIds || [],
+          auditType: auditType,
+          // The backend should get assignedBy from req.user.id automatically
         },
         {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
         }
       );
 
@@ -272,7 +324,7 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
           }),
           [
             {
-              text: "OK",
+               text: t("MAIN.OK") ,
               onPress: () => navigation.navigate("AssignJobs"),
             },
           ]
@@ -280,18 +332,42 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
       } else {
         Alert.alert(
           t("Main.Error"),
-          response.data.message || t("AssignJobOfficerList.FailedToAssignJobs")
+           t("AssignJobOfficerList.FailedToAssignJobs"),
+           [{ text: t("MAIN.OK") }]
         );
       }
     } catch (error: any) {
       console.error("Failed to assign jobs:", error);
-      Alert.alert(
-        t("Main.Error"),
-        error.response?.data?.message ||
-          error.message ||
-          t("AssignJobOfficerList.FailedToAssignJobs")
-      );
-    } finally {
+
+      let errorMessage = t("AssignJobOfficerList.FailedToAssignJobs");
+
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        console.error("Error response data:", error.response.data);
+        console.error("Error response status:", error.response.status);
+        console.error("Error response headers:", error.response.headers);
+
+        errorMessage =
+          error.response.data?.message ||
+          `Server Error: ${error.response.status}`;
+      } else if (error.request) {
+        // The request was made but no response was received
+        console.error("Error request:", error.request);
+        errorMessage =
+          "No response from server. Please check your internet connection.";
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.error("Error message:", error.message);
+        errorMessage = error.message || "An unexpected error occurred";
+      }
+
+Alert.alert(
+          t("Main.Error"),
+           t("AssignJobOfficerList.FailedToAssignJobs"),
+           [{ text: t("MAIN.OK") }]
+        );
+          } finally {
       setAssigning(false);
     }
   };
@@ -314,6 +390,26 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
   // Circle parameters
   const radius = 65;
   const circumference = 2 * Math.PI * radius;
+
+  // Determine which IDs to display based on auditType
+  const getAssignedJobInfo = () => {
+    if (
+      auditType === "feildaudits" &&
+      fieldAuditIds &&
+      fieldAuditIds.length > 0
+    ) {
+      return `Field Audit ID(s): ${fieldAuditIds.join(", ")}`;
+    } else if (
+      auditType === "govilinkjobs" &&
+      govilinkJobIds &&
+      govilinkJobIds.length > 0
+    ) {
+      return `Govilink Job ID(s): ${govilinkJobIds.join(", ")}`;
+    } else if (singleJobId) {
+      return `Job ID: ${singleJobId}`;
+    }
+    return "Job Assignment";
+  };
 
   return (
     <View className="flex-1 bg-white">
@@ -339,7 +435,7 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
 
         <View className="flex-1 items-center">
           <Text className="text-lg font-bold text-black">
-            #{selectedJobIds.join(", ")}
+            {singleJobId ? `#${singleJobId}` : getAssignedJobInfo()}
           </Text>
           <Text className="text-sm text-black mt-1">
             {selectedDate

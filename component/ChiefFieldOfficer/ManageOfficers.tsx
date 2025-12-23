@@ -50,6 +50,31 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
   const [officers, setOfficers] = useState<Officer[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
 
+  const getName = (officer: Officer) => {
+    if (!officer) return "";
+
+    switch (i18n.language) {
+      case "si":
+        return `${officer.firstNameSinhala || officer.firstName} ${
+          officer.lastNameSinhala || officer.lastName
+        }`;
+      case "ta":
+        return `${officer.firstNameTamil || officer.firstName} ${
+          officer.lastNameTamil || officer.lastName
+        }`;
+      default:
+        return `${officer.firstName} ${officer.lastName}`;
+    }
+  };
+
+  const sortOfficersAlphabetically = (officersList: Officer[]) => {
+    return [...officersList].sort((a, b) => {
+      const nameA = getName(a).toLowerCase();
+      const nameB = getName(b).toLowerCase();
+      return nameA.localeCompare(nameB);
+    });
+  };
+
   const fetchFieldOfficers = async (search: string = "") => {
     try {
       setLoading(true);
@@ -60,7 +85,8 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
           t("Error.Sorry"),
           t(
             "Error.Your login session has expired. Please log in again to continue."
-          )
+          ),
+          [{ text: t("MAIN.OK") }]
         );
         navigation.navigate("Login");
         return;
@@ -76,7 +102,9 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
       });
 
       if (response.data.status === "success") {
-        setOfficers(response.data.data || []);
+        const fetchedOfficers = response.data.data || [];
+        const sortedOfficers = sortOfficersAlphabetically(fetchedOfficers);
+        setOfficers(sortedOfficers);
       } else {
         throw new Error(response.data.message || "Failed to fetch officers");
       }
@@ -88,14 +116,17 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
           t("Error.Sorry"),
           t(
             "Error.Your login session has expired. Please log in again to continue."
-          )
+          ),
+          [{ text: t("MAIN.OK") }]
         );
         navigation.navigate("Login");
       } else {
-        Alert.alert(
-          t("Error.Error"),
-          error.response?.data?.message || t("Error.FailedToLoadOfficers")
-        );
+        // Alert.alert(
+        //   t("Error.Error"),
+        //   error.response?.data?.message || t("Error.FailedToLoadOfficers")
+        // );
+              Alert.alert(t("Error.Error"), t("Error.somethingWentWrong"),[{ text: t("MAIN.OK") }]);
+        
       }
     } finally {
       setLoading(false);
@@ -113,23 +144,6 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
       fetchFieldOfficers(searchQuery);
     }, [searchQuery])
   );
-
-  const getName = (officer: Officer) => {
-    if (!officer) return "";
-
-    switch (i18n.language) {
-      case "si":
-        return `${officer.firstNameSinhala || officer.firstName} ${
-          officer.lastNameSinhala || officer.lastName
-        }`;
-      case "ta":
-        return `${officer.firstNameTamil || officer.firstName} ${
-          officer.lastNameTamil || officer.lastName
-        }`;
-      default:
-        return `${officer.firstName} ${officer.lastName}`;
-    }
-  };
 
   const getStatusColor = (status: string) => {
     const statusLower = status?.toLowerCase();
@@ -172,6 +186,10 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
     );
   }
 
+  const formatCount = (count: number) => {
+    return count < 10 ? `0${count}` : `${count}`;
+  };
+
   return (
     <View className="flex-1 bg-white">
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
@@ -199,7 +217,7 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
               {t("ManageOfficers.OfficersList")}{" "}
             </Text>
             <Text>
-              ({t("ManageOfficers.All")} {officers.length})
+              ({t("ManageOfficers.All")} {formatCount(officers.length)})
             </Text>
           </Text>
 
@@ -289,7 +307,7 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
           elevation: 50,
         }}
         onPress={() => {
-          navigation.navigate("AddOfficerStep1");
+          navigation.navigate("AddOfficerStep1", {isnew:true});
         }}
       >
         <Ionicons name="add" size={50} color="#fff" />

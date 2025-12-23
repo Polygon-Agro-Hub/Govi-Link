@@ -101,28 +101,18 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
     setEditingId(id);
   };
 
-  // const handleChangeProblem = (
-  //   id: number,
-  //   field: "problem" | "solution",
-  //   value: string
-  // ) => {
-  //   setProblems((prev) =>
-  //     prev.map((item) => (item.id === id ? { ...item, [field]: value } : item))
-  //   );
-  // };
 const handleChangeProblem = (
   id: number,
   field: "problem" | "solution",
   value: string
 ) => {
-  // Block single leading space
-  if (value.length === 1 && value[0] === " ") return;
 
-  // Capitalize first letter if lowercase
-  if (value.length > 0 && value[0] === value[0].toLowerCase()) {
+  value = value.replace(/^\s+/, "");
+
+  // Capitalize first letter
+  if (value.length > 0) {
     value = value.charAt(0).toUpperCase() + value.slice(1);
   }
-
   setProblems((prev) =>
     prev.map((item) =>
       item.id === id ? { ...item, [field]: value } : item
@@ -132,7 +122,7 @@ const handleChangeProblem = (
 
   const handleSaveProblem = async (item: ProblemItem) => {
     if (!item.problem.trim() || !item.solution.trim()) {
-      Alert.alert(t("Error.Sorry"), t("CertificateSuggestions.Both problem and solution must be filled."));
+      Alert.alert(t("Error.Sorry"), t("CertificateSuggestions.Both problem and solution must be filled."), [{ text: t("MAIN.OK") }]);
       return;
     }
 
@@ -142,7 +132,8 @@ const handleChangeProblem = (
       if (!token) {
         Alert.alert(
           t("Error.Sorry"),
-          t("Error.Your login session has expired. Please log in again to continue.")
+          t("Error.Your login session has expired. Please log in again to continue."),
+          [{ text: t("MAIN.OK") }]
         );
         return;
       }
@@ -179,12 +170,13 @@ const handleChangeProblem = (
       } else {
         Alert.alert(
           t("Error.Sorry"),
-          t("CertificateSuggestions.Failed to save problem.")
+          t("CertificateSuggestions.Failed to save problem."),
+          [{ text: t("MAIN.OK") }]
         );
       }
     } catch (err) {
       console.error("❌ Error saving/updating problem:", err);
-      Alert.alert(t("Error.Sorry"), t("Something went wrong while saving. try again later"));
+      Alert.alert(t("Error.Sorry"), t("Something went wrong while saving. try again later"), [{ text: t("MAIN.OK") }]);
     }finally{
             setLoading(false)
 
@@ -202,7 +194,8 @@ const handleChangeProblem = (
       if (!token) {
            Alert.alert(
           t("Error.Sorry"),
-          t("Error.Your login session has expired. Please log in again to continue.")
+          t("Error.Your login session has expired. Please log in again to continue."),
+          [{ text: t("MAIN.OK") }]
         );
         return;
       }
@@ -287,9 +280,7 @@ const handleChangeProblem = (
             setIsButtonDisabled(false);
              setOtpSendLoading(false);
           } catch (error) {
-            Alert.alert(t("Main.error"), t("SignupForum.otpSendFailed"), [{
-              text: t("PublicForum.OK"),
-            }]);
+            Alert.alert(t("Main.error"), t("SignupForum.otpSendFailed"), [{ text: t("MAIN.OK") }]);
             setOtpSendLoading(false);
           }finally{
             setOtpSendLoading(false);
@@ -396,16 +387,6 @@ const handleChangeProblem = (
                           : t("CertificateSuggestions.Save Problem")}
                       </Text>
                     </TouchableOpacity>
-                    {/* {item.saved && editingId === item.id && (
-                      <TouchableOpacity
-                        className="bg-[#C4C4C4] p-4 rounded-3xl w-full flex-1 justify-center items-center mt-2"
-                        onPress={() => handleCancelEdit(item.id)}
-                      >
-                        <Text className="text-white text-center font-semibold text-base">
-                          {t("CertificateQuesanory.Cancel")}
-                        </Text>
-                      </TouchableOpacity>
-                    )} */}
                       <TouchableOpacity
                         className="bg-[#C4C4C4] p-4 rounded-3xl w-full flex-1 justify-center items-center mt-2"
                         onPress={() => handleCancelEdit(item.id)}
@@ -437,9 +418,9 @@ const handleChangeProblem = (
           </View>
         </ScrollView>
       )}
-      <View className="flex-row justify-between p-4 border-t border-gray-200">
+    {/* */ }  <View className="flex-row justify-between p-4 border-t border-gray-200">
         <TouchableOpacity
-          className="flex-row items-center bg-[#444444] px-12 py-3 rounded-full"
+          className="flex-row items-center bg-[#444444] px-10 py-3 rounded-full"
           onPress={() => navigation.goBack()}
         >
           <AntDesign name="arrow-left" size={20} color="#fff" />
