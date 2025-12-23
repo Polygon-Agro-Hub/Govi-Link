@@ -752,7 +752,7 @@ style={{ marginHorizontal: 10, padding: dynamicStyles.cropcardPadding, width: wp
           </View>
         </>
       )}
-  {/* <View className="p-8 mt-4">
+  <View className="p-8 mt-4">
         <TouchableOpacity
           className="bg-[#FEE5E6] rounded-lg p-3 h-28 mr-4 w-full flex-row justify-between items-center"
           style={{
@@ -779,7 +779,7 @@ style={{ marginHorizontal: 10, padding: dynamicStyles.cropcardPadding, width: wp
             resizeMode="contain"
           />
         </TouchableOpacity>
-      </View> */}
+      </View>
         <Modal
         transparent
         visible={showPopup}

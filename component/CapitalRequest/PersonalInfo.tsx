@@ -32,12 +32,16 @@ const Input = ({
     value,
   onChangeText,
   required = false,
+    error,
+  keyboardType = "default"
 }: {
   label: string;
   placeholder: string;
   required?: boolean;
     value?: string;
   onChangeText?: (text: string) => void;
+    error?: string;
+  keyboardType?: any;
 }) => (
   <View className="mb-4">
     <Text className="text-sm text-[#070707] mb-1">
@@ -51,9 +55,63 @@ const Input = ({
          value={value}
         onChangeText={onChangeText}
       />
+          {error && (
+      <Text className="text-red-500 text-xs mt-1 ml-3">{error}</Text>
+    )}
     </View>
   </View>
 );
+
+
+type ValidationRule = {
+  required?: boolean;
+  type?: "firstname" | "lastname" | "phone" | "email" | "text" | "othername";
+  minLength?: number;
+};
+
+const validateAndFormat = (
+  text: string,
+  rules: ValidationRule,
+  t: any
+) => {
+  let value = text;
+  let error = "";
+  console.log("Validating:", value, rules);
+
+  // Filtering
+if (rules.type === "firstname" || rules.type === "lastname" || rules.type ==="othername") {
+  value = value
+    .replace(/[^a-zA-Z]/g, "")   // ⛔ removes spaces
+    .toLowerCase();
+
+  value =
+    value.length > 0
+      ? value.charAt(0).toUpperCase() + value.slice(1)
+      : "";
+}
+
+  if (rules.type === "phone") {
+    value = value.replace(/[^0-9]/g, "");
+  }
+
+  // Validation
+  if (rules.required && value.trim().length === 0) {
+    error = t("Error.Required field");
+  }
+
+  if (rules.type === "email" && value) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(value)) {
+      error = t("Error.Invalid email");
+    }
+  }
+
+  if (rules.minLength && value.length < rules.minLength) {
+    error = t("Error.Min length", { count: rules.minLength });
+  }
+
+  return { value, error };
+};
 
 type InspectionForm1Props = {
   navigation: any;
@@ -100,6 +158,25 @@ const updateFormData = async (
     console.log("AsyncStorage save failed", e);
   }
 };
+
+const handleFieldChange = (
+    key: keyof typeof formData,
+    text: string,
+    rules: ValidationRule
+  ) => {
+    const { value, error } = validateAndFormat(text, rules, t);
+
+    updateFormData(key, value);
+
+    setErrors((prev) => {
+      const copy = { ...prev };
+      if (error) copy[key] = error;
+      else delete copy[key];
+      return copy;
+    });
+  };
+
+
 useFocusEffect(
   useCallback(() => {
     const loadData = async () => {
@@ -153,7 +230,9 @@ useFocusEffect(
   province: displayProvince,
   country: displayCountry,
 });
-
+  const isFormValid =
+    Object.keys(errors).length === 0 &&
+    Object.values(formData).every((v) => v !== "");
 console.log("Form Data:", formData);
   const getFilteredDistricts = () => {
     if (!districts || districts.length === 0) return [];
@@ -323,14 +402,24 @@ console.log("Form Data:", formData);
             label={t("InspectionForm.First Name")}
             placeholder="----"
             value={formData.firstName}
-  onChangeText={(text) => updateFormData("firstName", text)}
-              required
+            onChangeText={(text) =>
+            handleFieldChange("firstName", text, {
+              required: true,
+              type: "firstname",
+            })
+            }             
+           required
           />
           <Input
             label={t("InspectionForm.Last Name")}
             placeholder="----"
             value={formData.lastName}
-            onChangeText={(text) => updateFormData("lastName", text)}
+            onChangeText={(text) =>
+            handleFieldChange("lastName", text, {
+              required: true,
+              type: "lastname",
+            })
+            } 
             required
           />
           <Input
