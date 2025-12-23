@@ -547,7 +547,7 @@ navigation.navigate("Main", {screen: screenName})
               onPress={() => setShowCamera(true)}
               className=" border border-black rounded-3xl  py-3 items-center "
             >
-              <Text className="text-black font-semibold text-base">{t("Retake Previous Photo")}</Text>
+              <Text className="text-black font-semibold text-base">{t("CertificateQuesanory.Retake Previous Photo")}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -576,7 +576,7 @@ navigation.navigate("Main", {screen: screenName})
         }}
         className="mt-4"
       >
-        <Text className="text-gray-400 text-sm">{("Cancel")}</Text>
+        <Text className="text-gray-400 text-sm">{t("CertificateQuesanory.Cancel")}</Text>
       </TouchableOpacity>
     </View>
   </View>
