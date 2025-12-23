@@ -1,8 +1,9 @@
 {
   "expo": {
-    "name": "GoViLink",
-    "slug": "GoViLink",
+    "name": "GoviLink",
+    "slug": "GoviLink",
     "version": "1.0.0",
+    "versionCode": 3,
     "orientation": "portrait",
     "icon": "./assets/favicon-icon.png",
     "userInterfaceStyle": "light",
@@ -18,79 +19,98 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/favicon-icon.png",
-        "backgroundColor": "#ffffff",
-        "softwareKeyboardLayoutMode": "pan",
-        "versionCode": 12,
-        "compileSdkVersion": 35,
-        "targetSdkVersion": 35,
-        "minSdkVersion": 24,
-        "permissions": [
-          "INTERNET",
-          "CAMERA",
-          "RECORD_AUDIO",
-          "READ_MEDIA_IMAGES",
-          "READ_MEDIA_VIDEO",
-          "WRITE_EXTERNAL_STORAGE",
-          "ACCESS_COARSE_LOCATION",
-          "ACCESS_FINE_LOCATION",
-          "VIBRATE",
-          "WAKE_LOCK",
-          "RECEIVE_BOOT_COMPLETED",
-          "LOCATION",
-          "ACCESS_BACKGROUND_LOCATION",
-          "ACCESS_WIFI_STATE",
-          "CHANGE_WIFI_STATE",
-          "ACCESS_NETWORK_STATE",
-          "CHANGE_NETWORK_STATE",
-          "SYSTEM_ALERT_WINDOW",
-          "FOREGROUND_SERVICE",
-          "NOTIFICATIONS",
-          "WRITE_EXTERNAL_STORAGE",
-          "CALL_PHONE"
-        ]
+        "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false,
+      "softwareKeyboardLayoutMode": "pan",
+      "versionCode": 2,
+      "compileSdkVersion": 35,
+      "targetSdkVersion": 35,
+      "minSdkVersion": 24,
+      "permissions": [
+        "INTERNET",
+        "CAMERA",
+        "RECORD_AUDIO",
+        "READ_MEDIA_IMAGES",
+        "READ_MEDIA_VIDEO",
+        "WRITE_EXTERNAL_STORAGE",
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "VIBRATE",
+        "WAKE_LOCK",
+        "RECEIVE_BOOT_COMPLETED",
+        "LOCATION",
+        "ACCESS_BACKGROUND_LOCATION",
+        "ACCESS_WIFI_STATE",
+        "CHANGE_WIFI_STATE",
+        "ACCESS_NETWORK_STATE",
+        "CHANGE_NETWORK_STATE",
+        "SYSTEM_ALERT_WINDOW",
+        "FOREGROUND_SERVICE",
+        "NOTIFICATIONS",
+        "WRITE_EXTERNAL_STORAGE",
+        "CALL_PHONE"
+      ],
       "package": "com.polygonagro.GoviLink"
     },
-    "web": {
-      "favicon": "./assets/favicon-icon.png"
-    },
-    "plugins": [
-      "expo-router",
-      [
-        "expo-notifications",
-        {
-          "icon": "./assets/favicon-icon.png",
-          "color": "#ffffff",
-          "defaultChannel": "default",
-          "enableBackgroundRemoteNotifications": false
-        }
-      ],
-      "expo-font",
-      [
-        "expo-build-properties",
-        {
-          "android": {
-            "compileSdkVersion": 35,
-            "targetSdkVersion": 35,
-            "minSdkVersion": 24
-          }
-        }
-      ]
-    ],
+    "edgeToEdgeEnabled": true,
+    "predictiveBackGestureEnabled": false,
+    "package": "com.polygonagro.GoviLink",
     "extra": {
-      "router": {
-        "origin": false
-      },
       "eas": {
-        "projectId": "0a815704-f2f6-42af-be4b-cd1a4bf98329"
+        "projectId": "941b4b90-aa39-4362-95a2-c69b42bd1056"
       }
-    },
-    "expo-camera": {
-      "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
-      "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
-      "recordAudioAndroid": true
     }
+  },
+  "web": {
+    "favicon": "./assets/favicon-icon.png"
+  },
+  "plugins": [
+    "expo-router",
+    [
+      "expo-notifications",
+      {
+        "icon": "./assets/favicon-icon.png",
+        "color": "#ffffff",
+        "defaultChannel": "default",
+        "enableBackgroundRemoteNotifications": false
+      }
+    ],
+    "expo-font",
+    [
+      "expo-build-properties",
+      {
+        "android": {
+          "compileSdkVersion": 35,
+          "targetSdkVersion": 35,
+          "minSdkVersion": 24,
+          "ndkVersion": "28.0.12433566",
+          "enableProguardInReleaseBuilds": true,
+          "packagingOptions": {
+            "jniLibs": {
+              "useLegacyPackaging": false
+            }
+          },
+          "gradleProperties": {
+            "android.useAndroidX": "true",
+            "android.enableJetifier": "true",
+            "ANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES": "true"
+          },
+          "enableMinifyInReleaseBuilds": true
+        }
+      }
+    ]
+  ],
+  "extra": {
+    "router": {
+      "origin": false
+    },
+    "eas": {
+      "projectId": ""
+    }
+  },
+  "expo-camera": {
+    "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
+    "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
+    "recordAudioAndroid": true
   }
 }
