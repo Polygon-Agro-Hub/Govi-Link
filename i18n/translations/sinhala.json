@@ -81,7 +81,15 @@
 "You are not authorized to access this system. Please use a valid Employee ID":"ඔබ මෙම පද්ධතියට ප්‍රවේශ වීමට අවසර නොමැත. කරුණාකර වලංගු සේවක හැඳුනුම්පතක් භාවිතා කරන්න.",
 "This EMP ID is not approved.":"මෙම සේවක හැඳුනුම්පත අනුමත කර නොමැත.",
 "Please Wait":"කරුණාකර රැඳී සිටින්න",
-"Validating your information, please wait...":"ඔබගේ තොරතුරු තහවුරු කරන තෙක් රැඳී සිටින්න..."
+"Validating your information, please wait...":"ඔබගේ තොරතුරු තහවුරු කරන තෙක් රැඳී සිටින්න...",
+"firstName is required": "පළමු නම අවශ්‍යයි",
+"lastName is required" : "අවසන් නම අවශ්‍යයි",
+"otherNames is required": "වෙනත් නම් අවශ්‍යයි",
+"callName is required" : "ඇමතුම් නම අවශ්‍යයි",
+"houseNumber is required": "නිවාස/ගොඩනැගිලි අංකය අවශ්‍යයි",
+"cityName is required":"නගරය අවශ්‍යයි",
+"streetName is required":"වීදියේ නම අවශ්‍යයි",
+"Email addresses cannot be the same":"ඊමේල් ලිපින සමාන විය නොහැක."
   },
   "Login": {
     "Welcome": "සාදරයෙන් පිළිගනිමු!",
@@ -426,7 +434,55 @@
     "NoJobsSelected": "වැඩ තෝරා නැත",
     "SelectAtLeastOneJob": "කරුණාකර පැවරීම සඳහා අවම වශයෙන් එක් වැඩයක් හෝ තෝරන්න.",
     "Start":"අරබන්න",
-           "FailedToAssignJobs":"වැඩ පැවරීම අසාර්ථක විය. කරුණාකර නැවත උත්සාහ කරන්න."
-
-  }
+    "FailedToAssignJobs":"වැඩ පැවරීම අසාර්ථක විය. කරුණාකර නැවත උත්සාහ කරන්න."
+  },
+    "RequestLetter":{
+    "Request Letter":"ඉල්ලීම් ලිපිය",
+    "District":"දිස්ත්‍රික්කය",
+    "Crop":"බෝගය",
+    "Variety":"Variety",
+    "Certification":"Certification",
+    "Extent":"ප්‍රමාණය",
+    "Expected Investment":"අපේක්ෂිත ආයෝජන",
+    "Expected Yield":"අපේක්ෂිත අස්වැන්න",
+    "Cultivation Start Date":"වගා ආරම්භක දිනය",
+    "Start":"අරඹන්න"
+   },
+    "InspectionForm": {
+    "Personal Info": "පුද්ගලික තොරතුරු",
+     "ID Proof": "හැඳුනුම්පත් සාක්ෂිය",
+  "Finance Info": "මූල්‍ය තොරතුරු",
+  "Land Info": "ඉඩම් තොරතුරු",
+  "Investment Info": "ආයෝජන තොරතුරු",
+  "Cultivation Info": "වගාව පිළිබඳ තොරතුරු",
+  "Cropping Systems": "බීජපද්ධති",
+  "Profit & Risk": "ලාභ සහ අවදානම",
+  "Economical": "ආර්ථිකමය",
+  "Labour": "කම්කරු",
+  "Harvest Storage": "අස්වනු ගබඩාව",
+    "Inspection Form":"පරීක්ෂණ පෝරමය",
+    "First Name":"මුල් නම",
+    "Last Name":"අවසාන නම",
+    "Other Names":"වෙනත් නම්",
+    "Call Name":"ඇමතුම් නම",
+    "Sri Lanka":"ශ්‍රී ලංකාව",
+    "-- Select District --":"-- දිස්ත්‍රික්කය තෝරන්න --",
+    "-- Select Province --":"-- පළාත තෝරන්න --",
+    "Mobile Number - 1":"දුරකථන අංකය - 1",
+    "Mobile Number - 2":"දුරකථන අංකය - 2",
+    "Phone Number of a family member": "පවුලේ සාමාජිකයෙකුගේ දුරකථන අංකය",
+    "Land Phone Number - Home":"දුරකථන අංකය - නිවස",
+    "Land Phone Number - Work":"දුරකථන අංකය - වැඩ",
+    "Email Address - 1":"විද්‍යුත් තැපෑල - 1",
+    "Email Address - 2":"විද්‍යුත් තැපෑල - 2",
+    "House / Plot Number":"නිවසේ / බිම් කොටසේ අංකය",
+    "Street Name":"වීදියේ නම",
+    "City / Town Name":"නගරය / නගරයේ නම",
+    "District":"දිස්ත්‍රික්කය",
+    "Province":"පළාත",
+    "Country":"රට",
+    "-- Select Country --":"-- රට තෝරන්න --",
+    "Next":"ඊළඟ",
+    "Exit":"පිටවීම"
+   }
 }

@@ -81,7 +81,15 @@
 "You are not authorized to access this system. Please use a valid Employee ID":"You are not authorized to access this system. Please use a valid Employee ID",
 "This EMP ID is not approved.":"This EMP ID is not approved.",
 "Please Wait":"Please Wait",
-"Validating your information, please wait...":"Validating your information, please wait..."
+"Validating your information, please wait...":"Validating your information, please wait...",
+"firstName is required": "First name is required",
+"lastName is required" : "Last name is required",
+"otherNames is required": "Other names are required",
+"callName is required" : "Call name is required",
+"houseNumber is required": "House number is required",
+"cityName is required":"City name is required",
+"streetName is required":"Street name is required",
+"Email addresses cannot be the same":"Email addresses cannot be the same"
   },
   "Login": {
     "Welcome": "Welcome!",
@@ -440,6 +448,17 @@
     "Start":"Start"
    },
    "InspectionForm": {
+    "Personal Info": "Personal Info",
+    "ID Proof": "ID Proof",
+  "Finance Info": "Finance Info",
+  "Land Info": "Land Info",
+  "Investment Info": "Investment Info",
+  "Cultivation Info": "Cultivation Info",
+  "Cropping Systems": "Cropping Systems",
+  "Profit & Risk": "Profit & Risk",
+  "Economical": "Economical",
+  "Labour": "Labour",
+  "Harvest Storage": "Harvest Storage",
     "Inspection Form":"Inspection Form",
     "First Name":"First Name",
     "Last Name":"Last Name",
@@ -461,6 +480,8 @@
     "District":"District",
     "Province":"Province",
     "Country":"Country",
-    "-- Select Country --":"-- Select Country --"
+    "-- Select Country --":"-- Select Country --",
+    "Next":"Next",
+    "Exit":"Exit"
    }
 }

@@ -18,8 +18,12 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/favicon-icon.png",
-        "backgroundColor": "#ffffff",
-        "softwareKeyboardLayoutMode": "pan",
+        "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false,
+      "package": "com.polygonagro.GoviLink",
+      "softwareKeyboardLayoutMode": "pan",
         "versionCode": 12,
         "compileSdkVersion": 35,
         "targetSdkVersion": 35,
@@ -48,10 +52,6 @@
           "WRITE_EXTERNAL_STORAGE",
           "CALL_PHONE"
         ]
-      },
-      "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false,
-      "package": "com.polygonagro.GoviLink"
     },
     "web": {
       "favicon": "./assets/favicon-icon.png"

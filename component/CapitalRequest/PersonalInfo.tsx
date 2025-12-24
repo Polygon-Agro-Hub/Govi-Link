@@ -1,4 +1,4 @@
-import React, { useState , useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -22,92 +22,285 @@ import Checkbox from "expo-checkbox";
 import { AntDesign } from "@expo/vector-icons";
 import countryData from "@/assets/json/countryflag.json";
 import sriLankaData from "@/assets/json/provinceDistrict.json";
-import districts from "@/assets/json/Districts.json";
+import districtData from "@/assets/json/Districts.json";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
+import { LinearGradient } from "expo-linear-gradient";
+import { StackNavigationProp } from "@react-navigation/stack";
+
+interface District {
+  en: string;
+  si: string;
+  ta: string;
+}
+
+interface DistrictsMap {
+  [country: string]: District[];
+}
+
+type FormData = {
+  firstName: string;
+  lastName: string;
+  otherNames: string;
+  callName: string;
+  mobile1: string;
+  mobile2: string;
+  familyPhone: string;
+  landPhoneHome: string;
+  landPhoneWork: string;
+  email1: string;
+  email2: string;
+  houseNumber: string;
+  streetName: string;
+  cityName: string;
+  district: string | null;
+  province: string;
+  country: string;
+};
 
 const Input = ({
   label,
   placeholder,
-    value,
+  value,
   onChangeText,
   required = false,
-    error,
-  keyboardType = "default"
+  error,
+  keyboardType = "default",
+  isMobile = false,
 }: {
   label: string;
   placeholder: string;
   required?: boolean;
-    value?: string;
+  value?: string;
   onChangeText?: (text: string) => void;
-    error?: string;
+  error?: string;
   keyboardType?: any;
+  isMobile?: boolean;
 }) => (
   <View className="mb-4">
     <Text className="text-sm text-[#070707] mb-1">
       {label} {required && <Text className="text-black">*</Text>}
     </Text>
-    <View className="bg-[#F6F6F6] rounded-full">
-      <TextInput
-        placeholder={placeholder}
-        placeholderTextColor="#838B8C"
-        className=" px-5 py-4 text-base text-black"
-         value={value}
-        onChangeText={onChangeText}
-      />
-          {error && (
-      <Text className="text-red-500 text-xs mt-1 ml-3">{error}</Text>
-    )}
+    <View
+      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
+        error ? "border border-red-500" : ""
+      }`}
+    >
+      {isMobile ? (
+        <View className="flex-row flex-1 items-center">
+          <Text className="px-5 text-base text-black">+94</Text>
+          <TextInput
+            placeholder={placeholder}
+            placeholderTextColor="#838B8C"
+            className="flex-1 px-2 py-4 text-base text-black"
+            value={value}
+            onChangeText={onChangeText}
+            keyboardType="phone-pad"
+            maxLength={9}
+          />
+        </View>
+      ) : (
+        <TextInput
+          placeholder={placeholder}
+          placeholderTextColor="#838B8C"
+          className="px-5 py-4 text-base text-black flex-1"
+          value={value}
+          onChangeText={onChangeText}
+          keyboardType={keyboardType}
+        />
+      )}
     </View>
+
+    {error && <Text className="text-red-500 text-sm mt-1 ml-4">{error}</Text>}
   </View>
 );
 
-
 type ValidationRule = {
   required?: boolean;
-  type?: "firstname" | "lastname" | "phone" | "email" | "text" | "othername";
+  type?:
+    | "firstName"
+    | "lastName"
+    | "email"
+    | "mobile1"
+    | "mobile2"
+    | "familyPhone"
+    | "otherNames"
+    | "callName"
+    | "landPhoneHome"
+    | "landPhoneWork"
+    | "streetName"
+    | "email1"
+    | "email2"
+    | "cityName"
+    | "houseNumber";
   minLength?: number;
+  uniqueWith?: (keyof FormData)[];
 };
+
+
+const validateGmailLocalPart = (localPart: string): boolean => {
+  const validCharsRegex = /^[a-zA-Z0-9.+]+$/;
+
+  if (!validCharsRegex.test(localPart)) return false;
+  if (localPart.startsWith(".") || localPart.endsWith(".")) return false;
+  if (localPart.includes("..")) return false;
+  if (localPart.length === 0) return false;
+
+  return true;
+};
+
+const validateEmail = (email: string): boolean => {
+  console.log("hit email v")
+  const generalEmailRegex =
+    /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+  if (!generalEmailRegex.test(email)) return false;
+
+  const emailLower = email.toLowerCase();
+  const [localPart, domain] = emailLower.split("@");
+
+  const allowedTLDs = [".com", ".gov", ".lk"];
+
+  if (domain === "gmail.com" || domain === "googlemail.com") {
+    return validateGmailLocalPart(localPart);
+  }
+
+  if (domain === "yahoo.com") {
+    return true;
+  }
+
+  return allowedTLDs.some((tld) => domain.endsWith(tld));
+};
+
 
 const validateAndFormat = (
   text: string,
   rules: ValidationRule,
-  t: any
+  t: any,
+  formData: any,
+  currentKey: keyof typeof formData
 ) => {
   let value = text;
   let error = "";
+
   console.log("Validating:", value, rules);
 
   // Filtering
-if (rules.type === "firstname" || rules.type === "lastname" || rules.type ==="othername") {
-  value = value
-    .replace(/[^a-zA-Z]/g, "")   // ⛔ removes spaces
-    .toLowerCase();
+  if (
+    rules.type === "firstName" ||
+    rules.type === "lastName" ||
+    rules.type === "otherNames" ||
+    rules.type === "callName" ||
+    rules.type === "houseNumber" ||
+    rules.type === "cityName" ||
+    rules.type === "streetName"
+  ) {
+    value = value.replace(/^\s+/, "");
+    value = value.replace(/[^a-zA-Z\s]/g, "").toLowerCase();
 
-  value =
-    value.length > 0
-      ? value.charAt(0).toUpperCase() + value.slice(1)
-      : "";
-}
+    value = value.length > 0 ? value.charAt(0).toUpperCase() + value.slice(1) : "";
+    console.log("hit", value);
 
-  if (rules.type === "phone") {
-    value = value.replace(/[^0-9]/g, "");
-  }
-
-  // Validation
-  if (rules.required && value.trim().length === 0) {
-    error = t("Error.Required field");
-  }
-
-  if (rules.type === "email" && value) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(value)) {
-      error = t("Error.Invalid email");
+    if (rules.required && value.trim().length === 0) {
+      error = t(`Error.${rules.type} is required`);
     }
   }
 
+if (rules.type === "email1" || rules.type === "email2") {
+  value = value.trim();
+
+  if (value.length === 0 && rules.type === "email1") {
+    error = rules.required ? t("Error.Email is required") : "";
+  } 
+  else if (value.length > 0) {
+    if (!validateEmail(value)) {
+      const domain = value.toLowerCase().split("@")[1];
+
+      if (domain === "gmail.com" || domain === "googlemail.com") {
+        error = t("Error.Invalid Gmail address");
+      } else {
+        error = t("Error.Invalid email address Example");
+      }
+    } 
+    else if (rules.uniqueWith) {
+      const isDuplicate = rules.uniqueWith.some(
+        (key) =>
+          formData[key]?.toLowerCase().trim() === value.toLowerCase().trim() &&
+          key !== currentKey
+      );
+
+      if (isDuplicate) {
+        error = t("Error.Email addresses cannot be the same");
+      }
+    }
+  }
+}
+
+
+
   if (rules.minLength && value.length < rules.minLength) {
     error = t("Error.Min length", { count: rules.minLength });
+  }
+
+  if (
+    rules.type === "mobile1" ||
+    rules.type === "mobile2" ||
+    rules.type === "familyPhone"
+  ) {
+    let numbersOnly = value.replace(/[^0-9]/g, "");
+
+    numbersOnly = numbersOnly.replace(/^0+/, "");
+
+    if (numbersOnly.length > 9) {
+      numbersOnly = numbersOnly.slice(0, 9);
+    }
+
+    value = numbersOnly;
+
+    if (numbersOnly.length === 0) {
+      error = t("Error.Phone number is required");
+    } else if (!numbersOnly.startsWith("7")) {
+      error = t("Error.Invalid phone number");
+    } else if (numbersOnly.length < 9) {
+      error = t("Error.Phone number must be 9 digits long");
+    } else if (rules.uniqueWith) {
+      const isDuplicate = rules.uniqueWith.some(
+        (key) =>
+          formData[key]?.replace(/[^0-9]/g, "").replace(/^0+/, "") ===
+            numbersOnly && key !== currentKey
+      );
+
+      if (isDuplicate) {
+        error = t("Error.Phone numbers cannot be the same");
+      }
+    }
+  }
+
+  if (rules.type === "landPhoneHome" || rules.type === "landPhoneWork") {
+    let numbersOnly = value.replace(/[^0-9]/g, "");
+
+    numbersOnly = numbersOnly.replace(/^0+/, "");
+
+    if (numbersOnly.length > 9) {
+      numbersOnly = numbersOnly.slice(0, 9);
+    }
+
+    value = numbersOnly;
+    if (numbersOnly.length != 0 && numbersOnly.length < 9) {
+      error = t("Error.Phone number must be 9 digits long");
+    } else if (rules.uniqueWith) {
+      const isDuplicate = rules.uniqueWith.some(
+        (key) =>
+          formData[key]?.replace(/[^0-9]/g, "").replace(/^0+/, "") ===
+            numbersOnly &&
+          key !== currentKey &&
+          numbersOnly.length > 0
+      );
+
+      if (isDuplicate) {
+        error = t("Error.Phone numbers cannot be the same");
+      }
+    }
   }
 
   return { value, error };
@@ -116,8 +309,6 @@ if (rules.type === "firstname" || rules.type === "lastname" || rules.type ==="ot
 type InspectionForm1Props = {
   navigation: any;
 };
-
-
 
 const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
   const [showDistrictDropdown, setShowDistrictDropdown] = useState(false);
@@ -134,114 +325,182 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
   );
   const [countrySearch, setCountrySearch] = useState("");
   const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
-const [isLoaded, setIsLoaded] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [isNextEnabled, setIsNextEnabled] = useState(false);
+ const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    otherNames: "",
+    callName: "",
+    mobile1: "",
+    mobile2: "",
+    familyPhone: "",
+    landPhoneHome: "",
+    landPhoneWork: "",
+    email1: "",
+    email2: "",
+    houseNumber: "",
+    streetName: "",
+    cityName: "",
+    district: selectedDistrict,
+    province: displayProvince,
+    country: displayCountry,
+  });
+  const districts: DistrictsMap = districtData;
 
-const STORAGE_KEY = "INSPECTION_FORM_1";
+  useEffect(() => {
+  const requiredFields: (keyof FormData)[] = [
+    "firstName",
+    "lastName",
+    "otherNames",
+    "callName",
+    "mobile1",
+    "familyPhone",
+    "email1",
+    "houseNumber",
+    "streetName",
+    "cityName",
+    "district",
+    "province",
+    "country",
+  ];
 
-const updateFormData = async (
-  key: keyof typeof formData,
-  value: string
-) => {
-  const updatedData = {
-    ...formData,
-    [key]: value,
+  const allFilled = requiredFields.every((key) => {
+    const value = formData[key];
+    return value !== null && value !== undefined && value.toString().trim() !== "";
+  });
+
+  const hasErrors = Object.keys(errors).length > 0;
+
+  setIsNextEnabled(allFilled && !hasErrors);
+}, [formData, errors]);
+
+
+  const STORAGE_KEY = "INSPECTION_FORM_1";
+
+  let jobId = "GC000001";
+
+  const updateFormData = async (updates: Partial<typeof formData>) => {
+    const updatedData = {
+      ...formData,
+      ...updates,
+    };
+
+    setFormData(updatedData);
+
+    try {
+      await AsyncStorage.setItem(
+        `${STORAGE_KEY}_${jobId}`,
+        JSON.stringify(updatedData)
+      );
+    } catch (e) {
+      console.log("AsyncStorage save failed", e);
+    }
   };
 
-  setFormData(updatedData);
+  const handleFieldChange = (
+  key: keyof typeof formData,
+  text: string,
+  rules: ValidationRule
+) => {
+  // Validate and format field
+  const { value, error } = validateAndFormat(text, rules, t, formData, key);
 
-  try {
-    await AsyncStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify(updatedData)
-    );
-  } catch (e) {
-    console.log("AsyncStorage save failed", e);
+  // Update local state for the field
+  setFormData((prev) => ({
+    ...prev,
+    [key]: value,
+  }));
+
+  // Update errors object
+  setErrors((prev) => {
+    const newErrors = { ...prev };
+
+    if (error) {
+      newErrors[key] = error; // mark error
+    } else {
+      delete newErrors[key]; // remove error if fixed
+    }
+
+    // Re-validate uniqueWith fields if applicable
+    if (rules.uniqueWith) {
+      rules.uniqueWith.forEach((relatedKey) => {
+        const relatedValue = formData[relatedKey];
+        if (!relatedValue) {
+          delete newErrors[relatedKey];
+          return;
+        }
+
+        const { error: relatedError } = validateAndFormat(
+          relatedValue,
+          {
+            type: rules.type,
+            uniqueWith: rules.uniqueWith,
+          },
+          t,
+          {
+            ...formData,
+            [key]: value,
+          },
+          relatedKey
+        );
+
+        if (relatedError) newErrors[relatedKey] = relatedError;
+        else delete newErrors[relatedKey];
+      });
+    }
+
+    return newErrors;
+  });
+
+  // ✅ Save only if this field has NO error
+  if (!error) {
+    updateFormData({ [key]: value });
   }
 };
 
-const handleFieldChange = (
-    key: keyof typeof formData,
-    text: string,
-    rules: ValidationRule
-  ) => {
-    const { value, error } = validateAndFormat(text, rules, t);
+  useFocusEffect(
+    useCallback(() => {
+      const loadData = async () => {
+        const saved = await AsyncStorage.getItem(`${STORAGE_KEY}_${jobId}`);
+        console.log("saved", saved);
 
-    updateFormData(key, value);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          setFormData(parsed);
 
-    setErrors((prev) => {
-      const copy = { ...prev };
-      if (error) copy[key] = error;
-      else delete copy[key];
-      return copy;
-    });
-  };
+          setSelectedDistrict(parsed.district || null);
+          setSelectedCountry(parsed.country);
 
+          const provinceObj = sriLankaData["Sri Lanka"].provinces.find(
+            (prov) => prov.name.en === parsed.province
+          );
+          setSelectedProvince(provinceObj?.name.en || null);
+          setDisplayProvince(
+            provinceObj
+              ? provinceObj.name[
+                  i18n.language as keyof typeof provinceObj.name
+                ] || provinceObj.name.en
+              : ""
+          );
+          setDisplayCountry(t(`InspectionForm.${parsed.country}`));
+        }
+      };
 
-useFocusEffect(
-  useCallback(() => {
-    const loadData = async () => {
-      const saved = await AsyncStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        setFormData(parsed);
+      loadData();
+    }, [i18n.language])
+  );
 
-        // Set district
-        setSelectedDistrict(parsed.district || null);
+ 
 
-        // Find the province object by stored province name (en)
-        const provinceObj = sriLankaData.provinces.find(
-          (prov) => prov.name.en === parsed.province
-        );
-
-        // Set province & display in selected language
-        setSelectedProvince(provinceObj?.name.en || null);
-        setDisplayProvince(
-          provinceObj
-            ? provinceObj.name[i18n.language as keyof typeof provinceObj.name] ||
-              provinceObj.name.en
-            : ""
-        );
-
-        // Set country
-        setDisplayCountry(parsed.country || t("InspectionForm.Sri Lanka"));
-      }
-    };
-
-    loadData();
-  }, [i18n.language])
-);
-
-  const [formData, setFormData] = useState({
-  firstName: "",
-  lastName: "",
-  otherNames: "",
-  callName: "",
-  mobile1: "",
-  mobile2: "",
-  familyPhone: "",
-  landPhoneHome: "",
-  landPhoneWork: "",
-  email1: "",
-  email2: "",
-  houseNumber: "",
-  streetName: "",
-  cityName: "",
-  district: selectedDistrict,
-  province: displayProvince,
-  country: displayCountry,
-});
-  const isFormValid =
-    Object.keys(errors).length === 0 &&
-    Object.values(formData).every((v) => v !== "");
-console.log("Form Data:", formData);
   const getFilteredDistricts = () => {
-    if (!districts || districts.length === 0) return [];
+    const countryDistricts = districts[selectedCountry] || [];
 
-    let filtered = districts;
+    if (countryDistricts.length === 0) return [];
 
-    if (districtSearch) {
+    if (districtSearch.trim()) {
       const searchTerm = districtSearch.toLowerCase();
-      filtered = filtered.filter(
+      return countryDistricts.filter(
         (d) =>
           d.en.toLowerCase().includes(searchTerm) ||
           d.si.includes(districtSearch) ||
@@ -249,32 +508,42 @@ console.log("Form Data:", formData);
       );
     }
 
-    return filtered;
+    return countryDistricts;
   };
 
   const clearSearch = () => setDistrictSearch("");
 
-  const selectDistrict =async (district: { en: string; si: string; ta: string }) => {
+  const selectDistrict = async (district: {
+    en: string;
+    si: string;
+    ta: string;
+  }) => {
     setSelectedDistrict(district.en);
-    const province = sriLankaData.provinces.find((prov) =>
+
+
+    const province = sriLankaData["Sri Lanka"].provinces.find((prov) =>
       prov.districts.some((d) => d.en === district.en)
     );
+
     const displayProv = province
-      ? province.name[i18n.language as keyof typeof province.name] || province.name.en
+      ? province.name[i18n.language as keyof typeof province.name] ||
+        province.name.en
       : "";
+
     setSelectedProvince(province?.name.en || null);
     setDisplayProvince(displayProv);
-  const updatedData = {
-    ...formData,
-    district: district.en,
-    province: province?.name.en || "",
-  };
-  await AsyncStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify(updatedData)
-  );
+    updateFormData({
+      district: district.en,
+      province: province?.name.en,
+    });
+      setErrors((prev) => {
+    const newErrors = { ...prev };
+    delete newErrors.district;
+    return newErrors;
+  });
     setShowDistrictDropdown(false);
   };
+
   const getFilteredCountries = () => {
     if (!countryData || countryData.length === 0) return [];
     if (!countrySearch) return countryData;
@@ -333,12 +602,20 @@ console.log("Form Data:", formData);
   );
 
   const handleCountrySelect = (country: any) => {
+    setSelectedDistrict(null);
+    setSelectedProvince(null);
+    setDisplayProvince("");
+
     setSelectedCountry(country.name.en);
-    const display = country.name[i18n.language as keyof typeof country.name] || country.name.en;
+    const display =
+      country.name[i18n.language as keyof typeof country.name] ||
+      country.name.en;
     setDisplayCountry(display);
-    setFormData({
-      ...formData,
-      country: display,
+
+    updateFormData({
+      country: country.name.en,
+      district: null,
+      province: "",
     });
     setShowCountryDropdown(false);
   };
@@ -346,6 +623,72 @@ console.log("Form Data:", formData);
   const handleModalClose = () => {
     setShowCountryDropdown(false);
   };
+
+
+  const handleNext = () => {
+  const requiredFields: (keyof FormData)[] = [
+    "firstName",
+    "lastName",
+    "otherNames",
+    "callName",
+    "mobile1",
+    "familyPhone",
+    "email1",
+    "houseNumber",
+    "streetName",
+    "cityName",
+    "province",
+    "country",
+  ];
+
+  // If country is Sri Lanka, district is required
+  if (formData.country === "Sri Lanka") {
+    requiredFields.push("district");
+  }
+
+  // Validate all fields
+  const validationErrors: Record<string, string> = {};
+  requiredFields.forEach((key) => {
+    let value = formData[key];
+    let error = "";
+
+    if ((key === "district" || key === "province") && !value) {
+      error = t(`Error.${key.charAt(0).toUpperCase() + key.slice(1)} is required`);
+    } else {
+      let rules: ValidationRule = { required: true, type: key as any };
+
+      if (key.startsWith("mobile") || key.includes("Phone")) {
+        rules.type = key as
+          | "mobile1"
+          | "mobile2"
+          | "familyPhone"
+          | "landPhoneHome"
+          | "landPhoneWork";
+      }
+      if (key.includes("email")) {
+        rules.type = key as "email1" | "email2";
+        rules.uniqueWith = key === "email1" ? ["email2"] : ["email1"];
+      }
+
+      const result = validateAndFormat(value || "", rules, t, formData, key);
+      error = result.error;
+    }
+
+    if (error) validationErrors[key] = error;
+  });
+
+  if (Object.keys(validationErrors).length > 0) {
+    setErrors((prev) => ({ ...prev, ...validationErrors }));
+    const errorMessage = "• " + Object.values(validationErrors).join("\n• ");
+    Alert.alert(t("Error.Validation Error"), errorMessage, [
+      { text: t("MAIN.OK") },
+    ]);
+    return;
+  }
+
+  navigation.navigate("NextPage", { formData });
+};
+
 
   const renderSearchInput = (
     value: string,
@@ -376,12 +719,12 @@ console.log("Form Data:", formData);
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1, backgroundColor: "white" }}
     >
-      <View className="flex-1 bg-[#F3F3F3]">
+      <View className="flex-1 bg-[#F3F3F3] ">
         <StatusBar barStyle="dark-content" />
 
         {/* Header */}
         <View className="flex-row items-center justify-center py-4">
-          <TouchableOpacity className="absolute left-4 bg-[#F3F3F3] rounded-full p-2">
+          <TouchableOpacity className="absolute left-4 bg-[#F3F3F3] rounded-full p-2" onPress={()=> navigation.goBack()}>
             <MaterialIcons name="arrow-back-ios" size={20} color="#000" />
           </TouchableOpacity>
           <Text className="text-lg font-semibold text-black">
@@ -398,160 +741,236 @@ console.log("Form Data:", formData);
           contentContainerStyle={{ paddingBottom: 120 }}
         >
           <View className="h-6" />
-           <Input
+          <Input
             label={t("InspectionForm.First Name")}
             placeholder="----"
             value={formData.firstName}
             onChangeText={(text) =>
-            handleFieldChange("firstName", text, {
-              required: true,
-              type: "firstname",
-            })
-            }             
-           required
+              handleFieldChange("firstName", text, {
+                required: true,
+                type: "firstName",
+              })
+            }
+            required
+            error={errors.firstName}
           />
           <Input
             label={t("InspectionForm.Last Name")}
             placeholder="----"
             value={formData.lastName}
             onChangeText={(text) =>
-            handleFieldChange("lastName", text, {
-              required: true,
-              type: "lastname",
-            })
-            } 
+              handleFieldChange("lastName", text, {
+                required: true,
+                type: "lastName",
+              })
+            }
             required
+            error={errors.lastName}
           />
           <Input
             label={t("InspectionForm.Other Names")}
             placeholder="----"
             value={formData.otherNames}
-            onChangeText={(text) => updateFormData("otherNames", text)}
+            onChangeText={(text) =>
+              handleFieldChange("otherNames", text, {
+                required: true,
+                type: "otherNames",
+              })
+            }
             required
+            error={errors.otherNames}
           />
           <Input
             label={t("InspectionForm.Call Name")}
             placeholder="----"
             value={formData.callName}
-            onChangeText={(text) => updateFormData("callName", text)}
+            onChangeText={(text) =>
+              handleFieldChange("callName", text, {
+                required: true,
+                type: "callName",
+              })
+            }
             required
+            error={errors.callName}
           />
 
           <View className="border-t border-[#CACACA] my-4 mb-8" />
 
           <Input
             label={t("InspectionForm.Mobile Number - 1")}
-            placeholder="07XXXXXXXX"
+            placeholder="7XXXXXXXX"
             value={formData.mobile1}
-            onChangeText={(text) => updateFormData("mobile1", text)}
+            onChangeText={(text) =>
+              handleFieldChange("mobile1", text, {
+                required: true,
+                type: "mobile1",
+                uniqueWith: [
+                  "mobile2",
+                  "familyPhone",
+                  "landPhoneWork",
+                  "landPhoneHome",
+                ],
+              })
+            }
+            error={errors.mobile1}
+            keyboardType={"phone-pad"}
+            isMobile={true}
             required
           />
           <Input
             label={t("InspectionForm.Mobile Number - 2")}
-            placeholder="07XXXXXXXX"
+            placeholder="7XXXXXXXX"
             value={formData.mobile2}
-            onChangeText={(text) => updateFormData("mobile2", text)}
+            onChangeText={(text) =>
+              handleFieldChange("mobile2", text, {
+                required: false,
+                type: "mobile2",
+                uniqueWith: [
+                  "mobile1",
+                  "familyPhone",
+                  "landPhoneWork",
+                  "landPhoneHome",
+                ],
+              })
+            }
+            keyboardType={"phone-pad"}
+            error={errors.mobile2}
+            isMobile={true}
           />
           <Input
             label={t("InspectionForm.Phone Number of a family member")}
-            placeholder="07XXXXXXXX"
+            placeholder="7XXXXXXXX"
             value={formData.familyPhone}
-            onChangeText={(text) => updateFormData("familyPhone", text)}
+            keyboardType={"phone-pad"}
+            onChangeText={(text) =>
+              handleFieldChange("familyPhone", text, {
+                required: true,
+                type: "familyPhone",
+                uniqueWith: [
+                  "mobile1",
+                  "mobile2",
+                  "landPhoneWork",
+                  "landPhoneHome",
+                ],
+              })
+            }
+            error={errors.familyPhone}
+            isMobile={true}
             required
           />
           <Input
             label={t("InspectionForm.Land Phone Number - Home")}
-            placeholder="0XXXXXXXXX"
+            placeholder="XXXXXXXXX"
             value={formData.landPhoneHome}
-            onChangeText={(text) => updateFormData("landPhoneHome", text)}
+            onChangeText={(text) =>
+              handleFieldChange("landPhoneHome", text, {
+                required: false,
+                type: "landPhoneHome",
+                uniqueWith: [
+                  "mobile1",
+                  "mobile2",
+                  "familyPhone",
+                  "landPhoneWork",
+                ],
+              })
+            }
+            keyboardType={"phone-pad"}
+            error={errors.landPhoneHome}
+            isMobile={true}
           />
           <Input
             label={t("InspectionForm.Land Phone Number - Work")}
-            placeholder="0XXXXXXXXX"
+            placeholder="XXXXXXXXX"
             value={formData.landPhoneWork}
-            onChangeText={(text) => updateFormData("landPhoneWork", text)}
+            onChangeText={(text) =>
+              handleFieldChange("landPhoneWork", text, {
+                required: false,
+                type: "landPhoneWork",
+                uniqueWith: [
+                  "mobile1",
+                  "mobile2",
+                  "familyPhone",
+                  "landPhoneHome",
+                ],
+              })
+            }
+            keyboardType={"phone-pad"}
+            error={errors.landPhoneWork}
+            isMobile={true}
           />
           <Input
             label={t("InspectionForm.Email Address - 1")}
             placeholder="----"
             value={formData.email1}
-            onChangeText={(text) =>  updateFormData("email1", text)}
+            onChangeText={(text) =>
+              handleFieldChange("email1", text, {
+                required: true,
+                type: "email1",
+                     uniqueWith: [
+                  "email2"
+                ]
+              })
+            }
             required
+            error={errors.email1}
           />
           <Input
             label={t("InspectionForm.Email Address - 2")}
             placeholder="----"
             value={formData.email2}
-            onChangeText={(text) => updateFormData("email2", text)}
+            onChangeText={(text) =>
+              handleFieldChange("email2", text, {
+                required: false,
+                type: "email2",
+                    uniqueWith: [
+                  "email1"
+                ]
+              })
+            }
+            error={errors.email2}
           />
 
-
-          {/* Divider */}
           <View className="border-t  border-[#CACACA] my-4 mb-8" />
 
           <Input
             label={t("InspectionForm.House / Plot Number")}
             placeholder="----"
             value={formData.houseNumber}
-            onChangeText={(text) => updateFormData("houseNumber", text)}
+            onChangeText={(text) =>
+              handleFieldChange("houseNumber", text, {
+                required: true,
+                type: "houseNumber",
+              })
+            }
             required
+            error={errors.houseNumber}
           />
           <Input
             label={t("InspectionForm.Street Name")}
             placeholder="----"
             value={formData.streetName}
-            onChangeText={(text) => updateFormData("streetName", text)}
+            onChangeText={(text) =>
+              handleFieldChange("streetName", text, {
+                required: true,
+                type: "streetName",
+              })
+            }
             required
+            error={errors.streetName}
           />
           <Input
             label={t("InspectionForm.City / Town Name")}
             placeholder="----"
             value={formData.cityName}
-            onChangeText={(text) => updateFormData("cityName", text)}
+            onChangeText={(text) =>
+              handleFieldChange("cityName", text, {
+                required: true,
+                type: "cityName",
+              })
+            }
             required
+            error={errors.cityName}
           />
-
-          <View className="relative mb-4">
-            <Text className="text-sm text-[#070707] mb-1">
-              <Text className="text-black">
-                {t("InspectionForm.District")} *
-              </Text>
-            </Text>
-            <TouchableOpacity
-              onPress={() => setShowDistrictDropdown(true)}
-              activeOpacity={0.8}
-            >
-              <View className="bg-[#F6F6F6] rounded-full px-5 py-4 flex-row items-center justify-between">
-                <Text
-                  className={`text-base ${
-                    selectedDistrict ? "text-black" : "text-[#838B8C]"
-                  }`}
-                >
-                  {selectedDistrict
-                    ? t(`Districts.${selectedDistrict}`)
-                    : t("InspectionForm.-- Select District --")}
-                </Text>
-                <AntDesign name="down" size={20} color="#838B8C" />
-              </View>
-            </TouchableOpacity>
-          </View>
-
-          <View className="relative mb-4">
-            <Text className="text-sm text-[#070707] mb-1">
-              <Text className="text-black">{t("InspectionForm.Province")}</Text>
-            </Text>
-            <View className="bg-[#F6F6F6] rounded-full px-5 py-4">
-              <Text
-                className={`text-base ${
-                  selectedProvince ? "text-black" : "text-[#838B8C]"
-                }`}
-              >
-                {selectedProvince
-                  ? displayProvince
-                  : t("InspectionForm.-- Select Province --")}
-              </Text>
-            </View>
-          </View>
 
           <View className="relative mb-4">
             <Text className="text-sm text-[#070707] mb-1">
@@ -575,18 +994,98 @@ console.log("Form Data:", formData);
               </View>
             </TouchableOpacity>
           </View>
+          {selectedCountry === "Sri Lanka" ? (
+            <>
+              <View className="relative mb-4">
+                <Text className="text-sm text-[#070707] mb-1">
+                  <Text className="text-black">
+                    {t("InspectionForm.District")} *
+                  </Text>
+                </Text>
+                <TouchableOpacity
+                  onPress={() => setShowDistrictDropdown(true)}
+                  activeOpacity={0.8}
+                >
+                  <View className="bg-[#F6F6F6] rounded-full px-5 py-4 flex-row items-center justify-between">
+                    <Text
+                      className={`text-base ${
+                        selectedDistrict ? "text-black" : "text-[#838B8C]"
+                      }`}
+                    >
+                      {selectedDistrict
+                        ? t(`Districts.${selectedDistrict}`)
+                        : t("InspectionForm.-- Select District --")}
+                    </Text>
+                    <AntDesign name="down" size={20} color="#838B8C" />
+                  </View>
+                </TouchableOpacity>
+                  {errors.district && (
+    <Text className="text-red-500 text-sm mt-1 ml-4">{errors.district}</Text>
+  )}
+              </View>
+              <View className="relative mb-4">
+                <Text className="text-sm text-[#070707] mb-1">
+                  <Text className="text-black">
+                    {t("InspectionForm.Province")}
+                  </Text>
+                </Text>
+                <View className="bg-[#F6F6F6] rounded-full px-5 py-4">
+                  <Text
+                    className={`text-base ${
+                      selectedProvince ? "text-black" : "text-[#838B8C]"
+                    }`}
+                  >
+                    {selectedProvince
+                      ? displayProvince
+                      : t("InspectionForm.-- Select Province --")}
+                  </Text>
+                </View>
+              </View>
+            </>
+          ) : null}
         </ScrollView>
 
-        <View className="flex-row px-6 py-4 gap-4 bg-white border-t border-gray-200">
-          <TouchableOpacity className="flex-1 bg-[#444444] rounded-full py-4 items-center">
-            <Text className="text-white text-base font-semibold">Exit</Text>
+        <View className="flex-row px-6 py-4 gap-4 bg-white border-t border-gray-200 ">
+          <TouchableOpacity className="flex-1 bg-[#444444] rounded-full py-4 items-center"  onPress={() =>
+    navigation.navigate("Main", {
+      screen: "MainTabs",
+      params: {
+        screen: "CapitalRequests",
+      },
+    })
+  }>
+            <Text className="text-white text-base font-semibold">{t("InspectionForm.Exit")}</Text>
           </TouchableOpacity>
+           {isNextEnabled == true ? (
+              <View className="flex-1">
+          <TouchableOpacity
+            className="flex-1 "
+            onPress={handleNext}
+          >
+              <LinearGradient
+                          colors={["#F35125", "#FF1D85"]}
+                          start={{ x: 0, y: 0 }}
+                          end={{ x: 1, y: 0 }}
+                          className=" rounded-full py-4 items-center"
+                          style={{
+                            shadowColor: "#000",
+                            shadowOffset: { width: 0, height: 3 },
+                            shadowOpacity: 0.25,
+                            shadowRadius: 5,
+                            elevation: 6,
+                          }}
+                        >
+            <Text className="text-white text-base font-semibold">{t("InspectionForm.Next")}</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+          </View>
 
-          <TouchableOpacity className="flex-1 bg-gray-300 rounded-full py-4 items-center"
-            onPress={() => navigation.navigate("NextPage", { formData })}
-            >
-            <Text className="text-white text-base font-semibold">Next</Text>
-          </TouchableOpacity>
+): (
+  <View className="flex-1 bg-gray-300 rounded-full py-4 items-center">
+            <Text className="text-white text-base font-semibold">{t("InspectionForm.Next")}</Text>
+          </View>
+)}
+
         </View>
       </View>
 

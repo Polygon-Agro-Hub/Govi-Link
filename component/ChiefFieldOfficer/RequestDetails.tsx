@@ -172,7 +172,7 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
     return (
       <View className="flex-1 bg-white justify-center items-center">
         <ActivityIndicator size="large" color="#21202B" />
-        <Text className="mt-4 text-[#565559]">Loading request details...</Text>
+        <Text className="mt-4 text-[#565559]"> {t("CapitalRequests.LoadingRequests")}</Text>
       </View>
     );
   }

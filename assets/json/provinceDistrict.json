@@ -1,4 +1,5 @@
 {
+    "Sri Lanka": {
   "provinces": [
     {
       "name": { "en": "Western", "si": "බටහිර", "ta": "மேற்கு" },
@@ -71,4 +72,5 @@
       ]
     }
   ]
+}
 }
