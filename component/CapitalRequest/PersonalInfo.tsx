@@ -690,7 +690,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
     return;
   }
 
-  navigation.navigate("NextPage", { formData });
+  navigation.navigate("IDProof", { formData });
 };
 
 

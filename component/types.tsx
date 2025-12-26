@@ -87,7 +87,7 @@ export type RootStackParamList = {
   ComplainHistory: undefined;
   AssignJobs: undefined;
   CapitalRequests: undefined;
-  RequestDetails: { requestId: string, requestNumber:string };
+  RequestDetails: { requestId: number, requestNumber:string };
   AssignJobOfficerList: {
     selectedJobIds: string[];
     selectedDate: string;

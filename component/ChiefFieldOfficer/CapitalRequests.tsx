@@ -15,6 +15,9 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../types";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import { environment } from "@/environment/environment";
 
 type CapitalRequestsNavigationProps = StackNavigationProp<
   RootStackParamList,
@@ -26,10 +29,10 @@ interface CapitalRequestsProps {
 }
 
 interface Request {
-  id: string;
-  requestNumber: string;
-  customerName: string;
-  requestType: string;
+  id: number;
+  farmerName:string
+  jobId:string
+
 }
 
 const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
@@ -40,32 +43,33 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState("");
 
   // Dummy data for capital requests
-  const dummyRequests: Request[] = [
-    {
-      id: "1",
-      requestNumber: "#GC000001",
-      customerName: "Kelum Dissanayake",
-      requestType: "Loan Request",
-    },
-    {
-      id: "2",
-      requestNumber: "#GC000002",
-      customerName: "Kamal Perera",
-      requestType: "Investment Request",
-    },
-    {
-      id: "3",
-      requestNumber: "#GC000003",
-      customerName: "Nimal Fernando",
-      requestType: "Loan Request",
-    },
-    {
-      id: "4",
-      requestNumber: "#GC000004",
-      customerName: "Sunil Rathnayake",
-      requestType: "Investment Request",
-    },
-  ];
+const STORAGE_KEY = "INSPECTION_FORM_1";
+
+// state to store jobIds that exist in AsyncStorage
+const [highlightedJobs, setHighlightedJobs] = useState<string[]>([]);
+
+const loadStoredJobs = async (requests: Request[]) => {
+  try {
+    const keys = requests.map(req => `${STORAGE_KEY}_${req.jobId}`);
+    const keyValues = await AsyncStorage.multiGet(keys);
+
+    const jobsWithData = keyValues
+      .filter(([key, value]) => value && value !== "[]") // has stored data
+      .map(([key]) => key.split("_").pop()!); // get the jobId from key
+
+    setHighlightedJobs(jobsWithData);
+    console.log("Highlighted jobs:", jobsWithData);
+  } catch (e) {
+    console.error("Failed to load stored jobs", e);
+  }
+};
+
+// Call after fetching requests
+useEffect(() => {
+  if (requests.length > 0) {
+    loadStoredJobs(requests);
+  }
+}, [requests]);
 
   const fetchCapitalRequests = async (search: string = "") => {
     try {
@@ -73,23 +77,31 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
 
       // Simulate API call delay
       await new Promise((resolve) => setTimeout(resolve, 1000));
+      const token = await AsyncStorage.getItem("token");
+      if (!token) return;
 
+      const response = await axios.get(
+        `${environment.API_BASE_URL}api/capital-request/requests`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      console.log('Requests', response.data.requests)
       // For demo purposes, using dummy data
       // In real implementation, you would make API call here
-      let filteredRequests = dummyRequests;
+      const apiRequests = response.data.requests;
+      // if (search.trim() !== "") {
+      //   filteredRequests = dummyRequests.filter(
+      //     (request) =>
+      //       request.requestNumber
+      //         .toLowerCase()
+      //         .includes(search.toLowerCase()) ||
+      //       request.customerName.toLowerCase().includes(search.toLowerCase()) ||
+      //       request.requestType.toLowerCase().includes(search.toLowerCase())
+      //   );
+      // }
 
-      if (search.trim() !== "") {
-        filteredRequests = dummyRequests.filter(
-          (request) =>
-            request.requestNumber
-              .toLowerCase()
-              .includes(search.toLowerCase()) ||
-            request.customerName.toLowerCase().includes(search.toLowerCase()) ||
-            request.requestType.toLowerCase().includes(search.toLowerCase())
-        );
-      }
-
-      setRequests(filteredRequests);
+      setRequests(apiRequests);
     } catch (error: any) {
       console.error("Failed to fetch capital requests:", error);
       Alert.alert(t("Error.Error"), t("Error.FailedToLoadRequests"),[{ text: t("MAIN.OK") }]);
@@ -168,42 +180,58 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
             </View>
           ) : (
             requests.map((request, index) => (
+                              <TouchableOpacity
+                  className=""
+                  onPress={() => {
+                    navigation.navigate("RequestDetails", {
+                      requestId: request.id,
+                      requestNumber: request.jobId
+                    });
+                  }}
+                  
+                >
               <View
                 key={`${request.id}-${index}`}
-                className="bg-[#ADADAD1A] rounded-3xl p-6 flex-row items-center justify-between"
+                className="bg-[#ADADAD1A] rounded-3xl p-4 flex-row items-center justify-between"
+                    style={{
+      borderWidth: highlightedJobs.includes(request.jobId) ? 1 : 0,
+      borderColor: highlightedJobs.includes(request.jobId) ? "#FA4064" : "transparent",
+    }}
               >
                 {/* Left side content */}
                 <View className="flex-1">
-                  <Text className="text-[#000000] text-base">
-                    {request.requestNumber}
+                  <View className="flex-row space-x-2 items-baseline">
+                                      <Text className="text-[#000000] text-base">
+                    #{request.jobId} 
+  
                   </Text>
+                                    {highlightedJobs.includes(request.jobId) && (
+                      <Text className=" font-bold  text-[#FA345A] "> 
+                        ({t("RequestLetter.Saved Draft")})
+                        </Text>
+                    )}
+                    </View>
+
 
                   <Text className="text-[#212121] text-lg font-medium mt-1">
-                    {request.customerName}
+                    {request.farmerName}
                   </Text>
 
                   <Text className="text-[#4E6393] text-sm mt-1">
-                    {request.requestType}
+                    {t("RequestLetter.Investment Request")}
                   </Text>
                 </View>
 
                 {/* Right side arrow button */}
-                <TouchableOpacity
-                  className="ml-3 p-2"
-                  onPress={() => {
-                    navigation.navigate("RequestDetails", {
-                      requestId: request.id,
-                      requestNumber: request.requestNumber
-                    });
-                  }}
-                >
+
                   <MaterialIcons
                     name="keyboard-arrow-right"
                     size={40}
                     color="#000"
                   />
-                </TouchableOpacity>
+             
               </View>
+                 </TouchableOpacity>
             ))
           )}
         </View>

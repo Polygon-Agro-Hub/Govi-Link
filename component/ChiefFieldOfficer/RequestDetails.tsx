@@ -15,6 +15,9 @@ import { RouteProp, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../types";
 import { MaterialIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+import axios from "axios";
+import { environment } from "@/environment/environment";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type RequestDetailsNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -25,26 +28,23 @@ interface RequestDetailsProps {
   navigation: RequestDetailsNavigationProp;
 }
 
-interface RequestDetailsData {
-  id: string;
-  requestNumber: string;
-  customerName: string;
-  contactNumber: string;
-  district: string;
-  crop: string;
-  variety: string;
-  certification: string;
-  extent: {
-    hectares: string;
-    acres: string;
-    perches: string;
-  };
-  expectedInvestment: string;
-  expectedYield: string;
-  cultivationStartDate: string;
-  status: "pending" | "approved" | "rejected";
-}
 
+interface RequestData {
+  id: number;
+  jobId: string;
+  extentha: number;
+  extentac: number;
+    extentp: number;
+  district: string;
+  investment: string;
+  expectedYield: string;
+  farmerName: string;
+  phoneNumber:string;
+  cropNameEnglish:string;
+  cropNameSinhala:string;
+  cropNameTamil:string;
+  startDate:string
+}
 
 type ProjectDetailsProps = {
   label: string;
@@ -77,31 +77,10 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
   const route = useRoute<RouteProp<RootStackParamList, "RequestDetails">>();
   const { requestId, requestNumber } = route.params;
   const [loading, setLoading] = useState(true);
-  const [requestData, setRequestData] = useState<RequestDetailsData | null>(
+  const [requestData, setRequestData] = useState<RequestData | null>(
     null
   );
-  const {t} = useTranslation();
-
-  // Mock data - replace with actual API call
-  const mockRequestData: RequestDetailsData = {
-    id: "1",
-    requestNumber: "#GC000001",
-    customerName: "Kelum Dissanayake",
-    contactNumber: "+94 77 123 4567",
-    district: "Colombo",
-    crop: "Rice",
-    variety: "BG 300",
-    certification: "Organic",
-    extent: {
-      hectares: "2.5",
-      acres: "6.18",
-      perches: "990",
-    },
-    expectedInvestment: "250,000",
-    expectedYield: "4500",
-    cultivationStartDate: "2024-03-15",
-    status: "pending",
-  };
+  const {t, i18n} = useTranslation();
 
   useEffect(() => {
     fetchRequestDetails();
@@ -112,9 +91,18 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
       setLoading(true);
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
-
+            const token = await AsyncStorage.getItem("token");
+      if (!token) return;
+      const response = await axios.get(
+        `${environment.API_BASE_URL}api/capital-request/requests/${requestId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      console.log('Requests', response.data.requests)
       // In real implementation, fetch by requestId
-      setRequestData(mockRequestData);
+     setRequestData(response.data.requests[0] || null);
+
     } catch (error) {
       console.error("Failed to fetch request details:", error);
       Alert.alert("Error", "Failed to load request details");
@@ -217,24 +205,32 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
         <View className="mx-6 my-4 bg-white rounded-lg p-2">
           {/* Letter Content */}
           <Text className="text-base mb-4 text-[#070707] leading-6">
-            Dear Sir/Madam,
+            {t("RequestLetter.Dear Sir/Madam")}
           </Text>
 
           <Text className="text-base mb-4 text-[#070707] leading-6">
-            I, {requestData.customerName}, a farmer from {requestData.district},
+            {/* I, {requestData.farmerName}, a farmer from {t(`Districts.${requestData.district}`)},
             am writing to formally request an agricultural loan for the upcoming
-            cultivation season.
+            cultivation season. */}
+           {t("RequestLetter.IRequestFarm", {
+    farmerName: requestData.farmerName,
+    district: t(`Districts.${requestData.district}`)
+  })}
           </Text>
 
-          <Text className="text-base mb-4 text-[#070707] leading-6">
-            I am planning to cultivate {requestData.crop} of the{" "}
-            {requestData.variety} variety. The cultivation will be carried out
-            using {requestData.certification} certified practices, ensuring
-            high-quality and sustainable output.
+          <Text className="text-base mb-4 text-[#070707] leading-6">           
+  {t("RequestLetter.IamPlaning", {
+    cropName:
+      i18n.language === "si"
+        ? requestData.cropNameSinhala
+        : i18n.language === "ta"
+        ? requestData.cropNameTamil
+        : requestData.cropNameEnglish,
+  })}  
           </Text>
 
           <Text className="text-base mb-4 text-[#070707]">
-            The project details are as follows:
+            {t("RequestLetter.The project details are as follows")}
           </Text>
 
           {/* Project Details */}
@@ -242,45 +238,49 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
 <View className="">
   <ProjectDetails
     label={t("RequestLetter.District")}
-    value={requestData.district}
+    value={t(`Districts.${requestData.district}`)}
   />
  <ProjectDetails
     label={t("RequestLetter.Crop")}
-    value={requestData.crop}
+    value={      i18n.language === "si"
+        ? requestData.cropNameSinhala
+        : i18n.language === "ta"
+        ? requestData.cropNameTamil
+        : requestData.cropNameEnglish}
   />
 
   <ProjectDetails
     label={t("RequestLetter.Extent")}
-    value={`${requestData.extent.hectares} hectare, ${requestData.extent.acres} acres, ${requestData.extent.perches} perches`}
+        value={t("RequestLetter.Extentdetails",{
+          hectare:requestData.extentha,
+          acres:requestData.extentac,
+          perches:requestData.extentp
+        })}
   />
 
   <ProjectDetails
     label={t("RequestLetter.Expected Investment")}
-    value={`Rs. ${requestData.expectedInvestment}`}
+    value={`${t("RequestLetter.Rs")}. ${requestData.investment}`}
   />
 
   <ProjectDetails
     label={t("RequestLetter.Expected Yield")}
-    value={`${requestData.expectedYield} kg`}
+    value={`${requestData.expectedYield} ${t("RequestLetter.kg")}`}
   />
 
   <ProjectDetails
     label={t("RequestLetter.Cultivation Start Date")}
-    value={requestData.cultivationStartDate}
+    value={requestData.startDate}
   />
   </View>
           </View>
 
           <Text className="text-base mb-4 text-black leading-6">
-            This loan is essential for covering the costs of high-quality seeds,
-            fertilizers, pesticides, irrigation, and labor required to achieve
-            the projected yield. The expected harvest is projected to generate
-            sufficient revenue for the timely repayment of the loan along with
-            the accrued interest.
+            {t("RequestLetter.This loan is essential for covering the costst")}
           </Text>
 
           <Text className="text-base mb-4 text-black leading-6">
-            I have attached the necessary documents for your perusal.
+            {t("RequestLetter.I have attached the necessary documents for your perusal.")}
           </Text>
 
           {/* Sample Images */}
@@ -303,19 +303,17 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
           </View>
 
           <Text className="text-base  mt-2 text-black leading-6">
-            I am confident in the success of this venture and request you to
-            kindly approve my loan application at the earliest. Thank you for
-            your time and consideration.
+            {t("RequestLetter.I am confident in the success of this venture and request")}
           </Text>
 
           {/* Signature */}
           <View className="mt-8 mb-8">
-            <Text className="text-base text-black ">Sincerely,</Text>
+            <Text className="text-base text-black ">{t("RequestLetter.Sincerely")},</Text>
             <Text className="text-base text-black">
-              {requestData.customerName}
+              {requestData.farmerName}
             </Text>
             <Text className="text-base text-black">
-              {requestData.contactNumber}
+              {requestData.phoneNumber}
             </Text>
           </View>
         </View>
