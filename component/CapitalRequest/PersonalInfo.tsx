@@ -23,10 +23,11 @@ import { AntDesign } from "@expo/vector-icons";
 import countryData from "@/assets/json/countryflag.json";
 import sriLankaData from "@/assets/json/provinceDistrict.json";
 import districtData from "@/assets/json/Districts.json";
-import { useFocusEffect } from "@react-navigation/native";
+import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
 import { useCallback } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../types";
 
 interface District {
   en: string;
@@ -311,6 +312,8 @@ type InspectionForm1Props = {
 };
 
 const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
+    const route = useRoute<RouteProp<RootStackParamList, "PersonalInfo">>();
+    const {requestNumber } = route.params;
   const [showDistrictDropdown, setShowDistrictDropdown] = useState(false);
   const [districtSearch, setDistrictSearch] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState<string | null>(null);
@@ -378,7 +381,8 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
 
   const STORAGE_KEY = "INSPECTION_FORM_1";
 
-  let jobId = "GC000001";
+  let jobId = requestNumber;
+  console.log("jobid", jobId)
 
   const updateFormData = async (updates: Partial<typeof formData>) => {
     const updatedData = {

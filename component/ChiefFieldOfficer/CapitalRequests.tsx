@@ -193,6 +193,7 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
                   onPress={() => {
                     navigation.navigate("RequestDetails", {
                       requestId: request.id,
+                      requestNumber: request.requestNumber
                     });
                   }}
                 >

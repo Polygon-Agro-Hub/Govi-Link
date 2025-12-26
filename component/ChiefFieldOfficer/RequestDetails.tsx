@@ -75,7 +75,7 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
   navigation,
 }) => {
   const route = useRoute<RouteProp<RootStackParamList, "RequestDetails">>();
-  const { requestId } = route.params;
+  const { requestId, requestNumber } = route.params;
   const [loading, setLoading] = useState(true);
   const [requestData, setRequestData] = useState<RequestDetailsData | null>(
     null
@@ -383,7 +383,7 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
               elevation: 3,
             }}
           />
-              <TouchableOpacity onPress={() => navigation.navigate("PersonalInfo")} className="w-[80%] mt-6 self-center">
+              <TouchableOpacity onPress={() => navigation.navigate("PersonalInfo", {requestNumber})} className="w-[80%] mt-6 self-center">
               <LinearGradient
                 colors={["#F35125", "#FF1D85"]}
                 start={{ x: 0, y: 0 }}

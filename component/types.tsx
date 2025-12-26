@@ -87,7 +87,7 @@ export type RootStackParamList = {
   ComplainHistory: undefined;
   AssignJobs: undefined;
   CapitalRequests: undefined;
-  RequestDetails: { requestId: string };
+  RequestDetails: { requestId: string, requestNumber:string };
   AssignJobOfficerList: {
     selectedJobIds: string[];
     selectedDate: string;
@@ -99,5 +99,5 @@ export type RootStackParamList = {
     auditType?: "feildaudits" | "govilinkjobs";
   };
 
-  PersonalInfo:undefined
+  PersonalInfo: { requestNumber:string }
 };
