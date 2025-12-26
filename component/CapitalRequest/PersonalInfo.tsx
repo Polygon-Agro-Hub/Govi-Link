@@ -346,9 +346,10 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
     streetName: "",
     cityName: "",
     district: selectedDistrict,
-    province: displayProvince,
-    country: displayCountry,
+    province: selectedProvince,
+    country: selectedCountry,
   });
+  console.log(formData)
   const districts: DistrictsMap = districtData;
 
   useEffect(() => {
@@ -487,8 +488,16 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
                 ] || provinceObj.name.en
               : ""
           );
-          setDisplayCountry(t(`InspectionForm.${parsed.country}`));
-        }
+
+             const countryObj = countryData.find(
+          (c) => c.name.en === parsed.country
+        );
+        setDisplayCountry(
+          countryObj
+            ? countryObj.name[i18n.language as keyof typeof countryObj.name] ||
+              countryObj.name.en
+            : parsed.country
+        );        }
       };
 
       loadData();
@@ -630,6 +639,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
 
 
   const handleNext = () => {
+      navigation.navigate("IDProof", { formData });
   const requiredFields: (keyof FormData)[] = [
     "firstName",
     "lastName",
@@ -1060,7 +1070,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
   }>
             <Text className="text-white text-base font-semibold">{t("InspectionForm.Exit")}</Text>
           </TouchableOpacity>
-           {isNextEnabled == true ? (
+           {isNextEnabled == false ? (
               <View className="flex-1">
           <TouchableOpacity
             className="flex-1 "

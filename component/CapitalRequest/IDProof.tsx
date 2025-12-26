@@ -11,6 +11,7 @@ import {
   Platform,
   Modal,
   FlatList,
+  Image
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import FormTabs from "../CapitalRequest/FormTabs";
@@ -25,188 +26,204 @@ import { useCallback } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../types";
+import * as ImagePicker from "expo-image-picker";
+import { CameraScreen } from "@/Items/CameraScreen";
 
-type FormData = {
-  firstName: string;
+type StoredFormData = {
+  fields: Record<string, any>;
+  files: Record<
+    string,
+    {
+      uri: string;
+      name: string;
+      type: string;
+    }
+  >;
 };
 
-
-type ValidationRule = {
-  required?: boolean;
-  type?:"firstName"
-  minLength?: number;
-  uniqueWith?: (keyof FormData)[];
-};
-
-
-
-const validateAndFormat = (
-  text: string,
-  rules: ValidationRule,
-  t: any,
-  formData: any,
-  currentKey: keyof typeof formData
-) => {
-  let value = text;
-  let error = "";
-
-  console.log("Validating:", value, rules);
-
-  return { value, error };
-}
 
 type IDProofProps = {
   navigation: any;
 };
 
+const UploadButton = ({
+  title,
+  onPress,
+  image,
+  onClear,
+}: {
+  title: string;
+  onPress: () => void;
+  image?: string | null;
+  onClear?: () => void;
+}) => (
+  <View className="mb-8">
+    <TouchableOpacity
+      className="bg-[#1A1A1A] rounded-3xl px-6 py-4 flex-row justify-center items-center"
+      onPress={onPress}
+    >
+      {image ? (
+        <MaterialIcons name="refresh" size={22} color="#fff" /> 
+      ) : (
+        <MaterialIcons name="photo-camera" size={22} color="#fff" />
+      )}      <Text className="text-base text-white ml-3">{title}</Text>
+    </TouchableOpacity>
+
+    {image && (
+      <View className="mt-4 relative">
+        <Image
+          source={{ uri: image }}
+          className="w-full h-48 rounded-2xl"
+          resizeMode="cover"
+        />
+
+        <TouchableOpacity
+          onPress={onClear}
+          className="absolute top-2 right-2 bg-[#f21d1d] p-2 rounded-full"
+        >
+          <AntDesign name="close" size={16} color="white" />
+        </TouchableOpacity>
+      </View>
+    )}
+  </View>
+);
+
+  
 const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
-    const route = useRoute<RouteProp<RootStackParamList, "PersonalInfo">>();
+    const route = useRoute<RouteProp<RootStackParamList, "IDProof">>();
+      const prevFormData = route.params?.formData;
+  const [formData, setFormData] = useState(prevFormData);
     const {requestNumber } = route.params;
+      let jobId = "SS111";
+const [showIdProofDropdown, setShowIdProofDropdown] = useState(false);
+const [FrontImage, setFrontImage] = useState<string | null>(
+  prevFormData?.idFrontImage?.uri || null
+);
+const [BackImage, setBackImage] = useState<string | null>(
+  prevFormData?.idBackImage?.uri || null
+);
+const [selectedIdProof, setSelectedIdProof] = useState<string | null>(
+  prevFormData?.idProofType || null
+);
+console.log(selectedIdProof)
+const [isNextEnabled, setIsNextEnabled] = useState(
+  prevFormData?.idFrontImage && prevFormData?.idBackImage ? true : false
+);
 
-  const [displayProvince, setDisplayProvince] = useState("");
+
   const { t, i18n } = useTranslation();
-  const [errors, setErrors] = useState<Record<string, string>>({});
+const [showCamera, setShowCamera] = useState(false);
+const [cameraSide, setCameraSide] = useState<"front" | "back" | null>(null);
 
-  const [showCountryDropdown, setShowCountryDropdown] = useState(false);
-  const [selectedCountry, setSelectedCountry] = useState("Sri Lanka");
-  const [displayCountry, setDisplayCountry] = useState(
-    t("InspectionForm.Sri Lanka")
-  );
-  const [countrySearch, setCountrySearch] = useState("");
-  const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [isNextEnabled, setIsNextEnabled] = useState(false);
- const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    otherNames: "",
-    callName: "",
-    mobile1: "",
-    mobile2: "",
-    familyPhone: "",
-    landPhoneHome: "",
-    landPhoneWork: "",
-    email1: "",
-    email2: "",
-    houseNumber: "",
-    streetName: "",
-    cityName: "",
-
-  });
-
-
-
+const openCamera = (side: "front" | "back") => {
+  setCameraSide(side);
+  setShowCamera(true);
+};
 
   const STORAGE_KEY = "INSPECTION_FORM_1";
+const handleCameraClose = async (uri: string | null) => {
+  setShowCamera(false);
 
-  let jobId = requestNumber;
-  console.log("jobid", jobId)
+  if (!uri || !cameraSide) return;
 
-  const updateFormData = async (updates: Partial<typeof formData>) => {
-    const updatedData = {
+  const fileName = `${cameraSide}_id_${Date.now()}.jpg`;
+  const fileObj = await convertImageToFormData(uri, cameraSide);
+
+  if (!fileObj) return;
+
+  let updatedFormData = { ...formData };
+
+  if (cameraSide === "front") {
+    setFrontImage(uri);
+
+    updatedFormData = {
       ...formData,
-      ...updates,
+      idFrontImage: fileObj,
+      idProofType: selectedIdProof || "",
     };
+  } else {
+    setBackImage(uri);
 
-    setFormData(updatedData);
+    updatedFormData = {
+      ...formData,
+      idBackImage: fileObj,
+      idProofType: selectedIdProof || "",
+    };
+  }
 
-    try {
-      await AsyncStorage.setItem(
-        `${STORAGE_KEY}_${jobId}`,
-        JSON.stringify(updatedData)
-      );
-    } catch (e) {
-      console.log("AsyncStorage save failed", e);
-    }
-  };
+  // Update formData state
+  setFormData(updatedFormData);
 
-  const handleFieldChange = (
-  key: keyof typeof formData,
-  text: string,
-  rules: ValidationRule
-) => {
-  // Validate and format field
-  const { value, error } = validateAndFormat(text, rules, t, formData, key);
+  // Save updated formData to AsyncStorage
+  try {
+    await AsyncStorage.setItem(
+      `${STORAGE_KEY}_${jobId}`,
+      JSON.stringify(updatedFormData)
+    );
+    console.log("Form data saved!");
+  } catch (error) {
+    console.error("Failed to save form data:", error);
+  }
 
-  // Update local state for the field
-  setFormData((prev) => ({
-    ...prev,
-    [key]: value,
-  }));
+  setCameraSide(null);
 
-  // Update errors object
-  setErrors((prev) => {
-    const newErrors = { ...prev };
-
-    if (error) {
-      newErrors[key] = error; // mark error
-    } else {
-      delete newErrors[key]; // remove error if fixed
-    }
-
-    // Re-validate uniqueWith fields if applicable
-    if (rules.uniqueWith) {
-      rules.uniqueWith.forEach((relatedKey) => {
-        const relatedValue = formData[relatedKey];
-        if (!relatedValue) {
-          delete newErrors[relatedKey];
-          return;
-        }
-
-        const { error: relatedError } = validateAndFormat(
-          relatedValue,
-          {
-            type: rules.type,
-            uniqueWith: rules.uniqueWith,
-          },
-          t,
-          {
-            ...formData,
-            [key]: value,
-          },
-          relatedKey
-        );
-
-        if (relatedError) newErrors[relatedKey] = relatedError;
-        else delete newErrors[relatedKey];
-      });
-    }
-
-    return newErrors;
-  });
-
-  // ✅ Save only if this field has NO error
-  if (!error) {
-    updateFormData({ [key]: value });
+  // Enable Next button if both images are captured
+  if (
+    (cameraSide === "front" && updatedFormData.idBackImage) ||
+    (cameraSide === "back" && updatedFormData.idFrontImage)
+  ) {
+    setIsNextEnabled(true);
   }
 };
 
-  useFocusEffect(
-    useCallback(() => {
-      const loadData = async () => {
-        const saved = await AsyncStorage.getItem(`${STORAGE_KEY}_${jobId}`);
-        console.log("saved", saved);
+  // let jobId = requestNumber;
+  // console.log("jobid", jobId)
 
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          setFormData(parsed);
+// const updateFormData = async (updates: Partial<typeof formData>) => {
+//   const updatedData = {
+//     ...formData,
+//     ...updates,
+//   };
 
-        }
-      };
+//   setFormData(updatedData);
 
-      loadData();
-    }, [i18n.language])
-  );
-
- 
-
+//   try {
+//     await AsyncStorage.setItem(
+//       `${STORAGE_KEY}_${jobId}`,
+//       JSON.stringify(updatedData)
+//     );
+//   } catch (e) {
+//     console.log("AsyncStorage save failed", e);
+//   }
+// };
   const handleNext = () => {
-  const requiredFields: (keyof FormData)[] = [
-    "firstName",
-  ];
 
 
   navigation.navigate("NextPage", { formData });
+};
+
+const idProofOptions = [
+  { key: "NIC Number", label: t("InspectionForm.NIC Number") },
+  { key: "Driving License ID", label: t("InspectionForm.Driving License") },
+];
+
+const convertImageToFormData = async (
+  imageUri: string,
+  fieldName: string
+) => {
+  try {
+    const extension = imageUri.split(".").pop() || "jpg";
+    const fileName = `${fieldName}_${Date.now()}.${extension}`;
+
+    return {
+      uri: imageUri,
+      name: fileName,
+      type: `image/${extension === "jpg" ? "jpeg" : extension}`,
+    };
+  } catch (error) {
+    console.error(`Error converting ${fieldName} image:`, error);
+    return null;
+  }
 };
 
 
@@ -229,7 +246,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
         </View>
 
         {/* Tabs */}
-        <FormTabs activeKey="Personal Info" />
+        <FormTabs activeKey="ID Proof" onTabPress={()=>navigation.goBack()} />
 
         <ScrollView
           className="flex-1 px-6 bg-white rounded-t-3xl"
@@ -242,26 +259,77 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
           <View className="relative mb-4">
             <Text className="text-sm text-[#070707] mb-1">
               <Text className="text-black">
-                {t("InspectionForm.Country")} *
+                 {t("InspectionForm.ID Proof Type")} *
               </Text>
             </Text>
-            <TouchableOpacity
-              onPress={() => setShowCountryDropdown(true)}
-              activeOpacity={0.8}
-            >
-              <View className="bg-[#F6F6F6] rounded-full px-5 py-4 flex-row items-center justify-between">
-                <Text
-                  className={`text-base ${
-                    selectedCountry ? "text-black" : "text-[#838B8C]"
-                  }`}
-                >
-                  {displayCountry || t("InspectionForm.-- Select Country --")}
-                </Text>
-                <AntDesign name="down" size={20} color="#838B8C" />
-              </View>
-            </TouchableOpacity>
+<TouchableOpacity
+  onPress={() => setShowIdProofDropdown(true)}
+  activeOpacity={0.8}
+>
+  <View className="bg-[#F6F6F6] rounded-full px-5 py-4 flex-row items-center justify-between">
+    <Text
+      className={`text-base ${
+        selectedIdProof ? "text-black" : "text-[#838B8C]"
+      }`}
+    >
+      {selectedIdProof
+        ? t(`InspectionForm.${selectedIdProof}`)
+        : t("InspectionForm.-- Select ID Proof --")}
+    </Text>
+    <AntDesign name="down" size={20} color="#838B8C" />
+  </View>
+</TouchableOpacity>
+
           </View>
-       
+{selectedIdProof && (
+  <View className="mt-6">
+<UploadButton
+  title={ selectedIdProof=="NIC Number" ? t("InspectionForm.NIC Front Photo") : t("InspectionForm.Driving License Front Photo") }
+  onPress={() => openCamera("front")}
+  image={FrontImage}
+  onClear={async () => {
+    setFrontImage(null);
+    const updatedFormData = { ...formData, idFrontImage: null };
+    setFormData(updatedFormData);
+
+    try {
+      await AsyncStorage.setItem(
+        `${STORAGE_KEY}_${jobId}`,
+        JSON.stringify(updatedFormData)
+      );
+      console.log("Front image cleared!");
+    } catch (e) {
+      console.error("Failed to clear front image in storage", e);
+    }
+    setIsNextEnabled(updatedFormData.idFrontImage && updatedFormData.idBackImage ? true : false);
+  }}
+/>
+
+
+    <UploadButton
+      title={selectedIdProof=="NIC Number" ? t("InspectionForm.NIC Back Photo") : t("InspectionForm.Driving License Back Photo") }
+      onPress={() => openCamera("back")}
+  image={BackImage}
+  onClear={async () => {
+    setBackImage(null);
+    const updatedFormData = { ...formData, idBackImage: null };
+    setFormData(updatedFormData);
+
+    try {
+      await AsyncStorage.setItem(
+        `${STORAGE_KEY}_${jobId}`,
+        JSON.stringify(updatedFormData)
+      );
+      console.log("Back image cleared!");
+    } catch (e) {
+      console.error("Failed to clear back image in storage", e);
+    }
+    setIsNextEnabled(updatedFormData.idFrontImage && updatedFormData.idBackImage ? true : false);
+  }}
+   />
+  </View>
+)}
+
              
         </ScrollView>
 
@@ -308,6 +376,36 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
 
         </View>
       </View>
+<Modal
+  visible={showIdProofDropdown}
+  transparent
+  animationType="none">
+  <TouchableOpacity
+    className="flex-1 bg-black/40 justify-center px-6"
+    activeOpacity={1}
+    onPress={() => setShowIdProofDropdown(false)}
+  >
+    <View className="bg-white rounded-2xl p-4">
+      {idProofOptions.map(option => (
+        <TouchableOpacity
+          key={option.key}
+          className="py-4 border-b border-gray-200"
+          onPress={() => {
+            setSelectedIdProof(option.label);
+            setShowIdProofDropdown(false);
+          }}
+        >
+          <Text className="text-base text-black">
+            {option.label}
+          </Text>
+        </TouchableOpacity>
+      ))}
+    </View>
+  </TouchableOpacity>
+</Modal>
+<Modal visible={showCamera} animationType="slide">
+  <CameraScreen onClose={handleCameraClose} />
+</Modal>
 
     </KeyboardAvoidingView>
   );

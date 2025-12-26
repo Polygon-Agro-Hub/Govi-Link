@@ -498,6 +498,15 @@
     "Country":"Country",
     "-- Select Country --":"-- Select Country --",
     "Next":"Next",
-    "Exit":"Exit"
+    "Exit":"Exit",
+    "ID Proof Type":"ID Proof Type",
+    "-- Select ID Proof --":"-- Select ID Proof --",
+    "NIC Number":"NIC Number",
+    "Driving License":"Driving License",
+    "Driving License ID":"Driving License ID",
+    "NIC Front Photo":"NIC Front Photo",
+    "NIC Back Photo":"NIC Back Photo",
+    "Driving License Front Photo":"Driving License Front Photo",
+    "Driving License Back Photo":"Driving License Back Photo"
    }
 }

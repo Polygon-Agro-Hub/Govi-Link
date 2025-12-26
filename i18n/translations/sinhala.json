@@ -499,6 +499,15 @@
     "Country":"රට",
     "-- Select Country --":"-- රට තෝරන්න --",
     "Next":"ඊළඟ",
-    "Exit":"පිටවීම"
+    "Exit":"පිටවීම",
+    "ID Proof Type":"හැඳුනුම්පත් සාක්ෂි වර්ගය",
+    "-- Select ID Proof --":"-- හැඳුනුම්පත් සාක්ෂි තෝරන්න --",
+    "NIC Number":"හැඳුනුම්පත් අංකය",
+    "Driving License":"රියදුරු බලපත්රය",
+    "Driving License ID":"රියදුරු බලපත්ර අංකය",
+    "NIC Front Photo":"හැඳුනුම්පත් ඉදිරිපස ඡායාරූපය",
+    "NIC Back Photo":"හැඳුනුම්පත් පසුපස ඡායාරූපය",
+    "Driving License Front Photo":"රියදුරු බලපත්ර ඉදිරිපස ඡායාරූපය",
+    "Driving License Back Photo":"රියදුරු බලපත්ර පසුපස ඡායාරූපය"
    }
 }

@@ -100,4 +100,5 @@ export type RootStackParamList = {
   };
 
   PersonalInfo: { requestNumber:string }
+  IDProof:{formData:any, requestNumber:string}
 };
