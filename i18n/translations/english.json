@@ -94,7 +94,10 @@
     "NIC Number is required": "NIC number is required",
     "Driving License ID is required": "Driving license ID is required",
     "accountholderName is required": "Account holder's name is required",
-    "accountNumber is required": "Account number is required"
+    "accountNumber is required": "Account number is required",
+    "Both ID images are required":"Both ID images are required",
+    "noOfDependents id required": "Number of dependents is required",
+    "existingDebts is required":"Existing debts of the farmer is required"
   },
   "Login": {
     "Welcome": "Welcome!",

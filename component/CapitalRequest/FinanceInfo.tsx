@@ -26,13 +26,12 @@ import banksData from "@/assets/json/banks.json";
 import branchesData from "@/assets/json/branches.json";
 
 type FormData = {
-  personalInfo?: { [key: string]: any };
   financeInfo?: FinanceInfoData;
-  idProof?: { [key: string]: any };
 };
 type FinanceInfoData = {
   accountholderName: string;
-  accountNumber: string;
+  accountNumber: number;
+   confirmAccountNumber:number;
   bank?: string;
   branch?: string;
   existingDebts?: string;
@@ -120,6 +119,13 @@ const validateAndFormat = (
       error = t(`Error.${rules.type} is required`);
     }
 
+    if (rules.required && value.trim().length === 0) {
+      error = t(`Error.${rules.type} is required`);
+    }
+  }
+
+  if(rules.type==="noOfDependents"){
+        value = value.replace(/[^0-9]/g, ""); 
     if (rules.required && value.trim().length === 0) {
       error = t(`Error.${rules.type} is required`);
     }
@@ -466,42 +472,63 @@ const handleFieldChange = (
             error={errors.accountholderName}
           />
 
-          <Input
-            label={t("InspectionForm.Account Number")}
-            placeholder="----"
-  value={formData.financeInfo?.accountNumber || ""}
-            onChangeText={(text) =>
-              handleFieldChange("accountNumber", text, {
-                required: true,
-                type: "accountNumber",
-              })
-            }
-            error={errors.accountNumber}
-            keyboardType={"phone-pad"}
-            required
-          />
+<Input
+  label={t("InspectionForm.Account Number")}
+  placeholder="----"
+  value={formData.financeInfo?.accountNumber?.toString() || ""}
+  onChangeText={(text) => {
+    const numericValue = parseInt(text.replace(/[^0-9]/g, ""), 10) || 0;
 
-          <Input
-            label={t("InspectionForm.Confirm Account Number")}
-            placeholder="----"
-            value={confirmAccountNumber}
-            onChangeText={(text) => {
-              setConfirmAccountNumber(text);
+    setFormData((prev: FormData) => ({
+      ...prev,
+      financeInfo: {
+        ...prev.financeInfo,
+        accountNumber: numericValue,
+      },
+    }));
 
-              let error = "";
+    updateFormData({ accountNumber: numericValue });
+  }}
+  error={errors.accountNumber}
+  keyboardType="number-pad"
+  required
+/>
 
-              if (text.trim().length === 0) {
-                error = t("Error.Confirm account number is required");
-              } else if (text !== formData.accountNumber) {
-                error = t("Error.Account numbers do not match");
-              }
+<Input
+  label={t("InspectionForm.Confirm Account Number")}
+  placeholder="----"
+  value={formData.financeInfo?.confirmAccountNumber?.toString() || ""}
+  onChangeText={(text) => {
+    // Convert to number safely
+    const numericValue = text ? parseInt(text, 10) : undefined; // undefined if empty
 
-              setErrors((prev) => ({ ...prev, confirmAccountNumber: error }));
-            }}
-            error={errors.confirmAccountNumber}
-            keyboardType="phone-pad"
-            required
-          />
+    // Update state
+    setFormData((prev: FormData) => ({
+      ...prev,
+      financeInfo: {
+        ...prev.financeInfo,
+        confirmAccountNumber: numericValue,
+      },
+    }));
+
+    // Save to AsyncStorage
+    updateFormData({ confirmAccountNumber: numericValue });
+
+    // Validation
+    let error = "";
+    if (!numericValue) {
+      error = t("Error.Confirm account number is required");
+    } else if (numericValue !== formData.financeInfo?.accountNumber) {
+      error = t("Error.Account numbers do not match");
+    }
+
+    setErrors((prev) => ({ ...prev, confirmAccountNumber: error }));
+  }}
+  error={errors.confirmAccountNumber}
+  keyboardType="number-pad"
+  required
+/>
+
 
           <View>
             <Text className="text-sm text-[#070707] mb-1">
@@ -560,37 +587,70 @@ const handleFieldChange = (
             <Text className="text-sm text-[#070707] mb-1">
               {t("InspectionForm.Existing debts of the farmer")} *
             </Text>
-  <TextInput
-    className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${
+            <View    className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${
       errors.debts ? "border border-red-500" : ""
-    }`}
-    placeholder={t("Type here...")}
-    value={formData.existingDebts || ""}
-    onChangeText={(text) => {
-      setFormData((prev: any) => ({ ...prev, existingDebts: text }));
-      updateFormData({ existingDebts: text });
-    }}
-    keyboardType="default"
-    multiline={true}         
-    textAlignVertical="top"  
-  />
+    }`}>
 
+<TextInput
+  placeholder={t("InspectionForm.Type here...")}
+  value={formData.financeInfo?.existingDebts || ""}
+  onChangeText={(text) => {
+    // Remove leading spaces
+    let formattedText = text.replace(/^\s+/, "");
+
+    // Capitalize first letter
+    if (formattedText.length > 0) {
+      formattedText = formattedText.charAt(0).toUpperCase() + formattedText.slice(1);
+    }
+
+    // Update state
+    setFormData((prev: FormData) => ({
+      ...prev,
+      financeInfo: {
+        ...prev.financeInfo,
+        existingDebts: formattedText,
+      },
+    }));
+
+    // Validation
+    let error = "";
+    if (!formattedText || formattedText.trim() === "") {
+      error = t("Error.existingDebts is required");
+    }
+    setErrors((prev) => ({ ...prev, debts: error }));
+
+    // Save to AsyncStorage
+    if (!error) {
+      updateFormData({ existingDebts: formattedText });
+    }
+  }}
+  keyboardType="default"
+  multiline={true}
+  textAlignVertical="top"
+/>
+
+            </View>
+  {errors.debts && (
+    <Text className="text-red-500 text-sm mt-1 ml-2">{errors.debts}</Text>
+  )}
 </View>
+
+        <View className="mt-4">
           <Input
             label={t("InspectionForm.No of Dependents")}
             placeholder={t("InspectionForm.0 or more")}
-            value={formData.accountNumber}
+            value={formData.financeInfo?.noOfDependents}
             onChangeText={(text) =>
               handleFieldChange("noOfDependents", text, {
                 required: true,
                 type: "noOfDependents",
               })
             }
-            error={errors.accountNumber}
+            error={errors.noOfDependents}
             keyboardType={"phone-pad"}
             required
           />
-
+</View>
   {/* <View className="mt-4">
     <Text className="text-sm text-[#070707] mb-1">
       {t("InspectionForm.Assets owned by the farmer")} *

@@ -39,7 +39,7 @@ interface DistrictsMap {
   [country: string]: District[];
 }
 
-type FormData = {
+type PersonalInfo = {
   firstName: string;
   lastName: string;
   otherNames: string;
@@ -55,9 +55,14 @@ type FormData = {
   streetName: string;
   cityName: string;
   district: string | null;
-  province: string;
+  province: string | null;
   country: string;
 };
+
+type FormData = {
+  personalInfo: PersonalInfo;
+};
+
 
 const Input = ({
   label,
@@ -135,7 +140,7 @@ type ValidationRule = {
     | "cityName"
     | "houseNumber";
   minLength?: number;
-  uniqueWith?: (keyof FormData)[];
+ uniqueWith?: (keyof PersonalInfo)[];
 };
 
 
@@ -330,7 +335,8 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
   const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isNextEnabled, setIsNextEnabled] = useState(false);
- const [formData, setFormData] = useState({
+const [formData, setFormData] = useState<FormData>({
+  personalInfo: {
     firstName: "",
     lastName: "",
     otherNames: "",
@@ -345,15 +351,17 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
     houseNumber: "",
     streetName: "",
     cityName: "",
-    district: selectedDistrict,
-    province: selectedProvince,
-    country: selectedCountry,
-  });
+    district: null,
+    province: null,
+    country: "Sri Lanka",
+  },
+});
+
   console.log(formData)
   const districts: DistrictsMap = districtData;
 
   useEffect(() => {
-  const requiredFields: (keyof FormData)[] = [
+  const requiredFields: (keyof PersonalInfo)[] = [
     "firstName",
     "lastName",
     "otherNames",
@@ -368,9 +376,8 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
     "province",
     "country",
   ];
-
   const allFilled = requiredFields.every((key) => {
-    const value = formData[key];
+    const value = formData.personalInfo[key];
     return value !== null && value !== undefined && value.toString().trim() !== "";
   });
 
@@ -380,57 +387,66 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
 }, [formData, errors]);
 
 
-  const STORAGE_KEY = "INSPECTION_FORM_1";
 
   let jobId = requestNumber;
   console.log("jobid", jobId)
 
-  const updateFormData = async (updates: Partial<typeof formData>) => {
-    const updatedData = {
-      ...formData,
+const updateFormData = async (
+  updates: Partial<PersonalInfo>
+) => {
+  const updatedData: FormData = {
+    ...formData,
+    personalInfo: {
+      ...formData.personalInfo,
       ...updates,
-    };
-
-    setFormData(updatedData);
-
-    try {
-      await AsyncStorage.setItem(
-        `${STORAGE_KEY}_${jobId}`,
-        JSON.stringify(updatedData)
-      );
-    } catch (e) {
-      console.log("AsyncStorage save failed", e);
-    }
+    },
   };
 
+  setFormData(updatedData);
+
+  try {
+    await AsyncStorage.setItem(
+      `${jobId}`,
+      JSON.stringify(updatedData)
+    );
+  } catch (e) {
+    console.log("AsyncStorage save failed", e);
+  }
+};
+
   const handleFieldChange = (
-  key: keyof typeof formData,
+  key: keyof PersonalInfo,
   text: string,
   rules: ValidationRule
 ) => {
-  // Validate and format field
-  const { value, error } = validateAndFormat(text, rules, t, formData, key);
+  const { value, error } = validateAndFormat(
+    text,
+    rules,
+    t,
+    formData.personalInfo,
+    key
+  );
 
-  // Update local state for the field
+  // Update state
   setFormData((prev) => ({
     ...prev,
-    [key]: value,
+    personalInfo: {
+      ...prev.personalInfo,
+      [key]: value,
+    },
   }));
 
-  // Update errors object
+  // Errors
   setErrors((prev) => {
     const newErrors = { ...prev };
 
-    if (error) {
-      newErrors[key] = error; // mark error
-    } else {
-      delete newErrors[key]; // remove error if fixed
-    }
+    if (error) newErrors[key] = error;
+    else delete newErrors[key];
 
-    // Re-validate uniqueWith fields if applicable
+    // Revalidate unique fields
     if (rules.uniqueWith) {
       rules.uniqueWith.forEach((relatedKey) => {
-        const relatedValue = formData[relatedKey];
+        const relatedValue = formData.personalInfo[relatedKey];
         if (!relatedValue) {
           delete newErrors[relatedKey];
           return;
@@ -438,13 +454,10 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
 
         const { error: relatedError } = validateAndFormat(
           relatedValue,
-          {
-            type: rules.type,
-            uniqueWith: rules.uniqueWith,
-          },
+          rules,
           t,
           {
-            ...formData,
+            ...formData.personalInfo,
             [key]: value,
           },
           relatedKey
@@ -458,51 +471,79 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
     return newErrors;
   });
 
-  // ✅ Save only if this field has NO error
+  // Save only if valid
   if (!error) {
     updateFormData({ [key]: value });
   }
 };
 
-  useFocusEffect(
-    useCallback(() => {
-      const loadData = async () => {
-        const saved = await AsyncStorage.getItem(`${STORAGE_KEY}_${jobId}`);
+useFocusEffect(
+  useCallback(() => {
+    const loadData = async () => {
+      try {
+        const saved = await AsyncStorage.getItem(`${jobId}`);
         console.log("saved", saved);
 
         if (saved) {
           const parsed = JSON.parse(saved);
-          setFormData(parsed);
 
-          setSelectedDistrict(parsed.district || null);
-          setSelectedCountry(parsed.country);
+          // Set the full formData object correctly
+          setFormData({
+            personalInfo: parsed.personalInfo || {
+              firstName: "",
+              lastName: "",
+              otherNames: "",
+              callName: "",
+              mobile1: "",
+              mobile2: "",
+              familyPhone: "",
+              landPhoneHome: "",
+              landPhoneWork: "",
+              email1: "",
+              email2: "",
+              houseNumber: "",
+              streetName: "",
+              cityName: "",
+              district: null,
+              province: null,
+              country: "Sri Lanka",
+            },
+          });
+
+          const personal = parsed.personalInfo || {};
+
+          setSelectedDistrict(personal.district || null);
+          setSelectedCountry(personal.country || "Sri Lanka");
 
           const provinceObj = sriLankaData["Sri Lanka"].provinces.find(
-            (prov) => prov.name.en === parsed.province
+            (prov) => prov.name.en === personal.province
           );
           setSelectedProvince(provinceObj?.name.en || null);
           setDisplayProvince(
             provinceObj
-              ? provinceObj.name[
-                  i18n.language as keyof typeof provinceObj.name
-                ] || provinceObj.name.en
+              ? provinceObj.name[i18n.language as keyof typeof provinceObj.name] ||
+                provinceObj.name.en
               : ""
           );
 
-             const countryObj = countryData.find(
-          (c) => c.name.en === parsed.country
-        );
-        setDisplayCountry(
-          countryObj
-            ? countryObj.name[i18n.language as keyof typeof countryObj.name] ||
-              countryObj.name.en
-            : parsed.country
-        );        }
-      };
+          const countryObj = countryData.find(
+            (c) => c.name.en === personal.country
+          );
+          setDisplayCountry(
+            countryObj
+              ? countryObj.name[i18n.language as keyof typeof countryObj.name] ||
+                countryObj.name.en
+              : personal.country || "Sri Lanka"
+          );
+        }
+      } catch (error) {
+        console.log("Failed to load saved data", error);
+      }
+    };
 
-      loadData();
-    }, [i18n.language])
-  );
+    loadData();
+  }, [i18n.language])
+);
 
  
 
@@ -639,8 +680,8 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
 
 
   const handleNext = () => {
-      navigation.navigate("IDProof", { formData });
-  const requiredFields: (keyof FormData)[] = [
+      navigation.navigate("IDProof", { formData, requestNumber });
+  const requiredFields: (keyof PersonalInfo)[] = [
     "firstName",
     "lastName",
     "otherNames",
@@ -651,19 +692,19 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
     "houseNumber",
     "streetName",
     "cityName",
+    "district",
     "province",
     "country",
   ];
-
   // If country is Sri Lanka, district is required
-  if (formData.country === "Sri Lanka") {
+  if (formData.personalInfo.country === "Sri Lanka") {
     requiredFields.push("district");
   }
 
   // Validate all fields
   const validationErrors: Record<string, string> = {};
   requiredFields.forEach((key) => {
-    let value = formData[key];
+    let value = formData.personalInfo[key];
     let error = "";
 
     if ((key === "district" || key === "province") && !value) {
@@ -758,7 +799,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           <Input
             label={t("InspectionForm.First Name")}
             placeholder="----"
-            value={formData.firstName}
+            value={formData.personalInfo.firstName}
             onChangeText={(text) =>
               handleFieldChange("firstName", text, {
                 required: true,
@@ -771,7 +812,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           <Input
             label={t("InspectionForm.Last Name")}
             placeholder="----"
-            value={formData.lastName}
+            value={formData.personalInfo.lastName}
             onChangeText={(text) =>
               handleFieldChange("lastName", text, {
                 required: true,
@@ -784,7 +825,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           <Input
             label={t("InspectionForm.Other Names")}
             placeholder="----"
-            value={formData.otherNames}
+            value={formData.personalInfo.otherNames}
             onChangeText={(text) =>
               handleFieldChange("otherNames", text, {
                 required: true,
@@ -797,7 +838,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           <Input
             label={t("InspectionForm.Call Name")}
             placeholder="----"
-            value={formData.callName}
+            value={formData.personalInfo.callName}
             onChangeText={(text) =>
               handleFieldChange("callName", text, {
                 required: true,
@@ -813,7 +854,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           <Input
             label={t("InspectionForm.Mobile Number - 1")}
             placeholder="7XXXXXXXX"
-            value={formData.mobile1}
+            value={formData.personalInfo.mobile1}
             onChangeText={(text) =>
               handleFieldChange("mobile1", text, {
                 required: true,
@@ -834,7 +875,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           <Input
             label={t("InspectionForm.Mobile Number - 2")}
             placeholder="7XXXXXXXX"
-            value={formData.mobile2}
+            value={formData.personalInfo.mobile2}
             onChangeText={(text) =>
               handleFieldChange("mobile2", text, {
                 required: false,
@@ -854,7 +895,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           <Input
             label={t("InspectionForm.Phone Number of a family member")}
             placeholder="7XXXXXXXX"
-            value={formData.familyPhone}
+            value={formData.personalInfo.familyPhone}
             keyboardType={"phone-pad"}
             onChangeText={(text) =>
               handleFieldChange("familyPhone", text, {
@@ -875,7 +916,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           <Input
             label={t("InspectionForm.Land Phone Number - Home")}
             placeholder="XXXXXXXXX"
-            value={formData.landPhoneHome}
+            value={formData.personalInfo.landPhoneHome}
             onChangeText={(text) =>
               handleFieldChange("landPhoneHome", text, {
                 required: false,
@@ -895,7 +936,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           <Input
             label={t("InspectionForm.Land Phone Number - Work")}
             placeholder="XXXXXXXXX"
-            value={formData.landPhoneWork}
+            value={formData.personalInfo.landPhoneWork}
             onChangeText={(text) =>
               handleFieldChange("landPhoneWork", text, {
                 required: false,
@@ -915,7 +956,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           <Input
             label={t("InspectionForm.Email Address - 1")}
             placeholder="----"
-            value={formData.email1}
+            value={formData.personalInfo.email1}
             onChangeText={(text) =>
               handleFieldChange("email1", text, {
                 required: true,
@@ -931,7 +972,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           <Input
             label={t("InspectionForm.Email Address - 2")}
             placeholder="----"
-            value={formData.email2}
+            value={formData.personalInfo.email2}
             onChangeText={(text) =>
               handleFieldChange("email2", text, {
                 required: false,
@@ -949,7 +990,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           <Input
             label={t("InspectionForm.House / Plot Number")}
             placeholder="----"
-            value={formData.houseNumber}
+            value={formData.personalInfo.houseNumber}
             onChangeText={(text) =>
               handleFieldChange("houseNumber", text, {
                 required: true,
@@ -962,7 +1003,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           <Input
             label={t("InspectionForm.Street Name")}
             placeholder="----"
-            value={formData.streetName}
+            value={formData.personalInfo.streetName}
             onChangeText={(text) =>
               handleFieldChange("streetName", text, {
                 required: true,
@@ -975,7 +1016,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           <Input
             label={t("InspectionForm.City / Town Name")}
             placeholder="----"
-            value={formData.cityName}
+            value={formData.personalInfo.cityName}
             onChangeText={(text) =>
               handleFieldChange("cityName", text, {
                 required: true,

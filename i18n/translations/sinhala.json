@@ -94,7 +94,10 @@
     "NIC Number is required": "ජාතික හැඳුනුම්පත් අංකය අවශ්‍යයි",
     "Driving License ID is required": "රියදුරු බලපත්‍ර අංකය අවශ්‍යයි",
     "accountholderName is required": "ගිණුම් හිමියාගේ නම අවශ්‍යයි",
-    "accountNumber is required": "ගිණුම් අංකය අවශ්‍යයි"
+    "accountNumber is required": "ගිණුම් අංකය අවශ්‍යයි",
+        "Both ID images are required":"ID රූප දෙකම අවශ්‍ය වේ",
+            "noOfDependents id required": "යැපෙන්නන් සංඛ්‍යාව අවශ්‍ය වේ",
+                "existingDebts is required":"ගොවියාගේ පවතින ණය ගෙවීම අවශ්‍ය වේ"
   },
   "Login": {
     "Welcome": "සාදරයෙන් පිළිගනිමු!",
