@@ -89,7 +89,13 @@
 "houseNumber is required": "නිවාස/ගොඩනැගිලි අංකය අවශ්‍යයි",
 "cityName is required":"නගරය අවශ්‍යයි",
 "streetName is required":"වීදියේ නම අවශ්‍යයි",
-"Email addresses cannot be the same":"ඊමේල් ලිපින සමාන විය නොහැක."
+"Email addresses cannot be the same":"ඊමේල් ලිපින සමාන විය නොහැක.",
+"Invalid Driving License number":"වලංගු නොවන රියදුරු බලපත්‍ර අංකය",
+    "NIC Number is required": "ජාතික හැඳුනුම්පත් අංකය අවශ්‍යයි",
+        "Driving License ID is required":"රියදුරු බලපත්‍ර අංකය අවශ්‍යයි",
+            "accountholderName is required" : "ගිණුම් හිමියාගේ නම අවශ්‍යයි",
+                    "accountNumber is required" : "ගිණුම් අංකය අවශ්‍යයි"
+
   },
   "Login": {
     "Welcome": "සාදරයෙන් පිළිගනිමු!",
@@ -508,6 +514,13 @@
     "NIC Front Photo":"හැඳුනුම්පත් ඉදිරිපස ඡායාරූපය",
     "NIC Back Photo":"හැඳුනුම්පත් පසුපස ඡායාරූපය",
     "Driving License Front Photo":"රියදුරු බලපත්ර ඉදිරිපස ඡායාරූපය",
-    "Driving License Back Photo":"රියදුරු බලපත්ර පසුපස ඡායාරූපය"
+    "Driving License Back Photo":"රියදුරු බලපත්ර පසුපස ඡායාරූපය",
+        "Account Holder’s Name":"ගිණුම් හිමියාගේ නම",
+    "Account Number":"ගිණුම් අංකය",
+    "Confirm Account Number":"ගිණුම් අංකය තහවුරු කරන්න",
+        "Bank Name":"බැංකුවේ නම",
+    "Branch Name":"ශාඛාවේ නම",
+    "Select Bank":"--බැංකුව තෝරන්න--",
+    "Select Branch":"--ශාඛාව තෝරන්න--"
    }
 }

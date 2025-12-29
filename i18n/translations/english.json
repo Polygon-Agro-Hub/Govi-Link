@@ -89,7 +89,13 @@
 "houseNumber is required": "House number is required",
 "cityName is required":"City name is required",
 "streetName is required":"Street name is required",
-"Email addresses cannot be the same":"Email addresses cannot be the same"
+"Email addresses cannot be the same":"Email addresses cannot be the same",
+"Invalid Driving License number":"Invalid Driving License number",
+    "NIC Number is required": "NIC number is required",
+    "Driving License ID is required":"Driving license ID is required",
+    "accountholderName is required" : "Account holder's name is required",
+        "accountNumber is required" : "Account number is required"
+
   },
   "Login": {
     "Welcome": "Welcome!",
@@ -507,6 +513,13 @@
     "NIC Front Photo":"NIC Front Photo",
     "NIC Back Photo":"NIC Back Photo",
     "Driving License Front Photo":"Driving License Front Photo",
-    "Driving License Back Photo":"Driving License Back Photo"
+    "Driving License Back Photo":"Driving License Back Photo",
+    "Account Holder’s Name":"Account Holder’s Name",
+    "Account Number":"Account Number",
+    "Confirm Account Number":"Confirm Account Number",
+    "Bank Name":"Bank Name",
+    "Branch Name":"Branch Name",
+    "Select Bank":"--Select Bank--",
+    "Select Branch":"--Select Branch--"
    }
 }

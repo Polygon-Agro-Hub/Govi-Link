@@ -47,6 +47,7 @@ import RequestDetails from "@/component/ChiefFieldOfficer/RequestDetails";
 import AssignJobOfficerList from "@/component/AssignJobOfficerList";
 import PersonalInfo from "@/component/CapitalRequest/PersonalInfo";
 import IDProof from "@/component/CapitalRequest/IDProof";
+import FinanceInfo from "@/component/CapitalRequest/FinanceInfo";
 
 LogBox.ignoreAllLogs(true);
 NativeWindStyleSheet.setOutput({ default: "native" });
@@ -217,6 +218,7 @@ function AppContent() {
                     <Stack.Screen name="RequestDetails" component={RequestDetails} />
                     <Stack.Screen name="PersonalInfo" component={PersonalInfo} />
                     <Stack.Screen name="IDProof" component={IDProof} />
+                    <Stack.Screen name="FinanceInfo" component={FinanceInfo} />
 
           </Stack.Navigator>
         </NavigationContainer>
