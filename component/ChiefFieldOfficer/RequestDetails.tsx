@@ -381,7 +381,19 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
               elevation: 3,
             }}
           />
-              <TouchableOpacity onPress={() => navigation.navigate("PersonalInfo", {requestNumber})} className="w-[80%] mt-6 self-center">
+              <TouchableOpacity
+              //  onPress={() => navigation.navigate("PersonalInfo", {requestNumber})} 
+                onPress={async () => {
+    try {
+      await AsyncStorage.removeItem(`${requestNumber}`);
+      console.log("AsyncStorage cleared");
+
+      navigation.navigate("PersonalInfo", { requestNumber });
+    } catch (e) {
+      console.log("Error clearing AsyncStorage:", e);
+    }
+  }}
+              className="w-[80%] mt-6 self-center">
               <LinearGradient
                 colors={["#F35125", "#FF1D85"]}
                 start={{ x: 0, y: 0 }}

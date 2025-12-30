@@ -48,6 +48,8 @@ import AssignJobOfficerList from "@/component/AssignJobOfficerList";
 import PersonalInfo from "@/component/CapitalRequest/PersonalInfo";
 import IDProof from "@/component/CapitalRequest/IDProof";
 import FinanceInfo from "@/component/CapitalRequest/FinanceInfo";
+import LandInfo from "@/component/CapitalRequest/LandInfo";
+import AttachGeoLocationScreen from "@/component/CapitalRequest/AttachGeoLocationScreen";
 
 LogBox.ignoreAllLogs(true);
 NativeWindStyleSheet.setOutput({ default: "native" });
@@ -219,6 +221,8 @@ function AppContent() {
                     <Stack.Screen name="PersonalInfo" component={PersonalInfo} />
                     <Stack.Screen name="IDProof" component={IDProof} />
                     <Stack.Screen name="FinanceInfo" component={FinanceInfo} />
+                    <Stack.Screen name="LandInfo" component={LandInfo} />
+                    <Stack.Screen name="AttachGeoLocationScreen" component={AttachGeoLocationScreen  as any} />
 
           </Stack.Navigator>
         </NavigationContainer>

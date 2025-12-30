@@ -28,14 +28,23 @@ import branchesData from "@/assets/json/branches.json";
 type FormData = {
   financeInfo?: FinanceInfoData;
 };
+
+type AssetCategory = {
+  key: string;
+  label: string;
+  subCategories?: { key: string; label: string }[];
+};
 type FinanceInfoData = {
   accountholderName: string;
   accountNumber: number;
-   confirmAccountNumber:number;
+  confirmAccountNumber: number;
   bank?: string;
   branch?: string;
   existingDebts?: string;
   noOfDependents?: string;
+  assets?: {
+    [parentKey: string]: string[]; 
+  };
 };
 const Input = ({
   label,
@@ -55,7 +64,7 @@ const Input = ({
   keyboardType?: any;
 }) => (
   <View className="mb-4">
-    <Text className="text-sm text-[#070707] mb-1">
+    <Text className="text-sm text-[#070707] mb-2">
       {label} {required && <Text className="text-black">*</Text>}
     </Text>
     <View
@@ -94,8 +103,6 @@ const validateAndFormat = (
   let value = text;
   let error = "";
 
-  console.log("Validating:", value, rules);
-
   if (rules.type === "accountholderName") {
     value = value.replace(/^\s+/, "");
     value = value.replace(/[^a-zA-Z\s]/g, "");
@@ -113,7 +120,7 @@ const validateAndFormat = (
   }
 
   if (rules.type === "accountNumber") {
-    value = value.replace(/[^0-9]/g, ""); 
+    value = value.replace(/[^0-9]/g, "");
 
     if (rules.required && value.trim().length === 0) {
       error = t(`Error.${rules.type} is required`);
@@ -124,8 +131,8 @@ const validateAndFormat = (
     }
   }
 
-  if(rules.type==="noOfDependents"){
-        value = value.replace(/[^0-9]/g, ""); 
+  if (rules.type === "noOfDependents") {
+    value = value.replace(/[^0-9]/g, "");
     if (rules.required && value.trim().length === 0) {
       error = t(`Error.${rules.type} is required`);
     }
@@ -159,148 +166,172 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     Array<{ ID: number; name: string }>
   >([]);
 
-  console.log("finance", formData);
-
   const banks = banksData.map((bank) => ({
     id: bank.ID,
     name: bank.name,
   }));
-useEffect(() => {
-  const requiredFields: (keyof FinanceInfoData)[] = [
-    "accountholderName",
-    "accountNumber",
-  ];
+  useEffect(() => {
+    const requiredFields: (keyof FinanceInfoData)[] = [
+      "accountholderName",
+      "accountNumber",
+    ];
 
-  const allFilled = requiredFields.every((key) => {
-    const value = formData.financeInfo?.[key];
-    return value !== null && value !== undefined && value.toString().trim() !== "";
-  });
-
-  const hasErrors = Object.keys(errors).length > 0;
-
-  setIsNextEnabled(allFilled && !hasErrors);
-}, [formData, errors]);
-
-
-  let jobId = requestNumber;
-  console.log("jobid", jobId);
-
-const updateFormData = async (updates: Partial<FinanceInfoData>) => {
-  try {
-    const updatedFormData = {
-      ...formData,
-      financeInfo: {
-        ...formData.financeInfo,
-        ...updates,
-        bank: selectedBank,
-        branch: updates.branch ?? selectedBranch,
-      },
-    };
-
-    setFormData(updatedFormData);
-
-    await AsyncStorage.setItem(
-      `${jobId}`,
-      JSON.stringify(updatedFormData)
+    const allFilled = requiredFields.every((key) => {
+      const value = formData.financeInfo?.[key];
+      return (
+        value !== null && value !== undefined && value.toString().trim() !== ""
+      );
+    });
+    console.log("all", allFilled);
+    const assetsError = validateAssets(formData.financeInfo?.assets);
+    const hasErrors = Object.values({ ...errors, assets: assetsError }).some(
+      (err) => err && err.trim() !== ""
     );
 
-    console.log("FormData saved:", updatedFormData);
-  } catch (e) {
-    console.log("AsyncStorage save failed", e);
-  }
-};
+    console.log("hass err", errors);
 
+    setIsNextEnabled(allFilled && !hasErrors && !hasAssetWarnings());
+  }, [formData, errors]);
 
-useFocusEffect(
-  useCallback(() => {
-    const loadFormData = async () => {
-      try {
-        const savedData = await AsyncStorage.getItem(`${jobId}`);
-        if (savedData) {
-          const parsedData: FormData = JSON.parse(savedData);
-          setFormData(parsedData);
+  let jobId = requestNumber;
 
-          // Set selected bank & branch for UI
-          if (parsedData.financeInfo?.bank) setSelectedBank(parsedData.financeInfo.bank);
-          if (parsedData.financeInfo?.branch) setSelectedBranch(parsedData.financeInfo.branch);
+  const updateFormData = async (updates: Partial<FinanceInfoData>) => {
+    try {
+      const updatedFormData = {
+        ...formData,
+        financeInfo: {
+          ...formData.financeInfo,
+          ...updates,
+          bank: selectedBank,
+          branch: updates.branch ?? selectedBranch,
+        },
+      };
 
-          // Populate available branches if bank exists
-          if (parsedData.financeInfo?.bank) {
-            const bankObj = banks.find(b => b.name === parsedData.financeInfo?.bank);
-            if (bankObj) {
-              const filteredBranches = (branchesData as any)[bankObj.id.toString()] || [];
-              setAvailableBranches(filteredBranches);
+      setFormData(updatedFormData);
+
+      await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData));
+    } catch (e) {
+      console.log("AsyncStorage save failed", e);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      const loadFormData = async () => {
+        try {
+          const savedData = await AsyncStorage.getItem(`${jobId}`);
+          if (savedData) {
+            const parsedData: FormData = JSON.parse(savedData);
+            setFormData(parsedData);
+
+            if (parsedData.financeInfo?.bank)
+              setSelectedBank(parsedData.financeInfo.bank);
+            if (parsedData.financeInfo?.branch)
+              setSelectedBranch(parsedData.financeInfo.branch);
+
+            if (parsedData.financeInfo?.bank) {
+              const bankObj = banks.find(
+                (b) => b.name === parsedData.financeInfo?.bank
+              );
+              if (bankObj) {
+                const filteredBranches =
+                  (branchesData as any)[bankObj.id.toString()] || [];
+                setAvailableBranches(filteredBranches);
+              }
             }
           }
+        } catch (e) {
+          console.log("Failed to load form data", e);
         }
-      } catch (e) {
-        console.log("Failed to load form data", e);
-      }
-    };
+      };
 
-    loadFormData();
-  }, [])
-);
+      loadFormData();
+    }, [])
+  );
 
+  const handleFieldChange = (
+    key: keyof FinanceInfoData,
+    text: string,
+    rules: ValidationRule
+  ) => {
 
-const handleFieldChange = (
-  key: keyof FinanceInfoData,
-  text: string,
-  rules: ValidationRule
-) => {
-  const { value, error } = validateAndFormat(text, rules, t, formData, key);
+    const { value, error } = validateAndFormat(text, rules, t, formData, key);
 
-  // Update state correctly inside financeInfo
-  setFormData((prev: FormData) => ({
-    ...prev,
-    financeInfo: {
-      ...prev.financeInfo,
-      [key]: value,
-      bank: selectedBank,
-      branch: prev.financeInfo?.branch ?? selectedBranch,
-    },
-  }));
+    setFormData((prev: FormData) => ({
+      ...prev,
+      financeInfo: {
+        ...prev.financeInfo,
+        [key]: value,
+        bank: selectedBank,
+        branch: prev.financeInfo?.branch ?? selectedBranch,
+      },
+    }));
 
-  // Update errors
-  setErrors((prev) => ({ ...prev, [key]: error || "" }));
+    // Update errors
+    setErrors((prev) => ({ ...prev, [key]: error || "" }));
 
-  // Save to AsyncStorage
-  if (!error) {
-    updateFormData({ [key]: value });
-  }
-};
-
+    // Save to AsyncStorage
+    if (!error) {
+      updateFormData({ [key]: value });
+    }
+  };
 
   const handleNext = () => {
-  const requiredFields: (keyof FinanceInfoData)[] = [
-    "accountholderName",
-    "accountNumber",
-  ];
+            navigation.navigate("LandInfo", { formData, requestNumber });
+
     const validationErrors: Record<string, string> = {};
 
-    requiredFields.forEach((key) => {
-      const value = formData[key];
-      let error = "";
+    const accInfo = formData.financeInfo;
 
-      if (!value || value.trim() === "") {
-        error = t(`Error.${key} is required`);
-      }
+    if (
+      !accInfo?.accountholderName ||
+      accInfo.accountholderName.trim() === ""
+    ) {
+      validationErrors.accountholderName = t(
+        "Error.accountholderName is required"
+      );
+    }
 
-      if (error) validationErrors[key] = error;
-    });
+    if (
+      !accInfo?.accountNumber ||
+      accInfo.accountNumber.toString().trim() === ""
+    ) {
+      validationErrors.accountNumber = t("Error.accountNumber is required");
+    }
 
-    if (!confirmAccountNumber || confirmAccountNumber.trim() === "") {
+    if (!accInfo?.confirmAccountNumber) {
       validationErrors.confirmAccountNumber = t(
         "Error.Confirm account number is required"
       );
-    } else if (confirmAccountNumber !== formData.accountNumber) {
+    } else if (accInfo.confirmAccountNumber !== accInfo.accountNumber) {
       validationErrors.confirmAccountNumber = t(
         "Error.Account numbers do not match"
       );
     }
 
+    const assets = accInfo?.assets;
+    const anyAssetSelected =
+      assets &&
+      Object.keys(assets).some((key) => {
+        const value = assets[key];
+        return Array.isArray(value) ? value.length > 0 : true;
+      });
+
+    if (!anyAssetSelected) {
+      validationErrors.assets = t(
+        "Error.At least one option must be selected."
+      );
+    }
+
+    if (!accInfo?.bank || accInfo.bank === "") {
+      validationErrors.bank = t("Error.Bank is required");
+    }
+    if (!accInfo?.branch || accInfo.branch === "") {
+      validationErrors.branch = t("Error.Branch is required");
+    }
+
     if (Object.keys(validationErrors).length > 0) {
-      setErrors((prev) => ({ ...prev, ...validationErrors }));
+      setErrors(validationErrors);
 
       const errorMessage = "• " + Object.values(validationErrors).join("\n• ");
       Alert.alert(t("Error.Validation Error"), errorMessage, [
@@ -309,7 +340,7 @@ const handleFieldChange = (
       return;
     }
 
-    navigation.navigate("IDProof", { formData, requestNumber });
+    // navigation.navigate("IDProof", { formData, requestNumber });
   };
 
   const handleModalClose = (modalType: string) => {
@@ -428,6 +459,74 @@ const handleFieldChange = (
       </View>
     </View>
   );
+
+  const assetCategories: AssetCategory[] = [
+    {
+      key: "Land",
+      label: t("InspectionForm.Land"),
+      subCategories: [
+        {
+          key: "Land Residential",
+          label: t("InspectionForm.Land Residential"),
+        },
+        { key: "Land Farm", label: t("InspectionForm.Land Farm") },
+      ],
+    },
+    {
+      key: "Building",
+      label: t("InspectionForm.Building"),
+      subCategories: [
+        {
+          key: "House Residential",
+          label: t("InspectionForm.House Residential"),
+        },
+        {
+          key: "Building at the farm",
+          label: t("InspectionForm.Building at the farm"),
+        },
+      ],
+    },
+    {
+      key: "Vehicle",
+      label: t("InspectionForm.Vehicle"),
+
+      subCategories: [
+        { key: "Motor bike", label: t("InspectionForm.Motor bike") },
+        { key: "Three Wheeler", label: t("InspectionForm.Three Wheeler") },
+        { key: "Motor car", label: t("InspectionForm.Motor car") },
+        { key: "Motor van", label: t("InspectionForm.Motor van") },
+
+        { key: "Tractor", label: t("InspectionForm.Tractor") },
+      ],
+    },
+    {
+      key: "Special Farm Tools",
+      label: t("InspectionForm.Special Farm Tools"),
+    },
+  ];
+
+  const validateAssets = (assets: FinanceInfoData["assets"]) => {
+    if (!assets) return "At least one option must be selected.";
+
+    // Check if any category/standalone asset has a value or subitems
+    const anySelected = Object.keys(assets).some((key) => {
+      const value = assets[key];
+      return Array.isArray(value) ? value.length > 0 : true; // standalone asset has empty array
+    });
+
+    return anySelected ? "" : "At least one option must be selected.";
+  };
+  // Check if any selected category has no sub-items (like Land or Building)
+  const hasAssetWarnings = (): boolean => {
+    const parentAssets = formData.financeInfo?.assets || {};
+    return assetCategories.some((category) => {
+      const isCategorySelected = parentAssets.hasOwnProperty(category.key);
+      return (
+        isCategorySelected && (parentAssets[category.key]?.length || 0) === 0
+      );
+    });
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -461,7 +560,7 @@ const handleFieldChange = (
           <Input
             label={t("InspectionForm.Account Holder’s Name")}
             placeholder="----"
-  value={formData.financeInfo?.accountholderName || ""}
+            value={formData.financeInfo?.accountholderName || ""}
             onChangeText={(text) =>
               handleFieldChange("accountholderName", text, {
                 required: true,
@@ -472,66 +571,66 @@ const handleFieldChange = (
             error={errors.accountholderName}
           />
 
-<Input
-  label={t("InspectionForm.Account Number")}
-  placeholder="----"
-  value={formData.financeInfo?.accountNumber?.toString() || ""}
-  onChangeText={(text) => {
-    const numericValue = parseInt(text.replace(/[^0-9]/g, ""), 10) || 0;
+          <Input
+            label={t("InspectionForm.Account Number")}
+            placeholder="----"
+            value={formData.financeInfo?.accountNumber?.toString() || ""}
+            onChangeText={(text) => {
+              const numericValue =
+                parseInt(text.replace(/[^0-9]/g, ""), 10) || 0;
 
-    setFormData((prev: FormData) => ({
-      ...prev,
-      financeInfo: {
-        ...prev.financeInfo,
-        accountNumber: numericValue,
-      },
-    }));
+              setFormData((prev: FormData) => ({
+                ...prev,
+                financeInfo: {
+                  ...prev.financeInfo,
+                  accountNumber: numericValue,
+                },
+              }));
 
-    updateFormData({ accountNumber: numericValue });
-  }}
-  error={errors.accountNumber}
-  keyboardType="number-pad"
-  required
-/>
+              updateFormData({ accountNumber: numericValue });
+            }}
+            error={errors.accountNumber}
+            keyboardType="number-pad"
+            required
+          />
 
-<Input
-  label={t("InspectionForm.Confirm Account Number")}
-  placeholder="----"
-  value={formData.financeInfo?.confirmAccountNumber?.toString() || ""}
-  onChangeText={(text) => {
-    // Convert to number safely
-    const numericValue = text ? parseInt(text, 10) : undefined; // undefined if empty
+          <Input
+            label={t("InspectionForm.Confirm Account Number")}
+            placeholder="----"
+            value={formData.financeInfo?.confirmAccountNumber?.toString() || ""}
+            onChangeText={(text) => {
+              // Convert to number safely
+              const numericValue = text ? parseInt(text, 10) : undefined; // undefined if empty
 
-    // Update state
-    setFormData((prev: FormData) => ({
-      ...prev,
-      financeInfo: {
-        ...prev.financeInfo,
-        confirmAccountNumber: numericValue,
-      },
-    }));
+              // Update state
+              setFormData((prev: FormData) => ({
+                ...prev,
+                financeInfo: {
+                  ...prev.financeInfo,
+                  confirmAccountNumber: numericValue,
+                },
+              }));
 
-    // Save to AsyncStorage
-    updateFormData({ confirmAccountNumber: numericValue });
+              // Save to AsyncStorage
+              updateFormData({ confirmAccountNumber: numericValue });
 
-    // Validation
-    let error = "";
-    if (!numericValue) {
-      error = t("Error.Confirm account number is required");
-    } else if (numericValue !== formData.financeInfo?.accountNumber) {
-      error = t("Error.Account numbers do not match");
-    }
+              // Validation
+              let error = "";
+              if (!numericValue) {
+                error = t("Error.Confirm account number is required");
+              } else if (numericValue !== formData.financeInfo?.accountNumber) {
+                error = t("Error.Account numbers do not match");
+              }
 
-    setErrors((prev) => ({ ...prev, confirmAccountNumber: error }));
-  }}
-  error={errors.confirmAccountNumber}
-  keyboardType="number-pad"
-  required
-/>
-
+              setErrors((prev) => ({ ...prev, confirmAccountNumber: error }));
+            }}
+            error={errors.confirmAccountNumber}
+            keyboardType="number-pad"
+            required
+          />
 
           <View>
-            <Text className="text-sm text-[#070707] mb-1">
+            <Text className="text-sm text-[#070707] mb-2">
               {t("InspectionForm.Bank Name")} *
             </Text>
             <TouchableOpacity
@@ -555,7 +654,7 @@ const handleFieldChange = (
           </View>
 
           <View className="mt-4">
-            <Text className="text-sm text-[#070707] mb-1">
+            <Text className="text-sm text-[#070707] mb-2">
               {t("InspectionForm.Branch Name")} *
             </Text>
             <TouchableOpacity
@@ -583,100 +682,272 @@ const handleFieldChange = (
 
           <View className="border-t border-[#CACACA] my-10 mb-4" />
 
-                    <View className="mt-4">
-            <Text className="text-sm text-[#070707] mb-1">
+          <View className="mt-4">
+            <Text className="text-sm text-[#070707] mb-2">
               {t("InspectionForm.Existing debts of the farmer")} *
             </Text>
-            <View    className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${
-      errors.debts ? "border border-red-500" : ""
-    }`}>
+            <View
+              className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${
+                errors.debts ? "border border-red-500" : ""
+              }`}
+            >
+              <TextInput
+                placeholder={t("InspectionForm.Type here...")}
+                value={formData.financeInfo?.existingDebts || ""}
+                onChangeText={(text) => {
+                  // Remove leading spaces
+                  let formattedText = text.replace(/^\s+/, "");
 
-<TextInput
-  placeholder={t("InspectionForm.Type here...")}
-  value={formData.financeInfo?.existingDebts || ""}
-  onChangeText={(text) => {
-    // Remove leading spaces
-    let formattedText = text.replace(/^\s+/, "");
+                  // Capitalize first letter
+                  if (formattedText.length > 0) {
+                    formattedText =
+                      formattedText.charAt(0).toUpperCase() +
+                      formattedText.slice(1);
+                  }
 
-    // Capitalize first letter
-    if (formattedText.length > 0) {
-      formattedText = formattedText.charAt(0).toUpperCase() + formattedText.slice(1);
-    }
+                  // Update state
+                  setFormData((prev: FormData) => ({
+                    ...prev,
+                    financeInfo: {
+                      ...prev.financeInfo,
+                      existingDebts: formattedText,
+                    },
+                  }));
 
-    // Update state
-    setFormData((prev: FormData) => ({
-      ...prev,
-      financeInfo: {
-        ...prev.financeInfo,
-        existingDebts: formattedText,
-      },
-    }));
+                  // Validation
+                  let error = "";
+                  if (!formattedText || formattedText.trim() === "") {
+                    error = t("Error.existingDebts is required");
+                  }
+                  setErrors((prev) => ({ ...prev, debts: error }));
 
-    // Validation
-    let error = "";
-    if (!formattedText || formattedText.trim() === "") {
-      error = t("Error.existingDebts is required");
-    }
-    setErrors((prev) => ({ ...prev, debts: error }));
-
-    // Save to AsyncStorage
-    if (!error) {
-      updateFormData({ existingDebts: formattedText });
-    }
-  }}
-  keyboardType="default"
-  multiline={true}
-  textAlignVertical="top"
-/>
-
+                  // Save to AsyncStorage
+                  if (!error) {
+                    updateFormData({ existingDebts: formattedText });
+                  }
+                }}
+                keyboardType="default"
+                multiline={true}
+                textAlignVertical="top"
+              />
             </View>
-  {errors.debts && (
-    <Text className="text-red-500 text-sm mt-1 ml-2">{errors.debts}</Text>
-  )}
-</View>
+            {errors.debts && (
+              <Text className="text-red-500 text-sm mt-1 ml-2">
+                {errors.debts}
+              </Text>
+            )}
+          </View>
 
-        <View className="mt-4">
-          <Input
-            label={t("InspectionForm.No of Dependents")}
-            placeholder={t("InspectionForm.0 or more")}
-            value={formData.financeInfo?.noOfDependents}
-            onChangeText={(text) =>
-              handleFieldChange("noOfDependents", text, {
-                required: true,
-                type: "noOfDependents",
-              })
-            }
-            error={errors.noOfDependents}
-            keyboardType={"phone-pad"}
-            required
-          />
-</View>
-  {/* <View className="mt-4">
-    <Text className="text-sm text-[#070707] mb-1">
-      {t("InspectionForm.Assets owned by the farmer")} *
-    </Text>
+          <View className="mt-4">
+            <Input
+              label={t("InspectionForm.No of Dependents")}
+              placeholder={t("InspectionForm.0 or more")}
+              value={formData.financeInfo?.noOfDependents}
+              onChangeText={(text) =>
+                handleFieldChange("noOfDependents", text, {
+                  required: true,
+                  type: "noOfDependents",
+                })
+              }
+              error={errors.noOfDependents}
+              keyboardType={"phone-pad"}
+              required
+            />
+          </View>
 
-    {["Land", "Building", "Vehicle", "Machinery"].map((asset) => (
-      <View key={asset} className="flex-row items-center mb-2">
-        <Checkbox
-          value={formData.assets?.includes(asset)}
-        //   onValueChange={(newValue) => {
-        //     let updatedAssets = formData.assets || [];
-        //     if (newValue) updatedAssets.push(asset);
-        //     else updatedAssets = updatedAssets.filter((a) => a !== asset);
-        //     setFormData((prev) => ({ ...prev, assets: updatedAssets }));
-        //     updateFormData({ assets: updatedAssets });
-        //   }}
-          color={formData.assets?.includes(asset) ? "#F35125" : undefined}
-        />
-        <Text className="ml-2 text-black">{asset}</Text>
-      </View>
-    ))}
-    {errors.assets && (
-      <Text className="text-red-500 text-sm mt-1 ml-2">{errors.assets}</Text>
-    )}
-  </View> */}
+
+          {/* tickble options  */}
+          <View className="mt-4">
+            <Text className="text-sm text-[#070707] mb-4">
+              {t("InspectionForm.Assets owned by the farmer")} *
+            </Text>
+            {assetCategories.map((category) => {
+              const parentAssets = formData.financeInfo?.assets || {};
+              console.log(parentAssets);
+
+              const isCategorySelected = parentAssets.hasOwnProperty(
+                category.key
+              );
+
+              const showLandWarning =
+                category.key &&
+                isCategorySelected &&
+                (parentAssets[category.key]?.length || 0) === 0;
+
+              return (
+                <View key={category.key} className="mb-4 ml-4">
+                  <View className="flex-row items-center mb-2">
+                    <Checkbox
+                      value={isCategorySelected}
+                      onValueChange={(newValue) => {
+                        let updatedAssets = { ...parentAssets };
+                        console.log("up ass", updatedAssets);
+                        if (newValue) {
+                          updatedAssets[category.key] =
+                            updatedAssets[category.key] || [];
+                        } else {
+                          delete updatedAssets[category.key];
+                        }
+                        setFormData((prev: any) => ({
+                          ...prev,
+                          financeInfo: {
+                            ...prev.financeInfo,
+                            assets: updatedAssets,
+                          },
+                        }));
+                        updateFormData({ assets: updatedAssets });
+
+                        const noCategorySelected =
+                          Object.keys(updatedAssets).filter(
+                            (key) => key !== "Special Farm Tools" // ignore this category
+                          ).length === 0;
+
+                        setErrors((prev) => ({
+                          ...prev,
+                          assets: noCategorySelected
+                            ? t("Error.At least one option must be selected.")
+                            : "",
+                        }));
+                      }}
+                      color={isCategorySelected ? "#000" : undefined}
+                      style={{ borderRadius: 6 }}
+                    />
+                    <Text className="ml-2 text-black ">
+                      {t(category.label)}
+                    </Text>
+                  </View>
+
+                  {isCategorySelected &&
+                    category.subCategories?.map((sub) => {
+                      const isSubSelected = parentAssets[
+                        category.key
+                      ]?.includes(sub.key);
+
+                      return (
+                        <View
+                          key={sub.key}
+                          className="flex-row items-center ml-6 mb-2 mt-2"
+                        >
+                          <Checkbox
+                            value={isSubSelected}
+                            onValueChange={(newValue) => {
+                              let updatedAssets = { ...parentAssets };
+
+                              if (newValue) {
+                                updatedAssets[category.key] =
+                                  updatedAssets[category.key] || [];
+                                if (
+                                  !updatedAssets[category.key].includes(sub.key)
+                                ) {
+                                  updatedAssets[category.key].push(sub.key);
+                                }
+                              } else {
+                                updatedAssets[category.key] = updatedAssets[
+                                  category.key
+                                ].filter((s: string) => s !== sub.key);
+                              }
+
+                              setFormData((prev: any) => ({
+                                ...prev,
+                                financeInfo: {
+                                  ...prev.financeInfo,
+                                  assets: updatedAssets,
+                                },
+                              }));
+                              updateFormData({ assets: updatedAssets });
+                            }}
+                            color={isSubSelected ? "#000" : undefined}
+                            style={{ borderRadius: 6 }}
+                          />
+                          <Text className="ml-2 text-black">
+                            {t(sub.label)}
+                          </Text>
+                        </View>
+                      );
+                    })}
+
+                  {category.key === "Special Farm Tools" &&
+                    isCategorySelected && (
+                      <View className=" mt-2 bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2">
+                        <TextInput
+                          placeholder={t("InspectionForm.Type here...")}
+                          value={parentAssets["Special Farm Tools"]?.[0] || ""}
+                          onChangeText={(text) => {
+                            let formattedText = text.replace(/^\s+/, "");
+
+                            if (formattedText.length > 0) {
+                              formattedText =
+                                formattedText.charAt(0).toUpperCase() +
+                                formattedText.slice(1);
+                            }
+
+                            let updatedAssets = { ...parentAssets };
+                            if (!updatedAssets["Special Farm Tools"]) {
+                              updatedAssets["Special Farm Tools"] = [];
+                            }
+
+                            if (formattedText.length > 0) {
+                              updatedAssets["Special Farm Tools"][0] =
+                                formattedText;
+                            } else {
+                              updatedAssets["Special Farm Tools"] = [];
+                            }
+
+                            setFormData((prev: any) => ({
+                              ...prev,
+                              financeInfo: {
+                                ...prev.financeInfo,
+                                assets: updatedAssets,
+                              },
+                            }));
+
+                            updateFormData({ assets: updatedAssets });
+
+                            // Validation
+                            const error =
+                              formattedText.trim() === ""
+                                ? t("Error.SpecialFarmTools is required")
+                                : "";
+                            setErrors((prev) => ({
+                              ...prev,
+                              specialTools: error,
+                            }));
+                          }}
+                          keyboardType="default"
+                          multiline={true}
+                          textAlignVertical="top"
+                        />
+                      </View>
+                    )}
+
+                  {showLandWarning && (
+                    <Text
+                      className={`${
+                        category.key === "Special Farm Tools" ? "" : ""
+                      } text-red-500 text-sm mt-2`}
+                    >
+                      {category.key === "Special Farm Tools"
+                        ? t(
+                            `Error.Please specify any special farm tools utilized by the farmer.`
+                          )
+                        : t("Error.At least one", {
+                            category: category.label,
+                          })}
+                    </Text>
+                  )}
+                </View>
+              );
+            })}
+
+            {errors.assets && (
+              <Text className="text-red-500 text-sm mt-1 ml-2">
+                {errors.assets}
+              </Text>
+            )}
+          </View>
         </ScrollView>
+
+
         <Modal
           visible={showBankDropdown}
           transparent={true}

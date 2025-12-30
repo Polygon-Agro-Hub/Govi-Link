@@ -371,7 +371,7 @@ const handleIdNumberChange = async (input: string) => {
          
 
           <View className="relative mb-4">
-            <Text className="text-sm text-[#070707] mb-1">
+            <Text className="text-sm text-[#070707] mb-2">
               <Text className="text-black">
                  {t("InspectionForm.ID Proof Type")} *
               </Text>
@@ -396,7 +396,7 @@ const handleIdNumberChange = async (input: string) => {
 
 
               <View className="mt-4">
-                            <Text className="text-sm text-[#070707] mb-1">
+                            <Text className="text-sm text-[#070707] mb-2">
               <Text className="text-black">
                  {
                   selectedIdProof==="NIC Number" ? (

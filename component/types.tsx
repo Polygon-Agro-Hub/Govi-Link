@@ -102,4 +102,20 @@ export type RootStackParamList = {
   PersonalInfo: { requestNumber:string }
   IDProof:{formData:any, requestNumber:string}
   FinanceInfo:{formData:any, requestNumber:string}
+  LandInfo:{formData:any, requestNumber:string}
+    AttachGeoLocationScreen: {
+  currentLatitude?: number;
+  currentLongitude?: number;
+  onLocationSelect?: (latitude: number, longitude: number, locationName: string) => void;
+};
+  ViewLocationScreen: {
+  latitude: number;
+  longitude: number;
+  locationName?: string;
+}
+AttachGeoLocationScreenEdit:{
+   currentLatitude?: number;
+  currentLongitude?: number;
+  onLocationSelect?: (latitude: number, longitude: number, locationName: string) => void;
+}
 };
