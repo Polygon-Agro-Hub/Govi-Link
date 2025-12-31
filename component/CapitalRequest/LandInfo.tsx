@@ -12,7 +12,7 @@ import {
   Modal,
   Image
 } from "react-native";
-import { AntDesign, FontAwesome6, MaterialIcons } from "@expo/vector-icons";
+import { AntDesign, Feather, FontAwesome6, MaterialIcons } from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTranslation } from "react-i18next";
@@ -31,12 +31,18 @@ type LandImage = {
   name: string;
   type: string;
 };
+type GeoLocation = {
+  latitude: number;
+  longitude: number;
+  locationName?: string;
+};
 
 type LandInfoData = {
   cultivationLandsDescription: string;
   landownby?: "Yes" | "No";
   legalstatus?: string;
   landImages?: LandImage[];
+  geoLocation?: GeoLocation[]
 };
 
 type ValidationRule = {
@@ -118,6 +124,7 @@ useEffect(() => {
     "cultivationLandsDescription",
     "landownby",
     "legalstatus",
+    "geoLocation"
   ];
 
   // Check if all required fields have a value
@@ -192,6 +199,8 @@ useEffect(() => {
   };
 
   const handleNext = () => {
+        navigation.navigate("InvestmentInfo", { formData, requestNumber });
+
     const requiredFields: (keyof FormData)[] = [];
     const validationErrors: Record<string, string> = {};
 
@@ -216,7 +225,7 @@ useEffect(() => {
       return;
     }
 
-    navigation.navigate("IDProof", { formData, requestNumber });
+    // navigation.navigate("InvestmentInfo", { formData, requestNumber });
   };
 
 
@@ -279,14 +288,11 @@ const handleCameraClose = async (uri: string | null) => {
       <View className="flex-1 bg-[#F3F3F3] ">
         <StatusBar barStyle="dark-content" />
 
-        {/* Header */}
-        <View className="flex-row items-center justify-center py-4">
-          <TouchableOpacity
-            className="absolute left-4 bg-[#F3F3F3] rounded-full p-2"
-            onPress={() => navigation.goBack()}
-          >
-            <MaterialIcons name="arrow-back-ios" size={20} color="#000" />
+        <View className="flex-row items-center justify-center py-4 mt-2">
+          <TouchableOpacity className="absolute left-4 bg-[#E0E0E080] rounded-full p-4" onPress={()=> navigation.goBack()}>
+            <AntDesign name="left" size={20} color="#000" />
           </TouchableOpacity>
+
           <Text className="text-lg font-semibold text-black">
             {t("InspectionForm.Inspection Form")}
           </Text>
@@ -427,9 +433,41 @@ const handleCameraClose = async (uri: string | null) => {
             </Text>
   <TouchableOpacity
     className="bg-[#FA345A] rounded-full px-4 py-4 flex-row items-center justify-center gap-x-2"
-    onPress={() => navigation.navigate("AttachGeoLocationScreen")}
+onPress={() =>
+  navigation.navigate("AttachGeoLocationScreen", {
+    currentLatitude: formData?.landinfo?.geoLocation?.latitude,
+    currentLongitude: formData?.landinfo?.geoLocation?.longitude,
+
+    onLocationSelect: (
+      latitude: number,
+      longitude: number,
+      locationName: string
+    ) => {
+      const updatedLandInfo = {
+        ...(formData?.landinfo || {}),
+        geoLocation: {
+          latitude,
+          longitude,
+          locationName,
+        },
+      };
+
+      setFormData((prev: any) => ({
+        ...prev,
+        landinfo: updatedLandInfo,
+      }));
+
+      updateFormData({ landinfo: updatedLandInfo });
+    },
+  })
+}
+
   >
-    <MaterialIcons name="gps-fixed" size={22} color="#fff" />
+    {formData?.landinfo?.geoLocation ? (
+    <Feather name="rotate-ccw" size={22} color="#fff" />
+    ): (
+          <MaterialIcons name="gps-fixed" size={22} color="#fff" />
+    )}
     <Text className="text-white font-semibold">
       {t("InspectionForm.Tag Geo Coordinate")}
     </Text>
@@ -437,6 +475,23 @@ const handleCameraClose = async (uri: string | null) => {
 
 
 </View>
+{formData?.landinfo?.geoLocation && (
+  <TouchableOpacity
+    className="mt-2 rounded-full px-4 py-3 flex-row items-center justify-center gap-x-2"
+    onPress={() =>
+      navigation.navigate("ViewLocationScreen", {
+        latitude: formData.landinfo.geoLocation.latitude,
+        longitude: formData.landinfo.geoLocation.longitude,
+        locationName:formData.landinfo.geoLocation.locationName
+      })
+    }
+  >
+    <MaterialIcons name="location-pin" size={24} color="#FF0000" />
+    <Text className="text-[#FF0000] font-semibold  border-b-2 border-[#FF0000]">
+      {t("InspectionForm.View Here")}
+    </Text>
+  </TouchableOpacity>
+)}
 
           <View className="mt-6 ">
                                               <Text className="text-sm text-[#070707] mb-2">
@@ -519,7 +574,7 @@ const handleCameraClose = async (uri: string | null) => {
               {t("InspectionForm.Exit")}
             </Text>
           </TouchableOpacity>
-          {isNextEnabled == true ? (
+          {isNextEnabled == false ? (
             <View className="flex-1">
               <TouchableOpacity className="flex-1 " onPress={handleNext}>
                 <LinearGradient

@@ -50,6 +50,9 @@ import IDProof from "@/component/CapitalRequest/IDProof";
 import FinanceInfo from "@/component/CapitalRequest/FinanceInfo";
 import LandInfo from "@/component/CapitalRequest/LandInfo";
 import AttachGeoLocationScreen from "@/component/CapitalRequest/AttachGeoLocationScreen";
+import ViewLocationScreen from "@/component/CapitalRequest/ViewLocationScreen";
+import InvestmentInfo from "@/component/CapitalRequest/InvestmentInfo";
+import CultivationInfo from "@/component/CapitalRequest/CultivationInfo";
 
 LogBox.ignoreAllLogs(true);
 NativeWindStyleSheet.setOutput({ default: "native" });
@@ -223,6 +226,9 @@ function AppContent() {
                     <Stack.Screen name="FinanceInfo" component={FinanceInfo} />
                     <Stack.Screen name="LandInfo" component={LandInfo} />
                     <Stack.Screen name="AttachGeoLocationScreen" component={AttachGeoLocationScreen  as any} />
+                    <Stack.Screen name="ViewLocationScreen" component={ViewLocationScreen as any} />
+                    <Stack.Screen name="InvestmentInfo" component={InvestmentInfo} />
+                    <Stack.Screen name="CultivationInfo" component={CultivationInfo} />
 
           </Stack.Navigator>
         </NavigationContainer>

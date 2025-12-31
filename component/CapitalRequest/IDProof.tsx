@@ -350,10 +350,11 @@ const handleIdNumberChange = async (input: string) => {
         <StatusBar barStyle="dark-content" />
 
         {/* Header */}
-        <View className="flex-row items-center justify-center py-4">
-          <TouchableOpacity className="absolute left-4 bg-[#F3F3F3] rounded-full p-2" onPress={()=> navigation.goBack()}>
-            <MaterialIcons name="arrow-back-ios" size={20} color="#000" />
+        <View className="flex-row items-center justify-center py-4 mt-2">
+          <TouchableOpacity className="absolute left-4 bg-[#E0E0E080] rounded-full p-4" onPress={()=> navigation.goBack()}>
+            <AntDesign name="left" size={20} color="#000" />
           </TouchableOpacity>
+
           <Text className="text-lg font-semibold text-black">
             {t("InspectionForm.Inspection Form")}
           </Text>

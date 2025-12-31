@@ -24,34 +24,34 @@
       "predictiveBackGestureEnabled": false,
       "package": "com.polygonagro.GoviLink",
       "softwareKeyboardLayoutMode": "pan",
-        "versionCode": 12,
-        "compileSdkVersion": 35,
-        "targetSdkVersion": 35,
-        "minSdkVersion": 24,
-        "permissions": [
-          "INTERNET",
-          "CAMERA",
-          "RECORD_AUDIO",
-          "READ_MEDIA_IMAGES",
-          "READ_MEDIA_VIDEO",
-          "WRITE_EXTERNAL_STORAGE",
-          "ACCESS_COARSE_LOCATION",
-          "ACCESS_FINE_LOCATION",
-          "VIBRATE",
-          "WAKE_LOCK",
-          "RECEIVE_BOOT_COMPLETED",
-          "LOCATION",
-          "ACCESS_BACKGROUND_LOCATION",
-          "ACCESS_WIFI_STATE",
-          "CHANGE_WIFI_STATE",
-          "ACCESS_NETWORK_STATE",
-          "CHANGE_NETWORK_STATE",
-          "SYSTEM_ALERT_WINDOW",
-          "FOREGROUND_SERVICE",
-          "NOTIFICATIONS",
-          "WRITE_EXTERNAL_STORAGE",
-          "CALL_PHONE"
-        ]
+      "versionCode": 12,
+      "compileSdkVersion": 35,
+      "targetSdkVersion": 35,
+      "minSdkVersion": 24,
+      "permissions": [
+        "INTERNET",
+        "CAMERA",
+        "RECORD_AUDIO",
+        "READ_MEDIA_IMAGES",
+        "READ_MEDIA_VIDEO",
+        "WRITE_EXTERNAL_STORAGE",
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "VIBRATE",
+        "WAKE_LOCK",
+        "RECEIVE_BOOT_COMPLETED",
+        "LOCATION",
+        "ACCESS_BACKGROUND_LOCATION",
+        "ACCESS_WIFI_STATE",
+        "CHANGE_WIFI_STATE",
+        "ACCESS_NETWORK_STATE",
+        "CHANGE_NETWORK_STATE",
+        "SYSTEM_ALERT_WINDOW",
+        "FOREGROUND_SERVICE",
+        "NOTIFICATIONS",
+        "WRITE_EXTERNAL_STORAGE",
+        "CALL_PHONE"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon-icon.png"
@@ -84,7 +84,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "0a815704-f2f6-42af-be4b-cd1a4bf98329"
+        "projectId": "6fad4b83-fe0a-4957-b214-557a8bc9ad69"
       }
     },
     "expo-camera": {

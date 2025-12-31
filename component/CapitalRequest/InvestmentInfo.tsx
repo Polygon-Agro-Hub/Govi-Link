@@ -12,7 +12,7 @@ import {
   Modal,
   FlatList,
 } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
+import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTranslation } from "react-i18next";
@@ -26,13 +26,12 @@ import banksData from "@/assets/json/banks.json";
 import branchesData from "@/assets/json/branches.json";
 
 type FormData = {
-  landinfo?: LandInfoData;
+  investmentInfo?: InvestmentInfoData;
 };
-type LandInfoData = {
-  cultivationLandsDescription: string;
-  // images?: {
-  //   [parentKey: string]: string[]; 
-  // };
+type InvestmentInfoData = {
+  expectedInvestment: number;
+  purposeforInvestment:number;
+  expectedRepayment:number
 };
 const Input = ({
   label,
@@ -41,6 +40,7 @@ const Input = ({
   onChangeText,
   required = false,
   error,
+ extra,
   keyboardType = "default",
 }: {
   label: string;
@@ -50,11 +50,16 @@ const Input = ({
   onChangeText?: (text: string) => void;
   error?: string;
   keyboardType?: any;
+  extra?:any
 }) => (
   <View className="mb-4">
-    <Text className="text-sm text-[#070707] mb-2">
-      {label} {required && <Text className="text-black">*</Text>}
-    </Text>
+<Text className="text-sm text-[#070707] mb-2">
+  {label}{" "}
+  {extra && (
+    <Text className="text-black font-bold">{extra}{" "}</Text>
+  )}
+  {required && <Text className="text-black">*</Text>}
+</Text>
     <View
       className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
         error ? "border border-red-500" : ""
@@ -76,7 +81,7 @@ const Input = ({
 
 type ValidationRule = {
   required?: boolean;
-  type?: "accountholderName" | "accountNumber";
+  type?: "expectedInvestment" | "expectedRepayment" | "purposeforInvestment" ;
   minLength?: number;
   uniqueWith?: (keyof FormData)[];
 };
@@ -92,8 +97,32 @@ const validateAndFormat = (
   let error = "";
 
   console.log("Validating:", value, rules);
+if (rules.type === "expectedInvestment") {
+  value = value.replace(/[^0-9.]/g, "");
+  if (value.startsWith(".")) {
+    value = value.slice(1);
+  }
+  const parts = value.split(".");
+  if (parts.length > 2) {
+    value = parts[0] + "." + parts.slice(1).join("");
+  }
+  value = value.replace(/\.{2,}/g, ".");
 
-  if (rules.type === "accountholderName") {
+  if (rules.required && value.trim().length === 0) {
+    error = t(`Error.${rules.type} is required`);
+  }
+}
+if (rules.type === "expectedRepayment") {
+  value = value.replace(/[^0-9]/g, "");
+  if (value.startsWith("0")) {
+    value = value.slice(1);
+  }
+  if (rules.required && value.length === 0) {
+    error = t(`Error.${rules.type} is required`);
+  }
+}
+
+  if (rules.type === "purposeforInvestment") {
     value = value.replace(/^\s+/, "");
     value = value.replace(/[^a-zA-Z\s]/g, "");
 
@@ -105,31 +134,15 @@ const validateAndFormat = (
     }
   }
 
-  if (rules.minLength && value.length < rules.minLength) {
-    error = t("Error.Min length", { count: rules.minLength });
-  }
-
-  if (rules.type === "accountNumber") {
-    value = value.replace(/[^0-9]/g, ""); 
-
-    if (rules.required && value.trim().length === 0) {
-      error = t(`Error.${rules.type} is required`);
-    }
-
-    if (rules.required && value.trim().length === 0) {
-      error = t(`Error.${rules.type} is required`);
-    }
-  }
-
   return { value, error };
 };
 
-type LandInfoProps = {
+type InvestmentInfoProps = {
   navigation: any;
 };
 
-const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
-  const route = useRoute<RouteProp<RootStackParamList, "LandInfo">>();
+const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
+  const route = useRoute<RouteProp<RootStackParamList, "InvestmentInfo">>();
   const { requestNumber } = route.params;
   const prevFormData = route.params?.formData;
   const [formData, setFormData] = useState(prevFormData);
@@ -146,48 +159,46 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
     id: bank.ID,
     name: bank.name,
   }));
-  useEffect(() => {
-    const requiredFields: (keyof FormData)[] = [
+useEffect(() => {
+   const requiredFields: (keyof InvestmentInfoData)[] = [
+    "expectedInvestment",
+    "purposeforInvestment",
+    "expectedRepayment"
+  ];
 
-    ];
+  const allFilled = requiredFields.every((key) => {
+    const value = formData.investmentInfo?.[key];
+    return value !== null && value !== undefined && value.toString().trim() !== "";
+  });
+console.log(allFilled)
+  const hasErrors = Object.values(errors).some((err) => err !== "");
+  console.log(hasErrors)
 
-    const allFilled = requiredFields.every((key) => {
-      const value = formData[key];
-      return (
-        value !== null && value !== undefined && value.toString().trim() !== ""
-      );
-    });
-
-    const hasErrors = Object.keys(errors).length > 0;
-
-    setIsNextEnabled(allFilled && !hasErrors);
-  }, [formData, errors]);
+  setIsNextEnabled(allFilled && !hasErrors);
+}, [formData, errors]);
 
 
   let jobId = requestNumber;
   console.log("jobid", jobId);
 
-  const updateFormData = async (updates: Partial<FormData>) => {
-    console.log("hit update");
-    try {
-      const updatedFormData = {
-        ...formData,
+const updateFormData = async (updates: Partial<InvestmentInfoData>) => {
+  try {
+    const updatedFormData = {
+      ...formData,
+      investmentInfo: {
+        ...formData.investmentInfo,
         ...updates,
+      },
+    };
 
-      };
+    setFormData(updatedFormData);
 
-      setFormData(updatedFormData);
+    await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData));
+  } catch (e) {
+    console.log("AsyncStorage save failed", e);
+  }
+};
 
-      await AsyncStorage.setItem(
-        `${jobId}`,
-        JSON.stringify(updatedFormData)
-      );
-
-      console.log("FormData saved:", updatedFormData);
-    } catch (e) {
-      console.log("AsyncStorage save failed", e);
-    }
-  };
 
   useFocusEffect(
     useCallback(() => {
@@ -213,36 +224,39 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
   );
 
   const handleFieldChange = (
-    key: keyof typeof formData,
-    text: string,
-    rules: ValidationRule
-  ) => {
-    console.log("hit sfsf");
-    const { value, error } = validateAndFormat(text, rules, t, formData, key);
-    setFormData((prev: any) => ({ ...prev, [key]: value }));
-    setErrors((prev) => ({ ...prev, [key]: error || "" }));
+  key: keyof InvestmentInfoData,
+  text: string,
+  rules: ValidationRule
+) => {
+  const { value, error } = validateAndFormat(
+    text,
+    rules,
+    t,
+    formData.investmentInfo,
+    key
+  );
 
-    if (!error) {
-      updateFormData({ [key]: value });
-    }
-  };
+  // Update nested investmentInfo
+  setFormData((prev: any) => ({
+    ...prev,
+    investmentInfo: {
+      ...prev.investmentInfo,
+      [key]: value,
+    },
+  }));
+
+  setErrors((prev) => ({ ...prev, [key]: error || "" }));
+
+  if (!error) {
+    updateFormData({ [key]: value });
+  }
+};
+
 
   const handleNext = () => {
-    const requiredFields: (keyof FormData)[] = [
+    navigation.navigate("CultivationInfo", { formData, requestNumber });
 
-    ];
     const validationErrors: Record<string, string> = {};
-
-    requiredFields.forEach((key) => {
-      const value = formData[key];
-      let error = "";
-
-      // if (!value || value.trim() === "") {
-      //   error = t(`Error.${key} is required`);
-      // }
-
-      if (error) validationErrors[key] = error;
-    });
 
 
     if (Object.keys(validationErrors).length > 0) {
@@ -255,7 +269,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
       return;
     }
 
-    navigation.navigate("IDProof", { formData, requestNumber });
+    navigation.navigate("CultivationInfo", { formData, requestNumber });
   };
 
 
@@ -271,12 +285,12 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
         <StatusBar barStyle="dark-content" />
 
         {/* Header */}
-        <View className="flex-row items-center justify-center py-4">
+        <View className="flex-row items-center justify-center py-4 mt-2">
           <TouchableOpacity
-            className="absolute left-4 bg-[#F3F3F3] rounded-full p-2"
+            className="absolute left-4 bg-[#F3F3F3] rounded-full p-4"
             onPress={() => navigation.goBack()}
           >
-            <MaterialIcons name="arrow-back-ios" size={20} color="#000" />
+            <AntDesign name="left" size={20} color="#000" />
           </TouchableOpacity>
           <Text className="text-lg font-semibold text-black">
             {t("InspectionForm.Inspection Form")}
@@ -284,7 +298,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
         </View>
 
         {/* Tabs */}
-        <FormTabs activeKey="Land Info" />
+        <FormTabs activeKey="Investment Info" />
 
         <ScrollView
           className="flex-1 px-6 bg-white rounded-t-3xl"
@@ -293,82 +307,49 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
         >
           <View className="h-6" />
           <Input
-            label={t("InspectionForm.Account Holder’s Name")}
-            placeholder="----"
-            value={formData.accountholderName}
+            label={t("InspectionForm.Expected investment by the farmer")}
+            placeholder="0.00"
+            value={formData.investmentInfo?.expectedInvestment}
             onChangeText={(text) =>
-              handleFieldChange("accountholderName", text, {
+              handleFieldChange("expectedInvestment", text, {
                 required: true,
-                type: "accountholderName",
+                type: "expectedInvestment",
               })
             }
             required
-            error={errors.accountholderName}
+                        extra={t("InspectionForm.Rs")}
+             keyboardType={"phone-pad"}
+            error={errors.expectedInvestment}
           />
 
+                    <Input
+            label={t("InspectionForm.Purpose for investment required as per the farmer")}
+            placeholder="----"
+            value={formData.investmentInfo?.purposeforInvestment}
+            onChangeText={(text) =>
+              handleFieldChange("purposeforInvestment", text, {
+                required: true,
+                type: "purposeforInvestment",
+              })
+            }
+            required
+            error={errors.purposeforInvestment}
+          />
 
-<View className="mt-4">
-            <Text className="text-sm text-[#070707] mb-2">
-              {t("InspectionForm.Provide brief description to reach the cultivation land")} *
-            </Text>
-            <View
-              className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${
-                errors.debts ? "border border-red-500" : ""
-              }`}
-            >
-              <TextInput
-                placeholder={t("InspectionForm.Type here...")}
-                value={formData.landinfo?.cultivationLandsDescription || ""}
-                onChangeText={(text) => {
-                  // Remove leading spaces
-                  let formattedText = text.replace(/^\s+/, "");
-
-                  // Capitalize first letter
-                  if (formattedText.length > 0) {
-                    formattedText =
-                      formattedText.charAt(0).toUpperCase() +
-                      formattedText.slice(1);
-                  }
-
-                  // Update state
-                  setFormData((prev: FormData) => ({
-                    ...prev,
-                    landinfo: {
-                      ...prev.landinfo,
-                      cultivationLandsDescription: formattedText,
-                    },
-                  }));
-
-                  // Validation
-                  let error = "";
-                  if (!formattedText || formattedText.trim() === "") {
-                    error = t("Error.cultivationLandsDescription is required");
-                  }
-                  setErrors((prev) => ({ ...prev, cultivationLandsDescription: error }));
-
-                  // Save to AsyncStorage
-                  if (!error) {
-                updateFormData({
-  landinfo: {
-    ...(formData.landinfo || {}),
-    cultivationLandsDescription: formattedText,
-  },
-});
-
-                  }
-                }}
-                keyboardType="default"
-                multiline={true}
-                textAlignVertical="top"
-              />
-            </View>
-            {errors.cultivationLandsDescription && (
-              <Text className="text-red-500 text-sm mt-1 ml-2">
-                {errors.cultivationLandsDescription}
-              </Text>
-            )}
-          </View>
-        
+                              <Input
+            label={t("InspectionForm.Expected repayment period as per the farmer in months")}
+            placeholder="----"
+            value={formData.investmentInfo?.expectedRepayment}
+            onChangeText={(text) =>
+              handleFieldChange("expectedRepayment", text, {
+                required: true,
+                type: "expectedRepayment",
+              })
+            }
+            required
+             keyboardType={"phone-pad"}
+            error={errors.expectedRepayment}
+          />
         </ScrollView>
       
         <View className="flex-row px-6 py-4 gap-4 bg-white border-t border-gray-200 ">
@@ -422,4 +403,4 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
   );
 };
 
-export default LandInfo;
+export default InvestmentInfo;

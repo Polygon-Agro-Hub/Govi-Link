@@ -12,7 +12,7 @@ import {
   Modal,
   FlatList,
 } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
+import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import FormTabs from "../CapitalRequest/FormTabs";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTranslation } from "react-i18next";
@@ -340,7 +340,8 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
       return;
     }
 
-    // navigation.navigate("IDProof", { formData, requestNumber });
+    //navigation.navigate("LandInfo", { formData, requestNumber });
+
   };
 
   const handleModalClose = (modalType: string) => {
@@ -534,15 +535,11 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     >
       <View className="flex-1 bg-[#F3F3F3] ">
         <StatusBar barStyle="dark-content" />
-
-        {/* Header */}
-        <View className="flex-row items-center justify-center py-4">
-          <TouchableOpacity
-            className="absolute left-4 bg-[#F3F3F3] rounded-full p-2"
-            onPress={() => navigation.goBack()}
-          >
-            <MaterialIcons name="arrow-back-ios" size={20} color="#000" />
+        <View className="flex-row items-center justify-center py-4 mt-2">
+          <TouchableOpacity className="absolute left-4 bg-[#E0E0E080] rounded-full p-4" onPress={()=> navigation.goBack()}>
+            <AntDesign name="left" size={20} color="#000" />
           </TouchableOpacity>
+
           <Text className="text-lg font-semibold text-black">
             {t("InspectionForm.Inspection Form")}
           </Text>

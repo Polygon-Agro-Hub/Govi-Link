@@ -112,10 +112,7 @@ export type RootStackParamList = {
   latitude: number;
   longitude: number;
   locationName?: string;
-}
-AttachGeoLocationScreenEdit:{
-   currentLatitude?: number;
-  currentLongitude?: number;
-  onLocationSelect?: (latitude: number, longitude: number, locationName: string) => void;
-}
+},
+InvestmentInfo:{formData:any, requestNumber:string};
+CultivationInfo:{formData:any, requestNumber:string};
 };

@@ -197,20 +197,42 @@ const validateAndFormat = (
     rules.type === "lastName" ||
     rules.type === "otherNames" ||
     rules.type === "callName" ||
-    rules.type === "houseNumber" ||
     rules.type === "cityName" ||
     rules.type === "streetName"
   ) {
-    value = value.replace(/^\s+/, "");
-    value = value.replace(/[^a-zA-Z\s]/g, "").toLowerCase();
+    // value = value.replace(/^\s+/, "");
+    // value = value.replace(/[^a-zA-Z\s]/g, "").toLowerCase();
 
-    value = value.length > 0 ? value.charAt(0).toUpperCase() + value.slice(1) : "";
-    console.log("hit", value);
+    // value = value.length > 0 ? value.charAt(0).toUpperCase() + value.slice(1) : "";
+    // console.log("hit", value);
 
+    // if (rules.required && value.trim().length === 0) {
+    //   error = t(`Error.${rules.type} is required`);
+    // }
+        value = value.replace(/^\s+/, "");
+    value = value.replace(/[^a-zA-Z\s]/g, "");
+
+    if (value.length > 0) {
+      value = value.charAt(0).toUpperCase() + value.slice(1);
+    }
     if (rules.required && value.trim().length === 0) {
       error = t(`Error.${rules.type} is required`);
     }
   }
+
+if (rules.type === "houseNumber") {
+  let cleaned = value.replace(/[^a-zA-Z0-9 ]/g, "");
+
+  cleaned = cleaned.replace(/^\s+/, "");
+
+  value = cleaned;
+
+  if (rules.required && value.trim().length === 0) {
+    error = t(`Error.${rules.type} is required`);
+  }
+}
+
+
 
 if (rules.type === "email1" || rules.type === "email2") {
   value = value.trim();
@@ -251,7 +273,7 @@ if (rules.type === "email1" || rules.type === "email2") {
   if (
     rules.type === "mobile1" ||
     rules.type === "mobile2" ||
-    rules.type === "familyPhone"
+    rules.type === "familyPhone" 
   ) {
     let numbersOnly = value.replace(/[^0-9]/g, "");
 
@@ -778,10 +800,11 @@ useFocusEffect(
         <StatusBar barStyle="dark-content" />
 
         {/* Header */}
-        <View className="flex-row items-center justify-center py-4">
-          <TouchableOpacity className="absolute left-4 bg-[#F3F3F3] rounded-full p-2" onPress={()=> navigation.goBack()}>
-            <MaterialIcons name="arrow-back-ios" size={20} color="#000" />
+        <View className="flex-row items-center justify-center py-4 mt-2">
+          <TouchableOpacity className="absolute left-4 bg-[#E0E0E080] rounded-full p-4" onPress={()=> navigation.goBack()}>
+            <AntDesign name="left" size={20} color="#000" />
           </TouchableOpacity>
+
           <Text className="text-lg font-semibold text-black">
             {t("InspectionForm.Inspection Form")}
           </Text>
