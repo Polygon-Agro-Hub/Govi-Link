@@ -11,8 +11,9 @@ import {
   Platform,
   Modal,
   FlatList,
+  Image
 } from "react-native";
-import { AntDesign, MaterialIcons } from "@expo/vector-icons";
+import { AntDesign, Feather, FontAwesome6, MaterialIcons } from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTranslation } from "react-i18next";
@@ -22,8 +23,7 @@ import { useCallback } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../types";
-import banksData from "@/assets/json/banks.json";
-import branchesData from "@/assets/json/branches.json";
+import { CameraScreen } from "@/Items/CameraScreen";
 
 const climateParameters = [
   "Temperature",
@@ -44,14 +44,6 @@ type CultivationInfoData = {
   soilType: string;
   pH: number;
 };
-const soilFertilityOptions = [
-  "Excellent",
-  "Good",
-  "Could be improved with additional effort",
-  "Not Suitable",
-] as const;
-
-type SoilFertilityType = (typeof soilFertilityOptions)[number];
 
 const YesNoSelect = ({
   label,
@@ -240,37 +232,60 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
     useState(false);
   console.log("finance", formData);
 
-  const banks = banksData.map((bank) => ({
-    id: bank.ID,
-    name: bank.name,
-  }));
-  useEffect(() => {
-    // Combine required fields from cultivationInfo dynamically
-    const requiredFields: (keyof CultivationInfoData)[] = [
-      // List any static input keys here if needed, e.g.
-      // "expectedInvestment",
-      // "purposeforInvestment",
-      // "expectedRepayment"
-    ];
+  const [selections, setSelections] = useState<Record<string, Selection>>(() =>
+    climateParameters.reduce((acc, param) => {
+      acc[param] = null;
+      return acc;
+    }, {} as Record<string, Selection>)
+  );
+  const [showCamera, setShowCamera] = useState(false);
+const image = formData?.cultivationInfo?.waterSourceImage?.uri;
 
-    const cultivationInfo = formData.cultivationInfo || {};
+useEffect(() => {
+  const cultivationInfo = formData?.cultivationInfo || {};
 
-    const allTextFieldsFilled = requiredFields.every((key) => {
-      const value = (cultivationInfo as any)[key];
-      return (
-        value !== null && value !== undefined && value.toString().trim() !== ""
-      );
-    });
+  const allClimateSelected = climateParameters.every(
+    (param) => selections[param] === "yes" || selections[param] === "no"
+  );
 
-    const allClimateSelected = climateParameters.every(
-      (param) =>
-        cultivationInfo[param] === "yes" || cultivationInfo[param] === "no"
-    );
+  const isPHValid = !!cultivationInfo.pH && !errors.pH;
+  const isSoilTypeValid = !!cultivationInfo.soilType && !errors.soilType;
 
-    const hasErrors = Object.values(errors).some((err) => err !== "");
+  const waterSources = cultivationInfo.waterSources || [];
+  const isWaterSourceValid =
+    waterSources.length > 0 &&
+    (!waterSources.includes("Other") ||
+      cultivationInfo.otherWaterSource?.trim());
 
-    setIsNextEnabled(allTextFieldsFilled && allClimateSelected && !hasErrors);
-  }, [formData, errors]);
+  const isOverallSoilFertilityValid =
+    !!cultivationInfo.overallSoilFertility;
+
+  const yesNoFields = [
+    "isTheCropSuitableForLocalSoil",
+    "landReceiveAdequateRainfall",
+    "isDistributionRainfallSuitableGrowIdentifiedCrops",
+    "isTheWaterQualitySuitableForCultivation",
+    "isElectricityAvailableForLiftingTheWater",
+    "isTherePumpSetsMicroIrrigationSystems",
+  ];
+
+  const allYesNoSelected = yesNoFields.every(
+    (key) => cultivationInfo[key] === "Yes" || cultivationInfo[key] === "No"
+  );
+
+  const hasErrors = Object.values(errors).some(Boolean);
+ const isImageValid = !!cultivationInfo.waterSourceImage;
+  setIsNextEnabled(
+    allClimateSelected &&
+      isPHValid &&
+      isSoilTypeValid &&
+      isWaterSourceValid &&
+      isOverallSoilFertilityValid &&
+      allYesNoSelected &&
+      isImageValid &&
+      !hasErrors
+  );
+}, [formData, selections, errors]);
 
   let jobId = requestNumber;
   console.log("jobid", jobId);
@@ -362,68 +377,26 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
     navigation.navigate("", { formData, requestNumber });
   };
 
-  const [selections, setSelections] = useState<Record<string, Selection>>(() =>
-    climateParameters.reduce((acc, param) => {
-      acc[param] = null;
-      return acc;
-    }, {} as Record<string, Selection>)
-  );
-
   console.log(selections);
 
   const [error, setError] = useState<string>("");
-
-  // const handleSelect = async (param: string, value: Selection) => {
-  //   const currentValue = selections[param];
-  //   const newValue = currentValue === value ? null : value;
-
-  //   const updatedSelections = { ...selections, [param]: newValue };
-  //   setSelections(updatedSelections);
-
-  //   const updatedCultivationInfo = {
-  //     ...formData.cultivationInfo,
-  //     [param]: newValue,
-  //   };
-  //   const updatedFormData = { ...formData, cultivationInfo: updatedCultivationInfo };
-  //   setFormData(updatedFormData);
-
-  //   try {
-  //     await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData));
-  //   } catch (e) {
-  //     console.log("AsyncStorage save failed", e);
-  //   }
-
-  //   const nextMissing = climateParameters.find((p) => !updatedSelections[p]);
-  //   if (nextMissing) {
-  //     setError(
-  //       t("Error.Please select Yes or No for", {
-  //         Missing: t(`InspectionForm.${nextMissing}`),
-  //       })
-  //     );
-  //   } else {
-  //     setError("");
-  //   }
-  // };
 
   const handleSelect = async (param: string, value: Selection) => {
     const currentValue = selections[param];
     const newValue = currentValue === value ? null : value;
 
-    // 1️⃣ Update local selections state
     const updatedSelections = {
       ...selections,
       [param]: newValue,
     };
     setSelections(updatedSelections);
 
-    // 2️⃣ Update cultivationInfo → suitableForOverallLocalClimaticParameters
     const updatedSuitableParams = {
       ...(formData.cultivationInfo?.suitableForOverallLocalClimaticParameters ||
         {}),
       [param]: newValue,
     };
 
-    // If unticked → remove key completely
     if (newValue === null) {
       delete updatedSuitableParams[param];
     }
@@ -440,14 +413,12 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
 
     setFormData(updatedFormData);
 
-    // 3️⃣ Save to AsyncStorage
     try {
       await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData));
     } catch (e) {
       console.log("AsyncStorage save failed", e);
     }
 
-    // 4️⃣ Show error ONE BY ONE (next missing only)
     const nextMissing = climateParameters.find((p) => !updatedSelections[p]);
 
     if (nextMissing) {
@@ -478,6 +449,86 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
       console.log("AsyncStorage save failed", e);
     }
   };
+
+
+const handleCameraClose = async (uri: string | null) => {
+  setShowCamera(false);
+
+  // If camera closed without image → do nothing
+  if (!uri) return;
+
+  const fileName = "waterSourceImage";
+  const fileObj = await convertImageToFormData(uri, fileName);
+
+  if (!fileObj) return;
+
+  const updatedFormData = {
+    ...formData,
+    cultivationInfo: {
+      ...formData.cultivationInfo,
+      waterSourceImage: fileObj, // 🔁 REPLACED every time
+    },
+  };
+
+  setFormData(updatedFormData);
+  setErrors((prev) => ({
+    ...prev,
+    waterSourceImage: "",
+  }));
+  try {
+    await AsyncStorage.setItem(
+      `${jobId}`,
+      JSON.stringify(updatedFormData)
+    );
+  } catch (e) {
+    console.log("AsyncStorage save failed", e);
+  }
+};
+
+const convertImageToFormData = async (
+  imageUri: string,
+  fieldName: string
+) => {
+  try {
+    const extension = imageUri.split(".").pop() || "jpg";
+    const fileName = `${fieldName}.${extension}`;
+
+    return {
+      uri: imageUri,
+      name: fileName,
+      type: `image/${extension === "jpg" ? "jpeg" : extension}`,
+    };
+  } catch (error) {
+    console.error(`Error converting ${fieldName} image:`, error);
+    return null;
+  }
+};
+
+const onClearImage = async () => {
+  const updatedFormData = {
+    ...formData,
+    cultivationInfo: {
+      ...formData.cultivationInfo,
+      waterSourceImage: null,
+    },
+  };
+
+  setFormData(updatedFormData);
+
+  setErrors((prev) => ({
+    ...prev,
+    waterSourceImage: t("Error.Image of the water source is required"),
+  }));
+
+  try {
+    await AsyncStorage.setItem(
+      `${jobId}`,
+      JSON.stringify(updatedFormData)
+    );
+  } catch (e) {
+    console.log("AsyncStorage save failed", e);
+  }
+};
 
   return (
     <KeyboardAvoidingView
@@ -632,7 +683,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
     {t("InspectionForm.Water sources")} <Text className="text-red-500">*</Text>
   </Text>
 
-  {["Tanks", "River", "Other"].map((option) => {
+  {["Tanks","Wells", "River","Dams", "Other"].map((option) => {
     const selected =
       formData.cultivationInfo?.waterSources?.includes(option) || false;
 
@@ -690,16 +741,13 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
       </View>
     );
   })}
-  {errors.waterSources ? (
-    <Text className="text-red-500 text-sm mt-1">{errors.waterSources}</Text>
-  ) : null}
 
 
   {formData.cultivationInfo?.waterSources?.includes("Other") && (
     <TextInput
-      placeholder={t("InspectionForm.Please specify")}
+      placeholder={t("InspectionForm.--Mention Other--")}
       placeholderTextColor="#838B8C"
-      className="bg-[#F6F6F6] px-4 py-3 rounded-full text-black"
+      className="bg-[#F6F6F6] px-4 py-4 rounded-full text-black mb-2"
       value={formData.cultivationInfo?.otherWaterSource || ""}
       onChangeText={async (text) => {
         const updatedFormData = {
@@ -722,9 +770,49 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
       }}
     />
   )}
+
+    {errors.waterSources ? (
+    <Text className="text-red-500 text-sm mt-1">{errors.waterSources}</Text>
+  ) : null}
+
 </View>
 
+  <View className="mb-2 mt-4">
+              <Text className="text-sm text-[#070707] mb-2">
+              {t("InspectionForm.Images of the water source")}{" "}
+              <Text className="text-red-500">*</Text>
+            </Text>
+    <TouchableOpacity
+      className="bg-[#1A1A1A] rounded-3xl px-6 py-4 flex-row justify-center items-center"
+      onPress={()=> {  setShowCamera(true);}}
+    >
+      {image ? (
+        <Feather name="rotate-ccw" size={22} color="#fff" /> 
+      ) : (
+        <FontAwesome6 name="camera" size={22} color="#fff" />
+      )}      <Text className="text-base text-white ml-3">{t("InspectionForm.Capture Photos")}</Text>
+    </TouchableOpacity>
 
+{image && (
+  <View className="mt-8 relative">
+    <Image
+      source={{ uri: image }}
+      className="w-full h-48 rounded-2xl"
+      resizeMode="cover"
+    />
+
+    <TouchableOpacity
+      onPress={onClearImage}
+      className="absolute top-2 right-2 bg-[#f21d1d] p-2 rounded-full"
+    >
+      <AntDesign name="close" size={16} color="white" />
+    </TouchableOpacity>
+  </View>
+)}
+    {errors.waterSourceImage ? (
+    <Text className="text-red-500 text-sm mt-2">{errors.waterSourceImage}</Text>
+  ) : null}
+  </View>
           <View className="mt-2">
             <Text className="text-sm text-[#070707] mb-2">
               {t("InspectionForm.Overall soil fertility")}{" "}
@@ -733,14 +821,15 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
 
             <TouchableOpacity
               className="bg-[#F6F6F6] px-4 py-4 flex-row items-center justify-between rounded-full"
-              onPress={() =>
+              onPress={() =>{
+                setOverallSoilFertilityVisible(true)
                 setFormData({
                   ...formData,
                   cultivationInfo: {
-                    ...formData.cultivationInfo,
-                    soilFertilityModalVisible: true,
+                    ...formData.cultivationInfo
                   },
                 })
+              }
               }
             >
               <Text
@@ -1004,6 +1093,10 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
             ))}
           </View>
         </TouchableOpacity>
+      </Modal>
+
+      <Modal visible={showCamera} animationType="slide">
+        <CameraScreen onClose={handleCameraClose} />
       </Modal>
     </KeyboardAvoidingView>
   );

@@ -111,7 +111,10 @@
     "Please select Yes or No for": "කරුණාකර {{Missing}} සඳහා ඔව් හෝ නැත තෝරන්න",
     "pH is required": "pH අගය අවශ්‍යයි",
     "soilType is required": "පාංශු වර්ගය අවශ්‍යයි",
-    "cultivationLandsDescription is required":"වගා බිම් විස්තරය අවශ්‍යයි."
+    "cultivationLandsDescription is required": "වගා බිම් විස්තරය අවශ්‍යයි.",
+    "Please select at least one water source": "කරුණාකර අවම වශයෙන් එක් ජල මූලාශ්‍රයක් හෝ තෝරන්න",
+    "Please specify the other water source": "කරුණාකර අනෙක් ජල ප්‍රභවය විස්තර කරන්න",
+    "Image of the water source is required": "ජල මූලාශ්‍රයේ රූපය අවශ්‍යයි."
   },
   "Login": {
     "Welcome": "සාදරයෙන් පිළිගනිමු!",
@@ -597,15 +600,23 @@
     "Is the crop / cropping system suitable for local soil type": "බෝග/බෝග ක්‍රමය දේශීය පස් වර්ගයට සුදුසුද?",
     "pH": "pH",
     "Soil Type": "පාංශු වර්ගය",
-        "Overall soil fertility":"සමස්ත පාංශු සාරවත් බව",
-    "Excellent":"විශිෂ්ටයි",
-    "Good":"හොඳයි",
-    "Could be improved with additional effort":"අමතර උත්සාහයකින් වැඩිදියුණු කළ හැකිය",
-    "Not Suitable":"සුදුසු නොවේ",
-    "Does this land receive adequate rainfall":"මෙම භූමියට ප්‍රමාණවත් වර්ෂාපතනයක් ලැබේද?",
-    "Is the distribution of rainfall suitable to grow identified crops":"හඳුනාගත් බෝග වගා කිරීමට වර්ෂාපතන ව්‍යාප්තිය සුදුසු ද?",
-    "Is the water quality suitable for cultivation":"වගාවට සුදුසු ජලයේ ගුණාත්මකභාවය කුමක්ද?",
-    "Is electricity available for lifting the water":"ජලය එසවීම සඳහා විදුලිය තිබේද?",
-    "Is there pump sets, micro irrigation systems":"පොම්ප කට්ටල, ක්ෂුද්‍ර වාරිමාර්ග පද්ධති තිබේද?"
+    "Overall soil fertility": "සමස්ත පාංශු සාරවත් බව",
+    "Excellent": "විශිෂ්ටයි",
+    "Good": "හොඳයි",
+    "Could be improved with additional effort": "අමතර උත්සාහයකින් වැඩිදියුණු කළ හැකිය",
+    "Not Suitable": "සුදුසු නොවේ",
+    "Does this land receive adequate rainfall": "මෙම භූමියට ප්‍රමාණවත් වර්ෂාපතනයක් ලැබේද?",
+    "Is the distribution of rainfall suitable to grow identified crops": "හඳුනාගත් බෝග වගා කිරීමට වර්ෂාපතන ව්‍යාප්තිය සුදුසු ද?",
+    "Is the water quality suitable for cultivation": "වගාවට සුදුසු ජලයේ ගුණාත්මකභාවය කුමක්ද?",
+    "Is electricity available for lifting the water": "ජලය එසවීම සඳහා විදුලිය තිබේද?",
+    "Is there pump sets, micro irrigation systems": "පොම්ප කට්ටල, ක්ෂුද්‍ර වාරිමාර්ග පද්ධති තිබේද?",
+    "Water sources": "ජල මූලාශ්ර",
+    "Tanks": "ටැංකි",
+    "Wells": "ළිං",
+    "River": "ගඟ",
+    "Dams": "වේලි",
+    "Other": "වෙනත්",
+    "Images of the water source": "ජල මූලාශ්‍රයේ රූප",
+    "--Mention Other--": "--වෙනත් සඳහන් කරන්න--"
   }
 }
