@@ -150,6 +150,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
   const { requestNumber } = route.params;
   const prevFormData = route.params?.formData;
   const [formData, setFormData] = useState(prevFormData);
+  console.log(formData)
   const { t, i18n } = useTranslation();
   const [errors, setErrors] = useState<Record<string, string>>({});
 

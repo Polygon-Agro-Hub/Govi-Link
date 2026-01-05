@@ -38,11 +38,11 @@ const climateParameters = [
 type Selection = "yes" | "no" | null;
 
 type FormData = {
-  cultivationInfo?: CultivationInfoData;
+  inspectioncultivation?: CultivationInfoData;
 };
 type CultivationInfoData = {
   soilType: string;
-  pH: number;
+  ph: number;
 };
 
 const YesNoSelect = ({
@@ -168,7 +168,7 @@ const Input = ({
 
 type ValidationRule = {
   required?: boolean;
-  type?: "soilType" | "pH";
+  type?: "soilType" | "ph";
   minLength?: number;
   uniqueWith?: (keyof FormData)[];
 };
@@ -194,7 +194,7 @@ const validateAndFormat = (
       error = t(`Error.${rules.type} is required`);
     }
   }
-  if (rules.type === "pH") {
+  if (rules.type === "ph") {
     value = value.replace(/[^0-9.]/g, "");
     if (value.startsWith(".")) {
       value = value.slice(1);
@@ -239,16 +239,16 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
     }, {} as Record<string, Selection>)
   );
   const [showCamera, setShowCamera] = useState(false);
-const image = formData?.cultivationInfo?.waterSourceImage?.uri;
+const image = formData?.inspectioncultivation?.waterImage?.uri;
 
 useEffect(() => {
-  const cultivationInfo = formData?.cultivationInfo || {};
+  const cultivationInfo = formData?.inspectioncultivation || {};
 
   const allClimateSelected = climateParameters.every(
     (param) => selections[param] === "yes" || selections[param] === "no"
   );
 
-  const isPHValid = !!cultivationInfo.pH && !errors.pH;
+  const isPHValid = !!cultivationInfo.ph && !errors.ph;
   const isSoilTypeValid = !!cultivationInfo.soilType && !errors.soilType;
 
   const waterSources = cultivationInfo.waterSources || [];
@@ -258,15 +258,15 @@ useEffect(() => {
       cultivationInfo.otherWaterSource?.trim());
 
   const isOverallSoilFertilityValid =
-    !!cultivationInfo.overallSoilFertility;
+    !!cultivationInfo.soilfertility;
 
   const yesNoFields = [
-    "isTheCropSuitableForLocalSoil",
-    "landReceiveAdequateRainfall",
-    "isDistributionRainfallSuitableGrowIdentifiedCrops",
-    "isTheWaterQualitySuitableForCultivation",
-    "isElectricityAvailableForLiftingTheWater",
-    "isTherePumpSetsMicroIrrigationSystems",
+    "isCropSuitale",
+    "isRecevieRainFall",
+    "isRainFallSuitableCrop",
+    "isRainFallSuitableCultivation",
+    "isElectrocityAvailable",
+    "ispumpOrirrigation",
   ];
 
   const allYesNoSelected = yesNoFields.every(
@@ -274,7 +274,7 @@ useEffect(() => {
   );
 
   const hasErrors = Object.values(errors).some(Boolean);
- const isImageValid = !!cultivationInfo.waterSourceImage;
+ const isImageValid = !!cultivationInfo.waterImage;
   setIsNextEnabled(
     allClimateSelected &&
       isPHValid &&
@@ -294,8 +294,8 @@ useEffect(() => {
     try {
       const updatedFormData = {
         ...formData,
-        cultivationInfo: {
-          ...formData.cultivationInfo,
+        inspectioncultivation: {
+          ...formData.inspectioncultivation,
           ...updates,
         },
       };
@@ -319,7 +319,7 @@ useEffect(() => {
             const savedSelections: Record<string, Selection> = {};
             climateParameters.forEach((param) => {
               savedSelections[param] =
-                parsedData.cultivationInfo
+                parsedData.inspectioncultivation
                   .suitableForOverallLocalClimaticParameters?.[param] || null;
             });
             setSelections(savedSelections);
@@ -342,14 +342,14 @@ useEffect(() => {
       text,
       rules,
       t,
-      formData.cultivationInfo,
+      formData.inspectioncultivation,
       key
     );
 
     setFormData((prev: any) => ({
       ...prev,
-      cultivationInfo: {
-        ...prev.cultivationInfo,
+      inspectioncultivation: {
+        ...prev.inspectioncultivation,
         [key]: value,
       },
     }));
@@ -394,7 +394,7 @@ useEffect(() => {
     setSelections(updatedSelections);
 
     const updatedSuitableParams = {
-      ...(formData.cultivationInfo?.suitableForOverallLocalClimaticParameters ||
+      ...(formData.inspectioncultivation?.suitableForOverallLocalClimaticParameters ||
         {}),
       [param]: newValue,
     };
@@ -404,13 +404,13 @@ useEffect(() => {
     }
 
     const updatedCultivationInfo = {
-      ...formData.cultivationInfo,
+      ...formData.inspectioncultivation,
       suitableForOverallLocalClimaticParameters: updatedSuitableParams,
     };
 
     const updatedFormData = {
       ...formData,
-      cultivationInfo: updatedCultivationInfo,
+      inspectioncultivation: updatedCultivationInfo,
     };
 
     setFormData(updatedFormData);
@@ -437,8 +437,8 @@ useEffect(() => {
   const handleyesNOFieldChange = async (key: string, value: "Yes" | "No") => {
     const updatedFormData = {
       ...formData,
-      cultivationInfo: {
-        ...formData.cultivationInfo,
+      inspectioncultivation: {
+        ...formData.inspectioncultivation,
         [key]: value,
       },
     };
@@ -459,23 +459,23 @@ const handleCameraClose = async (uri: string | null) => {
   // If camera closed without image → do nothing
   if (!uri) return;
 
-  const fileName = "waterSourceImage";
+  const fileName = "waterImage";
   const fileObj = await convertImageToFormData(uri, fileName);
 
   if (!fileObj) return;
 
   const updatedFormData = {
     ...formData,
-    cultivationInfo: {
-      ...formData.cultivationInfo,
-      waterSourceImage: fileObj, // 🔁 REPLACED every time
+    inspectioncultivation: {
+      ...formData.inspectioncultivation,
+      waterImage: fileObj, // 🔁 REPLACED every time
     },
   };
 
   setFormData(updatedFormData);
   setErrors((prev) => ({
     ...prev,
-    waterSourceImage: "",
+    waterImage: "",
   }));
   try {
     await AsyncStorage.setItem(
@@ -509,9 +509,9 @@ const convertImageToFormData = async (
 const onClearImage = async () => {
   const updatedFormData = {
     ...formData,
-    cultivationInfo: {
-      ...formData.cultivationInfo,
-      waterSourceImage: null,
+    inspectioncultivation: {
+      ...formData.inspectioncultivation,
+      waterImage: null,
     },
   };
 
@@ -519,7 +519,7 @@ const onClearImage = async () => {
 
   setErrors((prev) => ({
     ...prev,
-    waterSourceImage: t("Error.Image of the water source is required"),
+    waterImage: t("Error.Image of the water source is required"),
   }));
 
   try {
@@ -631,14 +631,14 @@ const onClearImage = async () => {
             )}
             required
             value={
-              formData.cultivationInfo?.isTheCropSuitableForLocalSoil || null
+              formData.inspectioncultivation?.isCropSuitale || null
             }
             visible={
               yesNoModalVisible &&
-              activeYesNoField === "isTheCropSuitableForLocalSoil"
+              activeYesNoField === "isCropSuitale"
             }
             onOpen={() => {
-              setActiveYesNoField("isTheCropSuitableForLocalSoil");
+              setActiveYesNoField("isCropSuitale");
               setYesNoModalVisible(true);
             }}
             onClose={() => {
@@ -646,29 +646,29 @@ const onClearImage = async () => {
               setActiveYesNoField(null);
             }}
             onSelect={(value) =>
-              handleyesNOFieldChange("isTheCropSuitableForLocalSoil", value)
+              handleyesNOFieldChange("isCropSuitale", value)
             }
           />
           <View className="mt-4" />
           <Input
             label={t("InspectionForm.pH")}
             placeholder="----"
-            value={formData.cultivationInfo?.pH}
+            value={formData.inspectioncultivation?.ph}
             onChangeText={(text) =>
-              handleFieldChange("pH", text, {
+              handleFieldChange("ph", text, {
                 required: true,
-                type: "pH",
+                type: "ph",
               })
             }
             required
             keyboardType={"phone-pad"}
-            error={errors.pH}
+            error={errors.ph}
           />
 
           <Input
             label={t("InspectionForm.Soil Type")}
             placeholder="----"
-            value={formData.cultivationInfo?.soilType}
+            value={formData.inspectioncultivation?.soilType}
             onChangeText={(text) =>
               handleFieldChange("soilType", text, {
                 required: true,
@@ -687,14 +687,14 @@ const onClearImage = async () => {
 
   {["Tanks","Wells", "River","Dams", "Other"].map((option) => {
     const selected =
-      formData.cultivationInfo?.waterSources?.includes(option) || false;
+      formData.inspectioncultivation?.waterSources?.includes(option) || false;
 
     return (
       <View key={option} className="flex-row items-center mb-4">
         <Checkbox
           value={selected}
             onValueChange={async () => {
-            let updatedOptions = formData.cultivationInfo?.waterSources || [];
+            let updatedOptions = formData.inspectioncultivation?.waterSources || [];
 
             if (selected) {
               updatedOptions = updatedOptions.filter((o: any) => o !== option);
@@ -704,13 +704,13 @@ const onClearImage = async () => {
 
             const updatedFormData = {
               ...formData,
-              cultivationInfo: {
-                ...formData.cultivationInfo,
+              inspectioncultivation: {
+                ...formData.inspectioncultivation,
                 waterSources: updatedOptions,
                 otherWaterSource:
                   option === "Other" && !updatedOptions.includes("Other")
                     ? ""
-                    : formData.cultivationInfo?.otherWaterSource,
+                    : formData.inspectioncultivation?.otherWaterSource,
               },
             };
 
@@ -719,7 +719,7 @@ const onClearImage = async () => {
 // VALIDATION
 let errorMsg = "";
 
-const waterSources = updatedFormData.cultivationInfo.waterSources || [];
+const waterSources = updatedFormData.inspectioncultivation.waterSources || [];
 
 // Filter out "Other" to see if at least one real option is selected
 const validWaterSources = waterSources.filter((source: string) => source !== "Other");
@@ -729,7 +729,7 @@ if (validWaterSources.length === 0) {
   errorMsg = t("Error.Please select at least one water source");
 } else if (
   waterSources.includes("Other") && 
-  !updatedFormData.cultivationInfo.otherWaterSource?.trim()
+  !updatedFormData.inspectioncultivation.otherWaterSource?.trim()
 ) {
   // "Other" is selected but not specified
   errorMsg = t("Error.Please specify the other water source");
@@ -755,17 +755,17 @@ setErrors(prev => ({ ...prev, waterSources: errorMsg }));
   })}
 
 
-  {formData.cultivationInfo?.waterSources?.includes("Other") && (
+  {formData.inspectioncultivation?.waterSources?.includes("Other") && (
     <TextInput
       placeholder={t("InspectionForm.--Mention Other--")}
       placeholderTextColor="#838B8C"
       className="bg-[#F6F6F6] px-4 py-4 rounded-full text-black mb-2"
-      value={formData.cultivationInfo?.otherWaterSource || ""}
+      value={formData.inspectioncultivation?.otherWaterSource || ""}
     onChangeText={(text) => {
   const updatedFormData = {
     ...formData,
-    cultivationInfo: {
-      ...formData.cultivationInfo,
+    inspectioncultivation: {
+      ...formData.inspectioncultivation,
       otherWaterSource: text,
     },
   };
@@ -773,7 +773,7 @@ setErrors(prev => ({ ...prev, waterSources: errorMsg }));
   setFormData(updatedFormData);
 
   let errorMsg = "";
-  const waterSources = updatedFormData.cultivationInfo.waterSources || [];
+  const waterSources = updatedFormData.inspectioncultivation.waterSources || [];
   const validWaterSources = waterSources.filter(
     (source: string) => source !== "Other"
   );
@@ -834,8 +834,8 @@ setErrors(prev => ({ ...prev, waterSources: errorMsg }));
     </TouchableOpacity>
   </View>
 )}
-    {errors.waterSourceImage ? (
-    <Text className="text-red-500 text-sm mt-2">{errors.waterSourceImage}</Text>
+    {errors.waterImage ? (
+    <Text className="text-red-500 text-sm mt-2">{errors.waterImage}</Text>
   ) : null}
   </View>
           <View className="mt-2">
@@ -850,8 +850,8 @@ setErrors(prev => ({ ...prev, waterSources: errorMsg }));
                 setOverallSoilFertilityVisible(true)
                 setFormData({
                   ...formData,
-                  cultivationInfo: {
-                    ...formData.cultivationInfo
+                  inspectioncultivation: {
+                    ...formData.inspectioncultivation
                   },
                 })
               }
@@ -859,19 +859,19 @@ setErrors(prev => ({ ...prev, waterSources: errorMsg }));
             >
               <Text
                 className={
-                  formData.cultivationInfo?.overallSoilFertility
+                  formData.inspectioncultivation?.soilfertility
                     ? "text-black"
                     : "text-[#A3A3A3]"
                 }
               >
-                {formData.cultivationInfo?.overallSoilFertility
+                {formData.inspectioncultivation?.soilfertility
                   ? t(
-                      `InspectionForm.${formData.cultivationInfo.overallSoilFertility}`
+                      `InspectionForm.${formData.inspectioncultivation.soilfertility}`
                     )
                   : t("InspectionForm.--Select From Here--")}
               </Text>
 
-              {!formData.cultivationInfo?.overallSoilFertility && (
+              {!formData.inspectioncultivation?.soilfertility && (
                 <AntDesign name="down" size={20} color="#838B8C" />
               )}
             </TouchableOpacity>
@@ -881,14 +881,14 @@ setErrors(prev => ({ ...prev, waterSources: errorMsg }));
             label={t("InspectionForm.Does this land receive adequate rainfall")}
             required
             value={
-              formData.cultivationInfo?.landReceiveAdequateRainfall || null
+              formData.inspectioncultivation?.isRecevieRainFall || null
             }
             visible={
               yesNoModalVisible &&
-              activeYesNoField === "landReceiveAdequateRainfall"
+              activeYesNoField === "isRecevieRainFall"
             }
             onOpen={() => {
-              setActiveYesNoField("landReceiveAdequateRainfall");
+              setActiveYesNoField("isRecevieRainFall");
               setYesNoModalVisible(true);
             }}
             onClose={() => {
@@ -896,7 +896,7 @@ setErrors(prev => ({ ...prev, waterSources: errorMsg }));
               setActiveYesNoField(null);
             }}
             onSelect={(value) =>
-              handleyesNOFieldChange("landReceiveAdequateRainfall", value)
+              handleyesNOFieldChange("isRecevieRainFall", value)
             }
           />
           <YesNoSelect
@@ -905,17 +905,17 @@ setErrors(prev => ({ ...prev, waterSources: errorMsg }));
             )}
             required
             value={
-              formData.cultivationInfo
-                ?.isDistributionRainfallSuitableGrowIdentifiedCrops || null
+              formData.inspectioncultivation
+                ?.isRainFallSuitableCrop || null
             }
             visible={
               yesNoModalVisible &&
               activeYesNoField ===
-                "isDistributionRainfallSuitableGrowIdentifiedCrops"
+                "isRainFallSuitableCrop"
             }
             onOpen={() => {
               setActiveYesNoField(
-                "isDistributionRainfallSuitableGrowIdentifiedCrops"
+                "isRainFallSuitableCrop"
               );
               setYesNoModalVisible(true);
             }}
@@ -925,7 +925,7 @@ setErrors(prev => ({ ...prev, waterSources: errorMsg }));
             }}
             onSelect={(value) =>
               handleyesNOFieldChange(
-                "isDistributionRainfallSuitableGrowIdentifiedCrops",
+                "isRainFallSuitableCrop",
                 value
               )
             }
@@ -937,15 +937,15 @@ setErrors(prev => ({ ...prev, waterSources: errorMsg }));
             )}
             required
             value={
-              formData.cultivationInfo
-                ?.isTheWaterQualitySuitableForCultivation || null
+              formData.inspectioncultivation
+                ?.isRainFallSuitableCultivation || null
             }
             visible={
               yesNoModalVisible &&
-              activeYesNoField === "isTheWaterQualitySuitableForCultivation"
+              activeYesNoField === "isRainFallSuitableCultivation"
             }
             onOpen={() => {
-              setActiveYesNoField("isTheWaterQualitySuitableForCultivation");
+              setActiveYesNoField("isRainFallSuitableCultivation");
               setYesNoModalVisible(true);
             }}
             onClose={() => {
@@ -954,7 +954,7 @@ setErrors(prev => ({ ...prev, waterSources: errorMsg }));
             }}
             onSelect={(value) =>
               handleyesNOFieldChange(
-                "isTheWaterQualitySuitableForCultivation",
+                "isRainFallSuitableCultivation",
                 value
               )
             }
@@ -965,15 +965,15 @@ setErrors(prev => ({ ...prev, waterSources: errorMsg }));
             )}
             required
             value={
-              formData.cultivationInfo
-                ?.isElectricityAvailableForLiftingTheWater || null
+              formData.inspectioncultivation
+                ?.isElectrocityAvailable || null
             }
             visible={
               yesNoModalVisible &&
-              activeYesNoField === "isElectricityAvailableForLiftingTheWater"
+              activeYesNoField === "isElectrocityAvailable"
             }
             onOpen={() => {
-              setActiveYesNoField("isElectricityAvailableForLiftingTheWater");
+              setActiveYesNoField("isElectrocityAvailable");
               setYesNoModalVisible(true);
             }}
             onClose={() => {
@@ -982,7 +982,7 @@ setErrors(prev => ({ ...prev, waterSources: errorMsg }));
             }}
             onSelect={(value) =>
               handleyesNOFieldChange(
-                "isElectricityAvailableForLiftingTheWater",
+                "isElectrocityAvailable",
                 value
               )
             }
@@ -994,15 +994,15 @@ setErrors(prev => ({ ...prev, waterSources: errorMsg }));
             )}
             required
             value={
-              formData.cultivationInfo?.isTherePumpSetsMicroIrrigationSystems ||
+              formData.inspectioncultivation?.ispumpOrirrigation ||
               null
             }
             visible={
               yesNoModalVisible &&
-              activeYesNoField === "isTherePumpSetsMicroIrrigationSystems"
+              activeYesNoField === "ispumpOrirrigation"
             }
             onOpen={() => {
-              setActiveYesNoField("isTherePumpSetsMicroIrrigationSystems");
+              setActiveYesNoField("ispumpOrirrigation");
               setYesNoModalVisible(true);
             }}
             onClose={() => {
@@ -1011,7 +1011,7 @@ setErrors(prev => ({ ...prev, waterSources: errorMsg }));
             }}
             onSelect={(value) =>
               handleyesNOFieldChange(
-                "isTherePumpSetsMicroIrrigationSystems",
+                "ispumpOrirrigation",
                 value
               )
             }
@@ -1089,9 +1089,9 @@ setErrors(prev => ({ ...prev, waterSources: errorMsg }));
                   onPress={async () => {
                     const updatedFormData = {
                       ...formData,
-                      cultivationInfo: {
-                        ...formData.cultivationInfo,
-                        overallSoilFertility: item,
+                      inspectioncultivation: {
+                        ...formData.inspectioncultivation,
+                        soilfertility: item,
                       },
                     };
 

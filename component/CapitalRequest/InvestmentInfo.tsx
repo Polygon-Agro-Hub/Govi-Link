@@ -26,12 +26,12 @@ import banksData from "@/assets/json/banks.json";
 import branchesData from "@/assets/json/branches.json";
 
 type FormData = {
-  investmentInfo?: InvestmentInfoData;
+  inspectioninvestment?: InvestmentInfoData;
 };
 type InvestmentInfoData = {
-  expectedInvestment: number;
-  purposeforInvestment:number;
-  expectedRepayment:number
+  expected: number;
+  purpose:number;
+  repaymentMonth:number
 };
 const Input = ({
   label,
@@ -81,7 +81,7 @@ const Input = ({
 
 type ValidationRule = {
   required?: boolean;
-  type?: "expectedInvestment" | "expectedRepayment" | "purposeforInvestment" ;
+  type?: "expected" | "repaymentMonth" | "purpose" ;
   minLength?: number;
   uniqueWith?: (keyof FormData)[];
 };
@@ -97,22 +97,26 @@ const validateAndFormat = (
   let error = "";
 
   console.log("Validating:", value, rules);
-if (rules.type === "expectedInvestment") {
+if (rules.type === "expected") {
   value = value.replace(/[^0-9.]/g, "");
+
   if (value.startsWith(".")) {
     value = value.slice(1);
   }
+
   const parts = value.split(".");
   if (parts.length > 2) {
     value = parts[0] + "." + parts.slice(1).join("");
   }
-  value = value.replace(/\.{2,}/g, ".");
 
-  if (rules.required && value.trim().length === 0) {
+  value = value.replace(/\.{2,}/g, ".");
+  if (value === "0") {
+    error = t("Error.Value must be greater than 0");
+  } else if (rules.required && value.trim().length === 0) {
     error = t(`Error.${rules.type} is required`);
   }
 }
-if (rules.type === "expectedRepayment") {
+if (rules.type === "repaymentMonth") {
   value = value.replace(/[^0-9]/g, "");
   if (value.startsWith("0")) {
     value = value.slice(1);
@@ -122,7 +126,7 @@ if (rules.type === "expectedRepayment") {
   }
 }
 
-  if (rules.type === "purposeforInvestment") {
+  if (rules.type === "purpose") {
     value = value.replace(/^\s+/, "");
     value = value.replace(/[^a-zA-Z\s]/g, "");
 
@@ -161,13 +165,13 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
   }));
 useEffect(() => {
    const requiredFields: (keyof InvestmentInfoData)[] = [
-    "expectedInvestment",
-    "purposeforInvestment",
-    "expectedRepayment"
+    "expected",
+    "purpose",
+    "repaymentMonth"
   ];
 
   const allFilled = requiredFields.every((key) => {
-    const value = formData.investmentInfo?.[key];
+    const value = formData.inspectioninvestment?.[key];
     return value !== null && value !== undefined && value.toString().trim() !== "";
   });
 console.log(allFilled)
@@ -185,8 +189,8 @@ const updateFormData = async (updates: Partial<InvestmentInfoData>) => {
   try {
     const updatedFormData = {
       ...formData,
-      investmentInfo: {
-        ...formData.investmentInfo,
+      inspectioninvestment: {
+        ...formData.inspectioninvestment,
         ...updates,
       },
     };
@@ -232,24 +236,21 @@ const updateFormData = async (updates: Partial<InvestmentInfoData>) => {
     text,
     rules,
     t,
-    formData.investmentInfo,
+    formData.inspectioninvestment,
     key
   );
 
   // Update nested investmentInfo
   setFormData((prev: any) => ({
     ...prev,
-    investmentInfo: {
-      ...prev.investmentInfo,
+    inspectioninvestment: {
+      ...prev.inspectioninvestment,
       [key]: value,
     },
   }));
 
   setErrors((prev) => ({ ...prev, [key]: error || "" }));
-
-  if (!error) {
     updateFormData({ [key]: value });
-  }
 };
 
 
@@ -309,46 +310,46 @@ const updateFormData = async (updates: Partial<InvestmentInfoData>) => {
           <Input
             label={t("InspectionForm.Expected investment by the farmer")}
             placeholder="0.00"
-            value={formData.investmentInfo?.expectedInvestment}
+            value={formData.inspectioninvestment?.expected}
             onChangeText={(text) =>
-              handleFieldChange("expectedInvestment", text, {
+              handleFieldChange("expected", text, {
                 required: true,
-                type: "expectedInvestment",
+                type: "expected",
               })
             }
             required
                         extra={t("InspectionForm.Rs")}
              keyboardType={"phone-pad"}
-            error={errors.expectedInvestment}
+            error={errors.expected}
           />
 
                     <Input
             label={t("InspectionForm.Purpose for investment required as per the farmer")}
             placeholder="----"
-            value={formData.investmentInfo?.purposeforInvestment}
+            value={formData.inspectioninvestment?.purpose}
             onChangeText={(text) =>
-              handleFieldChange("purposeforInvestment", text, {
+              handleFieldChange("purpose", text, {
                 required: true,
-                type: "purposeforInvestment",
+                type: "purpose",
               })
             }
             required
-            error={errors.purposeforInvestment}
+            error={errors.purpose}
           />
 
                               <Input
             label={t("InspectionForm.Expected repayment period as per the farmer in months")}
             placeholder="----"
-            value={formData.investmentInfo?.expectedRepayment}
+            value={formData.inspectioninvestment?.repaymentMonth}
             onChangeText={(text) =>
-              handleFieldChange("expectedRepayment", text, {
+              handleFieldChange("repaymentMonth", text, {
                 required: true,
-                type: "expectedRepayment",
+                type: "repaymentMonth",
               })
             }
             required
              keyboardType={"phone-pad"}
-            error={errors.expectedRepayment}
+            error={errors.repaymentMonth}
           />
         </ScrollView>
       

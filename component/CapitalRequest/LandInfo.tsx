@@ -24,7 +24,7 @@ import { RootStackParamList } from "../types";
 import { CameraScreen } from "@/Items/CameraScreen";
 
 type FormData = {
-  landinfo?: LandInfoData;
+  inspectionland?: LandInfoData;
 };
 type LandImage = {
   uri: string;
@@ -38,10 +38,10 @@ type GeoLocation = {
 };
 
 type LandInfoData = {
-  cultivationLandsDescription: string;
-  landownby?: "Yes" | "No";
-  legalstatus?: string;
-  landImages?: LandImage[];
+  landDiscription: string;
+  isOwnByFarmer?: "Yes" | "No";
+  ownershipStatus?: string;
+  images?: LandImage[];
   geoLocation?: GeoLocation[]
 };
 
@@ -115,29 +115,29 @@ const [showCamera, setShowCamera] = useState(false);
   console.log("finance", formData);
 
 useEffect(() => {
-  if (!formData.landinfo) {
+  if (!formData.inspectionland) {
     setIsNextEnabled(false);
     return;
   }
 
   const requiredFields: (keyof LandInfoData)[] = [
-    "cultivationLandsDescription",
-    "landownby",
-    "legalstatus",
+    "landDiscription",
+    "isOwnByFarmer",
+    "ownershipStatus",
     "geoLocation"
   ];
 
   // Check if all required fields have a value
   const allFilled = requiredFields.every(
     (key) =>
-      formData.landinfo?.[key] !== undefined &&
-      formData.landinfo?.[key] !== null &&
-      formData.landinfo?.[key].toString().trim() !== ""
+      formData.inspectionland?.[key] !== undefined &&
+      formData.inspectionland?.[key] !== null &&
+      formData.inspectionland?.[key].toString().trim() !== ""
   );
 
   // Check if at least one image exists
   const hasImages =
-    formData.landinfo.landImages && formData.landinfo.landImages.length > 0;
+    formData.inspectionland.images && formData.inspectionland.images.length > 0;
 
   // Enable Next button only if all fields filled and at least one image
   setIsNextEnabled(allFilled && hasImages);
@@ -186,16 +186,16 @@ useEffect(() => {
   
   const handleLandInfoFieldChange = (key: keyof LandInfoData, value: any) => {
     const updatedLandInfo = {
-      ...(formData?.landinfo || {}),
+      ...(formData?.inspectionland || {}),
       [key]: value,
     };
 
     setFormData((prev: any) => ({
       ...prev,
-      landinfo: updatedLandInfo,
+      inspectionland: updatedLandInfo,
     }));
 
-    updateFormData({ landinfo: updatedLandInfo });
+    updateFormData({ inspectionland: updatedLandInfo });
   };
 
   const handleNext = () => {
@@ -262,21 +262,21 @@ const handleCameraClose = async (uri: string | null) => {
   if (!fileObj) return;
 
   const updatedImages = [
-    ...(formData?.landinfo?.landImages || []),
+    ...(formData?.inspectionland?.images || []),
     fileObj,
   ];
 
   const updatedLandInfo = {
-    ...(formData?.landinfo || {}),
-    landImages: updatedImages,
+    ...(formData?.inspectionland || {}),
+    images: updatedImages,
   };
 
   setFormData((prev: any) => ({
     ...prev,
-    landinfo: updatedLandInfo,
+    inspectionland: updatedLandInfo,
   }));
 
-  updateFormData({ landinfo: updatedLandInfo });
+  updateFormData({ inspectionland: updatedLandInfo });
 };
 
 
@@ -318,9 +318,9 @@ const handleCameraClose = async (uri: string | null) => {
               onPress={() => setlandownNoModal(true)}
               activeOpacity={0.7}
             >
-              {formData.landinfo?.landownby ? (
+              {formData.inspectionland?.isOwnByFarmer ? (
                 <Text className="text-black">
-                 {t(`InspectionForm.${formData.landinfo.landownby}`)}
+                 {t(`InspectionForm.${formData.inspectionland.isOwnByFarmer}`)}
                 </Text>
               ) : (
                 <Text className="text-[#838B8C]">
@@ -328,7 +328,7 @@ const handleCameraClose = async (uri: string | null) => {
                 </Text>
               )}
 
-              {!formData.landinfo?.landownby && (
+              {!formData.inspectionland?.isOwnByFarmer && (
                 <AntDesign name="down" size={20}
                
                   color="#838B8C"
@@ -347,9 +347,9 @@ const handleCameraClose = async (uri: string | null) => {
               onPress={() => setLegalStatusModal(true)}
               activeOpacity={0.7}
             >
-              {formData.landinfo?.legalstatus ? (
+              {formData.inspectionland?.ownershipStatus ? (
                 <Text className="text-black">
-                  {t(`InspectionForm.${formData.landinfo.legalstatus}`)}
+                  {t(`InspectionForm.${formData.inspectionland.ownershipStatus}`)}
                 </Text>
               ) : (
                 <Text className="text-[#838B8C]">
@@ -357,7 +357,7 @@ const handleCameraClose = async (uri: string | null) => {
                 </Text>
               )}
 
-              {!formData.landinfo?.legalstatus && (
+              {!formData.inspectionland?.ownershipStatus && (
                 <AntDesign name="down" size={20}
                   color="#838B8C"
                 />
@@ -379,7 +379,7 @@ const handleCameraClose = async (uri: string | null) => {
             >
               <TextInput
                 placeholder={t("InspectionForm.Type here...")}
-                value={formData.landinfo?.cultivationLandsDescription || ""}
+                value={formData.inspectionland?.landDiscription || ""}
                 onChangeText={(text) => {
                   let formattedText = text.replace(/^\s+/, "");
 
@@ -391,26 +391,26 @@ const handleCameraClose = async (uri: string | null) => {
 
                   setFormData((prev: FormData) => ({
                     ...prev,
-                    landinfo: {
-                      ...prev.landinfo,
-                      cultivationLandsDescription: formattedText,
+                    inspectionland: {
+                      ...prev.inspectionland,
+                      landDiscription: formattedText,
                     },
                   }));
 
                   let error = "";
                   if (!formattedText || formattedText.trim() === "") {
-                    error = t("Error.cultivationLandsDescription is required");
+                    error = t("Error.landDiscription is required");
                   }
                   setErrors((prev) => ({
                     ...prev,
-                    cultivationLandsDescription: error,
+                    landDiscription: error,
                   }));
 
                   if (!error) {
                     updateFormData({
-                      landinfo: {
-                        ...(formData.landinfo || {}),
-                        cultivationLandsDescription: formattedText,
+                      inspectionland: {
+                        ...(formData.inspectionland || {}),
+                        landDiscription: formattedText,
                       },
                     });
                   }
@@ -420,9 +420,9 @@ const handleCameraClose = async (uri: string | null) => {
                 textAlignVertical="top"
               />
             </View>
-            {errors.cultivationLandsDescription && (
+            {errors.landDiscription && (
               <Text className="text-red-500 text-sm mt-1 ml-2">
-                {errors.cultivationLandsDescription}
+                {errors.landDiscription}
               </Text>
             )}
           </View>
@@ -435,8 +435,8 @@ const handleCameraClose = async (uri: string | null) => {
     className="bg-[#FA345A] rounded-full px-4 py-4 flex-row items-center justify-center gap-x-2"
 onPress={() =>
   navigation.navigate("AttachGeoLocationScreen", {
-    currentLatitude: formData?.landinfo?.geoLocation?.latitude,
-    currentLongitude: formData?.landinfo?.geoLocation?.longitude,
+    currentLatitude: formData?.inspectionland?.geoLocation?.latitude,
+    currentLongitude: formData?.inspectionland?.geoLocation?.longitude,
 
     onLocationSelect: (
       latitude: number,
@@ -444,7 +444,7 @@ onPress={() =>
       locationName: string
     ) => {
       const updatedLandInfo = {
-        ...(formData?.landinfo || {}),
+        ...(formData?.inspectionland || {}),
         geoLocation: {
           latitude,
           longitude,
@@ -454,16 +454,16 @@ onPress={() =>
 
       setFormData((prev: any) => ({
         ...prev,
-        landinfo: updatedLandInfo,
+        inspectionland: updatedLandInfo,
       }));
 
-      updateFormData({ landinfo: updatedLandInfo });
+      updateFormData({ inspectionland: updatedLandInfo });
     },
   })
 }
 
   >
-    {formData?.landinfo?.geoLocation ? (
+    {formData?.inspectionland?.geoLocation ? (
     <Feather name="rotate-ccw" size={22} color="#fff" />
     ): (
           <MaterialIcons name="gps-fixed" size={22} color="#fff" />
@@ -475,14 +475,14 @@ onPress={() =>
 
 
 </View>
-{formData?.landinfo?.geoLocation && (
+{formData?.inspectionland?.geoLocation && (
   <TouchableOpacity
     className="mt-2 rounded-full px-4 py-3 flex-row items-center justify-center gap-x-2"
     onPress={() =>
       navigation.navigate("ViewLocationScreen", {
-        latitude: formData.landinfo.geoLocation.latitude,
-        longitude: formData.landinfo.geoLocation.longitude,
-        locationName:formData.landinfo.geoLocation.locationName
+        latitude: formData.inspectionland.geoLocation.latitude,
+        longitude: formData.inspectionland.geoLocation.longitude,
+        locationName:formData.inspectionland.geoLocation.locationName
       })
     }
   >
@@ -511,9 +511,9 @@ onPress={() =>
 </View>
 <View>
   
-{formData?.landinfo?.landImages?.length > 0 && (
+{formData?.inspectionland?.images?.length > 0 && (
   <View className="mt-4  flex-row flex-wrap">
-    {formData.landinfo.landImages.map((img: LandImage, index: number) => (
+    {formData.inspectionland.images.map((img: LandImage, index: number) => (
       <View key={index} className="w-40 h-40 m-1  rounded-xl overflow-hidden relative">
         <Image
           source={{ uri: img.uri }}
@@ -522,24 +522,24 @@ onPress={() =>
         <TouchableOpacity
           className="absolute top-1 right-1 bg-red-500 rounded-full w-6 h-6 justify-center items-center"
           onPress={async () => {
-            const updatedImages = formData.landinfo!.landImages.filter(
+            const updatedImages = formData.inspectionland!.images.filter(
               (_: LandImage, i: number) => i !== index
             );
 
             const updatedLandInfo = {
-              ...(formData.landinfo || {}),
-              landImages: updatedImages,
+              ...(formData.inspectionland || {}),
+              images: updatedImages,
             };
 
             setFormData((prev:any) => ({
               ...prev,
-              landinfo: updatedLandInfo,
+              inspectionland: updatedLandInfo,
             }));
 
             try {
               await AsyncStorage.setItem(
                 `${jobId}`,
-                JSON.stringify({ ...formData, landinfo: updatedLandInfo })
+                JSON.stringify({ ...formData, inspectionland: updatedLandInfo })
               );
               console.log("Image cleared!");
             } catch (e) {
@@ -618,7 +618,7 @@ onPress={() =>
                   className="py-4"
                   onPress={() => {
                     handleLandInfoFieldChange(
-                      "landownby",
+                      "isOwnByFarmer",
                       item as "Yes" | "No"
                     );
                     setlandownNoModal(false);
@@ -650,7 +650,7 @@ onPress={() =>
           <TouchableOpacity
             className="py-4 px-4"
             onPress={() => {
-              handleLandInfoFieldChange("legalstatus", item);
+              handleLandInfoFieldChange("ownershipStatus", item);
               setLegalStatusModal(false);
             }}
           >

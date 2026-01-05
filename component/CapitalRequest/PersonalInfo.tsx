@@ -42,17 +42,17 @@ interface DistrictsMap {
 type PersonalInfo = {
   firstName: string;
   lastName: string;
-  otherNames: string;
+  otherName: string;
   callName: string;
-  mobile1: string;
-  mobile2: string;
+  phone1: string;
+  phone2: string;
   familyPhone: string;
-  landPhoneHome: string;
-  landPhoneWork: string;
+  landHome: string;
+  landWork: string;
   email1: string;
   email2: string;
-  houseNumber: string;
-  streetName: string;
+  house: string;
+  street: string;
   cityName: string;
   district: string | null;
   province: string | null;
@@ -127,18 +127,18 @@ type ValidationRule = {
     | "firstName"
     | "lastName"
     | "email"
-    | "mobile1"
-    | "mobile2"
+    | "phone1"
+    | "phone2"
     | "familyPhone"
-    | "otherNames"
+    | "otherName"
     | "callName"
-    | "landPhoneHome"
-    | "landPhoneWork"
-    | "streetName"
+    | "landHome"
+    | "landWork"
+    | "street"
     | "email1"
     | "email2"
     | "cityName"
-    | "houseNumber";
+    | "house";
   minLength?: number;
  uniqueWith?: (keyof PersonalInfo)[];
 };
@@ -195,10 +195,10 @@ const validateAndFormat = (
   if (
     rules.type === "firstName" ||
     rules.type === "lastName" ||
-    rules.type === "otherNames" ||
+    rules.type === "otherName" ||
     rules.type === "callName" ||
     rules.type === "cityName" ||
-    rules.type === "streetName"
+    rules.type === "street"
   ) {
     // value = value.replace(/^\s+/, "");
     // value = value.replace(/[^a-zA-Z\s]/g, "").toLowerCase();
@@ -220,7 +220,7 @@ const validateAndFormat = (
     }
   }
 
-if (rules.type === "houseNumber") {
+if (rules.type === "house") {
   let cleaned = value.replace(/[^a-zA-Z0-9 ]/g, "");
 
   cleaned = cleaned.replace(/^\s+/, "");
@@ -271,8 +271,8 @@ if (rules.type === "email1" || rules.type === "email2") {
   }
 
   if (
-    rules.type === "mobile1" ||
-    rules.type === "mobile2" ||
+    rules.type === "phone1" ||
+    rules.type === "phone2" ||
     rules.type === "familyPhone" 
   ) {
     let numbersOnly = value.replace(/[^0-9]/g, "");
@@ -304,7 +304,7 @@ if (rules.type === "email1" || rules.type === "email2") {
     }
   }
 
-  if (rules.type === "landPhoneHome" || rules.type === "landPhoneWork") {
+  if (rules.type === "landHome" || rules.type === "landWork") {
     let numbersOnly = value.replace(/[^0-9]/g, "");
 
     numbersOnly = numbersOnly.replace(/^0+/, "");
@@ -361,17 +361,17 @@ const [formData, setFormData] = useState<FormData>({
   personalInfo: {
     firstName: "",
     lastName: "",
-    otherNames: "",
+    otherName: "",
     callName: "",
-    mobile1: "",
-    mobile2: "",
+    phone1: "",
+    phone2: "",
     familyPhone: "",
-    landPhoneHome: "",
-    landPhoneWork: "",
+    landHome: "",
+    landWork: "",
     email1: "",
     email2: "",
-    houseNumber: "",
-    streetName: "",
+    house: "",
+    street: "",
     cityName: "",
     district: null,
     province: null,
@@ -386,13 +386,13 @@ const [formData, setFormData] = useState<FormData>({
   const requiredFields: (keyof PersonalInfo)[] = [
     "firstName",
     "lastName",
-    "otherNames",
+    "otherName",
     "callName",
-    "mobile1",
+    "phone1",
     "familyPhone",
     "email1",
-    "houseNumber",
-    "streetName",
+    "house",
+    "street",
     "cityName",
     "district",
     "province",
@@ -516,15 +516,15 @@ useFocusEffect(
               lastName: "",
               otherNames: "",
               callName: "",
-              mobile1: "",
-              mobile2: "",
+              phone1: "",
+              phone2: "",
               familyPhone: "",
-              landPhoneHome: "",
-              landPhoneWork: "",
+              landHome: "",
+              landWork: "",
               email1: "",
               email2: "",
-              houseNumber: "",
-              streetName: "",
+              house: "",
+              street: "",
               cityName: "",
               district: null,
               province: null,
@@ -706,13 +706,13 @@ useFocusEffect(
   const requiredFields: (keyof PersonalInfo)[] = [
     "firstName",
     "lastName",
-    "otherNames",
+    "otherName",
     "callName",
-    "mobile1",
+    "phone1",
     "familyPhone",
     "email1",
-    "houseNumber",
-    "streetName",
+    "house",
+    "street",
     "cityName",
     "district",
     "province",
@@ -736,11 +736,11 @@ useFocusEffect(
 
       if (key.startsWith("mobile") || key.includes("Phone")) {
         rules.type = key as
-          | "mobile1"
-          | "mobile2"
+          | "phone1"
+          | "phone2"
           | "familyPhone"
-          | "landPhoneHome"
-          | "landPhoneWork";
+          | "landHome"
+          | "landWork";
       }
       if (key.includes("email")) {
         rules.type = key as "email1" | "email2";
@@ -848,15 +848,15 @@ useFocusEffect(
           <Input
             label={t("InspectionForm.Other Names")}
             placeholder="----"
-            value={formData.personalInfo.otherNames}
+            value={formData.personalInfo.otherName}
             onChangeText={(text) =>
-              handleFieldChange("otherNames", text, {
+              handleFieldChange("otherName", text, {
                 required: true,
-                type: "otherNames",
+                type: "otherName",
               })
             }
             required
-            error={errors.otherNames}
+            error={errors.otherName}
           />
           <Input
             label={t("InspectionForm.Call Name")}
@@ -877,20 +877,20 @@ useFocusEffect(
           <Input
             label={t("InspectionForm.Mobile Number - 1")}
             placeholder="7XXXXXXXX"
-            value={formData.personalInfo.mobile1}
+            value={formData.personalInfo.phone1}
             onChangeText={(text) =>
-              handleFieldChange("mobile1", text, {
+              handleFieldChange("phone1", text, {
                 required: true,
-                type: "mobile1",
+                type: "phone1",
                 uniqueWith: [
-                  "mobile2",
+                  "phone2",
                   "familyPhone",
-                  "landPhoneWork",
-                  "landPhoneHome",
+                  "landWork",
+                  "landHome",
                 ],
               })
             }
-            error={errors.mobile1}
+            error={errors.phone1}
             keyboardType={"phone-pad"}
             isMobile={true}
             required
@@ -898,21 +898,21 @@ useFocusEffect(
           <Input
             label={t("InspectionForm.Mobile Number - 2")}
             placeholder="7XXXXXXXX"
-            value={formData.personalInfo.mobile2}
+            value={formData.personalInfo.phone2}
             onChangeText={(text) =>
-              handleFieldChange("mobile2", text, {
+              handleFieldChange("phone2", text, {
                 required: false,
-                type: "mobile2",
+                type: "phone2",
                 uniqueWith: [
-                  "mobile1",
+                  "phone1",
                   "familyPhone",
-                  "landPhoneWork",
-                  "landPhoneHome",
+                  "landWork",
+                  "landHome",
                 ],
               })
             }
             keyboardType={"phone-pad"}
-            error={errors.mobile2}
+            error={errors.phone2}
             isMobile={true}
           />
           <Input
@@ -925,10 +925,10 @@ useFocusEffect(
                 required: true,
                 type: "familyPhone",
                 uniqueWith: [
-                  "mobile1",
-                  "mobile2",
-                  "landPhoneWork",
-                  "landPhoneHome",
+                  "phone1",
+                  "phone2",
+                  "landWork",
+                  "landHome",
                 ],
               })
             }
@@ -939,41 +939,41 @@ useFocusEffect(
           <Input
             label={t("InspectionForm.Land Phone Number - Home")}
             placeholder="XXXXXXXXX"
-            value={formData.personalInfo.landPhoneHome}
+            value={formData.personalInfo.landHome}
             onChangeText={(text) =>
-              handleFieldChange("landPhoneHome", text, {
+              handleFieldChange("landHome", text, {
                 required: false,
-                type: "landPhoneHome",
+                type: "landHome",
                 uniqueWith: [
-                  "mobile1",
-                  "mobile2",
+                  "phone1",
+                  "phone2",
                   "familyPhone",
-                  "landPhoneWork",
+                  "landWork",
                 ],
               })
             }
             keyboardType={"phone-pad"}
-            error={errors.landPhoneHome}
+            error={errors.landHome}
             isMobile={true}
           />
           <Input
             label={t("InspectionForm.Land Phone Number - Work")}
             placeholder="XXXXXXXXX"
-            value={formData.personalInfo.landPhoneWork}
+            value={formData.personalInfo.landWork}
             onChangeText={(text) =>
-              handleFieldChange("landPhoneWork", text, {
+              handleFieldChange("landWork", text, {
                 required: false,
-                type: "landPhoneWork",
+                type: "landWork",
                 uniqueWith: [
-                  "mobile1",
-                  "mobile2",
+                  "phone1",
+                  "phone2",
                   "familyPhone",
-                  "landPhoneHome",
+                  "landHome",
                 ],
               })
             }
             keyboardType={"phone-pad"}
-            error={errors.landPhoneWork}
+            error={errors.landWork}
             isMobile={true}
           />
           <Input
@@ -1013,28 +1013,28 @@ useFocusEffect(
           <Input
             label={t("InspectionForm.House / Plot Number")}
             placeholder="----"
-            value={formData.personalInfo.houseNumber}
+            value={formData.personalInfo.house}
             onChangeText={(text) =>
-              handleFieldChange("houseNumber", text, {
+              handleFieldChange("house", text, {
                 required: true,
-                type: "houseNumber",
+                type: "house",
               })
             }
             required
-            error={errors.houseNumber}
+            error={errors.house}
           />
           <Input
             label={t("InspectionForm.Street Name")}
             placeholder="----"
-            value={formData.personalInfo.streetName}
+            value={formData.personalInfo.street}
             onChangeText={(text) =>
-              handleFieldChange("streetName", text, {
+              handleFieldChange("street", text, {
                 required: true,
-                type: "streetName",
+                type: "street",
               })
             }
             required
-            error={errors.streetName}
+            error={errors.street}
           />
           <Input
             label={t("InspectionForm.City / Town Name")}

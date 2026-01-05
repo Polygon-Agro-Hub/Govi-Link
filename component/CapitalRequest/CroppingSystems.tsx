@@ -28,15 +28,15 @@ import { CameraScreen } from "@/Items/CameraScreen";
 
 
 type CroppingSystemsData = {
-  AnOpportunityToGoFor?: string[];
-  otherAnOpportunityToGoFor?: string;
-  DoestheFarmerHasTheKnowledgeOnCropping?: "Yes" | "No";
-  WhatisYourPreviousExperiences?: string;
-  WhatistheGeneralOpinionofYourFriends?: string;
+  opportunity?: string[];
+  otherOpportunity?: string;
+  hasKnowlage?: "Yes" | "No";
+  prevExperince?: string;
+  opinion?: string;
 };
 
 type FormData = {
-  CroppingSystems?: CroppingSystemsData;
+  inspectioncropping?: CroppingSystemsData;
 };
 
 const YesNoSelect = ({
@@ -138,21 +138,21 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
 
 
 useEffect(() => {
-  const cs = formData?.CroppingSystems ?? {};
+  const cs = formData?.inspectioncropping ?? {};
 
   const isOpportunityValid =
-    cs.AnOpportunityToGoFor?.length > 0 &&
-    (!cs.AnOpportunityToGoFor.includes("Other") ||
-      cs.otherAnOpportunityToGoFor?.trim());
+    cs.opportunity?.length > 0 &&
+    (!cs.opportunity.includes("Other") ||
+      cs.otherOpportunity?.trim());
 
   const isKnowledgeValid =
-    cs.DoestheFarmerHasTheKnowledgeOnCropping === "Yes" ||
-    cs.DoestheFarmerHasTheKnowledgeOnCropping === "No";
+    cs.hasKnowlage === "Yes" ||
+    cs.hasKnowlage === "No";
 
-  const isExperienceValid = !!cs.WhatisYourPreviousExperiences;
+  const isExperienceValid = !!cs.prevExperince;
 
   const isOpinionValid =
-    !!cs.WhatistheGeneralOpinionofYourFriends?.trim();
+    !!cs.opinion?.trim();
 
   const hasErrors = Object.values(errors).some(Boolean);
 
@@ -173,8 +173,8 @@ useEffect(() => {
     try {
       const updatedFormData = {
         ...formData,
-        CroppingSystems: {
-          ...formData.CroppingSystems,
+        inspectioncropping: {
+          ...formData.inspectioncropping,
           ...updates,
         },
       };
@@ -206,6 +206,7 @@ useEffect(() => {
 
 
   const handleNext = () => {
+        navigation.navigate("ProfitRisk", { formData, requestNumber });
     const validationErrors: Record<string, string> = {};
 
     if (Object.keys(validationErrors).length > 0) {
@@ -218,15 +219,15 @@ useEffect(() => {
       return;
     }
 
-    navigation.navigate("CroppingSystems", { formData, requestNumber });
+    navigation.navigate("ProfitRisk", { formData, requestNumber });
   };
 
   
   const handleyesNOFieldChange = async (key: string, value: "Yes" | "No") => {
     const updatedFormData = {
       ...formData,
-      CroppingSystems: {
-        ...formData.CroppingSystems,
+      inspectioncropping: {
+        ...formData.inspectioncropping,
         [key]: value,
       },
     };
@@ -280,14 +281,14 @@ useEffect(() => {
 
   {["Inter cropping","Mixed cropping", "Multistoreyed cropping","Relay Cropping","Crop Rotation", "Other"].map((option) => {
     const selected =
-      formData.CroppingSystems?.AnOpportunityToGoFor?.includes(option) || false;
+      formData.inspectioncropping?.opportunity?.includes(option) || false;
 
     return (
       <View key={option} className="flex-row items-center mb-4">
         <Checkbox
           value={selected}
             onValueChange={async () => {
-            let updatedOptions = formData.CroppingSystems?.AnOpportunityToGoFor || [];
+            let updatedOptions = formData.inspectioncropping?.opportunity || [];
 
             if (selected) {
               updatedOptions = updatedOptions.filter((o: any) => o !== option);
@@ -297,13 +298,13 @@ useEffect(() => {
 
             const updatedFormData = {
               ...formData,
-              CroppingSystems: {
-                ...formData.CroppingSystems,
-                AnOpportunityToGoFor: updatedOptions,
-                otherAnOpportunityToGoFor:
+              inspectioncropping: {
+                ...formData.inspectioncropping,
+                opportunity: updatedOptions,
+                otherOpportunity:
                   option === "Other" && !updatedOptions.includes("Other")
                     ? ""
-                    : formData.CroppingSystems?.otherAnOpportunityToGoFor,
+                    : formData.inspectioncropping?.otherOpportunity,
               },
             };
 
@@ -311,7 +312,7 @@ useEffect(() => {
 
 let errorMsg = "";
 
-const opportunity = updatedFormData.CroppingSystems.AnOpportunityToGoFor || [];
+const opportunity = updatedFormData.inspectioncropping.opportunity || [];
 
 // Filter out "Other" to see if at least one real option is selected
 const validopportunity = opportunity.filter((source: string) => source !== "Other");
@@ -321,7 +322,7 @@ if (validopportunity.length === 0) {
   errorMsg = t("Error.Please select at least one opportunity to go for");
 } else if (
   opportunity.includes("Other") && 
-  !updatedFormData.CroppingSystems.otherAnOpportunityToGoFor?.trim()
+  !updatedFormData.inspectioncropping.otherOpportunity?.trim()
 ) {
   // "Other" is selected but not specified
   errorMsg = t("Error.Please specify the other opportunity to go for");
@@ -329,7 +330,7 @@ if (validopportunity.length === 0) {
 
 setErrors((prev) => ({
   ...prev,
-  AnOpportunityToGoFor: errorMsg,
+  opportunity: errorMsg,
 }));
 
 
@@ -350,23 +351,23 @@ setErrors((prev) => ({
   })}
 
 
-  {formData.CroppingSystems?.AnOpportunityToGoFor?.includes("Other") && (
+  {formData.inspectioncropping?.opportunity?.includes("Other") && (
     <TextInput
       placeholder={t("InspectionForm.--Mention Other--")}
       placeholderTextColor="#838B8C"
       className="bg-[#F6F6F6] px-4 py-4 rounded-full text-black mb-2"
-      value={formData.CroppingSystems?.otherAnOpportunityToGoFor || ""}
+      value={formData.inspectioncropping?.otherOpportunity || ""}
       onChangeText={async (text) => {
         const updatedFormData = {
           ...formData,
-          CroppingSystems: {
-            ...formData.CroppingSystems,
-             otherAnOpportunityToGoFor: text,
+          inspectioncropping: {
+            ...formData.inspectioncropping,
+             otherOpportunity: text,
           },
         };
         setFormData(updatedFormData);
    let errorMsg = "";
-  const opportunity = updatedFormData.CroppingSystems.AnOpportunityToGoFor || [];
+  const opportunity = updatedFormData.inspectioncropping.opportunity|| [];
   const validopportunity= opportunity.filter(
     (source: string) => source !== "Other"
   );
@@ -377,7 +378,7 @@ setErrors((prev) => ({
     errorMsg = t("Error.Please specify the other opportunity to go for");
   }
 
-  setErrors((prev) => ({ ...prev, AnOpportunityToGoFor: errorMsg }));
+  setErrors((prev) => ({ ...prev, opportunity: errorMsg }));
 
         try {
           await AsyncStorage.setItem(
@@ -391,8 +392,8 @@ setErrors((prev) => ({
     />
   )}
 
-    {errors.AnOpportunityToGoFor ? (
-    <Text className="text-red-500 text-sm mt-1">{errors.AnOpportunityToGoFor}</Text>
+    {errors.opportunity ? (
+    <Text className="text-red-500 text-sm mt-1">{errors.opportunity}</Text>
   ) : null}
 
 </View>
@@ -403,14 +404,14 @@ setErrors((prev) => ({
             )}
             required
             value={
-              formData.CroppingSystems?.DoestheFarmerHasTheKnowledgeOnCropping || null
+              formData.inspectioncropping?.hasKnowlage || null
             }
             visible={
               yesNoModalVisible &&
-              activeYesNoField === "DoestheFarmerHasTheKnowledgeOnCropping"
+              activeYesNoField === "hasKnowlage"
             }
             onOpen={() => {
-              setActiveYesNoField("DoestheFarmerHasTheKnowledgeOnCropping");
+              setActiveYesNoField("hasKnowlage");
               setYesNoModalVisible(true);
             }}
             onClose={() => {
@@ -418,7 +419,7 @@ setErrors((prev) => ({
               setActiveYesNoField(null);
             }}
             onSelect={(value) =>
-              handleyesNOFieldChange("DoestheFarmerHasTheKnowledgeOnCropping", value)
+              handleyesNOFieldChange("hasKnowlage", value)
             }
           />
 
@@ -434,8 +435,8 @@ setErrors((prev) => ({
                           setOverallSoilFertilityVisible(true)
                           setFormData({
                             ...formData,
-                            CroppingSystems: {
-                              ...formData.CroppingSystems
+                            inspectioncropping: {
+                              ...formData.inspectioncropping
                             },
                           })
                         }
@@ -443,19 +444,19 @@ setErrors((prev) => ({
                       >
                         <Text
                           className={
-                            formData.CroppingSystems?.WhatisYourPreviousExperiences
+                            formData.inspectioncropping?.prevExperince
                               ? "text-black"
                               : "text-[#A3A3A3]"
                           }
                         >
-                          {formData.CroppingSystems?.WhatisYourPreviousExperiences
+                          {formData.inspectioncropping?.prevExperince
                             ? t(
-                                `InspectionForm.${formData.CroppingSystems.WhatisYourPreviousExperiences}`
+                                `InspectionForm.${formData.inspectioncropping.prevExperince}`
                               )
                             : t("InspectionForm.--Select From Here--")}
                         </Text>
           
-                        {!formData.CroppingSystems?.WhatisYourPreviousExperiences && (
+                        {!formData.inspectioncropping?.prevExperince && (
                           <AntDesign name="down" size={20} color="#838B8C" />
                         )}
                       </TouchableOpacity>
@@ -476,7 +477,7 @@ setErrors((prev) => ({
                       >
                         <TextInput
                           placeholder={t("InspectionForm.Type here...")}
-                          value={formData.CroppingSystems?.WhatistheGeneralOpinionofYourFriends || ""}
+                          value={formData.inspectioncropping?.opinion || ""}
                           onChangeText={(text) => {
                             let formattedText = text.replace(/^\s+/, "");
           
@@ -488,9 +489,9 @@ setErrors((prev) => ({
           
                             setFormData((prev: FormData) => ({
                               ...prev,
-                              CroppingSystems: {
-                                ...prev.CroppingSystems,
-                                WhatistheGeneralOpinionofYourFriends: formattedText,
+                              inspectioncropping: {
+                                ...prev.inspectioncropping,
+                                opinion: formattedText,
                               },
                             }));
           
@@ -500,12 +501,12 @@ setErrors((prev) => ({
                             }
                             setErrors((prev) => ({
                               ...prev,
-                              WhatistheGeneralOpinionofYourFriends: error,
+                              opinion: error,
                             }));
           
                      
              updateFormData({
-  WhatistheGeneralOpinionofYourFriends: formattedText,
+  opinion: formattedText,
 });
 
                           }}
@@ -514,9 +515,9 @@ setErrors((prev) => ({
                           textAlignVertical="top"
                         />
                       </View>
-                      {errors.WhatistheGeneralOpinionofYourFriends && (
+                      {errors.opinion && (
                         <Text className="text-red-500 text-sm mt-1 ml-2">
-                          {errors.WhatistheGeneralOpinionofYourFriends}
+                          {errors.opinion}
                         </Text>
                       )}
                     </View>
@@ -539,7 +540,7 @@ setErrors((prev) => ({
               {t("InspectionForm.Exit")}
             </Text>
           </TouchableOpacity>
-          {isNextEnabled == true ? (
+          {isNextEnabled == false ? (
             <View className="flex-1"> 
               <TouchableOpacity className="flex-1 " onPress={handleNext}>
                 <LinearGradient
@@ -593,9 +594,9 @@ setErrors((prev) => ({
                   onPress={async () => {
                     const updatedFormData = {
                       ...formData,
-                      CroppingSystems: {
-                        ...formData.CroppingSystems,
-                        WhatisYourPreviousExperiences: item,
+                      inspectioncropping: {
+                        ...formData.inspectioncropping,
+                        prevExperince: item,
                       },
                     };
 
