@@ -114,7 +114,10 @@
     "cultivationLandsDescription is required": "Cultivation lands description is required",
     "Please select at least one water source": "Please select at least one water source",
     "Please specify the other water source": "Please specify the other water source",
-    "Image of the water source is required":"Image of the water source is required"
+    "Image of the water source is required": "Image of the water source is required",
+    "Please select at least one opportunity to go for": "Please select at least one opportunity to go for",
+    "Please specify the other opportunity to go for": "Please specify the other opportunity to go for",
+    "General opinion of your friends is required": "General opinion of your friends is required"
   },
   "Login": {
     "Welcome": "Welcome!",
@@ -615,7 +618,19 @@
     "River": "River",
     "Dams": "Dams",
     "Other": "Other",
-    "Images of the water source":"Images of the water source",
-    "--Mention Other--":"--Mention Other--"
+    "Images of the water source": "Images of the water source",
+    "--Mention Other--": "--Mention Other--",
+    "An opportunity to go for": "An opportunity to go for :",
+    "Inter cropping": "Inter cropping",
+    "Mixed cropping": "Mixed cropping",
+    "Multistoreyed cropping": "Multistoreyed cropping",
+    "Relay Cropping": "Relay Cropping",
+    "Crop Rotation": "Crop Rotation",
+    "Does the farmer has the knowledge on cropping systems management": "Does the farmer has the knowledge on cropping systems management?",
+    "What is the general opinion of your friends, neighborhood farmers on proposed crop / cropping systems": "What is the general opinion of your friends, neighborhood farmers on proposed crop / cropping systems?",
+    "No previous experience":"No previous experience",
+    "Have grown this crop once or twice":"Have grown this crop once or twice",
+    "Have grown this crop multiple seasons":"Have grown this crop multiple seasons",
+    "Have been cultivating this crop for many years":"Have been cultivating this crop for many years"
   }
 }

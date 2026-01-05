@@ -617,6 +617,18 @@
     "Dams": "වේලි",
     "Other": "වෙනත්",
     "Images of the water source": "ජල මූලාශ්‍රයේ රූප",
-    "--Mention Other--": "--වෙනත් සඳහන් කරන්න--"
+    "--Mention Other--": "--වෙනත් සඳහන් කරන්න--",
+      "An opportunity to go for": "යාමට අවස්ථාවක් :",
+    "Inter cropping": "Inter cropping",
+    "Mixed cropping": "Mixed cropping",
+    "Multistoreyed cropping": "Multistoreyed cropping",
+    "Relay Cropping": "Relay Cropping",
+    "Crop Rotation": "Crop Rotation",
+    "Does the farmer has the knowledge on cropping systems management": "Does the farmer has the knowledge on cropping systems management?",
+    "What is the general opinion of your friends, neighborhood farmers on proposed crop / cropping systems": "What is the general opinion of your friends, neighborhood farmers on proposed crop / cropping systems?",
+    "No previous experience":"No previous experience",
+    "Have grown this crop once or twice":"Have grown this crop once or twice",
+    "Have grown this crop multiple seasons":"Have grown this crop multiple seasons",
+    "Have been cultivating this crop for many years":"Have been cultivating this crop for many years"
   }
 }

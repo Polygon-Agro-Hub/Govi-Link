@@ -53,6 +53,7 @@ import AttachGeoLocationScreen from "@/component/CapitalRequest/AttachGeoLocatio
 import ViewLocationScreen from "@/component/CapitalRequest/ViewLocationScreen";
 import InvestmentInfo from "@/component/CapitalRequest/InvestmentInfo";
 import CultivationInfo from "@/component/CapitalRequest/CultivationInfo";
+import CroppingSystems from "@/component/CapitalRequest/CroppingSystems";
 
 LogBox.ignoreAllLogs(true);
 NativeWindStyleSheet.setOutput({ default: "native" });
@@ -229,6 +230,7 @@ function AppContent() {
                     <Stack.Screen name="ViewLocationScreen" component={ViewLocationScreen as any} />
                     <Stack.Screen name="InvestmentInfo" component={InvestmentInfo} />
                     <Stack.Screen name="CultivationInfo" component={CultivationInfo} />
+                    <Stack.Screen name="CroppingSystems" component={CroppingSystems} />
 
           </Stack.Navigator>
         </NavigationContainer>

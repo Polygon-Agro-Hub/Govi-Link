@@ -115,4 +115,5 @@ export type RootStackParamList = {
 },
 InvestmentInfo:{formData:any, requestNumber:string};
 CultivationInfo:{formData:any, requestNumber:string};
+CroppingSystems:{formData:any, requestNumber:string};
 };

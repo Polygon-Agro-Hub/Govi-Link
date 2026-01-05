@@ -362,6 +362,8 @@ useEffect(() => {
   };
 
   const handleNext = () => {
+        navigation.navigate("CroppingSystems", { formData, requestNumber });
+
     const validationErrors: Record<string, string> = {};
 
     if (Object.keys(validationErrors).length > 0) {
@@ -374,7 +376,7 @@ useEffect(() => {
       return;
     }
 
-    navigation.navigate("", { formData, requestNumber });
+    navigation.navigate("CroppingSystems", { formData, requestNumber });
   };
 
   console.log(selections);
@@ -714,17 +716,27 @@ const onClearImage = async () => {
 
             setFormData(updatedFormData);
 
-            // VALIDATION
-            let errorMsg = "";
-            if (!updatedFormData.cultivationInfo.waterSources?.length) {
-              errorMsg = t("Error.Please select at least one water source");
-            } else if (
-              updatedFormData.cultivationInfo.waterSources.includes("Other") &&
-              !updatedFormData.cultivationInfo.otherWaterSource?.trim()
-            ) {
-              errorMsg = t("Error.Please specify the other water source");
-            }
-            setErrors((prev) => ({ ...prev, waterSources: errorMsg }));
+// VALIDATION
+let errorMsg = "";
+
+const waterSources = updatedFormData.cultivationInfo.waterSources || [];
+
+// Filter out "Other" to see if at least one real option is selected
+const validWaterSources = waterSources.filter((source: string) => source !== "Other");
+
+if (validWaterSources.length === 0) {
+  // No real water source selected
+  errorMsg = t("Error.Please select at least one water source");
+} else if (
+  waterSources.includes("Other") && 
+  !updatedFormData.cultivationInfo.otherWaterSource?.trim()
+) {
+  // "Other" is selected but not specified
+  errorMsg = t("Error.Please specify the other water source");
+}
+
+setErrors(prev => ({ ...prev, waterSources: errorMsg }));
+
 
             try {
               await AsyncStorage.setItem(
@@ -749,26 +761,39 @@ const onClearImage = async () => {
       placeholderTextColor="#838B8C"
       className="bg-[#F6F6F6] px-4 py-4 rounded-full text-black mb-2"
       value={formData.cultivationInfo?.otherWaterSource || ""}
-      onChangeText={async (text) => {
-        const updatedFormData = {
-          ...formData,
-          cultivationInfo: {
-            ...formData.cultivationInfo,
-            otherWaterSource: text,
-          },
-        };
-        setFormData(updatedFormData);
+    onChangeText={(text) => {
+  const updatedFormData = {
+    ...formData,
+    cultivationInfo: {
+      ...formData.cultivationInfo,
+      otherWaterSource: text,
+    },
+  };
 
-        try {
-          await AsyncStorage.setItem(
-            `${jobId}`,
-            JSON.stringify(updatedFormData)
-          );
-        } catch (e) {
-          console.log("AsyncStorage save failed", e);
-        }
-      }}
+  setFormData(updatedFormData);
+
+  let errorMsg = "";
+  const waterSources = updatedFormData.cultivationInfo.waterSources || [];
+  const validWaterSources = waterSources.filter(
+    (source: string) => source !== "Other"
+  );
+
+  if (validWaterSources.length === 0) {
+    errorMsg = t("Error.Please select at least one water source");
+  } else if (waterSources.includes("Other") && !text.trim()) {
+    errorMsg = t("Error.Please specify the other water source");
+  }
+
+  setErrors((prev) => ({ ...prev, waterSources: errorMsg }));
+
+  // 3️⃣ Save to AsyncStorage in the background (don't await here)
+  AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData)).catch(e =>
+    console.log("AsyncStorage save failed", e)
+  );
+}}
+
     />
+
   )}
 
     {errors.waterSources ? (
@@ -1009,7 +1034,7 @@ const onClearImage = async () => {
               {t("InspectionForm.Exit")}
             </Text>
           </TouchableOpacity>
-          {isNextEnabled == true ? (
+          {isNextEnabled == false ? (
             <View className="flex-1">
               <TouchableOpacity className="flex-1 " onPress={handleNext}>
                 <LinearGradient
@@ -1044,10 +1069,12 @@ const onClearImage = async () => {
         transparent
         animationType="fade"
         visible={overallSoilFertilityVisible}
+        
       >
         <TouchableOpacity
           className="flex-1 bg-black/40 justify-center items-center"
           activeOpacity={1}
+                    onPress={()=>{setOverallSoilFertilityVisible(false)}}
         >
           <View className="bg-white w-80 rounded-2xl overflow-hidden">
             {[
