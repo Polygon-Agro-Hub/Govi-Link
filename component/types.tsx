@@ -1,5 +1,7 @@
 export type RootStackParamList = {
   Main: { screen: keyof RootStackParamList; params?: any };
+    MainTabs: { screen: keyof RootStackParamList; params?: any };
+
   Dashboard: undefined;
   Lanuage: undefined;
   Splash: undefined;
@@ -78,14 +80,14 @@ export type RootStackParamList = {
     farmerMobile?: number;
   };
   ManageOfficers: undefined;
-  AddOfficerStep1: undefined;
-  AddOfficerStep2: { formData: any };
-  AddOfficerStep3: { formData: any };
+  AddOfficerStep1: {isnew?:boolean};
+  AddOfficerStep2: { formData: any , isnewsecondstep?:boolean};
+  AddOfficerStep3: { formData: any, isnewthirdstep?:boolean};
   ChangePassword: { passwordUpdate: number };
   ComplainHistory: undefined;
   AssignJobs: undefined;
   CapitalRequests: undefined;
-  RequestDetails: { requestId: string };
+  RequestDetails: { requestId: number, requestNumber:string };
   AssignJobOfficerList: {
     selectedJobIds: string[];
     selectedDate: string;
@@ -96,4 +98,22 @@ export type RootStackParamList = {
     govilinkJobIds?: number[];
     auditType?: "feildaudits" | "govilinkjobs";
   };
+
+  PersonalInfo: { requestNumber:string }
+  IDProof:{formData:any, requestNumber:string}
+  FinanceInfo:{formData:any, requestNumber:string}
+  LandInfo:{formData:any, requestNumber:string}
+    AttachGeoLocationScreen: {
+  currentLatitude?: number;
+  currentLongitude?: number;
+  onLocationSelect?: (latitude: number, longitude: number, locationName: string) => void;
+};
+  ViewLocationScreen: {
+  latitude: number;
+  longitude: number;
+  locationName?: string;
+},
+InvestmentInfo:{formData:any, requestNumber:string};
+CultivationInfo:{formData:any, requestNumber:string};
+CroppingSystems:{formData:any, requestNumber:string};
 };

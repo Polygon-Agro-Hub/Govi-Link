@@ -15,6 +15,7 @@ import {
   Linking,
   Alert,
   Dimensions,
+    Animated, PanResponder
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
@@ -149,7 +150,49 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
 
   };
 
+const translateY = useRef(new Animated.Value(0)).current;
+const currentTranslateY = useRef(0);
+console.log(translateY)
 
+const panResponder = useRef(
+  PanResponder.create({
+    onMoveShouldSetPanResponderCapture: (_, g) => g.dy > 5,
+    onStartShouldSetPanResponder: () => true,
+
+    onPanResponderMove: (_, g) => {
+      if (g.dy > 0) translateY.setValue(g.dy);
+    },
+
+    onPanResponderRelease: (_, g) => {
+      if (g.dy > 120) {
+        console.log("hit1");
+                  setShowPopup(false);
+        Animated.timing(translateY, {
+          toValue: 600,
+          duration: 100,
+          useNativeDriver: true,
+        }).start(() => {
+          console.log("hit3");
+          translateY.setValue(0);
+          setShowPopup(false);
+          setSelectedItem(null);
+        });
+      } else {
+        console.log("hit4");
+        Animated.spring(translateY, {
+          toValue: 0,
+          useNativeDriver: true,
+        }).start();
+      }
+    },
+  })
+).current;
+
+useEffect(() => {
+  if (showPopup) {
+    translateY.setValue(0);
+  }
+}, [showPopup]);
   const scrollToIndex = (index: number) => {
     if (!flatListRef.current || !visitsData || visitsData.length === 0) return;
 
@@ -191,7 +234,8 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
           t("Error.Sorry"),
           t(
             "Error.Your login session has expired. Please log in again to continue."
-          )
+          ),
+          [{ text: t("MAIN.OK") }]
         );
         return;
       }
@@ -212,7 +256,8 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
           t("Error.Sorry"),
           t(
             "Error.Your login session has expired. Please log in again to continue."
-          )
+          ),
+          [{ text: t("MAIN.OK") }]
         );
         navigation.navigate("Login");
       }
@@ -268,17 +313,6 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
     }
   };
 
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     const onBackPress = () => true;
-  //     BackHandler.addEventListener("hardwareBackPress", onBackPress);
-  //     const subscription = BackHandler.addEventListener(
-  //       "hardwareBackPress",
-  //       onBackPress
-  //     );
-  //     return () => subscription.remove();
-  //   }, [])
-  // );
   useFocusEffect(
     React.useCallback(() => {
       const backAction = () => {
@@ -305,49 +339,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
       };
     }
   };
-  // const fetchVisits = async () => {
-  //   try {
-  //     const token = await AsyncStorage.getItem("token");
-
-  //     if (token) {
-  //       const response = await axios.get(
-  //         `${environment.API_BASE_URL}api/officer/officer-visits`,
-  //         {
-  //           headers: { Authorization: `Bearer ${token}` },
-  //         }
-  //       );
-  //       setVisitsData(response.data.data);
-
-  //     }
-  //   } catch (error) {
-  //     console.error("Failed to fetch officer visits:", error);
-  //   } finally {
-  //     setRefreshing(false);
-
-  //   }
-  // };
-
-  //   const fetchVisitsDraft = async () => {
-  //     console.log("hitt")
-  //   try {
-  //     const token = await AsyncStorage.getItem("token");
-  //     if (token) {
-  //       const response = await axios.get(
-  //         `${environment.API_BASE_URL}api/officer/officer-visits-draft`,
-  //         {
-  //           headers: { Authorization: `Bearer ${token}` },
-  //         }
-  //       );
-  //       setDraftVisits(response.data.data || []);
-  //           console.log(response.data.data)
-  //     }
-  //   } catch (error) {
-  //     console.error("Failed to fetch officer visits:", error);
-  //   } finally {
-  //     setRefreshing(false);
-
-  //   }
-  // };
+  
   useEffect(() => {
     console.log("🎯 Loading States:", { loadingVisitsdrafts });
   }, [loadingVisitsdrafts]);
@@ -511,9 +503,6 @@ style={{ marginHorizontal: 10, padding: dynamicStyles.cropcardPadding, width: wp
                           farmName: item.farmerName,
                           screenName: "Dashboard"
                         });
-                        {
-                          /*if cluster need send  clusterID , jobId    */
-                        }
                       }
                     }}
                   >
@@ -678,25 +667,6 @@ style={{ marginHorizontal: 10, padding: dynamicStyles.cropcardPadding, width: wp
                             {item.farmerName}
                           </Text>
                           <Text className="text-[#4E6393] text-sm mt-1">
-                            {/* {item.propose === "Cluster"
-                              ? i18n.language === "si"
-                                ? "ගොවි සමූහ විගණනය"
-                                : i18n.language === "ta"
-                                ? "உழவர் குழு தணிக்கை"
-                                : "Farm Cluster Audit"
-                              : item.propose === "Requested"
-                              ? i18n.language === "si"
-                                ? item.servicesinhalaName
-                                : i18n.language === "ta"
-                                ? item.servicetamilName
-                                : item.serviceenglishName
-                                   : item.propose === "Individual"
-                              ? "Farmer Service Request"
-                              : i18n.language === "si"
-                              ? "තනි ගොවි විගණනය"
-                              : i18n.language === "ta"
-                              ? "தனிப்பட்ட விவசாயி தணிக்கை"
-                              : "Individual Farmer Audit"} */}
                                {truncateTextDraft(
     (() => {
       if (item.propose === "Cluster") {
@@ -782,8 +752,7 @@ style={{ marginHorizontal: 10, padding: dynamicStyles.cropcardPadding, width: wp
           </View>
         </>
       )}
-
-      {/* <View className="p-8 mt-4">
+  <View className="p-8 mt-4">
         <TouchableOpacity
           className="bg-[#FEE5E6] rounded-lg p-3 h-28 mr-4 w-full flex-row justify-between items-center"
           style={{
@@ -810,33 +779,36 @@ style={{ marginHorizontal: 10, padding: dynamicStyles.cropcardPadding, width: wp
             resizeMode="contain"
           />
         </TouchableOpacity>
-      </View> */}
-
-      <Modal
+      </View>
+        <Modal
         transparent
         visible={showPopup}
-        animationType="slide"
-        onRequestClose={() => {
-          console.log("hitt");
-          setShowPopup(false);
-          setSelectedItem(null);
-        }}
+        animationType="none"
       >
-        <TouchableWithoutFeedback
-          onPress={() => {
-            setShowPopup(false);
-            setSelectedItem(null);
-          }}
-        >
+
           <View
             style={{
               flex: 1,
               backgroundColor: "rgba(0,0,0,0.3)",
-              justifyContent: "flex-end",
             }}
           >
-            <TouchableWithoutFeedback>
-              <View className="bg-white rounded-t-3xl p-5 w-full ">
+                            <Pressable
+                  style={{ flex: 1 }}
+                  onPress={() => {
+                    setShowPopup(false);
+                    setSelectedItem(null);
+                  }}
+                />
+                          <Animated.View
+              {...panResponder.panHandlers}
+              style={{
+                position: "absolute",
+                bottom: 0,
+                width: "100%",
+                transform: [{ translateY }],
+              }}
+              className="bg-white rounded-t-3xl p-5 w-full"
+            > 
                 <View className="items-center mt-4">
                   <TouchableOpacity
                     className="z-50 justify-center items-center"
@@ -1011,16 +983,16 @@ style={{ marginHorizontal: 10, padding: dynamicStyles.cropcardPadding, width: wp
                         marginBottom:30
                       }}
                     >
-                      <Text className="text-white text-lg font-semibold">
-                        {t("VisitPopup.Start")}
-                      </Text>
+
+                                            <Text className={`text-white  font-semibold ${i18n.language==="si"? "text-base": i18n.language === "ta"? "text-base": "text-lg"}`}>
+                                              {t("VisitPopup.Start")}
+                                            </Text>
                     </LinearGradient>
                   </TouchableOpacity>
                 </View>
+                              </Animated.View>
+                
               </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
       </Modal>
     </ScrollView>
   );

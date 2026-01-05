@@ -150,48 +150,7 @@ useEffect(() => {
     }
   };
 
-// const handleCheck = async (q: Question) => {
-//   console.log("Toggle check for question:", q.id);
 
-//   try {
-//     if (q.type === "Photo Proof") {
-//         setSelectedQuestion(q);
-//       setShowCameraModal(true);
-//       return;
-//     }
-
-//     const token = await AsyncStorage.getItem("token");
-//     if (!token) {
-//       Alert.alert("Error", "Authentication token missing. Please log in again.");
-//       return;
-//     }
-// setLoadingQuestionId(q.id);
-//     // Toggle value: if it's 1, set to 0; if 0, set to 1
-//     const newTickResult = q.tickResult === 1 ? 0 : 1;
-
-//     const response = await axios.put(
-//       `${environment.API_BASE_URL}api/officer/check-question/${q.id}`,
-//       { tickResult: newTickResult }, // send new state
-//       { headers: { Authorization: `Bearer ${token}` } }
-//     );
-
-//     if (response.data?.success || response.status === 200) {
-//       setQuestions((prev) =>
-//         prev.map((item) =>
-//           item.id === q.id ? { ...item, tickResult: newTickResult } : item
-//         )
-//       );
-//       console.log("✅ Question tick toggled:", q.id, "→", newTickResult);
-//     } else {
-//       Alert.alert("Error", response.data?.message || "Failed to update question status.");
-//     }
-//   } catch (err: any) {
-//     console.error("❌ Error updating tickResult:", err);
-//     Alert.alert("Error", "Something went wrong while updating question.");
-//   }finally{
-//     setLoadingQuestionId(null);
-//   }
-// };
 const handleCheck = async (q: Question) => {
   console.log("Toggle check for question:", q.id);
 
@@ -200,7 +159,8 @@ const handleCheck = async (q: Question) => {
       if (!token) {
            Alert.alert(
           t("Error.Sorry"),
-          t("Error.Your login session has expired. Please log in again to continue.")
+          t("Error.Your login session has expired. Please log in again to continue."),
+            [{ text: t("MAIN.OK") }]
         );
         return;
       }
@@ -260,23 +220,9 @@ const handleCheck = async (q: Question) => {
 
 await updateTickResult(q, newTickResult, token);
 
-    // const response = await axios.put(
-    //   `${environment.API_BASE_URL}api/officer/check-question/${q.id}`,
-    //   { officerTickResult: newTickResult },
-    //   { headers: { Authorization: `Bearer ${token}` } }
-    // );
-
-    // if (response.data?.success || response.status === 200) {
-    //   setQuestions((prev) =>
-    //     prev.map((item) =>
-    //       item.id === q.id ? { ...item, officerTickResult: newTickResult } : item
-    //     )
-    //   );
-    // }
-
   } catch (err) {
     console.error("❌ Error updating tickResult:", err);
-    Alert.alert(t("Error.error"), t("CertificateQuesanory.Something went wrong while updating question."));
+    Alert.alert(t("Error.error"), t("CertificateQuesanory.Something went wrong while updating question."),[{ text: t("MAIN.OK") }]);
   } finally {
     setLoadingQuestionId(null);
   }
@@ -301,13 +247,14 @@ const updateTickResult = async (q: Question, newValue: number, token: string) =>
       if (newValue === 1) {
         Alert.alert(
           t("CertificateQuesanory.Success"),
-          t("CertificateQuesanory.Task complete successfully!")
+          t("CertificateQuesanory.Task complete successfully!"),
+          [{ text: t("MAIN.OK") }]
         );
       }
     }
   } catch (err) {
     console.error("❌ Error updating tickResult:", err);
-    Alert.alert(t("Error.error"), t("CertificateQuesanory.Something went wrong while updating question."));
+    Alert.alert(t("Error.error"), t("CertificateQuesanory.Something went wrong while updating question."), [{ text: t("MAIN.OK") }]);
   } finally {
     setLoadingQuestionId(null);
   }
@@ -323,7 +270,8 @@ const handleSubmitPhoto = async (q: Question) => {
       if (!token) {
            Alert.alert(
           t("Error.Sorry"),
-          t("Error.Your login session has expired. Please log in again to continue.")
+          t("Error.Your login session has expired. Please log in again to continue."),
+          [{ text: t("MAIN.OK") }]
         );
         return;
       }
@@ -354,7 +302,7 @@ const handleSubmitPhoto = async (q: Question) => {
     );
 
     if (response.data?.success || response.status === 200) {
-      Alert.alert(t("CertificateQuesanory.Success"), t("CertificateQuesanory.Task complete successfully!"));
+      Alert.alert(t("CertificateQuesanory.Success"), t("CertificateQuesanory.Task complete successfully!"), [{ text: t("MAIN.OK") }]);
       setQuestions((prev) =>
         prev.map((item) =>
           item.id === selectedQuestion.id
@@ -366,11 +314,11 @@ const handleSubmitPhoto = async (q: Question) => {
       setCapturedImage(null);
       setSelectedQuestion(null);
     } else {
-      Alert.alert(t("Error.error"), t("CertificateQuesanory.Failed to complete task, Please try again"));
+      Alert.alert(t("Error.error"), t("CertificateQuesanory.Failed to complete task, Please try again"), [{ text: t("MAIN.OK") }]);
     }
   } catch (err) {
     console.error("❌ Upload photo failed:", err);
-    Alert.alert(t("Error.error"), t("CertificateQuesanory.Failed to complete task, Please try again"));
+    Alert.alert(t("Error.error"), t("CertificateQuesanory.Failed to complete task, Please try again"),[{ text: t("MAIN.OK") }]);
   } finally {
     setLoadingQuestionId(null);
   }
@@ -388,9 +336,13 @@ const handleCameraClose = (imageUri: string | null) => {
 useFocusEffect(
   useCallback(() => {
     const onBackPress = () => {
-      // Navigate to screenName with params
-      navigation.navigate("Main", {screen:screenName})
-      return true; // prevent default back behavior
+      navigation.navigate("Main", {
+        screen: "MainTabs",
+        params: {
+          screen: screenName
+        }
+      });     
+       return true; // prevent default back behavior
     };
 
     const subscription = BackHandler.addEventListener(
@@ -408,7 +360,14 @@ useFocusEffect(
       <View className="flex-row items-center px-4 py-4 bg-white shadow-sm border-b border-[#E5E5E5]">
         <TouchableOpacity
           className="bg-[#F6F6F680] rounded-full p-2 justify-center w-10 z-20"
-          onPress={() =>  navigation.navigate("Main", {screen:screenName})}
+          // onPress={() =>  navigation.navigate("Main", {screen:screenName})}
+                onPress={() =>             
+                      navigation.navigate("Main", {
+        screen: "MainTabs",
+        params: {
+          screen: screenName
+        }
+      }) }
         >
           <AntDesign name="left" size={22} color="#000" />
         </TouchableOpacity>
@@ -429,13 +388,6 @@ useFocusEffect(
   <View className="w-full items-center mb-8">
       {/* Inner row: logo + text */}
       <View className="flex-row items-center justify-center max-w-[240px]">
-        {/* {CertificateData?.logo && (
-          <Image
-            source={{ uri: CertificateData.logo }}
-            style={{ width: 100, height: 100 }}
-            resizeMode="contain"
-          />
-        )} */}
 
         <Image 
           source={require("../assets/staraward.png")}
@@ -595,7 +547,7 @@ navigation.navigate("Main", {screen: screenName})
               onPress={() => setShowCamera(true)}
               className=" border border-black rounded-3xl  py-3 items-center "
             >
-              <Text className="text-black font-semibold text-base">{t("Retake Previous Photo")}</Text>
+              <Text className="text-black font-semibold text-base">{t("CertificateQuesanory.Retake Previous Photo")}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -624,7 +576,7 @@ navigation.navigate("Main", {screen: screenName})
         }}
         className="mt-4"
       >
-        <Text className="text-gray-400 text-sm">{("Cancel")}</Text>
+        <Text className="text-gray-400 text-sm">{t("CertificateQuesanory.Cancel")}</Text>
       </TouchableOpacity>
     </View>
   </View>

@@ -50,7 +50,7 @@ export function CameraScreen({
       />
 
       {/* Bottom controls */}
-      <View className="absolute bottom-10 w-full flex-row justify-center items-center">
+      <View className="absolute bottom-12 w-full flex-row justify-center items-center">
         <TouchableOpacity
           className="bg-white/70 p-4 rounded-full mx-5"
           onPress={() => onClose(null)}

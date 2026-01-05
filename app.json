@@ -1,14 +1,14 @@
 {
   "expo": {
-    "name": "GoviLink",
-    "slug": "GoviLink",
+    "name": "GoViLink",
+    "slug": "GoViLink",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/favicon-icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/favicon-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -18,40 +18,40 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/favicon-icon.png",
-        "backgroundColor": "#ffffff",
-        "softwareKeyboardLayoutMode": "pan",
-        "versionCode": 12,
-        "compileSdkVersion": 35,
-        "targetSdkVersion": 35,
-        "minSdkVersion": 24,
-        "permissions": [
-          "INTERNET",
-          "CAMERA",
-          "RECORD_AUDIO",
-          "READ_MEDIA_IMAGES",
-          "READ_MEDIA_VIDEO",
-          "WRITE_EXTERNAL_STORAGE",
-          "ACCESS_COARSE_LOCATION",
-          "ACCESS_FINE_LOCATION",
-          "VIBRATE",
-          "WAKE_LOCK",
-          "RECEIVE_BOOT_COMPLETED",
-          "LOCATION",
-          "ACCESS_BACKGROUND_LOCATION",
-          "ACCESS_WIFI_STATE",
-          "CHANGE_WIFI_STATE",
-          "ACCESS_NETWORK_STATE",
-          "CHANGE_NETWORK_STATE",
-          "SYSTEM_ALERT_WINDOW",
-          "FOREGROUND_SERVICE",
-          "NOTIFICATIONS",
-          "WRITE_EXTERNAL_STORAGE",
-          "CALL_PHONE"
-        ]
+        "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.polygonagro.GoviLink"
+      "package": "com.polygonagro.GoviLink",
+      "softwareKeyboardLayoutMode": "pan",
+      "versionCode": 12,
+      "compileSdkVersion": 35,
+      "targetSdkVersion": 35,
+      "minSdkVersion": 24,
+      "permissions": [
+        "INTERNET",
+        "CAMERA",
+        "RECORD_AUDIO",
+        "READ_MEDIA_IMAGES",
+        "READ_MEDIA_VIDEO",
+        "WRITE_EXTERNAL_STORAGE",
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "VIBRATE",
+        "WAKE_LOCK",
+        "RECEIVE_BOOT_COMPLETED",
+        "LOCATION",
+        "ACCESS_BACKGROUND_LOCATION",
+        "ACCESS_WIFI_STATE",
+        "CHANGE_WIFI_STATE",
+        "ACCESS_NETWORK_STATE",
+        "CHANGE_NETWORK_STATE",
+        "SYSTEM_ALERT_WINDOW",
+        "FOREGROUND_SERVICE",
+        "NOTIFICATIONS",
+        "WRITE_EXTERNAL_STORAGE",
+        "CALL_PHONE"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon-icon.png"
@@ -84,7 +84,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": ""
+        "projectId": "731e2d17-3fac-4c8f-9718-e1b97fc9e0cc"
       }
     },
     "expo-camera": {

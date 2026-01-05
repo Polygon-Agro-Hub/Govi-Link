@@ -7,13 +7,14 @@ import {
   Animated,
   Image,
   Dimensions,
-  BackHandler
+  BackHandler,
+  Pressable
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "./types";
 import { CameraView, Camera } from "expo-camera";
 import { useTranslation } from "react-i18next";
-import {AntDesign} from "@expo/vector-icons";
+import {AntDesign, Ionicons} from "@expo/vector-icons";
 import { useRoute, RouteProp } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect } from "@react-navigation/native";
@@ -136,7 +137,13 @@ useFocusEffect(
   useCallback(() => {
     const onBackPress = () => {
       // Navigate to screenName with params
-      navigation.navigate("Main", {screen:screenName})
+      // navigation.navigate("Main", {screen:screenName})
+                  navigation.navigate("Main", {
+        screen: "MainTabs",
+        params: {
+          screen: screenName
+        }
+      });   
       return true; // prevent default back behavior
     };
 
@@ -222,7 +229,15 @@ useFocusEffect(
   return (
     <View style={{ flex: 1, position: "relative" }}>
                     <View className="flex-row items-center px-4 py-4 bg-white shadow-sm">
-                      <TouchableOpacity  className="bg-[#F6F6F680] rounded-full p-2 justify-center w-10 z-20 " onPress={() => navigation.navigate("Main", {screen:screenName})}>
+                      <TouchableOpacity  className="bg-[#F6F6F680] rounded-full p-2 justify-center w-10 z-20 " 
+                      onPress={() =>             
+                      navigation.navigate("Main", {
+        screen: "MainTabs",
+        params: {
+          screen: screenName
+        }
+      }) }
+      >
                         <AntDesign name="left" size={22} color="#000" />
                       </TouchableOpacity>
        
@@ -294,6 +309,12 @@ useFocusEffect(
 >
   <View className="flex-1 justify-center items-center bg-black bg-opacity-70">
     <View className="bg-white rounded-lg w-72 h-80 items-center relative overflow-hidden">
+              <Pressable
+    onPress={() => setIsUnsuccessfulModalVisible(false)}
+    className="absolute top-3 right-3 z-10"
+  >
+    <Ionicons name="close" size={24} color="#000" />
+  </Pressable>
       <View className="p-6 items-center">
         <Text className="text-xl font-bold mb-4">
           {t("QRScanner.Failed")}
