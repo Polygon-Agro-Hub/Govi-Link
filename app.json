@@ -3,7 +3,6 @@
     "name": "GoviLink",
     "slug": "GoviLink",
     "version": "1.0.0",
-    "versionCode": 3,
     "orientation": "portrait",
     "icon": "./assets/favicon-icon.png",
     "userInterfaceStyle": "light",
@@ -22,7 +21,7 @@
         "backgroundColor": "#ffffff"
       },
       "softwareKeyboardLayoutMode": "pan",
-      "versionCode": 3,
+      "versionCode": 9,
       "compileSdkVersion": 35,
       "targetSdkVersion": 35,
       "minSdkVersion": 24,
@@ -37,15 +36,10 @@
         "WAKE_LOCK",
         "RECEIVE_BOOT_COMPLETED",
         "LOCATION",
-        "ACCESS_BACKGROUND_LOCATION",
         "ACCESS_WIFI_STATE",
-        "CHANGE_WIFI_STATE",
         "ACCESS_NETWORK_STATE",
-        "CHANGE_NETWORK_STATE",
-        "SYSTEM_ALERT_WINDOW",
         "FOREGROUND_SERVICE",
         "NOTIFICATIONS",
-        "WRITE_EXTERNAL_STORAGE",
         "CALL_PHONE"
       ],
       "edgeToEdgeEnabled": true,
@@ -96,7 +90,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "941b4b90-aa39-4362-95a2-c69b42bd1056"
+        "projectId": "40186f33-48b8-44ef-ab85-fe2b6be02549"
       }
     },
     "expo-camera": {
