@@ -46,6 +46,17 @@ import CapitalRequests from "@/component/ChiefFieldOfficer/CapitalRequests";
 import RequestDetails from "@/component/ChiefFieldOfficer/RequestDetails";
 import AssignJobOfficerList from "@/component/AssignJobOfficerList";
 import PersonalInfo from "@/component/CapitalRequest/PersonalInfo";
+import IDProof from "@/component/CapitalRequest/IDProof";
+import FinanceInfo from "@/component/CapitalRequest/FinanceInfo";
+import LandInfo from "@/component/CapitalRequest/LandInfo";
+import AttachGeoLocationScreen from "@/component/CapitalRequest/AttachGeoLocationScreen";
+import ViewLocationScreen from "@/component/CapitalRequest/ViewLocationScreen";
+import InvestmentInfo from "@/component/CapitalRequest/InvestmentInfo";
+import CultivationInfo from "@/component/CapitalRequest/CultivationInfo";
+import CroppingSystems from "@/component/CapitalRequest/CroppingSystems";
+import ProfitRisk from "@/component/CapitalRequest/ProfitRisk";
+import Economical from "@/component/CapitalRequest/Economical";
+import Labour from "@/component/CapitalRequest/Labour";
 
 LogBox.ignoreAllLogs(true);
 NativeWindStyleSheet.setOutput({ default: "native" });
@@ -215,7 +226,18 @@ function AppContent() {
           <Stack.Screen name="QRScaneerRequstAudit" component={QRScaneerRequstAudit} />
                     <Stack.Screen name="RequestDetails" component={RequestDetails} />
                     <Stack.Screen name="PersonalInfo" component={PersonalInfo} />
-
+                    <Stack.Screen name="IDProof" component={IDProof} />
+                    <Stack.Screen name="FinanceInfo" component={FinanceInfo} />
+                    <Stack.Screen name="LandInfo" component={LandInfo} />
+                    <Stack.Screen name="AttachGeoLocationScreen" component={AttachGeoLocationScreen  as any} />
+                    <Stack.Screen name="ViewLocationScreen" component={ViewLocationScreen as any} />
+                    <Stack.Screen name="InvestmentInfo" component={InvestmentInfo} />
+                    <Stack.Screen name="CultivationInfo" component={CultivationInfo} />
+                    <Stack.Screen name="CroppingSystems" component={CroppingSystems} />
+                    <Stack.Screen name="ProfitRisk" component={ProfitRisk} />
+                    <Stack.Screen name="Economical" component={Economical} />
+                    <Stack.Screen name="Labour" component={Labour} />
+ 
           </Stack.Navigator>
         </NavigationContainer>
       </SafeAreaView>

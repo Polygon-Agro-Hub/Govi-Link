@@ -87,7 +87,7 @@ export type RootStackParamList = {
   ComplainHistory: undefined;
   AssignJobs: undefined;
   CapitalRequests: undefined;
-  RequestDetails: { requestId: string };
+  RequestDetails: { requestId: number, requestNumber:string };
   AssignJobOfficerList: {
     selectedJobIds: string[];
     selectedDate: string;
@@ -99,5 +99,24 @@ export type RootStackParamList = {
     auditType?: "feildaudits" | "govilinkjobs";
   };
 
-  PersonalInfo:undefined
+  PersonalInfo: { requestNumber:string }
+  IDProof:{formData:any, requestNumber:string}
+  FinanceInfo:{formData:any, requestNumber:string}
+  LandInfo:{formData:any, requestNumber:string}
+    AttachGeoLocationScreen: {
+  currentLatitude?: number;
+  currentLongitude?: number;
+  onLocationSelect?: (latitude: number, longitude: number, locationName: string) => void;
+};
+  ViewLocationScreen: {
+  latitude: number;
+  longitude: number;
+  locationName?: string;
+},
+InvestmentInfo:{formData:any, requestNumber:string};
+CultivationInfo:{formData:any, requestNumber:string};
+CroppingSystems:{formData:any, requestNumber:string};
+ProfitRisk:{formData:any, requestNumber:string};
+Economical:{formData:any, requestNumber:string};
+Labour:{formData:any, requestNumber:string};
 };
