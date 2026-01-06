@@ -644,6 +644,14 @@
     "What are the risks you are anticipating in the proposed crop / cropping system":"යෝජිත බෝග/බෝග ක්‍රමය තුළ ඔබ අපේක්ෂා කරන අවදානම් මොනවාද?",
     "Do you have the solution":"ඔබට විසඳුම තිබේද?",
     "Can the farmer manage the risks":"ගොවියාට අවදානම් කළමනාකරණය කළ හැකිද?",
-    "Is it worth to take the risks for anticipated profits":"අපේක්ෂිත ලාභ සඳහා අවදානම් ගැනීම වටී ද?"
+    "Is it worth to take the risks for anticipated profits":"අපේක්ෂිත ලාභ සඳහා අවදානම් ගැනීම වටී ද?",
+    "Are the proposed crop/cropping systems suitable for the farmer’s size of land holding":"යෝජිත බෝග/බෝග වගා ක්‍රම ගොවියාගේ ඉඩම් ප්‍රමාණයට සුදුසු ද?",
+    "Are the financial resources adequate to manage the proposed crop/cropping system":"යෝජිත බෝග/බෝග ක්‍රමය කළමනාකරණය කිරීමට මූල්‍ය සම්පත් ප්‍රමාණවත්ද?",
+    "If not, can the farmer mobilize financial resources through alternative routes":"එසේ නොමැති නම්, ගොවියාට විකල්ප මාර්ග හරහා මූල්‍ය සම්පත් රැස්කර ගත හැකිද?",
+    "Can the farmer manage the proposed crop/cropping system through your family labour":"ගොවියාට ඔබේ පවුලේ ශ්‍රමය හරහා යෝජිත බෝග/බෝග ක්‍රමය කළමනාකරණය කළ හැකිද?",
+    "Are there any mechanization options to substitute the labour":"ශ්‍රමය ආදේශ කිරීම සඳහා යාන්ත්‍රිකකරණ විකල්ප තිබේද?",
+    "Is machinery available":"යන්ත්‍රෝපකරණ තිබේ",
+    "Is machinery affordable":"යන්ත්‍රෝපකරණ දැරිය හැකි මිලකට තිබේ",
+    "Is machinery cost effective":"යන්ත්‍රෝපකරණ පිරිවැය ඵලදායී වේ"
   }
 }

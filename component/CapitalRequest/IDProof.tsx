@@ -96,10 +96,10 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
   const [formData, setFormData] = useState(prevFormData);
       console.log("job id re", formData)
 
-  const [selectedIdProof, setSelectedIdProof] = useState<string | null>(prevFormData?.idProof?.pType || null);
-  const [nic, setNic] = useState<string>(prevFormData?.idProof?.pNumber || "");
-  const [FrontImage, setFrontImage] = useState<string | null>(prevFormData?.idProof?.frontImg?.uri || null);
-  const [BackImage, setBackImage] = useState<string | null>(prevFormData?.idProof?.backImg?.uri || null);
+  const [selectedIdProof, setSelectedIdProof] = useState<string | null>(prevFormData?.inspectionidproof?.pType || null);
+  const [nic, setNic] = useState<string>(prevFormData?.inspectionidproof?.pNumber || "");
+  const [FrontImage, setFrontImage] = useState<string | null>(prevFormData?.inspectionidproof?.frontImg?.uri || null);
+  const [BackImage, setBackImage] = useState<string | null>(prevFormData?.inspectionidproof?.backImg?.uri || null);
   const [isNextEnabled, setIsNextEnabled] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showCamera, setShowCamera] = useState(false);
@@ -123,11 +123,11 @@ useEffect(() => {
             const parsed = JSON.parse(stored);
             setFormData(parsed);
 
-            const idProof = parsed.idProof || {};
-            setSelectedIdProof(idProof.pType|| null);
-            setNic(idProof.pNumber || "");
-            setFrontImage(idProof.frontImg?.uri || null);
-            setBackImage(idProof.backImg?.uri || null);
+            const inspectionidproof= parsed.inspectionidproof || {};
+            setSelectedIdProof(inspectionidproof.pType|| null);
+            setNic(inspectionidproof.pNumber || "");
+            setFrontImage(inspectionidproof.frontImg?.uri || null);
+            setBackImage(inspectionidproof.backImg?.uri || null);
           }
         } catch (e) {
           console.error("Failed to load formData from storage", e);
@@ -158,8 +158,8 @@ const handleCameraClose = async (uri: string | null) => {
   setFrontImage(uri);
   updatedFormData = {
     ...formData,
-    idProof: {
-      ...formData.idProof,
+    inspectionidproof: {
+      ...formData.inspectionidproof,
       frontImg: fileObj,
       pType: selectedIdProof || "",
     },
@@ -168,8 +168,8 @@ const handleCameraClose = async (uri: string | null) => {
   setBackImage(uri);
   updatedFormData = {
     ...formData,
-    idProof: {
-      ...formData.idProof,
+    inspectionidproof: {
+      ...formData.inspectionidproof,
       backImg: fileObj,
       pType: selectedIdProof || "",
     },
@@ -195,8 +195,8 @@ const handleCameraClose = async (uri: string | null) => {
 
   // Enable Next button if both images are captured
   if (
-    (cameraSide === "front" && updatedFormData.idProof.backImg) ||
-    (cameraSide === "back" && updatedFormData.idProof.frontImg)
+    (cameraSide === "front" && updatedFormData.inspectionidproof.backImg) ||
+    (cameraSide === "back" && updatedFormData.inspectionidproof.frontImg)
   ) {
     setIsNextEnabled(true);
   }
@@ -234,7 +234,7 @@ const handleNext = () => {
     return;
   }
 
-  if (!formData.idProof?.frontImg || !formData.idProof?.backImg) {
+  if (!formData.inspectionidproof?.frontImg || !formData.inspectionidproof?.backImg) {
     Alert.alert(
       t("Error.Validation Error"),
       t("Error.Both ID images are required"),[
@@ -318,12 +318,12 @@ const handleIdNumberChange = async (input: string) => {
   // ✅ Update formData
   const updatedFormData = {
     ...formData,
-    idProof: {
-      ...formData.idProof,
+    inspectionidproof: {
+      ...formData.inspectionidproof,
       pNumber: value,
       pType: selectedIdProof,
-      frontImg: formData.idProof?.frontImg || null,
-      backImg: formData.idProof?.backImg || null,
+      frontImg: formData.inspectionidproof?.frontImg || null,
+      backImg: formData.inspectionidproof?.backImg || null,
     },
   };
 
@@ -441,7 +441,7 @@ value={nic || ""}
   image={FrontImage}
   onClear={async () => {
                   setFrontImage(null);
-                    const updatedFormData = { ...formData, idProof: { ...formData.idProof, frontImg: null } };
+                    const updatedFormData = { ...formData, inspectionidproof: { ...formData.inspectionidproof, frontImg: null } };
                     setFormData(updatedFormData);
     try {
       await AsyncStorage.setItem(
@@ -463,7 +463,7 @@ value={nic || ""}
   image={BackImage}
   onClear={async () => {
     setBackImage(null);
-                    const updatedFormData = { ...formData, idProof: { ...formData.idProof, backImg: null } };
+                    const updatedFormData = { ...formData, inspectionidproof: { ...formData.inspectionidproof, backImg: null } };
                     setFormData(updatedFormData);
 
     try {
@@ -549,7 +549,7 @@ value={nic || ""}
                   setFrontImage(null);
                   setBackImage(null);
                   setErrors({});
-                  const updatedFormData = { ...formData, idProof: { pType: option.key, pNumber: "", frontImg: null, backImg: null } };
+                  const updatedFormData = { ...formData, inspectionidproof: { pType: option.key, pNumber: "", frontImg: null, backImg: null } };
                   setFormData(updatedFormData);
 
     // Save cleared state to AsyncStorage

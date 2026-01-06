@@ -644,6 +644,15 @@
     "What are the risks you are anticipating in the proposed crop / cropping system":"What are the risks you are anticipating in the proposed crop / cropping system?",
     "Do you have the solution":"Do you have the solution?",
     "Can the farmer manage the risks":"Can the farmer manage the risks?",
-    "Is it worth to take the risks for anticipated profits":"Is it worth to take the risks for anticipated profits?"
-  }
+    "Is it worth to take the risks for anticipated profits":"Is it worth to take the risks for anticipated profits?",
+    "Are the proposed crop/cropping systems suitable for the farmer’s size of land holding":"Are the proposed crop/cropping systems suitable for the farmer’s size of land holding?",
+    "Are the financial resources adequate to manage the proposed crop/cropping system":"Are the financial resources adequate to manage the proposed crop/cropping system?",
+    "If not, can the farmer mobilize financial resources through alternative routes":"If not, can the farmer mobilize financial resources through alternative routes?",
+    "Can the farmer manage the proposed crop/cropping system through your family labour":"Can the farmer manage the proposed crop/cropping system through your family labour?",
+    "Are there any mechanization options to substitute the labour":"Are there any mechanization options to substitute the labour?",
+    "Is machinery available":"Is machinery available",
+    "Is machinery affordable":"Is machinery affordable",
+    "Is machinery cost effective":"Is machinery cost effective",
+    "Is family/hired labour equipped to handle the proposed crop/cropping system":"Is family/hired labour equipped to handle the proposed crop/cropping system?"
+  } 
 }

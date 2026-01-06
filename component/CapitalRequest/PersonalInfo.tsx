@@ -60,7 +60,7 @@ type PersonalInfo = {
 };
 
 type FormData = {
-  personalInfo: PersonalInfo;
+  inspectionpersonal: PersonalInfo;
 };
 
 
@@ -358,7 +358,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isNextEnabled, setIsNextEnabled] = useState(false);
 const [formData, setFormData] = useState<FormData>({
-  personalInfo: {
+  inspectionpersonal: {
     firstName: "",
     lastName: "",
     otherName: "",
@@ -399,7 +399,7 @@ const [formData, setFormData] = useState<FormData>({
     "country",
   ];
   const allFilled = requiredFields.every((key) => {
-    const value = formData.personalInfo[key];
+    const value = formData.inspectionpersonal[key];
     return value !== null && value !== undefined && value.toString().trim() !== "";
   });
 
@@ -418,8 +418,8 @@ const updateFormData = async (
 ) => {
   const updatedData: FormData = {
     ...formData,
-    personalInfo: {
-      ...formData.personalInfo,
+    inspectionpersonal: {
+      ...formData.inspectionpersonal,
       ...updates,
     },
   };
@@ -445,15 +445,15 @@ const updateFormData = async (
     text,
     rules,
     t,
-    formData.personalInfo,
+    formData.inspectionpersonal,
     key
   );
 
   // Update state
   setFormData((prev) => ({
     ...prev,
-    personalInfo: {
-      ...prev.personalInfo,
+    inspectionpersonal: {
+      ...prev.inspectionpersonal,
       [key]: value,
     },
   }));
@@ -468,7 +468,7 @@ const updateFormData = async (
     // Revalidate unique fields
     if (rules.uniqueWith) {
       rules.uniqueWith.forEach((relatedKey) => {
-        const relatedValue = formData.personalInfo[relatedKey];
+        const relatedValue = formData.inspectionpersonal[relatedKey];
         if (!relatedValue) {
           delete newErrors[relatedKey];
           return;
@@ -479,7 +479,7 @@ const updateFormData = async (
           rules,
           t,
           {
-            ...formData.personalInfo,
+            ...formData.inspectionpersonal,
             [key]: value,
           },
           relatedKey
@@ -493,10 +493,7 @@ const updateFormData = async (
     return newErrors;
   });
 
-  // Save only if valid
-  if (!error) {
     updateFormData({ [key]: value });
-  }
 };
 
 useFocusEffect(
@@ -511,7 +508,7 @@ useFocusEffect(
 
           // Set the full formData object correctly
           setFormData({
-            personalInfo: parsed.personalInfo || {
+            inspectionpersonal: parsed.inspectionpersonal || {
               firstName: "",
               lastName: "",
               otherNames: "",
@@ -532,7 +529,7 @@ useFocusEffect(
             },
           });
 
-          const personal = parsed.personalInfo || {};
+          const personal = parsed.inspectionpersonal || {};
 
           setSelectedDistrict(personal.district || null);
           setSelectedCountry(personal.country || "Sri Lanka");
@@ -719,14 +716,14 @@ useFocusEffect(
     "country",
   ];
   // If country is Sri Lanka, district is required
-  if (formData.personalInfo.country === "Sri Lanka") {
+  if (formData.inspectionpersonal.country === "Sri Lanka") {
     requiredFields.push("district");
   }
 
   // Validate all fields
   const validationErrors: Record<string, string> = {};
   requiredFields.forEach((key) => {
-    let value = formData.personalInfo[key];
+    let value = formData.inspectionpersonal[key];
     let error = "";
 
     if ((key === "district" || key === "province") && !value) {
@@ -822,7 +819,7 @@ useFocusEffect(
           <Input
             label={t("InspectionForm.First Name")}
             placeholder="----"
-            value={formData.personalInfo.firstName}
+            value={formData.inspectionpersonal.firstName}
             onChangeText={(text) =>
               handleFieldChange("firstName", text, {
                 required: true,
@@ -835,7 +832,7 @@ useFocusEffect(
           <Input
             label={t("InspectionForm.Last Name")}
             placeholder="----"
-            value={formData.personalInfo.lastName}
+            value={formData.inspectionpersonal.lastName}
             onChangeText={(text) =>
               handleFieldChange("lastName", text, {
                 required: true,
@@ -848,7 +845,7 @@ useFocusEffect(
           <Input
             label={t("InspectionForm.Other Names")}
             placeholder="----"
-            value={formData.personalInfo.otherName}
+            value={formData.inspectionpersonal.otherName}
             onChangeText={(text) =>
               handleFieldChange("otherName", text, {
                 required: true,
@@ -861,7 +858,7 @@ useFocusEffect(
           <Input
             label={t("InspectionForm.Call Name")}
             placeholder="----"
-            value={formData.personalInfo.callName}
+            value={formData.inspectionpersonal.callName}
             onChangeText={(text) =>
               handleFieldChange("callName", text, {
                 required: true,
@@ -877,7 +874,7 @@ useFocusEffect(
           <Input
             label={t("InspectionForm.Mobile Number - 1")}
             placeholder="7XXXXXXXX"
-            value={formData.personalInfo.phone1}
+            value={formData.inspectionpersonal.phone1}
             onChangeText={(text) =>
               handleFieldChange("phone1", text, {
                 required: true,
@@ -898,7 +895,7 @@ useFocusEffect(
           <Input
             label={t("InspectionForm.Mobile Number - 2")}
             placeholder="7XXXXXXXX"
-            value={formData.personalInfo.phone2}
+            value={formData.inspectionpersonal.phone2}
             onChangeText={(text) =>
               handleFieldChange("phone2", text, {
                 required: false,
@@ -918,7 +915,7 @@ useFocusEffect(
           <Input
             label={t("InspectionForm.Phone Number of a family member")}
             placeholder="7XXXXXXXX"
-            value={formData.personalInfo.familyPhone}
+            value={formData.inspectionpersonal.familyPhone}
             keyboardType={"phone-pad"}
             onChangeText={(text) =>
               handleFieldChange("familyPhone", text, {
@@ -939,7 +936,7 @@ useFocusEffect(
           <Input
             label={t("InspectionForm.Land Phone Number - Home")}
             placeholder="XXXXXXXXX"
-            value={formData.personalInfo.landHome}
+            value={formData.inspectionpersonal.landHome}
             onChangeText={(text) =>
               handleFieldChange("landHome", text, {
                 required: false,
@@ -959,7 +956,7 @@ useFocusEffect(
           <Input
             label={t("InspectionForm.Land Phone Number - Work")}
             placeholder="XXXXXXXXX"
-            value={formData.personalInfo.landWork}
+            value={formData.inspectionpersonal.landWork}
             onChangeText={(text) =>
               handleFieldChange("landWork", text, {
                 required: false,
@@ -979,7 +976,7 @@ useFocusEffect(
           <Input
             label={t("InspectionForm.Email Address - 1")}
             placeholder="----"
-            value={formData.personalInfo.email1}
+            value={formData.inspectionpersonal.email1}
             onChangeText={(text) =>
               handleFieldChange("email1", text, {
                 required: true,
@@ -995,7 +992,7 @@ useFocusEffect(
           <Input
             label={t("InspectionForm.Email Address - 2")}
             placeholder="----"
-            value={formData.personalInfo.email2}
+            value={formData.inspectionpersonal.email2}
             onChangeText={(text) =>
               handleFieldChange("email2", text, {
                 required: false,
@@ -1013,7 +1010,7 @@ useFocusEffect(
           <Input
             label={t("InspectionForm.House / Plot Number")}
             placeholder="----"
-            value={formData.personalInfo.house}
+            value={formData.inspectionpersonal.house}
             onChangeText={(text) =>
               handleFieldChange("house", text, {
                 required: true,
@@ -1026,7 +1023,7 @@ useFocusEffect(
           <Input
             label={t("InspectionForm.Street Name")}
             placeholder="----"
-            value={formData.personalInfo.street}
+            value={formData.inspectionpersonal.street}
             onChangeText={(text) =>
               handleFieldChange("street", text, {
                 required: true,
@@ -1039,7 +1036,7 @@ useFocusEffect(
           <Input
             label={t("InspectionForm.City / Town Name")}
             placeholder="----"
-            value={formData.personalInfo.cityName}
+            value={formData.inspectionpersonal.cityName}
             onChangeText={(text) =>
               handleFieldChange("cityName", text, {
                 required: true,

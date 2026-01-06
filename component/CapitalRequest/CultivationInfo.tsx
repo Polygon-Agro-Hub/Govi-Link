@@ -355,10 +355,7 @@ useEffect(() => {
     }));
 
     setErrors((prev) => ({ ...prev, [key]: error || "" }));
-
-    if (!error) {
       updateFormData({ [key]: value });
-    }
   };
 
   const handleNext = () => {

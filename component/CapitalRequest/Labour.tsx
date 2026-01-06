@@ -23,12 +23,12 @@ import { LinearGradient } from "expo-linear-gradient";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../types";
 type FormData = {
-  Economical?: EconomicalData;
+  Economical?: LabourData;
 };
-type EconomicalData = {
+type LabourData = {
 
 };
-type EconomicalProps = {
+type LabourProps = {
   navigation: any;
 };
 const YesNoSelect = ({
@@ -107,8 +107,8 @@ const YesNoSelect = ({
     </>
   );
 };
-const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
-  const route = useRoute<RouteProp<RootStackParamList, "Economical">>();
+const Labour: React.FC<LabourProps> = ({ navigation }) => {
+  const route = useRoute<RouteProp<RootStackParamList, "Labour">>();
   const { requestNumber } = route.params;
   const prevFormData = route.params?.formData;
   const [formData, setFormData] = useState(prevFormData);
@@ -123,7 +123,7 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
   console.log("finance", formData);
 
 useEffect(() => {
-  const eco = formData?.inspectioneconomical ?? {};
+  const eco = formData?.inspectionlabour ?? {};
 
   const isSuitaleSizeValid =
     eco.isSuitaleSize === "Yes" || eco.isSuitaleSize === "No";
@@ -149,12 +149,12 @@ useEffect(() => {
   let jobId = requestNumber;
   console.log("jobid", jobId);
 
-const updateFormData = async (updates: Partial<EconomicalData>) => {
+const updateFormData = async (updates: Partial<LabourData>) => {
   try {
     const updatedFormData = {
       ...formData,
-      inspectioneconomical: {
-        ...formData.inspectioneconomical,
+      inspectionlabour: {
+        ...formData.inspectionlabour,
         ...updates,
       },
     };
@@ -194,7 +194,7 @@ const updateFormData = async (updates: Partial<EconomicalData>) => {
   
 
   const handleNext = () => {
-    navigation.navigate("Labour", { formData, requestNumber });
+    // navigation.navigate("CultivationInfo", { formData, requestNumber });
 
     const validationErrors: Record<string, string> = {};
 
@@ -209,15 +209,15 @@ const updateFormData = async (updates: Partial<EconomicalData>) => {
       return;
     }
 
-    navigation.navigate("Labour", { formData, requestNumber });
+    navigation.navigate("CultivationInfo", { formData, requestNumber });
   };
 
 
   const handleyesNOFieldChange = async (key: string, value: "Yes" | "No") => {
     const updatedFormData = {
       ...formData,
-      inspectioneconomical: {
-        ...formData.inspectioneconomical,
+      inspectionlabour: {
+        ...formData.inspectionlabour,
         [key]: value,
       },
     };
@@ -263,14 +263,14 @@ const updateFormData = async (updates: Partial<EconomicalData>) => {
         >
           <View className="h-6" />
          <YesNoSelect
-            label={t("InspectionForm.Are the proposed crop/cropping systems suitable for the farmer’s size of land holding")}
+            label={t("InspectionForm.Can the farmer manage the proposed crop/cropping system through your family labour")}
             required
-            value={formData.inspectioneconomical?.isSuitaleSize|| null}
+            value={formData.inspectionlabour?.isManageFamilyLabour|| null}
             visible={
-              yesNoModalVisible && activeYesNoField === "isSuitaleSize"
+              yesNoModalVisible && activeYesNoField === "isManageFamilyLabour"
             }
             onOpen={() => {
-              setActiveYesNoField("isSuitaleSize");
+              setActiveYesNoField("isManageFamilyLabour");
               setYesNoModalVisible(true);
             }}
             onClose={() => {
@@ -278,19 +278,93 @@ const updateFormData = async (updates: Partial<EconomicalData>) => {
               setActiveYesNoField(null);
             }}
             onSelect={(value) =>
-              handleyesNOFieldChange("isSuitaleSize", value)
+              handleyesNOFieldChange("isManageFamilyLabour", value)
             }
           />
+          {formData.inspectionlabour?.isManageFamilyLabour === "Yes" && (
+  <YesNoSelect
+    label={t(
+      "InspectionForm.Is family/hired labour equipped to handle the proposed crop/cropping system"
+    )}
+    required
+    value={formData.inspectionlabour?.isFamilyHiredLabourEquipped || null}
+    visible={
+      yesNoModalVisible &&
+      activeYesNoField === "isFamilyHiredLabourEquipped"
+    }
+    onOpen={() => {
+      setActiveYesNoField("isFamilyHiredLabourEquipped");
+      setYesNoModalVisible(true);
+    }}
+    onClose={() => {
+      setYesNoModalVisible(false);
+      setActiveYesNoField(null);
+    }}
+    onSelect={(value) =>
+      handleyesNOFieldChange("isLabourEquipped", value)
+    }
+  />
+)}
+
+{formData.inspectionlabour?.isManageFamilyLabour === "No" && (
+    <>
+  <YesNoSelect
+    label={t(
+      "InspectionForm.If not, do you have adequate labours to manage the same"
+    )}
+    required
+    value={formData.inspectionlabour?.hasAdequateAlternativeLabour || null}
+    visible={
+      yesNoModalVisible &&
+      activeYesNoField === "hasAdequateAlternativeLabour"
+    }
+    onOpen={() => {
+      setActiveYesNoField("hasAdequateAlternativeLabour");
+      setYesNoModalVisible(true);
+    }}
+    onClose={() => {
+      setYesNoModalVisible(false);
+      setActiveYesNoField(null);
+    }}
+    onSelect={(value) =>
+      handleyesNOFieldChange("hasAdequateAlternativeLabour", value)
+    }
+  />
+
+   <YesNoSelect
+    label={t(
+      "InspectionForm.Is family/hired labour equipped to handle the proposed crop/cropping system"
+    )}
+    required
+    value={formData.inspectionlabour?.areThereMechanizationOptions || null}
+    visible={
+      yesNoModalVisible &&
+      activeYesNoField === "areThereMechanizationOptions"
+    }
+    onOpen={() => {
+      setActiveYesNoField("areThereMechanizationOptions");
+      setYesNoModalVisible(true);
+    }}
+    onClose={() => {
+      setYesNoModalVisible(false);
+      setActiveYesNoField(null);
+    }}
+    onSelect={(value) =>
+      handleyesNOFieldChange("areThereMechanizationOptions", value)
+    }
+  />
+  </>
+)}
 
   <YesNoSelect
-            label={t("InspectionForm.Are the financial resources adequate to manage the proposed crop/cropping system")}
+            label={t("InspectionForm.Are there any mechanization options to substitute the labour")}
             required
-            value={formData.inspectioneconomical?.isFinanceResource|| null}
+            value={formData.inspectionlabour?.areThereMechanizationOptions|| null}
             visible={
-              yesNoModalVisible && activeYesNoField === "isFinanceResource"
+              yesNoModalVisible && activeYesNoField === "areThereMechanizationOptions"
             }
             onOpen={() => {
-              setActiveYesNoField("isFinanceResource");
+              setActiveYesNoField("areThereMechanizationOptions");
               setYesNoModalVisible(true);
             }}
             onClose={() => {
@@ -298,18 +372,18 @@ const updateFormData = async (updates: Partial<EconomicalData>) => {
               setActiveYesNoField(null);
             }}
             onSelect={(value) =>
-              handleyesNOFieldChange("isFinanceResource", value)
+              handleyesNOFieldChange("areThereMechanizationOptions", value)
             }
           />
             <YesNoSelect
-            label={t("InspectionForm.If not, can the farmer mobilize financial resources through alternative routes")}
+            label={t("InspectionForm.Is machinery available")}
             required
-            value={formData.inspectioneconomical?.isAltRoutes|| null}
+            value={formData.inspectionlabour?.isMachineryAvailable|| null}
             visible={
-              yesNoModalVisible && activeYesNoField === "isAltRoutes"
+              yesNoModalVisible && activeYesNoField === "isMachineryAvailable"
             }
             onOpen={() => {
-              setActiveYesNoField("isAltRoutes");
+              setActiveYesNoField("isMachineryAvailable");
               setYesNoModalVisible(true);
             }}
             onClose={() => {
@@ -317,7 +391,47 @@ const updateFormData = async (updates: Partial<EconomicalData>) => {
               setActiveYesNoField(null);
             }}
             onSelect={(value) =>
-              handleyesNOFieldChange("isAltRoutes", value)
+              handleyesNOFieldChange("isMachineryAvailable", value)
+            }
+          />
+
+                      <YesNoSelect
+            label={t("InspectionForm.Is machinery affordable")}
+            required
+            value={formData.inspectionlabour?.isMachineryAffordable || null}
+            visible={
+              yesNoModalVisible && activeYesNoField === "isMachineryAffordable"
+            }
+            onOpen={() => {
+              setActiveYesNoField("isMachineryAffordable");
+              setYesNoModalVisible(true);
+            }}
+            onClose={() => {
+              setYesNoModalVisible(false);
+              setActiveYesNoField(null);
+            }}
+            onSelect={(value) =>
+              handleyesNOFieldChange("isMachineryAffordable", value)
+            }
+          />
+
+                                <YesNoSelect
+            label={t("InspectionForm.Is machinery cost effective")}
+            required
+            value={formData.inspectionlabour?.isMachineryCostEffective || null}
+            visible={
+              yesNoModalVisible && activeYesNoField === "isMachineryCostEffective"
+            }
+            onOpen={() => {
+              setActiveYesNoField("isMachineryCostEffective");
+              setYesNoModalVisible(true);
+            }}
+            onClose={() => {
+              setYesNoModalVisible(false);
+              setActiveYesNoField(null);
+            }}
+            onSelect={(value) =>
+              handleyesNOFieldChange("isMachineryCostEffective", value)
             }
           />
         </ScrollView>
@@ -373,4 +487,4 @@ const updateFormData = async (updates: Partial<EconomicalData>) => {
   );
 };
 
-export default Economical;
+export default Labour;

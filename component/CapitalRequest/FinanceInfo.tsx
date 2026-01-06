@@ -26,7 +26,7 @@ import banksData from "@/assets/json/banks.json";
 import branchesData from "@/assets/json/branches.json";
 
 type FormData = {
-  financeInfo?: FinanceInfoData;
+  inspectionfinance?: FinanceInfoData;
 };
 
 type AssetCategory = {
@@ -178,13 +178,13 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     ];
 
     const allFilled = requiredFields.every((key) => {
-      const value = formData.financeInfo?.[key];
+      const value = formData.inspectionfinance?.[key];
       return (
         value !== null && value !== undefined && value.toString().trim() !== ""
       );
     });
     console.log("all", allFilled);
-    const assetsError = validateAssets(formData.financeInfo?.assets);
+    const assetsError = validateAssets(formData.inspectionfinance?.assets);
     const hasErrors = Object.values({ ...errors, assets: assetsError }).some(
       (err) => err && err.trim() !== ""
     );
@@ -200,8 +200,8 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     try {
       const updatedFormData = {
         ...formData,
-        financeInfo: {
-          ...formData.financeInfo,
+        inspectionfinance: {
+          ...formData.inspectionfinance,
           ...updates,
           bank: selectedBank,
           branch: updates.branch ?? selectedBranch,
@@ -225,14 +225,14 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
             const parsedData: FormData = JSON.parse(savedData);
             setFormData(parsedData);
 
-            if (parsedData.financeInfo?.bank)
-              setSelectedBank(parsedData.financeInfo.bank);
-            if (parsedData.financeInfo?.branch)
-              setSelectedBranch(parsedData.financeInfo.branch);
+            if (parsedData.inspectionfinance?.bank)
+              setSelectedBank(parsedData.inspectionfinance.bank);
+            if (parsedData.inspectionfinance?.branch)
+              setSelectedBranch(parsedData.inspectionfinance.branch);
 
-            if (parsedData.financeInfo?.bank) {
+            if (parsedData.inspectionfinance?.bank) {
               const bankObj = banks.find(
-                (b) => b.name === parsedData.financeInfo?.bank
+                (b) => b.name === parsedData.inspectionfinance?.bank
               );
               if (bankObj) {
                 const filteredBranches =
@@ -260,21 +260,17 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
 
     setFormData((prev: FormData) => ({
       ...prev,
-      financeInfo: {
-        ...prev.financeInfo,
+      inspectionfinance: {
+        ...prev.inspectionfinance,
         [key]: value,
         bank: selectedBank,
-        branch: prev.financeInfo?.branch ?? selectedBranch,
+        branch: prev.inspectionfinance?.branch ?? selectedBranch,
       },
     }));
 
     // Update errors
     setErrors((prev) => ({ ...prev, [key]: error || "" }));
-
-    // Save to AsyncStorage
-    if (!error) {
       updateFormData({ [key]: value });
-    }
   };
 
   const handleNext = () => {
@@ -282,7 +278,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
 
     const validationErrors: Record<string, string> = {};
 
-    const accInfo = formData.financeInfo;
+    const accInfo = formData.inspectionfinance;
 
     if (
       !accInfo?.accountholderName ||
@@ -520,7 +516,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
   };
   // Check if any selected category has no sub-items (like Land or Building)
   const hasAssetWarnings = (): boolean => {
-    const parentAssets = formData.financeInfo?.assets || {};
+    const parentAssets = formData.inspectionfinance?.assets || {};
     return assetCategories.some((category) => {
       const isCategorySelected = parentAssets.hasOwnProperty(category.key);
       return (
@@ -558,7 +554,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
           <Input
             label={t("InspectionForm.Account Holder’s Name")}
             placeholder="----"
-            value={formData.financeInfo?.accountholderName || ""}
+            value={formData.inspectionfinance?.accountholderName || ""}
             onChangeText={(text) =>
               handleFieldChange("accountholderName", text, {
                 required: true,
@@ -572,15 +568,15 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
           <Input
             label={t("InspectionForm.Account Number")}
             placeholder="----"
-            value={formData.financeInfo?.accountNumber?.toString() || ""}
+            value={formData.inspectionfinance?.accountNumber?.toString() || ""}
             onChangeText={(text) => {
               const numericValue =
                 parseInt(text.replace(/[^0-9]/g, ""), 10) || 0;
 
               setFormData((prev: FormData) => ({
                 ...prev,
-                financeInfo: {
-                  ...prev.financeInfo,
+                inspectionfinance: {
+                  ...prev.inspectionfinance,
                   accountNumber: numericValue,
                 },
               }));
@@ -595,7 +591,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
           <Input
             label={t("InspectionForm.Confirm Account Number")}
             placeholder="----"
-            value={formData.financeInfo?.confirmAccountNumber?.toString() || ""}
+            value={formData.inspectionfinance?.confirmAccountNumber?.toString() || ""}
             onChangeText={(text) => {
               // Convert to number safely
               const numericValue = text ? parseInt(text, 10) : undefined; // undefined if empty
@@ -603,8 +599,8 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               // Update state
               setFormData((prev: FormData) => ({
                 ...prev,
-                financeInfo: {
-                  ...prev.financeInfo,
+                inspectionfinance: {
+                  ...prev.inspectionfinance,
                   confirmAccountNumber: numericValue,
                 },
               }));
@@ -616,7 +612,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               let error = "";
               if (!numericValue) {
                 error = t("Error.Confirm account number is required");
-              } else if (numericValue !== formData.financeInfo?.accountNumber) {
+              } else if (numericValue !== formData.inspectionfinance?.accountNumber) {
                 error = t("Error.Account numbers do not match");
               }
 
@@ -691,7 +687,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
             >
               <TextInput
                 placeholder={t("InspectionForm.Type here...")}
-                value={formData.financeInfo?.existingDebts || ""}
+                value={formData.inspectionfinance?.existingDebts || ""}
                 onChangeText={(text) => {
                   // Remove leading spaces
                   let formattedText = text.replace(/^\s+/, "");
@@ -706,8 +702,8 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
                   // Update state
                   setFormData((prev: FormData) => ({
                     ...prev,
-                    financeInfo: {
-                      ...prev.financeInfo,
+                    inspectionfinance: {
+                      ...prev.inspectionfinance,
                       existingDebts: formattedText,
                     },
                   }));
@@ -740,7 +736,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
             <Input
               label={t("InspectionForm.No of Dependents")}
               placeholder={t("InspectionForm.0 or more")}
-              value={formData.financeInfo?.noOfDependents}
+              value={formData.inspectionfinance?.noOfDependents}
               onChangeText={(text) =>
                 handleFieldChange("noOfDependents", text, {
                   required: true,
@@ -760,7 +756,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               {t("InspectionForm.Assets owned by the farmer")} *
             </Text>
             {assetCategories.map((category) => {
-              const parentAssets = formData.financeInfo?.assets || {};
+              const parentAssets = formData.inspectionfinance?.assets || {};
               console.log(parentAssets);
 
               const isCategorySelected = parentAssets.hasOwnProperty(
@@ -788,8 +784,8 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
                         }
                         setFormData((prev: any) => ({
                           ...prev,
-                          financeInfo: {
-                            ...prev.financeInfo,
+                          inspectionfinance: {
+                            ...prev.inspectionfinance,
                             assets: updatedAssets,
                           },
                         }));
@@ -847,8 +843,8 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
 
                               setFormData((prev: any) => ({
                                 ...prev,
-                                financeInfo: {
-                                  ...prev.financeInfo,
+                                inspectionfinance: {
+                                  ...prev.inspectionfinance,
                                   assets: updatedAssets,
                                 },
                               }));
@@ -893,8 +889,8 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
 
                             setFormData((prev: any) => ({
                               ...prev,
-                              financeInfo: {
-                                ...prev.financeInfo,
+                              inspectionfinance: {
+                                ...prev.inspectionfinance,
                                 assets: updatedAssets,
                               },
                             }));
