@@ -699,7 +699,6 @@ useFocusEffect(
 
 
   const handleNext = () => {
-      navigation.navigate("IDProof", { formData, requestNumber });
   const requiredFields: (keyof PersonalInfo)[] = [
     "firstName",
     "lastName",
@@ -760,7 +759,7 @@ useFocusEffect(
     return;
   }
 
-  navigation.navigate("IDProof", { formData });
+  navigation.navigate("IDProof", { formData, requestNumber });
 };
 
 
@@ -1131,7 +1130,7 @@ useFocusEffect(
   }>
             <Text className="text-white text-base font-semibold">{t("InspectionForm.Exit")}</Text>
           </TouchableOpacity>
-           {isNextEnabled == false ? (
+           {isNextEnabled == true ? (
               <View className="flex-1">
           <TouchableOpacity
             className="flex-1 "

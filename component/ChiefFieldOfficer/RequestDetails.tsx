@@ -8,12 +8,13 @@ import {
   Alert,
   ActivityIndicator,
   Image,
+  Linking,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../types";
-import { MaterialIcons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import axios from "axios";
 import { environment } from "@/environment/environment";
@@ -154,7 +155,12 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
     );
   };
 
-
+  const handleDial = (phoneNumber: string) => {
+    const phoneUrl = `tel:${phoneNumber}`;
+    Linking.openURL(phoneUrl).catch((err) =>
+      console.error("Failed to open dial pad:", err)
+    );
+  };
   
   if (loading) {
     return (
@@ -370,6 +376,7 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
         </View> */}
       </ScrollView>
       <View className=" bottom-4 bg-white " >
+
                   <View
             style={{
               height: 1,
@@ -381,19 +388,30 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
               elevation: 3,
             }}
           />
+                                          <TouchableOpacity
+                          className="flex "
+                          onPress={() => handleDial(requestData.phoneNumber)}
+                        >
+                          <View className="flex-row mt-4 self-center items-center justify-center border border-[#F83B4F] rounded-full px-6 w-[50%] py-2">
+                            <Ionicons name="call" size={20} color="#F83B4F" />
+                            <Text className="text-base font-semibold  ml-2">
+                              {t("VisitPopup.Get Call")}
+                            </Text>
+                          </View>
+                        </TouchableOpacity>
               <TouchableOpacity
-              //  onPress={() => navigation.navigate("PersonalInfo", {requestNumber})} 
-                onPress={async () => {
-    try {
-      await AsyncStorage.removeItem(`${requestNumber}`);
-      console.log("AsyncStorage cleared");
+               onPress={() => navigation.navigate("PersonalInfo", {requestNumber})} 
+  //               onPress={async () => {
+  //   try {
+  //     await AsyncStorage.removeItem(`${requestNumber}`);
+  //     console.log("AsyncStorage cleared");
 
-      navigation.navigate("PersonalInfo", { requestNumber });
-    } catch (e) {
-      console.log("Error clearing AsyncStorage:", e);
-    }
-  }}
-              className="w-[80%] mt-6 self-center">
+  //     navigation.navigate("PersonalInfo", { requestNumber });
+  //   } catch (e) {
+  //     console.log("Error clearing AsyncStorage:", e);
+  //   }
+  // }}
+              className="w-[80%] mt-4 self-center">
               <LinearGradient
                 colors={["#F35125", "#FF1D85"]}
                 start={{ x: 0, y: 0 }}

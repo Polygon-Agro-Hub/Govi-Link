@@ -23,12 +23,12 @@ import { LinearGradient } from "expo-linear-gradient";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../types";
 type FormData = {
-  Economical?: EconomicalData;
+  HarvestStorage?: HarvestStorageData;
 };
-type EconomicalData = {
+type HarvestStorageData = {
 
 };
-type EconomicalProps = {
+type HarvestStorageProps = {
   navigation: any;
 };
 const YesNoSelect = ({
@@ -107,8 +107,8 @@ const YesNoSelect = ({
     </>
   );
 };
-const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
-  const route = useRoute<RouteProp<RootStackParamList, "Economical">>();
+const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
+  const route = useRoute<RouteProp<RootStackParamList, "HarvestStorage">>();
   const { requestNumber } = route.params;
   const prevFormData = route.params?.formData;
   const [formData, setFormData] = useState(prevFormData);
@@ -123,38 +123,60 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
   console.log("finance", formData);
 
 useEffect(() => {
-  const eco = formData?.inspectioneconomical ?? {};
+  const hs = formData?.inspectionharveststorage ?? {};
 
-  const isSuitaleSizeValid =
-    eco.isSuitaleSize === "Yes" || eco.isSuitaleSize === "No";
+  const hasOwnStorageValid =
+    hs.hasOwnStorage === "Yes" || hs.hasOwnStorage === "No";
 
-  const isFinanceResourceValid =
-    eco.isFinanceResource === "Yes" || eco.isFinanceResource === "No";
+  let facilityAccessValid = true;
 
-  const isAltRoutesValid =
-    eco.isAltRoutes === "Yes" || eco.isAltRoutes === "No";
+  if (hs.hasOwnStorage === "No") {
+    facilityAccessValid =
+      hs.ifNotHasFacilityAccess === "Yes" ||
+      hs.ifNotHasFacilityAccess === "No";
+  }
+
+  const primaryProcessingValid =
+    hs.hasPrimaryProcessingAccess === "Yes" ||
+    hs.hasPrimaryProcessingAccess === "No";
+
+  const valueAdditionTechValid =
+    hs.knowsValueAdditionTech === "Yes" ||
+    hs.knowsValueAdditionTech === "No";
+
+  const marketLinkageValid =
+    hs.hasValueAddedMarketLinkage === "Yes" ||
+    hs.hasValueAddedMarketLinkage === "No";
+
+  const qualityStandardsValid =
+    hs.awareOfQualityStandards === "Yes" ||
+    hs.awareOfQualityStandards === "No";
 
   const hasErrors = Object.values(errors).some(Boolean);
 
   setIsNextEnabled(
-    isSuitaleSizeValid &&
-    isFinanceResourceValid &&
-    isAltRoutesValid &&
-    !hasErrors
+    hasOwnStorageValid &&
+      facilityAccessValid &&
+      primaryProcessingValid &&
+      valueAdditionTechValid &&
+      marketLinkageValid &&
+      qualityStandardsValid &&
+      !hasErrors
   );
 }, [formData, errors]);
+
 
 
 
   let jobId = requestNumber;
   console.log("jobid", jobId);
 
-const updateFormData = async (updates: Partial<EconomicalData>) => {
+const updateFormData = async (updates: Partial<HarvestStorageData>) => {
   try {
     const updatedFormData = {
       ...formData,
-      inspectioneconomical: {
-        ...formData.inspectioneconomical,
+      inspectionharveststorage: {
+        ...formData.inspectionharveststorage,
         ...updates,
       },
     };
@@ -208,27 +230,30 @@ const updateFormData = async (updates: Partial<EconomicalData>) => {
       return;
     }
 
-    navigation.navigate("Labour", { formData, requestNumber });
+    navigation.navigate("CultivationInfo", { formData, requestNumber });
   };
 
 
-  const handleyesNOFieldChange = async (key: string, value: "Yes" | "No") => {
-    const updatedFormData = {
-      ...formData,
-      inspectioneconomical: {
-        ...formData.inspectioneconomical,
-        [key]: value,
-      },
-    };
-
-    setFormData(updatedFormData);
-
-    try {
-      await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData));
-    } catch (e) {
-      console.log("AsyncStorage save failed", e);
-    }
+const handleyesNOFieldChange = async (key: string, value: "Yes" | "No") => {
+  let updatedData = {
+    ...formData.inspectionharveststorage,
+    [key]: value,
   };
+
+  if (key === "hasOwnStorage" && value === "Yes") {
+    delete updatedData.ifNotHasFacilityAccess;
+  }
+
+  const updatedFormData = {
+    ...formData,
+    inspectionharveststorage: updatedData,
+  };
+
+  setFormData(updatedFormData);
+  await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData));
+};
+
+
 
   
   return (
@@ -253,7 +278,7 @@ const updateFormData = async (updates: Partial<EconomicalData>) => {
         </View>
 
         {/* Tabs */}
-        <FormTabs activeKey="Economical" />
+        <FormTabs activeKey="Labour" />
 
         <ScrollView
           className="flex-1 px-6 bg-white rounded-t-3xl"
@@ -262,14 +287,14 @@ const updateFormData = async (updates: Partial<EconomicalData>) => {
         >
           <View className="h-6" />
          <YesNoSelect
-            label={t("InspectionForm.Are the proposed crop/cropping systems suitable for the farmer’s size of land holding")}
+            label={t("InspectionForm.Does the farmer own storage facility")}
             required
-            value={formData.inspectioneconomical?.isSuitaleSize|| null}
+            value={formData.inspectionharveststorage?.hasOwnStorage|| null}
             visible={
-              yesNoModalVisible && activeYesNoField === "isSuitaleSize"
+              yesNoModalVisible && activeYesNoField === "hasOwnStorage"
             }
             onOpen={() => {
-              setActiveYesNoField("isSuitaleSize");
+              setActiveYesNoField("hasOwnStorage");
               setYesNoModalVisible(true);
             }}
             onClose={() => {
@@ -277,19 +302,44 @@ const updateFormData = async (updates: Partial<EconomicalData>) => {
               setActiveYesNoField(null);
             }}
             onSelect={(value) =>
-              handleyesNOFieldChange("isSuitaleSize", value)
+              handleyesNOFieldChange("hasOwnStorage", value)
             }
           />
 
+{formData.inspectionharveststorage?.hasOwnStorage === "No" && (
   <YesNoSelect
-            label={t("InspectionForm.Are the financial resources adequate to manage the proposed crop/cropping system")}
+    label={t(
+      "InspectionForm.If not, does the farmer have access to such facility"
+    )}
+    required
+    value={formData.inspectionharveststorage?.ifNotHasFacilityAccess || null}
+    visible={
+      yesNoModalVisible &&
+      activeYesNoField === "ifNotHasFacilityAccess"
+    }
+    onOpen={() => {
+      setActiveYesNoField("ifNotHasFacilityAccess");
+      setYesNoModalVisible(true);
+    }}
+    onClose={() => {
+      setYesNoModalVisible(false);
+      setActiveYesNoField(null);
+    }}
+    onSelect={(value) =>
+      handleyesNOFieldChange("ifNotHasFacilityAccess", value)
+    }
+  />
+)}
+
+  <YesNoSelect
+            label={t("InspectionForm.Does the farmer has access to primary processing facility")}
             required
-            value={formData.inspectioneconomical?.isFinanceResource|| null}
+            value={formData.inspectionharveststorage?.hasPrimaryProcessingAccess|| null}
             visible={
-              yesNoModalVisible && activeYesNoField === "isFinanceResource"
+              yesNoModalVisible && activeYesNoField === "hasPrimaryProcessingAccess"
             }
             onOpen={() => {
-              setActiveYesNoField("isFinanceResource");
+              setActiveYesNoField("hasPrimaryProcessingAccess");
               setYesNoModalVisible(true);
             }}
             onClose={() => {
@@ -297,18 +347,18 @@ const updateFormData = async (updates: Partial<EconomicalData>) => {
               setActiveYesNoField(null);
             }}
             onSelect={(value) =>
-              handleyesNOFieldChange("isFinanceResource", value)
+              handleyesNOFieldChange("hasPrimaryProcessingAccess", value)
             }
           />
             <YesNoSelect
-            label={t("InspectionForm.If not, can the farmer mobilize financial resources through alternative routes")}
+            label={t("InspectionForm.Does the farmer knows technologies for value addition of your crop")}
             required
-            value={formData.inspectioneconomical?.isAltRoutes|| null}
+            value={formData.inspectionharveststorage?.knowsValueAdditionTech || null}
             visible={
-              yesNoModalVisible && activeYesNoField === "isAltRoutes"
+              yesNoModalVisible && activeYesNoField === "knowsValueAdditionTech"
             }
             onOpen={() => {
-              setActiveYesNoField("isAltRoutes");
+              setActiveYesNoField("knowsValueAdditionTech");
               setYesNoModalVisible(true);
             }}
             onClose={() => {
@@ -316,7 +366,47 @@ const updateFormData = async (updates: Partial<EconomicalData>) => {
               setActiveYesNoField(null);
             }}
             onSelect={(value) =>
-              handleyesNOFieldChange("isAltRoutes", value)
+              handleyesNOFieldChange("knowsValueAdditionTech", value)
+            }
+          />
+
+                      <YesNoSelect
+            label={t("InspectionForm.Does the farmer has market linkage for value added products")}
+            required
+            value={formData.inspectionharveststorage?.hasValueAddedMarketLinkage || null}
+            visible={
+              yesNoModalVisible && activeYesNoField === "hasValueAddedMarketLinkage"
+            }
+            onOpen={() => {
+              setActiveYesNoField("hasValueAddedMarketLinkage");
+              setYesNoModalVisible(true);
+            }}
+            onClose={() => {
+              setYesNoModalVisible(false);
+              setActiveYesNoField(null);
+            }}
+            onSelect={(value) =>
+              handleyesNOFieldChange("hasValueAddedMarketLinkage", value)
+            }
+          />
+
+                                <YesNoSelect
+            label={t("InspectionForm.Is farmer aware about required quality standards of value added products of proposed crops")}
+            required
+            value={formData.inspectionharveststorage?.awareOfQualityStandards || null}
+            visible={
+              yesNoModalVisible && activeYesNoField === "awareOfQualityStandards"
+            }
+            onOpen={() => {
+              setActiveYesNoField("awareOfQualityStandards");
+              setYesNoModalVisible(true);
+            }}
+            onClose={() => {
+              setYesNoModalVisible(false);
+              setActiveYesNoField(null);
+            }}
+            onSelect={(value) =>
+              handleyesNOFieldChange("awareOfQualityStandards", value)
             }
           />
         </ScrollView>
@@ -367,4 +457,4 @@ const updateFormData = async (updates: Partial<EconomicalData>) => {
   );
 };
 
-export default Economical;
+export default HarvestStorage;

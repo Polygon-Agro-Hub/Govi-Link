@@ -94,7 +94,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
     const {requestNumber } = route.params;
       let jobId = requestNumber;
   const [formData, setFormData] = useState(prevFormData);
-      console.log("job id re", formData)
+      console.log("job id re", jobId)
 
   const [selectedIdProof, setSelectedIdProof] = useState<string | null>(prevFormData?.inspectionidproof?.pType || null);
   const [nic, setNic] = useState<string>(prevFormData?.inspectionidproof?.pNumber || "");
@@ -119,6 +119,7 @@ useEffect(() => {
       const loadData = async () => {
         try {
           const stored = await AsyncStorage.getItem(`${requestNumber}`);
+          console.log ("request nuer", requestNumber)
           if (stored) {
             const parsed = JSON.parse(stored);
             setFormData(parsed);
@@ -204,8 +205,6 @@ const handleCameraClose = async (uri: string | null) => {
 
 
 const handleNext = () => {
-  console.log(requestNumber)
-    navigation.navigate("FinanceInfo", { formData , requestNumber});
 
   if (!selectedIdProof) {
     setErrors(prev => ({ ...prev, nic: t("Error.ID Proof Type is required") }));
@@ -244,7 +243,7 @@ const handleNext = () => {
   }
 
   // ✅ Everything valid → go next
-  // navigation.navigate("FinanceInfo", { formData , requestNumber});
+  navigation.navigate("FinanceInfo", { formData , requestNumber});
 };
 
 
@@ -486,16 +485,11 @@ value={nic || ""}
 
         <View className="flex-row px-6 py-4 gap-4 bg-white border-t border-gray-200 ">
           <TouchableOpacity className="flex-1 bg-[#444444] rounded-full py-4 items-center"  onPress={() =>
-    navigation.navigate("Main", {
-      screen: "MainTabs",
-      params: {
-        screen: "CapitalRequests",
-      },
-    })
+    navigation.goBack()
   }>
-            <Text className="text-white text-base font-semibold">{t("InspectionForm.Exit")}</Text>
+            <Text className="text-white text-base font-semibold">{t("InspectionForm.Back")}</Text>
           </TouchableOpacity>
-           {isNextEnabled == false ? (
+           {isNextEnabled == true ? (
               <View className="flex-1">
           <TouchableOpacity
             className="flex-1 "

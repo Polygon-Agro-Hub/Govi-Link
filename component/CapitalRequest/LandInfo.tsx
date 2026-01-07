@@ -199,8 +199,6 @@ useEffect(() => {
   };
 
   const handleNext = () => {
-        navigation.navigate("InvestmentInfo", { formData, requestNumber });
-
     const requiredFields: (keyof FormData)[] = [];
     const validationErrors: Record<string, string> = {};
 
@@ -225,7 +223,7 @@ useEffect(() => {
       return;
     }
 
-    // navigation.navigate("InvestmentInfo", { formData, requestNumber });
+    navigation.navigate("InvestmentInfo", { formData, requestNumber });
   };
 
 
@@ -562,19 +560,14 @@ onPress={() =>
           <TouchableOpacity
             className="flex-1 bg-[#444444] rounded-full py-4 items-center"
             onPress={() =>
-              navigation.navigate("Main", {
-                screen: "MainTabs",
-                params: {
-                  screen: "CapitalRequests",
-                },
-              })
+              navigation.goBack()
             }
           >
             <Text className="text-white text-base font-semibold">
-              {t("InspectionForm.Exit")}
+              {t("InspectionForm.Back")}
             </Text>
           </TouchableOpacity>
-          {isNextEnabled == false ? (
+          {isNextEnabled == true ? (
             <View className="flex-1">
               <TouchableOpacity className="flex-1 " onPress={handleNext}>
                 <LinearGradient
