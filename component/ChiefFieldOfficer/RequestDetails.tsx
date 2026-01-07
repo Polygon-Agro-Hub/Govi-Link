@@ -391,9 +391,6 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
           //  onPress={() => navigation.navigate("PersonalInfo", {requestNumber})} 
           onPress={async () => {
             try {
-              await AsyncStorage.removeItem(`${requestNumber}`);
-              console.log("AsyncStorage cleared");
-
               navigation.navigate("PersonalInfo", {
                 requestNumber,
                 requestId: requestData.id

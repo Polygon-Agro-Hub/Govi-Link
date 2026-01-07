@@ -406,14 +406,13 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
       email2: data.email2,
       house: data.house,
       street: data.street,
-      city: data.cityName, 
+      city: data.cityName,
       district: data.district,
       province: data.province,
       country: data.country,
     };
   };
 
-  // Update saveToBackend to use the transform function
   const saveToBackend = async (
     reqId: number,
     tableName: string,
@@ -430,12 +429,18 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
       console.log(`📦 Original data:`, data);
       console.log(`📦 Transformed data:`, transformedData);
 
+      // ✅ Send with data spread at root level, not nested
       const response = await axios.post(
         `${environment.API_BASE_URL}api/capital-request/inspection/save`,
         {
           reqId,
           tableName,
-          data: transformedData,
+          ...transformedData, // ✅ CORRECT - spreads fields at root level
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
         }
       );
 
