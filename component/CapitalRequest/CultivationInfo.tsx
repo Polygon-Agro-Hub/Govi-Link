@@ -26,14 +26,18 @@ import { RootStackParamList } from "../types";
 import { CameraScreen } from "@/Items/CameraScreen";
 
 const climateParameters = [
-  "Temperature",
-  "Rainfall",
-  "Sun shine hours",
-  "Relative humidity",
-  "Wind velocity",
-  "Wind direction",
-  "Seasons and agro-ecological zone",
+  { key: "temperature", label: "Temperature" },
+  { key: "rainfall", label: "Rainfall" },
+  { key: "sunShine", label: "Sun shine hours" },
+  { key: "humidity", label: "Relative humidity" },
+  { key: "windVelocity", label: "Wind velocity" },
+  { key: "windDirection", label: "Wind direction" },
+  {
+    key: "zone",
+    label: "Seasons and agro-ecological zone",
+  },
 ];
+
 
 type Selection = "yes" | "no" | null;
 
@@ -232,12 +236,13 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
     useState(false);
   console.log("finance", formData);
 
-  const [selections, setSelections] = useState<Record<string, Selection>>(() =>
-    climateParameters.reduce((acc, param) => {
-      acc[param] = null;
-      return acc;
-    }, {} as Record<string, Selection>)
-  );
+const [selections, setSelections] = useState<Record<string, Selection>>(() =>
+  climateParameters.reduce((acc, item) => {
+    acc[item.key] = null;
+    return acc;
+  }, {} as Record<string, Selection>)
+);
+
   const [showCamera, setShowCamera] = useState(false);
 const image = formData?.inspectioncultivation?.waterImage?.uri;
 
@@ -245,7 +250,7 @@ useEffect(() => {
   const cultivationInfo = formData?.inspectioncultivation || {};
 
   const allClimateSelected = climateParameters.every(
-    (param) => selections[param] === "yes" || selections[param] === "no"
+    (param) => selections[param.key] === "yes" || selections[param.key] === "no"
   );
 
   const isPHValid = !!cultivationInfo.ph && !errors.ph;
@@ -307,31 +312,58 @@ useEffect(() => {
     }
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      const loadFormData = async () => {
-        try {
-          const savedData = await AsyncStorage.getItem(`${jobId}`);
-          if (savedData) {
-            const parsedData = JSON.parse(savedData);
-            setFormData(parsedData);
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     const loadFormData = async () => {
+  //       try {
+  //         const savedData = await AsyncStorage.getItem(`${jobId}`);
+  //         if (savedData) {
+  //           const parsedData = JSON.parse(savedData);
+  //           setFormData(parsedData);
 
-            const savedSelections: Record<string, Selection> = {};
-            climateParameters.forEach((param) => {
-              savedSelections[param] =
-                parsedData.inspectioncultivation
-                  .suitableForOverallLocalClimaticParameters?.[param] || null;
-            });
-            setSelections(savedSelections);
-          }
-        } catch (e) {
-          console.log("Failed to load form data", e);
+  //           const savedSelections: Record<string, Selection> = {};
+  //           climateParameters.forEach((param) => {
+  //             savedSelections[param] =
+  //               parsedData.inspectioncultivation
+  //                 .suitableForOverallLocalClimaticParameters?.[param] || null;
+  //           });
+  //           setSelections(savedSelections);
+  //         }
+  //       } catch (e) {
+  //         console.log("Failed to load form data", e);
+  //       }
+  //     };
+
+  //     loadFormData();
+  //   }, [])
+  // );
+useFocusEffect(
+  useCallback(() => {
+    const loadFormData = async () => {
+      try {
+        const savedData = await AsyncStorage.getItem(`${jobId}`);
+        if (savedData) {
+          const parsedData = JSON.parse(savedData);
+          setFormData(parsedData);
+
+          const savedSelections: Record<string, Selection> = {};
+
+          climateParameters.forEach(({ key }) => {
+            savedSelections[key] =
+              parsedData.inspectioncultivation?.[key] ?? null;
+          });
+
+          setSelections(savedSelections);
         }
-      };
+      } catch (e) {
+        console.log("Failed to load form data", e);
+      }
+    };
 
-      loadFormData();
-    }, [])
-  );
+    loadFormData();
+  }, [jobId])
+);
+
 
   const handleFieldChange = (
     key: keyof CultivationInfoData,
@@ -359,7 +391,6 @@ useEffect(() => {
   };
 
   const handleNext = () => {
-        navigation.navigate("CroppingSystems", { formData, requestNumber });
 
     const validationErrors: Record<string, string> = {};
 
@@ -380,56 +411,104 @@ useEffect(() => {
 
   const [error, setError] = useState<string>("");
 
-  const handleSelect = async (param: string, value: Selection) => {
-    const currentValue = selections[param];
-    const newValue = currentValue === value ? null : value;
+  // const handleSelect = async (param: string, value: Selection) => {
+  //   const currentValue = selections[param];
+  //   const newValue = currentValue === value ? null : value;
 
-    const updatedSelections = {
-      ...selections,
-      [param]: newValue,
-    };
-    setSelections(updatedSelections);
+  //   const updatedSelections = {
+  //     ...selections,
+  //     [param]: newValue,
+  //   };
+  //   setSelections(updatedSelections);
 
-    const updatedSuitableParams = {
-      ...(formData.inspectioncultivation?.suitableForOverallLocalClimaticParameters ||
-        {}),
-      [param]: newValue,
-    };
+  //   const updatedSuitableParams = {
+  //     ...(formData.inspectioncultivation?.suitableForOverallLocalClimaticParameters ||
+  //       {}),
+  //     [param]: newValue,
+  //   };
 
-    if (newValue === null) {
-      delete updatedSuitableParams[param];
-    }
+  //   if (newValue === null) {
+  //     delete updatedSuitableParams[param];
+  //   }
 
-    const updatedCultivationInfo = {
-      ...formData.inspectioncultivation,
-      suitableForOverallLocalClimaticParameters: updatedSuitableParams,
-    };
+  //   const updatedCultivationInfo = {
+  //     ...formData.inspectioncultivation,
+  //     suitableForOverallLocalClimaticParameters: updatedSuitableParams,
+  //   };
 
-    const updatedFormData = {
-      ...formData,
-      inspectioncultivation: updatedCultivationInfo,
-    };
+  //   const updatedFormData = {
+  //     ...formData,
+  //     inspectioncultivation: updatedCultivationInfo,
+  //   };
 
-    setFormData(updatedFormData);
+  //   setFormData(updatedFormData);
 
-    try {
-      await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData));
-    } catch (e) {
-      console.log("AsyncStorage save failed", e);
-    }
+  //   try {
+  //     await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData));
+  //   } catch (e) {
+  //     console.log("AsyncStorage save failed", e);
+  //   }
 
-    const nextMissing = climateParameters.find((p) => !updatedSelections[p]);
+  //   const nextMissing = climateParameters.find((p) => !updatedSelections[p]);
 
-    if (nextMissing) {
-      setError(
-        t("Error.Please select Yes or No for", {
-          Missing: t(`InspectionForm.${nextMissing}`),
-        })
-      );
-    } else {
-      setError("");
-    }
+  //   if (nextMissing) {
+  //     setError(
+  //       t("Error.Please select Yes or No for", {
+  //         Missing: t(`InspectionForm.${nextMissing}`),
+  //       })
+  //     );
+  //   } else {
+  //     setError("");
+  //   }
+  // };
+
+ const handleSelect = async (key: string, value: Selection) => {
+  const currentValue = selections[key];
+  const newValue = currentValue === value ? null : value;
+
+  const updatedSelections = {
+    ...selections,
+    [key]: newValue,
   };
+  setSelections(updatedSelections);
+
+  const updatedCultivationInfo = {
+    ...formData.inspectioncultivation,
+    [key]: newValue,
+  };
+
+  if (newValue === null) {
+    delete updatedCultivationInfo[key];
+  }
+
+  const updatedFormData = {
+    ...formData,
+    inspectioncultivation: updatedCultivationInfo,
+  };
+
+  setFormData(updatedFormData);
+
+  try {
+    await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData));
+  } catch (e) {
+    console.log("AsyncStorage save failed", e);
+  }
+
+  const nextMissing = climateParameters.find(
+    (p) => !updatedSelections[p.key]
+  );
+
+  if (nextMissing) {
+    setError(
+      t("Error.Please select Yes or No for", {
+        Missing: t(`InspectionForm.${nextMissing.label}`),
+      })
+    );
+  } else {
+    setError("");
+  }
+};
+
 
   const handleyesNOFieldChange = async (key: string, value: "Yes" | "No") => {
     const updatedFormData = {
@@ -587,32 +666,33 @@ const onClearImage = async () => {
             </View>
 
             {/* Table Rows */}
-            {climateParameters.map((param) => (
-              <View
-                key={param}
-                className="flex-row border-b border-gray-300  justify-center items-center py-1"
-              >
-                <Text className="flex-1 text-left border-r border-[#CACACA] py-2 p-1">
-                  {t(`InspectionForm.${param}`)}
-                </Text>
+           {climateParameters.map(({ key, label }) => (
+  <View
+    key={key}
+    className="flex-row border-b border-gray-300 justify-center items-center py-1"
+  >
+    <Text className="flex-1 text-left border-r border-[#CACACA] py-2 p-1">
+      {t(`InspectionForm.${label}`)}
+    </Text>
 
-                <View className="w-16 items-center border-r border-[#CACACA] py-3">
-                  <Checkbox
-                    value={selections[param] === "yes"}
-                    onValueChange={() => handleSelect(param, "yes")}
-                    color={selections[param] === "yes" ? "#000" : undefined}
-                  />
-                </View>
+    <View className="w-16 items-center border-r border-[#CACACA] py-3">
+      <Checkbox
+        value={selections[key] === "yes"}
+        onValueChange={() => handleSelect(key, "yes")}
+        color={selections[key] === "yes" ? "#000" : undefined}
+      />
+    </View>
 
-                <View className="w-16 items-center py-2">
-                  <Checkbox
-                    value={selections[param] === "no"}
-                    onValueChange={() => handleSelect(param, "no")}
-                    color={selections[param] === "no" ? "#F44336" : undefined}
-                  />
-                </View>
-              </View>
-            ))}
+    <View className="w-16 items-center py-2">
+      <Checkbox
+        value={selections[key] === "no"}
+        onValueChange={() => handleSelect(key, "no")}
+        color={selections[key] === "no" ? "#F44336" : undefined}
+      />
+    </View>
+  </View>
+))}
+
             {error ? (
               <View className="mt-2">
                 <Text className="text-red-500 text-sm whitespace-pre-line">
@@ -1019,19 +1099,14 @@ setErrors(prev => ({ ...prev, waterSources: errorMsg }));
           <TouchableOpacity
             className="flex-1 bg-[#444444] rounded-full py-4 items-center"
             onPress={() =>
-              navigation.navigate("Main", {
-                screen: "MainTabs",
-                params: {
-                  screen: "CapitalRequests",
-                },
-              })
+              navigation.goBack()
             }
           >
             <Text className="text-white text-base font-semibold">
-              {t("InspectionForm.Exit")}
+              {t("InspectionForm.Back")}
             </Text>
           </TouchableOpacity>
-          {isNextEnabled == false ? (
+          {isNextEnabled == true ? (
             <View className="flex-1">
               <TouchableOpacity className="flex-1 " onPress={handleNext}>
                 <LinearGradient

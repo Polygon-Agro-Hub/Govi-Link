@@ -43,22 +43,37 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState("");
 
   // Dummy data for capital requests
-const STORAGE_KEY = "INSPECTION_FORM_1";
 
 // state to store jobIds that exist in AsyncStorage
 const [highlightedJobs, setHighlightedJobs] = useState<string[]>([]);
 
 const loadStoredJobs = async (requests: Request[]) => {
   try {
-    const keys = requests.map(req => `${STORAGE_KEY}_${req.jobId}`);
+    const keys = requests.map(req => `${req.jobId}`);
     const keyValues = await AsyncStorage.multiGet(keys);
 
-    const jobsWithData = keyValues
-      .filter(([key, value]) => value && value !== "[]") // has stored data
-      .map(([key]) => key.split("_").pop()!); // get the jobId from key
+    // const jobsWithData = keyValues
+    //   .filter(([key, value]) => value && value !== "[]") // has stored data
+    //   .map(([key]) => key.split("_").pop()!); // get the jobId from key
 
-    setHighlightedJobs(jobsWithData);
-    console.log("Highlighted jobs:", jobsWithData);
+    // setHighlightedJobs(jobsWithData);
+const jobsWithinspectioncultivation = keyValues
+  .filter(([key, value]) => {
+    if (!value) return false; // no data
+    try {
+      const parsed = JSON.parse(value);
+      console.log(parsed);
+
+      return parsed.inspectioncultivation && Object.keys(parsed.inspectioncultivation).length > 0;
+    } catch (e) {
+      console.warn(`Failed to parse AsyncStorage value for key ${key}`, e);
+      return false;
+    }
+  })
+  .map(([key]) => key); 
+
+setHighlightedJobs(jobsWithinspectioncultivation);
+console.log("Highlighted jobs:", jobsWithinspectioncultivation);
   } catch (e) {
     console.error("Failed to load stored jobs", e);
   }

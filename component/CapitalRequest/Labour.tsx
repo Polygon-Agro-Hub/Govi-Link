@@ -23,7 +23,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../types";
 type FormData = {
-  Economical?: LabourData;
+  Labour?: LabourData;
 };
 type LabourData = {
 
@@ -123,24 +123,52 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
   console.log("finance", formData);
 
 useEffect(() => {
-  const eco = formData?.inspectionlabour ?? {};
+  const labour = formData?.inspectionlabour ?? {};
 
-  const isSuitaleSizeValid =
-    eco.isSuitaleSize === "Yes" || eco.isSuitaleSize === "No";
+  const hasBaseAnswer =
+    labour.isManageFamilyLabour === "Yes" ||
+    labour.isManageFamilyLabour === "No";
 
-  const isFinanceResourceValid =
-    eco.isFinanceResource === "Yes" || eco.isFinanceResource === "No";
+  let conditionalValid = false;
 
-  const isAltRoutesValid =
-    eco.isAltRoutes === "Yes" || eco.isAltRoutes === "No";
+  if (labour.isManageFamilyLabour === "Yes") {
+    conditionalValid =
+      labour.isFamilyHiredLabourEquipped === "Yes" ||
+      labour.isFamilyHiredLabourEquipped === "No";
+  }
+
+  if (labour.isManageFamilyLabour === "No") {
+    conditionalValid =
+      labour.hasAdequateAlternativeLabour === "Yes" ||
+      labour.hasAdequateAlternativeLabour === "No";
+  }
+
+  const mechanizationValid =
+    labour.areThereMechanizationOptions === "Yes" ||
+    labour.areThereMechanizationOptions === "No";
+
+  const machineryAvailableValid =
+    labour.isMachineryAvailable === "Yes" ||
+    labour.isMachineryAvailable === "No";
+
+  const machineryAffordableValid =
+    labour.isMachineryAffordable === "Yes" ||
+    labour.isMachineryAffordable === "No";
+
+  const machineryCostEffectiveValid =
+    labour.isMachineryCostEffective === "Yes" ||
+    labour.isMachineryCostEffective === "No";
 
   const hasErrors = Object.values(errors).some(Boolean);
 
   setIsNextEnabled(
-    isSuitaleSizeValid &&
-    isFinanceResourceValid &&
-    isAltRoutesValid &&
-    !hasErrors
+    hasBaseAnswer &&
+      conditionalValid &&
+      mechanizationValid &&
+      machineryAvailableValid &&
+      machineryAffordableValid &&
+      machineryCostEffectiveValid &&
+      !hasErrors
   );
 }, [formData, errors]);
 
@@ -194,8 +222,6 @@ const updateFormData = async (updates: Partial<LabourData>) => {
   
 
   const handleNext = () => {
-    // navigation.navigate("CultivationInfo", { formData, requestNumber });
-
     const validationErrors: Record<string, string> = {};
 
 
@@ -209,27 +235,33 @@ const updateFormData = async (updates: Partial<LabourData>) => {
       return;
     }
 
-    navigation.navigate("CultivationInfo", { formData, requestNumber });
+    navigation.navigate("HarvestStorage", { formData, requestNumber });
   };
 
 
-  const handleyesNOFieldChange = async (key: string, value: "Yes" | "No") => {
-    const updatedFormData = {
-      ...formData,
-      inspectionlabour: {
-        ...formData.inspectionlabour,
-        [key]: value,
-      },
-    };
+const handleyesNOFieldChange = async (key: string, value: "Yes" | "No") => {
+  let updatedLabour = {
+    ...formData.inspectionlabour,
+    [key]: value,
+  };
 
-    setFormData(updatedFormData);
-
-    try {
-      await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData));
-    } catch (e) {
-      console.log("AsyncStorage save failed", e);
+  if (key === "isManageFamilyLabour") {
+    if (value === "Yes") {
+      delete updatedLabour.hasAdequateAlternativeLabour;
+    } else {
+      delete updatedLabour.isFamilyHiredLabourEquipped;
     }
+  }
+
+  const updatedFormData = {
+    ...formData,
+    inspectionlabour: updatedLabour,
   };
+
+  setFormData(updatedFormData);
+  await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData));
+};
+
 
   
   return (
@@ -254,7 +286,7 @@ const updateFormData = async (updates: Partial<LabourData>) => {
         </View>
 
         {/* Tabs */}
-        <FormTabs activeKey="Economical" />
+        <FormTabs activeKey="Labour" />
 
         <ScrollView
           className="flex-1 px-6 bg-white rounded-t-3xl"
@@ -301,13 +333,12 @@ const updateFormData = async (updates: Partial<LabourData>) => {
       setActiveYesNoField(null);
     }}
     onSelect={(value) =>
-      handleyesNOFieldChange("isLabourEquipped", value)
+      handleyesNOFieldChange("isFamilyHiredLabourEquipped", value)
     }
   />
 )}
 
 {formData.inspectionlabour?.isManageFamilyLabour === "No" && (
-    <>
   <YesNoSelect
     label={t(
       "InspectionForm.If not, do you have adequate labours to manage the same"
@@ -330,30 +361,6 @@ const updateFormData = async (updates: Partial<LabourData>) => {
       handleyesNOFieldChange("hasAdequateAlternativeLabour", value)
     }
   />
-
-   <YesNoSelect
-    label={t(
-      "InspectionForm.Is family/hired labour equipped to handle the proposed crop/cropping system"
-    )}
-    required
-    value={formData.inspectionlabour?.areThereMechanizationOptions || null}
-    visible={
-      yesNoModalVisible &&
-      activeYesNoField === "areThereMechanizationOptions"
-    }
-    onOpen={() => {
-      setActiveYesNoField("areThereMechanizationOptions");
-      setYesNoModalVisible(true);
-    }}
-    onClose={() => {
-      setYesNoModalVisible(false);
-      setActiveYesNoField(null);
-    }}
-    onSelect={(value) =>
-      handleyesNOFieldChange("areThereMechanizationOptions", value)
-    }
-  />
-  </>
 )}
 
   <YesNoSelect
@@ -440,19 +447,14 @@ const updateFormData = async (updates: Partial<LabourData>) => {
           <TouchableOpacity
             className="flex-1 bg-[#444444] rounded-full py-4 items-center"
             onPress={() =>
-              navigation.navigate("Main", {
-                screen: "MainTabs",
-                params: {
-                  screen: "CapitalRequests",
-                },
-              })
+              navigation.goBack()
             }
           >
             <Text className="text-white text-base font-semibold">
-              {t("InspectionForm.Exit")}
+              {t("InspectionForm.Back")}
             </Text>
           </TouchableOpacity>
-          {isNextEnabled == false ? (
+          {isNextEnabled == true ? (
             <View className="flex-1">
               <TouchableOpacity className="flex-1 " onPress={handleNext}>
                 <LinearGradient
