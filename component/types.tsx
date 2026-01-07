@@ -99,8 +99,11 @@ export type RootStackParamList = {
     auditType?: "feildaudits" | "govilinkjobs";
   };
 
-  PersonalInfo: { requestNumber:string }
-  IDProof:{formData:any, requestNumber:string}
+  PersonalInfo: {
+    requestNumber: string;
+    requestId: number;
+  };
+  IDProof:{formData:any, requestNumber:string,requestId:number};
   FinanceInfo:{formData:any, requestNumber:string}
   LandInfo:{formData:any, requestNumber:string}
     AttachGeoLocationScreen: {
