@@ -255,7 +255,6 @@ const updateFormData = async (updates: Partial<InvestmentInfoData>) => {
 
 
   const handleNext = () => {
-    navigation.navigate("CultivationInfo", { formData, requestNumber });
 
     const validationErrors: Record<string, string> = {};
 
@@ -357,19 +356,14 @@ const updateFormData = async (updates: Partial<InvestmentInfoData>) => {
           <TouchableOpacity
             className="flex-1 bg-[#444444] rounded-full py-4 items-center"
             onPress={() =>
-              navigation.navigate("Main", {
-                screen: "MainTabs",
-                params: {
-                  screen: "CapitalRequests",
-                },
-              })
+              navigation.goBack()
             }
           >
             <Text className="text-white text-base font-semibold">
-              {t("InspectionForm.Exit")}
+              {t("InspectionForm.Back")}
             </Text>
           </TouchableOpacity>
-          {isNextEnabled == false ? (
+          {isNextEnabled == true ? (
             <View className="flex-1">
               <TouchableOpacity className="flex-1 " onPress={handleNext}>
                 <LinearGradient

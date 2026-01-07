@@ -8,12 +8,13 @@ import {
   Alert,
   ActivityIndicator,
   Image,
+  Linking,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../types";
-import { MaterialIcons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import axios from "axios";
 import { environment } from "@/environment/environment";
@@ -154,8 +155,13 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
     );
   };
 
-
-
+  const handleDial = (phoneNumber: string) => {
+    const phoneUrl = `tel:${phoneNumber}`;
+    Linking.openURL(phoneUrl).catch((err) =>
+      console.error("Failed to open dial pad:", err)
+    );
+  };
+  
   if (loading) {
     return (
       <View className="flex-1 bg-white justify-center items-center">

@@ -57,6 +57,7 @@ import CroppingSystems from "@/component/CapitalRequest/CroppingSystems";
 import ProfitRisk from "@/component/CapitalRequest/ProfitRisk";
 import Economical from "@/component/CapitalRequest/Economical";
 import Labour from "@/component/CapitalRequest/Labour";
+import HarvestStorage from "@/component/CapitalRequest/HarvestStorage";
 
 LogBox.ignoreAllLogs(true);
 NativeWindStyleSheet.setOutput({ default: "native" });
@@ -237,6 +238,7 @@ function AppContent() {
                     <Stack.Screen name="ProfitRisk" component={ProfitRisk} />
                     <Stack.Screen name="Economical" component={Economical} />
                     <Stack.Screen name="Labour" component={Labour} />
+                    <Stack.Screen name="HarvestStorage" component={HarvestStorage}/>
  
           </Stack.Navigator>
         </NavigationContainer>

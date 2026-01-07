@@ -122,4 +122,5 @@ CroppingSystems:{formData:any, requestNumber:string};
 ProfitRisk:{formData:any, requestNumber:string};
 Economical:{formData:any, requestNumber:string};
 Labour:{formData:any, requestNumber:string};
+HarvestStorage:{formData:any, requestNumber:string};
 };
