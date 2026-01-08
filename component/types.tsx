@@ -116,20 +116,13 @@ export type RootStackParamList = {
   longitude: number;
   locationName?: string;
 },
-InvestmentInfo:{formData:any, requestNumber:string};
-CultivationInfo:{formData:any, requestNumber:string};
-CroppingSystems:{formData:any, requestNumber:string};
-ProfitRisk:{formData:any, requestNumber:string};
-Economical:{formData:any, requestNumber:string};
-Labour:{formData:any, requestNumber:string};
-HarvestStorage:{formData:any, requestNumber:string};
+InvestmentInfo:{formData:any, requestNumber:string,requestId:number};
+CultivationInfo:{formData:any, requestNumber:string,requestId:number};
+CroppingSystems:{formData:any, requestNumber:string,requestId:number};
+ProfitRisk:{formData:any, requestNumber:string,requestId:number};
+Economical:{formData:any, requestNumber:string,requestId:number};
+Labour:{formData:any, requestNumber:string,requestId:number};
+HarvestStorage:{formData:any, requestNumber:string,requestId:number};
 
 };
 
-type InspectionFormData = {
-  inspectionland?: any;
-  inspectionpersonal?: any;
-  inspectionidproof?: any;
-  inspectionfinance?: any;
-  // ... other inspection types
-};

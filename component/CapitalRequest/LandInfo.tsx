@@ -177,7 +177,6 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
       console.log(`💾 Saving to backend (${isUpdate ? 'UPDATE' : 'INSERT'}):`, tableName);
       console.log(`📝 reqId being sent:`, reqId);
 
-      // ✅ Use a different variable name to avoid conflict with state
       const apiFormData = new FormData();
       apiFormData.append('reqId', reqId.toString());
       apiFormData.append('tableName', tableName);
@@ -187,25 +186,35 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
       apiFormData.append('ownershipStatus', data.ownershipStatus || '');
       apiFormData.append('landDiscription', data.landDiscription || '');
 
-      // ✅ Add geo location - now accessing as object, not array
+      // Add geo location
       if (data.geoLocation) {
         apiFormData.append('latitude', data.geoLocation.latitude.toString());
         apiFormData.append('longitude', data.geoLocation.longitude.toString());
+        if (data.geoLocation.locationName) {
+          apiFormData.append('locationName', data.geoLocation.locationName);
+        }
       }
 
       // Add images
       if (data.images && data.images.length > 0) {
-        data.images.forEach((img, index) => {
-          if (typeof img === 'string') {
-            // Already uploaded (S3 URL)
-            apiFormData.append(`imageUrl_${index}`, img);
-          } else if (img.uri && img.uri.startsWith('file://')) {
-            // Local file - need to upload
+        let existingUrlIndex = 0;
+
+        data.images.forEach((img: LandImage, index: number) => {
+          // Check if it's an S3 URL (already uploaded)
+          if (typeof img === 'string' || (img.uri && (img.uri.startsWith('http://') || img.uri.startsWith('https://')))) {
+            const url = typeof img === 'string' ? img : img.uri;
+            apiFormData.append(`imageUrl_${existingUrlIndex}`, url);
+            existingUrlIndex++;
+            console.log(`🔗 Keeping existing image URL: ${url}`);
+          }
+          // Local file - need to upload
+          else if (img.uri && img.uri.startsWith('file://')) {
             apiFormData.append('images', {
               uri: img.uri,
               name: img.name || `land_${Date.now()}_${index}.jpg`,
               type: img.type || 'image/jpeg',
             } as any);
+            console.log(`📤 Uploading new image: ${img.name}`);
           }
         });
       }
@@ -227,11 +236,33 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
 
         // Update local state with S3 URLs from backend
         if (response.data.data.images) {
+          // ✅ Parse images if it's a string
+          let imageUrls = response.data.data.images;
+          if (typeof imageUrls === 'string') {
+            try {
+              imageUrls = JSON.parse(imageUrls);
+            } catch (e) {
+              console.error('Failed to parse images:', imageUrls);
+              imageUrls = [];
+            }
+          }
+
+          // ✅ Ensure it's an array
+          if (!Array.isArray(imageUrls)) {
+            imageUrls = [];
+          }
+
+          const imageObjects = imageUrls.map((url: string) => ({
+            uri: url,
+            name: url.split('/').pop() || 'image.jpg',
+            type: 'image/jpeg'
+          }));
+
           setFormData((prev: FormData) => ({
             ...prev,
             inspectionland: {
               ...(prev.inspectionland || {}),
-              images: response.data.data.images as LandImage[]
+              images: imageObjects
             }
           }));
 
@@ -240,7 +271,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
             ...formData,
             inspectionland: {
               ...formData.inspectionland!,
-              images: response.data.data.images,
+              images: imageObjects,
             }
           };
 
@@ -825,11 +856,10 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
 
           </View>
           <View>
-
-            {formData?.inspectionland?.images?.length > 0 && (
-              <View className="mt-4  flex-row flex-wrap">
+            {formData?.inspectionland?.images && Array.isArray(formData.inspectionland.images) && formData.inspectionland.images.length > 0 && (
+              <View className="mt-4 flex-row flex-wrap">
                 {formData.inspectionland.images.map((img: LandImage, index: number) => (
-                  <View key={index} className="w-40 h-40 m-1  rounded-xl overflow-hidden relative">
+                  <View key={index} className="w-40 h-40 m-1 rounded-xl overflow-hidden relative">
                     <Image
                       source={{ uri: img.uri }}
                       className="w-full h-full rounded-xl"
@@ -837,7 +867,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
                     <TouchableOpacity
                       className="absolute top-1 right-1 bg-red-500 rounded-full w-6 h-6 justify-center items-center"
                       onPress={async () => {
-                        const updatedImages = formData.inspectionland!.images.filter(
+                        const updatedImages = formData.inspectionland!.images!.filter(
                           (_: LandImage, i: number) => i !== index
                         );
 
@@ -868,7 +898,6 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
                 ))}
               </View>
             )}
-
           </View>
 
         </ScrollView>

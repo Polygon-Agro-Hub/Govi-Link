@@ -22,12 +22,20 @@ import { useCallback } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../types";
-type FormData = {
-  Economical?: EconomicalData;
-};
-type EconomicalData = {
+import axios from "axios";
+import { environment } from "@/environment/environment";
 
+type FormData = {
+  inspectioneconomical?: EconomicalData;
 };
+
+type EconomicalData = {
+  isSuitaleSize?: "Yes" | "No";
+  isFinanceResource?: "Yes" | "No";
+  isAltRoutes?: "Yes" | "No";
+};
+
+
 type EconomicalProps = {
   navigation: any;
 };
@@ -109,98 +117,249 @@ const YesNoSelect = ({
 };
 const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
   const route = useRoute<RouteProp<RootStackParamList, "Economical">>();
-  const { requestNumber } = route.params;
+  const { requestNumber, requestId } = route.params; // ✅ Add requestId
   const prevFormData = route.params?.formData;
   const [formData, setFormData] = useState(prevFormData);
   const { t, i18n } = useTranslation();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [yesNoModalVisible, setYesNoModalVisible] = useState(false);
   const [activeYesNoField, setActiveYesNoField] = useState<string | null>(null);
-
+  const [isExistingData, setIsExistingData] = useState(false); // ✅ Add this
   const [isNextEnabled, setIsNextEnabled] = useState(false);
+
+
 
 
   console.log("finance", formData);
 
-useEffect(() => {
-  const eco = formData?.inspectioneconomical ?? {};
+  useEffect(() => {
+    const eco = formData?.inspectioneconomical ?? {};
 
-  const isSuitaleSizeValid =
-    eco.isSuitaleSize === "Yes" || eco.isSuitaleSize === "No";
+    const isSuitaleSizeValid =
+      eco.isSuitaleSize === "Yes" || eco.isSuitaleSize === "No";
 
-  const isFinanceResourceValid =
-    eco.isFinanceResource === "Yes" || eco.isFinanceResource === "No";
+    const isFinanceResourceValid =
+      eco.isFinanceResource === "Yes" || eco.isFinanceResource === "No";
 
-  const isAltRoutesValid =
-    eco.isAltRoutes === "Yes" || eco.isAltRoutes === "No";
+    const isAltRoutesValid =
+      eco.isAltRoutes === "Yes" || eco.isAltRoutes === "No";
 
-  const hasErrors = Object.values(errors).some(Boolean);
+    const hasErrors = Object.values(errors).some(Boolean);
 
-  setIsNextEnabled(
-    isSuitaleSizeValid &&
-    isFinanceResourceValid &&
-    isAltRoutesValid &&
-    !hasErrors
-  );
-}, [formData, errors]);
+    setIsNextEnabled(
+      isSuitaleSizeValid &&
+      isFinanceResourceValid &&
+      isAltRoutesValid &&
+      !hasErrors
+    );
+  }, [formData, errors]);
 
 
 
   let jobId = requestNumber;
   console.log("jobid", jobId);
 
-const updateFormData = async (updates: Partial<EconomicalData>) => {
-  try {
-    const updatedFormData = {
-      ...formData,
-      inspectioneconomical: {
-        ...formData.inspectioneconomical,
-        ...updates,
-      },
-    };
+  const updateFormData = async (updates: Partial<EconomicalData>) => {
+    try {
+      const updatedFormData = {
+        ...formData,
+        inspectioneconomical: {
+          ...formData.inspectioneconomical,
+          ...updates,
+        },
+      };
 
-    setFormData(updatedFormData);
+      setFormData(updatedFormData);
 
-    await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData));
-  } catch (e) {
-    console.log("AsyncStorage save failed", e);
-  }
-};
+      await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData));
+    } catch (e) {
+      console.log("AsyncStorage save failed", e);
+    }
+  };
+
+  const fetchInspectionData = async (reqId: number): Promise<EconomicalData | null> => {
+    try {
+      console.log(`🔍 Fetching economical data for reqId: ${reqId}`);
+
+      const response = await axios.get(
+        `${environment.API_BASE_URL}api/capital-request/inspection/get`,
+        {
+          params: {
+            reqId,
+            tableName: 'inspectioneconomical'
+          }
+        }
+      );
+
+      console.log('📦 Raw response:', response.data);
+
+      if (response.data.success && response.data.data) {
+        console.log(`✅ Fetched existing economical data:`, response.data.data);
+
+        const data = response.data.data;
+
+        // Helper to convert boolean (0/1) to "Yes"/"No"
+        const boolToYesNo = (val: any): "Yes" | "No" | undefined => {
+          if (val === 1 || val === '1' || val === true) return "Yes";
+          if (val === 0 || val === '0' || val === false) return "No";
+          return undefined;
+        };
+
+        return {
+          isSuitaleSize: boolToYesNo(data.isSuitaleSize),
+          isFinanceResource: boolToYesNo(data.isFinanceResource),
+          isAltRoutes: boolToYesNo(data.isAltRoutes),
+        };
+      }
+
+      console.log(`📭 No existing economical data found for reqId: ${reqId}`);
+      return null;
+    } catch (error: any) {
+      console.error(`❌ Error fetching economical data:`, error);
+      console.error('Error details:', error.response?.data);
+
+      if (error.response?.status === 404) {
+        console.log(`📝 No existing record - will create new`);
+        return null;
+      }
+
+      return null;
+    }
+  };
+
+  const saveToBackend = async (
+    reqId: number,
+    tableName: string,
+    data: EconomicalData,
+    isUpdate: boolean
+  ): Promise<boolean> => {
+    try {
+      console.log(`💾 Saving to backend (${isUpdate ? 'UPDATE' : 'INSERT'}):`, tableName);
+      console.log(`📝 reqId being sent:`, reqId);
+
+      // Yes/No fields
+      const yesNoToInt = (val: any) => val === "Yes" ? '1' : val === "No" ? '0' : null;
+
+      const transformedData: any = {
+        reqId,
+        tableName,
+      };
+
+      if (data.isSuitaleSize !== undefined) {
+        transformedData.isSuitaleSize = yesNoToInt(data.isSuitaleSize);
+      }
+      if (data.isFinanceResource !== undefined) {
+        transformedData.isFinanceResource = yesNoToInt(data.isFinanceResource);
+      }
+      if (data.isAltRoutes !== undefined) {
+        transformedData.isAltRoutes = yesNoToInt(data.isAltRoutes);
+      }
+
+      console.log(`📦 Transformed data:`, transformedData);
+
+      const response = await axios.post(
+        `${environment.API_BASE_URL}api/capital-request/inspection/save`,
+        transformedData,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (response.data.success) {
+        console.log(`✅ ${tableName} ${response.data.operation}d successfully`);
+        return true;
+      } else {
+        console.error(`❌ ${tableName} save failed:`, response.data.message);
+        return false;
+      }
+    } catch (error: any) {
+      console.error(`❌ Error saving ${tableName}:`, error);
+      if (error.response) {
+        console.error("Response data:", error.response.data);
+        console.error("Response status:", error.response.status);
+      }
+      return false;
+    }
+  };
 
 
   useFocusEffect(
     useCallback(() => {
       const loadFormData = async () => {
         try {
-          const savedData = await AsyncStorage.getItem(
-            `${jobId}`
-          );
+          // First, try to fetch from backend
+          if (requestId) {
+            const reqId = Number(requestId);
+            if (!isNaN(reqId) && reqId > 0) {
+              console.log(`🔄 Attempting to fetch economical data from backend for reqId: ${reqId}`);
+
+              const backendData = await fetchInspectionData(reqId);
+
+              if (backendData) {
+                console.log(`✅ Loaded economical data from backend`);
+
+                // Update form with backend data
+                const updatedFormData = {
+                  ...formData,
+                  inspectioneconomical: backendData
+                };
+
+                setFormData(updatedFormData);
+                setIsExistingData(true);
+
+                // Save to AsyncStorage as backup
+                await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData));
+
+                return; // Exit after loading from backend
+              }
+            }
+          }
+
+          // If no backend data, try AsyncStorage
+          console.log(`📂 Checking AsyncStorage for jobId: ${jobId}`);
+          const savedData = await AsyncStorage.getItem(`${jobId}`);
+
           if (savedData) {
             const parsedData = JSON.parse(savedData);
+            console.log(`✅ Loaded economical data from AsyncStorage`);
             setFormData(parsedData);
-
-         
-            
+            setIsExistingData(true);
+          } else {
+            // No data found anywhere - new entry
+            setIsExistingData(false);
+            console.log("📝 No existing economical data - new entry");
           }
         } catch (e) {
-          console.log("Failed to load form data", e);
+          console.error("Failed to load economical form data", e);
+          setIsExistingData(false);
         }
       };
 
       loadFormData();
-    }, [])
+    }, [requestId, jobId])
   );
 
-  
 
-  const handleNext = () => {
 
+  const handleNext = async () => {
     const validationErrors: Record<string, string> = {};
+    const economicalInfo = formData.inspectioneconomical;
 
+    // Validate required fields
+    if (!economicalInfo?.isSuitaleSize) {
+      validationErrors.isSuitaleSize = t("Error.Suitable size field is required");
+    }
+    if (!economicalInfo?.isFinanceResource) {
+      validationErrors.isFinanceResource = t("Error.Finance resource field is required");
+    }
+    if (!economicalInfo?.isAltRoutes) {
+      validationErrors.isAltRoutes = t("Error.Alternative routes field is required");
+    }
 
     if (Object.keys(validationErrors).length > 0) {
-      setErrors((prev) => ({ ...prev, ...validationErrors }));
-
+      setErrors(validationErrors);
       const errorMessage = "• " + Object.values(validationErrors).join("\n• ");
       Alert.alert(t("Error.Validation Error"), errorMessage, [
         { text: t("MAIN.OK") },
@@ -208,7 +367,106 @@ const updateFormData = async (updates: Partial<EconomicalData>) => {
       return;
     }
 
-    navigation.navigate("Labour", { formData, requestNumber });
+    // ✅ Validate requestId exists
+    if (!route.params?.requestId) {
+      console.error("❌ requestId is missing!");
+      Alert.alert(
+        t("Error.Error"),
+        "Request ID is missing. Please go back and try again.",
+        [{ text: t("MAIN.OK") }]
+      );
+      return;
+    }
+
+    const reqId = Number(route.params.requestId);
+
+    if (isNaN(reqId) || reqId <= 0) {
+      console.error("❌ Invalid requestId:", route.params.requestId);
+      Alert.alert(
+        t("Error.Error"),
+        "Invalid request ID. Please go back and try again.",
+        [{ text: t("MAIN.OK") }]
+      );
+      return;
+    }
+
+    console.log("✅ Using requestId:", reqId);
+
+    Alert.alert(
+      t("InspectionForm.Saving"),
+      t("InspectionForm.Please wait..."),
+      [],
+      { cancelable: false }
+    );
+
+    try {
+      console.log(`🚀 Saving to backend (${isExistingData ? "UPDATE" : "INSERT"})`);
+
+      const saved = await saveToBackend(
+        reqId,
+        "inspectioneconomical",
+        formData.inspectioneconomical!,
+        isExistingData
+      );
+
+      if (saved) {
+        console.log("✅ Economical info saved successfully to backend");
+        setIsExistingData(true);
+
+        Alert.alert(
+          t("MAIN.Success"),
+          t("InspectionForm.Data saved successfully"),
+          [
+            {
+              text: t("MAIN.OK"),
+              onPress: () => {
+                navigation.navigate("Labour", {
+                  formData,
+                  requestNumber,
+                  requestId: route.params.requestId
+                });
+              },
+            },
+          ]
+        );
+      } else {
+        console.log("⚠️ Backend save failed, but continuing with local data");
+        Alert.alert(
+          t("MAIN.Warning"),
+          t("InspectionForm.Could not save to server. Data saved locally."),
+          [
+            {
+              text: t("MAIN.Continue"),
+              onPress: () => {
+                navigation.navigate("Labour", {
+                  formData,
+                  requestNumber,
+                  requestId: route.params.requestId
+                });
+              },
+            },
+          ]
+        );
+      }
+    } catch (error) {
+      console.error("Error during final save:", error);
+      Alert.alert(
+        t("MAIN.Warning"),
+        t("InspectionForm.Could not save to server. Data saved locally."),
+        [
+          {
+            text: t("MAIN.Continue"),
+            onPress: () => {
+              navigation.navigate("Labour", {
+                formData,
+                requestNumber,
+                requestId: route.params.requestId
+              });
+            },
+          },
+        ]
+      );
+    }
   };
 
 
@@ -230,7 +488,7 @@ const updateFormData = async (updates: Partial<EconomicalData>) => {
     }
   };
 
-  
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -261,10 +519,10 @@ const updateFormData = async (updates: Partial<EconomicalData>) => {
           contentContainerStyle={{ paddingBottom: 120 }}
         >
           <View className="h-6" />
-         <YesNoSelect
+          <YesNoSelect
             label={t("InspectionForm.Are the proposed crop/cropping systems suitable for the farmer’s size of land holding")}
             required
-            value={formData.inspectioneconomical?.isSuitaleSize|| null}
+            value={formData.inspectioneconomical?.isSuitaleSize || null}
             visible={
               yesNoModalVisible && activeYesNoField === "isSuitaleSize"
             }
@@ -281,10 +539,10 @@ const updateFormData = async (updates: Partial<EconomicalData>) => {
             }
           />
 
-  <YesNoSelect
+          <YesNoSelect
             label={t("InspectionForm.Are the financial resources adequate to manage the proposed crop/cropping system")}
             required
-            value={formData.inspectioneconomical?.isFinanceResource|| null}
+            value={formData.inspectioneconomical?.isFinanceResource || null}
             visible={
               yesNoModalVisible && activeYesNoField === "isFinanceResource"
             }
@@ -300,10 +558,10 @@ const updateFormData = async (updates: Partial<EconomicalData>) => {
               handleyesNOFieldChange("isFinanceResource", value)
             }
           />
-            <YesNoSelect
+          <YesNoSelect
             label={t("InspectionForm.If not, can the farmer mobilize financial resources through alternative routes")}
             required
-            value={formData.inspectioneconomical?.isAltRoutes|| null}
+            value={formData.inspectioneconomical?.isAltRoutes || null}
             visible={
               yesNoModalVisible && activeYesNoField === "isAltRoutes"
             }
@@ -320,7 +578,7 @@ const updateFormData = async (updates: Partial<EconomicalData>) => {
             }
           />
         </ScrollView>
-      
+
         <View className="flex-row px-6 py-4 gap-4 bg-white border-t border-gray-200 ">
           <TouchableOpacity
             className="flex-1 bg-[#444444] rounded-full py-4 items-center"
