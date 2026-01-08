@@ -35,16 +35,16 @@ interface RequestData {
   jobId: string;
   extentha: number;
   extentac: number;
-    extentp: number;
+  extentp: number;
   district: string;
   investment: string;
   expectedYield: string;
   farmerName: string;
-  phoneNumber:string;
-  cropNameEnglish:string;
-  cropNameSinhala:string;
-  cropNameTamil:string;
-  startDate:string
+  phoneNumber: string;
+  cropNameEnglish: string;
+  cropNameSinhala: string;
+  cropNameTamil: string;
+  startDate: string
 }
 
 type ProjectDetailsProps = {
@@ -81,7 +81,7 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
   const [requestData, setRequestData] = useState<RequestData | null>(
     null
   );
-  const {t, i18n} = useTranslation();
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     fetchRequestDetails();
@@ -92,7 +92,7 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
       setLoading(true);
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
-            const token = await AsyncStorage.getItem("token");
+      const token = await AsyncStorage.getItem("token");
       if (!token) return;
       const response = await axios.get(
         `${environment.API_BASE_URL}api/capital-request/requests/${requestId}`,
@@ -102,12 +102,12 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
       );
       console.log('Requests', response.data.requests)
       // In real implementation, fetch by requestId
-     setRequestData(response.data.requests[0] || null);
+      setRequestData(response.data.requests[0] || null);
 
     } catch (error) {
       console.error("Failed to fetch request details:", error);
       Alert.alert("Error", "Failed to load request details");
-      
+
     } finally {
       setLoading(false);
     }
@@ -218,21 +218,21 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
             {/* I, {requestData.farmerName}, a farmer from {t(`Districts.${requestData.district}`)},
             am writing to formally request an agricultural loan for the upcoming
             cultivation season. */}
-           {t("RequestLetter.IRequestFarm", {
-    farmerName: requestData.farmerName,
-    district: t(`Districts.${requestData.district}`)
-  })}
+            {t("RequestLetter.IRequestFarm", {
+              farmerName: requestData.farmerName,
+              district: t(`Districts.${requestData.district}`)
+            })}
           </Text>
 
-          <Text className="text-base mb-4 text-[#070707] leading-6">           
-  {t("RequestLetter.IamPlaning", {
-    cropName:
-      i18n.language === "si"
-        ? requestData.cropNameSinhala
-        : i18n.language === "ta"
-        ? requestData.cropNameTamil
-        : requestData.cropNameEnglish,
-  })}  
+          <Text className="text-base mb-4 text-[#070707] leading-6">
+            {t("RequestLetter.IamPlaning", {
+              cropName:
+                i18n.language === "si"
+                  ? requestData.cropNameSinhala
+                  : i18n.language === "ta"
+                    ? requestData.cropNameTamil
+                    : requestData.cropNameEnglish,
+            })}
           </Text>
 
           <Text className="text-base mb-4 text-[#070707]">
@@ -241,44 +241,44 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
 
           {/* Project Details */}
           <View className="space-y-3 mb-6">
-<View className="">
-  <ProjectDetails
-    label={t("RequestLetter.District")}
-    value={t(`Districts.${requestData.district}`)}
-  />
- <ProjectDetails
-    label={t("RequestLetter.Crop")}
-    value={      i18n.language === "si"
-        ? requestData.cropNameSinhala
-        : i18n.language === "ta"
-        ? requestData.cropNameTamil
-        : requestData.cropNameEnglish}
-  />
+            <View className="">
+              <ProjectDetails
+                label={t("RequestLetter.District")}
+                value={t(`Districts.${requestData.district}`)}
+              />
+              <ProjectDetails
+                label={t("RequestLetter.Crop")}
+                value={i18n.language === "si"
+                  ? requestData.cropNameSinhala
+                  : i18n.language === "ta"
+                    ? requestData.cropNameTamil
+                    : requestData.cropNameEnglish}
+              />
 
-  <ProjectDetails
-    label={t("RequestLetter.Extent")}
-        value={t("RequestLetter.Extentdetails",{
-          hectare:requestData.extentha,
-          acres:requestData.extentac,
-          perches:requestData.extentp
-        })}
-  />
+              <ProjectDetails
+                label={t("RequestLetter.Extent")}
+                value={t("RequestLetter.Extentdetails", {
+                  hectare: requestData.extentha,
+                  acres: requestData.extentac,
+                  perches: requestData.extentp
+                })}
+              />
 
-  <ProjectDetails
-    label={t("RequestLetter.Expected Investment")}
-    value={`${t("RequestLetter.Rs")}. ${requestData.investment}`}
-  />
+              <ProjectDetails
+                label={t("RequestLetter.Expected Investment")}
+                value={`${t("RequestLetter.Rs")}. ${requestData.investment}`}
+              />
 
-  <ProjectDetails
-    label={t("RequestLetter.Expected Yield")}
-    value={`${requestData.expectedYield} ${t("RequestLetter.kg")}`}
-  />
+              <ProjectDetails
+                label={t("RequestLetter.Expected Yield")}
+                value={`${requestData.expectedYield} ${t("RequestLetter.kg")}`}
+              />
 
-  <ProjectDetails
-    label={t("RequestLetter.Cultivation Start Date")}
-    value={requestData.startDate}
-  />
-  </View>
+              <ProjectDetails
+                label={t("RequestLetter.Cultivation Start Date")}
+                value={requestData.startDate}
+              />
+            </View>
           </View>
 
           <Text className="text-base mb-4 text-black leading-6">
@@ -376,61 +376,49 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
         </View> */}
       </ScrollView>
       <View className=" bottom-4 bg-white " >
-
-                  <View
+        <View
+          style={{
+            height: 1,
+            backgroundColor: "#fff",
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 3,
+            elevation: 3,
+          }}
+        />
+        <TouchableOpacity
+          //  onPress={() => navigation.navigate("PersonalInfo", {requestNumber})} 
+          onPress={async () => {
+            try {
+              navigation.navigate("PersonalInfo", {
+                requestNumber,
+                requestId: requestData.id
+              });
+            } catch (e) {
+              console.log("Error clearing AsyncStorage:", e);
+            }
+          }}
+          className="w-[80%] mt-6 self-center">
+          <LinearGradient
+            colors={["#F35125", "#FF1D85"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            className="rounded-full px-6 py-3 w-full items-center"
             style={{
-              height: 1,
-              backgroundColor: "#fff",
               shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.1,
-              shadowRadius: 3,
-              elevation: 3,
+              shadowOffset: { width: 0, height: 3 },
+              shadowOpacity: 0.25,
+              shadowRadius: 5,
+              elevation: 6,
             }}
-          />
-                                          <TouchableOpacity
-                          className="flex "
-                          onPress={() => handleDial(requestData.phoneNumber)}
-                        >
-                          <View className="flex-row mt-4 self-center items-center justify-center border border-[#F83B4F] rounded-full px-6 w-[50%] py-2">
-                            <Ionicons name="call" size={20} color="#F83B4F" />
-                            <Text className="text-base font-semibold  ml-2">
-                              {t("VisitPopup.Get Call")}
-                            </Text>
-                          </View>
-                        </TouchableOpacity>
-              <TouchableOpacity
-               onPress={() => navigation.navigate("PersonalInfo", {requestNumber})} 
-  //               onPress={async () => {
-  //   try {
-  //     await AsyncStorage.removeItem(`${requestNumber}`);
-  //     console.log("AsyncStorage cleared");
-
-  //     navigation.navigate("PersonalInfo", { requestNumber });
-  //   } catch (e) {
-  //     console.log("Error clearing AsyncStorage:", e);
-  //   }
-  // }}
-              className="w-[80%] mt-4 self-center">
-              <LinearGradient
-                colors={["#F35125", "#FF1D85"]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                className="rounded-full px-6 py-3 w-full items-center"
-                style={{
-                  shadowColor: "#000",
-                  shadowOffset: { width: 0, height: 3 },
-                  shadowOpacity: 0.25,
-                  shadowRadius: 5,
-                  elevation: 6,
-                }}
-              >
-                <Text className="text-white text-lg font-semibold">
-                  {t("RequestLetter.Start")}
-                </Text>
-              </LinearGradient>
-            </TouchableOpacity>
-</View>
+          >
+            <Text className="text-white text-lg font-semibold">
+              {t("RequestLetter.Start")}
+            </Text>
+          </LinearGradient>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };

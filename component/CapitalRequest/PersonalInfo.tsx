@@ -88,9 +88,8 @@ const Input = ({
       {label} {required && <Text className="text-black">*</Text>}
     </Text>
     <View
-      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
-        error ? "border border-red-500" : ""
-      }`}
+      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${error ? "border border-red-500" : ""
+        }`}
     >
       {isMobile ? (
         <View className="flex-row flex-1 items-center">
@@ -124,23 +123,23 @@ const Input = ({
 type ValidationRule = {
   required?: boolean;
   type?:
-    | "firstName"
-    | "lastName"
-    | "email"
-    | "phone1"
-    | "phone2"
-    | "familyPhone"
-    | "otherName"
-    | "callName"
-    | "landHome"
-    | "landWork"
-    | "street"
-    | "email1"
-    | "email2"
-    | "cityName"
-    | "house";
+  | "firstName"
+  | "lastName"
+  | "email"
+  | "phone1"
+  | "phone2"
+  | "familyPhone"
+  | "otherName"
+  | "callName"
+  | "landHome"
+  | "landWork"
+  | "street"
+  | "email1"
+  | "email2"
+  | "cityName"
+  | "house";
   minLength?: number;
- uniqueWith?: (keyof PersonalInfo)[];
+  uniqueWith?: (keyof PersonalInfo)[];
 };
 
 
@@ -209,7 +208,7 @@ const validateAndFormat = (
     // if (rules.required && value.trim().length === 0) {
     //   error = t(`Error.${rules.type} is required`);
     // }
-        value = value.replace(/^\s+/, "");
+    value = value.replace(/^\s+/, "");
     value = value.replace(/[^a-zA-Z\s]/g, "");
 
     if (value.length > 0) {
@@ -220,49 +219,49 @@ const validateAndFormat = (
     }
   }
 
-if (rules.type === "house") {
-  let cleaned = value.replace(/[^a-zA-Z0-9 ]/g, "");
+  if (rules.type === "house") {
+    let cleaned = value.replace(/[^a-zA-Z0-9 ]/g, "");
 
-  cleaned = cleaned.replace(/^\s+/, "");
+    cleaned = cleaned.replace(/^\s+/, "");
 
-  value = cleaned;
+    value = cleaned;
 
-  if (rules.required && value.trim().length === 0) {
-    error = t(`Error.${rules.type} is required`);
+    if (rules.required && value.trim().length === 0) {
+      error = t(`Error.${rules.type} is required`);
+    }
   }
-}
 
 
 
-if (rules.type === "email1" || rules.type === "email2") {
-  value = value.trim();
+  if (rules.type === "email1" || rules.type === "email2") {
+    value = value.trim();
 
-  if (value.length === 0 && rules.type === "email1") {
-    error = rules.required ? t("Error.Email is required") : "";
-  } 
-  else if (value.length > 0) {
-    if (!validateEmail(value)) {
-      const domain = value.toLowerCase().split("@")[1];
+    if (value.length === 0 && rules.type === "email1") {
+      error = rules.required ? t("Error.Email is required") : "";
+    }
+    else if (value.length > 0) {
+      if (!validateEmail(value)) {
+        const domain = value.toLowerCase().split("@")[1];
 
-      if (domain === "gmail.com" || domain === "googlemail.com") {
-        error = t("Error.Invalid Gmail address");
-      } else {
-        error = t("Error.Invalid email address Example");
+        if (domain === "gmail.com" || domain === "googlemail.com") {
+          error = t("Error.Invalid Gmail address");
+        } else {
+          error = t("Error.Invalid email address Example");
+        }
       }
-    } 
-    else if (rules.uniqueWith) {
-      const isDuplicate = rules.uniqueWith.some(
-        (key) =>
-          formData[key]?.toLowerCase().trim() === value.toLowerCase().trim() &&
-          key !== currentKey
-      );
+      else if (rules.uniqueWith) {
+        const isDuplicate = rules.uniqueWith.some(
+          (key) =>
+            formData[key]?.toLowerCase().trim() === value.toLowerCase().trim() &&
+            key !== currentKey
+        );
 
-      if (isDuplicate) {
-        error = t("Error.Email addresses cannot be the same");
+        if (isDuplicate) {
+          error = t("Error.Email addresses cannot be the same");
+        }
       }
     }
   }
-}
 
 
 
@@ -273,7 +272,7 @@ if (rules.type === "email1" || rules.type === "email2") {
   if (
     rules.type === "phone1" ||
     rules.type === "phone2" ||
-    rules.type === "familyPhone" 
+    rules.type === "familyPhone"
   ) {
     let numbersOnly = value.replace(/[^0-9]/g, "");
 
@@ -295,7 +294,7 @@ if (rules.type === "email1" || rules.type === "email2") {
       const isDuplicate = rules.uniqueWith.some(
         (key) =>
           formData[key]?.replace(/[^0-9]/g, "").replace(/^0+/, "") ===
-            numbersOnly && key !== currentKey
+          numbersOnly && key !== currentKey
       );
 
       if (isDuplicate) {
@@ -320,7 +319,7 @@ if (rules.type === "email1" || rules.type === "email2") {
       const isDuplicate = rules.uniqueWith.some(
         (key) =>
           formData[key]?.replace(/[^0-9]/g, "").replace(/^0+/, "") ===
-            numbersOnly &&
+          numbersOnly &&
           key !== currentKey &&
           numbersOnly.length > 0
       );
@@ -339,15 +338,18 @@ type InspectionForm1Props = {
 };
 
 const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
-    const route = useRoute<RouteProp<RootStackParamList, "PersonalInfo">>();
-    const {requestNumber } = route.params;
+  const route = useRoute<RouteProp<RootStackParamList, "PersonalInfo">>();
+  const { requestNumber, requestId } = route.params;
+
+  console.log("Request Number:", requestNumber);
+  console.log("Request ID:", requestId);
+
   const [showDistrictDropdown, setShowDistrictDropdown] = useState(false);
   const [districtSearch, setDistrictSearch] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState<string | null>(null);
   const [displayProvince, setDisplayProvince] = useState("");
   const { t, i18n } = useTranslation();
   const [errors, setErrors] = useState<Record<string, string>>({});
-
   const [showCountryDropdown, setShowCountryDropdown] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState("Sri Lanka");
   const [displayCountry, setDisplayCountry] = useState(
@@ -357,214 +359,293 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
   const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isNextEnabled, setIsNextEnabled] = useState(false);
-const [formData, setFormData] = useState<FormData>({
-  inspectionpersonal: {
-    firstName: "",
-    lastName: "",
-    otherName: "",
-    callName: "",
-    phone1: "",
-    phone2: "",
-    familyPhone: "",
-    landHome: "",
-    landWork: "",
-    email1: "",
-    email2: "",
-    house: "",
-    street: "",
-    cityName: "",
-    district: null,
-    province: null,
-    country: "Sri Lanka",
-  },
-});
 
-  console.log(formData)
-  const districts: DistrictsMap = districtData;
+  // NEW: Track if this is existing data (UPDATE) or new data (INSERT)
+  const [isExistingData, setIsExistingData] = useState(false);
 
-  useEffect(() => {
-  const requiredFields: (keyof PersonalInfo)[] = [
-    "firstName",
-    "lastName",
-    "otherName",
-    "callName",
-    "phone1",
-    "familyPhone",
-    "email1",
-    "house",
-    "street",
-    "cityName",
-    "district",
-    "province",
-    "country",
-  ];
-  const allFilled = requiredFields.every((key) => {
-    const value = formData.inspectionpersonal[key];
-    return value !== null && value !== undefined && value.toString().trim() !== "";
+  const [formData, setFormData] = useState<FormData>({
+    inspectionpersonal: {
+      firstName: "",
+      lastName: "",
+      otherName: "",
+      callName: "",
+      phone1: "",
+      phone2: "",
+      familyPhone: "",
+      landHome: "",
+      landWork: "",
+      email1: "",
+      email2: "",
+      house: "",
+      street: "",
+      cityName: "",
+      district: null,
+      province: null,
+      country: "Sri Lanka",
+    },
   });
 
-  const hasErrors = Object.keys(errors).length > 0;
+  console.log("Form Data:", formData);
+  console.log("Is Existing Data (UPDATE mode):", isExistingData);
 
-  setIsNextEnabled(allFilled && !hasErrors);
-}, [formData, errors]);
-
-
-
+  const districts: DistrictsMap = districtData;
   let jobId = requestNumber;
-  console.log("jobid", jobId)
 
-const updateFormData = async (
-  updates: Partial<PersonalInfo>
-) => {
-  const updatedData: FormData = {
-    ...formData,
-    inspectionpersonal: {
-      ...formData.inspectionpersonal,
-      ...updates,
-    },
+  const transformPersonalInfoForBackend = (data: PersonalInfo) => {
+    return {
+      firstName: data.firstName,
+      lastName: data.lastName,
+      otherName: data.otherName,
+      callName: data.callName,
+      phone1: data.phone1,
+      phone2: data.phone2,
+      familyPhone: data.familyPhone,
+      landHome: data.landHome,
+      landWork: data.landWork,
+      email1: data.email1,
+      email2: data.email2,
+      house: data.house,
+      street: data.street,
+      city: data.cityName,
+      district: data.district,
+      province: data.province,
+      country: data.country,
+    };
   };
 
-  setFormData(updatedData);
+  const saveToBackend = async (
+    reqId: number,
+    tableName: string,
+    data: PersonalInfo,
+    isUpdate: boolean
+  ): Promise<boolean> => {
+    try {
+      console.log(`💾 Saving to backend (${isUpdate ? 'UPDATE' : 'INSERT'}):`, tableName);
+      console.log(`📝 reqId being sent:`, reqId);
 
-  try {
-    await AsyncStorage.setItem(
-      `${jobId}`,
-      JSON.stringify(updatedData)
-    );
-  } catch (e) {
-    console.log("AsyncStorage save failed", e);
-  }
-};
+      // ✅ Transform data to match backend schema
+      const transformedData = transformPersonalInfoForBackend(data);
 
-  const handleFieldChange = (
-  key: keyof PersonalInfo,
-  text: string,
-  rules: ValidationRule
-) => {
-  const { value, error } = validateAndFormat(
-    text,
-    rules,
-    t,
-    formData.inspectionpersonal,
-    key
-  );
+      console.log(`📦 Original data:`, data);
+      console.log(`📦 Transformed data:`, transformedData);
 
-  // Update state
-  setFormData((prev) => ({
-    ...prev,
-    inspectionpersonal: {
-      ...prev.inspectionpersonal,
-      [key]: value,
-    },
-  }));
-
-  // Errors
-  setErrors((prev) => {
-    const newErrors = { ...prev };
-
-    if (error) newErrors[key] = error;
-    else delete newErrors[key];
-
-    // Revalidate unique fields
-    if (rules.uniqueWith) {
-      rules.uniqueWith.forEach((relatedKey) => {
-        const relatedValue = formData.inspectionpersonal[relatedKey];
-        if (!relatedValue) {
-          delete newErrors[relatedKey];
-          return;
-        }
-
-        const { error: relatedError } = validateAndFormat(
-          relatedValue,
-          rules,
-          t,
-          {
-            ...formData.inspectionpersonal,
-            [key]: value,
+      // ✅ Send with data spread at root level, not nested
+      const response = await axios.post(
+        `${environment.API_BASE_URL}api/capital-request/inspection/save`,
+        {
+          reqId,
+          tableName,
+          ...transformedData, // ✅ CORRECT - spreads fields at root level
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
           },
-          relatedKey
-        );
-
-        if (relatedError) newErrors[relatedKey] = relatedError;
-        else delete newErrors[relatedKey];
-      });
-    }
-
-    return newErrors;
-  });
-
-    updateFormData({ [key]: value });
-};
-
-useFocusEffect(
-  useCallback(() => {
-    const loadData = async () => {
-      try {
-        const saved = await AsyncStorage.getItem(`${jobId}`);
-        console.log("saved", saved);
-
-        if (saved) {
-          const parsed = JSON.parse(saved);
-
-          // Set the full formData object correctly
-          setFormData({
-            inspectionpersonal: parsed.inspectionpersonal || {
-              firstName: "",
-              lastName: "",
-              otherNames: "",
-              callName: "",
-              phone1: "",
-              phone2: "",
-              familyPhone: "",
-              landHome: "",
-              landWork: "",
-              email1: "",
-              email2: "",
-              house: "",
-              street: "",
-              cityName: "",
-              district: null,
-              province: null,
-              country: "Sri Lanka",
-            },
-          });
-
-          const personal = parsed.inspectionpersonal || {};
-
-          setSelectedDistrict(personal.district || null);
-          setSelectedCountry(personal.country || "Sri Lanka");
-
-          const provinceObj = sriLankaData["Sri Lanka"].provinces.find(
-            (prov) => prov.name.en === personal.province
-          );
-          setSelectedProvince(provinceObj?.name.en || null);
-          setDisplayProvince(
-            provinceObj
-              ? provinceObj.name[i18n.language as keyof typeof provinceObj.name] ||
-                provinceObj.name.en
-              : ""
-          );
-
-          const countryObj = countryData.find(
-            (c) => c.name.en === personal.country
-          );
-          setDisplayCountry(
-            countryObj
-              ? countryObj.name[i18n.language as keyof typeof countryObj.name] ||
-                countryObj.name.en
-              : personal.country || "Sri Lanka"
-          );
         }
-      } catch (error) {
-        console.log("Failed to load saved data", error);
+      );
+
+      if (response.data.success) {
+        console.log(`✅ ${tableName} ${response.data.operation}d successfully`);
+        return true;
+      } else {
+        console.error(`❌ ${tableName} save failed:`, response.data.message);
+        return false;
       }
+    } catch (error: any) {
+      console.error(`❌ Error saving ${tableName}:`, error);
+      if (error.response) {
+        console.error("Response data:", error.response.data);
+        console.error("Response status:", error.response.status);
+      }
+      return false;
+    }
+  };
+
+  useEffect(() => {
+    const requiredFields: (keyof PersonalInfo)[] = [
+      "firstName",
+      "lastName",
+      "otherName",
+      "callName",
+      "phone1",
+      "familyPhone",
+      "email1",
+      "house",
+      "street",
+      "cityName",
+      "district",
+      "province",
+      "country",
+    ];
+
+    const allFilled = requiredFields.every((key) => {
+      const value = formData.inspectionpersonal[key];
+      return value !== null && value !== undefined && value.toString().trim() !== "";
+    });
+
+    const hasErrors = Object.keys(errors).length > 0;
+    setIsNextEnabled(allFilled && !hasErrors);
+  }, [formData, errors]);
+
+  const updateFormData = async (updates: Partial<PersonalInfo>) => {
+    const updatedData: FormData = {
+      ...formData,
+      inspectionpersonal: {
+        ...formData.inspectionpersonal,
+        ...updates,
+      },
     };
 
-    loadData();
-  }, [i18n.language])
-);
+    setFormData(updatedData);
 
- 
+    try {
+      // ONLY save to AsyncStorage (local, instant)
+      await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedData));
+      console.log("💾 Saved to AsyncStorage");
+    } catch (e) {
+      console.log("AsyncStorage save failed", e);
+    }
+  };
+
+  const handleFieldChange = (
+    key: keyof PersonalInfo,
+    text: string,
+    rules: ValidationRule
+  ) => {
+    const { value, error } = validateAndFormat(
+      text,
+      rules,
+      t,
+      formData.inspectionpersonal,
+      key
+    );
+
+    // Update state
+    setFormData((prev) => ({
+      ...prev,
+      inspectionpersonal: {
+        ...prev.inspectionpersonal,
+        [key]: value,
+      },
+    }));
+
+    // Errors
+    setErrors((prev) => {
+      const newErrors = { ...prev };
+
+      if (error) newErrors[key] = error;
+      else delete newErrors[key];
+
+      // Revalidate unique fields
+      if (rules.uniqueWith) {
+        rules.uniqueWith.forEach((relatedKey) => {
+          const relatedValue = formData.inspectionpersonal[relatedKey];
+          if (!relatedValue) {
+            delete newErrors[relatedKey];
+            return;
+          }
+
+          const { error: relatedError } = validateAndFormat(
+            relatedValue,
+            rules,
+            t,
+            {
+              ...formData.inspectionpersonal,
+              [key]: value,
+            },
+            relatedKey
+          );
+
+          if (relatedError) newErrors[relatedKey] = relatedError;
+          else delete newErrors[relatedKey];
+        });
+      }
+
+      return newErrors;
+    });
+
+    updateFormData({ [key]: value });
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      const loadData = async () => {
+        try {
+          const saved = await AsyncStorage.getItem(`${jobId}`);
+          console.log("📦 Loading from AsyncStorage:", saved ? "Data found" : "No data");
+
+          if (saved) {
+            const parsed = JSON.parse(saved);
+
+            // Set flag that this is existing data (will trigger UPDATE operations)
+            setIsExistingData(true);
+
+            // Set the full formData object correctly
+            setFormData({
+              inspectionpersonal: parsed.inspectionpersonal || {
+                firstName: "",
+                lastName: "",
+                otherName: "",
+                callName: "",
+                phone1: "",
+                phone2: "",
+                familyPhone: "",
+                landHome: "",
+                landWork: "",
+                email1: "",
+                email2: "",
+                house: "",
+                street: "",
+                cityName: "",
+                district: null,
+                province: null,
+                country: "Sri Lanka",
+              },
+            });
+
+            const personal = parsed.inspectionpersonal || {};
+
+            setSelectedDistrict(personal.district || null);
+            setSelectedCountry(personal.country || "Sri Lanka");
+
+            const provinceObj = sriLankaData["Sri Lanka"].provinces.find(
+              (prov) => prov.name.en === personal.province
+            );
+            setSelectedProvince(provinceObj?.name.en || null);
+            setDisplayProvince(
+              provinceObj
+                ? provinceObj.name[
+                i18n.language as keyof typeof provinceObj.name
+                ] || provinceObj.name.en
+                : ""
+            );
+
+            const countryObj = countryData.find(
+              (c) => c.name.en === personal.country
+            );
+            setDisplayCountry(
+              countryObj
+                ? countryObj.name[i18n.language as keyof typeof countryObj.name] ||
+                countryObj.name.en
+                : personal.country || "Sri Lanka"
+            );
+          } else {
+            // No AsyncStorage data means this is a new entry (INSERT)
+            setIsExistingData(false);
+            console.log("📝 New entry - will INSERT on save");
+          }
+        } catch (error) {
+          console.log("Failed to load saved data", error);
+          setIsExistingData(false);
+        }
+      };
+
+      loadData();
+    }, [i18n.language, jobId])
+  );
+
+
+
 
   const getFilteredDistricts = () => {
     const countryDistricts = districts[selectedCountry] || [];
@@ -600,7 +681,7 @@ useFocusEffect(
 
     const displayProv = province
       ? province.name[i18n.language as keyof typeof province.name] ||
-        province.name.en
+      province.name.en
       : "";
 
     setSelectedProvince(province?.name.en || null);
@@ -609,11 +690,11 @@ useFocusEffect(
       district: district.en,
       province: province?.name.en,
     });
-      setErrors((prev) => {
-    const newErrors = { ...prev };
-    delete newErrors.district;
-    return newErrors;
-  });
+    setErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors.district;
+      return newErrors;
+    });
     setShowDistrictDropdown(false);
   };
 
@@ -698,70 +779,167 @@ useFocusEffect(
   };
 
 
-  const handleNext = () => {
-  const requiredFields: (keyof PersonalInfo)[] = [
-    "firstName",
-    "lastName",
-    "otherName",
-    "callName",
-    "phone1",
-    "familyPhone",
-    "email1",
-    "house",
-    "street",
-    "cityName",
-    "district",
-    "province",
-    "country",
-  ];
-  // If country is Sri Lanka, district is required
-  if (formData.inspectionpersonal.country === "Sri Lanka") {
-    requiredFields.push("district");
-  }
+  const handleNext = async () => {
+    const requiredFields: (keyof PersonalInfo)[] = [
+      "firstName",
+      "lastName",
+      "otherName",
+      "callName",
+      "phone1",
+      "familyPhone",
+      "email1",
+      "house",
+      "street",
+      "cityName",
+      "district",
+      "province",
+      "country",
+    ];
 
-  // Validate all fields
-  const validationErrors: Record<string, string> = {};
-  requiredFields.forEach((key) => {
-    let value = formData.inspectionpersonal[key];
-    let error = "";
+    // Validate all fields
+    const validationErrors: Record<string, string> = {};
+    requiredFields.forEach((key) => {
+      let value = formData.inspectionpersonal[key];
+      let error = "";
 
-    if ((key === "district" || key === "province") && !value) {
-      error = t(`Error.${key.charAt(0).toUpperCase() + key.slice(1)} is required`);
-    } else {
-      let rules: ValidationRule = { required: true, type: key as any };
+      if ((key === "district" || key === "province") && !value) {
+        error = t(
+          `Error.${key.charAt(0).toUpperCase() + key.slice(1)} is required`
+        );
+      } else {
+        let rules: ValidationRule = { required: true, type: key as any };
 
-      if (key.startsWith("mobile") || key.includes("Phone")) {
-        rules.type = key as
-          | "phone1"
-          | "phone2"
-          | "familyPhone"
-          | "landHome"
-          | "landWork";
+        if (key.startsWith("phone") || key.includes("Phone") || key.includes("land")) {
+          rules.type = key as any;
+          rules.uniqueWith = [
+            "phone1",
+            "phone2",
+            "familyPhone",
+            "landHome",
+            "landWork",
+          ].filter((k) => k !== key) as any;
+        }
+        if (key.includes("email")) {
+          rules.type = key as "email1" | "email2";
+          rules.uniqueWith = key === "email1" ? ["email2"] : ["email1"];
+        }
+
+        const result = validateAndFormat(
+          value || "",
+          rules,
+          t,
+          formData.inspectionpersonal,
+          key
+        );
+        error = result.error;
       }
-      if (key.includes("email")) {
-        rules.type = key as "email1" | "email2";
-        rules.uniqueWith = key === "email1" ? ["email2"] : ["email1"];
-      }
 
-      const result = validateAndFormat(value || "", rules, t, formData, key);
-      error = result.error;
+      if (error) validationErrors[key] = error;
+    });
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors((prev) => ({ ...prev, ...validationErrors }));
+      const errorMessage = "• " + Object.values(validationErrors).join("\n• ");
+      Alert.alert(t("Error.Validation Error"), errorMessage, [
+        { text: t("MAIN.OK") },
+      ]);
+      return;
     }
 
-    if (error) validationErrors[key] = error;
-  });
+    // ✅ Validate requestId exists
+    if (!requestId) {
+      console.error("❌ requestId is missing!");
+      Alert.alert(
+        t("Error.Error"),
+        "Request ID is missing. Please go back and try again.",
+        [{ text: t("MAIN.OK") }]
+      );
+      return;
+    }
 
-  if (Object.keys(validationErrors).length > 0) {
-    setErrors((prev) => ({ ...prev, ...validationErrors }));
-    const errorMessage = "• " + Object.values(validationErrors).join("\n• ");
-    Alert.alert(t("Error.Validation Error"), errorMessage, [
-      { text: t("MAIN.OK") },
-    ]);
-    return;
-  }
+    const reqId = Number(requestId);
 
-  navigation.navigate("IDProof", { formData, requestNumber });
-};
+    // ✅ Validate it's a valid number
+    if (isNaN(reqId) || reqId <= 0) {
+      console.error("❌ Invalid requestId:", requestId);
+      Alert.alert(
+        t("Error.Error"),
+        "Invalid request ID. Please go back and try again.",
+        [{ text: t("MAIN.OK") }]
+      );
+      return;
+    }
 
+    console.log("✅ Using requestId:", reqId);
+
+    // Show loading indicator
+    Alert.alert(
+      t("InspectionForm.Saving"),
+      t("InspectionForm.Please wait..."),
+      [],
+      { cancelable: false }
+    );
+
+    // Save to backend
+    try {
+      console.log(
+        `🚀 Saving to backend (${isExistingData ? "UPDATE" : "INSERT"})`
+      );
+
+      const saved = await saveToBackend(
+        reqId,  // Use validated reqId (from requestId)
+        "inspectionpersonal",
+        formData.inspectionpersonal,
+        isExistingData
+      );
+
+      if (saved) {
+        console.log("✅ Personal info saved successfully to backend");
+        setIsExistingData(true);
+
+        Alert.alert(
+          t("MAIN.Success"),
+          t("InspectionForm.Data saved successfully"),
+          [
+            {
+              text: t("MAIN.OK"),
+              onPress: () => {
+                navigation.navigate("IDProof", { formData, requestNumber, requestId });
+              },
+            },
+          ]
+        );
+      } else {
+        console.log("⚠️ Backend save failed, but continuing with local data");
+        Alert.alert(
+          t("MAIN.Warning"),
+          t("InspectionForm.Could not save to server. Data saved locally."),
+          [
+            {
+              text: t("MAIN.Continue"),
+              onPress: () => {
+                navigation.navigate("IDProof", { formData, requestNumber, requestId });
+              },
+            },
+          ]
+        );
+      }
+    } catch (error) {
+      console.error("Error during final save:", error);
+      Alert.alert(
+        t("MAIN.Warning"),
+        t("InspectionForm.Could not save to server. Data saved locally."),
+        [
+          {
+            text: t("MAIN.Continue"),
+            onPress: () => {
+              navigation.navigate("IDProof", { formData, requestNumber, requestId });
+            },
+          },
+        ]
+      );
+    }
+  };
 
   const renderSearchInput = (
     value: string,
@@ -797,7 +975,7 @@ useFocusEffect(
 
         {/* Header */}
         <View className="flex-row items-center justify-center py-4 mt-2">
-          <TouchableOpacity className="absolute left-4 bg-[#E0E0E080] rounded-full p-4" onPress={()=> navigation.goBack()}>
+          <TouchableOpacity className="absolute left-4 bg-[#E0E0E080] rounded-full p-4" onPress={() => navigation.goBack()}>
             <AntDesign name="left" size={20} color="#000" />
           </TouchableOpacity>
 
@@ -980,7 +1158,7 @@ useFocusEffect(
               handleFieldChange("email1", text, {
                 required: true,
                 type: "email1",
-                     uniqueWith: [
+                uniqueWith: [
                   "email2"
                 ]
               })
@@ -996,7 +1174,7 @@ useFocusEffect(
               handleFieldChange("email2", text, {
                 required: false,
                 type: "email2",
-                    uniqueWith: [
+                uniqueWith: [
                   "email1"
                 ]
               })
@@ -1058,9 +1236,8 @@ useFocusEffect(
             >
               <View className="bg-[#F6F6F6] rounded-full px-5 py-4 flex-row items-center justify-between">
                 <Text
-                  className={`text-base ${
-                    selectedCountry ? "text-black" : "text-[#838B8C]"
-                  }`}
+                  className={`text-base ${selectedCountry ? "text-black" : "text-[#838B8C]"
+                    }`}
                 >
                   {displayCountry || t("InspectionForm.-- Select Country --")}
                 </Text>
@@ -1082,9 +1259,8 @@ useFocusEffect(
                 >
                   <View className="bg-[#F6F6F6] rounded-full px-5 py-4 flex-row items-center justify-between">
                     <Text
-                      className={`text-base ${
-                        selectedDistrict ? "text-black" : "text-[#838B8C]"
-                      }`}
+                      className={`text-base ${selectedDistrict ? "text-black" : "text-[#838B8C]"
+                        }`}
                     >
                       {selectedDistrict
                         ? t(`Districts.${selectedDistrict}`)
@@ -1093,9 +1269,9 @@ useFocusEffect(
                     <AntDesign name="down" size={20} color="#838B8C" />
                   </View>
                 </TouchableOpacity>
-                  {errors.district && (
-    <Text className="text-red-500 text-sm mt-1 ml-4">{errors.district}</Text>
-  )}
+                {errors.district && (
+                  <Text className="text-red-500 text-sm mt-1 ml-4">{errors.district}</Text>
+                )}
               </View>
               <View className="relative mb-4">
                 <Text className="text-sm text-[#070707] mb-1">
@@ -1105,9 +1281,8 @@ useFocusEffect(
                 </Text>
                 <View className="bg-[#F6F6F6] rounded-full px-5 py-4">
                   <Text
-                    className={`text-base ${
-                      selectedProvince ? "text-black" : "text-[#838B8C]"
-                    }`}
+                    className={`text-base ${selectedProvince ? "text-black" : "text-[#838B8C]"
+                      }`}
                   >
                     {selectedProvince
                       ? displayProvince
@@ -1120,45 +1295,45 @@ useFocusEffect(
         </ScrollView>
 
         <View className="flex-row px-6 py-4 gap-4 bg-white border-t border-gray-200 ">
-          <TouchableOpacity className="flex-1 bg-[#444444] rounded-full py-4 items-center"  onPress={() =>
-    navigation.navigate("Main", {
-      screen: "MainTabs",
-      params: {
-        screen: "CapitalRequests",
-      },
-    })
-  }>
+          <TouchableOpacity className="flex-1 bg-[#444444] rounded-full py-4 items-center" onPress={() =>
+            navigation.navigate("Main", {
+              screen: "MainTabs",
+              params: {
+                screen: "CapitalRequests",
+              },
+            })
+          }>
             <Text className="text-white text-base font-semibold">{t("InspectionForm.Exit")}</Text>
           </TouchableOpacity>
-           {isNextEnabled == true ? (
-              <View className="flex-1">
-          <TouchableOpacity
-            className="flex-1 "
-            onPress={handleNext}
-          >
-              <LinearGradient
-                          colors={["#F35125", "#FF1D85"]}
-                          start={{ x: 0, y: 0 }}
-                          end={{ x: 1, y: 0 }}
-                          className=" rounded-full py-4 items-center"
-                          style={{
-                            shadowColor: "#000",
-                            shadowOffset: { width: 0, height: 3 },
-                            shadowOpacity: 0.25,
-                            shadowRadius: 5,
-                            elevation: 6,
-                          }}
-                        >
-            <Text className="text-white text-base font-semibold">{t("InspectionForm.Next")}</Text>
-            </LinearGradient>
-          </TouchableOpacity>
-          </View>
+          {isNextEnabled ? (
+            <View className="flex-1">
+              <TouchableOpacity
+                className="flex-1 "
+                onPress={handleNext}
+              >
+                <LinearGradient
+                  colors={["#F35125", "#FF1D85"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  className=" rounded-full py-4 items-center"
+                  style={{
+                    shadowColor: "#000",
+                    shadowOffset: { width: 0, height: 3 },
+                    shadowOpacity: 0.25,
+                    shadowRadius: 5,
+                    elevation: 6,
+                  }}
+                >
+                  <Text className="text-white text-base font-semibold">{t("InspectionForm.Next")}</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
 
-): (
-  <View className="flex-1 bg-gray-300 rounded-full py-4 items-center">
-            <Text className="text-white text-base font-semibold">{t("InspectionForm.Next")}</Text>
-          </View>
-)}
+          ) : (
+            <View className="flex-1 bg-gray-300 rounded-full py-4 items-center">
+              <Text className="text-white text-base font-semibold">{t("InspectionForm.Next")}</Text>
+            </View>
+          )}
 
         </View>
       </View>

@@ -99,10 +99,13 @@ export type RootStackParamList = {
     auditType?: "feildaudits" | "govilinkjobs";
   };
 
-  PersonalInfo: { requestNumber:string }
-  IDProof:{formData:any, requestNumber:string}
-  FinanceInfo:{formData:any, requestNumber:string}
-  LandInfo:{formData:any, requestNumber:string}
+  PersonalInfo: {
+    requestNumber: string;
+    requestId: number;
+  };
+  IDProof:{formData:any, requestNumber:string,requestId:number};
+  FinanceInfo:{formData:any, requestNumber:string,requestId:number};
+  LandInfo:{formData:any, requestNumber:string , requestId:number};
     AttachGeoLocationScreen: {
   currentLatitude?: number;
   currentLongitude?: number;
@@ -120,4 +123,13 @@ ProfitRisk:{formData:any, requestNumber:string};
 Economical:{formData:any, requestNumber:string};
 Labour:{formData:any, requestNumber:string};
 HarvestStorage:{formData:any, requestNumber:string};
+
+};
+
+type InspectionFormData = {
+  inspectionland?: any;
+  inspectionpersonal?: any;
+  inspectionidproof?: any;
+  inspectionfinance?: any;
+  // ... other inspection types
 };
