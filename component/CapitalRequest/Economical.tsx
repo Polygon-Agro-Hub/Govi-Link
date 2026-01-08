@@ -22,180 +22,171 @@ import { useCallback } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../types";
-import banksData from "@/assets/json/banks.json";
-import branchesData from "@/assets/json/branches.json";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 
 type FormData = {
-  inspectioninvestment?: InvestmentInfoData;
-};
-type InvestmentInfoData = {
-  expected: number;
-  purpose: number;
-  repaymentMonth: number
-};
-const Input = ({
-  label,
-  placeholder,
-  value,
-  onChangeText,
-  required = false,
-  error,
-  extra,
-  keyboardType = "default",
-}: {
-  label: string;
-  placeholder: string;
-  required?: boolean;
-  value?: string;
-  onChangeText?: (text: string) => void;
-  error?: string;
-  keyboardType?: any;
-  extra?: any
-}) => (
-  <View className="mb-4">
-    <Text className="text-sm text-[#070707] mb-2">
-      {label}{" "}
-      {extra && (
-        <Text className="text-black font-bold">{extra}{" "}</Text>
-      )}
-      {required && <Text className="text-black">*</Text>}
-    </Text>
-    <View
-      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${error ? "border border-red-500" : ""
-        }`}
-    >
-      <TextInput
-        placeholder={placeholder}
-        placeholderTextColor="#838B8C"
-        className="px-5 py-4 text-base text-black flex-1"
-        value={value}
-        onChangeText={onChangeText}
-        keyboardType={keyboardType}
-      />
-    </View>
-
-    {error && <Text className="text-red-500 text-sm mt-1 ml-4">{error}</Text>}
-  </View>
-);
-
-type ValidationRule = {
-  required?: boolean;
-  type?: "expected" | "repaymentMonth" | "purpose";
-  minLength?: number;
-  uniqueWith?: (keyof FormData)[];
+  inspectioneconomical?: EconomicalData;
 };
 
-const validateAndFormat = (
-  text: string,
-  rules: ValidationRule,
-  t: any,
-  formData: any,
-  currentKey: keyof typeof formData
-) => {
-  let value = text;
-  let error = "";
-
-  console.log("Validating:", value, rules);
-  if (rules.type === "expected") {
-    value = value.replace(/[^0-9.]/g, "");
-
-    if (value.startsWith(".")) {
-      value = value.slice(1);
-    }
-
-    const parts = value.split(".");
-    if (parts.length > 2) {
-      value = parts[0] + "." + parts.slice(1).join("");
-    }
-
-    value = value.replace(/\.{2,}/g, ".");
-    if (value === "0") {
-      error = t("Error.Value must be greater than 0");
-    } else if (rules.required && value.trim().length === 0) {
-      error = t(`Error.${rules.type} is required`);
-    }
-  }
-  if (rules.type === "repaymentMonth") {
-    value = value.replace(/[^0-9]/g, "");
-    if (value.startsWith("0")) {
-      value = value.slice(1);
-    }
-    if (rules.required && value.length === 0) {
-      error = t(`Error.${rules.type} is required`);
-    }
-  }
-
-  if (rules.type === "purpose") {
-    value = value.replace(/^\s+/, "");
-    value = value.replace(/[^a-zA-Z\s]/g, "");
-
-    if (value.length > 0) {
-      value = value.charAt(0).toUpperCase() + value.slice(1);
-    }
-    if (rules.required && value.trim().length === 0) {
-      error = t(`Error.${rules.type} is required`);
-    }
-  }
-
-  return { value, error };
+type EconomicalData = {
+  isSuitaleSize?: "Yes" | "No";
+  isFinanceResource?: "Yes" | "No";
+  isAltRoutes?: "Yes" | "No";
 };
 
-type InvestmentInfoProps = {
+
+type EconomicalProps = {
   navigation: any;
 };
+const YesNoSelect = ({
+  label,
+  value,
+  visible,
+  onOpen,
+  onClose,
+  onSelect,
+  required = false,
+}: {
+  label: string;
+  value: "Yes" | "No" | null;
+  visible: boolean;
+  onOpen: () => void;
+  onClose: () => void;
+  onSelect: (value: "Yes" | "No") => void;
+  required?: boolean;
+}) => {
+  const { t } = useTranslation();
 
-const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
-  const route = useRoute<RouteProp<RootStackParamList, "InvestmentInfo">>();
+  return (
+    <>
+      <Modal transparent visible={visible} animationType="fade">
+        <TouchableOpacity
+          className="flex-1 bg-black/40 justify-center items-center"
+          activeOpacity={1}
+          onPress={onClose}
+        >
+          <View className="bg-white w-80 rounded-2xl overflow-hidden">
+            {["Yes", "No"].map((item, index, arr) => (
+              <View key={item}>
+                <TouchableOpacity
+                  className="py-4"
+                  onPress={() => {
+                    onSelect(item as "Yes" | "No");
+                    onClose();
+                  }}
+                >
+                  <Text className="text-center text-base text-black">
+                    {t(`InspectionForm.${item}`)}
+                  </Text>
+                </TouchableOpacity>
+
+                {index !== arr.length - 1 && (
+                  <View className="h-px bg-gray-300 mx-4" />
+                )}
+              </View>
+            ))}
+          </View>
+        </TouchableOpacity>
+      </Modal>
+
+      {/* Field */}
+      <View className="mt-4">
+        <Text className="text-sm text-[#070707] mb-2">
+          {label} {required && <Text className="text-black">*</Text>}
+        </Text>
+
+        <TouchableOpacity
+          className="bg-[#F6F6F6] rounded-full px-4 py-4 flex-row items-center justify-between"
+          onPress={onOpen}
+          activeOpacity={0.7}
+        >
+          {value ? (
+            <Text className="text-black">{t(`InspectionForm.${value}`)}</Text>
+          ) : (
+            <Text className="text-[#838B8C]">
+              {t("InspectionForm.--Select From Here--")}
+            </Text>
+          )}
+
+          {!value && <AntDesign name="down" size={20} color="#838B8C" />}
+        </TouchableOpacity>
+      </View>
+    </>
+  );
+};
+const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
+  const route = useRoute<RouteProp<RootStackParamList, "Economical">>();
   const { requestNumber, requestId } = route.params; // ✅ Add requestId
   const prevFormData = route.params?.formData;
   const [formData, setFormData] = useState(prevFormData);
   const { t, i18n } = useTranslation();
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [yesNoModalVisible, setYesNoModalVisible] = useState(false);
+  const [activeYesNoField, setActiveYesNoField] = useState<string | null>(null);
   const [isExistingData, setIsExistingData] = useState(false); // ✅ Add this
   const [isNextEnabled, setIsNextEnabled] = useState(false);
 
 
 
+
   console.log("finance", formData);
 
-  const banks = banksData.map((bank) => ({
-    id: bank.ID,
-    name: bank.name,
-  }));
   useEffect(() => {
-    const requiredFields: (keyof InvestmentInfoData)[] = [
-      "expected",
-      "purpose",
-      "repaymentMonth"
-    ];
+    const eco = formData?.inspectioneconomical ?? {};
 
-    const allFilled = requiredFields.every((key) => {
-      const value = formData.inspectioninvestment?.[key];
-      return value !== null && value !== undefined && value.toString().trim() !== "";
-    });
-    console.log(allFilled)
-    const hasErrors = Object.values(errors).some((err) => err !== "");
-    console.log(hasErrors)
+    const isSuitaleSizeValid =
+      eco.isSuitaleSize === "Yes" || eco.isSuitaleSize === "No";
 
-    setIsNextEnabled(allFilled && !hasErrors);
+    const isFinanceResourceValid =
+      eco.isFinanceResource === "Yes" || eco.isFinanceResource === "No";
+
+    const isAltRoutesValid =
+      eco.isAltRoutes === "Yes" || eco.isAltRoutes === "No";
+
+    const hasErrors = Object.values(errors).some(Boolean);
+
+    setIsNextEnabled(
+      isSuitaleSizeValid &&
+      isFinanceResourceValid &&
+      isAltRoutesValid &&
+      !hasErrors
+    );
   }, [formData, errors]);
+
 
 
   let jobId = requestNumber;
   console.log("jobid", jobId);
 
-  const fetchInspectionData = async (reqId: number): Promise<InvestmentInfoData | null> => {
+  const updateFormData = async (updates: Partial<EconomicalData>) => {
     try {
-      console.log(`🔍 Fetching investment inspection data for reqId: ${reqId}`);
+      const updatedFormData = {
+        ...formData,
+        inspectioneconomical: {
+          ...formData.inspectioneconomical,
+          ...updates,
+        },
+      };
+
+      setFormData(updatedFormData);
+
+      await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData));
+    } catch (e) {
+      console.log("AsyncStorage save failed", e);
+    }
+  };
+
+  const fetchInspectionData = async (reqId: number): Promise<EconomicalData | null> => {
+    try {
+      console.log(`🔍 Fetching economical data for reqId: ${reqId}`);
 
       const response = await axios.get(
         `${environment.API_BASE_URL}api/capital-request/inspection/get`,
         {
           params: {
             reqId,
-            tableName: 'inspectioninvestment'
+            tableName: 'inspectioneconomical'
           }
         }
       );
@@ -203,21 +194,28 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
       console.log('📦 Raw response:', response.data);
 
       if (response.data.success && response.data.data) {
-        console.log(`✅ Fetched existing investment data:`, response.data.data);
+        console.log(`✅ Fetched existing economical data:`, response.data.data);
 
         const data = response.data.data;
 
+        // Helper to convert boolean (0/1) to "Yes"/"No"
+        const boolToYesNo = (val: any): "Yes" | "No" | undefined => {
+          if (val === 1 || val === '1' || val === true) return "Yes";
+          if (val === 0 || val === '0' || val === false) return "No";
+          return undefined;
+        };
+
         return {
-          expected: data.expected ? parseFloat(data.expected) : 0,
-          purpose: data.purpose || '',
-          repaymentMonth: data.repaymentMonth ? parseInt(data.repaymentMonth) : 0
+          isSuitaleSize: boolToYesNo(data.isSuitaleSize),
+          isFinanceResource: boolToYesNo(data.isFinanceResource),
+          isAltRoutes: boolToYesNo(data.isAltRoutes),
         };
       }
 
-      console.log(`📭 No existing investment data found for reqId: ${reqId}`);
+      console.log(`📭 No existing economical data found for reqId: ${reqId}`);
       return null;
     } catch (error: any) {
-      console.error(`❌ Error fetching investment inspection data:`, error);
+      console.error(`❌ Error fetching economical data:`, error);
       console.error('Error details:', error.response?.data);
 
       if (error.response?.status === 404) {
@@ -232,28 +230,36 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
   const saveToBackend = async (
     reqId: number,
     tableName: string,
-    data: InvestmentInfoData,
+    data: EconomicalData,
     isUpdate: boolean
   ): Promise<boolean> => {
     try {
       console.log(`💾 Saving to backend (${isUpdate ? 'UPDATE' : 'INSERT'}):`, tableName);
       console.log(`📝 reqId being sent:`, reqId);
 
-      const transformedData = {
-        expected: data.expected?.toString() || '0',
-        purpose: data.purpose || '',
-        repaymentMonth: data.repaymentMonth ? parseInt(data.repaymentMonth.toString()) : 0
+      // Yes/No fields
+      const yesNoToInt = (val: any) => val === "Yes" ? '1' : val === "No" ? '0' : null;
+
+      const transformedData: any = {
+        reqId,
+        tableName,
       };
+
+      if (data.isSuitaleSize !== undefined) {
+        transformedData.isSuitaleSize = yesNoToInt(data.isSuitaleSize);
+      }
+      if (data.isFinanceResource !== undefined) {
+        transformedData.isFinanceResource = yesNoToInt(data.isFinanceResource);
+      }
+      if (data.isAltRoutes !== undefined) {
+        transformedData.isAltRoutes = yesNoToInt(data.isAltRoutes);
+      }
 
       console.log(`📦 Transformed data:`, transformedData);
 
       const response = await axios.post(
         `${environment.API_BASE_URL}api/capital-request/inspection/save`,
-        {
-          reqId,
-          tableName,
-          ...transformedData,
-        },
+        transformedData,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -278,24 +284,6 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
     }
   };
 
-  const updateFormData = async (updates: Partial<InvestmentInfoData>) => {
-    try {
-      const updatedFormData = {
-        ...formData,
-        inspectioninvestment: {
-          ...formData.inspectioninvestment,
-          ...updates,
-        },
-      };
-
-      setFormData(updatedFormData);
-
-      await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData));
-    } catch (e) {
-      console.log("AsyncStorage save failed", e);
-    }
-  };
-
 
   useFocusEffect(
     useCallback(() => {
@@ -305,17 +293,17 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
           if (requestId) {
             const reqId = Number(requestId);
             if (!isNaN(reqId) && reqId > 0) {
-              console.log(`🔄 Attempting to fetch investment data from backend for reqId: ${reqId}`);
+              console.log(`🔄 Attempting to fetch economical data from backend for reqId: ${reqId}`);
 
               const backendData = await fetchInspectionData(reqId);
 
               if (backendData) {
-                console.log(`✅ Loaded investment data from backend`);
+                console.log(`✅ Loaded economical data from backend`);
 
                 // Update form with backend data
                 const updatedFormData = {
                   ...formData,
-                  inspectioninvestment: backendData
+                  inspectioneconomical: backendData
                 };
 
                 setFormData(updatedFormData);
@@ -335,16 +323,16 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
 
           if (savedData) {
             const parsedData = JSON.parse(savedData);
-            console.log(`✅ Loaded investment data from AsyncStorage`);
+            console.log(`✅ Loaded economical data from AsyncStorage`);
             setFormData(parsedData);
             setIsExistingData(true);
           } else {
             // No data found anywhere - new entry
             setIsExistingData(false);
-            console.log("📝 No existing investment data - new entry");
+            console.log("📝 No existing economical data - new entry");
           }
         } catch (e) {
-          console.error("Failed to load investment form data", e);
+          console.error("Failed to load economical form data", e);
           setIsExistingData(false);
         }
       };
@@ -353,46 +341,21 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
     }, [requestId, jobId])
   );
 
-  const handleFieldChange = (
-    key: keyof InvestmentInfoData,
-    text: string,
-    rules: ValidationRule
-  ) => {
-    const { value, error } = validateAndFormat(
-      text,
-      rules,
-      t,
-      formData.inspectioninvestment,
-      key
-    );
-
-    // Update nested investmentInfo
-    setFormData((prev: any) => ({
-      ...prev,
-      inspectioninvestment: {
-        ...prev.inspectioninvestment,
-        [key]: value,
-      },
-    }));
-
-    setErrors((prev) => ({ ...prev, [key]: error || "" }));
-    updateFormData({ [key]: value });
-  };
 
 
   const handleNext = async () => {
     const validationErrors: Record<string, string> = {};
-    const investmentInfo = formData.inspectioninvestment;
+    const economicalInfo = formData.inspectioneconomical;
 
     // Validate required fields
-    if (!investmentInfo?.expected || investmentInfo.expected.toString().trim() === "" || investmentInfo.expected === 0) {
-      validationErrors.expected = t("Error.expected is required");
+    if (!economicalInfo?.isSuitaleSize) {
+      validationErrors.isSuitaleSize = t("Error.Suitable size field is required");
     }
-    if (!investmentInfo?.purpose || investmentInfo.purpose.trim() === "") {
-      validationErrors.purpose = t("Error.purpose is required");
+    if (!economicalInfo?.isFinanceResource) {
+      validationErrors.isFinanceResource = t("Error.Finance resource field is required");
     }
-    if (!investmentInfo?.repaymentMonth || investmentInfo.repaymentMonth.toString().trim() === "" || investmentInfo.repaymentMonth === 0) {
-      validationErrors.repaymentMonth = t("Error.repaymentMonth is required");
+    if (!economicalInfo?.isAltRoutes) {
+      validationErrors.isAltRoutes = t("Error.Alternative routes field is required");
     }
 
     if (Object.keys(validationErrors).length > 0) {
@@ -417,7 +380,6 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
 
     const reqId = Number(route.params.requestId);
 
-    // ✅ Validate it's a valid number
     if (isNaN(reqId) || reqId <= 0) {
       console.error("❌ Invalid requestId:", route.params.requestId);
       Alert.alert(
@@ -430,7 +392,6 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
 
     console.log("✅ Using requestId:", reqId);
 
-    // Show loading indicator
     Alert.alert(
       t("InspectionForm.Saving"),
       t("InspectionForm.Please wait..."),
@@ -438,21 +399,18 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
       { cancelable: false }
     );
 
-    // Save to backend
     try {
-      console.log(
-        `🚀 Saving to backend (${isExistingData ? "UPDATE" : "INSERT"})`
-      );
+      console.log(`🚀 Saving to backend (${isExistingData ? "UPDATE" : "INSERT"})`);
 
       const saved = await saveToBackend(
         reqId,
-        "inspectioninvestment",
-        formData.inspectioninvestment!,
+        "inspectioneconomical",
+        formData.inspectioneconomical!,
         isExistingData
       );
 
       if (saved) {
-        console.log("✅ Investment info saved successfully to backend");
+        console.log("✅ Economical info saved successfully to backend");
         setIsExistingData(true);
 
         Alert.alert(
@@ -462,7 +420,7 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
             {
               text: t("MAIN.OK"),
               onPress: () => {
-                navigation.navigate("CultivationInfo", {
+                navigation.navigate("Labour", {
                   formData,
                   requestNumber,
                   requestId: route.params.requestId
@@ -480,7 +438,7 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
             {
               text: t("MAIN.Continue"),
               onPress: () => {
-                navigation.navigate("CultivationInfo", {
+                navigation.navigate("Labour", {
                   formData,
                   requestNumber,
                   requestId: route.params.requestId
@@ -499,7 +457,7 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
           {
             text: t("MAIN.Continue"),
             onPress: () => {
-              navigation.navigate("CultivationInfo", {
+              navigation.navigate("Labour", {
                 formData,
                 requestNumber,
                 requestId: route.params.requestId
@@ -512,6 +470,23 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
   };
 
 
+  const handleyesNOFieldChange = async (key: string, value: "Yes" | "No") => {
+    const updatedFormData = {
+      ...formData,
+      inspectioneconomical: {
+        ...formData.inspectioneconomical,
+        [key]: value,
+      },
+    };
+
+    setFormData(updatedFormData);
+
+    try {
+      await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData));
+    } catch (e) {
+      console.log("AsyncStorage save failed", e);
+    }
+  };
 
 
   return (
@@ -536,7 +511,7 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
         </View>
 
         {/* Tabs */}
-        <FormTabs activeKey="Investment Info" />
+        <FormTabs activeKey="Economical" />
 
         <ScrollView
           className="flex-1 px-6 bg-white rounded-t-3xl"
@@ -544,49 +519,63 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
           contentContainerStyle={{ paddingBottom: 120 }}
         >
           <View className="h-6" />
-          <Input
-            label={t("InspectionForm.Expected investment by the farmer")}
-            placeholder="0.00"
-             value={formData.inspectioninvestment?.expected?.toString() || ""}
-            onChangeText={(text) =>
-              handleFieldChange("expected", text, {
-                required: true,
-                type: "expected",
-              })
-            }
+          <YesNoSelect
+            label={t("InspectionForm.Are the proposed crop/cropping systems suitable for the farmer’s size of land holding")}
             required
-            extra={t("InspectionForm.Rs")}
-            keyboardType={"phone-pad"}
-            error={errors.expected}
+            value={formData.inspectioneconomical?.isSuitaleSize || null}
+            visible={
+              yesNoModalVisible && activeYesNoField === "isSuitaleSize"
+            }
+            onOpen={() => {
+              setActiveYesNoField("isSuitaleSize");
+              setYesNoModalVisible(true);
+            }}
+            onClose={() => {
+              setYesNoModalVisible(false);
+              setActiveYesNoField(null);
+            }}
+            onSelect={(value) =>
+              handleyesNOFieldChange("isSuitaleSize", value)
+            }
           />
 
-          <Input
-            label={t("InspectionForm.Purpose for investment required as per the farmer")}
-            placeholder="----"
-            value={formData.inspectioninvestment?.purpose}
-            onChangeText={(text) =>
-              handleFieldChange("purpose", text, {
-                required: true,
-                type: "purpose",
-              })
-            }
+          <YesNoSelect
+            label={t("InspectionForm.Are the financial resources adequate to manage the proposed crop/cropping system")}
             required
-            error={errors.purpose}
+            value={formData.inspectioneconomical?.isFinanceResource || null}
+            visible={
+              yesNoModalVisible && activeYesNoField === "isFinanceResource"
+            }
+            onOpen={() => {
+              setActiveYesNoField("isFinanceResource");
+              setYesNoModalVisible(true);
+            }}
+            onClose={() => {
+              setYesNoModalVisible(false);
+              setActiveYesNoField(null);
+            }}
+            onSelect={(value) =>
+              handleyesNOFieldChange("isFinanceResource", value)
+            }
           />
-
-          <Input
-            label={t("InspectionForm.Expected repayment period as per the farmer in months")}
-            placeholder="----"
-            value={formData.inspectioninvestment?.repaymentMonth?.toString() || ""}
-            onChangeText={(text) =>
-              handleFieldChange("repaymentMonth", text, {
-                required: true,
-                type: "repaymentMonth",
-              })
-            }
+          <YesNoSelect
+            label={t("InspectionForm.If not, can the farmer mobilize financial resources through alternative routes")}
             required
-            keyboardType={"phone-pad"}
-            error={errors.repaymentMonth}
+            value={formData.inspectioneconomical?.isAltRoutes || null}
+            visible={
+              yesNoModalVisible && activeYesNoField === "isAltRoutes"
+            }
+            onOpen={() => {
+              setActiveYesNoField("isAltRoutes");
+              setYesNoModalVisible(true);
+            }}
+            onClose={() => {
+              setYesNoModalVisible(false);
+              setActiveYesNoField(null);
+            }}
+            onSelect={(value) =>
+              handleyesNOFieldChange("isAltRoutes", value)
+            }
           />
         </ScrollView>
 
@@ -636,4 +625,4 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
   );
 };
 
-export default InvestmentInfo;
+export default Economical;

@@ -22,9 +22,11 @@ import { LinearGradient } from "expo-linear-gradient";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../types";
 import { CameraScreen } from "@/Items/CameraScreen";
+import axios from "axios";
+import { environment } from "@/environment/environment";
 
 type FormData = {
-  landinfo?: LandInfoData;
+  inspectionland?: LandInfoData;
 };
 type LandImage = {
   uri: string;
@@ -38,11 +40,11 @@ type GeoLocation = {
 };
 
 type LandInfoData = {
-  cultivationLandsDescription: string;
-  landownby?: "Yes" | "No";
-  legalstatus?: string;
-  landImages?: LandImage[];
-  geoLocation?: GeoLocation[]
+  landDiscription: string;
+  isOwnByFarmer?: "Yes" | "No";
+  ownershipStatus?: string;
+  images?: LandImage[];
+  geoLocation?: GeoLocation;  // ✅ Remove the array brackets []
 };
 
 type ValidationRule = {
@@ -101,47 +103,48 @@ type LandInfoProps = {
 
 const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
   const route = useRoute<RouteProp<RootStackParamList, "LandInfo">>();
-  const { requestNumber } = route.params;
+  const { requestNumber, requestId } = route.params;
   const prevFormData = route.params?.formData;
   const [formData, setFormData] = useState(prevFormData);
   const { t, i18n } = useTranslation();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [landownModal, setlandownNoModal] = useState(false);
   const [legalStatusModal, setLegalStatusModal] = useState(false);
-const [showCamera, setShowCamera] = useState(false);
+  const [showCamera, setShowCamera] = useState(false);
+  const [isExistingData, setIsExistingData] = useState(false);
 
   const [isNextEnabled, setIsNextEnabled] = useState(false);
 
   console.log("finance", formData);
 
-useEffect(() => {
-  if (!formData.landinfo) {
-    setIsNextEnabled(false);
-    return;
-  }
+  useEffect(() => {
+    if (!formData.inspectionland) {
+      setIsNextEnabled(false);
+      return;
+    }
 
-  const requiredFields: (keyof LandInfoData)[] = [
-    "cultivationLandsDescription",
-    "landownby",
-    "legalstatus",
-    "geoLocation"
-  ];
+    const requiredFields: (keyof LandInfoData)[] = [
+      "landDiscription",
+      "isOwnByFarmer",
+      "ownershipStatus",
+      "geoLocation"
+    ];
 
-  // Check if all required fields have a value
-  const allFilled = requiredFields.every(
-    (key) =>
-      formData.landinfo?.[key] !== undefined &&
-      formData.landinfo?.[key] !== null &&
-      formData.landinfo?.[key].toString().trim() !== ""
-  );
+    // Check if all required fields have a value
+    const allFilled = requiredFields.every(
+      (key) =>
+        formData.inspectionland?.[key] !== undefined &&
+        formData.inspectionland?.[key] !== null &&
+        formData.inspectionland?.[key].toString().trim() !== ""
+    );
 
-  // Check if at least one image exists
-  const hasImages =
-    formData.landinfo.landImages && formData.landinfo.landImages.length > 0;
+    // Check if at least one image exists
+    const hasImages =
+      formData.inspectionland.images && formData.inspectionland.images.length > 0;
 
-  // Enable Next button only if all fields filled and at least one image
-  setIsNextEnabled(allFilled && hasImages);
-}, [formData]);
+    // Enable Next button only if all fields filled and at least one image
+    setIsNextEnabled(allFilled && hasImages);
+  }, [formData]);
 
 
   let jobId = requestNumber;
@@ -164,60 +167,300 @@ useEffect(() => {
       console.log("AsyncStorage save failed", e);
     }
   };
+  const saveToBackend = async (
+    reqId: number,
+    tableName: string,
+    data: LandInfoData,
+    isUpdate: boolean
+  ): Promise<boolean> => {
+    try {
+      console.log(`💾 Saving to backend (${isUpdate ? 'UPDATE' : 'INSERT'}):`, tableName);
+      console.log(`📝 reqId being sent:`, reqId);
+
+      const apiFormData = new FormData();
+      apiFormData.append('reqId', reqId.toString());
+      apiFormData.append('tableName', tableName);
+
+      // Add non-file fields
+      apiFormData.append('isOwnByFarmer', data.isOwnByFarmer === "Yes" ? '1' : '0');
+      apiFormData.append('ownershipStatus', data.ownershipStatus || '');
+      apiFormData.append('landDiscription', data.landDiscription || '');
+
+      // Add geo location
+      if (data.geoLocation) {
+        apiFormData.append('latitude', data.geoLocation.latitude.toString());
+        apiFormData.append('longitude', data.geoLocation.longitude.toString());
+        if (data.geoLocation.locationName) {
+          apiFormData.append('locationName', data.geoLocation.locationName);
+        }
+      }
+
+      // Add images
+      if (data.images && data.images.length > 0) {
+        let existingUrlIndex = 0;
+
+        data.images.forEach((img: LandImage, index: number) => {
+          // Check if it's an S3 URL (already uploaded)
+          if (typeof img === 'string' || (img.uri && (img.uri.startsWith('http://') || img.uri.startsWith('https://')))) {
+            const url = typeof img === 'string' ? img : img.uri;
+            apiFormData.append(`imageUrl_${existingUrlIndex}`, url);
+            existingUrlIndex++;
+            console.log(`🔗 Keeping existing image URL: ${url}`);
+          }
+          // Local file - need to upload
+          else if (img.uri && img.uri.startsWith('file://')) {
+            apiFormData.append('images', {
+              uri: img.uri,
+              name: img.name || `land_${Date.now()}_${index}.jpg`,
+              type: img.type || 'image/jpeg',
+            } as any);
+            console.log(`📤 Uploading new image: ${img.name}`);
+          }
+        });
+      }
+
+      console.log(`📦 Sending FormData to backend`);
+
+      const response = await axios.post(
+        `${environment.API_BASE_URL}api/capital-request/inspection/save`,
+        apiFormData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      if (response.data.success) {
+        console.log(`✅ ${tableName} ${response.data.operation}d successfully`);
+
+        // Update local state with S3 URLs from backend
+        if (response.data.data.images) {
+          // ✅ Parse images if it's a string
+          let imageUrls = response.data.data.images;
+          if (typeof imageUrls === 'string') {
+            try {
+              imageUrls = JSON.parse(imageUrls);
+            } catch (e) {
+              console.error('Failed to parse images:', imageUrls);
+              imageUrls = [];
+            }
+          }
+
+          // ✅ Ensure it's an array
+          if (!Array.isArray(imageUrls)) {
+            imageUrls = [];
+          }
+
+          const imageObjects = imageUrls.map((url: string) => ({
+            uri: url,
+            name: url.split('/').pop() || 'image.jpg',
+            type: 'image/jpeg'
+          }));
+
+          setFormData((prev: FormData) => ({
+            ...prev,
+            inspectionland: {
+              ...(prev.inspectionland || {}),
+              images: imageObjects
+            }
+          }));
+
+          // Save updated formData with S3 URLs to AsyncStorage
+          const updatedFormData: FormData = {
+            ...formData,
+            inspectionland: {
+              ...formData.inspectionland!,
+              images: imageObjects,
+            }
+          };
+
+          await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData));
+          console.log("💾 Updated AsyncStorage with S3 URLs");
+        }
+
+        return true;
+      } else {
+        console.error(`❌ ${tableName} save failed:`, response.data.message);
+        return false;
+      }
+    } catch (error: any) {
+      console.error(`❌ Error saving ${tableName}:`, error);
+      if (error.response) {
+        console.error("Response data:", error.response.data);
+        console.error("Response status:", error.response.status);
+      }
+      return false;
+    }
+  };
+
+  const fetchInspectionData = async (reqId: number): Promise<LandInfoData | null> => {
+    try {
+      console.log(`🔍 Fetching land inspection data for reqId: ${reqId}`);
+
+      const response = await axios.get(
+        `${environment.API_BASE_URL}api/capital-request/inspection/get`,
+        {
+          params: {
+            reqId,
+            tableName: 'inspectionland'
+          }
+        }
+      );
+
+      console.log('📦 Raw response:', response.data);
+
+      if (response.data.success && response.data.data) {
+        console.log(`✅ Fetched existing land data:`, response.data.data);
+
+        const data = response.data.data;
+
+        // Helper function to safely parse images JSON
+        const safeJsonParse = (field: any): string[] => {
+          if (!field) return [];
+          if (Array.isArray(field)) return field;
+          if (typeof field === 'string') {
+            try {
+              const parsed = JSON.parse(field);
+              return Array.isArray(parsed) ? parsed : [];
+            } catch (e) {
+              console.warn(`Failed to parse images:`, field);
+              return [];
+            }
+          }
+          if (typeof field === 'object') {
+            return Array.isArray(field) ? field : [];
+          }
+          return [];
+        };
+
+        // Transform backend data to frontend format
+        return {
+          isOwnByFarmer: data.isOwnByFarmer === 1 || data.isOwnByFarmer === '1' ? "Yes" : "No",
+          ownershipStatus: data.ownershipStatus || '',
+          landDiscription: data.landDiscription || '',
+          geoLocation: (data.latitude && data.longitude) ? {
+            latitude: parseFloat(data.latitude),
+            longitude: parseFloat(data.longitude),
+            locationName: data.locationName || ''
+          } : undefined,
+          images: safeJsonParse(data.images).map((url: string) => ({
+            uri: url,
+            name: url.split('/').pop() || 'image.jpg',
+            type: 'image/jpeg'
+          }))
+        };
+      }
+
+      console.log(`📭 No existing land data found for reqId: ${reqId}`);
+      return null;
+    } catch (error: any) {
+      console.error(`❌ Error fetching land inspection data:`, error);
+      console.error('Error details:', error.response?.data);
+
+      if (error.response?.status === 404) {
+        console.log(`📝 No existing record - will create new`);
+        return null;
+      }
+
+      return null;
+    }
+  };
 
   useFocusEffect(
     useCallback(() => {
       const loadFormData = async () => {
         try {
+          // First, try to fetch from backend
+          if (requestId) {
+            const reqId = Number(requestId);
+            if (!isNaN(reqId) && reqId > 0) {
+              console.log(`🔄 Attempting to fetch land data from backend for reqId: ${reqId}`);
+
+              const backendData = await fetchInspectionData(reqId);
+
+              if (backendData) {
+                console.log(`✅ Loaded land data from backend`);
+
+                // Update form with backend data
+                const updatedFormData = {
+                  ...formData,
+                  inspectionland: backendData
+                };
+
+                setFormData(updatedFormData);
+                setIsExistingData(true);
+
+                // Save to AsyncStorage as backup
+                await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData));
+
+                return; // Exit after loading from backend
+              }
+            }
+          }
+
+          // If no backend data, try AsyncStorage
+          console.log(`📂 Checking AsyncStorage for jobId: ${jobId}`);
           const savedData = await AsyncStorage.getItem(`${jobId}`);
+
           if (savedData) {
             const parsedData = JSON.parse(savedData);
+            console.log(`✅ Loaded land data from AsyncStorage`);
             setFormData(parsedData);
+            setIsExistingData(true);
+          } else {
+            // No data found anywhere - new entry
+            setIsExistingData(false);
+            console.log("📝 No existing land data - new entry");
           }
         } catch (e) {
-          console.log("Failed to load form data", e);
+          console.error("Failed to load land form data", e);
+          setIsExistingData(false);
         }
       };
 
       loadFormData();
-    }, [])
+    }, [requestId, jobId])
   );
 
-  
+
   const handleLandInfoFieldChange = (key: keyof LandInfoData, value: any) => {
     const updatedLandInfo = {
-      ...(formData?.landinfo || {}),
+      ...(formData?.inspectionland || {}),
       [key]: value,
     };
 
     setFormData((prev: any) => ({
       ...prev,
-      landinfo: updatedLandInfo,
+      inspectionland: updatedLandInfo,
     }));
 
-    updateFormData({ landinfo: updatedLandInfo });
+    updateFormData({ inspectionland: updatedLandInfo });
   };
 
-  const handleNext = () => {
-        navigation.navigate("InvestmentInfo", { formData, requestNumber });
-
-    const requiredFields: (keyof FormData)[] = [];
+  const handleNext = async () => {
     const validationErrors: Record<string, string> = {};
+    const landInfo = formData.inspectionland;
 
-    requiredFields.forEach((key) => {
-      const value = formData[key];
-      let error = "";
-
-      // if (!value || value.trim() === "") {
-      //   error = t(`Error.${key} is required`);
-      // }
-
-      if (error) validationErrors[key] = error;
-    });
+    // Validate required fields
+    if (!landInfo?.landDiscription || landInfo.landDiscription.trim() === "") {
+      validationErrors.landDiscription = t("Error.landDiscription is required");
+    }
+    if (!landInfo?.isOwnByFarmer) {
+      validationErrors.isOwnByFarmer = t("Error.Land ownership is required");
+    }
+    if (!landInfo?.ownershipStatus) {
+      validationErrors.ownershipStatus = t("Error.Ownership status is required");
+    }
+    if (!landInfo?.geoLocation) {
+      validationErrors.geoLocation = t("Error.Geo location is required");
+    }
+    if (!landInfo?.images || landInfo.images.length === 0) {
+      validationErrors.images = t("Error.At least one image is required");
+    }
 
     if (Object.keys(validationErrors).length > 0) {
-      setErrors((prev) => ({ ...prev, ...validationErrors }));
-
+      setErrors(validationErrors);
       const errorMessage = "• " + Object.values(validationErrors).join("\n• ");
       Alert.alert(t("Error.Validation Error"), errorMessage, [
         { text: t("MAIN.OK") },
@@ -225,59 +468,163 @@ useEffect(() => {
       return;
     }
 
-    // navigation.navigate("InvestmentInfo", { formData, requestNumber });
+    // ✅ Validate requestId exists
+    if (!route.params?.requestId) {
+      console.error("❌ requestId is missing!");
+      Alert.alert(
+        t("Error.Error"),
+        "Request ID is missing. Please go back and try again.",
+        [{ text: t("MAIN.OK") }]
+      );
+      return;
+    }
+
+    const reqId = Number(route.params.requestId);
+
+    // ✅ Validate it's a valid number
+    if (isNaN(reqId) || reqId <= 0) {
+      console.error("❌ Invalid requestId:", route.params.requestId);
+      Alert.alert(
+        t("Error.Error"),
+        "Invalid request ID. Please go back and try again.",
+        [{ text: t("MAIN.OK") }]
+      );
+      return;
+    }
+
+    console.log("✅ Using requestId:", reqId);
+
+    // Show loading indicator
+    Alert.alert(
+      t("InspectionForm.Saving"),
+      t("InspectionForm.Please wait..."),
+      [],
+      { cancelable: false }
+    );
+
+    // Save to backend
+    try {
+      console.log(
+        `🚀 Saving to backend (${isExistingData ? "UPDATE" : "INSERT"})`
+      );
+
+      const saved = await saveToBackend(
+        reqId,
+        "inspectionland",
+        formData.inspectionland!,
+        isExistingData
+      );
+
+      if (saved) {
+        console.log("✅ Land info saved successfully to backend");
+        setIsExistingData(true);
+
+        Alert.alert(
+          t("MAIN.Success"),
+          t("InspectionForm.Data saved successfully"),
+          [
+            {
+              text: t("MAIN.OK"),
+              onPress: () => {
+                navigation.navigate("InvestmentInfo", {
+                  formData,
+                  requestNumber,
+                  requestId: route.params.requestId
+                });
+              },
+            },
+          ]
+        );
+      } else {
+        console.log("⚠️ Backend save failed, but continuing with local data");
+        Alert.alert(
+          t("MAIN.Warning"),
+          t("InspectionForm.Could not save to server. Data saved locally."),
+          [
+            {
+              text: t("MAIN.Continue"),
+              onPress: () => {
+                navigation.navigate("InvestmentInfo", {
+                  formData,
+                  requestNumber,
+                  requestId: route.params.requestId
+                });
+              },
+            },
+          ]
+        );
+      }
+    } catch (error) {
+      console.error("Error during final save:", error);
+      Alert.alert(
+        t("MAIN.Warning"),
+        t("InspectionForm.Could not save to server. Data saved locally."),
+        [
+          {
+            text: t("MAIN.Continue"),
+            onPress: () => {
+              navigation.navigate("InvestmentInfo", {
+                formData,
+                requestNumber,
+                requestId: route.params.requestId
+              });
+            },
+          },
+        ]
+      );
+    }
   };
 
 
   const LEGAL_STATUS_OPTIONS = [
-  "Own land – Single owner",
-  "Own land – Multiple owners (undivided)",
-  "Leased land from private owner",
-  "Leased land from the government",
-  "Permit land – short term from the government",
-  "Permit land – long term from the government",
-] ;
-
-const convertImageToFormData = async (imageUri: string) => {
-  try {
-    const extension = imageUri.split(".").pop() || "jpg";
-
-    return {
-      uri: imageUri,
-      name: `land_${Date.now()}.${extension}`,
-      type: `image/${extension === "jpg" ? "jpeg" : extension}`,
-    };
-  } catch (error) {
-    console.error("Image convert error:", error);
-    return null;
-  }
-};
-
-const handleCameraClose = async (uri: string | null) => {
-  setShowCamera(false);
-
-  if (!uri) return;
-
-  const fileObj = await convertImageToFormData(uri);
-  if (!fileObj) return;
-
-  const updatedImages = [
-    ...(formData?.landinfo?.landImages || []),
-    fileObj,
+    "Own land – Single owner",
+    "Own land – Multiple owners (undivided)",
+    "Leased land from private owner",
+    "Leased land from the government",
+    "Permit land – short term from the government",
+    "Permit land – long term from the government",
   ];
 
-  const updatedLandInfo = {
-    ...(formData?.landinfo || {}),
-    landImages: updatedImages,
+  const convertImageToFormData = async (imageUri: string) => {
+    try {
+      const extension = imageUri.split(".").pop() || "jpg";
+
+      return {
+        uri: imageUri,
+        name: `land_${Date.now()}.${extension}`,
+        type: `image/${extension === "jpg" ? "jpeg" : extension}`,
+      };
+    } catch (error) {
+      console.error("Image convert error:", error);
+      return null;
+    }
   };
 
-  setFormData((prev: any) => ({
-    ...prev,
-    landinfo: updatedLandInfo,
-  }));
+  const handleCameraClose = async (uri: string | null) => {
+    setShowCamera(false);
 
-  updateFormData({ landinfo: updatedLandInfo });
-};
+    if (!uri) return;
+
+    const fileObj = await convertImageToFormData(uri);
+    if (!fileObj) return;
+
+    const updatedImages = [
+      ...(formData?.inspectionland?.images || []),
+      fileObj,
+    ];
+
+    const updatedLandInfo = {
+      ...(formData?.inspectionland || {}),
+      images: updatedImages,
+    };
+
+    setFormData((prev: any) => ({
+      ...prev,
+      inspectionland: updatedLandInfo,
+    }));
+
+    updateFormData({ inspectionland: updatedLandInfo });
+  };
 
 
   return (
@@ -289,7 +636,7 @@ const handleCameraClose = async (uri: string | null) => {
         <StatusBar barStyle="dark-content" />
 
         <View className="flex-row items-center justify-center py-4 mt-2">
-          <TouchableOpacity className="absolute left-4 bg-[#E0E0E080] rounded-full p-4" onPress={()=> navigation.goBack()}>
+          <TouchableOpacity className="absolute left-4 bg-[#E0E0E080] rounded-full p-4" onPress={() => navigation.goBack()}>
             <AntDesign name="left" size={20} color="#000" />
           </TouchableOpacity>
 
@@ -318,9 +665,9 @@ const handleCameraClose = async (uri: string | null) => {
               onPress={() => setlandownNoModal(true)}
               activeOpacity={0.7}
             >
-              {formData.landinfo?.landownby ? (
+              {formData.inspectionland?.isOwnByFarmer ? (
                 <Text className="text-black">
-                 {t(`InspectionForm.${formData.landinfo.landownby}`)}
+                  {t(`InspectionForm.${formData.inspectionland.isOwnByFarmer}`)}
                 </Text>
               ) : (
                 <Text className="text-[#838B8C]">
@@ -328,16 +675,16 @@ const handleCameraClose = async (uri: string | null) => {
                 </Text>
               )}
 
-              {!formData.landinfo?.landownby && (
+              {!formData.inspectionland?.isOwnByFarmer && (
                 <AntDesign name="down" size={20}
-               
+
                   color="#838B8C"
                 />
               )}
             </TouchableOpacity>
           </View>
 
-                 <View className="mt-4">
+          <View className="mt-4">
             <Text className="text-sm text-[#070707] mb-2">
               {t("InspectionForm.Legal status of the ownership of the land")} *
             </Text>
@@ -347,9 +694,9 @@ const handleCameraClose = async (uri: string | null) => {
               onPress={() => setLegalStatusModal(true)}
               activeOpacity={0.7}
             >
-              {formData.landinfo?.legalstatus ? (
+              {formData.inspectionland?.ownershipStatus ? (
                 <Text className="text-black">
-                  {t(`InspectionForm.${formData.landinfo.legalstatus}`)}
+                  {t(`InspectionForm.${formData.inspectionland.ownershipStatus}`)}
                 </Text>
               ) : (
                 <Text className="text-[#838B8C]">
@@ -357,7 +704,7 @@ const handleCameraClose = async (uri: string | null) => {
                 </Text>
               )}
 
-              {!formData.landinfo?.legalstatus && (
+              {!formData.inspectionland?.ownershipStatus && (
                 <AntDesign name="down" size={20}
                   color="#838B8C"
                 />
@@ -373,13 +720,12 @@ const handleCameraClose = async (uri: string | null) => {
               *
             </Text>
             <View
-              className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${
-                errors.debts ? "border border-red-500" : ""
-              }`}
+              className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${errors.debts ? "border border-red-500" : ""
+                }`}
             >
               <TextInput
                 placeholder={t("InspectionForm.Type here...")}
-                value={formData.landinfo?.cultivationLandsDescription || ""}
+                value={formData.inspectionland?.landDiscription || ""}
                 onChangeText={(text) => {
                   let formattedText = text.replace(/^\s+/, "");
 
@@ -391,26 +737,26 @@ const handleCameraClose = async (uri: string | null) => {
 
                   setFormData((prev: FormData) => ({
                     ...prev,
-                    landinfo: {
-                      ...prev.landinfo,
-                      cultivationLandsDescription: formattedText,
+                    inspectionland: {
+                      ...prev.inspectionland,
+                      landDiscription: formattedText,
                     },
                   }));
 
                   let error = "";
                   if (!formattedText || formattedText.trim() === "") {
-                    error = t("Error.cultivationLandsDescription is required");
+                    error = t("Error.landDiscription is required");
                   }
                   setErrors((prev) => ({
                     ...prev,
-                    cultivationLandsDescription: error,
+                    landDiscription: error,
                   }));
 
                   if (!error) {
                     updateFormData({
-                      landinfo: {
-                        ...(formData.landinfo || {}),
-                        cultivationLandsDescription: formattedText,
+                      inspectionland: {
+                        ...(formData.inspectionland || {}),
+                        landDiscription: formattedText,
                       },
                     });
                   }
@@ -420,141 +766,139 @@ const handleCameraClose = async (uri: string | null) => {
                 textAlignVertical="top"
               />
             </View>
-            {errors.cultivationLandsDescription && (
+            {errors.landDiscription && (
               <Text className="text-red-500 text-sm mt-1 ml-2">
-                {errors.cultivationLandsDescription}
+                {errors.landDiscription}
               </Text>
             )}
           </View>
 
-                    <View className="mt-6 ">
-                                  <Text className="text-sm text-[#070707] mb-2">
+          <View className="mt-6 ">
+            <Text className="text-sm text-[#070707] mb-2">
               {t("InspectionForm.Tag the geo coordinates of the land")} *
             </Text>
-  <TouchableOpacity
-    className="bg-[#FA345A] rounded-full px-4 py-4 flex-row items-center justify-center gap-x-2"
-onPress={() =>
-  navigation.navigate("AttachGeoLocationScreen", {
-    currentLatitude: formData?.landinfo?.geoLocation?.latitude,
-    currentLongitude: formData?.landinfo?.geoLocation?.longitude,
+            <TouchableOpacity
+              className="bg-[#FA345A] rounded-full px-4 py-4 flex-row items-center justify-center gap-x-2"
+              onPress={() =>
+                navigation.navigate("AttachGeoLocationScreen", {
+                  currentLatitude: formData?.inspectionland?.geoLocation?.latitude,
+                  currentLongitude: formData?.inspectionland?.geoLocation?.longitude,
 
-    onLocationSelect: (
-      latitude: number,
-      longitude: number,
-      locationName: string
-    ) => {
-      const updatedLandInfo = {
-        ...(formData?.landinfo || {}),
-        geoLocation: {
-          latitude,
-          longitude,
-          locationName,
-        },
-      };
+                  onLocationSelect: (
+                    latitude: number,
+                    longitude: number,
+                    locationName: string
+                  ) => {
+                    const updatedLandInfo = {
+                      ...(formData?.inspectionland || {}),
+                      geoLocation: {
+                        latitude,
+                        longitude,
+                        locationName,
+                      },
+                    };
 
-      setFormData((prev: any) => ({
-        ...prev,
-        landinfo: updatedLandInfo,
-      }));
+                    setFormData((prev: any) => ({
+                      ...prev,
+                      inspectionland: updatedLandInfo,
+                    }));
 
-      updateFormData({ landinfo: updatedLandInfo });
-    },
-  })
-}
+                    updateFormData({ inspectionland: updatedLandInfo });
+                  },
+                })
+              }
 
-  >
-    {formData?.landinfo?.geoLocation ? (
-    <Feather name="rotate-ccw" size={22} color="#fff" />
-    ): (
-          <MaterialIcons name="gps-fixed" size={22} color="#fff" />
-    )}
-    <Text className="text-white font-semibold">
-      {t("InspectionForm.Tag Geo Coordinate")}
-    </Text>
-  </TouchableOpacity>
+            >
+              {formData?.inspectionland?.geoLocation ? (
+                <Feather name="rotate-ccw" size={22} color="#fff" />
+              ) : (
+                <MaterialIcons name="gps-fixed" size={22} color="#fff" />
+              )}
+              <Text className="text-white font-semibold">
+                {t("InspectionForm.Tag Geo Coordinate")}
+              </Text>
+            </TouchableOpacity>
 
 
-</View>
-{formData?.landinfo?.geoLocation && (
-  <TouchableOpacity
-    className="mt-2 rounded-full px-4 py-3 flex-row items-center justify-center gap-x-2"
-    onPress={() =>
-      navigation.navigate("ViewLocationScreen", {
-        latitude: formData.landinfo.geoLocation.latitude,
-        longitude: formData.landinfo.geoLocation.longitude,
-        locationName:formData.landinfo.geoLocation.locationName
-      })
-    }
-  >
-    <MaterialIcons name="location-pin" size={24} color="#FF0000" />
-    <Text className="text-[#FF0000] font-semibold  border-b-2 border-[#FF0000]">
-      {t("InspectionForm.View Here")}
-    </Text>
-  </TouchableOpacity>
-)}
+          </View>
+          {formData?.inspectionland?.geoLocation && (
+            <TouchableOpacity
+              className="mt-2 rounded-full px-4 py-3 flex-row items-center justify-center gap-x-2"
+              onPress={() =>
+                navigation.navigate("ViewLocationScreen", {
+                  latitude: formData.inspectionland.geoLocation.latitude,
+                  longitude: formData.inspectionland.geoLocation.longitude,
+                  locationName: formData.inspectionland.geoLocation.locationName
+                })
+              }
+            >
+              <MaterialIcons name="location-pin" size={24} color="#FF0000" />
+              <Text className="text-[#FF0000] font-semibold  border-b-2 border-[#FF0000]">
+                {t("InspectionForm.View Here")}
+              </Text>
+            </TouchableOpacity>
+          )}
 
           <View className="mt-6 ">
-                                              <Text className="text-sm text-[#070707] mb-2">
+            <Text className="text-sm text-[#070707] mb-2">
               {t("InspectionForm.Images of the deed / lease / permit / any other formal document to prove the ownership of the land by the farmer")} *
             </Text>
-  <TouchableOpacity
-    className="bg-[#1A1A1A] rounded-full px-4 py-4 flex-row items-center justify-center gap-x-2"
-    onPress={() => setShowCamera(true)}
-  >
-    <FontAwesome6 name="camera" size={22} color="#fff" />
-    <Text className="text-white font-semibold">
-      {t("InspectionForm.Capture Photos")}
-    </Text>
-  </TouchableOpacity>
+            <TouchableOpacity
+              className="bg-[#1A1A1A] rounded-full px-4 py-4 flex-row items-center justify-center gap-x-2"
+              onPress={() => setShowCamera(true)}
+            >
+              <FontAwesome6 name="camera" size={22} color="#fff" />
+              <Text className="text-white font-semibold">
+                {t("InspectionForm.Capture Photos")}
+              </Text>
+            </TouchableOpacity>
 
 
-</View>
-<View>
-  
-{formData?.landinfo?.landImages?.length > 0 && (
-  <View className="mt-4  flex-row flex-wrap">
-    {formData.landinfo.landImages.map((img: LandImage, index: number) => (
-      <View key={index} className="w-40 h-40 m-1  rounded-xl overflow-hidden relative">
-        <Image
-          source={{ uri: img.uri }}
-          className="w-full h-full rounded-xl"
-        />
-        <TouchableOpacity
-          className="absolute top-1 right-1 bg-red-500 rounded-full w-6 h-6 justify-center items-center"
-          onPress={async () => {
-            const updatedImages = formData.landinfo!.landImages.filter(
-              (_: LandImage, i: number) => i !== index
-            );
+          </View>
+          <View>
+            {formData?.inspectionland?.images && Array.isArray(formData.inspectionland.images) && formData.inspectionland.images.length > 0 && (
+              <View className="mt-4 flex-row flex-wrap">
+                {formData.inspectionland.images.map((img: LandImage, index: number) => (
+                  <View key={index} className="w-40 h-40 m-1 rounded-xl overflow-hidden relative">
+                    <Image
+                      source={{ uri: img.uri }}
+                      className="w-full h-full rounded-xl"
+                    />
+                    <TouchableOpacity
+                      className="absolute top-1 right-1 bg-red-500 rounded-full w-6 h-6 justify-center items-center"
+                      onPress={async () => {
+                        const updatedImages = formData.inspectionland!.images!.filter(
+                          (_: LandImage, i: number) => i !== index
+                        );
 
-            const updatedLandInfo = {
-              ...(formData.landinfo || {}),
-              landImages: updatedImages,
-            };
+                        const updatedLandInfo = {
+                          ...(formData.inspectionland || {}),
+                          images: updatedImages,
+                        };
 
-            setFormData((prev:any) => ({
-              ...prev,
-              landinfo: updatedLandInfo,
-            }));
+                        setFormData((prev: any) => ({
+                          ...prev,
+                          inspectionland: updatedLandInfo,
+                        }));
 
-            try {
-              await AsyncStorage.setItem(
-                `${jobId}`,
-                JSON.stringify({ ...formData, landinfo: updatedLandInfo })
-              );
-              console.log("Image cleared!");
-            } catch (e) {
-              console.error("Failed to clear image in storage", e);
-            }
-          }}
-        >
-          <Text className="text-white text-xs font-bold">×</Text>
-        </TouchableOpacity>
-      </View>
-    ))}
-  </View>
-)}
-
-</View>
+                        try {
+                          await AsyncStorage.setItem(
+                            `${jobId}`,
+                            JSON.stringify({ ...formData, inspectionland: updatedLandInfo })
+                          );
+                          console.log("Image cleared!");
+                        } catch (e) {
+                          console.error("Failed to clear image in storage", e);
+                        }
+                      }}
+                    >
+                      <Text className="text-white text-xs font-bold">×</Text>
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </View>
+            )}
+          </View>
 
         </ScrollView>
 
@@ -562,19 +906,14 @@ onPress={() =>
           <TouchableOpacity
             className="flex-1 bg-[#444444] rounded-full py-4 items-center"
             onPress={() =>
-              navigation.navigate("Main", {
-                screen: "MainTabs",
-                params: {
-                  screen: "CapitalRequests",
-                },
-              })
+              navigation.goBack()
             }
           >
             <Text className="text-white text-base font-semibold">
-              {t("InspectionForm.Exit")}
+              {t("InspectionForm.Back")}
             </Text>
           </TouchableOpacity>
-          {isNextEnabled == false ? (
+          {isNextEnabled == true ? (
             <View className="flex-1">
               <TouchableOpacity className="flex-1 " onPress={handleNext}>
                 <LinearGradient
@@ -618,7 +957,7 @@ onPress={() =>
                   className="py-4"
                   onPress={() => {
                     handleLandInfoFieldChange(
-                      "landownby",
+                      "isOwnByFarmer",
                       item as "Yes" | "No"
                     );
                     setlandownNoModal(false);
@@ -639,38 +978,38 @@ onPress={() =>
       </Modal>
 
       <Modal transparent visible={legalStatusModal} animationType="fade">
-  <TouchableOpacity
-    className="flex-1 bg-black/40 justify-center items-center"
-    activeOpacity={1}
-    onPress={() => setLegalStatusModal(false)}
-  >
-    <View className="bg-white w-80 rounded-2xl overflow-hidden">
-      {LEGAL_STATUS_OPTIONS.map((item, index) => (
-        <View key={item}>
-          <TouchableOpacity
-            className="py-4 px-4"
-            onPress={() => {
-              handleLandInfoFieldChange("legalstatus", item);
-              setLegalStatusModal(false);
-            }}
-          >
-            <Text className="text-center text-base text-black">
-              {t(`InspectionForm.${item}`)}
-            </Text>
-          </TouchableOpacity>
+        <TouchableOpacity
+          className="flex-1 bg-black/40 justify-center items-center"
+          activeOpacity={1}
+          onPress={() => setLegalStatusModal(false)}
+        >
+          <View className="bg-white w-80 rounded-2xl overflow-hidden">
+            {LEGAL_STATUS_OPTIONS.map((item, index) => (
+              <View key={item}>
+                <TouchableOpacity
+                  className="py-4 px-4"
+                  onPress={() => {
+                    handleLandInfoFieldChange("ownershipStatus", item);
+                    setLegalStatusModal(false);
+                  }}
+                >
+                  <Text className="text-center text-base text-black">
+                    {t(`InspectionForm.${item}`)}
+                  </Text>
+                </TouchableOpacity>
 
-          {index !== LEGAL_STATUS_OPTIONS.length - 1 && (
-            <View className="h-px bg-gray-300 mx-4" />
-          )}
-        </View>
-      ))}
-    </View>
-  </TouchableOpacity>
-</Modal>
+                {index !== LEGAL_STATUS_OPTIONS.length - 1 && (
+                  <View className="h-px bg-gray-300 mx-4" />
+                )}
+              </View>
+            ))}
+          </View>
+        </TouchableOpacity>
+      </Modal>
 
-<Modal visible={showCamera} animationType="slide">
-  <CameraScreen onClose={handleCameraClose} />
-</Modal>
+      <Modal visible={showCamera} animationType="slide">
+        <CameraScreen onClose={handleCameraClose} />
+      </Modal>
 
     </KeyboardAvoidingView>
   );
