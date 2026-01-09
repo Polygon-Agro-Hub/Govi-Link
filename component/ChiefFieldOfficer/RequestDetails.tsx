@@ -387,6 +387,17 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
             elevation: 3,
           }}
         />
+                                                  <TouchableOpacity
+                          className="flex "
+                          onPress={() => handleDial(requestData.phoneNumber)}
+                        >
+                          <View className="flex-row mt-4 self-center items-center justify-center border border-[#F83B4F] rounded-full px-6 w-[50%] py-2">
+                            <Ionicons name="call" size={20} color="#F83B4F" />
+                            <Text className="text-base font-semibold  ml-2">
+                              {t("VisitPopup.Get Call")}
+                            </Text>
+                          </View>
+                        </TouchableOpacity>
         <TouchableOpacity
           //  onPress={() => navigation.navigate("PersonalInfo", {requestNumber})} 
           onPress={async () => {
@@ -399,7 +410,7 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
               console.log("Error clearing AsyncStorage:", e);
             }
           }}
-          className="w-[80%] mt-6 self-center">
+          className="w-[80%] mt-4 self-center">
           <LinearGradient
             colors={["#F35125", "#FF1D85"]}
             start={{ x: 0, y: 0 }}
