@@ -567,15 +567,132 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
     updateFormData({ [key]: value });
   };
 
+
+  const fetchInspectionData = async (reqId: number): Promise<PersonalInfo | null> => {
+    try {
+      console.log(`🔍 Fetching personal inspection data for reqId: ${reqId}`);
+
+      const response = await axios.get(
+        `${environment.API_BASE_URL}api/capital-request/inspection/get`,
+        {
+          params: {
+            reqId,
+            tableName: 'inspectionpersonal'
+          }
+        }
+      );
+
+      console.log('📦 Raw response:', response.data);
+
+      if (response.data.success && response.data.data) {
+        console.log(`✅ Fetched existing personal data:`, response.data.data);
+
+        const data = response.data.data;
+
+        // ✅ Map backend field names to frontend field names
+        return {
+          firstName: data.firstName || '',
+          lastName: data.lastName || '',
+          otherName: data.otherName || '',
+          callName: data.callName || '',
+          phone1: data.phone1 || '',
+          phone2: data.phone2 || '',
+          familyPhone: data.familyPhone || '',
+          landHome: data.landHome || '',
+          landWork: data.landWork || '',
+          email1: data.email1 || '',
+          email2: data.email2 || '',
+          house: data.house || '',
+          street: data.street || '',
+          cityName: data.city || '', // ✅ Backend uses 'city', frontend uses 'cityName'
+          district: data.district || null,
+          province: data.province || null,
+          country: data.country || 'Sri Lanka',
+        };
+      }
+
+      console.log(`📭 No existing personal data found for reqId: ${reqId}`);
+      return null;
+    } catch (error: any) {
+      console.error(`❌ Error fetching personal inspection data:`, error);
+      console.error('Error details:', error.response?.data);
+
+      if (error.response?.status === 404) {
+        console.log(`📝 No existing record - will create new`);
+        return null;
+      }
+
+      return null;
+    }
+  };
+
+
   useFocusEffect(
     useCallback(() => {
       const loadData = async () => {
         try {
+          // ✅ First, try to fetch from backend using requestId
+          if (requestId) {
+            const reqId = Number(requestId);
+            if (!isNaN(reqId) && reqId > 0) {
+              console.log(`🔄 Attempting to fetch personal data from backend for reqId: ${reqId}`);
+
+              const backendData = await fetchInspectionData(reqId);
+
+              if (backendData) {
+                console.log(`✅ Loaded personal data from backend`);
+
+                // Set the formData with backend data
+                setFormData({
+                  inspectionpersonal: backendData
+                });
+
+                // Set UI state for district/province/country
+                setSelectedDistrict(backendData.district || null);
+                setSelectedCountry(backendData.country || "Sri Lanka");
+
+                const provinceObj = sriLankaData["Sri Lanka"].provinces.find(
+                  (prov) => prov.name.en === backendData.province
+                );
+                setSelectedProvince(provinceObj?.name.en || null);
+                setDisplayProvince(
+                  provinceObj
+                    ? provinceObj.name[
+                    i18n.language as keyof typeof provinceObj.name
+                    ] || provinceObj.name.en
+                    : ""
+                );
+
+                const countryObj = countryData.find(
+                  (c) => c.name.en === backendData.country
+                );
+                setDisplayCountry(
+                  countryObj
+                    ? countryObj.name[i18n.language as keyof typeof countryObj.name] ||
+                    countryObj.name.en
+                    : backendData.country || "Sri Lanka"
+                );
+
+                // Mark as existing data (for UPDATE operations)
+                setIsExistingData(true);
+
+                // Save to AsyncStorage as backup
+                await AsyncStorage.setItem(`${jobId}`, JSON.stringify({
+                  inspectionpersonal: backendData
+                }));
+
+                return; 
+              }
+            }
+          }
+
+          // ✅ If no backend data, try AsyncStorage
+          console.log(`📂 Checking AsyncStorage for jobId: ${jobId}`);
           const saved = await AsyncStorage.getItem(`${jobId}`);
-          console.log("📦 Loading from AsyncStorage:", saved ? "Data found" : "No data");
 
           if (saved) {
             const parsed = JSON.parse(saved);
+            console.log(`✅ Loaded personal data from AsyncStorage`);
 
             // Set flag that this is existing data (will trigger UPDATE operations)
             setIsExistingData(true);
@@ -632,16 +749,16 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           } else {
             // No AsyncStorage data means this is a new entry (INSERT)
             setIsExistingData(false);
-            console.log("📝 New entry - will INSERT on save");
+            console.log("📝 No existing personal data - new entry - will INSERT on save");
           }
         } catch (error) {
-          console.log("Failed to load saved data", error);
+          console.error("Failed to load saved data", error);
           setIsExistingData(false);
         }
       };
 
       loadData();
-    }, [i18n.language, jobId])
+    }, [i18n.language, jobId, requestId])
   );
 
 
