@@ -1,4 +1,5 @@
-{ "MAIN":{
+{
+  "MAIN": {
     "OK": "OK"
   },
   "Main": {
@@ -38,8 +39,8 @@
     "Invalid NIC format": "Invalid NIC format",
     "Invalid email address": "தவறான மின்னஞ்சல் முகவரி. செல்லுபடியாகும் மின்னஞ்சல் வடிவமைப்பை உள்ளிடவும் (e.g. example@domain.com).",
     "NIC already exists": "இந்த தேசிய அடையாள அட்டை ஏற்கனவே உள்ளது.",
-    "Email already exists": "மின்னஞ்சல் ஏற்கனவே உள்ளது", 
-    "Phone already exists": "தொலைபேசி எண் 1 ஏற்கனவே உள்ளது.",    
+    "Email already exists": "மின்னஞ்சல் ஏற்கனவே உள்ளது",
+    "Phone already exists": "தொலைபேசி எண் 1 ஏற்கனவே உள்ளது.",
     "Phone 2 already exists": "தொலைபேசி எண் 2 ஏற்கனவே உள்ளது.",
     "Validation Error": "சரிபார்ப்பு தவறுகள்",
     "Please fix all errors before proceeding": "Please fix all errors before proceeding",
@@ -54,7 +55,7 @@
     "Account number is required": "கணக்கு எண் தேவை.",
     "Confirm account number is required": "Confirm account number is required",
     "Bank is required": "வங்கியின் பெயர் அவசியம்",
-    "Branch is required": "கிளையின் பெயர் அவசியம்.", 
+    "Branch is required": "கிளையின் பெயர் அவசியம்.",
     "Account numbers do not match": "கணக்கு எண்கள் பொருந்தவில்லை.",
     "Commission amount must be a number": "Commission amount must be a number",
     "NIC front image is required": "NIC front image is required",
@@ -63,24 +64,24 @@
     "Contract image is required": "Contract image is required",
     "FailedToCreateOfficer": "Failed to create officer",
     "RequestTimeout": "Request timeout, please try again",
-    "All fields are required":"அனைத்து புலங்களும் தேவை",
-"Your password must contain":"உங்கள் கடவுச்சொல்லில் குறைந்தபட்சம் 8 எழுத்துகள் இருக்க வேண்டும், அதில் ஒரு பெரிய எழுத்து, எண்கள் மற்றும் சிறப்பு எழுத்துகள் இருக்க வேண்டும்.",
-"Your password must contain a minimum":"உங்கள் கடவுச்சொல்லில் குறைந்தபட்சம் 8 எழுத்துகள் இருக்க வேண்டும், அதில் ஒரு பெரிய எழுத்து, எண்கள் மற்றும் சிறப்பு எழுத்துகள் இருக்க வேண்டும்.",
-"New password and confirm password do not match":"புதிய கடவுச்சொல் மற்றும் உறுதிப்படுத்தல் கடவுச்சொல் பொருந்தவில்லை.",
-"Password updated successfully":"கடவுச்சொல் வெற்றிகரமாக புதுப்பிக்கப்பட்டது",
-    "Phone numbers cannot be the same":"Phone numbers cannot be the same",
-    "Phone number must be 9 digits long":"Phone number must be 9 digits long",
-        "NIC Number must be 9 digits followed by 'V' or 12 digits.": "NIC Number must be 9 digits followed by 'V' or 12 digits.",
+    "All fields are required": "அனைத்து புலங்களும் தேவை",
+    "Your password must contain": "உங்கள் கடவுச்சொல்லில் குறைந்தபட்சம் 8 எழுத்துகள் இருக்க வேண்டும், அதில் ஒரு பெரிய எழுத்து, எண்கள் மற்றும் சிறப்பு எழுத்துகள் இருக்க வேண்டும்.",
+    "Your password must contain a minimum": "உங்கள் கடவுச்சொல்லில் குறைந்தபட்சம் 8 எழுத்துகள் இருக்க வேண்டும், அதில் ஒரு பெரிய எழுத்து, எண்கள் மற்றும் சிறப்பு எழுத்துகள் இருக்க வேண்டும்.",
+    "New password and confirm password do not match": "புதிய கடவுச்சொல் மற்றும் உறுதிப்படுத்தல் கடவுச்சொல் பொருந்தவில்லை.",
+    "Password updated successfully": "கடவுச்சொல் வெற்றிகரமாக புதுப்பிக்கப்பட்டது",
+    "Phone numbers cannot be the same": "Phone numbers cannot be the same",
+    "Phone number must be 9 digits long": "Phone number must be 9 digits long",
+    "NIC Number must be 9 digits followed by 'V' or 12 digits.": "NIC Number must be 9 digits followed by 'V' or 12 digits.",
     "This NIC is already registered in the system.": "This NIC is already registered in the system.",
-   "This Email is already registered in the system.": "This Email is already registered in the system.",
-   "Invalid Gmail address":"Invalid Gmail address. Gmail addresses cannot have consecutive dots (.), leading/trailing dots, or special characters except + and .",
-"Invalid email address Example":"Invalid email address. Please enter a valid email format (e.g. example@domain.com).",
-"Commission amount cannot exceed 100":"Commission amount cannot exceed 100",
-"Unauthorized Access":"Unauthorized Access",
-"You are not authorized to access this system. Please use a valid Employee ID":"You are not authorized to access this system. Please use a valid Employee ID",
-"This EMP ID is not approved.":"This EMP ID is not approved.",
-"Please Wait":"Please Wait",
-"Validating your information, please wait...":"Validating your information, please wait..."
+    "This Email is already registered in the system.": "This Email is already registered in the system.",
+    "Invalid Gmail address": "Invalid Gmail address. Gmail addresses cannot have consecutive dots (.), leading/trailing dots, or special characters except + and .",
+    "Invalid email address Example": "Invalid email address. Please enter a valid email format (e.g. example@domain.com).",
+    "Commission amount cannot exceed 100": "Commission amount cannot exceed 100",
+    "Unauthorized Access": "Unauthorized Access",
+    "You are not authorized to access this system. Please use a valid Employee ID": "You are not authorized to access this system. Please use a valid Employee ID",
+    "This EMP ID is not approved.": "This EMP ID is not approved.",
+    "Please Wait": "Please Wait",
+    "Validating your information, please wait...": "Validating your information, please wait..."
   },
   "Login": {
     "Welcome": "வரவேற்கிறோம்",
@@ -125,9 +126,9 @@
     "Please fill out all fields.": "தயவுசெய்து அனைத்து புலங்களையும் நிரப்பவும்.",
     "Complaint submitted successfully!": "புகார் வெற்றிகரமாக சேர்க்கப்பட்டது!",
     "Failed to submit complaint. Please try again.": "புகாரை சேர்க்க முடியவில்லை. தயவுசெய்து மீண்டும் முயற்சிக்கவும்.",
-    "Please select a category.":"ஒரு வகையைத் தேர்ந்தெடுக்கவும்.",
-    "Please enter your complaint.":"உங்கள் புகாரை உள்ளிடவும்.",
-        "Add the Complaint here..": "Add the Complaint here.."
+    "Please select a category.": "ஒரு வகையைத் தேர்ந்தெடுக்கவும்.",
+    "Please enter your complaint.": "உங்கள் புகாரை உள்ளிடவும்.",
+    "Add the Complaint here..": "Add the Complaint here.."
   },
   "Profile": {
     "Employee ID": "பணியாளர் அடையாள எண்",
@@ -150,7 +151,7 @@
     "Start": "தொடக்கம்"
   },
   "Districts": {
-   "Ampara": "அம்பாறை",
+    "Ampara": "அம்பாறை",
     "Anuradhapura": "அனுராதபுரம்",
     "Badulla": "பதுளை",
     "Batticaloa": "மட்டக்களப்பு",
@@ -196,7 +197,10 @@
     "Success": "வெற்றி",
     "Task complete successfully!": "Task complete successfully!",
     "Failed to complete task, Please try again": "Failed to complete task, Please try again",
-    "Are you sure you want to mark this task as incomplete?":"Are you sure you want to mark this task as incomplete?"
+    "Are you sure you want to mark this task as incomplete?": "Are you sure you want to mark this task as incomplete?",
+    "Are you sure you want to continue?": "நீங்கள் தொடர விரும்புகிறீர்களா?",
+    "You haven’t marked any tasks as completed.": "நீங்கள் எந்த பணிகளையும் நிறைவு செய்ததாக குறிக்கவில்லை.",
+    "Continue": "தொடரவும்"
   },
   "CertificateSuggestions": {
     "Please mention identified problems and suggestions you made below.": "Please mention identified problems and suggestions you made below.",
@@ -231,7 +235,7 @@
     "Verification Successful": "Verification Successful",
     "Your phone number has been verified successfully.": "Your phone number has been verified successfully.",
     "Invalid OTP": "Invalid OTP",
-    "OTP Expired":"OTP Expired",
+    "OTP Expired": "OTP Expired",
     "Your OTP is invalid or expired.": "Your OTP is invalid or expired.",
     "Try Again": "மீண்டும் முயற்சிக்கவும்",
     "The OTP you entered is incorrect. Please try again.": "The OTP you entered is incorrect. Please try again.",
@@ -298,7 +302,7 @@
     "selected": "selected",
     "ClearAll": "Clear All",
     "Done": "Done",
-    "SelectCountryCode": "Select Country Code", 
+    "SelectCountryCode": "Select Country Code",
     "HousePlotNumber": "--வீடு / கட்டிட எண்--",
     "StreetName": "--தெரு பெயர்--",
     "City": "--நகரம்--",
@@ -360,23 +364,23 @@
     "Today": "Today",
     "Start": "Start",
     "Open": "Open",
-    "ID":"ID",
-    "farms left to finish":"{{count}} farms left to finish",
-    "1 farm left to finish":"1 farm left to finish"
+    "ID": "ID",
+    "farms left to finish": "{{count}} farms left to finish",
+    "1 farm left to finish": "1 farm left to finish"
   },
   "ChangePassword": {
     "ChoosePassword": "கடவுச்சொல்லை மாற்றவும்",
     "Changepassword": "கடவுச்சொல்லை மாற்றி பாதுகாப்பாக வைத்துக்கொள்ளுங்கள்",
     "CurrentPassword": "தற்போதைய கடவுச்சொல்",
     "NewPassword": "புதிய கடவுச்சொல்",
-    "ConfirmNewPassword": "புதிய கடவுச்சொல்லை உறுதிப்படுத்தவும்", 
+    "ConfirmNewPassword": "புதிய கடவுச்சொல்லை உறுதிப்படுத்தவும்",
     "Next": "அடுத்து",
     "Password updated successfully": "கடவுச்சொல் வெற்றிகரமாக புதுப்பிக்கப்பட்டது",
     "Invalid current password": "தவறான தற்போதைய கடவுச்சொல்",
     "Failed to update password": "கடவுச்சொல்லை புதுப்பிக்க முடியவில்லை"
   },
   "ComplainHistory": {
-    "No Reply": "No Reply", 
+    "No Reply": "No Reply",
     "OK": "சரி",
     "Complaint History": "வரலாற்றைப் காட்டவும்",
     "No Data": "இங்கே புகார்கள் இல்லை!",
@@ -385,8 +389,8 @@
     "View Response": "பதிலைக் காண்க",
     "Opened": "திறக்கப்பட்டது",
     "Closed": "மூடப்பட்டது",
-    "See more...":"மேலும் காண்க...",
-    "See less":"குறைவாகப் பாருங்கள்..."
+    "See more...": "மேலும் காண்க...",
+    "See less": "குறைவாகப் பாருங்கள்..."
   },
   "CapitalRequests": {
     "CapitalRequests": "Capital Requests",
@@ -423,8 +427,7 @@
     "AssignConfirmMessage": "Assign {{count}} job(s) to this officer?",
     "NoJobsSelected": "No Jobs Selected",
     "SelectAtLeastOneJob": "Please select at least one job to assign.",
-      "Start":"Start",
-             "FailedToAssignJobs":"Failed to assign jobs. Please try again."
-
+    "Start": "Start",
+    "FailedToAssignJobs": "Failed to assign jobs. Please try again."
   }
 }
