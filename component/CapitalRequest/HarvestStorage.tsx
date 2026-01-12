@@ -121,8 +121,7 @@ const YesNoSelect = ({
 };
 const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
   const route = useRoute<RouteProp<RootStackParamList, "HarvestStorage">>();
-  const { requestNumber, requestId } = route.params; // ✅ Add requestId
-  const prevFormData = route.params?.formData;
+  const { requestNumber, requestId, formData: prevFormData } = route.params; // ✅ Extract all params
   const [formData, setFormData] = useState(prevFormData);
   const { t, i18n } = useTranslation();
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -488,7 +487,12 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
 
   const handleSuccessClose = () => {
     setSuccessModalVisible(false);
-    navigation.navigate("Dashboard"); 
+    // ✅ Navigate to ConfirmationCapitalRequest page with required parameters
+    navigation.navigate("ConfirmationCapitalRequest", {
+      formData: formData, 
+      requestNumber: requestNumber, 
+      requestId: requestId 
+    });
   };
 
   const handleErrorClose = () => {

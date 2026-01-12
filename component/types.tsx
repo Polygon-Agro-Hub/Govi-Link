@@ -1,6 +1,6 @@
 export type RootStackParamList = {
   Main: { screen: keyof RootStackParamList; params?: any };
-    MainTabs: { screen: keyof RootStackParamList; params?: any };
+  MainTabs: { screen: keyof RootStackParamList; params?: any };
 
   Dashboard: undefined;
   Lanuage: undefined;
@@ -80,14 +80,14 @@ export type RootStackParamList = {
     farmerMobile?: number;
   };
   ManageOfficers: undefined;
-  AddOfficerStep1: {isnew?:boolean};
-  AddOfficerStep2: { formData: any , isnewsecondstep?:boolean};
-  AddOfficerStep3: { formData: any, isnewthirdstep?:boolean};
+  AddOfficerStep1: { isnew?: boolean };
+  AddOfficerStep2: { formData: any; isnewsecondstep?: boolean };
+  AddOfficerStep3: { formData: any; isnewthirdstep?: boolean };
   ChangePassword: { passwordUpdate: number };
   ComplainHistory: undefined;
   AssignJobs: undefined;
   CapitalRequests: undefined;
-  RequestDetails: { requestId: number, requestNumber:string };
+  RequestDetails: { requestId: number; requestNumber: string };
   AssignJobOfficerList: {
     selectedJobIds: string[];
     selectedDate: string;
@@ -103,26 +103,33 @@ export type RootStackParamList = {
     requestNumber: string;
     requestId: number;
   };
-  IDProof:{formData:any, requestNumber:string,requestId:number};
-  FinanceInfo:{formData:any, requestNumber:string,requestId:number};
-  LandInfo:{formData:any, requestNumber:string , requestId:number};
-    AttachGeoLocationScreen: {
-  currentLatitude?: number;
-  currentLongitude?: number;
-  onLocationSelect?: (latitude: number, longitude: number, locationName: string) => void;
-};
+  IDProof: { formData: any; requestNumber: string; requestId: number };
+  FinanceInfo: { formData: any; requestNumber: string; requestId: number };
+  LandInfo: { formData: any; requestNumber: string; requestId: number };
+  AttachGeoLocationScreen: {
+    currentLatitude?: number;
+    currentLongitude?: number;
+    onLocationSelect?: (
+      latitude: number,
+      longitude: number,
+      locationName: string
+    ) => void;
+  };
   ViewLocationScreen: {
-  latitude: number;
-  longitude: number;
-  locationName?: string;
-},
-InvestmentInfo:{formData:any, requestNumber:string,requestId:number};
-CultivationInfo:{formData:any, requestNumber:string,requestId:number};
-CroppingSystems:{formData:any, requestNumber:string,requestId:number};
-ProfitRisk:{formData:any, requestNumber:string,requestId:number};
-Economical:{formData:any, requestNumber:string,requestId:number};
-Labour:{formData:any, requestNumber:string,requestId:number};
-HarvestStorage:{formData:any, requestNumber:string,requestId:number};
-
+    latitude: number;
+    longitude: number;
+    locationName?: string;
+  };
+  InvestmentInfo: { formData: any; requestNumber: string; requestId: number };
+  CultivationInfo: { formData: any; requestNumber: string; requestId: number };
+  CroppingSystems: { formData: any; requestNumber: string; requestId: number };
+  ProfitRisk: { formData: any; requestNumber: string; requestId: number };
+  Economical: { formData: any; requestNumber: string; requestId: number };
+  Labour: { formData: any; requestNumber: string; requestId: number };
+  HarvestStorage: { formData: any; requestNumber: string; requestId: number };
+  ConfirmationCapitalRequest: {
+    formData: any;
+    requestNumber: string;
+    requestId: number;
+  };
 };
-

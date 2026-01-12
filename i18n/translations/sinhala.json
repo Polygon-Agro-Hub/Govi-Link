@@ -670,5 +670,26 @@
     "Does the farmer has market linkage for value added products": "අගය එකතු කළ නිෂ්පාදන සඳහා ගොවියාට වෙළඳපොළ සම්බන්ධතාවයක් තිබේද?",
     "Is farmer aware about required quality standards of value added products of proposed crops": "යෝජිත බෝගවල අගය එකතු කළ නිෂ්පාදනවල අවශ්‍ය ගුණාත්මක ප්‍රමිතීන් පිළිබඳව ගොවියා දැනුවත්ද?",
     "Back": "ආපසු"
+  },
+  "ConfirmationCapitalRequest": {
+    "ConfirmSuccess": "තහවුරු කිරීම සාර්ථකයි!",
+    "AutoAssignSuccess": "ඉල්ලීම ස්වයංක්‍රීයව තහවුරු විය!",
+    "ConfirmLeaveButton": "තහවුරු කර පිටවන්න",
+    "UndoButton": "අහෝසි කරන්න",
+    "LoadingOfficers": "නිලධාරීන් පූරණය වෙමින්...",
+    "SelectOfficer": "නිලධාරියෙකු තෝරන්න",
+    "OfficerAssignedJobs": "නියම කරන ලද වැඩ",
+    "AssignButton": "නියම කරන්න",
+    "CountdownInstruction1": "කිසිදු ක්‍රියාවක් සිදු නොකරන්නේ නම් මෙම ඉල්ලීම ස්වයංක්‍රීයව තහවුරු වන්නේ",
+    "CountdownInstruction2": "විනාඩි ඇතුළතයි.",
+    "CountdownInstruction3": "කරුණාකර පහත ඉල්ලීම් විස්තර සමාලෝචනය කරන්න.",
+    "RequestDetails": "ඉල්ලීම් විස්තර",
+    "RequestNumber": "ඉල්ලීම් අංකය",
+    "RequestID": "ඉල්ලීම් හැඳුනුම්පත",
+    "Status": "තත්වය",
+    "PendingConfirmation": "තහවුරු කිරීම සඳහා රැඳී සිටිමින්",
+    "AssignSuccess": "{name} වෙත සාර්ථකව නියම කරන ලදී!",
+    "NoOfficersAvailable": "නියම කිරීම සඳහා නිලධාරීන් නොමැත",
+    "HeaderOn": "තහවුරු කිරීම"
   }
 }

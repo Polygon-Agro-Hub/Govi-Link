@@ -670,5 +670,26 @@
     "Does the farmer has market linkage for value added products": "Does the farmer has market linkage for value added products?",
     "Is farmer aware about required quality standards of value added products of proposed crops": "Is farmer aware about required quality standards of value added products of proposed crops?",
     "Back": "Back"
+  },
+  "ConfirmationCapitalRequest": {
+    "ConfirmSuccess": "Confirmation successful!",
+    "AutoAssignSuccess": "Request confirmed automatically!",
+    "ConfirmLeaveButton": "Confirm & Leave",
+    "UndoButton": "Undo",
+    "LoadingOfficers": "Loading officers...",
+    "SelectOfficer": "Select an officer",
+    "OfficerAssignedJobs": "Assigned jobs",
+    "AssignButton": "Assign",
+    "CountdownInstruction1": "This request will be automatically confirmed in",
+    "CountdownInstruction2": "minutes if no action is taken.",
+    "CountdownInstruction3": "Please review the request details below.",
+    "RequestDetails": "Request Details",
+    "RequestNumber": "Request Number",
+    "RequestID": "Request ID",
+    "Status": "Status",
+    "PendingConfirmation": "Pending Confirmation",
+    "AssignSuccess": "Assigned to {name} successfully!",
+    "NoOfficersAvailable": "No officers available for assignment",
+    "HeaderOn": "Confirmation"
   }
 }

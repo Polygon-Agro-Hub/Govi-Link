@@ -429,5 +429,26 @@
     "SelectAtLeastOneJob": "Please select at least one job to assign.",
     "Start": "Start",
     "FailedToAssignJobs": "Failed to assign jobs. Please try again."
+  },
+  "ConfirmationCapitalRequest": {
+    "ConfirmSuccess": "உறுதிப்படுத்தல் வெற்றிகரமாக!",
+    "AutoAssignSuccess": "கோரிக்கை தானாக உறுதிப்படுத்தப்பட்டது!",
+    "ConfirmLeaveButton": "உறுதிசெய்து வெளியேறு",
+    "UndoButton": "செயல்தவிர்",
+    "LoadingOfficers": "அதிகாரிகள் ஏற்றப்படுகிறது...",
+    "SelectOfficer": "ஒரு அதிகாரியைத் தேர்ந்தெடுக்கவும்",
+    "OfficerAssignedJobs": "ஒதுக்கப்பட்ட பணிகள்",
+    "AssignButton": "ஒதுக்கு",
+    "CountdownInstruction1": "இந்தக் கோரிக்கை தானாக உறுதிப்படுத்தப்படும்",
+    "CountdownInstruction2": "நிமிடங்களில் எந்த நடவடிக்கையும் எடுக்கப்படாவிட்டால்.",
+    "CountdownInstruction3": "கீழே உள்ள கோரிக்கை விவரங்களை மதிப்பாய்வு செய்யவும்.",
+    "RequestDetails": "கோரிக்கை விவரங்கள்",
+    "RequestNumber": "கோரிக்கை எண்",
+    "RequestID": "கோரிக்கை ஐடி",
+    "Status": "நிலை",
+    "PendingConfirmation": "உறுதிப்படுத்தலுக்காக நிலுவையில்",
+    "AssignSuccess": "{name} க்கு வெற்றிகரமாக ஒதுக்கப்பட்டது!",
+    "NoOfficersAvailable": "ஒதுக்கீட்டிற்கு அதிகாரிகள் இல்லை",
+    "HeaderOn": "உறுதிப்படுத்தல்"
   }
 }
