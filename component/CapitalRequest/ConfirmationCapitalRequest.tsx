@@ -16,6 +16,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import { MaterialIcons } from "@expo/vector-icons";
 import Svg, { Circle, G, Text as SvgText } from "react-native-svg";
 import { RouteProp, useRoute } from "@react-navigation/native";
+import { environment } from "@/environment/environment";
+import axios from "axios";
 
 type ConfirmationCapitalRequestNavigationProps = StackNavigationProp<
   RootStackParamList,
@@ -112,12 +114,51 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
     };
   }, []);
 
-  const handleUndo = () => {
+  const handleUndo = async () => {
     if (animationRef.current) {
       animationRef.current.stop();
     }
-    setShowConfirmationModal(false);
-    setSelectedOfficer(null);
+
+    // Show loading
+    setAssigning(true);
+
+    try {
+      console.log(`🗑️ Deleting all inspection data for requestId: ${requestId}`);
+
+      const response = await axios.delete(
+        `${environment.API_BASE_URL}api/capital-request/inspection/delete/${requestId}`
+      );
+
+      if (response.data.success) {
+        console.log('✅ All inspection data deleted successfully');
+        console.log(`📊 Deleted from ${response.data.deletedTables.length} tables`);
+
+        setAssigning(false);
+        setShowConfirmationModal(false);
+
+        Alert.alert(
+          t("Main.Success"),
+          t("ConfirmationCapitalRequest.UndoSuccess"),
+          [
+            {
+              text: t("MAIN.OK"),
+              onPress: () => navigation.navigate("Main", { screen: "CapitalRequests" }),
+            },
+          ]
+        );
+      } else {
+        throw new Error(response.data.message || 'Delete failed');
+      }
+    } catch (error: any) {
+      console.error('❌ Error deleting inspection data:', error);
+      setAssigning(false);
+
+      Alert.alert(
+        t("Main.Error"),
+        error.response?.data?.message || t("ConfirmationCapitalRequest.UndoFailed"),
+        [{ text: t("MAIN.OK") }]
+      );
+    }
   };
 
   const handleConfirmAndLeave = () => {
@@ -275,9 +316,8 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
               <TouchableOpacity
                 onPress={handleUndo}
                 disabled={assigning}
-                className={`px-10 py-3 rounded-3xl items-center ml-3 mt-auto ${
-                  assigning ? "bg-gray-400" : "bg-black"
-                }`}
+                className={`px-10 py-3 rounded-3xl items-center ml-3 mt-auto ${assigning ? "bg-gray-400" : "bg-black"
+                  }`}
               >
                 {assigning ? (
                   <ActivityIndicator size="small" color="white" />
