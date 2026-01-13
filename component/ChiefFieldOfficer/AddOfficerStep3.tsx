@@ -77,7 +77,7 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
       Alert.alert(
         t("AddOfficer.PermissionRequired"),
         t("AddOfficer.PermissionRequiredMessage"),
-        [{ text: t("MAIN.OK") }]
+        [{ text: t("Main.OK") }]
       );
       return;
     }
@@ -192,7 +192,7 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
        Alert.alert(
       t("Error.Validation Error"),
       `• ${errorMessage}`,
-      [{ text: t("MAIN.OK") }]
+      [{ text: t("Main.OK") }]
     );
     return;
   }
@@ -204,7 +204,7 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
         Alert.alert(
           t("Error.Sorry"),
           t("Error.Your login session has expired"),
-          [{ text: t("MAIN.OK") }]
+          [{ text: t("Main.OK") }]
         );
         navigation.navigate("Login");
         return;
@@ -300,7 +300,7 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
         Alert.alert(
           t("AddOfficer.Success"),
           t("AddOfficer.OfficerAddedSuccess"),
-          [{ text: t("MAIN.OK") }]
+          [{ text: t("Main.OK") }]
         );
 
         clearAllFormData();
@@ -324,7 +324,7 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
         errorMessage = t("Error.RequestTimeout");
       }
 
-      Alert.alert(t("Error.Error"), t("Error.somethingWentWrong"),[{ text: t("MAIN.OK") }]);
+      Alert.alert(t("Error.Error"), t("Error.somethingWentWrong"),[{ text: t("Main.OK") }]);
     } finally {
       setLoading(false);
     }

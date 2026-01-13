@@ -267,7 +267,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
           t(
             "Error.Your login session has expired. Please log in again to continue."
           ),
-          [{ text: t("MAIN.OK") }]
+          [{ text: t("Main.OK") }]
         );
         return;
       }
@@ -341,7 +341,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
       Alert.alert(
         t("Error.error"),
         t("CertificateQuesanory.Something went wrong while updating question."),
-        [{ text: t("MAIN.OK") }]
+        [{ text: t("Main.OK") }]
       );
     } finally {
       setLoadingQuestionId(null);
@@ -371,7 +371,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
           Alert.alert(
             t("CertificateQuesanory.Success"),
             t("CertificateQuesanory.Task complete successfully!"),
-            [{ text: t("MAIN.OK") }]
+            [{ text: t("Main.OK") }]
           );
         }
       }
@@ -380,7 +380,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
       Alert.alert(
         t("Error.error"),
         t("CertificateQuesanory.Something went wrong while updating question."),
-        [{ text: t("MAIN.OK") }]
+        [{ text: t("Main.OK") }]
       );
     } finally {
       setLoadingQuestionId(null);
@@ -400,7 +400,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
           t(
             "Error.Your login session has expired. Please log in again to continue."
           ),
-          [{ text: t("MAIN.OK") }]
+          [{ text: t("Main.OK") }]
         );
         return;
       }
@@ -437,7 +437,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
         Alert.alert(
           t("CertificateQuesanory.Success"),
           t("CertificateQuesanory.Task complete successfully!"),
-          [{ text: t("MAIN.OK") }]
+          [{ text: t("Main.OK") }]
         );
         setQuestions((prev) =>
           prev.map((item) =>
@@ -457,7 +457,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
         Alert.alert(
           t("Error.error"),
           t("CertificateQuesanory.Failed to complete task, Please try again"),
-          [{ text: t("MAIN.OK") }]
+          [{ text: t("Main.OK") }]
         );
       }
     } catch (err) {
@@ -465,7 +465,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
       Alert.alert(
         t("Error.error"),
         t("CertificateQuesanory.Failed to complete task, Please try again"),
-        [{ text: t("MAIN.OK") }]
+        [{ text: t("Main.OK") }]
       );
     } finally {
       setLoadingQuestionId(null);

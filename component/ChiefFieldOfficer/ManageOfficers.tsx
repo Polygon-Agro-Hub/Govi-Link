@@ -86,7 +86,7 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
           t(
             "Error.Your login session has expired. Please log in again to continue."
           ),
-          [{ text: t("MAIN.OK") }]
+          [{ text: t("Main.OK") }]
         );
         navigation.navigate("Login");
         return;
@@ -117,7 +117,7 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
           t(
             "Error.Your login session has expired. Please log in again to continue."
           ),
-          [{ text: t("MAIN.OK") }]
+          [{ text: t("Main.OK") }]
         );
         navigation.navigate("Login");
       } else {
@@ -125,7 +125,7 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
         //   t("Error.Error"),
         //   error.response?.data?.message || t("Error.FailedToLoadOfficers")
         // );
-              Alert.alert(t("Error.Error"), t("Error.somethingWentWrong"),[{ text: t("MAIN.OK") }]);
+              Alert.alert(t("Error.Error"), t("Error.somethingWentWrong"),[{ text: t("Main.OK") }]);
         
       }
     } finally {

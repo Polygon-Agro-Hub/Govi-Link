@@ -119,7 +119,7 @@ useEffect(() => {
       setRequests(apiRequests);
     } catch (error: any) {
       console.error("Failed to fetch capital requests:", error);
-      Alert.alert(t("Error.Error"), t("Error.FailedToLoadRequests"),[{ text: t("MAIN.OK") }]);
+      Alert.alert(t("Error.Error"), t("Error.FailedToLoadRequests"),[{ text: t("Main.OK") }]);
     } finally {
       setLoading(false);
       setRefreshing(false);

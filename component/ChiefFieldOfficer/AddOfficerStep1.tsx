@@ -147,7 +147,7 @@ setProfileImage(null)
           t(
             "Error.Your login session has expired. Please log in again to continue."
           ),
-                [{ text: t("MAIN.OK") }]
+                [{ text: t("Main.OK") }]
         );
         return;
       }
@@ -592,7 +592,7 @@ const clearSamePhoneErrors = (p1: string, p2: string) => {
         Alert.alert(
           t("Error.Permission Denied"),
           t("Error.Gallery permission is required"),
-                [{ text: t("MAIN.OK") }]
+                [{ text: t("Main.OK") }]
         );
         return;
       }
@@ -610,7 +610,7 @@ const clearSamePhoneErrors = (p1: string, p2: string) => {
       }
     } catch (error) {
       console.error("Error picking image:", error);
-      Alert.alert(t("Error.Error"), t("Error.Failed to pick image"),[{ text: t("MAIN.OK") }]);
+      Alert.alert(t("Error.Error"), t("Error.Failed to pick image"),[{ text: t("Main.OK") }]);
     }
   };
 
@@ -929,7 +929,7 @@ const handleNext = async () => {
        Alert.alert(
       t("Error.Validation Error"),
       `• ${errorMessage}`,
-      [{ text: t("MAIN.OK") }]
+      [{ text: t("Main.OK") }]
     );
     return;
   }
@@ -938,7 +938,7 @@ const handleNext = async () => {
     Alert.alert(
       t("Error.Please Wait"),
       t("Error.Validating your information, please wait..."),
-            [{ text: t("MAIN.OK") }]
+            [{ text: t("Main.OK") }]
     );
     return;
   }
@@ -959,7 +959,7 @@ const handleNext = async () => {
       Alert.alert(
         t("Error.Validation Error"),
         t("Error.Please fix all errors before proceeding"),
-              [{ text: t("MAIN.OK") }]
+              [{ text: t("Main.OK") }]
       );
       setLoading(false);
       return;
@@ -993,7 +993,7 @@ console.log("Form Data:", formData);
     Alert.alert(
       t("Error.Error"),
       t("Error.An error occurred during validation"),
-            [{ text: t("MAIN.OK") }]
+            [{ text: t("Main.OK") }]
     );
   }
 };

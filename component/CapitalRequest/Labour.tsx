@@ -12,7 +12,7 @@ import {
   Modal,
   FlatList,
 } from "react-native";
-import { AntDesign, MaterialIcons } from "@expo/vector-icons";
+import { AntDesign, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTranslation } from "react-i18next";
@@ -24,7 +24,6 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../types";
 import axios from "axios";
 import { environment } from "@/environment/environment";
-
 
 type FormData = {
   inspectionlabour?: LabourData;
@@ -39,7 +38,6 @@ type LabourData = {
   isMachineryAffordable?: "Yes" | "No";
   isMachineryCostEffective?: "Yes" | "No";
 };
-
 
 type LabourProps = {
   navigation: any;
@@ -132,7 +130,6 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
   const [isExistingData, setIsExistingData] = useState(false); // ✅ Add this
   const [isNextEnabled, setIsNextEnabled] = useState(false);
 
-
   console.log("finance", formData);
 
   useEffect(() => {
@@ -176,16 +173,14 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
 
     setIsNextEnabled(
       hasBaseAnswer &&
-      conditionalValid &&
-      mechanizationValid &&
-      machineryAvailableValid &&
-      machineryAffordableValid &&
-      machineryCostEffectiveValid &&
-      !hasErrors
+        conditionalValid &&
+        mechanizationValid &&
+        machineryAvailableValid &&
+        machineryAffordableValid &&
+        machineryCostEffectiveValid &&
+        !hasErrors
     );
   }, [formData, errors]);
-
-
 
   let jobId = requestNumber;
   console.log("jobid", jobId);
@@ -208,7 +203,9 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
     }
   };
 
-  const fetchInspectionData = async (reqId: number): Promise<LabourData | null> => {
+  const fetchInspectionData = async (
+    reqId: number
+  ): Promise<LabourData | null> => {
     try {
       console.log(`🔍 Fetching labour data for reqId: ${reqId}`);
 
@@ -217,12 +214,12 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
         {
           params: {
             reqId,
-            tableName: 'inspectionlabour'
-          }
+            tableName: "inspectionlabour",
+          },
         }
       );
 
-      console.log('📦 Raw response:', response.data);
+      console.log("📦 Raw response:", response.data);
 
       if (response.data.success && response.data.data) {
         console.log(`✅ Fetched existing labour data:`, response.data.data);
@@ -231,16 +228,22 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
 
         // Helper to convert boolean (0/1) to "Yes"/"No"
         const boolToYesNo = (val: any): "Yes" | "No" | undefined => {
-          if (val === 1 || val === '1' || val === true) return "Yes";
-          if (val === 0 || val === '0' || val === false) return "No";
+          if (val === 1 || val === "1" || val === true) return "Yes";
+          if (val === 0 || val === "0" || val === false) return "No";
           return undefined;
         };
 
         return {
           isManageFamilyLabour: boolToYesNo(data.isManageFamilyLabour),
-          isFamilyHiredLabourEquipped: boolToYesNo(data.isFamilyHiredLabourEquipped),
-          hasAdequateAlternativeLabour: boolToYesNo(data.hasAdequateAlternativeLabour),
-          areThereMechanizationOptions: boolToYesNo(data.areThereMechanizationOptions),
+          isFamilyHiredLabourEquipped: boolToYesNo(
+            data.isFamilyHiredLabourEquipped
+          ),
+          hasAdequateAlternativeLabour: boolToYesNo(
+            data.hasAdequateAlternativeLabour
+          ),
+          areThereMechanizationOptions: boolToYesNo(
+            data.areThereMechanizationOptions
+          ),
           isMachineryAvailable: boolToYesNo(data.isMachineryAvailable),
           isMachineryAffordable: boolToYesNo(data.isMachineryAffordable),
           isMachineryCostEffective: boolToYesNo(data.isMachineryCostEffective),
@@ -251,7 +254,7 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
       return null;
     } catch (error: any) {
       console.error(`❌ Error fetching labour data:`, error);
-      console.error('Error details:', error.response?.data);
+      console.error("Error details:", error.response?.data);
 
       if (error.response?.status === 404) {
         console.log(`📝 No existing record - will create new`);
@@ -269,11 +272,15 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
     isUpdate: boolean
   ): Promise<boolean> => {
     try {
-      console.log(`💾 Saving to backend (${isUpdate ? 'UPDATE' : 'INSERT'}):`, tableName);
+      console.log(
+        `💾 Saving to backend (${isUpdate ? "UPDATE" : "INSERT"}):`,
+        tableName
+      );
       console.log(`📝 reqId being sent:`, reqId);
 
       // Yes/No fields
-      const yesNoToInt = (val: any) => val === "Yes" ? '1' : val === "No" ? '0' : null;
+      const yesNoToInt = (val: any) =>
+        val === "Yes" ? "1" : val === "No" ? "0" : null;
 
       const transformedData: any = {
         reqId,
@@ -282,19 +289,25 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
 
       // Base question
       if (data.isManageFamilyLabour !== undefined) {
-        transformedData.isManageFamilyLabour = yesNoToInt(data.isManageFamilyLabour);
+        transformedData.isManageFamilyLabour = yesNoToInt(
+          data.isManageFamilyLabour
+        );
       }
 
       // Conditional fields based on isManageFamilyLabour
       if (data.isManageFamilyLabour === "Yes") {
         if (data.isFamilyHiredLabourEquipped !== undefined) {
-          transformedData.isFamilyHiredLabourEquipped = yesNoToInt(data.isFamilyHiredLabourEquipped);
+          transformedData.isFamilyHiredLabourEquipped = yesNoToInt(
+            data.isFamilyHiredLabourEquipped
+          );
         }
         // Set the other conditional field to null
         transformedData.hasAdequateAlternativeLabour = null;
       } else if (data.isManageFamilyLabour === "No") {
         if (data.hasAdequateAlternativeLabour !== undefined) {
-          transformedData.hasAdequateAlternativeLabour = yesNoToInt(data.hasAdequateAlternativeLabour);
+          transformedData.hasAdequateAlternativeLabour = yesNoToInt(
+            data.hasAdequateAlternativeLabour
+          );
         }
         // Set the other conditional field to null
         transformedData.isFamilyHiredLabourEquipped = null;
@@ -302,16 +315,24 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
 
       // Other fields
       if (data.areThereMechanizationOptions !== undefined) {
-        transformedData.areThereMechanizationOptions = yesNoToInt(data.areThereMechanizationOptions);
+        transformedData.areThereMechanizationOptions = yesNoToInt(
+          data.areThereMechanizationOptions
+        );
       }
       if (data.isMachineryAvailable !== undefined) {
-        transformedData.isMachineryAvailable = yesNoToInt(data.isMachineryAvailable);
+        transformedData.isMachineryAvailable = yesNoToInt(
+          data.isMachineryAvailable
+        );
       }
       if (data.isMachineryAffordable !== undefined) {
-        transformedData.isMachineryAffordable = yesNoToInt(data.isMachineryAffordable);
+        transformedData.isMachineryAffordable = yesNoToInt(
+          data.isMachineryAffordable
+        );
       }
       if (data.isMachineryCostEffective !== undefined) {
-        transformedData.isMachineryCostEffective = yesNoToInt(data.isMachineryCostEffective);
+        transformedData.isMachineryCostEffective = yesNoToInt(
+          data.isMachineryCostEffective
+        );
       }
 
       console.log(`📦 Transformed data:`, transformedData);
@@ -321,7 +342,7 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
         transformedData,
         {
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
         }
       );
@@ -351,7 +372,9 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
           if (requestId) {
             const reqId = Number(requestId);
             if (!isNaN(reqId) && reqId > 0) {
-              console.log(`🔄 Attempting to fetch labour data from backend for reqId: ${reqId}`);
+              console.log(
+                `🔄 Attempting to fetch labour data from backend for reqId: ${reqId}`
+              );
 
               const backendData = await fetchInspectionData(reqId);
 
@@ -361,14 +384,17 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
                 // Update form with backend data
                 const updatedFormData = {
                   ...formData,
-                  inspectionlabour: backendData
+                  inspectionlabour: backendData,
                 };
 
                 setFormData(updatedFormData);
                 setIsExistingData(true);
 
                 // Save to AsyncStorage as backup
-                await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData));
+                await AsyncStorage.setItem(
+                  `${jobId}`,
+                  JSON.stringify(updatedFormData)
+                );
 
                 return; // Exit after loading from backend
               }
@@ -399,36 +425,55 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
     }, [requestId, jobId])
   );
 
-
   const handleNext = async () => {
     const validationErrors: Record<string, string> = {};
     const labourInfo = formData.inspectionlabour;
 
     // Validate required fields
     if (!labourInfo?.isManageFamilyLabour) {
-      validationErrors.isManageFamilyLabour = t("Error.Family labour field is required");
+      validationErrors.isManageFamilyLabour = t(
+        "Error.Family labour field is required"
+      );
     }
 
     // Conditional validation
-    if (labourInfo?.isManageFamilyLabour === "Yes" && !labourInfo?.isFamilyHiredLabourEquipped) {
-      validationErrors.isFamilyHiredLabourEquipped = t("Error.Family/hired labour equipped field is required");
+    if (
+      labourInfo?.isManageFamilyLabour === "Yes" &&
+      !labourInfo?.isFamilyHiredLabourEquipped
+    ) {
+      validationErrors.isFamilyHiredLabourEquipped = t(
+        "Error.Family/hired labour equipped field is required"
+      );
     }
 
-    if (labourInfo?.isManageFamilyLabour === "No" && !labourInfo?.hasAdequateAlternativeLabour) {
-      validationErrors.hasAdequateAlternativeLabour = t("Error.Adequate alternative labour field is required");
+    if (
+      labourInfo?.isManageFamilyLabour === "No" &&
+      !labourInfo?.hasAdequateAlternativeLabour
+    ) {
+      validationErrors.hasAdequateAlternativeLabour = t(
+        "Error.Adequate alternative labour field is required"
+      );
     }
 
     if (!labourInfo?.areThereMechanizationOptions) {
-      validationErrors.areThereMechanizationOptions = t("Error.Mechanization options field is required");
+      validationErrors.areThereMechanizationOptions = t(
+        "Error.Mechanization options field is required"
+      );
     }
     if (!labourInfo?.isMachineryAvailable) {
-      validationErrors.isMachineryAvailable = t("Error.Machinery available field is required");
+      validationErrors.isMachineryAvailable = t(
+        "Error.Machinery available field is required"
+      );
     }
     if (!labourInfo?.isMachineryAffordable) {
-      validationErrors.isMachineryAffordable = t("Error.Machinery affordable field is required");
+      validationErrors.isMachineryAffordable = t(
+        "Error.Machinery affordable field is required"
+      );
     }
     if (!labourInfo?.isMachineryCostEffective) {
-      validationErrors.isMachineryCostEffective = t("Error.Machinery cost effective field is required");
+      validationErrors.isMachineryCostEffective = t(
+        "Error.Machinery cost effective field is required"
+      );
     }
 
     if (Object.keys(validationErrors).length > 0) {
@@ -473,7 +518,9 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
     );
 
     try {
-      console.log(`🚀 Saving to backend (${isExistingData ? "UPDATE" : "INSERT"})`);
+      console.log(
+        `🚀 Saving to backend (${isExistingData ? "UPDATE" : "INSERT"})`
+      );
 
       const saved = await saveToBackend(
         reqId,
@@ -496,7 +543,7 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
                 navigation.navigate("HarvestStorage", {
                   formData,
                   requestNumber,
-                  requestId: route.params.requestId
+                  requestId: route.params.requestId,
                 });
               },
             },
@@ -514,7 +561,7 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
                 navigation.navigate("HarvestStorage", {
                   formData,
                   requestNumber,
-                  requestId: route.params.requestId
+                  requestId: route.params.requestId,
                 });
               },
             },
@@ -533,7 +580,7 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
               navigation.navigate("HarvestStorage", {
                 formData,
                 requestNumber,
-                requestId: route.params.requestId
+                requestId: route.params.requestId,
               });
             },
           },
@@ -564,8 +611,6 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
     setFormData(updatedFormData);
     await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData));
   };
-
-
 
   return (
     <KeyboardAvoidingView
@@ -598,7 +643,9 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
         >
           <View className="h-6" />
           <YesNoSelect
-            label={t("InspectionForm.Can the farmer manage the proposed crop/cropping system through your family labour")}
+            label={t(
+              "InspectionForm.Can the farmer manage the proposed crop/cropping system through your family labour"
+            )}
             required
             value={formData.inspectionlabour?.isManageFamilyLabour || null}
             visible={
@@ -622,7 +669,9 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
                 "InspectionForm.Is family/hired labour equipped to handle the proposed crop/cropping system"
               )}
               required
-              value={formData.inspectionlabour?.isFamilyHiredLabourEquipped || null}
+              value={
+                formData.inspectionlabour?.isFamilyHiredLabourEquipped || null
+              }
               visible={
                 yesNoModalVisible &&
                 activeYesNoField === "isFamilyHiredLabourEquipped"
@@ -647,7 +696,9 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
                 "InspectionForm.If not, do you have adequate labours to manage the same"
               )}
               required
-              value={formData.inspectionlabour?.hasAdequateAlternativeLabour || null}
+              value={
+                formData.inspectionlabour?.hasAdequateAlternativeLabour || null
+              }
               visible={
                 yesNoModalVisible &&
                 activeYesNoField === "hasAdequateAlternativeLabour"
@@ -667,11 +718,16 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
           )}
 
           <YesNoSelect
-            label={t("InspectionForm.Are there any mechanization options to substitute the labour")}
+            label={t(
+              "InspectionForm.Are there any mechanization options to substitute the labour"
+            )}
             required
-            value={formData.inspectionlabour?.areThereMechanizationOptions || null}
+            value={
+              formData.inspectionlabour?.areThereMechanizationOptions || null
+            }
             visible={
-              yesNoModalVisible && activeYesNoField === "areThereMechanizationOptions"
+              yesNoModalVisible &&
+              activeYesNoField === "areThereMechanizationOptions"
             }
             onOpen={() => {
               setActiveYesNoField("areThereMechanizationOptions");
@@ -730,7 +786,8 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
             required
             value={formData.inspectionlabour?.isMachineryCostEffective || null}
             visible={
-              yesNoModalVisible && activeYesNoField === "isMachineryCostEffective"
+              yesNoModalVisible &&
+              activeYesNoField === "isMachineryCostEffective"
             }
             onOpen={() => {
               setActiveYesNoField("isMachineryCostEffective");
@@ -746,44 +803,50 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
           />
         </ScrollView>
 
-        <View className="flex-row px-6 py-4 gap-4 bg-white border-t border-gray-200 ">
+        <View className="flex-row px-6 pb-4 gap-4 bg-white border-t border-gray-200">
+          {/* Back Button */}
           <TouchableOpacity
-            className="flex-1 bg-[#444444] rounded-full py-4 items-center"
-            onPress={() =>
-              navigation.goBack()
-            }
+            className="flex-1 bg-[#444444] rounded-full py-4 flex-row items-center justify-center"
+            onPress={() => navigation.goBack()}
           >
-            <Text className="text-white text-base font-semibold">
+            <Ionicons name="arrow-back" size={22} color="#fff" />
+            <Text className="text-white text-base font-semibold ml-2">
               {t("InspectionForm.Back")}
             </Text>
           </TouchableOpacity>
-          {isNextEnabled == true ? (
-            <View className="flex-1">
-              <TouchableOpacity className="flex-1 " onPress={handleNext}>
-                <LinearGradient
-                  colors={["#F35125", "#FF1D85"]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  className=" rounded-full py-4 items-center"
-                  style={{
-                    shadowColor: "#000",
-                    shadowOffset: { width: 0, height: 3 },
-                    shadowOpacity: 0.25,
-                    shadowRadius: 5,
-                    elevation: 6,
-                  }}
-                >
-                  <Text className="text-white text-base font-semibold">
-                    {t("InspectionForm.Next")}
-                  </Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            </View>
+
+          {/* Next Button */}
+          {isNextEnabled ? (
+            <TouchableOpacity
+              className="flex-1"
+              onPress={handleNext}
+              activeOpacity={0.8}
+            >
+              <LinearGradient
+                colors={["#F35125", "#FF1D85"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                className="rounded-full py-4 flex-row items-center justify-center"
+                style={{
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 3 },
+                  shadowOpacity: 0.25,
+                  shadowRadius: 5,
+                  elevation: 6,
+                }}
+              >
+                <Text className="text-white text-base font-semibold mr-2">
+                  {t("InspectionForm.Next")}
+                </Text>
+                <Ionicons name="arrow-forward" size={22} color="#fff" />
+              </LinearGradient>
+            </TouchableOpacity>
           ) : (
-            <View className="flex-1 bg-gray-300 rounded-full py-4 items-center">
-              <Text className="text-white text-base font-semibold">
+            <View className="flex-1 bg-gray-300 rounded-full py-4 flex-row items-center justify-center">
+              <Text className="text-white text-base font-semibold mr-2">
                 {t("InspectionForm.Next")}
               </Text>
+              <Ionicons name="arrow-forward" size={22} color="#fff" />
             </View>
           )}
         </View>

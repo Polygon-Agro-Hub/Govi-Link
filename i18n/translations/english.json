@@ -1,8 +1,7 @@
 {
-  "MAIN": {
-    "OK": "OK"
-  },
   "Main": {
+    "OK": "OK",
+    "Warning": "Warning",
     "error": "Sorry",
     "somethingWentWrong": "Something went wrong. Please try again later.",
     "ok": "OK",
@@ -11,7 +10,9 @@
     "No Internet Connection": "No Internet Connection",
     "Please turn on mobile data or Wi-Fi to continue.": "Please turn on Mobile Data or Wi-Fi to continue.",
     "Your login session has expired. Please log in again to continue.": "Your login session has expired. Please log in again to continue.",
-    "Success": "Success"
+    "Success": "Success",
+    "Go Back": "Go Back",
+    "Continue": "Continue"
   },
   "Error": {
     "error": "Sorry",
@@ -669,7 +670,18 @@
     "Does the farmer knows technologies for value addition of your crop": "Does the farmer knows technologies for value addition of your crop?",
     "Does the farmer has market linkage for value added products": "Does the farmer has market linkage for value added products?",
     "Is farmer aware about required quality standards of value added products of proposed crops": "Is farmer aware about required quality standards of value added products of proposed crops?",
-    "Back": "Back"
+    "Back": "Back",
+    "Data saved successfully": "Data saved successfully",
+    "Please wait...": "Please wait...",
+    "Saving": "Saving",
+    "Could not save to server. Data saved locally.": "Could not save to server. Data saved locally.",
+    "Submit Confirmation": "Submit Confirmation",
+    "Success": "Success",
+    "Error": "Error",
+    "You have filled out all the forms. If you need to make any changes, you can go back. Otherwise, continuing will take you to the confirmation step.": "You have filled out all the forms. If you need to make any changes, you can go back. Otherwise, continuing will take you to the confirmation step.",
+    "Inspection form completed successfully!": "Inspection form completed successfully!",
+    "Could not save to server. Please try again.": "Could not save to server. Please try again.",
+    "Go Back": "Go Back"
   },
   "ConfirmationCapitalRequest": {
     "ConfirmSuccess": "Confirmation successful!",

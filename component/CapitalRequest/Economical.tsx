@@ -12,7 +12,7 @@ import {
   Modal,
   FlatList,
 } from "react-native";
-import { AntDesign, MaterialIcons } from "@expo/vector-icons";
+import { AntDesign, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTranslation } from "react-i18next";
@@ -34,7 +34,6 @@ type EconomicalData = {
   isFinanceResource?: "Yes" | "No";
   isAltRoutes?: "Yes" | "No";
 };
-
 
 type EconomicalProps = {
   navigation: any;
@@ -127,9 +126,6 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
   const [isExistingData, setIsExistingData] = useState(false); // ✅ Add this
   const [isNextEnabled, setIsNextEnabled] = useState(false);
 
-
-
-
   console.log("finance", formData);
 
   useEffect(() => {
@@ -148,13 +144,11 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
 
     setIsNextEnabled(
       isSuitaleSizeValid &&
-      isFinanceResourceValid &&
-      isAltRoutesValid &&
-      !hasErrors
+        isFinanceResourceValid &&
+        isAltRoutesValid &&
+        !hasErrors
     );
   }, [formData, errors]);
-
-
 
   let jobId = requestNumber;
   console.log("jobid", jobId);
@@ -177,7 +171,9 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
     }
   };
 
-  const fetchInspectionData = async (reqId: number): Promise<EconomicalData | null> => {
+  const fetchInspectionData = async (
+    reqId: number
+  ): Promise<EconomicalData | null> => {
     try {
       console.log(`🔍 Fetching economical data for reqId: ${reqId}`);
 
@@ -186,12 +182,12 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
         {
           params: {
             reqId,
-            tableName: 'inspectioneconomical'
-          }
+            tableName: "inspectioneconomical",
+          },
         }
       );
 
-      console.log('📦 Raw response:', response.data);
+      console.log("📦 Raw response:", response.data);
 
       if (response.data.success && response.data.data) {
         console.log(`✅ Fetched existing economical data:`, response.data.data);
@@ -200,8 +196,8 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
 
         // Helper to convert boolean (0/1) to "Yes"/"No"
         const boolToYesNo = (val: any): "Yes" | "No" | undefined => {
-          if (val === 1 || val === '1' || val === true) return "Yes";
-          if (val === 0 || val === '0' || val === false) return "No";
+          if (val === 1 || val === "1" || val === true) return "Yes";
+          if (val === 0 || val === "0" || val === false) return "No";
           return undefined;
         };
 
@@ -216,7 +212,7 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
       return null;
     } catch (error: any) {
       console.error(`❌ Error fetching economical data:`, error);
-      console.error('Error details:', error.response?.data);
+      console.error("Error details:", error.response?.data);
 
       if (error.response?.status === 404) {
         console.log(`📝 No existing record - will create new`);
@@ -234,11 +230,15 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
     isUpdate: boolean
   ): Promise<boolean> => {
     try {
-      console.log(`💾 Saving to backend (${isUpdate ? 'UPDATE' : 'INSERT'}):`, tableName);
+      console.log(
+        `💾 Saving to backend (${isUpdate ? "UPDATE" : "INSERT"}):`,
+        tableName
+      );
       console.log(`📝 reqId being sent:`, reqId);
 
       // Yes/No fields
-      const yesNoToInt = (val: any) => val === "Yes" ? '1' : val === "No" ? '0' : null;
+      const yesNoToInt = (val: any) =>
+        val === "Yes" ? "1" : val === "No" ? "0" : null;
 
       const transformedData: any = {
         reqId,
@@ -262,7 +262,7 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
         transformedData,
         {
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
         }
       );
@@ -284,7 +284,6 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
     }
   };
 
-
   useFocusEffect(
     useCallback(() => {
       const loadFormData = async () => {
@@ -293,7 +292,9 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
           if (requestId) {
             const reqId = Number(requestId);
             if (!isNaN(reqId) && reqId > 0) {
-              console.log(`🔄 Attempting to fetch economical data from backend for reqId: ${reqId}`);
+              console.log(
+                `🔄 Attempting to fetch economical data from backend for reqId: ${reqId}`
+              );
 
               const backendData = await fetchInspectionData(reqId);
 
@@ -303,14 +304,17 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
                 // Update form with backend data
                 const updatedFormData = {
                   ...formData,
-                  inspectioneconomical: backendData
+                  inspectioneconomical: backendData,
                 };
 
                 setFormData(updatedFormData);
                 setIsExistingData(true);
 
                 // Save to AsyncStorage as backup
-                await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData));
+                await AsyncStorage.setItem(
+                  `${jobId}`,
+                  JSON.stringify(updatedFormData)
+                );
 
                 return; // Exit after loading from backend
               }
@@ -341,21 +345,25 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
     }, [requestId, jobId])
   );
 
-
-
   const handleNext = async () => {
     const validationErrors: Record<string, string> = {};
     const economicalInfo = formData.inspectioneconomical;
 
     // Validate required fields
     if (!economicalInfo?.isSuitaleSize) {
-      validationErrors.isSuitaleSize = t("Error.Suitable size field is required");
+      validationErrors.isSuitaleSize = t(
+        "Error.Suitable size field is required"
+      );
     }
     if (!economicalInfo?.isFinanceResource) {
-      validationErrors.isFinanceResource = t("Error.Finance resource field is required");
+      validationErrors.isFinanceResource = t(
+        "Error.Finance resource field is required"
+      );
     }
     if (!economicalInfo?.isAltRoutes) {
-      validationErrors.isAltRoutes = t("Error.Alternative routes field is required");
+      validationErrors.isAltRoutes = t(
+        "Error.Alternative routes field is required"
+      );
     }
 
     if (Object.keys(validationErrors).length > 0) {
@@ -400,7 +408,9 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
     );
 
     try {
-      console.log(`🚀 Saving to backend (${isExistingData ? "UPDATE" : "INSERT"})`);
+      console.log(
+        `🚀 Saving to backend (${isExistingData ? "UPDATE" : "INSERT"})`
+      );
 
       const saved = await saveToBackend(
         reqId,
@@ -423,7 +433,7 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
                 navigation.navigate("Labour", {
                   formData,
                   requestNumber,
-                  requestId: route.params.requestId
+                  requestId: route.params.requestId,
                 });
               },
             },
@@ -441,7 +451,7 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
                 navigation.navigate("Labour", {
                   formData,
                   requestNumber,
-                  requestId: route.params.requestId
+                  requestId: route.params.requestId,
                 });
               },
             },
@@ -460,7 +470,7 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
               navigation.navigate("Labour", {
                 formData,
                 requestNumber,
-                requestId: route.params.requestId
+                requestId: route.params.requestId,
               });
             },
           },
@@ -468,7 +478,6 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
       );
     }
   };
-
 
   const handleyesNOFieldChange = async (key: string, value: "Yes" | "No") => {
     const updatedFormData = {
@@ -487,7 +496,6 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
       console.log("AsyncStorage save failed", e);
     }
   };
-
 
   return (
     <KeyboardAvoidingView
@@ -520,12 +528,12 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
         >
           <View className="h-6" />
           <YesNoSelect
-            label={t("InspectionForm.Are the proposed crop/cropping systems suitable for the farmer’s size of land holding")}
+            label={t(
+              "InspectionForm.Are the proposed crop/cropping systems suitable for the farmer’s size of land holding"
+            )}
             required
             value={formData.inspectioneconomical?.isSuitaleSize || null}
-            visible={
-              yesNoModalVisible && activeYesNoField === "isSuitaleSize"
-            }
+            visible={yesNoModalVisible && activeYesNoField === "isSuitaleSize"}
             onOpen={() => {
               setActiveYesNoField("isSuitaleSize");
               setYesNoModalVisible(true);
@@ -534,13 +542,13 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
               setYesNoModalVisible(false);
               setActiveYesNoField(null);
             }}
-            onSelect={(value) =>
-              handleyesNOFieldChange("isSuitaleSize", value)
-            }
+            onSelect={(value) => handleyesNOFieldChange("isSuitaleSize", value)}
           />
 
           <YesNoSelect
-            label={t("InspectionForm.Are the financial resources adequate to manage the proposed crop/cropping system")}
+            label={t(
+              "InspectionForm.Are the financial resources adequate to manage the proposed crop/cropping system"
+            )}
             required
             value={formData.inspectioneconomical?.isFinanceResource || null}
             visible={
@@ -559,12 +567,12 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
             }
           />
           <YesNoSelect
-            label={t("InspectionForm.If not, can the farmer mobilize financial resources through alternative routes")}
+            label={t(
+              "InspectionForm.If not, can the farmer mobilize financial resources through alternative routes"
+            )}
             required
             value={formData.inspectioneconomical?.isAltRoutes || null}
-            visible={
-              yesNoModalVisible && activeYesNoField === "isAltRoutes"
-            }
+            visible={yesNoModalVisible && activeYesNoField === "isAltRoutes"}
             onOpen={() => {
               setActiveYesNoField("isAltRoutes");
               setYesNoModalVisible(true);
@@ -573,50 +581,54 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
               setYesNoModalVisible(false);
               setActiveYesNoField(null);
             }}
-            onSelect={(value) =>
-              handleyesNOFieldChange("isAltRoutes", value)
-            }
+            onSelect={(value) => handleyesNOFieldChange("isAltRoutes", value)}
           />
         </ScrollView>
 
-        <View className="flex-row px-6 py-4 gap-4 bg-white border-t border-gray-200 ">
+        <View className="flex-row px-6 pb-4 gap-4 bg-white border-t border-gray-200">
+          {/* Back Button */}
           <TouchableOpacity
-            className="flex-1 bg-[#444444] rounded-full py-4 items-center"
-            onPress={() =>
-              navigation.goBack()
-            }
+            className="flex-1 bg-[#444444] rounded-full py-4 flex-row items-center justify-center"
+            onPress={() => navigation.goBack()}
           >
-            <Text className="text-white text-base font-semibold">
+            <Ionicons name="arrow-back" size={22} color="#fff" />
+            <Text className="text-white text-base font-semibold ml-2">
               {t("InspectionForm.Back")}
             </Text>
           </TouchableOpacity>
-          {isNextEnabled == true ? (
-            <View className="flex-1">
-              <TouchableOpacity className="flex-1 " onPress={handleNext}>
-                <LinearGradient
-                  colors={["#F35125", "#FF1D85"]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  className=" rounded-full py-4 items-center"
-                  style={{
-                    shadowColor: "#000",
-                    shadowOffset: { width: 0, height: 3 },
-                    shadowOpacity: 0.25,
-                    shadowRadius: 5,
-                    elevation: 6,
-                  }}
-                >
-                  <Text className="text-white text-base font-semibold">
-                    {t("InspectionForm.Next")}
-                  </Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            </View>
+
+          {/* Next Button */}
+          {isNextEnabled ? (
+            <TouchableOpacity
+              className="flex-1"
+              onPress={handleNext}
+              activeOpacity={0.8}
+            >
+              <LinearGradient
+                colors={["#F35125", "#FF1D85"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                className="rounded-full py-4 flex-row items-center justify-center"
+                style={{
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 3 },
+                  shadowOpacity: 0.25,
+                  shadowRadius: 5,
+                  elevation: 6,
+                }}
+              >
+                <Text className="text-white text-base font-semibold mr-2">
+                  {t("InspectionForm.Next")}
+                </Text>
+                <Ionicons name="arrow-forward" size={22} color="#fff" />
+              </LinearGradient>
+            </TouchableOpacity>
           ) : (
-            <View className="flex-1 bg-gray-300 rounded-full py-4 items-center">
-              <Text className="text-white text-base font-semibold">
+            <View className="flex-1 bg-gray-300 rounded-full py-4 flex-row items-center justify-center">
+              <Text className="text-white text-base font-semibold mr-2">
                 {t("InspectionForm.Next")}
               </Text>
+              <Ionicons name="arrow-forward" size={22} color="#fff" />
             </View>
           )}
         </View>
