@@ -352,7 +352,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
       Alert.alert(
         t("Error.Validation Error"),
         "• " + t("Error.ID Proof Type is required"),
-        [{ text: t("MAIN.OK") }]
+        [{ text: t("Main.ok") }]
       );
       return;
     }
@@ -365,7 +365,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
       Alert.alert(
         t("Error.Validation Error"),
         "• " + t(`Error.${selectedIdProof} is required`),
-        [{ text: t("MAIN.OK") }]
+        [{ text: t("Main.ok") }]
       );
       return;
     }
@@ -382,7 +382,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
       Alert.alert(
         t("Error.Validation Error"),
         t("Error.Both ID images are required"),
-        [{ text: t("MAIN.OK") }]
+        [{ text: t("Main.ok") }]
       );
       return;
     }
@@ -393,7 +393,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
       Alert.alert(
         t("Error.Error"),
         "Request ID is missing. Please go back and try again.",
-        [{ text: t("MAIN.OK") }]
+        [{ text: t("Main.ok") }]
       );
       return;
     }
@@ -408,7 +408,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
       Alert.alert(
         t("Error.Error"),
         "Invalid request ID. Please go back and try again.",
-        [{ text: t("MAIN.OK") }]
+        [{ text: t("Main.ok") }]
       );
       return;
     }
@@ -441,11 +441,11 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
         setIsExistingData(true);
 
         Alert.alert(
-          t("MAIN.Success"),
+          t("Main.Success"),
           t("InspectionForm.Data saved successfully"),
           [
             {
-              text: t("MAIN.OK"),
+              text: t("Main.ok"),
               onPress: () => {
                 navigation.navigate("FinanceInfo", {
                   formData,
@@ -459,11 +459,11 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
       } else {
         console.log("⚠️ Backend save failed, but continuing with local data");
         Alert.alert(
-          t("MAIN.Warning"),
+          t("Main.Warning"),
           t("InspectionForm.Could not save to server. Data saved locally."),
           [
             {
-              text: t("MAIN.Continue"),
+              text: t("Main.Continue"),
               onPress: () => {
                 navigation.navigate("FinanceInfo", {
                   formData,
@@ -478,11 +478,11 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
     } catch (error) {
       console.error("Error during final save:", error);
       Alert.alert(
-        t("MAIN.Warning"),
+        t("Main.Warning"),
         t("InspectionForm.Could not save to server. Data saved locally."),
         [
           {
-            text: t("MAIN.Continue"),
+            text: t("Main.Continue"),
             onPress: () => {
               navigation.navigate("FinanceInfo", {
                 formData,
@@ -567,22 +567,8 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
       <View className="flex-1 bg-[#F3F3F3] ">
         <StatusBar barStyle="dark-content" />
 
-        {/* Header */}
-        <View className="flex-row items-center justify-center py-4 mt-2">
-          <TouchableOpacity
-            className="absolute left-4 bg-[#E0E0E080] rounded-full p-4"
-            onPress={() => navigation.goBack()}
-          >
-            <AntDesign name="left" size={20} color="#000" />
-          </TouchableOpacity>
-
-          <Text className="text-lg font-semibold text-black">
-            {t("InspectionForm.Inspection Form")}
-          </Text>
-        </View>
-
         {/* Tabs */}
-        <FormTabs activeKey="ID Proof" onTabPress={() => navigation.goBack()} />
+        <FormTabs activeKey="ID Proof" navigation={navigation} />
 
         <ScrollView
           className="flex-1 px-6 bg-white rounded-t-3xl"

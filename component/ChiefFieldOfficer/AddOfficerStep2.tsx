@@ -676,7 +676,7 @@ const validationErrors = validateStep2(); // ✅ use returned errors
        Alert.alert(
       t("Error.Validation Error"),
       `• ${errorMessage}`,
-      [{ text: t("Main.OK") }]
+      [{ text: t("Main.ok") }]
     );
     return;
   }

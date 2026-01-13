@@ -117,7 +117,7 @@ const [existingProblemId, setExistingProblemId] = useState<string | null>(null);
     Alert.alert(
       t("Error.Sorry"),
       t("CertificateSuggestions.Both problem and solution must be filled."),
-      [{ text: t("MAIN.OK") }]
+      [{ text: t("Main.ok") }]
     );
     return;
   }
@@ -141,7 +141,7 @@ const imageChanged =
       Alert.alert(
         t("Error.Sorry"),
         t("Main.Your login session has expired. Please log in again to continue."),
-        [{ text: t("MAIN.OK") }]
+        [{ text: t("Main.ok") }]
       );
       return;
     }
@@ -211,12 +211,12 @@ const imageChanged =
       Alert.alert(
         t("Error.Sorry"),
         t("RequestProblem.Failed to save problem. Please try again."),
-        [{ text: t("MAIN.OK") }]
+        [{ text: t("Main.ok") }]
       );
     }
   } catch (err) {
     console.error("❌ Error saving/updating problem:", err);
-    Alert.alert(t("Error.Sorry"), t("Main.somethingWentWrong"), [{ text: t("MAIN.OK") }]);
+    Alert.alert(t("Error.Sorry"), t("Main.somethingWentWrong"), [{ text: t("Main.ok") }]);
   } finally {
     setLoading(false);
   }

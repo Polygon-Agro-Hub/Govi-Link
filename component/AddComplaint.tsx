@@ -107,7 +107,7 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({ navigation }) =
       Alert.alert(
         t("Error.error"),
         t("AddComplaint.Please fill out all fields."),
-        [{ text: t("Main.OK") }]
+        [{ text: t("Main.ok") }]
       );
       return;
     }
@@ -117,7 +117,7 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({ navigation }) =
       Alert.alert(
         t("Error.error"),
         t("AddComplaint.Please select a category."),
-        [{ text: t("Main.OK") }]
+        [{ text: t("Main.ok") }]
       );
       return;
     }
@@ -127,7 +127,7 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({ navigation }) =
       Alert.alert(
         t("Error.error"),
         t("AddComplaint.Please enter your complaint."),
-        [{ text: t("Main.OK") }]
+        [{ text: t("Main.ok") }]
       );
       return;
     }
@@ -138,7 +138,7 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({ navigation }) =
         Alert.alert(
           t("Error.Sorry"),
           t("Error.Your login session has expired. Please log in again to continue."),
-          [{ text: t("Main.OK") }]
+          [{ text: t("Main.ok") }]
         );
         return;
       }
@@ -164,7 +164,7 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({ navigation }) =
       Alert.alert(
         t("Main.Success"),
         t("AddComplaint.Complaint submitted successfully!"),
-        [{ text: t("Main.OK") }]
+        [{ text: t("Main.ok") }]
       );
       resetForm(); // Use resetForm instead of individual setters
       navigation.navigate("Main", { screen: "Dashboard" });
@@ -174,11 +174,11 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({ navigation }) =
         Alert.alert(
           t("Error.Sorry"),
           t("AddComplaint.Failed to submit complaint. Please try again."),
-          [{ text: t("Main.OK") }]
+          [{ text: t("Main.ok") }]
         );
       } else {
         console.error("An unknown error occurred.");
-        Alert.alert(t("Error.Sorry"), t("Main.somethingWentWrong"), [{ text: t("Main.OK") }]);
+        Alert.alert(t("Error.Sorry"), t("Main.somethingWentWrong"), [{ text: t("Main.ok") }]);
       }
     } finally {
       setLoading(false);

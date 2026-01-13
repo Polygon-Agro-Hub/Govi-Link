@@ -654,7 +654,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
       setErrors(validationErrors);
       const errorMessage = "• " + Object.values(validationErrors).join("\n• ");
       Alert.alert(t("Error.Validation Error"), errorMessage, [
-        { text: t("Main.OK") },
+        { text: t("Main.ok") },
       ]);
       return;
     }
@@ -665,7 +665,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
       Alert.alert(
         t("Error.Error"),
         "Request ID is missing. Please go back and try again.",
-        [{ text: t("Main.OK") }]
+        [{ text: t("Main.ok") }]
       );
       return;
     }
@@ -677,7 +677,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
       Alert.alert(
         t("Error.Error"),
         "Invalid request ID. Please go back and try again.",
-        [{ text: t("Main.OK") }]
+        [{ text: t("Main.ok") }]
       );
       return;
     }
@@ -712,7 +712,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
           t("InspectionForm.Data saved successfully"),
           [
             {
-              text: t("Main.OK"),
+              text: t("Main.ok"),
               onPress: () => {
                 navigation.navigate("Economical", {
                   formData,
@@ -770,21 +770,8 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
       <View className="flex-1 bg-[#F3F3F3] ">
         <StatusBar barStyle="dark-content" />
 
-        {/* Header */}
-        <View className="flex-row items-center justify-center py-4 mt-2">
-          <TouchableOpacity
-            className="absolute left-4 bg-[#F3F3F3] rounded-full p-4"
-            onPress={() => navigation.goBack()}
-          >
-            <AntDesign name="left" size={20} color="#000" />
-          </TouchableOpacity>
-          <Text className="text-lg font-semibold text-black">
-            {t("InspectionForm.Inspection Form")}
-          </Text>
-        </View>
-
         {/* Tabs */}
-        <FormTabs activeKey="Profit & Risk" />
+        <FormTabs activeKey="Profit & Risk" navigation={navigation} />
 
         <ScrollView
           className="flex-1 px-6 bg-white rounded-t-3xl"

@@ -117,7 +117,7 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
 
   const handleSaveProblem = async (item: ProblemItem) => {
     if (!item.problem.trim() || !item.solution.trim()) {
-      Alert.alert(t("Error.Sorry"), t("CertificateSuggestions.Both problem and solution must be filled."),[{ text: t("Main.OK") }]);
+      Alert.alert(t("Error.Sorry"), t("CertificateSuggestions.Both problem and solution must be filled."),[{ text: t("Main.ok") }]);
       return;
     }
 
@@ -128,7 +128,7 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
         Alert.alert(
           t("Error.Sorry"),
           t("Error.Your login session has expired. Please log in again to continue."),
-          [{ text: t("Main.OK") }]
+          [{ text: t("Main.ok") }]
         );
         return;
       }
@@ -166,12 +166,12 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
         Alert.alert(
           t("Error.Sorry"),
           t("CertificateSuggestions.Failed to save problem."),
-          [{ text: t("Main.OK") }]
+          [{ text: t("Main.ok") }]
         );
       }
     } catch (err) {
       console.error("❌ Error saving/updating problem:", err);
-      Alert.alert(t("Error.Sorry"), t("Main.somethingWentWrong"), [{ text: t("Main.OK") }]);
+      Alert.alert(t("Error.Sorry"), t("Main.somethingWentWrong"), [{ text: t("Main.ok") }]);
 
     }finally{
       setLoading(false);
@@ -190,7 +190,7 @@ const fetchProblems = async () => {
       Alert.alert(
         t("Error.Sorry"),
         t("Error.Your login session has expired. Please log in again to continue."),
-        [{ text: t("Main.OK") }]
+        [{ text: t("Main.ok") }]
       );
       return;
     }
@@ -276,7 +276,7 @@ const fetchProblems = async () => {
              setOtpSendLoading(false);
           }  catch (error) {
                       Alert.alert(t("Main.error"), t("SignupForum.otpSendFailed"), [{
-                         text: t("Main.OK") ,
+                         text: t("Main.ok") ,
                       }]);
                       setOtpSendLoading(false);
                     }finally{

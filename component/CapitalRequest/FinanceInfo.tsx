@@ -608,7 +608,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
 
       const errorMessage = "• " + Object.values(validationErrors).join("\n• ");
       Alert.alert(t("Error.Validation Error"), errorMessage, [
-        { text: t("MAIN.OK") },
+        { text: t("Main.ok") },
       ]);
       return;
     }
@@ -619,7 +619,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
       Alert.alert(
         t("Error.Error"),
         "Request ID is missing. Please go back and try again.",
-        [{ text: t("MAIN.OK") }]
+        [{ text: t("Main.ok") }]
       );
       return;
     }
@@ -632,7 +632,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
       Alert.alert(
         t("Error.Error"),
         "Invalid request ID. Please go back and try again.",
-        [{ text: t("MAIN.OK") }]
+        [{ text: t("Main.ok") }]
       );
       return;
     }
@@ -665,11 +665,11 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
         setIsExistingData(true);
 
         Alert.alert(
-          t("MAIN.Success"),
+          t("Main.Success"),
           t("InspectionForm.Data saved successfully"),
           [
             {
-              text: t("MAIN.OK"),
+              text: t("Main.ok"),
               onPress: () => {
                 navigation.navigate("LandInfo", {
                   formData,
@@ -683,11 +683,11 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
       } else {
         console.log("⚠️ Backend save failed, but continuing with local data");
         Alert.alert(
-          t("MAIN.Warning"),
+          t("Main.Warning"),
           t("InspectionForm.Could not save to server. Data saved locally."),
           [
             {
-              text: t("MAIN.Continue"),
+              text: t("Main.Continue"),
               onPress: () => {
                 navigation.navigate("LandInfo", {
                   formData,
@@ -702,11 +702,11 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     } catch (error) {
       console.error("Error during final save:", error);
       Alert.alert(
-        t("MAIN.Warning"),
+        t("Main.Warning"),
         t("InspectionForm.Could not save to server. Data saved locally."),
         [
           {
-            text: t("MAIN.Continue"),
+            text: t("Main.Continue"),
             onPress: () => {
               navigation.navigate("LandInfo", {
                 formData,
@@ -930,21 +930,9 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     >
       <View className="flex-1 bg-[#F3F3F3] ">
         <StatusBar barStyle="dark-content" />
-        <View className="flex-row items-center justify-center py-4 mt-2">
-          <TouchableOpacity
-            className="absolute left-4 bg-[#E0E0E080] rounded-full p-4"
-            onPress={() => navigation.goBack()}
-          >
-            <AntDesign name="left" size={20} color="#000" />
-          </TouchableOpacity>
-
-          <Text className="text-lg font-semibold text-black">
-            {t("InspectionForm.Inspection Form")}
-          </Text>
-        </View>
 
         {/* Tabs */}
-        <FormTabs activeKey="Finance Info" />
+        <FormTabs activeKey="Finance Info" navigation={navigation} />
 
         <ScrollView
           className="flex-1 px-6 bg-white rounded-t-3xl"

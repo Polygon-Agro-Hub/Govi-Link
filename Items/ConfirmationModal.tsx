@@ -119,7 +119,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                 activeOpacity={0.7}
               >
                 <Text className="text-white text-base font-semibold">
-                  {t("Main.OK")}
+                  {t("Main.ok")}
                 </Text>
               </TouchableOpacity>
             )}

@@ -206,7 +206,7 @@ const formatDate = (dateString: string) => {
     try {
       const token = await AsyncStorage.getItem("token");
       if (!token) {
-        Alert.alert(t("Error.Error"), t("Error.AuthTokenNotFound"), [{ text: t("Main.OK") }]);
+        Alert.alert(t("Error.Error"), t("Error.AuthTokenNotFound"), [{ text: t("Main.ok") }]);
         return;
       }
 
@@ -231,7 +231,7 @@ const formatDate = (dateString: string) => {
         Alert.alert(
           t("Error.Error"),
           t("AssignJobOfficerList.FailedToFetchOfficers"),
-          [{ text: t("Main.OK") }]
+          [{ text: t("Main.ok") }]
         );
       }
     } catch (error) {
@@ -239,7 +239,7 @@ const formatDate = (dateString: string) => {
       Alert.alert(
         t("Error.Error"),
         t("AssignJobOfficerList.FailedToLoadOfficers"),
-        [{ text: t("Main.OK") }]
+        [{ text: t("Main.ok") }]
       );
     } finally {
       setLoading(false);
@@ -280,7 +280,7 @@ const formatDate = (dateString: string) => {
     try {
       const token = await AsyncStorage.getItem("token");
       if (!token) {
-        Alert.alert(t("Error.Error"), t("Error.AuthTokenNotFound"), [{ text: t("Main.OK") }]);
+        Alert.alert(t("Error.Error"), t("Error.AuthTokenNotFound"), [{ text: t("Main.ok") }]);
         return;
       }
 
@@ -324,7 +324,7 @@ const formatDate = (dateString: string) => {
           }),
           [
             {
-               text: t("Main.OK") ,
+               text: t("Main.ok") ,
               onPress: () => navigation.navigate("AssignJobs"),
             },
           ]
@@ -333,7 +333,7 @@ const formatDate = (dateString: string) => {
         Alert.alert(
           t("Main.Error"),
            t("AssignJobOfficerList.FailedToAssignJobs"),
-           [{ text: t("Main.OK") }]
+           [{ text: t("Main.ok") }]
         );
       }
     } catch (error: any) {
@@ -365,7 +365,7 @@ const formatDate = (dateString: string) => {
 Alert.alert(
           t("Main.Error"),
            t("AssignJobOfficerList.FailedToAssignJobs"),
-           [{ text: t("Main.OK") }]
+           [{ text: t("Main.ok") }]
         );
           } finally {
       setAssigning(false);

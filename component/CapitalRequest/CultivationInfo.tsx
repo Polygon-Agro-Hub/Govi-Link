@@ -810,7 +810,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
       setErrors(validationErrors);
       const errorMessage = "• " + Object.values(validationErrors).join("\n• ");
       Alert.alert(t("Error.Validation Error"), errorMessage, [
-        { text: t("MAIN.OK") },
+        { text: t("Main.ok") },
       ]);
       return;
     }
@@ -821,7 +821,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
       Alert.alert(
         t("Error.Error"),
         "Request ID is missing. Please go back and try again.",
-        [{ text: t("MAIN.OK") }]
+        [{ text: t("Main.ok") }]
       );
       return;
     }
@@ -833,7 +833,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
       Alert.alert(
         t("Error.Error"),
         "Invalid request ID. Please go back and try again.",
-        [{ text: t("MAIN.OK") }]
+        [{ text: t("Main.ok") }]
       );
       return;
     }
@@ -864,11 +864,11 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
         setIsExistingData(true);
 
         Alert.alert(
-          t("MAIN.Success"),
+          t("Main.Success"),
           t("InspectionForm.Data saved successfully"),
           [
             {
-              text: t("MAIN.OK"),
+              text: t("Main.ok"),
               onPress: () => {
                 navigation.navigate("CroppingSystems", {
                   formData,
@@ -882,11 +882,11 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
       } else {
         console.log("⚠️ Backend save failed, but continuing with local data");
         Alert.alert(
-          t("MAIN.Warning"),
+          t("Main.Warning"),
           t("InspectionForm.Could not save to server. Data saved locally."),
           [
             {
-              text: t("MAIN.Continue"),
+              text: t("Main.Continue"),
               onPress: () => {
                 navigation.navigate("CroppingSystems", {
                   formData,
@@ -901,11 +901,11 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
     } catch (error) {
       console.error("Error during final save:", error);
       Alert.alert(
-        t("MAIN.Warning"),
+        t("Main.Warning"),
         t("InspectionForm.Could not save to server. Data saved locally."),
         [
           {
-            text: t("MAIN.Continue"),
+            text: t("Main.Continue"),
             onPress: () => {
               navigation.navigate("CroppingSystems", {
                 formData,
@@ -922,57 +922,6 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
   console.log(selections);
 
   const [error, setError] = useState<string>("");
-
-  // const handleSelect = async (param: string, value: Selection) => {
-  //   const currentValue = selections[param];
-  //   const newValue = currentValue === value ? null : value;
-
-  //   const updatedSelections = {
-  //     ...selections,
-  //     [param]: newValue,
-  //   };
-  //   setSelections(updatedSelections);
-
-  //   const updatedSuitableParams = {
-  //     ...(formData.inspectioncultivation?.suitableForOverallLocalClimaticParameters ||
-  //       {}),
-  //     [param]: newValue,
-  //   };
-
-  //   if (newValue === null) {
-  //     delete updatedSuitableParams[param];
-  //   }
-
-  //   const updatedCultivationInfo = {
-  //     ...formData.inspectioncultivation,
-  //     suitableForOverallLocalClimaticParameters: updatedSuitableParams,
-  //   };
-
-  //   const updatedFormData = {
-  //     ...formData,
-  //     inspectioncultivation: updatedCultivationInfo,
-  //   };
-
-  //   setFormData(updatedFormData);
-
-  //   try {
-  //     await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData));
-  //   } catch (e) {
-  //     console.log("AsyncStorage save failed", e);
-  //   }
-
-  //   const nextMissing = climateParameters.find((p) => !updatedSelections[p]);
-
-  //   if (nextMissing) {
-  //     setError(
-  //       t("Error.Please select Yes or No for", {
-  //         Missing: t(`InspectionForm.${nextMissing}`),
-  //       })
-  //     );
-  //   } else {
-  //     setError("");
-  //   }
-  // };
 
   const handleSelect = async (key: string, value: Selection) => {
     const currentValue = selections[key];
@@ -1120,21 +1069,8 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
       <View className="flex-1 bg-[#F3F3F3] ">
         <StatusBar barStyle="dark-content" />
 
-        <View className="flex-row items-center justify-center py-4 mt-2">
-          <TouchableOpacity
-            className="absolute left-4 bg-[#E0E0E080] rounded-full p-4"
-            onPress={() => navigation.goBack()}
-          >
-            <AntDesign name="left" size={20} color="#000" />
-          </TouchableOpacity>
-
-          <Text className="text-lg font-semibold text-black">
-            {t("InspectionForm.Inspection Form")}
-          </Text>
-        </View>
-
         {/* Tabs */}
-        <FormTabs activeKey="Cultivation Info" />
+        <FormTabs activeKey="Cultivation Info" navigation={navigation} />
 
         <ScrollView
           className="flex-1 px-6 bg-white rounded-t-3xl"
