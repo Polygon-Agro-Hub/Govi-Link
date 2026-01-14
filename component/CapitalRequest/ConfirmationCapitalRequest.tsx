@@ -141,7 +141,7 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
           t("ConfirmationCapitalRequest.UndoSuccess"),
           [
             {
-              text: t("MAIN.OK"),
+              text: t("Main.ok"),
               onPress: () => navigation.navigate("Main", { screen: "CapitalRequests" }),
             },
           ]
@@ -156,7 +156,7 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
       Alert.alert(
         t("Main.Error"),
         error.response?.data?.message || t("ConfirmationCapitalRequest.UndoFailed"),
-        [{ text: t("MAIN.OK") }]
+        [{ text: t("Main.ok") }]
       );
     }
   };
@@ -176,7 +176,7 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
         t("ConfirmationCapitalRequest.ConfirmSuccess"),
         [
           {
-            text: t("MAIN.OK"),
+            text: t("Main.ok"),
             onPress: () => navigation.navigate("CapitalRequests"),
           },
         ]
@@ -196,7 +196,7 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
         t("ConfirmationCapitalRequest.AutoAssignSuccess"),
         [
           {
-            text: t("MAIN.OK"),
+            text: t("Main.ok"),
             onPress: () => navigation.navigate("CapitalRequests"),
           },
         ]

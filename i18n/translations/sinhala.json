@@ -1,25 +1,25 @@
 {
-  "MAIN": {
-    "OK": "හරි"
-  },
   "Main": {
-    "error": "සමාවන්න",
+    "Warning": "අවවාදය",
+    "error": "දෝෂයකි",
     "somethingWentWrong": "කිසියම් දෝෂයක් සිදුව ඇත. කරුණාකර නැවත උත්සාහ කරන්න.",
     "ok": "හරි",
     "Sorry": "සමාවන්න",
-    "userBlocked": "මෙම උපාංගයෙන් ඉල්ලීම් බොහෝ වතාවක් යවනු ලැබිය. කරුණාකර විනාඩි 30කට පසුව නැවත උත්සාහ කරන්න.",
+    "userBlocked": "මෙම උපාංගයෙන් ඉල්ලීම් අධික ලෙස යවනු ලැබ ඇත. කරුණාකර විනාඩි 30කට පසු නැවත උත්සාහ කරන්න.",
     "No Internet Connection": "අන්තර්ජාල සම්බන්ධතාවයක් නොමැත",
-    "Please turn on mobile data or Wi-Fi to continue.": "කරුණාකර Mobile Data හෝ Wi-Fi සක්‍රීය කරන්න.",
-    "Your login session has expired. Please log in again to continue.": "ඔබගේ පුරනය වීමේ සැසිය කල් ඉකුත් වී ඇත. කරුණාකර නැවත පුරනය වන්න.",
-    "Success": "සාර්ථකයි"
+    "Please turn on mobile data or Wi-Fi to continue.": "ඉදිරියට යාම සඳහා කරුණාකර Mobile Data හෝ Wi-Fi සක්‍රීය කරන්න.",
+    "Your login session has expired. Please log in again to continue.": "ඔබගේ පුරනය වීමේ සැසිය කල් ඉකුත් වී ඇත. ඉදිරියට යාම සඳහා කරුණාකර නැවත පුරනය වන්න.",
+    "Success": "සාර්ථකයි",
+    "Go Back": "ආපසු යන්න",
+    "Continue": "ඉදිරියට යන්න"
   },
   "Error": {
     "error": "සමාවන්න",
     "Error": "දෝෂය",
     "Sorry": "සමාවන්න",
     "somethingWentWrong": "කිසියම් දෝෂයක් සිදුව ඇත. කරුණාකර නැවත උත්සාහ කරන්න.",
-    "Failed to fetch empid.": "සේවක හැඳුනුම්පත සොයා ගැනීමට අසමත් විය.",
     "AuthTokenNotFound": "සත්‍යාපන ටෝකනය හමු නොවීය. කරුණාකර නැවත පුරනය වන්න.",
+    "Failed to fetch empid.": "සේවක හැඳුනුම්පත සොයා ගැනීමට අසමත් විය.",
     "New password and confirm password do not match.": "නව මුරපදය සහ එය තහවුරු කිරීමේ මුරපදය එකිනෙකට නොගැලපේ.",
     "New password must be at least 6 characters long.": "නව මුරපදයට අවම වශයෙන් අක්ෂර 6 ක් තිබිය යුතුය.",
     "Failed to update password.": "මුරපදය යාවත්කාලීන කිරීම අසාර්ථකයි.",
@@ -120,6 +120,7 @@
     "Please select at least one opportunity to go for": "කරුණාකර යාමට අවම වශයෙන් එක් අවස්ථාවක්වත් තෝරන්න",
     "Please specify the other opportunity to go for": "කරුණාකර යා යුතු අනෙක් අවස්ථාව සඳහන් කරන්න",
     "General opinion of your friends is required": "ඔබේ මිතුරන්ගේ සාමාන්‍ය මතය අවශ්‍යයි",
+    "profit is required": "How much profit are you expecting from the proposed crop/cropping system is required",
     "Value must be greater than 0": "අගය 0 ට වඩා වැඩි විය යුතුය.",
     "What are the risks you are anticipating in the proposed crop / cropping system is required": "යෝජිත බෝග/බෝග ක්‍රමය අවශ්‍ය වන විට ඔබ අපේක්ෂා කරන අවදානම් මොනවාද?",
     "Do you have the solution is required": "අවශ්‍ය විසඳුම ඔබ ළඟ තිබේද අවශ්‍යයි",
@@ -395,7 +396,6 @@
     "NoOfficersFound": "ඔබගේ සෙවුමට ගැලපෙන නිලධාරීන් නොමැත",
     "Approved": "අනුමත කළා"
   },
-
   "Visits": {
     "Pending": "පූර්ණ වෙමින්",
     "Completed": "සම්පූර්ණ කළා",
@@ -669,7 +669,18 @@
     "Does the farmer knows technologies for value addition of your crop": "ඔබේ බෝගයට අගය එකතු කිරීමේ තාක්ෂණයන් ගොවියා දන්නවාද?",
     "Does the farmer has market linkage for value added products": "අගය එකතු කළ නිෂ්පාදන සඳහා ගොවියාට වෙළඳපොළ සම්බන්ධතාවයක් තිබේද?",
     "Is farmer aware about required quality standards of value added products of proposed crops": "යෝජිත බෝගවල අගය එකතු කළ නිෂ්පාදනවල අවශ්‍ය ගුණාත්මක ප්‍රමිතීන් පිළිබඳව ගොවියා දැනුවත්ද?",
-    "Back": "ආපසු"
+    "Back": "ආපසු",
+    "Data saved successfully": "දත්ත සාර්ථකව සුරකින ලදී",
+    "Please wait...": "කරුණාකර රැඳී සිටින්න...",
+    "Saving": "සුරකිමින් පවතී",
+    "Could not save to server. Data saved locally.": "සේවාදායකයට සුරකින්න නොහැකි විය. දත්ත ස්ථානීයව සුරකින ලදී.",
+    "Submit Confirmation": "යොමු කිරීමේ තහවුරු කිරීම",
+    "Success": "සාර්ථකයි",
+    "Error": "දෝෂයකි",
+    "You have filled out all the forms. If you need to make any changes, you can go back. Otherwise, continuing will take you to the confirmation step.": "ඔබ සියලුම පෝරම පුරවා ඇත. වෙනස්කම් කිරීමට අවශ්‍ය නම් ආපසු යා හැක. එසේ නොමැති නම්, ඉදිරියට යාමෙන් තහවුරු කිරීමේ අදියරට ඔබව ගෙන යනු ඇත.",
+    "Inspection form completed successfully!": "පරීක්ෂණ පෝරමය සාර්ථකව සම්පූර්ණ කර ඇත!",
+    "Could not save to server. Please try again.": "සේවාදායකයට සුරකින්න නොහැකි විය. කරුණාකර නැවත උත්සාහ කරන්න.",
+    "Go Back": "ආපසු යන්න"
   },
   "ConfirmationCapitalRequest": {
     "ConfirmSuccess": "තහවුරු කිරීම සාර්ථකයි!",

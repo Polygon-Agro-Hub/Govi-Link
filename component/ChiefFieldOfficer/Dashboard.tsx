@@ -235,7 +235,7 @@ useEffect(() => {
           t(
             "Error.Your login session has expired. Please log in again to continue."
           ),
-          [{ text: t("MAIN.OK") }]
+          [{ text: t("Main.ok") }]
         );
         return;
       }
@@ -257,7 +257,7 @@ useEffect(() => {
           t(
             "Error.Your login session has expired. Please log in again to continue."
           ),
-          [{ text: t("MAIN.OK") }]
+          [{ text: t("Main.ok") }]
         );
         navigation.navigate("Login");
       }

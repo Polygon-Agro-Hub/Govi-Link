@@ -11,9 +11,14 @@ import {
   Platform,
   Modal,
   FlatList,
-  Image
+  Image,
 } from "react-native";
-import { Feather, FontAwesome6, MaterialIcons } from "@expo/vector-icons";
+import {
+  Feather,
+  FontAwesome6,
+  Ionicons,
+  MaterialIcons,
+} from "@expo/vector-icons";
 import FormTabs from "../CapitalRequest/FormTabs";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTranslation } from "react-i18next";
@@ -48,7 +53,6 @@ type IDProofInfo = {
   backImg: string | null;
 };
 
-
 type IDProofProps = {
   navigation: any;
 };
@@ -73,7 +77,8 @@ const UploadButton = ({
         <Feather name="rotate-ccw" size={22} color="#fff" />
       ) : (
         <FontAwesome6 name="camera" size={22} color="#fff" />
-      )}      <Text className="text-base text-white ml-3">{title}</Text>
+      )}{" "}
+      <Text className="text-base text-white ml-3">{title}</Text>
     </TouchableOpacity>
 
     {image && (
@@ -95,19 +100,26 @@ const UploadButton = ({
   </View>
 );
 
-
 const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
   const route = useRoute<RouteProp<RootStackParamList, "IDProof">>();
   const prevFormData = route.params?.formData;
-  const { requestNumber,requestId } = route.params;
+  const { requestNumber, requestId } = route.params;
   let jobId = requestNumber;
   const [formData, setFormData] = useState(prevFormData);
-  console.log("job id re", formData)
+  console.log("job id re", formData);
 
-  const [selectedIdProof, setSelectedIdProof] = useState<string | null>(prevFormData?.inspectionidproof?.pType || null);
-  const [nic, setNic] = useState<string>(prevFormData?.inspectionidproof?.pNumber || "");
-  const [FrontImage, setFrontImage] = useState<string | null>(prevFormData?.inspectionidproof?.frontImg?.uri || null);
-  const [BackImage, setBackImage] = useState<string | null>(prevFormData?.inspectionidproof?.backImg?.uri || null);
+  const [selectedIdProof, setSelectedIdProof] = useState<string | null>(
+    prevFormData?.inspectionidproof?.pType || null
+  );
+  const [nic, setNic] = useState<string>(
+    prevFormData?.inspectionidproof?.pNumber || ""
+  );
+  const [FrontImage, setFrontImage] = useState<string | null>(
+    prevFormData?.inspectionidproof?.frontImg?.uri || null
+  );
+  const [BackImage, setBackImage] = useState<string | null>(
+    prevFormData?.inspectionidproof?.backImg?.uri || null
+  );
   const [isNextEnabled, setIsNextEnabled] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showCamera, setShowCamera] = useState(false);
@@ -116,9 +128,9 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
   const { t, i18n } = useTranslation();
   const [isExistingData, setIsExistingData] = useState(false);
   const idProofOptions = [
-  { key: "NIC Number", label: "NIC Number" },
-  { key: "Driving License ID", label: "Driving License" },
-];
+    { key: "NIC Number", label: "NIC Number" },
+    { key: "Driving License ID", label: "Driving License" },
+  ];
 
   const saveToBackend = async (
     reqId: number,
@@ -127,7 +139,10 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
     isUpdate: boolean
   ): Promise<boolean> => {
     try {
-      console.log(`💾 Saving to backend (${isUpdate ? 'UPDATE' : 'INSERT'}):`, tableName);
+      console.log(
+        `💾 Saving to backend (${isUpdate ? "UPDATE" : "INSERT"}):`,
+        tableName
+      );
       console.log(`📝 reqId being sent:`, reqId);
 
       // Transform data to match backend schema
@@ -138,35 +153,35 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
 
       // Prepare FormData for multipart upload
       const formData = new FormData();
-      formData.append('reqId', reqId.toString());
-      formData.append('tableName', tableName);
+      formData.append("reqId", reqId.toString());
+      formData.append("tableName", tableName);
 
       // Add non-file fields
-      formData.append('pType', transformedData.pType);
-      formData.append('pNumber', transformedData.pNumber);
+      formData.append("pType", transformedData.pType);
+      formData.append("pNumber", transformedData.pNumber);
 
       // Add front image if exists and is local URI
-      if (data.frontImg?.uri && data.frontImg.uri.startsWith('file://')) {
-        formData.append('frontImg', {
+      if (data.frontImg?.uri && data.frontImg.uri.startsWith("file://")) {
+        formData.append("frontImg", {
           uri: data.frontImg.uri,
           name: data.frontImg.name,
           type: data.frontImg.type,
         } as any);
       } else if (data.frontImg) {
         // Image already uploaded (S3 URL)
-        formData.append('frontImgUrl', data.frontImg);
+        formData.append("frontImgUrl", data.frontImg);
       }
 
       // Add back image if exists and is local URI
-      if (data.backImg?.uri && data.backImg.uri.startsWith('file://')) {
-        formData.append('backImg', {
+      if (data.backImg?.uri && data.backImg.uri.startsWith("file://")) {
+        formData.append("backImg", {
           uri: data.backImg.uri,
           name: data.backImg.name,
           type: data.backImg.type,
         } as any);
       } else if (data.backImg) {
         // Image already uploaded (S3 URL)
-        formData.append('backImgUrl', data.backImg);
+        formData.append("backImgUrl", data.backImg);
       }
 
       const response = await axios.post(
@@ -174,7 +189,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
         formData,
         {
           headers: {
-            'Content-Type': 'multipart/form-data',
+            "Content-Type": "multipart/form-data",
           },
         }
       );
@@ -217,7 +232,10 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
       const loadData = async () => {
         try {
           const saved = await AsyncStorage.getItem(`${requestNumber}`);
-          console.log("📦 Loading from AsyncStorage:", saved ? "Data found" : "No data");
+          console.log(
+            "📦 Loading from AsyncStorage:",
+            saved ? "Data found" : "No data"
+          );
 
           if (saved) {
             const parsed = JSON.parse(saved);
@@ -265,215 +283,224 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
     setShowCamera(true);
   };
 
- const handleCameraClose = async (uri: string | null) => {
-  setShowCamera(false);
+  const handleCameraClose = async (uri: string | null) => {
+    setShowCamera(false);
 
-  if (!uri || !cameraSide) return;
+    if (!uri || !cameraSide) return;
 
-  const fileName = `${cameraSide}_id_${Date.now()}.jpg`;
-  const fileObj = {
-    uri: uri,
-    name: fileName,
-    type: 'image/jpeg',
+    const fileName = `${cameraSide}_id_${Date.now()}.jpg`;
+    const fileObj = {
+      uri: uri,
+      name: fileName,
+      type: "image/jpeg",
+    };
+
+    let updatedFormData = { ...formData };
+
+    if (cameraSide === "front") {
+      setFrontImage(uri);
+      updatedFormData = {
+        ...formData,
+        inspectionidproof: {
+          ...formData.inspectionidproof,
+          frontImg: fileObj,
+          pType: selectedIdProof || "",
+          pNumber: nic,
+        },
+      };
+    } else {
+      setBackImage(uri);
+      updatedFormData = {
+        ...formData,
+        inspectionidproof: {
+          ...formData.inspectionidproof,
+          backImg: fileObj,
+          pType: selectedIdProof || "",
+          pNumber: nic,
+        },
+      };
+    }
+
+    // Update formData state
+    setFormData(updatedFormData);
+
+    // Save updated formData to AsyncStorage
+    try {
+      await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData));
+      console.log("Form data saved!");
+    } catch (error) {
+      console.error("Failed to save form data:", error);
+    }
+
+    setCameraSide(null);
+
+    // Enable Next button if both images are captured
+    if (
+      (cameraSide === "front" && updatedFormData.inspectionidproof.backImg) ||
+      (cameraSide === "back" && updatedFormData.inspectionidproof.frontImg)
+    ) {
+      setIsNextEnabled(true);
+    }
   };
 
-  let updatedFormData = { ...formData };
-
-  if (cameraSide === "front") {
-    setFrontImage(uri);
-    updatedFormData = {
-      ...formData,
-      inspectionidproof: {
-        ...formData.inspectionidproof,
-        frontImg: fileObj,
-        pType: selectedIdProof || "",
-        pNumber: nic,
-      },
-    };
-  } else {
-    setBackImage(uri);
-    updatedFormData = {
-      ...formData,
-      inspectionidproof: {
-        ...formData.inspectionidproof,
-        backImg: fileObj,
-        pType: selectedIdProof || "",
-        pNumber: nic,
-      },
-    };
-  }
-
-  // Update formData state
-  setFormData(updatedFormData);
-
-  // Save updated formData to AsyncStorage
-  try {
-    await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData));
-    console.log("Form data saved!");
-  } catch (error) {
-    console.error("Failed to save form data:", error);
-  }
-
-  setCameraSide(null);
-
-  // Enable Next button if both images are captured
-  if (
-    (cameraSide === "front" && updatedFormData.inspectionidproof.backImg) ||
-    (cameraSide === "back" && updatedFormData.inspectionidproof.frontImg)
-  ) {
-    setIsNextEnabled(true);
-  }
-};
-
   const handleNext = async () => {
-  if (!selectedIdProof) {
-    setErrors(prev => ({ ...prev, nic: t("Error.ID Proof Type is required") }));
-    Alert.alert(t("Error.Validation Error"), "• " + t("Error.ID Proof Type is required"), [
-      { text: t("MAIN.OK") },
-    ]);
-    return;
-  }
-
-  if (!nic.trim()) {
-    setErrors(prev => ({
-      ...prev,
-      nic: t(`Error.${selectedIdProof} is required`),
-    }));
-    Alert.alert(t("Error.Validation Error"), "• " + t(`Error.${selectedIdProof} is required`), [
-      { text: t("MAIN.OK") },
-    ]);
-    return;
-  }
-
-  if (errors.nic) {
-    Alert.alert(t("Validation Error"), errors.nic);
-    return;
-  }
-
-  if (!formData.inspectionidproof?.frontImg || !formData.inspectionidproof?.backImg) {
-    Alert.alert(
-      t("Error.Validation Error"),
-      t("Error.Both ID images are required"),
-      [{ text: t("MAIN.OK") }]
-    );
-    return;
-  }
-
-  // ✅ Validate requestId exists
-  if (!route.params?.requestId) {
-    console.error("❌ requestId is missing!");
-    Alert.alert(
-      t("Error.Error"),
-      "Request ID is missing. Please go back and try again.",
-      [{ text: t("MAIN.OK") }]
-    );
-    return;
-  }
-
-  const reqId = Number(route.params.requestId);
-
-  console.log("🚀 Preparing to save ID Proof for requestId:", reqId);
-
-  // ✅ Validate it's a valid number
-  if (isNaN(reqId) || reqId <= 0) {
-    console.error("❌ Invalid requestId:", route.params.requestId);
-    Alert.alert(
-      t("Error.Error"),
-      "Invalid request ID. Please go back and try again.",
-      [{ text: t("MAIN.OK") }]
-    );
-    return;
-  }
-
-  console.log("✅ Using requestId:", reqId);
-
-  // Show loading indicator
-  Alert.alert(
-    t("InspectionForm.Saving"),
-    t("InspectionForm.Please wait..."),
-    [],
-    { cancelable: false }
-  );
-
-  // Save to backend
-  try {
-    console.log(
-      `🚀 Saving to backend (${isExistingData ? "UPDATE" : "INSERT"})`
-    );
-
-    const saved = await saveToBackend(
-      reqId,
-      "inspectionidproof",
-      formData.inspectionidproof,
-      isExistingData
-    );
-
-    if (saved) {
-      console.log("✅ ID Proof saved successfully to backend");
-      setIsExistingData(true);
-
+    if (!selectedIdProof) {
+      setErrors((prev) => ({
+        ...prev,
+        nic: t("Error.ID Proof Type is required"),
+      }));
       Alert.alert(
-        t("MAIN.Success"),
-        t("InspectionForm.Data saved successfully"),
-        [
-          {
-            text: t("MAIN.OK"),
-            onPress: () => {
-              navigation.navigate("FinanceInfo", { 
-                formData, 
-                requestNumber, 
-                requestId: route.params.requestId 
-              });
-            },
-          },
-        ]
+        t("Error.Validation Error"),
+        "• " + t("Error.ID Proof Type is required"),
+        [{ text: t("Main.ok") }]
       );
-    } else {
-      console.log("⚠️ Backend save failed, but continuing with local data");
+      return;
+    }
+
+    if (!nic.trim()) {
+      setErrors((prev) => ({
+        ...prev,
+        nic: t(`Error.${selectedIdProof} is required`),
+      }));
       Alert.alert(
-        t("MAIN.Warning"),
+        t("Error.Validation Error"),
+        "• " + t(`Error.${selectedIdProof} is required`),
+        [{ text: t("Main.ok") }]
+      );
+      return;
+    }
+
+    if (errors.nic) {
+      Alert.alert(t("Validation Error"), errors.nic);
+      return;
+    }
+
+    if (
+      !formData.inspectionidproof?.frontImg ||
+      !formData.inspectionidproof?.backImg
+    ) {
+      Alert.alert(
+        t("Error.Validation Error"),
+        t("Error.Both ID images are required"),
+        [{ text: t("Main.ok") }]
+      );
+      return;
+    }
+
+    // ✅ Validate requestId exists
+    if (!route.params?.requestId) {
+      console.error("❌ requestId is missing!");
+      Alert.alert(
+        t("Error.Error"),
+        "Request ID is missing. Please go back and try again.",
+        [{ text: t("Main.ok") }]
+      );
+      return;
+    }
+
+    const reqId = Number(route.params.requestId);
+
+    console.log("🚀 Preparing to save ID Proof for requestId:", reqId);
+
+    // ✅ Validate it's a valid number
+    if (isNaN(reqId) || reqId <= 0) {
+      console.error("❌ Invalid requestId:", route.params.requestId);
+      Alert.alert(
+        t("Error.Error"),
+        "Invalid request ID. Please go back and try again.",
+        [{ text: t("Main.ok") }]
+      );
+      return;
+    }
+
+    console.log("✅ Using requestId:", reqId);
+
+    // Show loading indicator
+    Alert.alert(
+      t("InspectionForm.Saving"),
+      t("InspectionForm.Please wait..."),
+      [],
+      { cancelable: false }
+    );
+
+    // Save to backend
+    try {
+      console.log(
+        `🚀 Saving to backend (${isExistingData ? "UPDATE" : "INSERT"})`
+      );
+
+      const saved = await saveToBackend(
+        reqId,
+        "inspectionidproof",
+        formData.inspectionidproof,
+        isExistingData
+      );
+
+      if (saved) {
+        console.log("✅ ID Proof saved successfully to backend");
+        setIsExistingData(true);
+
+        Alert.alert(
+          t("Main.Success"),
+          t("InspectionForm.Data saved successfully"),
+          [
+            {
+              text: t("Main.ok"),
+              onPress: () => {
+                navigation.navigate("FinanceInfo", {
+                  formData,
+                  requestNumber,
+                  requestId: route.params.requestId,
+                });
+              },
+            },
+          ]
+        );
+      } else {
+        console.log("⚠️ Backend save failed, but continuing with local data");
+        Alert.alert(
+          t("Main.Warning"),
+          t("InspectionForm.Could not save to server. Data saved locally."),
+          [
+            {
+              text: t("Main.Continue"),
+              onPress: () => {
+                navigation.navigate("FinanceInfo", {
+                  formData,
+                  requestNumber,
+                  requestId: route.params.requestId,
+                });
+              },
+            },
+          ]
+        );
+      }
+    } catch (error) {
+      console.error("Error during final save:", error);
+      Alert.alert(
+        t("Main.Warning"),
         t("InspectionForm.Could not save to server. Data saved locally."),
         [
           {
-            text: t("MAIN.Continue"),
+            text: t("Main.Continue"),
             onPress: () => {
-              navigation.navigate("FinanceInfo", { 
-                formData, 
-                requestNumber, 
-                requestId: route.params.requestId 
+              navigation.navigate("FinanceInfo", {
+                formData,
+                requestNumber,
+                requestId: route.params.requestId,
               });
             },
           },
         ]
       );
     }
-  } catch (error) {
-    console.error("Error during final save:", error);
-    Alert.alert(
-      t("MAIN.Warning"),
-      t("InspectionForm.Could not save to server. Data saved locally."),
-      [
-        {
-          text: t("MAIN.Continue"),
-          onPress: () => {
-            navigation.navigate("FinanceInfo", { 
-              formData, 
-              requestNumber, 
-              requestId: route.params.requestId 
-            });
-          },
-        },
-      ]
-    );
-  }
-};
+  };
 
   const validateNicNumber = (input: string) =>
     /^[0-9]{9}V$|^[0-9]{12}$/.test(input);
 
   const validateDrivingLicense = (input: string) =>
     /^(?:[A-Z]{1,2}[0-9]{8,9}|[0-9]{10})$/.test(input);
-
 
   const handleIdNumberChange = async (input: string) => {
     if (!selectedIdProof) return;
@@ -497,11 +524,10 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
 
     if (rules.required && value.trim().length === 0) {
       error = t(`Error.${rules.type} is required`);
-    } else if (
-      selectedIdProof === "NIC Number" &&
-      !validateNicNumber(value)
-    ) {
-      error = t("Error.NIC Number must be 9 digits followed by 'V' or 12 digits.");
+    } else if (selectedIdProof === "NIC Number" && !validateNicNumber(value)) {
+      error = t(
+        "Error.NIC Number must be 9 digits followed by 'V' or 12 digits."
+      );
     } else if (
       selectedIdProof === "Driving License ID" &&
       !validateDrivingLicense(value)
@@ -509,7 +535,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
       error = t("Error.Invalid Driving License number");
     }
 
-    setErrors(prev => ({ ...prev, nic: error }));
+    setErrors((prev) => ({ ...prev, nic: error }));
 
     // ✅ Update formData
     const updatedFormData = {
@@ -527,15 +553,11 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
 
     // ✅ Save to AsyncStorage
     try {
-      await AsyncStorage.setItem(
-        `${jobId}`,
-        JSON.stringify(updatedFormData)
-      );
+      await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData));
     } catch (e) {
       console.error("Failed to save ID number", e);
     }
   };
-
 
   return (
     <KeyboardAvoidingView
@@ -545,19 +567,8 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
       <View className="flex-1 bg-[#F3F3F3] ">
         <StatusBar barStyle="dark-content" />
 
-        {/* Header */}
-        <View className="flex-row items-center justify-center py-4 mt-2">
-          <TouchableOpacity className="absolute left-4 bg-[#E0E0E080] rounded-full p-4" onPress={() => navigation.goBack()}>
-            <AntDesign name="left" size={20} color="#000" />
-          </TouchableOpacity>
-
-          <Text className="text-lg font-semibold text-black">
-            {t("InspectionForm.Inspection Form")}
-          </Text>
-        </View>
-
         {/* Tabs */}
-        <FormTabs activeKey="ID Proof" onTabPress={() => navigation.goBack()} />
+        <FormTabs activeKey="ID Proof" navigation={navigation} />
 
         <ScrollView
           className="flex-1 px-6 bg-white rounded-t-3xl"
@@ -565,7 +576,6 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
           contentContainerStyle={{ paddingBottom: 120 }}
         >
           <View className="h-6" />
-
 
           <View className="relative mb-4">
             <Text className="text-sm text-[#070707] mb-2">
@@ -579,8 +589,9 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
             >
               <View className="bg-[#F6F6F6] rounded-full px-5 py-4 flex-row items-center justify-between">
                 <Text
-                  className={`text-base ${selectedIdProof ? "text-black" : "text-[#838B8C]"
-                    }`}
+                  className={`text-base ${
+                    selectedIdProof ? "text-black" : "text-[#838B8C]"
+                  }`}
                 >
                   {selectedIdProof
                     ? t(`InspectionForm.${selectedIdProof}`)
@@ -590,29 +601,26 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
               </View>
             </TouchableOpacity>
 
-
             <View className="mt-4">
               <Text className="text-sm text-[#070707] mb-2">
                 <Text className="text-black">
-                  {
-                    selectedIdProof === "NIC Number" ? (
-                      t("InspectionForm.NIC Number")
-
-                    ) : (t("InspectionForm.Driving License ID"))
-                  } *
+                  {selectedIdProof === "NIC Number"
+                    ? t("InspectionForm.NIC Number")
+                    : t("InspectionForm.Driving License ID")}{" "}
+                  *
                 </Text>
               </Text>
               <View
-                className={`bg-[#F6F6F6] rounded-full flex-row items-center ${errors.nic ? "border border-red-500" : ""
-                  }`}
+                className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
+                  errors.nic ? "border border-red-500" : ""
+                }`}
               >
                 <TextInput
-                  placeholder='----'
+                  placeholder="----"
                   placeholderTextColor="#7D7D7D"
                   className="flex-1 px-2 py-4 text-base text-black ml-4"
                   value={nic || ""}
                   onChangeText={handleIdNumberChange}
-
                   // onBlur={handleNICBlur}
                   underlineColorAndroid="transparent"
                   maxLength={selectedIdProof === "NIC Number" ? 12 : 10}
@@ -625,17 +633,26 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
                 </Text>
               )}
             </View>
-
           </View>
           {selectedIdProof && (
             <View className="mt-6">
               <UploadButton
-                title={selectedIdProof == "NIC Number" ? t("InspectionForm.NIC Front Photo") : t("InspectionForm.Driving License Front Photo")}
+                title={
+                  selectedIdProof == "NIC Number"
+                    ? t("InspectionForm.NIC Front Photo")
+                    : t("InspectionForm.Driving License Front Photo")
+                }
                 onPress={() => openCamera("front")}
                 image={FrontImage}
                 onClear={async () => {
                   setFrontImage(null);
-                  const updatedFormData = { ...formData, inspectionidproof: { ...formData.inspectionidproof, frontImg: null } };
+                  const updatedFormData = {
+                    ...formData,
+                    inspectionidproof: {
+                      ...formData.inspectionidproof,
+                      frontImg: null,
+                    },
+                  };
                   setFormData(updatedFormData);
                   try {
                     await AsyncStorage.setItem(
@@ -646,18 +663,31 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
                   } catch (e) {
                     console.error("Failed to clear front image in storage", e);
                   }
-                  setIsNextEnabled(updatedFormData.frontImg && updatedFormData.backImg ? true : false);
+                  setIsNextEnabled(
+                    updatedFormData.frontImg && updatedFormData.backImg
+                      ? true
+                      : false
+                  );
                 }}
               />
 
-
               <UploadButton
-                title={selectedIdProof == "NIC Number" ? t("InspectionForm.NIC Back Photo") : t("InspectionForm.Driving License Back Photo")}
+                title={
+                  selectedIdProof == "NIC Number"
+                    ? t("InspectionForm.NIC Back Photo")
+                    : t("InspectionForm.Driving License Back Photo")
+                }
                 onPress={() => openCamera("back")}
                 image={BackImage}
                 onClear={async () => {
                   setBackImage(null);
-                  const updatedFormData = { ...formData, inspectionidproof: { ...formData.inspectionidproof, backImg: null } };
+                  const updatedFormData = {
+                    ...formData,
+                    inspectionidproof: {
+                      ...formData.inspectionidproof,
+                      backImg: null,
+                    },
+                  };
                   setFormData(updatedFormData);
 
                   try {
@@ -669,69 +699,77 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
                   } catch (e) {
                     console.error("Failed to clear back image in storage", e);
                   }
-                  setIsNextEnabled(updatedFormData.frontImg && updatedFormData.backImg ? true : false);
+                  setIsNextEnabled(
+                    updatedFormData.frontImg && updatedFormData.backImg
+                      ? true
+                      : false
+                  );
                 }}
               />
             </View>
           )}
-
-
         </ScrollView>
 
-        <View className="flex-row px-6 py-4 gap-4 bg-white border-t border-gray-200 ">
-          <TouchableOpacity className="flex-1 bg-[#444444] rounded-full py-4 items-center" onPress={() =>
-            navigation.navigate("Main", {
-              screen: "MainTabs",
-              params: {
-                screen: "CapitalRequests",
-              },
-            })
-          }>
-            <Text className="text-white text-base font-semibold">{t("InspectionForm.Exit")}</Text>
+        <View className="flex-row px-6 py-4 justify-between bg-white border-t border-gray-200">
+          {/* Back Button */}
+          <TouchableOpacity
+            style={{ width: "48%" }}
+            className="bg-[#444444] rounded-full py-4 flex-row items-center justify-center"
+            onPress={() => navigation.goBack()}
+          >
+            <Ionicons name="arrow-back" size={22} color="#fff" />
+            <Text className="text-white text-base font-semibold ml-2">
+              {t("InspectionForm.Back")}
+            </Text>
           </TouchableOpacity>
-          {isNextEnabled ? (
-            <View className="flex-1">
-              <TouchableOpacity
-                className="flex-1 "
-                onPress={handleNext}
-              >
-                <LinearGradient
-                  colors={["#F35125", "#FF1D85"]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  className=" rounded-full py-4 items-center"
-                  style={{
-                    shadowColor: "#000",
-                    shadowOffset: { width: 0, height: 3 },
-                    shadowOpacity: 0.25,
-                    shadowRadius: 5,
-                    elevation: 6,
-                  }}
-                >
-                  <Text className="text-white text-base font-semibold">{t("InspectionForm.Next")}</Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            </View>
 
+          {/* Next Button */}
+          {isNextEnabled ? (
+            <TouchableOpacity
+              style={{ width: "48%" }}
+              onPress={handleNext}
+              activeOpacity={0.8}
+            >
+              <LinearGradient
+                colors={["#F35125", "#FF1D85"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                className="rounded-full py-4 flex-row items-center justify-center"
+                style={{
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 3 },
+                  shadowOpacity: 0.25,
+                  shadowRadius: 5,
+                  elevation: 6,
+                }}
+              >
+                <Text className="text-white text-base font-semibold mr-2">
+                  {t("InspectionForm.Next")}
+                </Text>
+                <Ionicons name="arrow-forward" size={22} color="#fff" />
+              </LinearGradient>
+            </TouchableOpacity>
           ) : (
-            <View className="flex-1 bg-gray-300 rounded-full py-4 items-center">
-              <Text className="text-white text-base font-semibold">{t("InspectionForm.Next")}</Text>
+            <View
+              style={{ width: "48%" }}
+              className="bg-gray-300 rounded-full py-4 flex-row items-center justify-center"
+            >
+              <Text className="text-white text-base font-semibold mr-2">
+                {t("InspectionForm.Next")}
+              </Text>
+              <Ionicons name="arrow-forward" size={22} color="#fff" />
             </View>
           )}
-
         </View>
       </View>
-      <Modal
-        visible={showIdProofDropdown}
-        transparent
-        animationType="none">
+      <Modal visible={showIdProofDropdown} transparent animationType="none">
         <TouchableOpacity
           className="flex-1 bg-black/40 justify-center px-6"
           activeOpacity={1}
           onPress={() => setShowIdProofDropdown(false)}
         >
           <View className="bg-white rounded-2xl p-4">
-            {idProofOptions.map(option => (
+            {idProofOptions.map((option) => (
               <TouchableOpacity
                 key={option.key}
                 className="py-4 border-b border-gray-200"
@@ -743,7 +781,15 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
                   setFrontImage(null);
                   setBackImage(null);
                   setErrors({});
-                  const updatedFormData = { ...formData, inspectionidproof: { pType: option.key, pNumber: "", frontImg: null, backImg: null } };
+                  const updatedFormData = {
+                    ...formData,
+                    inspectionidproof: {
+                      pType: option.key,
+                      pNumber: "",
+                      frontImg: null,
+                      backImg: null,
+                    },
+                  };
                   setFormData(updatedFormData);
 
                   // Save cleared state to AsyncStorage
@@ -754,16 +800,17 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
                     );
                     console.log("Cleared ID proof data due to type change!");
                   } catch (e) {
-                    console.error("Failed to clear ID proof data in storage", e);
+                    console.error(
+                      "Failed to clear ID proof data in storage",
+                      e
+                    );
                   }
 
                   // Disable Next button
                   setIsNextEnabled(false);
                 }}
               >
-                <Text className="text-base text-black">
-                  {option.label}
-                </Text>
+                <Text className="text-base text-black">{option.label}</Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -772,7 +819,6 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
       <Modal visible={showCamera} animationType="slide">
         <CameraScreen onClose={handleCameraClose} />
       </Modal>
-
     </KeyboardAvoidingView>
   );
 };

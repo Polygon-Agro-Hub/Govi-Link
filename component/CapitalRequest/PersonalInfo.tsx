@@ -12,7 +12,7 @@ import {
   Modal,
   FlatList,
 } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import FormTabs from "../CapitalRequest/FormTabs";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTranslation } from "react-i18next";
@@ -63,7 +63,6 @@ type FormData = {
   inspectionpersonal: PersonalInfo;
 };
 
-
 const Input = ({
   label,
   placeholder,
@@ -88,8 +87,9 @@ const Input = ({
       {label} {required && <Text className="text-black">*</Text>}
     </Text>
     <View
-      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${error ? "border border-red-500" : ""
-        }`}
+      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
+        error ? "border border-red-500" : ""
+      }`}
     >
       {isMobile ? (
         <View className="flex-row flex-1 items-center">
@@ -123,25 +123,24 @@ const Input = ({
 type ValidationRule = {
   required?: boolean;
   type?:
-  | "firstName"
-  | "lastName"
-  | "email"
-  | "phone1"
-  | "phone2"
-  | "familyPhone"
-  | "otherName"
-  | "callName"
-  | "landHome"
-  | "landWork"
-  | "street"
-  | "email1"
-  | "email2"
-  | "cityName"
-  | "house";
+    | "firstName"
+    | "lastName"
+    | "email"
+    | "phone1"
+    | "phone2"
+    | "familyPhone"
+    | "otherName"
+    | "callName"
+    | "landHome"
+    | "landWork"
+    | "street"
+    | "email1"
+    | "email2"
+    | "cityName"
+    | "house";
   minLength?: number;
   uniqueWith?: (keyof PersonalInfo)[];
 };
-
 
 const validateGmailLocalPart = (localPart: string): boolean => {
   const validCharsRegex = /^[a-zA-Z0-9.+]+$/;
@@ -155,9 +154,8 @@ const validateGmailLocalPart = (localPart: string): boolean => {
 };
 
 const validateEmail = (email: string): boolean => {
-  console.log("hit email v")
-  const generalEmailRegex =
-    /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  console.log("hit email v");
+  const generalEmailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
   if (!generalEmailRegex.test(email)) return false;
 
@@ -176,7 +174,6 @@ const validateEmail = (email: string): boolean => {
 
   return allowedTLDs.some((tld) => domain.endsWith(tld));
 };
-
 
 const validateAndFormat = (
   text: string,
@@ -231,15 +228,12 @@ const validateAndFormat = (
     }
   }
 
-
-
   if (rules.type === "email1" || rules.type === "email2") {
     value = value.trim();
 
     if (value.length === 0 && rules.type === "email1") {
       error = rules.required ? t("Error.Email is required") : "";
-    }
-    else if (value.length > 0) {
+    } else if (value.length > 0) {
       if (!validateEmail(value)) {
         const domain = value.toLowerCase().split("@")[1];
 
@@ -248,12 +242,11 @@ const validateAndFormat = (
         } else {
           error = t("Error.Invalid email address Example");
         }
-      }
-      else if (rules.uniqueWith) {
+      } else if (rules.uniqueWith) {
         const isDuplicate = rules.uniqueWith.some(
           (key) =>
-            formData[key]?.toLowerCase().trim() === value.toLowerCase().trim() &&
-            key !== currentKey
+            formData[key]?.toLowerCase().trim() ===
+              value.toLowerCase().trim() && key !== currentKey
         );
 
         if (isDuplicate) {
@@ -262,8 +255,6 @@ const validateAndFormat = (
       }
     }
   }
-
-
 
   if (rules.minLength && value.length < rules.minLength) {
     error = t("Error.Min length", { count: rules.minLength });
@@ -294,7 +285,7 @@ const validateAndFormat = (
       const isDuplicate = rules.uniqueWith.some(
         (key) =>
           formData[key]?.replace(/[^0-9]/g, "").replace(/^0+/, "") ===
-          numbersOnly && key !== currentKey
+            numbersOnly && key !== currentKey
       );
 
       if (isDuplicate) {
@@ -319,7 +310,7 @@ const validateAndFormat = (
       const isDuplicate = rules.uniqueWith.some(
         (key) =>
           formData[key]?.replace(/[^0-9]/g, "").replace(/^0+/, "") ===
-          numbersOnly &&
+            numbersOnly &&
           key !== currentKey &&
           numbersOnly.length > 0
       );
@@ -420,7 +411,10 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
     isUpdate: boolean
   ): Promise<boolean> => {
     try {
-      console.log(`💾 Saving to backend (${isUpdate ? 'UPDATE' : 'INSERT'}):`, tableName);
+      console.log(
+        `💾 Saving to backend (${isUpdate ? "UPDATE" : "INSERT"}):`,
+        tableName
+      );
       console.log(`📝 reqId being sent:`, reqId);
 
       // ✅ Transform data to match backend schema
@@ -439,7 +433,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
         },
         {
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
         }
       );
@@ -480,7 +474,9 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
 
     const allFilled = requiredFields.every((key) => {
       const value = formData.inspectionpersonal[key];
-      return value !== null && value !== undefined && value.toString().trim() !== "";
+      return (
+        value !== null && value !== undefined && value.toString().trim() !== ""
+      );
     });
 
     const hasErrors = Object.keys(errors).length > 0;
@@ -567,8 +563,9 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
     updateFormData({ [key]: value });
   };
 
-
-  const fetchInspectionData = async (reqId: number): Promise<PersonalInfo | null> => {
+  const fetchInspectionData = async (
+    reqId: number
+  ): Promise<PersonalInfo | null> => {
     try {
       console.log(`🔍 Fetching personal inspection data for reqId: ${reqId}`);
 
@@ -577,12 +574,12 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
         {
           params: {
             reqId,
-            tableName: 'inspectionpersonal'
-          }
+            tableName: "inspectionpersonal",
+          },
         }
       );
 
-      console.log('📦 Raw response:', response.data);
+      console.log("📦 Raw response:", response.data);
 
       if (response.data.success && response.data.data) {
         console.log(`✅ Fetched existing personal data:`, response.data.data);
@@ -591,23 +588,23 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
 
         // ✅ Map backend field names to frontend field names
         return {
-          firstName: data.firstName || '',
-          lastName: data.lastName || '',
-          otherName: data.otherName || '',
-          callName: data.callName || '',
-          phone1: data.phone1 || '',
-          phone2: data.phone2 || '',
-          familyPhone: data.familyPhone || '',
-          landHome: data.landHome || '',
-          landWork: data.landWork || '',
-          email1: data.email1 || '',
-          email2: data.email2 || '',
-          house: data.house || '',
-          street: data.street || '',
-          cityName: data.city || '', // ✅ Backend uses 'city', frontend uses 'cityName'
+          firstName: data.firstName || "",
+          lastName: data.lastName || "",
+          otherName: data.otherName || "",
+          callName: data.callName || "",
+          phone1: data.phone1 || "",
+          phone2: data.phone2 || "",
+          familyPhone: data.familyPhone || "",
+          landHome: data.landHome || "",
+          landWork: data.landWork || "",
+          email1: data.email1 || "",
+          email2: data.email2 || "",
+          house: data.house || "",
+          street: data.street || "",
+          cityName: data.city || "", // ✅ Backend uses 'city', frontend uses 'cityName'
           district: data.district || null,
           province: data.province || null,
-          country: data.country || 'Sri Lanka',
+          country: data.country || "Sri Lanka",
         };
       }
 
@@ -615,7 +612,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
       return null;
     } catch (error: any) {
       console.error(`❌ Error fetching personal inspection data:`, error);
-      console.error('Error details:', error.response?.data);
+      console.error("Error details:", error.response?.data);
 
       if (error.response?.status === 404) {
         console.log(`📝 No existing record - will create new`);
@@ -626,7 +623,6 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
     }
   };
 
-
   useFocusEffect(
     useCallback(() => {
       const loadData = async () => {
@@ -635,7 +631,9 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           if (requestId) {
             const reqId = Number(requestId);
             if (!isNaN(reqId) && reqId > 0) {
-              console.log(`🔄 Attempting to fetch personal data from backend for reqId: ${reqId}`);
+              console.log(
+                `🔄 Attempting to fetch personal data from backend for reqId: ${reqId}`
+              );
 
               const backendData = await fetchInspectionData(reqId);
 
@@ -644,7 +642,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
 
                 // Set the formData with backend data
                 setFormData({
-                  inspectionpersonal: backendData
+                  inspectionpersonal: backendData,
                 });
 
                 // Set UI state for district/province/country
@@ -658,8 +656,8 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
                 setDisplayProvince(
                   provinceObj
                     ? provinceObj.name[
-                    i18n.language as keyof typeof provinceObj.name
-                    ] || provinceObj.name.en
+                        i18n.language as keyof typeof provinceObj.name
+                      ] || provinceObj.name.en
                     : ""
                 );
 
@@ -668,8 +666,9 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
                 );
                 setDisplayCountry(
                   countryObj
-                    ? countryObj.name[i18n.language as keyof typeof countryObj.name] ||
-                    countryObj.name.en
+                    ? countryObj.name[
+                        i18n.language as keyof typeof countryObj.name
+                      ] || countryObj.name.en
                     : backendData.country || "Sri Lanka"
                 );
 
@@ -677,11 +676,14 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
                 setIsExistingData(true);
 
                 // Save to AsyncStorage as backup
-                await AsyncStorage.setItem(`${jobId}`, JSON.stringify({
-                  inspectionpersonal: backendData
-                }));
+                await AsyncStorage.setItem(
+                  `${jobId}`,
+                  JSON.stringify({
+                    inspectionpersonal: backendData,
+                  })
+                );
 
-                return; 
+                return;
               }
             }
           }
@@ -732,8 +734,8 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             setDisplayProvince(
               provinceObj
                 ? provinceObj.name[
-                i18n.language as keyof typeof provinceObj.name
-                ] || provinceObj.name.en
+                    i18n.language as keyof typeof provinceObj.name
+                  ] || provinceObj.name.en
                 : ""
             );
 
@@ -742,14 +744,17 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             );
             setDisplayCountry(
               countryObj
-                ? countryObj.name[i18n.language as keyof typeof countryObj.name] ||
-                countryObj.name.en
+                ? countryObj.name[
+                    i18n.language as keyof typeof countryObj.name
+                  ] || countryObj.name.en
                 : personal.country || "Sri Lanka"
             );
           } else {
             // No AsyncStorage data means this is a new entry (INSERT)
             setIsExistingData(false);
-            console.log("📝 No existing personal data - new entry - will INSERT on save");
+            console.log(
+              "📝 No existing personal data - new entry - will INSERT on save"
+            );
           }
         } catch (error) {
           console.error("Failed to load saved data", error);
@@ -760,9 +765,6 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
       loadData();
     }, [i18n.language, jobId, requestId])
   );
-
-
-
 
   const getFilteredDistricts = () => {
     const countryDistricts = districts[selectedCountry] || [];
@@ -791,14 +793,13 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
   }) => {
     setSelectedDistrict(district.en);
 
-
     const province = sriLankaData["Sri Lanka"].provinces.find((prov) =>
       prov.districts.some((d) => d.en === district.en)
     );
 
     const displayProv = province
       ? province.name[i18n.language as keyof typeof province.name] ||
-      province.name.en
+        province.name.en
       : "";
 
     setSelectedProvince(province?.name.en || null);
@@ -895,7 +896,6 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
     setShowCountryDropdown(false);
   };
 
-
   const handleNext = async () => {
     const requiredFields: (keyof PersonalInfo)[] = [
       "firstName",
@@ -926,7 +926,11 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
       } else {
         let rules: ValidationRule = { required: true, type: key as any };
 
-        if (key.startsWith("phone") || key.includes("Phone") || key.includes("land")) {
+        if (
+          key.startsWith("phone") ||
+          key.includes("Phone") ||
+          key.includes("land")
+        ) {
           rules.type = key as any;
           rules.uniqueWith = [
             "phone1",
@@ -958,7 +962,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
       setErrors((prev) => ({ ...prev, ...validationErrors }));
       const errorMessage = "• " + Object.values(validationErrors).join("\n• ");
       Alert.alert(t("Error.Validation Error"), errorMessage, [
-        { text: t("MAIN.OK") },
+        { text: t("Main.ok") },
       ]);
       return;
     }
@@ -969,7 +973,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
       Alert.alert(
         t("Error.Error"),
         "Request ID is missing. Please go back and try again.",
-        [{ text: t("MAIN.OK") }]
+        [{ text: t("Main.ok") }]
       );
       return;
     }
@@ -982,7 +986,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
       Alert.alert(
         t("Error.Error"),
         "Invalid request ID. Please go back and try again.",
-        [{ text: t("MAIN.OK") }]
+        [{ text: t("Main.ok") }]
       );
       return;
     }
@@ -1004,7 +1008,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
       );
 
       const saved = await saveToBackend(
-        reqId,  // Use validated reqId (from requestId)
+        reqId, // Use validated reqId (from requestId)
         "inspectionpersonal",
         formData.inspectionpersonal,
         isExistingData
@@ -1015,13 +1019,17 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
         setIsExistingData(true);
 
         Alert.alert(
-          t("MAIN.Success"),
+          t("Main.Success"),
           t("InspectionForm.Data saved successfully"),
           [
             {
-              text: t("MAIN.OK"),
+              text: t("Main.ok"),
               onPress: () => {
-                navigation.navigate("IDProof", { formData, requestNumber, requestId });
+                navigation.navigate("IDProof", {
+                  formData,
+                  requestNumber,
+                  requestId,
+                });
               },
             },
           ]
@@ -1029,13 +1037,17 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
       } else {
         console.log("⚠️ Backend save failed, but continuing with local data");
         Alert.alert(
-          t("MAIN.Warning"),
+          t("Main.Warning"),
           t("InspectionForm.Could not save to server. Data saved locally."),
           [
             {
-              text: t("MAIN.Continue"),
+              text: t("Main.Continue"),
               onPress: () => {
-                navigation.navigate("IDProof", { formData, requestNumber, requestId });
+                navigation.navigate("IDProof", {
+                  formData,
+                  requestNumber,
+                  requestId,
+                });
               },
             },
           ]
@@ -1044,13 +1056,17 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
     } catch (error) {
       console.error("Error during final save:", error);
       Alert.alert(
-        t("MAIN.Warning"),
+        t("Main.Warning"),
         t("InspectionForm.Could not save to server. Data saved locally."),
         [
           {
-            text: t("MAIN.Continue"),
+            text: t("Main.Continue"),
             onPress: () => {
-              navigation.navigate("IDProof", { formData, requestNumber, requestId });
+              navigation.navigate("IDProof", {
+                formData,
+                requestNumber,
+                requestId,
+              });
             },
           },
         ]
@@ -1090,19 +1106,8 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
       <View className="flex-1 bg-[#F3F3F3] ">
         <StatusBar barStyle="dark-content" />
 
-        {/* Header */}
-        <View className="flex-row items-center justify-center py-4 mt-2">
-          <TouchableOpacity className="absolute left-4 bg-[#E0E0E080] rounded-full p-4" onPress={() => navigation.goBack()}>
-            <AntDesign name="left" size={20} color="#000" />
-          </TouchableOpacity>
-
-          <Text className="text-lg font-semibold text-black">
-            {t("InspectionForm.Inspection Form")}
-          </Text>
-        </View>
-
         {/* Tabs */}
-        <FormTabs activeKey="Personal Info" />
+        <FormTabs activeKey="Personal Info" navigation={navigation} />
 
         <ScrollView
           className="flex-1 px-6 bg-white rounded-t-3xl"
@@ -1173,12 +1178,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
               handleFieldChange("phone1", text, {
                 required: true,
                 type: "phone1",
-                uniqueWith: [
-                  "phone2",
-                  "familyPhone",
-                  "landWork",
-                  "landHome",
-                ],
+                uniqueWith: ["phone2", "familyPhone", "landWork", "landHome"],
               })
             }
             error={errors.phone1}
@@ -1194,12 +1194,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
               handleFieldChange("phone2", text, {
                 required: false,
                 type: "phone2",
-                uniqueWith: [
-                  "phone1",
-                  "familyPhone",
-                  "landWork",
-                  "landHome",
-                ],
+                uniqueWith: ["phone1", "familyPhone", "landWork", "landHome"],
               })
             }
             keyboardType={"phone-pad"}
@@ -1215,12 +1210,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
               handleFieldChange("familyPhone", text, {
                 required: true,
                 type: "familyPhone",
-                uniqueWith: [
-                  "phone1",
-                  "phone2",
-                  "landWork",
-                  "landHome",
-                ],
+                uniqueWith: ["phone1", "phone2", "landWork", "landHome"],
               })
             }
             error={errors.familyPhone}
@@ -1235,12 +1225,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
               handleFieldChange("landHome", text, {
                 required: false,
                 type: "landHome",
-                uniqueWith: [
-                  "phone1",
-                  "phone2",
-                  "familyPhone",
-                  "landWork",
-                ],
+                uniqueWith: ["phone1", "phone2", "familyPhone", "landWork"],
               })
             }
             keyboardType={"phone-pad"}
@@ -1255,12 +1240,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
               handleFieldChange("landWork", text, {
                 required: false,
                 type: "landWork",
-                uniqueWith: [
-                  "phone1",
-                  "phone2",
-                  "familyPhone",
-                  "landHome",
-                ],
+                uniqueWith: ["phone1", "phone2", "familyPhone", "landHome"],
               })
             }
             keyboardType={"phone-pad"}
@@ -1275,9 +1255,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
               handleFieldChange("email1", text, {
                 required: true,
                 type: "email1",
-                uniqueWith: [
-                  "email2"
-                ]
+                uniqueWith: ["email2"],
               })
             }
             required
@@ -1291,9 +1269,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
               handleFieldChange("email2", text, {
                 required: false,
                 type: "email2",
-                uniqueWith: [
-                  "email1"
-                ]
+                uniqueWith: ["email1"],
               })
             }
             error={errors.email2}
@@ -1353,8 +1329,9 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             >
               <View className="bg-[#F6F6F6] rounded-full px-5 py-4 flex-row items-center justify-between">
                 <Text
-                  className={`text-base ${selectedCountry ? "text-black" : "text-[#838B8C]"
-                    }`}
+                  className={`text-base ${
+                    selectedCountry ? "text-black" : "text-[#838B8C]"
+                  }`}
                 >
                   {displayCountry || t("InspectionForm.-- Select Country --")}
                 </Text>
@@ -1376,8 +1353,9 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
                 >
                   <View className="bg-[#F6F6F6] rounded-full px-5 py-4 flex-row items-center justify-between">
                     <Text
-                      className={`text-base ${selectedDistrict ? "text-black" : "text-[#838B8C]"
-                        }`}
+                      className={`text-base ${
+                        selectedDistrict ? "text-black" : "text-[#838B8C]"
+                      }`}
                     >
                       {selectedDistrict
                         ? t(`Districts.${selectedDistrict}`)
@@ -1387,7 +1365,9 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
                   </View>
                 </TouchableOpacity>
                 {errors.district && (
-                  <Text className="text-red-500 text-sm mt-1 ml-4">{errors.district}</Text>
+                  <Text className="text-red-500 text-sm mt-1 ml-4">
+                    {errors.district}
+                  </Text>
                 )}
               </View>
               <View className="relative mb-4">
@@ -1398,8 +1378,9 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
                 </Text>
                 <View className="bg-[#F6F6F6] rounded-full px-5 py-4">
                   <Text
-                    className={`text-base ${selectedProvince ? "text-black" : "text-[#838B8C]"
-                      }`}
+                    className={`text-base ${
+                      selectedProvince ? "text-black" : "text-[#838B8C]"
+                    }`}
                   >
                     {selectedProvince
                       ? displayProvince
@@ -1411,47 +1392,59 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           ) : null}
         </ScrollView>
 
-        <View className="flex-row px-6 py-4 gap-4 bg-white border-t border-gray-200 ">
-          <TouchableOpacity className="flex-1 bg-[#444444] rounded-full py-4 items-center" onPress={() =>
-            navigation.navigate("Main", {
-              screen: "MainTabs",
-              params: {
-                screen: "CapitalRequests",
-              },
-            })
-          }>
-            <Text className="text-white text-base font-semibold">{t("InspectionForm.Exit")}</Text>
+        <View className="flex-row px-6 pb-4 gap-4 bg-white border-t border-gray-200">
+          {/* Exit Button */}
+          <TouchableOpacity
+            className="flex-1 bg-[#444444] rounded-full py-4 flex-row items-center justify-center"
+            onPress={() =>
+              navigation.navigate("Main", {
+                screen: "MainTabs",
+                params: {
+                  screen: "CapitalRequests",
+                },
+              })
+            }
+          >
+            <Ionicons name="arrow-back" size={22} color="#fff" />
+            <Text className="text-white text-base font-semibold ml-2">
+              {t("InspectionForm.Exit")}
+            </Text>
           </TouchableOpacity>
-          {isNextEnabled ? (
-            <View className="flex-1">
-              <TouchableOpacity
-                className="flex-1 "
-                onPress={handleNext}
-              >
-                <LinearGradient
-                  colors={["#F35125", "#FF1D85"]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  className=" rounded-full py-4 items-center"
-                  style={{
-                    shadowColor: "#000",
-                    shadowOffset: { width: 0, height: 3 },
-                    shadowOpacity: 0.25,
-                    shadowRadius: 5,
-                    elevation: 6,
-                  }}
-                >
-                  <Text className="text-white text-base font-semibold">{t("InspectionForm.Next")}</Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            </View>
 
+          {/* Next Button */}
+          {isNextEnabled ? (
+            <TouchableOpacity
+              className="flex-1"
+              onPress={handleNext}
+              activeOpacity={0.8}
+            >
+              <LinearGradient
+                colors={["#F35125", "#FF1D85"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                className="rounded-full py-4 flex-row items-center justify-center"
+                style={{
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 3 },
+                  shadowOpacity: 0.25,
+                  shadowRadius: 5,
+                  elevation: 6,
+                }}
+              >
+                <Text className="text-white text-base font-semibold mr-2">
+                  {t("InspectionForm.Next")}
+                </Text>
+                <Ionicons name="arrow-forward" size={22} color="#fff" />
+              </LinearGradient>
+            </TouchableOpacity>
           ) : (
-            <View className="flex-1 bg-gray-300 rounded-full py-4 items-center">
-              <Text className="text-white text-base font-semibold">{t("InspectionForm.Next")}</Text>
+            <View className="flex-1 bg-gray-300 rounded-full py-4 flex-row items-center justify-center">
+              <Text className="text-white text-base font-semibold mr-2">
+                {t("InspectionForm.Next")}
+              </Text>
+              <Ionicons name="arrow-forward" size={22} color="#fff" />
             </View>
           )}
-
         </View>
       </View>
 
