@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   View,
   Text,
@@ -18,13 +18,17 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTranslation } from "react-i18next";
 import Checkbox from "expo-checkbox";
 import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
-import { useCallback } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../types";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 import ConfirmationModal from "@/Items/ConfirmationModal";
+import { clearAllIDProof } from '@/store/IDproofSlice';
+import { clearAllPersonalInfo } from '@/store/personalInfoSlice';
+import { clearAllLandInfo } from '@/store/LandInfoSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/services/store';
 
 type FormData = {
   inspectionharveststorage?: HarvestStorageData;
@@ -133,6 +137,7 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
   const [successModalVisible, setSuccessModalVisible] = useState(false);
   const [errorModalVisible, setErrorModalVisible] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const dispatch = useDispatch();
 
 
   console.log("finance", formData);
@@ -204,7 +209,10 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
     }
   };
 
-  const fetchInspectionData = async (reqId: number): Promise<HarvestStorageData | null> => {
+  const isLoadingRef = useRef(false);
+
+  // Wrap fetchInspectionData in useCallback
+  const fetchInspectionData = useCallback(async (reqId: number): Promise<HarvestStorageData | null> => {
     try {
       console.log(`🔍 Fetching harvest storage data for reqId: ${reqId}`);
 
@@ -225,7 +233,6 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
 
         const data = response.data.data;
 
-        // Helper to convert boolean (0/1) to "Yes"/"No"
         const boolToYesNo = (val: any): "Yes" | "No" | undefined => {
           if (val === 1 || val === '1' || val === true) return "Yes";
           if (val === 0 || val === '0' || val === false) return "No";
@@ -242,20 +249,15 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
         };
       }
 
-      console.log(`📭 No existing harvest storage data found for reqId: ${reqId}`);
       return null;
     } catch (error: any) {
       console.error(`❌ Error fetching harvest storage data:`, error);
-      console.error('Error details:', error.response?.data);
-
       if (error.response?.status === 404) {
         console.log(`📝 No existing record - will create new`);
-        return null;
       }
-
       return null;
     }
-  };
+  }, []);
 
   const saveToBackend = async (
     reqId: number,
@@ -332,59 +334,61 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
   useFocusEffect(
     useCallback(() => {
       const loadFormData = async () => {
+        // ✅ Prevent multiple simultaneous loads
+        if (isLoadingRef.current) {
+          console.log('⏸️ Already loading, skipping...');
+          return;
+        }
+
         try {
+          isLoadingRef.current = true;
+          console.log(`🔄 Loading harvest storage data for requestId: ${requestId}`);
+
           // First, try to fetch from backend
           if (requestId) {
             const reqId = Number(requestId);
             if (!isNaN(reqId) && reqId > 0) {
-              console.log(`🔄 Attempting to fetch harvest storage data from backend for reqId: ${reqId}`);
-
               const backendData = await fetchInspectionData(reqId);
 
               if (backendData) {
                 console.log(`✅ Loaded harvest storage data from backend`);
 
-                // Update form with backend data
                 const updatedFormData = {
-                  ...formData,
+                  ...prevFormData, // ✅ Use prevFormData from route params
                   inspectionharveststorage: backendData
                 };
 
                 setFormData(updatedFormData);
                 setIsExistingData(true);
 
-                // Save to AsyncStorage as backup
                 await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData));
-
-                return; // Exit after loading from backend
+                return;
               }
             }
           }
 
           // If no backend data, try AsyncStorage
-          console.log(`📂 Checking AsyncStorage for jobId: ${jobId}`);
           const savedData = await AsyncStorage.getItem(`${jobId}`);
-
           if (savedData) {
             const parsedData = JSON.parse(savedData);
             console.log(`✅ Loaded harvest storage data from AsyncStorage`);
             setFormData(parsedData);
             setIsExistingData(true);
           } else {
-            // No data found anywhere - new entry
             setIsExistingData(false);
             console.log("📝 No existing harvest storage data - new entry");
           }
         } catch (e) {
           console.error("Failed to load harvest storage form data", e);
           setIsExistingData(false);
+        } finally {
+          isLoadingRef.current = false;
         }
       };
 
       loadFormData();
-    }, [requestId, jobId])
+    }, [requestId, jobId, fetchInspectionData])
   );
-
 
 
   const handleNext = () => {
@@ -485,14 +489,47 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
     }
   };
 
-  const handleSuccessClose = () => {
+  const handleSuccessClose = async () => {
     setSuccessModalVisible(false);
-    // ✅ Navigate to ConfirmationCapitalRequest page with required parameters
-    navigation.navigate("ConfirmationCapitalRequest", {
-      formData: formData, 
-      requestNumber: requestNumber, 
-      requestId: requestId 
-    });
+
+    try {
+      // ✅ Clear all Redux slices
+      console.log('🗑️ Clearing all Redux slices...');
+
+      dispatch(clearAllIDProof());
+      dispatch(clearAllPersonalInfo());
+      dispatch(clearAllLandInfo());
+      // Add other clear actions for remaining slices
+
+      console.log('✅ All Redux slices cleared successfully');
+
+      // ✅ Clear AsyncStorage for this specific request
+      try {
+        await AsyncStorage.removeItem(`${jobId}`);
+        await AsyncStorage.removeItem(`idproof_${requestId}`);
+        await AsyncStorage.removeItem(`landinfo_${requestId}`);
+        // Add other AsyncStorage keys if needed
+
+        console.log('✅ AsyncStorage cleared successfully');
+      } catch (clearError) {
+        console.error("⚠️ Failed to clear AsyncStorage:", clearError);
+      }
+
+      // Navigate to confirmation page
+      navigation.navigate("ConfirmationCapitalRequest", {
+        formData: formData,
+        requestNumber: requestNumber,
+        requestId: requestId
+      });
+    } catch (error) {
+      console.error('❌ Error during cleanup:', error);
+      // Still navigate even if cleanup fails
+      navigation.navigate("ConfirmationCapitalRequest", {
+        formData: formData,
+        requestNumber: requestNumber,
+        requestId: requestId
+      });
+    }
   };
 
   const handleErrorClose = () => {

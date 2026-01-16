@@ -1,9 +1,14 @@
 import { combineReducers } from 'redux';
 import authReducer from '@/store/authSlice';
+import personalInfoReducer from '@/store/personalInfoSlice';
+import idProofReducer from '@/store/IDproofSlice';
+import landInfoReducer from '@/store/LandInfoSlice';
 
 const appReducer = combineReducers({
   auth: authReducer,
-  // settings: settingsReducer,
+  inspectionpersonal: personalInfoReducer,
+  inspectionidproof: idProofReducer,
+  inspectionland: landInfoReducer,
 });
 
 const rootReducer = (state: any, action: any) => {

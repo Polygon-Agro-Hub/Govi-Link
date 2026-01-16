@@ -28,6 +28,16 @@ import { useCallback } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../types";
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/services/store'; // Adjust path to your store
+import {
+  initializePersonalInfo,
+  updatePersonalInfo,
+  setPersonalInfo,
+  markAsExisting,
+  PersonalInfo, // Import the type from slice
+} from '@/store/personalInfoSlice';
+
 
 interface District {
   en: string;
@@ -39,29 +49,6 @@ interface DistrictsMap {
   [country: string]: District[];
 }
 
-type PersonalInfo = {
-  firstName: string;
-  lastName: string;
-  otherName: string;
-  callName: string;
-  phone1: string;
-  phone2: string;
-  familyPhone: string;
-  landHome: string;
-  landWork: string;
-  email1: string;
-  email2: string;
-  house: string;
-  street: string;
-  cityName: string;
-  district: string | null;
-  province: string | null;
-  country: string;
-};
-
-type FormData = {
-  inspectionpersonal: PersonalInfo;
-};
 
 
 const Input = ({
@@ -340,6 +327,7 @@ type InspectionForm1Props = {
 const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
   const route = useRoute<RouteProp<RootStackParamList, "PersonalInfo">>();
   const { requestNumber, requestId } = route.params;
+  const dispatch = useDispatch();
 
   console.log("Request Number:", requestNumber);
   console.log("Request ID:", requestId);
@@ -360,11 +348,8 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isNextEnabled, setIsNextEnabled] = useState(false);
 
-  // NEW: Track if this is existing data (UPDATE) or new data (INSERT)
-  const [isExistingData, setIsExistingData] = useState(false);
-
-  const [formData, setFormData] = useState<FormData>({
-    inspectionpersonal: {
+  const formData = useSelector((state: RootState) =>
+    state.inspectionpersonal.data[requestId] || {
       firstName: "",
       lastName: "",
       otherName: "",
@@ -382,8 +367,12 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
       district: null,
       province: null,
       country: "Sri Lanka",
-    },
-  });
+    }
+  );
+
+  const isExistingData = useSelector((state: RootState) =>
+    state.inspectionpersonal.isExisting[requestId] || false
+  );
 
   console.log("Form Data:", formData);
   console.log("Is Existing Data (UPDATE mode):", isExistingData);
@@ -479,7 +468,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
     ];
 
     const allFilled = requiredFields.every((key) => {
-      const value = formData.inspectionpersonal[key];
+      const value = formData[key];
       return value !== null && value !== undefined && value.toString().trim() !== "";
     });
 
@@ -487,24 +476,11 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
     setIsNextEnabled(allFilled && !hasErrors);
   }, [formData, errors]);
 
-  const updateFormData = async (updates: Partial<PersonalInfo>) => {
-    const updatedData: FormData = {
-      ...formData,
-      inspectionpersonal: {
-        ...formData.inspectionpersonal,
-        ...updates,
-      },
-    };
-
-    setFormData(updatedData);
-
-    try {
-      // ONLY save to AsyncStorage (local, instant)
-      await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedData));
-      console.log("💾 Saved to AsyncStorage");
-    } catch (e) {
-      console.log("AsyncStorage save failed", e);
-    }
+  const updateFormData = (updates: Partial<PersonalInfo>) => {
+    dispatch(updatePersonalInfo({
+      requestId,
+      updates,
+    }));
   };
 
   const handleFieldChange = (
@@ -516,30 +492,26 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
       text,
       rules,
       t,
-      formData.inspectionpersonal,
+      formData, // Now from Redux
       key
     );
 
-    // Update state
-    setFormData((prev) => ({
-      ...prev,
-      inspectionpersonal: {
-        ...prev.inspectionpersonal,
-        [key]: value,
-      },
+    // Update Redux store instead of local state
+    dispatch(updatePersonalInfo({
+      requestId,
+      updates: { [key]: value },
     }));
 
-    // Errors
+    // Errors handling remains the same
     setErrors((prev) => {
       const newErrors = { ...prev };
 
       if (error) newErrors[key] = error;
       else delete newErrors[key];
 
-      // Revalidate unique fields
       if (rules.uniqueWith) {
         rules.uniqueWith.forEach((relatedKey) => {
-          const relatedValue = formData.inspectionpersonal[relatedKey];
+          const relatedValue = formData[relatedKey];
           if (!relatedValue) {
             delete newErrors[relatedKey];
             return;
@@ -550,7 +522,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             rules,
             t,
             {
-              ...formData.inspectionpersonal,
+              ...formData,
               [key]: value,
             },
             relatedKey
@@ -563,8 +535,6 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
 
       return newErrors;
     });
-
-    updateFormData({ [key]: value });
   };
 
 
@@ -631,21 +601,26 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
     useCallback(() => {
       const loadData = async () => {
         try {
-          // ✅ First, try to fetch from backend using requestId
+          // Initialize Redux state for this request
+          dispatch(initializePersonalInfo({ requestId }));
+
+          // Try to fetch from backend
           if (requestId) {
             const reqId = Number(requestId);
             if (!isNaN(reqId) && reqId > 0) {
-              console.log(`🔄 Attempting to fetch personal data from backend for reqId: ${reqId}`);
+              console.log(`🔄 Fetching personal data from backend for reqId: ${reqId}`);
 
               const backendData = await fetchInspectionData(reqId);
 
               if (backendData) {
                 console.log(`✅ Loaded personal data from backend`);
 
-                // Set the formData with backend data
-                setFormData({
-                  inspectionpersonal: backendData
-                });
+                // Save to Redux
+                dispatch(setPersonalInfo({
+                  requestId,
+                  data: backendData,
+                  isExisting: true,
+                }));
 
                 // Set UI state for district/province/country
                 setSelectedDistrict(backendData.district || null);
@@ -673,93 +648,22 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
                     : backendData.country || "Sri Lanka"
                 );
 
-                // Mark as existing data (for UPDATE operations)
-                setIsExistingData(true);
-
-                // Save to AsyncStorage as backup
-                await AsyncStorage.setItem(`${jobId}`, JSON.stringify({
-                  inspectionpersonal: backendData
-                }));
-
-                return; 
+                return;
               }
             }
           }
 
-          // ✅ If no backend data, try AsyncStorage
-          console.log(`📂 Checking AsyncStorage for jobId: ${jobId}`);
-          const saved = await AsyncStorage.getItem(`${jobId}`);
-
-          if (saved) {
-            const parsed = JSON.parse(saved);
-            console.log(`✅ Loaded personal data from AsyncStorage`);
-
-            // Set flag that this is existing data (will trigger UPDATE operations)
-            setIsExistingData(true);
-
-            // Set the full formData object correctly
-            setFormData({
-              inspectionpersonal: parsed.inspectionpersonal || {
-                firstName: "",
-                lastName: "",
-                otherName: "",
-                callName: "",
-                phone1: "",
-                phone2: "",
-                familyPhone: "",
-                landHome: "",
-                landWork: "",
-                email1: "",
-                email2: "",
-                house: "",
-                street: "",
-                cityName: "",
-                district: null,
-                province: null,
-                country: "Sri Lanka",
-              },
-            });
-
-            const personal = parsed.inspectionpersonal || {};
-
-            setSelectedDistrict(personal.district || null);
-            setSelectedCountry(personal.country || "Sri Lanka");
-
-            const provinceObj = sriLankaData["Sri Lanka"].provinces.find(
-              (prov) => prov.name.en === personal.province
-            );
-            setSelectedProvince(provinceObj?.name.en || null);
-            setDisplayProvince(
-              provinceObj
-                ? provinceObj.name[
-                i18n.language as keyof typeof provinceObj.name
-                ] || provinceObj.name.en
-                : ""
-            );
-
-            const countryObj = countryData.find(
-              (c) => c.name.en === personal.country
-            );
-            setDisplayCountry(
-              countryObj
-                ? countryObj.name[i18n.language as keyof typeof countryObj.name] ||
-                countryObj.name.en
-                : personal.country || "Sri Lanka"
-            );
-          } else {
-            // No AsyncStorage data means this is a new entry (INSERT)
-            setIsExistingData(false);
-            console.log("📝 No existing personal data - new entry - will INSERT on save");
-          }
+          // If no backend data, Redux already has initialized empty state
+          console.log("📝 No existing personal data - new entry - will INSERT on save");
         } catch (error) {
           console.error("Failed to load saved data", error);
-          setIsExistingData(false);
         }
       };
 
       loadData();
-    }, [i18n.language, jobId, requestId])
+    }, [i18n.language, requestId, dispatch])
   );
+
 
 
 
@@ -916,7 +820,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
     // Validate all fields
     const validationErrors: Record<string, string> = {};
     requiredFields.forEach((key) => {
-      let value = formData.inspectionpersonal[key];
+      let value = formData[key];
       let error = "";
 
       if ((key === "district" || key === "province") && !value) {
@@ -945,7 +849,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           value || "",
           rules,
           t,
-          formData.inspectionpersonal,
+          formData,
           key
         );
         error = result.error;
@@ -1004,15 +908,17 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
       );
 
       const saved = await saveToBackend(
-        reqId,  // Use validated reqId (from requestId)
+        reqId,
         "inspectionpersonal",
-        formData.inspectionpersonal,
+        formData, // Now from Redux
         isExistingData
       );
 
       if (saved) {
         console.log("✅ Personal info saved successfully to backend");
-        setIsExistingData(true);
+
+        // Mark as existing in Redux
+        dispatch(markAsExisting({ requestId }));
 
         Alert.alert(
           t("MAIN.Success"),
@@ -1021,13 +927,17 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             {
               text: t("MAIN.OK"),
               onPress: () => {
-                navigation.navigate("IDProof", { formData, requestNumber, requestId });
+                navigation.navigate("IDProof", {
+                  formData: { inspectionpersonal: formData },
+                  requestNumber,
+                  requestId
+                });
               },
             },
           ]
         );
       } else {
-        console.log("⚠️ Backend save failed, but continuing with local data");
+        // Continue with local Redux data
         Alert.alert(
           t("MAIN.Warning"),
           t("InspectionForm.Could not save to server. Data saved locally."),
@@ -1035,7 +945,11 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             {
               text: t("MAIN.Continue"),
               onPress: () => {
-                navigation.navigate("IDProof", { formData, requestNumber, requestId });
+                navigation.navigate("IDProof", {
+                  formData: { inspectionpersonal: formData },
+                  requestNumber,
+                  requestId
+                });
               },
             },
           ]
@@ -1050,7 +964,11 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           {
             text: t("MAIN.Continue"),
             onPress: () => {
-              navigation.navigate("IDProof", { formData, requestNumber, requestId });
+              navigation.navigate("IDProof", {
+                formData: { inspectionpersonal: formData },
+                requestNumber,
+                requestId
+              });
             },
           },
         ]
@@ -1113,7 +1031,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           <Input
             label={t("InspectionForm.First Name")}
             placeholder="----"
-            value={formData.inspectionpersonal.firstName}
+            value={formData.firstName}
             onChangeText={(text) =>
               handleFieldChange("firstName", text, {
                 required: true,
@@ -1126,7 +1044,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           <Input
             label={t("InspectionForm.Last Name")}
             placeholder="----"
-            value={formData.inspectionpersonal.lastName}
+            value={formData.lastName}
             onChangeText={(text) =>
               handleFieldChange("lastName", text, {
                 required: true,
@@ -1139,7 +1057,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           <Input
             label={t("InspectionForm.Other Names")}
             placeholder="----"
-            value={formData.inspectionpersonal.otherName}
+            value={formData.otherName}
             onChangeText={(text) =>
               handleFieldChange("otherName", text, {
                 required: true,
@@ -1152,7 +1070,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           <Input
             label={t("InspectionForm.Call Name")}
             placeholder="----"
-            value={formData.inspectionpersonal.callName}
+            value={formData.callName}
             onChangeText={(text) =>
               handleFieldChange("callName", text, {
                 required: true,
@@ -1168,7 +1086,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           <Input
             label={t("InspectionForm.Mobile Number - 1")}
             placeholder="7XXXXXXXX"
-            value={formData.inspectionpersonal.phone1}
+            value={formData.phone1}
             onChangeText={(text) =>
               handleFieldChange("phone1", text, {
                 required: true,
@@ -1189,7 +1107,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           <Input
             label={t("InspectionForm.Mobile Number - 2")}
             placeholder="7XXXXXXXX"
-            value={formData.inspectionpersonal.phone2}
+            value={formData.phone2}
             onChangeText={(text) =>
               handleFieldChange("phone2", text, {
                 required: false,
@@ -1209,7 +1127,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           <Input
             label={t("InspectionForm.Phone Number of a family member")}
             placeholder="7XXXXXXXX"
-            value={formData.inspectionpersonal.familyPhone}
+            value={formData.familyPhone}
             keyboardType={"phone-pad"}
             onChangeText={(text) =>
               handleFieldChange("familyPhone", text, {
@@ -1230,7 +1148,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           <Input
             label={t("InspectionForm.Land Phone Number - Home")}
             placeholder="XXXXXXXXX"
-            value={formData.inspectionpersonal.landHome}
+            value={formData.landHome}
             onChangeText={(text) =>
               handleFieldChange("landHome", text, {
                 required: false,
@@ -1250,7 +1168,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           <Input
             label={t("InspectionForm.Land Phone Number - Work")}
             placeholder="XXXXXXXXX"
-            value={formData.inspectionpersonal.landWork}
+            value={formData.landWork}
             onChangeText={(text) =>
               handleFieldChange("landWork", text, {
                 required: false,
@@ -1270,7 +1188,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           <Input
             label={t("InspectionForm.Email Address - 1")}
             placeholder="----"
-            value={formData.inspectionpersonal.email1}
+            value={formData.email1}
             onChangeText={(text) =>
               handleFieldChange("email1", text, {
                 required: true,
@@ -1286,7 +1204,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           <Input
             label={t("InspectionForm.Email Address - 2")}
             placeholder="----"
-            value={formData.inspectionpersonal.email2}
+            value={formData.email2}
             onChangeText={(text) =>
               handleFieldChange("email2", text, {
                 required: false,
@@ -1304,7 +1222,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           <Input
             label={t("InspectionForm.House / Plot Number")}
             placeholder="----"
-            value={formData.inspectionpersonal.house}
+            value={formData.house}
             onChangeText={(text) =>
               handleFieldChange("house", text, {
                 required: true,
@@ -1317,7 +1235,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           <Input
             label={t("InspectionForm.Street Name")}
             placeholder="----"
-            value={formData.inspectionpersonal.street}
+            value={formData.street}
             onChangeText={(text) =>
               handleFieldChange("street", text, {
                 required: true,
@@ -1330,7 +1248,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           <Input
             label={t("InspectionForm.City / Town Name")}
             placeholder="----"
-            value={formData.inspectionpersonal.cityName}
+            value={formData.cityName}
             onChangeText={(text) =>
               handleFieldChange("cityName", text, {
                 required: true,
