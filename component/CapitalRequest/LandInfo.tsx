@@ -10,9 +10,14 @@ import {
   KeyboardAvoidingView,
   Platform,
   Modal,
-  Image
+  Image,
 } from "react-native";
-import { AntDesign, Feather, FontAwesome6, MaterialIcons } from "@expo/vector-icons";
+import {
+  AntDesign,
+  Feather,
+  FontAwesome6,
+  MaterialIcons,
+} from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTranslation } from "react-i18next";
@@ -23,8 +28,8 @@ import { RootStackParamList } from "../types";
 import { CameraScreen } from "@/Items/CameraScreen";
 import axios from "axios";
 import { environment } from "@/environment/environment";
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '@/services/store';
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/services/store";
 import {
   initializeLandInfo,
   updateLandInfo,
@@ -39,7 +44,7 @@ import {
   LandInfoData,
   LandImage,
   GeoLocation,
-} from '@/store/LandInfoSlice';
+} from "@/store/LandInfoSlice";
 
 type LandInfoProps = {
   navigation: any;
@@ -58,18 +63,19 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
   const dispatch = useDispatch();
 
   // Get data from Redux store
-  const formData = useSelector((state: RootState) =>
-    state.inspectionland.data[requestId] || {
-      landDiscription: '',
-      isOwnByFarmer: undefined,
-      ownershipStatus: undefined,
-      images: [],
-      geoLocation: undefined,
-    }
+  const formData = useSelector(
+    (state: RootState) =>
+      state.inspectionland.data[requestId] || {
+        landDiscription: "",
+        isOwnByFarmer: undefined,
+        ownershipStatus: undefined,
+        images: [],
+        geoLocation: undefined,
+      },
   );
 
-  const isExistingData = useSelector((state: RootState) =>
-    state.inspectionland.isExisting[requestId] || false
+  const isExistingData = useSelector(
+    (state: RootState) => state.inspectionland.isExisting[requestId] || false,
   );
 
   // Validate form completion
@@ -78,14 +84,14 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
       "landDiscription",
       "isOwnByFarmer",
       "ownershipStatus",
-      "geoLocation"
+      "geoLocation",
     ];
 
     const allFilled = requiredFields.every(
       (key) =>
         formData[key] !== undefined &&
         formData[key] !== null &&
-        formData[key].toString().trim() !== ""
+        formData[key].toString().trim() !== "",
     );
 
     const hasImages = !!(formData.images && formData.images.length > 0);
@@ -94,7 +100,9 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
   }, [formData]);
 
   // Fetch land info from backend
-  const fetchInspectionData = async (reqId: number): Promise<LandInfoData | null> => {
+  const fetchInspectionData = async (
+    reqId: number,
+  ): Promise<LandInfoData | null> => {
     try {
       console.log(`🔍 Fetching land inspection data for reqId: ${reqId}`);
 
@@ -103,9 +111,9 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
         {
           params: {
             reqId,
-            tableName: 'inspectionland'
-          }
-        }
+            tableName: "inspectionland",
+          },
+        },
       );
 
       if (response.data.success && response.data.data) {
@@ -115,7 +123,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
         const safeJsonParse = (field: any): string[] => {
           if (!field) return [];
           if (Array.isArray(field)) return field;
-          if (typeof field === 'string') {
+          if (typeof field === "string") {
             try {
               const parsed = JSON.parse(field);
               return Array.isArray(parsed) ? parsed : [];
@@ -128,19 +136,25 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
         };
 
         return {
-          isOwnByFarmer: data.isOwnByFarmer === 1 || data.isOwnByFarmer === '1' ? "Yes" : "No",
-          ownershipStatus: data.ownershipStatus || '',
-          landDiscription: data.landDiscription || '',
-          geoLocation: (data.latitude && data.longitude) ? {
-            latitude: parseFloat(data.latitude),
-            longitude: parseFloat(data.longitude),
-            locationName: data.locationName || ''
-          } : undefined,
+          isOwnByFarmer:
+            data.isOwnByFarmer === 1 || data.isOwnByFarmer === "1"
+              ? "Yes"
+              : "No",
+          ownershipStatus: data.ownershipStatus || "",
+          landDiscription: data.landDiscription || "",
+          geoLocation:
+            data.latitude && data.longitude
+              ? {
+                  latitude: parseFloat(data.latitude),
+                  longitude: parseFloat(data.longitude),
+                  locationName: data.locationName || "",
+                }
+              : undefined,
           images: safeJsonParse(data.images).map((url: string) => ({
             uri: url,
-            name: url.split('/').pop() || 'image.jpg',
-            type: 'image/jpeg'
-          }))
+            name: url.split("/").pop() || "image.jpg",
+            type: "image/jpeg",
+          })),
         };
       }
 
@@ -159,22 +173,28 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
     reqId: number,
     tableName: string,
     data: LandInfoData,
-    isUpdate: boolean
+    isUpdate: boolean,
   ): Promise<boolean> => {
     try {
-      console.log(`💾 Saving to backend (${isUpdate ? 'UPDATE' : 'INSERT'}):`, tableName);
+      console.log(
+        `💾 Saving to backend (${isUpdate ? "UPDATE" : "INSERT"}):`,
+        tableName,
+      );
 
       const apiFormData = new FormData();
-      apiFormData.append('reqId', reqId.toString());
-      apiFormData.append('tableName', tableName);
-      apiFormData.append('isOwnByFarmer', data.isOwnByFarmer === "Yes" ? '1' : '0');
-      apiFormData.append('ownershipStatus', data.ownershipStatus || '');
-      apiFormData.append('landDiscription', data.landDiscription || '');
+      apiFormData.append("reqId", reqId.toString());
+      apiFormData.append("tableName", tableName);
+      apiFormData.append(
+        "isOwnByFarmer",
+        data.isOwnByFarmer === "Yes" ? "1" : "0",
+      );
+      apiFormData.append("ownershipStatus", data.ownershipStatus || "");
+      apiFormData.append("landDiscription", data.landDiscription || "");
 
       // Add geo location
       if (data.geoLocation) {
-        apiFormData.append('latitude', data.geoLocation.latitude.toString());
-        apiFormData.append('longitude', data.geoLocation.longitude.toString());
+        apiFormData.append("latitude", data.geoLocation.latitude.toString());
+        apiFormData.append("longitude", data.geoLocation.longitude.toString());
       }
 
       // Handle images - differentiate between S3 URLs and local files
@@ -183,17 +203,20 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
 
         data.images.forEach((img: LandImage, index: number) => {
           // Check if it's an S3 URL (already uploaded)
-          if (img.uri.startsWith('http://') || img.uri.startsWith('https://')) {
+          if (img.uri.startsWith("http://") || img.uri.startsWith("https://")) {
             apiFormData.append(`imageUrl_${existingUrlIndex}`, img.uri);
             existingUrlIndex++;
             console.log(`🔗 Keeping existing image URL: ${img.uri}`);
           }
           // Local file - need to upload
-          else if (img.uri.startsWith('file://') || img.uri.startsWith('content://')) {
-            apiFormData.append('images', {
+          else if (
+            img.uri.startsWith("file://") ||
+            img.uri.startsWith("content://")
+          ) {
+            apiFormData.append("images", {
               uri: img.uri,
               name: img.name || `land_${Date.now()}_${index}.jpg`,
-              type: img.type || 'image/jpeg',
+              type: img.type || "image/jpeg",
             } as any);
             console.log(`📤 Uploading new image: ${img.name}`);
           }
@@ -205,9 +228,9 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
         apiFormData,
         {
           headers: {
-            'Content-Type': 'multipart/form-data',
+            "Content-Type": "multipart/form-data",
           },
-        }
+        },
       );
 
       if (response.data.success) {
@@ -216,11 +239,11 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
         // Update Redux with S3 URLs from backend
         if (response.data.data.images) {
           let imageUrls = response.data.data.images;
-          if (typeof imageUrls === 'string') {
+          if (typeof imageUrls === "string") {
             try {
               imageUrls = JSON.parse(imageUrls);
             } catch (e) {
-              console.error('Failed to parse images:', imageUrls);
+              console.error("Failed to parse images:", imageUrls);
               imageUrls = [];
             }
           }
@@ -231,8 +254,8 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
 
           const imageObjects = imageUrls.map((url: string) => ({
             uri: url,
-            name: url.split('/').pop() || 'image.jpg',
-            type: 'image/jpeg'
+            name: url.split("/").pop() || "image.jpg",
+            type: "image/jpeg",
           }));
 
           dispatch(setImages({ requestId, images: imageObjects }));
@@ -267,11 +290,13 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
 
               if (backendData) {
                 console.log(`✅ Loaded land data from backend`);
-                dispatch(setLandInfo({
-                  requestId,
-                  data: backendData,
-                  isExisting: true,
-                }));
+                dispatch(
+                  setLandInfo({
+                    requestId,
+                    data: backendData,
+                    isExisting: true,
+                  }),
+                );
 
                 await saveLandInfoToStorage(requestId, backendData);
                 return;
@@ -294,15 +319,17 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
       };
 
       loadData();
-    }, [requestId, dispatch])
+    }, [requestId, dispatch]),
   );
 
   // Handle field changes
   const handleFieldChange = async (key: keyof LandInfoData, value: any) => {
-    dispatch(updateLandInfo({
-      requestId,
-      updates: { [key]: value },
-    }));
+    dispatch(
+      updateLandInfo({
+        requestId,
+        updates: { [key]: value },
+      }),
+    );
 
     // Save to AsyncStorage
     const updatedData = { ...formData, [key]: value };
@@ -318,7 +345,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
     const fileObj: LandImage = {
       uri,
       name: `land_${Date.now()}.jpg`,
-      type: 'image/jpeg',
+      type: "image/jpeg",
     };
 
     dispatch(addImage({ requestId, image: fileObj }));
@@ -352,7 +379,9 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
       validationErrors.isOwnByFarmer = t("Error.Land ownership is required");
     }
     if (!formData.ownershipStatus) {
-      validationErrors.ownershipStatus = t("Error.Ownership status is required");
+      validationErrors.ownershipStatus = t(
+        "Error.Ownership status is required",
+      );
     }
     if (!formData.geoLocation) {
       validationErrors.geoLocation = t("Error.Geo location is required");
@@ -365,7 +394,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
       setErrors(validationErrors);
       const errorMessage = "• " + Object.values(validationErrors).join("\n• ");
       Alert.alert(t("Error.Validation Error"), errorMessage, [
-        { text: t("MAIN.OK") },
+        { text: t("Main.ok") },
       ]);
       return;
     }
@@ -374,7 +403,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
       Alert.alert(
         t("Error.Error"),
         "Request ID is missing. Please go back and try again.",
-        [{ text: t("MAIN.OK") }]
+        [{ text: t("Main.ok") }],
       );
       return;
     }
@@ -385,7 +414,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
       Alert.alert(
         t("Error.Error"),
         "Invalid request ID. Please go back and try again.",
-        [{ text: t("MAIN.OK") }]
+        [{ text: t("Main.ok") }],
       );
       return;
     }
@@ -394,7 +423,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
       t("InspectionForm.Saving"),
       t("InspectionForm.Please wait..."),
       [],
-      { cancelable: false }
+      { cancelable: false },
     );
 
     try {
@@ -402,7 +431,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
         reqId,
         "inspectionland",
         formData,
-        isExistingData
+        isExistingData,
       );
 
       if (saved) {
@@ -410,56 +439,56 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
         dispatch(markAsExisting({ requestId }));
 
         Alert.alert(
-          t("MAIN.Success"),
+          t("Main.Success"),
           t("InspectionForm.Data saved successfully"),
           [
             {
-              text: t("MAIN.OK"),
+              text: t("Main.ok"),
               onPress: () => {
                 navigation.navigate("InvestmentInfo", {
                   formData,
                   requestNumber,
-                  requestId: route.params.requestId
+                  requestId: route.params.requestId,
                 });
               },
             },
-          ]
+          ],
         );
       } else {
         Alert.alert(
-          t("MAIN.Warning"),
+          t("Main.Warning"),
           t("InspectionForm.Could not save to server. Data saved locally."),
           [
             {
-              text: t("MAIN.Continue"),
+              text: t("Main.Continue"),
               onPress: () => {
                 navigation.navigate("InvestmentInfo", {
                   formData,
                   requestNumber,
-                  requestId: route.params.requestId
+                  requestId: route.params.requestId,
                 });
               },
             },
-          ]
+          ],
         );
       }
     } catch (error) {
       console.error("Error during final save:", error);
       Alert.alert(
-        t("MAIN.Warning"),
+        t("Main.Warning"),
         t("InspectionForm.Could not save to server. Data saved locally."),
         [
           {
-            text: t("MAIN.Continue"),
+            text: t("Main.Continue"),
             onPress: () => {
               navigation.navigate("InvestmentInfo", {
                 formData,
                 requestNumber,
-                requestId: route.params.requestId
+                requestId: route.params.requestId,
               });
             },
           },
-        ]
+        ],
       );
     }
   };
@@ -481,20 +510,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
       <View className="flex-1 bg-[#F3F3F3]">
         <StatusBar barStyle="dark-content" />
 
-        <View className="flex-row items-center justify-center py-4 mt-2">
-          <TouchableOpacity 
-            className="absolute left-4 bg-[#E0E0E080] rounded-full p-4" 
-            onPress={() => navigation.goBack()}
-          >
-            <AntDesign name="left" size={20} color="#000" />
-          </TouchableOpacity>
-
-          <Text className="text-lg font-semibold text-black">
-            {t("InspectionForm.Inspection Form")}
-          </Text>
-        </View>
-
-        <FormTabs activeKey="Land Info" />
+        <FormTabs activeKey="Land Info" navigation={navigation} />
 
         <ScrollView
           className="flex-1 px-6 bg-white rounded-t-3xl"
@@ -556,7 +572,10 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
           {/* Land description */}
           <View className="mt-4">
             <Text className="text-sm text-[#070707] mb-2">
-              {t("InspectionForm.Provide brief description to reach the cultivation land")} *
+              {t(
+                "InspectionForm.Provide brief description to reach the cultivation land",
+              )}{" "}
+              *
             </Text>
             <View
               className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${
@@ -570,7 +589,8 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
                   let formattedText = text.replace(/^\s+/, "");
                   if (formattedText.length > 0) {
                     formattedText =
-                      formattedText.charAt(0).toUpperCase() + formattedText.slice(1);
+                      formattedText.charAt(0).toUpperCase() +
+                      formattedText.slice(1);
                   }
                   handleFieldChange("landDiscription", formattedText);
                 }}
@@ -600,7 +620,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
                   onLocationSelect: async (
                     latitude: number,
                     longitude: number,
-                    locationName: string
+                    locationName: string,
                   ) => {
                     const geoLocation: GeoLocation = {
                       latitude,
@@ -608,7 +628,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
                       locationName,
                     };
                     dispatch(setGeoLocation({ requestId, geoLocation }));
-                    
+
                     const updatedData = { ...formData, geoLocation };
                     await saveLandInfoToStorage(requestId, updatedData);
                   },
@@ -633,7 +653,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
                 navigation.navigate("ViewLocationScreen", {
                   latitude: formData.geoLocation!.latitude,
                   longitude: formData.geoLocation!.longitude,
-                  locationName: formData.geoLocation!.locationName
+                  locationName: formData.geoLocation!.locationName,
                 })
               }
             >
@@ -647,7 +667,10 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
           {/* Images */}
           <View className="mt-6">
             <Text className="text-sm text-[#070707] mb-2">
-              {t("InspectionForm.Images of the deed / lease / permit / any other formal document to prove the ownership of the land by the farmer")} *
+              {t(
+                "InspectionForm.Images of the deed / lease / permit / any other formal document to prove the ownership of the land by the farmer",
+              )}{" "}
+              *
             </Text>
             <TouchableOpacity
               className="bg-[#1A1A1A] rounded-full px-4 py-4 flex-row items-center justify-center gap-x-2"
@@ -664,7 +687,10 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
           {formData.images && formData.images.length > 0 && (
             <View className="mt-4 flex-row flex-wrap">
               {formData.images.map((img: LandImage, index: number) => (
-                <View key={index} className="w-40 h-40 m-1 rounded-xl overflow-hidden relative">
+                <View
+                  key={index}
+                  className="w-40 h-40 m-1 rounded-xl overflow-hidden relative"
+                >
                   <Image
                     source={{ uri: img.uri }}
                     className="w-full h-full rounded-xl"
@@ -736,7 +762,10 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
                 <TouchableOpacity
                   className="py-4"
                   onPress={async () => {
-                    await handleFieldChange("isOwnByFarmer", item as "Yes" | "No");
+                    await handleFieldChange(
+                      "isOwnByFarmer",
+                      item as "Yes" | "No",
+                    );
                     setlandownNoModal(false);
                   }}
                 >

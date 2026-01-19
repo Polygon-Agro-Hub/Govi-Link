@@ -96,7 +96,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                   activeOpacity={0.7}
                 >
                   <Text className="text-black text-base font-semibold">
-                    {t("InspectionForm.Go Back")}
+                    {t("Main.Go Back")}
                   </Text>
                 </TouchableOpacity>
 
@@ -106,7 +106,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                   activeOpacity={0.7}
                 >
                   <Text className="text-white text-base font-semibold">
-                    {t("InspectionForm.Continue")}
+                    {t("Main.Continue")}
                   </Text>
                 </TouchableOpacity>
               </>
@@ -119,7 +119,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                 activeOpacity={0.7}
               >
                 <Text className="text-white text-base font-semibold">
-                  {t("MAIN.OK")}
+                  {t("Main.ok")}
                 </Text>
               </TouchableOpacity>
             )}

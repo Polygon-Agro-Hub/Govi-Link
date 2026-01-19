@@ -24,11 +24,11 @@ import { RootStackParamList } from "../types";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 import ConfirmationModal from "@/Items/ConfirmationModal";
-import { clearAllIDProof } from '@/store/IDproofSlice';
-import { clearAllPersonalInfo } from '@/store/personalInfoSlice';
-import { clearAllLandInfo } from '@/store/LandInfoSlice';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '@/services/store';
+import { clearAllIDProof } from "@/store/IDproofSlice";
+import { clearAllPersonalInfo } from "@/store/personalInfoSlice";
+import { clearAllLandInfo } from "@/store/LandInfoSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/services/store";
 
 type FormData = {
   inspectionharveststorage?: HarvestStorageData;
@@ -42,7 +42,6 @@ type HarvestStorageData = {
   hasValueAddedMarketLinkage?: "Yes" | "No";
   awareOfQualityStandards?: "Yes" | "No";
 };
-
 
 type HarvestStorageProps = {
   navigation: any;
@@ -133,12 +132,12 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
   const [activeYesNoField, setActiveYesNoField] = useState<string | null>(null);
   const [isExistingData, setIsExistingData] = useState(false); // ✅ Add this
   const [isNextEnabled, setIsNextEnabled] = useState(false);
-  const [confirmationModalVisible, setConfirmationModalVisible] = useState(false);
+  const [confirmationModalVisible, setConfirmationModalVisible] =
+    useState(false);
   const [successModalVisible, setSuccessModalVisible] = useState(false);
   const [errorModalVisible, setErrorModalVisible] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const dispatch = useDispatch();
-
 
   console.log("finance", formData);
 
@@ -161,8 +160,7 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
       hs.hasPrimaryProcessingAccess === "No";
 
     const valueAdditionTechValid =
-      hs.knowsValueAdditionTech === "Yes" ||
-      hs.knowsValueAdditionTech === "No";
+      hs.knowsValueAdditionTech === "Yes" || hs.knowsValueAdditionTech === "No";
 
     const marketLinkageValid =
       hs.hasValueAddedMarketLinkage === "Yes" ||
@@ -176,17 +174,14 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
 
     setIsNextEnabled(
       hasOwnStorageValid &&
-      facilityAccessValid &&
-      primaryProcessingValid &&
-      valueAdditionTechValid &&
-      marketLinkageValid &&
-      qualityStandardsValid &&
-      !hasErrors
+        facilityAccessValid &&
+        primaryProcessingValid &&
+        valueAdditionTechValid &&
+        marketLinkageValid &&
+        qualityStandardsValid &&
+        !hasErrors,
     );
   }, [formData, errors]);
-
-
-
 
   let jobId = requestNumber;
   console.log("jobid", jobId);
@@ -212,65 +207,79 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
   const isLoadingRef = useRef(false);
 
   // Wrap fetchInspectionData in useCallback
-  const fetchInspectionData = useCallback(async (reqId: number): Promise<HarvestStorageData | null> => {
-    try {
-      console.log(`🔍 Fetching harvest storage data for reqId: ${reqId}`);
+  const fetchInspectionData = useCallback(
+    async (reqId: number): Promise<HarvestStorageData | null> => {
+      try {
+        console.log(`🔍 Fetching harvest storage data for reqId: ${reqId}`);
 
-      const response = await axios.get(
-        `${environment.API_BASE_URL}api/capital-request/inspection/get`,
-        {
-          params: {
-            reqId,
-            tableName: 'inspectionharveststorage'
-          }
+        const response = await axios.get(
+          `${environment.API_BASE_URL}api/capital-request/inspection/get`,
+          {
+            params: {
+              reqId,
+              tableName: "inspectionharveststorage",
+            },
+          },
+        );
+
+        console.log("📦 Raw response:", response.data);
+
+        if (response.data.success && response.data.data) {
+          console.log(
+            `✅ Fetched existing harvest storage data:`,
+            response.data.data,
+          );
+
+          const data = response.data.data;
+
+          const boolToYesNo = (val: any): "Yes" | "No" | undefined => {
+            if (val === 1 || val === "1" || val === true) return "Yes";
+            if (val === 0 || val === "0" || val === false) return "No";
+            return undefined;
+          };
+
+          return {
+            hasOwnStorage: boolToYesNo(data.hasOwnStorage),
+            ifNotHasFacilityAccess: boolToYesNo(data.ifNotHasFacilityAccess),
+            hasPrimaryProcessingAccess: boolToYesNo(
+              data.hasPrimaryProcessingAccess,
+            ),
+            knowsValueAdditionTech: boolToYesNo(data.knowsValueAdditionTech),
+            hasValueAddedMarketLinkage: boolToYesNo(
+              data.hasValueAddedMarketLinkage,
+            ),
+            awareOfQualityStandards: boolToYesNo(data.awareOfQualityStandards),
+          };
         }
-      );
 
-      console.log('📦 Raw response:', response.data);
-
-      if (response.data.success && response.data.data) {
-        console.log(`✅ Fetched existing harvest storage data:`, response.data.data);
-
-        const data = response.data.data;
-
-        const boolToYesNo = (val: any): "Yes" | "No" | undefined => {
-          if (val === 1 || val === '1' || val === true) return "Yes";
-          if (val === 0 || val === '0' || val === false) return "No";
-          return undefined;
-        };
-
-        return {
-          hasOwnStorage: boolToYesNo(data.hasOwnStorage),
-          ifNotHasFacilityAccess: boolToYesNo(data.ifNotHasFacilityAccess),
-          hasPrimaryProcessingAccess: boolToYesNo(data.hasPrimaryProcessingAccess),
-          knowsValueAdditionTech: boolToYesNo(data.knowsValueAdditionTech),
-          hasValueAddedMarketLinkage: boolToYesNo(data.hasValueAddedMarketLinkage),
-          awareOfQualityStandards: boolToYesNo(data.awareOfQualityStandards),
-        };
+        return null;
+      } catch (error: any) {
+        console.error(`❌ Error fetching harvest storage data:`, error);
+        if (error.response?.status === 404) {
+          console.log(`📝 No existing record - will create new`);
+        }
+        return null;
       }
-
-      return null;
-    } catch (error: any) {
-      console.error(`❌ Error fetching harvest storage data:`, error);
-      if (error.response?.status === 404) {
-        console.log(`📝 No existing record - will create new`);
-      }
-      return null;
-    }
-  }, []);
+    },
+    [],
+  );
 
   const saveToBackend = async (
     reqId: number,
     tableName: string,
     data: HarvestStorageData,
-    isUpdate: boolean
+    isUpdate: boolean,
   ): Promise<boolean> => {
     try {
-      console.log(`💾 Saving to backend (${isUpdate ? 'UPDATE' : 'INSERT'}):`, tableName);
+      console.log(
+        `💾 Saving to backend (${isUpdate ? "UPDATE" : "INSERT"}):`,
+        tableName,
+      );
       console.log(`📝 reqId being sent:`, reqId);
 
       // Yes/No fields
-      const yesNoToInt = (val: any) => val === "Yes" ? '1' : val === "No" ? '0' : null;
+      const yesNoToInt = (val: any) =>
+        val === "Yes" ? "1" : val === "No" ? "0" : null;
 
       const transformedData: any = {
         reqId,
@@ -282,23 +291,36 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
       }
 
       // Conditional field
-      if (data.hasOwnStorage === "No" && data.ifNotHasFacilityAccess !== undefined) {
-        transformedData.ifNotHasFacilityAccess = yesNoToInt(data.ifNotHasFacilityAccess);
+      if (
+        data.hasOwnStorage === "No" &&
+        data.ifNotHasFacilityAccess !== undefined
+      ) {
+        transformedData.ifNotHasFacilityAccess = yesNoToInt(
+          data.ifNotHasFacilityAccess,
+        );
       } else {
         transformedData.ifNotHasFacilityAccess = null;
       }
 
       if (data.hasPrimaryProcessingAccess !== undefined) {
-        transformedData.hasPrimaryProcessingAccess = yesNoToInt(data.hasPrimaryProcessingAccess);
+        transformedData.hasPrimaryProcessingAccess = yesNoToInt(
+          data.hasPrimaryProcessingAccess,
+        );
       }
       if (data.knowsValueAdditionTech !== undefined) {
-        transformedData.knowsValueAdditionTech = yesNoToInt(data.knowsValueAdditionTech);
+        transformedData.knowsValueAdditionTech = yesNoToInt(
+          data.knowsValueAdditionTech,
+        );
       }
       if (data.hasValueAddedMarketLinkage !== undefined) {
-        transformedData.hasValueAddedMarketLinkage = yesNoToInt(data.hasValueAddedMarketLinkage);
+        transformedData.hasValueAddedMarketLinkage = yesNoToInt(
+          data.hasValueAddedMarketLinkage,
+        );
       }
       if (data.awareOfQualityStandards !== undefined) {
-        transformedData.awareOfQualityStandards = yesNoToInt(data.awareOfQualityStandards);
+        transformedData.awareOfQualityStandards = yesNoToInt(
+          data.awareOfQualityStandards,
+        );
       }
 
       console.log(`📦 Transformed data:`, transformedData);
@@ -308,9 +330,9 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
         transformedData,
         {
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       if (response.data.success) {
@@ -330,19 +352,20 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
     }
   };
 
-
   useFocusEffect(
     useCallback(() => {
       const loadFormData = async () => {
         // ✅ Prevent multiple simultaneous loads
         if (isLoadingRef.current) {
-          console.log('⏸️ Already loading, skipping...');
+          console.log("⏸️ Already loading, skipping...");
           return;
         }
 
         try {
           isLoadingRef.current = true;
-          console.log(`🔄 Loading harvest storage data for requestId: ${requestId}`);
+          console.log(
+            `🔄 Loading harvest storage data for requestId: ${requestId}`,
+          );
 
           // First, try to fetch from backend
           if (requestId) {
@@ -355,13 +378,16 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
 
                 const updatedFormData = {
                   ...prevFormData, // ✅ Use prevFormData from route params
-                  inspectionharveststorage: backendData
+                  inspectionharveststorage: backendData,
                 };
 
                 setFormData(updatedFormData);
                 setIsExistingData(true);
 
-                await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData));
+                await AsyncStorage.setItem(
+                  `${jobId}`,
+                  JSON.stringify(updatedFormData),
+                );
                 return;
               }
             }
@@ -387,9 +413,8 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
       };
 
       loadFormData();
-    }, [requestId, jobId, fetchInspectionData])
+    }, [requestId, jobId, fetchInspectionData]),
   );
-
 
   const handleNext = () => {
     const validationErrors: Record<string, string> = {};
@@ -401,28 +426,41 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
     }
 
     // Conditional validation
-    if (harvestStorageInfo?.hasOwnStorage === "No" && !harvestStorageInfo?.ifNotHasFacilityAccess) {
-      validationErrors.ifNotHasFacilityAccess = t("Error.Facility access field is required");
+    if (
+      harvestStorageInfo?.hasOwnStorage === "No" &&
+      !harvestStorageInfo?.ifNotHasFacilityAccess
+    ) {
+      validationErrors.ifNotHasFacilityAccess = t(
+        "Error.Facility access field is required",
+      );
     }
 
     if (!harvestStorageInfo?.hasPrimaryProcessingAccess) {
-      validationErrors.hasPrimaryProcessingAccess = t("Error.Primary processing access field is required");
+      validationErrors.hasPrimaryProcessingAccess = t(
+        "Error.Primary processing access field is required",
+      );
     }
     if (!harvestStorageInfo?.knowsValueAdditionTech) {
-      validationErrors.knowsValueAdditionTech = t("Error.Value addition tech field is required");
+      validationErrors.knowsValueAdditionTech = t(
+        "Error.Value addition tech field is required",
+      );
     }
     if (!harvestStorageInfo?.hasValueAddedMarketLinkage) {
-      validationErrors.hasValueAddedMarketLinkage = t("Error.Market linkage field is required");
+      validationErrors.hasValueAddedMarketLinkage = t(
+        "Error.Market linkage field is required",
+      );
     }
     if (!harvestStorageInfo?.awareOfQualityStandards) {
-      validationErrors.awareOfQualityStandards = t("Error.Quality standards field is required");
+      validationErrors.awareOfQualityStandards = t(
+        "Error.Quality standards field is required",
+      );
     }
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       const errorMessage = "• " + Object.values(validationErrors).join("\n• ");
       Alert.alert(t("Error.Validation Error"), errorMessage, [
-        { text: t("MAIN.OK") },
+        { text: t("Main.ok") },
       ]);
       return;
     }
@@ -454,13 +492,15 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
     console.log("✅ Using requestId:", reqId);
 
     try {
-      console.log(`🚀 Saving final form to backend (${isExistingData ? "UPDATE" : "INSERT"})`);
+      console.log(
+        `🚀 Saving final form to backend (${isExistingData ? "UPDATE" : "INSERT"})`,
+      );
 
       const saved = await saveToBackend(
         reqId,
         "inspectionharveststorage",
         formData.inspectionharveststorage!,
-        isExistingData
+        isExistingData,
       );
 
       setIsSaving(false);
@@ -494,14 +534,14 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
 
     try {
       // ✅ Clear all Redux slices
-      console.log('🗑️ Clearing all Redux slices...');
+      console.log("🗑️ Clearing all Redux slices...");
 
       dispatch(clearAllIDProof());
       dispatch(clearAllPersonalInfo());
       dispatch(clearAllLandInfo());
       // Add other clear actions for remaining slices
 
-      console.log('✅ All Redux slices cleared successfully');
+      console.log("✅ All Redux slices cleared successfully");
 
       // ✅ Clear AsyncStorage for this specific request
       try {
@@ -510,7 +550,7 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
         await AsyncStorage.removeItem(`landinfo_${requestId}`);
         // Add other AsyncStorage keys if needed
 
-        console.log('✅ AsyncStorage cleared successfully');
+        console.log("✅ AsyncStorage cleared successfully");
       } catch (clearError) {
         console.error("⚠️ Failed to clear AsyncStorage:", clearError);
       }
@@ -519,15 +559,15 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
       navigation.navigate("ConfirmationCapitalRequest", {
         formData: formData,
         requestNumber: requestNumber,
-        requestId: requestId
+        requestId: requestId,
       });
     } catch (error) {
-      console.error('❌ Error during cleanup:', error);
+      console.error("❌ Error during cleanup:", error);
       // Still navigate even if cleanup fails
       navigation.navigate("ConfirmationCapitalRequest", {
         formData: formData,
         requestNumber: requestNumber,
-        requestId: requestId
+        requestId: requestId,
       });
     }
   };
@@ -535,7 +575,6 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
   const handleErrorClose = () => {
     setErrorModalVisible(false);
   };
-
 
   const handleyesNOFieldChange = async (key: string, value: "Yes" | "No") => {
     let updatedData = {
@@ -556,9 +595,6 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
     await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData));
   };
 
-
-
-
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -567,21 +603,8 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
       <View className="flex-1 bg-[#F3F3F3] ">
         <StatusBar barStyle="dark-content" />
 
-        {/* Header */}
-        <View className="flex-row items-center justify-center py-4 mt-2">
-          <TouchableOpacity
-            className="absolute left-4 bg-[#F3F3F3] rounded-full p-4"
-            onPress={() => navigation.goBack()}
-          >
-            <AntDesign name="left" size={20} color="#000" />
-          </TouchableOpacity>
-          <Text className="text-lg font-semibold text-black">
-            {t("InspectionForm.Inspection Form")}
-          </Text>
-        </View>
-
         {/* Tabs */}
-        <FormTabs activeKey="Labour" />
+        <FormTabs activeKey="Harvest Storage" navigation={navigation} />
 
         <ScrollView
           className="flex-1 px-6 bg-white rounded-t-3xl"
@@ -593,9 +616,7 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
             label={t("InspectionForm.Does the farmer own storage facility")}
             required
             value={formData.inspectionharveststorage?.hasOwnStorage || null}
-            visible={
-              yesNoModalVisible && activeYesNoField === "hasOwnStorage"
-            }
+            visible={yesNoModalVisible && activeYesNoField === "hasOwnStorage"}
             onOpen={() => {
               setActiveYesNoField("hasOwnStorage");
               setYesNoModalVisible(true);
@@ -604,18 +625,19 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
               setYesNoModalVisible(false);
               setActiveYesNoField(null);
             }}
-            onSelect={(value) =>
-              handleyesNOFieldChange("hasOwnStorage", value)
-            }
+            onSelect={(value) => handleyesNOFieldChange("hasOwnStorage", value)}
           />
 
           {formData.inspectionharveststorage?.hasOwnStorage === "No" && (
             <YesNoSelect
               label={t(
-                "InspectionForm.If not, does the farmer have access to such facility"
+                "InspectionForm.If not, does the farmer have access to such facility",
               )}
               required
-              value={formData.inspectionharveststorage?.ifNotHasFacilityAccess || null}
+              value={
+                formData.inspectionharveststorage?.ifNotHasFacilityAccess ||
+                null
+              }
               visible={
                 yesNoModalVisible &&
                 activeYesNoField === "ifNotHasFacilityAccess"
@@ -635,11 +657,17 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
           )}
 
           <YesNoSelect
-            label={t("InspectionForm.Does the farmer has access to primary processing facility")}
+            label={t(
+              "InspectionForm.Does the farmer has access to primary processing facility",
+            )}
             required
-            value={formData.inspectionharveststorage?.hasPrimaryProcessingAccess || null}
+            value={
+              formData.inspectionharveststorage?.hasPrimaryProcessingAccess ||
+              null
+            }
             visible={
-              yesNoModalVisible && activeYesNoField === "hasPrimaryProcessingAccess"
+              yesNoModalVisible &&
+              activeYesNoField === "hasPrimaryProcessingAccess"
             }
             onOpen={() => {
               setActiveYesNoField("hasPrimaryProcessingAccess");
@@ -654,9 +682,13 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
             }
           />
           <YesNoSelect
-            label={t("InspectionForm.Does the farmer knows technologies for value addition of your crop")}
+            label={t(
+              "InspectionForm.Does the farmer knows technologies for value addition of your crop",
+            )}
             required
-            value={formData.inspectionharveststorage?.knowsValueAdditionTech || null}
+            value={
+              formData.inspectionharveststorage?.knowsValueAdditionTech || null
+            }
             visible={
               yesNoModalVisible && activeYesNoField === "knowsValueAdditionTech"
             }
@@ -674,11 +706,17 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
           />
 
           <YesNoSelect
-            label={t("InspectionForm.Does the farmer has market linkage for value added products")}
+            label={t(
+              "InspectionForm.Does the farmer has market linkage for value added products",
+            )}
             required
-            value={formData.inspectionharveststorage?.hasValueAddedMarketLinkage || null}
+            value={
+              formData.inspectionharveststorage?.hasValueAddedMarketLinkage ||
+              null
+            }
             visible={
-              yesNoModalVisible && activeYesNoField === "hasValueAddedMarketLinkage"
+              yesNoModalVisible &&
+              activeYesNoField === "hasValueAddedMarketLinkage"
             }
             onOpen={() => {
               setActiveYesNoField("hasValueAddedMarketLinkage");
@@ -694,11 +732,16 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
           />
 
           <YesNoSelect
-            label={t("InspectionForm.Is farmer aware about required quality standards of value added products of proposed crops")}
+            label={t(
+              "InspectionForm.Is farmer aware about required quality standards of value added products of proposed crops",
+            )}
             required
-            value={formData.inspectionharveststorage?.awareOfQualityStandards || null}
+            value={
+              formData.inspectionharveststorage?.awareOfQualityStandards || null
+            }
             visible={
-              yesNoModalVisible && activeYesNoField === "awareOfQualityStandards"
+              yesNoModalVisible &&
+              activeYesNoField === "awareOfQualityStandards"
             }
             onOpen={() => {
               setActiveYesNoField("awareOfQualityStandards");
@@ -717,9 +760,7 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
         <View className="flex-row px-6 py-4 gap-4 bg-white border-t border-gray-200 ">
           <TouchableOpacity
             className="flex-1 bg-[#444444] rounded-full py-4 items-center"
-            onPress={() =>
-              navigation.goBack()
-            }
+            onPress={() => navigation.goBack()}
           >
             <Text className="text-white text-base font-semibold">
               {t("InspectionForm.Back")}

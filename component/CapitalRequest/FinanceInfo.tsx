@@ -332,7 +332,7 @@
 
 //       const errorMessage = "• " + Object.values(validationErrors).join("\n• ");
 //       Alert.alert(t("Error.Validation Error"), errorMessage, [
-//         { text: t("MAIN.OK") },
+//         { text: t("Main.ok") },
 //       ]);
 //       return;
 //     }
@@ -1143,8 +1143,9 @@ const Input = ({
       {label} {required && <Text className="text-black">*</Text>}
     </Text>
     <View
-      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${error ? "border border-red-500" : ""
-        }`}
+      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
+        error ? "border border-red-500" : ""
+      }`}
     >
       <TextInput
         placeholder={placeholder}
@@ -1173,7 +1174,7 @@ const validateAndFormat = (
   t: any,
   formData: any,
   requestId: number,
-  currentKey: keyof typeof formData
+  currentKey: keyof typeof formData,
 ) => {
   let value = text;
   let error = "";
@@ -1222,7 +1223,7 @@ type FinanceInfoProps = {
 
 const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
   const route = useRoute<RouteProp<RootStackParamList, "FinanceInfo">>();
-  const { requestNumber, requestId } = route.params;  // ✅ Extract requestId here
+  const { requestNumber, requestId } = route.params; // ✅ Extract requestId here
   const prevFormData = route.params?.formData;
   const [formData, setFormData] = useState(prevFormData);
 
@@ -1258,7 +1259,9 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
 
     const allFilled = requiredFields.every((key) => {
       const value = formData.inspectionfinance?.[key];
-      return value !== null && value !== undefined && value.toString().trim() !== "";
+      return (
+        value !== null && value !== undefined && value.toString().trim() !== ""
+      );
     });
 
     // Check assets including assetsFarmTool
@@ -1284,14 +1287,11 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     })();
 
     const hasErrors = Object.values({ ...errors, assets: assetsError }).some(
-      (err) => err && err.trim() !== ""
+      (err) => err && err.trim() !== "",
     );
 
     setIsNextEnabled(allFilled && !hasErrors && !hasAssetWarnings());
   }, [formData, errors]);
-
-
-
 
   let jobId = requestNumber;
 
@@ -1319,10 +1319,13 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     reqId: number,
     tableName: string,
     data: FinanceInfoData,
-    isUpdate: boolean
+    isUpdate: boolean,
   ): Promise<boolean> => {
     try {
-      console.log(`💾 Saving to backend (${isUpdate ? 'UPDATE' : 'INSERT'}):`, tableName);
+      console.log(
+        `💾 Saving to backend (${isUpdate ? "UPDATE" : "INSERT"}):`,
+        tableName,
+      );
       console.log(`📝 reqId being sent:`, reqId);
 
       // Transform data to match backend schema
@@ -1341,9 +1344,9 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
         },
         {
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       if (response.data.success) {
@@ -1363,7 +1366,9 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     }
   };
 
-    const fetchInspectionData = async (reqId: number): Promise<FinanceInfoData | null> => {
+  const fetchInspectionData = async (
+    reqId: number,
+  ): Promise<FinanceInfoData | null> => {
     try {
       console.log(`🔍 Fetching inspection data for reqId: ${reqId}`);
 
@@ -1372,12 +1377,12 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
         {
           params: {
             reqId,
-            tableName: 'inspectionfinance'
-          }
-        }
+            tableName: "inspectionfinance",
+          },
+        },
       );
 
-      console.log('📦 Raw response:', response.data);
+      console.log("📦 Raw response:", response.data);
 
       if (response.data.success && response.data.data) {
         console.log(`✅ Fetched existing data:`, response.data.data);
@@ -1392,7 +1397,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
           if (Array.isArray(field)) return field;
 
           // If it's a string, try to parse it
-          if (typeof field === 'string') {
+          if (typeof field === "string") {
             try {
               const parsed = JSON.parse(field);
               return Array.isArray(parsed) ? parsed : [];
@@ -1403,7 +1408,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
           }
 
           // If it's an object (MySQL JSON type returns as object), convert to array
-          if (typeof field === 'object') {
+          if (typeof field === "object") {
             return Array.isArray(field) ? field : [];
           }
 
@@ -1412,18 +1417,18 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
 
         // Parse JSON fields back to arrays
         return {
-          accHolder: data.accHolder || '',
+          accHolder: data.accHolder || "",
           accountNumber: data.accNum ? parseInt(data.accNum) : 0,
           confirmAccountNumber: data.accNum ? parseInt(data.accNum) : 0,
-          bank: data.bank || '',
-          branch: data.branch || '',
-          debtsOfFarmer: data.debtsOfFarmer || '',
-          noOfDependents: data.noOfDependents?.toString() || '',
+          bank: data.bank || "",
+          branch: data.branch || "",
+          debtsOfFarmer: data.debtsOfFarmer || "",
+          noOfDependents: data.noOfDependents?.toString() || "",
           assetsLand: safeJsonParse(data.assetsLand),
           assetsBuilding: safeJsonParse(data.assetsBuilding),
           assetsVehicle: safeJsonParse(data.assetsVehicle),
           assetsMachinery: safeJsonParse(data.assetsMachinery),
-          assetsFarmTool: data.assetsFarmTool || ''
+          assetsFarmTool: data.assetsFarmTool || "",
         };
       }
 
@@ -1431,7 +1436,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
       return null;
     } catch (error: any) {
       console.error(`❌ Error fetching inspection data:`, error);
-      console.error('Error details:', error.response?.data);
+      console.error("Error details:", error.response?.data);
 
       if (error.response?.status === 404) {
         console.log(`📝 No existing record - will create new`);
@@ -1446,27 +1451,34 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
   const transformFinanceInfoForBackend = (data: FinanceInfoData) => {
     return {
       accHolder: data.accHolder,
-      accNum: data.accountNumber?.toString() || '', // ✅ Note: column is 'accNum' not 'accountNumber'
-      bank: data.bank || '',
-      branch: data.branch || '',
-      debtsOfFarmer: data.debtsOfFarmer || '',
-      noOfDependents: data.noOfDependents ? parseInt(data.noOfDependents) : null,
+      accNum: data.accountNumber?.toString() || "", // ✅ Note: column is 'accNum' not 'accountNumber'
+      bank: data.bank || "",
+      branch: data.branch || "",
+      debtsOfFarmer: data.debtsOfFarmer || "",
+      noOfDependents: data.noOfDependents
+        ? parseInt(data.noOfDependents)
+        : null,
       // ✅ Send arrays directly as JSON - MySQL will handle JSON conversion
-      assetsLand: data.assetsLand && data.assetsLand.length > 0
-        ? JSON.stringify(data.assetsLand)
-        : null,
-      assetsBuilding: data.assetsBuilding && data.assetsBuilding.length > 0
-        ? JSON.stringify(data.assetsBuilding)
-        : null,
-      assetsVehicle: data.assetsVehicle && data.assetsVehicle.length > 0
-        ? JSON.stringify(data.assetsVehicle)
-        : null,
-      assetsMachinery: data.assetsMachinery && data.assetsMachinery.length > 0
-        ? JSON.stringify(data.assetsMachinery)
-        : null,
-      assetsFarmTool: data.assetsFarmTool && data.assetsFarmTool.trim() !== ''
-        ? data.assetsFarmTool
-        : null,
+      assetsLand:
+        data.assetsLand && data.assetsLand.length > 0
+          ? JSON.stringify(data.assetsLand)
+          : null,
+      assetsBuilding:
+        data.assetsBuilding && data.assetsBuilding.length > 0
+          ? JSON.stringify(data.assetsBuilding)
+          : null,
+      assetsVehicle:
+        data.assetsVehicle && data.assetsVehicle.length > 0
+          ? JSON.stringify(data.assetsVehicle)
+          : null,
+      assetsMachinery:
+        data.assetsMachinery && data.assetsMachinery.length > 0
+          ? JSON.stringify(data.assetsMachinery)
+          : null,
+      assetsFarmTool:
+        data.assetsFarmTool && data.assetsFarmTool.trim() !== ""
+          ? data.assetsFarmTool
+          : null,
     };
   };
 
@@ -1478,7 +1490,9 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
           if (requestId) {
             const reqId = Number(requestId);
             if (!isNaN(reqId) && reqId > 0) {
-              console.log(`🔄 Attempting to fetch data from backend for reqId: ${reqId}`);
+              console.log(
+                `🔄 Attempting to fetch data from backend for reqId: ${reqId}`,
+              );
 
               const backendData = await fetchInspectionData(reqId);
 
@@ -1488,7 +1502,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
                 // Update form with backend data
                 const updatedFormData = {
                   ...formData,
-                  inspectionfinance: backendData
+                  inspectionfinance: backendData,
                 };
 
                 setFormData(updatedFormData);
@@ -1499,9 +1513,12 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
                   setSelectedBank(backendData.bank);
 
                   // Load branches for selected bank
-                  const bankObj = banks.find(b => b.name === backendData.bank);
+                  const bankObj = banks.find(
+                    (b) => b.name === backendData.bank,
+                  );
                   if (bankObj) {
-                    const filteredBranches = (branchesData as any)[bankObj.id.toString()] || [];
+                    const filteredBranches =
+                      (branchesData as any)[bankObj.id.toString()] || [];
                     setAvailableBranches(filteredBranches);
                   }
                 }
@@ -1511,7 +1528,10 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
                 }
 
                 // Save to AsyncStorage as backup
-                await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData));
+                await AsyncStorage.setItem(
+                  `${jobId}`,
+                  JSON.stringify(updatedFormData),
+                );
 
                 return; // Exit after loading from backend
               }
@@ -1538,7 +1558,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
 
             if (parsedData.inspectionfinance?.bank) {
               const bankObj = banks.find(
-                (b) => b.name === parsedData.inspectionfinance?.bank
+                (b) => b.name === parsedData.inspectionfinance?.bank,
               );
               if (bankObj) {
                 const filteredBranches =
@@ -1558,15 +1578,22 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
       };
 
       loadFormData();
-    }, [requestId, jobId])
+    }, [requestId, jobId]),
   );
 
   const handleFieldChange = (
     key: keyof FinanceInfoData,
     text: string,
-    rules: ValidationRule
+    rules: ValidationRule,
   ) => {
-    const { value, error } = validateAndFormat(text, rules, t, formData, requestId || 0, key);
+    const { value, error } = validateAndFormat(
+      text,
+      rules,
+      t,
+      formData,
+      requestId || 0,
+      key,
+    );
 
     setFormData((prev: FormData) => ({
       ...prev,
@@ -1592,18 +1619,21 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     }
 
     // Account number
-    if (!accInfo?.accountNumber || accInfo.accountNumber.toString().trim() === "") {
+    if (
+      !accInfo?.accountNumber ||
+      accInfo.accountNumber.toString().trim() === ""
+    ) {
       validationErrors.accountNumber = t("Error.accountNumber is required");
     }
 
     // Confirm account number
     if (!accInfo?.confirmAccountNumber) {
       validationErrors.confirmAccountNumber = t(
-        "Error.Confirm account number is required"
+        "Error.Confirm account number is required",
       );
     } else if (accInfo.confirmAccountNumber !== accInfo.accountNumber) {
       validationErrors.confirmAccountNumber = t(
-        "Error.Account numbers do not match"
+        "Error.Account numbers do not match",
       );
     }
 
@@ -1626,7 +1656,9 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     });
 
     if (!anyAssetSelected) {
-      validationErrors.assets = t("Error.At least one option must be selected.");
+      validationErrors.assets = t(
+        "Error.At least one option must be selected.",
+      );
     }
 
     // Bank & branch
@@ -1640,10 +1672,9 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
 
-      const errorMessage =
-        "• " + Object.values(validationErrors).join("\n• ");
+      const errorMessage = "• " + Object.values(validationErrors).join("\n• ");
       Alert.alert(t("Error.Validation Error"), errorMessage, [
-        { text: t("MAIN.OK") },
+        { text: t("Main.ok") },
       ]);
       return;
     }
@@ -1654,7 +1685,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
       Alert.alert(
         t("Error.Error"),
         "Request ID is missing. Please go back and try again.",
-        [{ text: t("MAIN.OK") }]
+        [{ text: t("Main.ok") }],
       );
       return;
     }
@@ -1667,7 +1698,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
       Alert.alert(
         t("Error.Error"),
         "Invalid request ID. Please go back and try again.",
-        [{ text: t("MAIN.OK") }]
+        [{ text: t("Main.ok") }],
       );
       return;
     }
@@ -1679,20 +1710,20 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
       t("InspectionForm.Saving"),
       t("InspectionForm.Please wait..."),
       [],
-      { cancelable: false }
+      { cancelable: false },
     );
 
     // Save to backend
     try {
       console.log(
-        `🚀 Saving to backend (${isExistingData ? "UPDATE" : "INSERT"})`
+        `🚀 Saving to backend (${isExistingData ? "UPDATE" : "INSERT"})`,
       );
 
       const saved = await saveToBackend(
         reqId,
         "inspectionfinance",
         formData.inspectionfinance!,
-        isExistingData
+        isExistingData,
       );
 
       if (saved) {
@@ -1700,63 +1731,60 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
         setIsExistingData(true);
 
         Alert.alert(
-          t("MAIN.Success"),
+          t("Main.Success"),
           t("InspectionForm.Data saved successfully"),
           [
             {
-              text: t("MAIN.OK"),
+              text: t("Main.ok"),
               onPress: () => {
                 navigation.navigate("LandInfo", {
                   formData,
                   requestNumber,
-                  requestId: route.params.requestId
+                  requestId: route.params.requestId,
                 });
               },
             },
-          ]
+          ],
         );
       } else {
         console.log("⚠️ Backend save failed, but continuing with local data");
         Alert.alert(
-          t("MAIN.Warning"),
+          t("Main.Warning"),
           t("InspectionForm.Could not save to server. Data saved locally."),
           [
             {
-              text: t("MAIN.Continue"),
+              text: t("Main.Continue"),
               onPress: () => {
                 navigation.navigate("LandInfo", {
                   formData,
                   requestNumber,
-                  requestId: route.params.requestId
+                  requestId: route.params.requestId,
                 });
               },
             },
-          ]
+          ],
         );
       }
     } catch (error) {
       console.error("Error during final save:", error);
       Alert.alert(
-        t("MAIN.Warning"),
+        t("Main.Warning"),
         t("InspectionForm.Could not save to server. Data saved locally."),
         [
           {
-            text: t("MAIN.Continue"),
+            text: t("Main.Continue"),
             onPress: () => {
               navigation.navigate("LandInfo", {
                 formData,
                 requestNumber,
-                requestId: route.params.requestId
+                requestId: route.params.requestId,
               });
             },
           },
-        ]
+        ],
       );
     }
   };
-
-
-
 
   const handleModalClose = (modalType: string) => {
     switch (modalType) {
@@ -1793,7 +1821,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
   };
 
   const sortBanksAlphabetically = (
-    banks: Array<{ id: number; name: string }>
+    banks: Array<{ id: number; name: string }>,
   ) => {
     return [...banks].sort((a, b) => {
       const nameA = a.name.toLowerCase();
@@ -1804,7 +1832,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
 
   // Sort branches by name
   const sortBranchesAlphabetically = (
-    branches: Array<{ ID: number; name: string }>
+    branches: Array<{ ID: number; name: string }>,
   ) => {
     return [...branches].sort((a, b) => {
       const nameA = a.name.toLowerCase();
@@ -1817,8 +1845,8 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     if (!bankSearch) return sortBanksAlphabetically(banks);
     return sortBanksAlphabetically(
       banks.filter((bank) =>
-        bank.name.toLowerCase().includes(bankSearch.toLowerCase())
-      )
+        bank.name.toLowerCase().includes(bankSearch.toLowerCase()),
+      ),
     );
   };
 
@@ -1826,8 +1854,8 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     if (!branchSearch) return sortBranchesAlphabetically(availableBranches);
     return sortBranchesAlphabetically(
       availableBranches.filter((branch) =>
-        branch.name.toLowerCase().includes(branchSearch.toLowerCase())
-      )
+        branch.name.toLowerCase().includes(branchSearch.toLowerCase()),
+      ),
     );
   };
   const renderBankItem = ({ item }: { item: { id: number; name: string } }) => (
@@ -1854,7 +1882,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
   const renderSearchInput = (
     value: string,
     onChangeText: (text: string) => void,
-    placeholder: string
+    placeholder: string,
   ) => (
     <View className="px-4 py-2 border-b border-gray-200">
       <View className="bg-gray-100 rounded-lg px-3 flex-row items-center">
@@ -1968,21 +1996,9 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     >
       <View className="flex-1 bg-[#F3F3F3] ">
         <StatusBar barStyle="dark-content" />
-        <View className="flex-row items-center justify-center py-4 mt-2">
-          <TouchableOpacity
-            className="absolute left-4 bg-[#E0E0E080] rounded-full p-4"
-            onPress={() => navigation.goBack()}
-          >
-            <AntDesign name="left" size={20} color="#000" />
-          </TouchableOpacity>
-
-          <Text className="text-lg font-semibold text-black">
-            {t("InspectionForm.Inspection Form")}
-          </Text>
-        </View>
 
         {/* Tabs */}
-        <FormTabs activeKey="Finance Info" />
+        <FormTabs activeKey="Finance Info" navigation={navigation} />
 
         <ScrollView
           className="flex-1 px-6 bg-white rounded-t-3xl"
@@ -2071,8 +2087,9 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               {t("InspectionForm.Bank Name")} *
             </Text>
             <TouchableOpacity
-              className={`bg-[#F4F4F4] rounded-full px-4 py-4 flex-row justify-between items-center ${errors.bank ? "border border-red-500" : ""
-                }`}
+              className={`bg-[#F4F4F4] rounded-full px-4 py-4 flex-row justify-between items-center ${
+                errors.bank ? "border border-red-500" : ""
+              }`}
               onPress={() => setShowBankDropdown(true)}
             >
               <Text
@@ -2094,14 +2111,16 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               {t("InspectionForm.Branch Name")} *
             </Text>
             <TouchableOpacity
-              className={`bg-[#F4F4F4] rounded-full px-4 py-4 flex-row justify-between items-center ${errors.branch ? "border border-red-500" : ""
-                }`}
+              className={`bg-[#F4F4F4] rounded-full px-4 py-4 flex-row justify-between items-center ${
+                errors.branch ? "border border-red-500" : ""
+              }`}
               onPress={() => setShowBranchDropdown(true)}
               disabled={availableBranches.length === 0}
             >
               <Text
-                className={`${selectedBranch ? "text-black" : "text-[#7D7D7D]"
-                  }`}
+                className={`${
+                  selectedBranch ? "text-black" : "text-[#7D7D7D]"
+                }`}
               >
                 {selectedBranch || t("InspectionForm.Select Branch")}
               </Text>
@@ -2121,8 +2140,9 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               {t("InspectionForm.Existing debts of the farmer")} *
             </Text>
             <View
-              className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${errors.debts ? "border border-red-500" : ""
-                }`}
+              className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${
+                errors.debts ? "border border-red-500" : ""
+              }`}
             >
               <TextInput
                 placeholder={t("InspectionForm.Type here...")}
@@ -2196,7 +2216,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
             {assetCategories.map((category) => {
               const parentAssets = formData.inspectionfinance || {}; // <- point here
               const isCategorySelected = parentAssets.hasOwnProperty(
-                category.key
+                category.key,
               );
 
               const showLandWarning =
@@ -2237,7 +2257,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
 
                         const noCategorySelected =
                           Object.keys(updatedFormData).filter(
-                            (key) => key !== "Special Farm Tools"
+                            (key) => key !== "Special Farm Tools",
                           ).length === 0;
 
                         setErrors((prev) => ({
@@ -2277,7 +2297,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
                                   updatedFormData[category.key] || [];
                                 if (
                                   !updatedFormData[category.key].includes(
-                                    sub.key
+                                    sub.key,
                                   )
                                 ) {
                                   updatedFormData[category.key].push(sub.key);
@@ -2342,7 +2362,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
 
                             AsyncStorage.setItem(
                               `${jobId}`,
-                              JSON.stringify(updatedFormData)
+                              JSON.stringify(updatedFormData),
                             );
 
                             return updatedFormData;
@@ -2366,16 +2386,17 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
 
                   {showLandWarning && (
                     <Text
-                      className={`${category.key === "assetsFarmTool" ? "" : ""
-                        } text-red-500 text-sm mt-2`}
+                      className={`${
+                        category.key === "assetsFarmTool" ? "" : ""
+                      } text-red-500 text-sm mt-2`}
                     >
                       {category.key === "assetsFarmTool"
                         ? t(
-                          `Error.Please specify any special farm tools utilized by the farmer.`
-                        )
+                            `Error.Please specify any special farm tools utilized by the farmer.`,
+                          )
                         : t("Error.At least one", {
-                          category: category.label,
-                        })}
+                            category: category.label,
+                          })}
                     </Text>
                   )}
                 </View>
@@ -2409,7 +2430,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               {renderSearchInput(
                 bankSearch,
                 setBankSearch,
-                t("AddOfficer.SearchBank") || "Search bank..."
+                t("AddOfficer.SearchBank") || "Search bank...",
               )}
               <FlatList
                 data={getFilteredBanks()}
@@ -2441,7 +2462,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               {renderSearchInput(
                 branchSearch,
                 setBranchSearch,
-                t("AddOfficer.SearchBranch") || "Search branch..."
+                t("AddOfficer.SearchBranch") || "Search branch...",
               )}
               <FlatList
                 data={getFilteredBranches()}
@@ -2456,9 +2477,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
         <View className="flex-row px-6 py-4 gap-4 bg-white border-t border-gray-200 ">
           <TouchableOpacity
             className="flex-1 bg-[#444444] rounded-full py-4 items-center"
-            onPress={() =>
-              navigation.goBack()
-            }
+            onPress={() => navigation.goBack()}
           >
             <Text className="text-white text-base font-semibold">
               {t("InspectionForm.Back")}
