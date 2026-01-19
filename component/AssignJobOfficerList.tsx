@@ -113,14 +113,33 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
   };
 
   // Format date to "On October 12" format
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const options: Intl.DateTimeFormatOptions = {
-      month: "long",
-      day: "numeric",
-    };
-    return `On ${date.toLocaleDateString("en-US", options)}`;
+  // const formatDate = (dateString: string) => {
+  //   const date = new Date(dateString);
+  //   const options: Intl.DateTimeFormatOptions = {
+  //     month: "long",
+  //     day: "numeric",
+  //   };
+  //   return `On ${date.toLocaleDateString("en-US", options)}`;
+  // };
+
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+
+  const options: Intl.DateTimeFormatOptions = {
+    month: "long",
+    day: "numeric",
   };
+
+  if( i18n.language === "si"){
+    return `${date.toLocaleDateString("si-LK", options)}`;
+  }
+  else if( i18n.language === "ta"){
+    return `${date.toLocaleDateString("ta-LK", options)}`;
+  }else{
+    return `On ${date.toLocaleDateString("en-US", options)}`;
+  }
+};
+
 
   // Start smooth countdown animation
   const startCountdownAnimation = () => {
@@ -187,7 +206,7 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
     try {
       const token = await AsyncStorage.getItem("token");
       if (!token) {
-        Alert.alert(t("Error.Error"), t("Error.AuthTokenNotFound"));
+        Alert.alert(t("Error.Error"), t("Error.AuthTokenNotFound"), [{ text: t("Main.ok") }]);
         return;
       }
 
@@ -211,14 +230,16 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
       } else {
         Alert.alert(
           t("Error.Error"),
-          t("AssignJobOfficerList.FailedToFetchOfficers")
+          t("AssignJobOfficerList.FailedToFetchOfficers"),
+          [{ text: t("Main.ok") }]
         );
       }
     } catch (error) {
       console.error("Failed to fetch officers:", error);
       Alert.alert(
         t("Error.Error"),
-        t("AssignJobOfficerList.FailedToLoadOfficers")
+        t("AssignJobOfficerList.FailedToLoadOfficers"),
+        [{ text: t("Main.ok") }]
       );
     } finally {
       setLoading(false);
@@ -259,7 +280,7 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
     try {
       const token = await AsyncStorage.getItem("token");
       if (!token) {
-        Alert.alert(t("Error.Error"), t("Error.AuthTokenNotFound"));
+        Alert.alert(t("Error.Error"), t("Error.AuthTokenNotFound"), [{ text: t("Main.ok") }]);
         return;
       }
 
@@ -303,7 +324,7 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
           }),
           [
             {
-              text: "OK",
+               text: t("Main.ok") ,
               onPress: () => navigation.navigate("AssignJobs"),
             },
           ]
@@ -311,7 +332,8 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
       } else {
         Alert.alert(
           t("Main.Error"),
-          response.data.message || t("AssignJobOfficerList.FailedToAssignJobs")
+           t("AssignJobOfficerList.FailedToAssignJobs"),
+           [{ text: t("Main.ok") }]
         );
       }
     } catch (error: any) {
@@ -340,8 +362,12 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
         errorMessage = error.message || "An unexpected error occurred";
       }
 
-      Alert.alert(t("Main.Error"), errorMessage);
-    } finally {
+Alert.alert(
+          t("Main.Error"),
+           t("AssignJobOfficerList.FailedToAssignJobs"),
+           [{ text: t("Main.ok") }]
+        );
+          } finally {
       setAssigning(false);
     }
   };

@@ -8,13 +8,17 @@ import {
   Alert,
   ActivityIndicator,
   Image,
+  Linking,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../types";
-import { MaterialIcons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+import axios from "axios";
+import { environment } from "@/environment/environment";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type RequestDetailsNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -25,56 +29,59 @@ interface RequestDetailsProps {
   navigation: RequestDetailsNavigationProp;
 }
 
-interface RequestDetailsData {
-  id: string;
-  requestNumber: string;
-  customerName: string;
-  contactNumber: string;
+
+interface RequestData {
+  id: number;
+  jobId: string;
+  extentha: number;
+  extentac: number;
+  extentp: number;
   district: string;
-  crop: string;
-  variety: string;
-  certification: string;
-  extent: {
-    hectares: string;
-    acres: string;
-    perches: string;
-  };
-  expectedInvestment: string;
+  investment: string;
   expectedYield: string;
-  cultivationStartDate: string;
-  status: "pending" | "approved" | "rejected";
+  farmerName: string;
+  phoneNumber: string;
+  cropNameEnglish: string;
+  cropNameSinhala: string;
+  cropNameTamil: string;
+  startDate: string
 }
+
+type ProjectDetailsProps = {
+  label: string;
+  value: string;
+};
+
+const ProjectDetails: React.FC<ProjectDetailsProps> = ({ label, value }) => {
+  return (
+    <View className="flex-row mb-3">
+      <View className="mr-2">
+        <Text className="text-base text-[#070707]">●</Text>
+      </View>
+
+      <View className="flex-1">
+        <Text className="text-base text-[#070707]">
+          {label} :
+        </Text>
+        <Text className="text-base text-[#070707]">
+          {value}
+        </Text>
+      </View>
+    </View>
+  );
+};
+
 
 const RequestDetails: React.FC<RequestDetailsProps> = ({
   navigation,
 }) => {
   const route = useRoute<RouteProp<RootStackParamList, "RequestDetails">>();
-  const { requestId } = route.params;
+  const { requestId, requestNumber } = route.params;
   const [loading, setLoading] = useState(true);
-  const [requestData, setRequestData] = useState<RequestDetailsData | null>(
+  const [requestData, setRequestData] = useState<RequestData | null>(
     null
   );
-
-  // Mock data - replace with actual API call
-  const mockRequestData: RequestDetailsData = {
-    id: "1",
-    requestNumber: "#GC000001",
-    customerName: "Kelum Dissanayake",
-    contactNumber: "+94 77 123 4567",
-    district: "Colombo",
-    crop: "Rice",
-    variety: "BG 300",
-    certification: "Organic",
-    extent: {
-      hectares: "2.5",
-      acres: "6.18",
-      perches: "990",
-    },
-    expectedInvestment: "250,000",
-    expectedYield: "4500",
-    cultivationStartDate: "2024-03-15",
-    status: "pending",
-  };
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     fetchRequestDetails();
@@ -85,12 +92,22 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
       setLoading(true);
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
-
+      const token = await AsyncStorage.getItem("token");
+      if (!token) return;
+      const response = await axios.get(
+        `${environment.API_BASE_URL}api/capital-request/requests/${requestId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      console.log('Requests', response.data.requests)
       // In real implementation, fetch by requestId
-      setRequestData(mockRequestData);
+      setRequestData(response.data.requests[0] || null);
+
     } catch (error) {
       console.error("Failed to fetch request details:", error);
       Alert.alert("Error", "Failed to load request details");
+
     } finally {
       setLoading(false);
     }
@@ -138,11 +155,18 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
     );
   };
 
+  const handleDial = (phoneNumber: string) => {
+    const phoneUrl = `tel:${phoneNumber}`;
+    Linking.openURL(phoneUrl).catch((err) =>
+      console.error("Failed to open dial pad:", err)
+    );
+  };
+  
   if (loading) {
     return (
       <View className="flex-1 bg-white justify-center items-center">
         <ActivityIndicator size="large" color="#21202B" />
-        <Text className="mt-4 text-[#565559]">Loading request details...</Text>
+        <Text className="mt-4 text-[#565559]"> {t("CapitalRequests.LoadingRequests")}</Text>
       </View>
     );
   }
@@ -173,7 +197,7 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
           />
         </TouchableOpacity>
         <Text className="text-lg font-bold text-black text-center flex-1">
-          Request Letter
+          {t("RequestLetter.Request Letter")}
         </Text>
         <View style={{ width: 55 }} />
       </View>
@@ -184,121 +208,92 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
         contentContainerStyle={{ paddingBottom: 20 }}
       >
         {/* Request Letter Content */}
-        <View className="mx-6 my-4 bg-white rounded-lg p-6">
+        <View className="mx-6 my-4 bg-white rounded-lg p-2">
           {/* Letter Content */}
           <Text className="text-base mb-4 text-[#070707] leading-6">
-            Dear Sir/Madam,
+            {t("RequestLetter.Dear Sir/Madam")}
           </Text>
 
           <Text className="text-base mb-4 text-[#070707] leading-6">
-            I, {requestData.customerName}, a farmer from {requestData.district},
+            {/* I, {requestData.farmerName}, a farmer from {t(`Districts.${requestData.district}`)},
             am writing to formally request an agricultural loan for the upcoming
-            cultivation season.
+            cultivation season. */}
+            {t("RequestLetter.IRequestFarm", {
+              farmerName: requestData.farmerName,
+              district: t(`Districts.${requestData.district}`)
+            })}
           </Text>
 
           <Text className="text-base mb-4 text-[#070707] leading-6">
-            I am planning to cultivate {requestData.crop} of the{" "}
-            {requestData.variety} variety. The cultivation will be carried out
-            using {requestData.certification} certified practices, ensuring
-            high-quality and sustainable output.
+            {t("RequestLetter.IamPlaning", {
+              cropName:
+                i18n.language === "si"
+                  ? requestData.cropNameSinhala
+                  : i18n.language === "ta"
+                    ? requestData.cropNameTamil
+                    : requestData.cropNameEnglish,
+            })}
           </Text>
 
-          <Text className="text-lg mb-4 text-[#070707]">
-            The project details are as follows:
+          <Text className="text-base mb-4 text-[#070707]">
+            {t("RequestLetter.The project details are as follows")}
           </Text>
 
           {/* Project Details */}
           <View className="space-y-3 mb-6">
-            <View className="flex-row">
-              <Text className="text-base text-[#070707] w-32">District :</Text>
-              <Text className="text-base text-[#070707] flex-1">
-                {requestData.district}
-              </Text>
-            </View>
+            <View className="">
+              <ProjectDetails
+                label={t("RequestLetter.District")}
+                value={t(`Districts.${requestData.district}`)}
+              />
+              <ProjectDetails
+                label={t("RequestLetter.Crop")}
+                value={i18n.language === "si"
+                  ? requestData.cropNameSinhala
+                  : i18n.language === "ta"
+                    ? requestData.cropNameTamil
+                    : requestData.cropNameEnglish}
+              />
 
-            <View className="flex-row">
-              <Text className="text-base text-[#070707] w-32">
-                Crop :
-              </Text>
-              <Text className="text-base text-[#070707] flex-1">
-                {requestData.crop}
-              </Text>
-            </View>
+              <ProjectDetails
+                label={t("RequestLetter.Extent")}
+                value={t("RequestLetter.Extentdetails", {
+                  hectare: requestData.extentha,
+                  acres: requestData.extentac,
+                  perches: requestData.extentp
+                })}
+              />
 
-            <View className="flex-row">
-              <Text className="text-base text-[#070707] w-32">
-                Variety :
-              </Text>
-              <Text className="text-base text-[#070707] flex-1">
-                {requestData.variety}
-              </Text>
-            </View>
+              <ProjectDetails
+                label={t("RequestLetter.Expected Investment")}
+                value={`${t("RequestLetter.Rs")}. ${requestData.investment}`}
+              />
 
-            <View className="flex-row">
-              <Text className="text-base text-[#070707] w-32">
-                Certification :
-              </Text>
-              <Text className="text-base text-[#070707] flex-1">
-                {requestData.certification}
-              </Text>
-            </View>
+              <ProjectDetails
+                label={t("RequestLetter.Expected Yield")}
+                value={`${requestData.expectedYield} ${t("RequestLetter.kg")}`}
+              />
 
-            <View className="flex-row">
-              <Text className="text-base text-[#070707] w-32">
-                Extent :
-              </Text>
-              <Text className="text-base text-[#070707] flex-1">
-                {requestData.extent.hectares} hectare,{" "}
-                {requestData.extent.acres} acres, and{" "}
-                {requestData.extent.perches} perches
-              </Text>
-            </View>
-
-            <View className="flex-row">
-              <Text className="text-base text-black w-32">
-                Expected Investment :
-              </Text>
-              <Text className="text-base text-black flex-1">
-                Rs. {requestData.expectedInvestment}
-              </Text>
-            </View>
-
-            <View className="flex-row">
-              <Text className="text-base text-black w-32">
-                Expected Yield :
-              </Text>
-              <Text className="text-base text-black flex-1">
-                {requestData.expectedYield}kg
-              </Text>
-            </View>
-
-            <View className="flex-row">
-              <Text className="text-base text-black w-32">
-                Cultivation Start Date :
-              </Text>
-              <Text className="text-base text-black flex-1">
-                {requestData.cultivationStartDate}
-              </Text>
+              <ProjectDetails
+                label={t("RequestLetter.Cultivation Start Date")}
+                value={requestData.startDate}
+              />
             </View>
           </View>
 
           <Text className="text-base mb-4 text-black leading-6">
-            This loan is essential for covering the costs of high-quality seeds,
-            fertilizers, pesticides, irrigation, and labor required to achieve
-            the projected yield. The expected harvest is projected to generate
-            sufficient revenue for the timely repayment of the loan along with
-            the accrued interest.
+            {t("RequestLetter.This loan is essential for covering the costst")}
           </Text>
 
           <Text className="text-base mb-4 text-black leading-6">
-            I have attached the necessary documents for your perusal.
+            {t("RequestLetter.I have attached the necessary documents for your perusal.")}
           </Text>
 
           {/* Sample Images */}
           <View className="my-4">
-            <Text className="text-base text-black mb-2">
+            {/* <Text className="text-base text-black mb-2">
               Attached Documents:
-            </Text>
+            </Text> */}
             <View className="flex-row justify-between w-full">
               <Image
                 source={require("../../assets/request-letter.png")}
@@ -313,27 +308,24 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
             </View>
           </View>
 
-          <Text className="text-base mb-6 text-black leading-6">
-            I am confident in the success of this venture and request you to
-            kindly approve my loan application at the earliest. Thank you for
-            your time and consideration.
+          <Text className="text-base  mt-2 text-black leading-6">
+            {t("RequestLetter.I am confident in the success of this venture and request")}
           </Text>
 
           {/* Signature */}
-          <View className="mt-8">
-            <Text className="text-base text-black mb-2">Sincerely,</Text>
+          <View className="mt-8 mb-8">
+            <Text className="text-base text-black ">{t("RequestLetter.Sincerely")},</Text>
             <Text className="text-base text-black">
-              {requestData.customerName}
+              {requestData.farmerName}
             </Text>
             <Text className="text-base text-black">
-              {requestData.contactNumber}
+              {requestData.phoneNumber}
             </Text>
           </View>
         </View>
 
         {/* Action Buttons */}
-        <View className="mb-20">
-          {/* Shadow Line */}
+        {/* <View className="mb-20">
           <View
             style={{
               height: 1,
@@ -346,7 +338,6 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
             }}
           />
 
-          {/* Buttons Section */}
           <View className="px-12 flex-col w-full gap-4 mt-4">
             <TouchableOpacity
               onPress={handleReject}
@@ -382,8 +373,63 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
               </LinearGradient>
             </TouchableOpacity>
           </View>
-        </View>
+        </View> */}
       </ScrollView>
+      <View className=" bottom-4 bg-white " >
+        <View
+          style={{
+            height: 1,
+            backgroundColor: "#fff",
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 3,
+            elevation: 3,
+          }}
+        />
+                                                  <TouchableOpacity
+                          className="flex "
+                          onPress={() => handleDial(requestData.phoneNumber)}
+                        >
+                          <View className="flex-row mt-4 self-center items-center justify-center border border-[#F83B4F] rounded-full px-6 w-[50%] py-2">
+                            <Ionicons name="call" size={20} color="#F83B4F" />
+                            <Text className="text-base font-semibold  ml-2">
+                              {t("VisitPopup.Get Call")}
+                            </Text>
+                          </View>
+                        </TouchableOpacity>
+        <TouchableOpacity
+          //  onPress={() => navigation.navigate("PersonalInfo", {requestNumber})} 
+          onPress={async () => {
+            try {
+              navigation.navigate("PersonalInfo", {
+                requestNumber,
+                requestId: requestData.id
+              });
+            } catch (e) {
+              console.log("Error clearing AsyncStorage:", e);
+            }
+          }}
+          className="w-[80%] mt-4 self-center">
+          <LinearGradient
+            colors={["#F35125", "#FF1D85"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            className="rounded-full px-6 py-3 w-full items-center"
+            style={{
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 3 },
+              shadowOpacity: 0.25,
+              shadowRadius: 5,
+              elevation: 6,
+            }}
+          >
+            <Text className="text-white text-lg font-semibold">
+              {t("RequestLetter.Start")}
+            </Text>
+          </LinearGradient>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
