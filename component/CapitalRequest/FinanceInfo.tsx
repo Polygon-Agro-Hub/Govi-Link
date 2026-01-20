@@ -1064,7 +1064,7 @@
 
 // export default FinanceInfo;
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -1092,6 +1092,9 @@ import banksData from "@/assets/json/banks.json";
 import branchesData from "@/assets/json/branches.json";
 import axios from "axios";
 import { environment } from "@/environment/environment";
+import { useDispatch, useSelector } from 'react-redux';
+import { setFinanceInfo, updateFinanceInfo } from '@/store/financeInfoSlice';
+import { RootState } from '@/services/store';
 
 type FormData = {
   inspectionfinance?: FinanceInfoData;
@@ -1143,9 +1146,8 @@ const Input = ({
       {label} {required && <Text className="text-black">*</Text>}
     </Text>
     <View
-      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
-        error ? "border border-red-500" : ""
-      }`}
+      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${error ? "border border-red-500" : ""
+        }`}
     >
       <TextInput
         placeholder={placeholder}
@@ -1222,10 +1224,16 @@ type FinanceInfoProps = {
 };
 
 const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
+  const dispatch = useDispatch();
   const route = useRoute<RouteProp<RootStackParamList, "FinanceInfo">>();
-  const { requestNumber, requestId } = route.params; // ✅ Extract requestId here
+  const { requestNumber, requestId } = route.params;
   const prevFormData = route.params?.formData;
-  const [formData, setFormData] = useState(prevFormData);
+
+  // Get data from Redux store
+  const jobId = requestNumber;
+  const storedFormData = useSelector((state: RootState) => state.financeInfo[jobId]);
+
+  const [formData, setFormData] = useState(prevFormData || storedFormData || {});
 
   console.log("Request Number:", requestNumber);
   console.log("Request ID:", requestId);
@@ -1246,6 +1254,8 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
   const [availableBranches, setAvailableBranches] = useState<
     Array<{ ID: number; name: string }>
   >([]);
+  const isDataLoadedRef = useRef(false);
+
 
   const banks = banksData.map((bank) => ({
     id: bank.ID,
@@ -1293,26 +1303,27 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     setIsNextEnabled(allFilled && !hasErrors && !hasAssetWarnings());
   }, [formData, errors]);
 
-  let jobId = requestNumber;
 
-  const updateFormData = async (updates: Partial<FinanceInfoData>) => {
-    try {
-      const updatedFormData = {
-        ...formData,
-        inspectionfinance: {
-          ...formData.inspectionfinance,
-          ...updates,
-          bank: selectedBank,
-          branch: updates.branch ?? selectedBranch,
-        },
-      };
+  const updateFormData = (updates: Partial<FinanceInfoData>) => {
+    const updatedFormData = {
+      ...formData,
+      inspectionfinance: {
+        ...formData.inspectionfinance,
+        ...updates,
+        bank: selectedBank,
+        branch: updates.branch ?? selectedBranch,
+      },
+    };
 
-      setFormData(updatedFormData);
+    setFormData(updatedFormData);
 
-      await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData));
-    } catch (e) {
-      console.log("AsyncStorage save failed", e);
-    }
+    // Save to Redux store
+    dispatch(
+      setFinanceInfo({
+        jobId,
+        data: updatedFormData,
+      })
+    );
   };
 
   const saveToBackend = async (
@@ -1485,8 +1496,14 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
   useFocusEffect(
     useCallback(() => {
       const loadFormData = async () => {
+        // Skip if already loaded
+        if (isDataLoadedRef.current) {
+          console.log("⏭️ Data already loaded, skipping...");
+          return;
+        }
+
         try {
-          // First, try to fetch from backend
+          // Try to fetch from backend
           if (requestId) {
             const reqId = Number(requestId);
             if (!isNaN(reqId) && reqId > 0) {
@@ -1499,7 +1516,6 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               if (backendData) {
                 console.log(`✅ Loaded data from backend`);
 
-                // Update form with backend data
                 const updatedFormData = {
                   ...formData,
                   inspectionfinance: backendData,
@@ -1508,14 +1524,9 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
                 setFormData(updatedFormData);
                 setIsExistingData(true);
 
-                // Set bank and branch
                 if (backendData.bank) {
                   setSelectedBank(backendData.bank);
-
-                  // Load branches for selected bank
-                  const bankObj = banks.find(
-                    (b) => b.name === backendData.bank,
-                  );
+                  const bankObj = banks.find((b) => b.name === backendData.bank);
                   if (bankObj) {
                     const filteredBranches =
                       (branchesData as any)[bankObj.id.toString()] || [];
@@ -1527,38 +1538,37 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
                   setSelectedBranch(backendData.branch);
                 }
 
-                // Save to AsyncStorage as backup
-                await AsyncStorage.setItem(
-                  `${jobId}`,
-                  JSON.stringify(updatedFormData),
+                // Save to Redux store
+                dispatch(
+                  setFinanceInfo({
+                    jobId,
+                    data: updatedFormData,
+                  })
                 );
 
-                return; // Exit after loading from backend
+                isDataLoadedRef.current = true; // ✅ Mark as loaded
+                return;
               }
             }
           }
 
-          // If no backend data, try AsyncStorage
-          console.log(`📂 Checking AsyncStorage for jobId: ${jobId}`);
-          const savedData = await AsyncStorage.getItem(`${jobId}`);
-
-          if (savedData) {
-            const parsedData: FormData = JSON.parse(savedData);
-            console.log(`✅ Loaded data from AsyncStorage`);
-            setFormData(parsedData);
+          // If no backend data, check Redux store
+          if (storedFormData && storedFormData.inspectionfinance) {
+            console.log(`✅ Loaded data from Redux store`);
+            setFormData(storedFormData);
             setIsExistingData(true);
 
-            if (parsedData.inspectionfinance?.bank) {
-              setSelectedBank(parsedData.inspectionfinance.bank);
+            if (storedFormData.inspectionfinance?.bank) {
+              setSelectedBank(storedFormData.inspectionfinance.bank);
             }
 
-            if (parsedData.inspectionfinance?.branch) {
-              setSelectedBranch(parsedData.inspectionfinance.branch);
+            if (storedFormData.inspectionfinance?.branch) {
+              setSelectedBranch(storedFormData.inspectionfinance.branch);
             }
 
-            if (parsedData.inspectionfinance?.bank) {
+            if (storedFormData.inspectionfinance?.bank) {
               const bankObj = banks.find(
-                (b) => b.name === parsedData.inspectionfinance?.bank,
+                (b) => b.name === storedFormData.inspectionfinance?.bank,
               );
               if (bankObj) {
                 const filteredBranches =
@@ -1566,19 +1576,25 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
                 setAvailableBranches(filteredBranches);
               }
             }
+            isDataLoadedRef.current = true; // ✅ Mark as loaded
           } else {
-            // No data found anywhere - new entry
             setIsExistingData(false);
             console.log("📝 No existing data - new entry");
+            isDataLoadedRef.current = true; // ✅ Mark as loaded even if no data
           }
         } catch (e) {
           console.error("Failed to load form data", e);
           setIsExistingData(false);
+          isDataLoadedRef.current = true; // ✅ Mark as loaded to prevent retry loop
         }
       };
 
       loadFormData();
-    }, [requestId, jobId]),
+
+      return () => {
+        isDataLoadedRef.current = false;
+      };
+    }, [requestId, jobId]), 
   );
 
   const handleFieldChange = (
@@ -1903,13 +1919,6 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     </View>
   );
 
-  const removeFromStorage = async (key: string) => {
-    try {
-      await AsyncStorage.removeItem(key);
-    } catch (e) {
-      console.error("Error removing key", key, e);
-    }
-  };
 
   const assetCategories: AssetCategory[] = [
     {
@@ -2087,9 +2096,8 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               {t("InspectionForm.Bank Name")} *
             </Text>
             <TouchableOpacity
-              className={`bg-[#F4F4F4] rounded-full px-4 py-4 flex-row justify-between items-center ${
-                errors.bank ? "border border-red-500" : ""
-              }`}
+              className={`bg-[#F4F4F4] rounded-full px-4 py-4 flex-row justify-between items-center ${errors.bank ? "border border-red-500" : ""
+                }`}
               onPress={() => setShowBankDropdown(true)}
             >
               <Text
@@ -2111,16 +2119,14 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               {t("InspectionForm.Branch Name")} *
             </Text>
             <TouchableOpacity
-              className={`bg-[#F4F4F4] rounded-full px-4 py-4 flex-row justify-between items-center ${
-                errors.branch ? "border border-red-500" : ""
-              }`}
+              className={`bg-[#F4F4F4] rounded-full px-4 py-4 flex-row justify-between items-center ${errors.branch ? "border border-red-500" : ""
+                }`}
               onPress={() => setShowBranchDropdown(true)}
               disabled={availableBranches.length === 0}
             >
               <Text
-                className={`${
-                  selectedBranch ? "text-black" : "text-[#7D7D7D]"
-                }`}
+                className={`${selectedBranch ? "text-black" : "text-[#7D7D7D]"
+                  }`}
               >
                 {selectedBranch || t("InspectionForm.Select Branch")}
               </Text>
@@ -2140,44 +2146,56 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               {t("InspectionForm.Existing debts of the farmer")} *
             </Text>
             <View
-              className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${
-                errors.debts ? "border border-red-500" : ""
-              }`}
+              className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${errors.debts ? "border border-red-500" : ""
+                }`}
             >
               <TextInput
                 placeholder={t("InspectionForm.Type here...")}
                 value={formData.inspectionfinance?.debtsOfFarmer || ""}
                 onChangeText={(text) => {
-                  // Remove leading spaces
                   let formattedText = text.replace(/^\s+/, "");
 
-                  // Capitalize first letter
                   if (formattedText.length > 0) {
                     formattedText =
                       formattedText.charAt(0).toUpperCase() +
                       formattedText.slice(1);
                   }
 
-                  // Update state
-                  setFormData((prev: FormData) => ({
-                    ...prev,
-                    inspectionfinance: {
+                  setFormData((prev: FormData) => {
+                    const updatedInspection = {
                       ...prev.inspectionfinance,
-                      debtsOfFarmer: formattedText,
-                    },
+                    };
+
+                    if (formattedText.length > 0) {
+                      updatedInspection.assetsFarmTool = formattedText;
+                    } else {
+                      delete updatedInspection.assetsFarmTool;
+                    }
+
+                    const updatedFormData = {
+                      ...prev,
+                      inspectionfinance: updatedInspection,
+                    };
+
+                    // Save to Redux instead of AsyncStorage
+                    dispatch(
+                      setFinanceInfo({
+                        jobId,
+                        data: updatedFormData,
+                      })
+                    );
+
+                    return updatedFormData;
+                  });
+
+                  const error =
+                    formattedText.trim() === ""
+                      ? t("Error.SpecialFarmTools is required")
+                      : "";
+                  setErrors((prev) => ({
+                    ...prev,
+                    specialTools: error,
                   }));
-
-                  // Validation
-                  let error = "";
-                  if (!formattedText || formattedText.trim() === "") {
-                    error = t("Error.debtsOfFarmer is required");
-                  }
-                  setErrors((prev) => ({ ...prev, debts: error }));
-
-                  // Save to AsyncStorage
-                  if (!error) {
-                    updateFormData({ debtsOfFarmer: formattedText });
-                  }
                 }}
                 keyboardType="default"
                 multiline={true}
@@ -2252,7 +2270,6 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
                             [category.key]: updatedFormData[category.key],
                           });
                         } else {
-                          removeFromStorage(category.key);
                         }
 
                         const noCategorySelected =
@@ -2386,17 +2403,16 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
 
                   {showLandWarning && (
                     <Text
-                      className={`${
-                        category.key === "assetsFarmTool" ? "" : ""
-                      } text-red-500 text-sm mt-2`}
+                      className={`${category.key === "assetsFarmTool" ? "" : ""
+                        } text-red-500 text-sm mt-2`}
                     >
                       {category.key === "assetsFarmTool"
                         ? t(
-                            `Error.Please specify any special farm tools utilized by the farmer.`,
-                          )
+                          `Error.Please specify any special farm tools utilized by the farmer.`,
+                        )
                         : t("Error.At least one", {
-                            category: category.label,
-                          })}
+                          category: category.label,
+                        })}
                     </Text>
                   )}
                 </View>

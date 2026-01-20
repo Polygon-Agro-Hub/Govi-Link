@@ -32,6 +32,7 @@ import { CameraScreen } from "@/Items/CameraScreen";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 
+
 const climateParameters = [
   { key: "temperature", label: "Temperature" },
   { key: "rainfall", label: "Rainfall" },
