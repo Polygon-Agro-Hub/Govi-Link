@@ -31,6 +31,7 @@ import { RootStackParamList } from "../types";
 import { CameraScreen } from "@/Items/CameraScreen";
 import axios from "axios";
 import { environment } from "@/environment/environment";
+import FormFooterButton from "./FormFooterButton";
 
 type CroppingSystemsData = {
   opportunity?: string[];
@@ -842,45 +843,13 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
           </View>
         </ScrollView>
 
-        <View className="flex-row px-6 py-4 gap-4 bg-white border-t border-gray-200 ">
-          <TouchableOpacity
-            className="flex-1 bg-[#444444] rounded-full py-4 items-center"
-            onPress={() => navigation.goBack()}
-          >
-            <Text className="text-white text-base font-semibold">
-              {t("InspectionForm.Back")}
-            </Text>
-          </TouchableOpacity>
-          {isNextEnabled == true ? (
-            <View className="flex-1">
-              <TouchableOpacity className="flex-1 " onPress={handleNext}>
-                <LinearGradient
-                  colors={["#F35125", "#FF1D85"]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  className=" rounded-full py-4 items-center"
-                  style={{
-                    shadowColor: "#000",
-                    shadowOffset: { width: 0, height: 3 },
-                    shadowOpacity: 0.25,
-                    shadowRadius: 5,
-                    elevation: 6,
-                  }}
-                >
-                  <Text className="text-white text-base font-semibold">
-                    {t("InspectionForm.Next")}
-                  </Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <View className="flex-1 bg-gray-300 rounded-full py-4 items-center">
-              <Text className="text-white text-base font-semibold">
-                {t("InspectionForm.Next")}
-              </Text>
-            </View>
-          )}
-        </View>
+        <FormFooterButton
+          exitText={t("InspectionForm.Back")}
+          nextText={t("InspectionForm.Next")}
+          isNextEnabled={isNextEnabled}
+          onExit={() => navigation.goBack()}
+          onNext={handleNext}
+        />
       </View>
       <Modal
         transparent

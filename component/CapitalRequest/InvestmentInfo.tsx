@@ -26,15 +26,16 @@ import banksData from "@/assets/json/banks.json";
 import branchesData from "@/assets/json/branches.json";
 import axios from "axios";
 import { environment } from "@/environment/environment";
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '@/services/store';
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/services/store";
 import {
   initializeInvestmentInfo,
   updateInvestmentInfo,
   setInvestmentInfo,
   markInvestmentAsExisting,
   InvestmentInfoData,
-} from '@/store/investmentInfoSlice';
+} from "@/store/investmentInfoSlice";
+import FormFooterButton from "./FormFooterButton";
 
 const Input = ({
   label,
@@ -61,8 +62,9 @@ const Input = ({
       {required && <Text className="text-black">*</Text>}
     </Text>
     <View
-      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${error ? "border border-red-500" : ""
-        }`}
+      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
+        error ? "border border-red-500" : ""
+      }`}
     >
       <TextInput
         placeholder={placeholder}
@@ -154,18 +156,18 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
   const [isNextEnabled, setIsNextEnabled] = useState(false);
 
   // Get data from Redux
-  const formData = useSelector((state: RootState) =>
-    state.investmentInfo.data[requestId] || {
-      expected: 0,
-      purpose: '',
-      repaymentMonth: 0,
-    }
+  const formData = useSelector(
+    (state: RootState) =>
+      state.investmentInfo.data[requestId] || {
+        expected: 0,
+        purpose: "",
+        repaymentMonth: 0,
+      },
   );
 
-  const isExistingData = useSelector((state: RootState) =>
-    state.investmentInfo.isExisting[requestId] || false
+  const isExistingData = useSelector(
+    (state: RootState) => state.investmentInfo.isExisting[requestId] || false,
   );
-
 
   console.log("finance", formData);
 
@@ -195,10 +197,12 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
 
   // 5. REPLACE updateFormData - Remove AsyncStorage
   const updateFormData = (updates: Partial<InvestmentInfoData>) => {
-    dispatch(updateInvestmentInfo({
-      requestId,
-      updates,
-    }));
+    dispatch(
+      updateInvestmentInfo({
+        requestId,
+        updates,
+      }),
+    );
   };
 
   // 6. UPDATE useFocusEffect - Use Redux instead of AsyncStorage
@@ -223,11 +227,13 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
                 console.log(`✅ Loaded investment data from backend`);
 
                 // Save to Redux
-                dispatch(setInvestmentInfo({
-                  requestId,
-                  data: backendData,
-                  isExisting: true,
-                }));
+                dispatch(
+                  setInvestmentInfo({
+                    requestId,
+                    data: backendData,
+                    isExisting: true,
+                  }),
+                );
 
                 return; // Exit after loading from backend
               }
@@ -244,7 +250,6 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
       loadFormData();
     }, [requestId, dispatch]),
   );
-
 
   let jobId = requestNumber;
   console.log("jobid", jobId);
@@ -350,25 +355,21 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
     }
   };
 
-    // 7. UPDATE handleFieldChange
+  // 7. UPDATE handleFieldChange
   const handleFieldChange = (
     key: keyof InvestmentInfoData,
     text: string,
     rules: ValidationRule,
   ) => {
-    const { value, error } = validateAndFormat(
-      text,
-      rules,
-      t,
-      formData,
-      key,
-    );
+    const { value, error } = validateAndFormat(text, rules, t, formData, key);
 
     // Update Redux
-    dispatch(updateInvestmentInfo({
-      requestId,
-      updates: { [key]: value },
-    }));
+    dispatch(
+      updateInvestmentInfo({
+        requestId,
+        updates: { [key]: value },
+      }),
+    );
 
     setErrors((prev) => ({ ...prev, [key]: error || "" }));
   };
@@ -514,7 +515,6 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
     }
   };
 
-
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -580,45 +580,13 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
           />
         </ScrollView>
 
-        <View className="flex-row px-6 py-4 gap-4 bg-white border-t border-gray-200 ">
-          <TouchableOpacity
-            className="flex-1 bg-[#444444] rounded-full py-4 items-center"
-            onPress={() => navigation.goBack()}
-          >
-            <Text className="text-white text-base font-semibold">
-              {t("InspectionForm.Back")}
-            </Text>
-          </TouchableOpacity>
-          {isNextEnabled == true ? (
-            <View className="flex-1">
-              <TouchableOpacity className="flex-1 " onPress={handleNext}>
-                <LinearGradient
-                  colors={["#F35125", "#FF1D85"]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  className=" rounded-full py-4 items-center"
-                  style={{
-                    shadowColor: "#000",
-                    shadowOffset: { width: 0, height: 3 },
-                    shadowOpacity: 0.25,
-                    shadowRadius: 5,
-                    elevation: 6,
-                  }}
-                >
-                  <Text className="text-white text-base font-semibold">
-                    {t("InspectionForm.Next")}
-                  </Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <View className="flex-1 bg-gray-300 rounded-full py-4 items-center">
-              <Text className="text-white text-base font-semibold">
-                {t("InspectionForm.Next")}
-              </Text>
-            </View>
-          )}
-        </View>
+        <FormFooterButton
+          exitText={t("InspectionForm.Back")}
+          nextText={t("InspectionForm.Next")}
+          isNextEnabled={isNextEnabled}
+          onExit={() => navigation.goBack()}
+          onNext={handleNext}
+        />
       </View>
     </KeyboardAvoidingView>
   );

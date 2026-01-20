@@ -1092,9 +1092,10 @@ import banksData from "@/assets/json/banks.json";
 import branchesData from "@/assets/json/branches.json";
 import axios from "axios";
 import { environment } from "@/environment/environment";
-import { useDispatch, useSelector } from 'react-redux';
-import { setFinanceInfo, updateFinanceInfo } from '@/store/financeInfoSlice';
-import { RootState } from '@/services/store';
+import { useDispatch, useSelector } from "react-redux";
+import { setFinanceInfo, updateFinanceInfo } from "@/store/financeInfoSlice";
+import { RootState } from "@/services/store";
+import FormFooterButton from "./FormFooterButton";
 
 type FormData = {
   inspectionfinance?: FinanceInfoData;
@@ -1146,8 +1147,9 @@ const Input = ({
       {label} {required && <Text className="text-black">*</Text>}
     </Text>
     <View
-      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${error ? "border border-red-500" : ""
-        }`}
+      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
+        error ? "border border-red-500" : ""
+      }`}
     >
       <TextInput
         placeholder={placeholder}
@@ -1231,9 +1233,13 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
 
   // Get data from Redux store
   const jobId = requestNumber;
-  const storedFormData = useSelector((state: RootState) => state.financeInfo[jobId]);
+  const storedFormData = useSelector(
+    (state: RootState) => state.financeInfo[jobId],
+  );
 
-  const [formData, setFormData] = useState(prevFormData || storedFormData || {});
+  const [formData, setFormData] = useState(
+    prevFormData || storedFormData || {},
+  );
 
   console.log("Request Number:", requestNumber);
   console.log("Request ID:", requestId);
@@ -1255,7 +1261,6 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     Array<{ ID: number; name: string }>
   >([]);
   const isDataLoadedRef = useRef(false);
-
 
   const banks = banksData.map((bank) => ({
     id: bank.ID,
@@ -1303,7 +1308,6 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     setIsNextEnabled(allFilled && !hasErrors && !hasAssetWarnings());
   }, [formData, errors]);
 
-
   const updateFormData = (updates: Partial<FinanceInfoData>) => {
     const updatedFormData = {
       ...formData,
@@ -1322,7 +1326,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
       setFinanceInfo({
         jobId,
         data: updatedFormData,
-      })
+      }),
     );
   };
 
@@ -1526,7 +1530,9 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
 
                 if (backendData.bank) {
                   setSelectedBank(backendData.bank);
-                  const bankObj = banks.find((b) => b.name === backendData.bank);
+                  const bankObj = banks.find(
+                    (b) => b.name === backendData.bank,
+                  );
                   if (bankObj) {
                     const filteredBranches =
                       (branchesData as any)[bankObj.id.toString()] || [];
@@ -1543,7 +1549,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
                   setFinanceInfo({
                     jobId,
                     data: updatedFormData,
-                  })
+                  }),
                 );
 
                 isDataLoadedRef.current = true; // ✅ Mark as loaded
@@ -1594,7 +1600,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
       return () => {
         isDataLoadedRef.current = false;
       };
-    }, [requestId, jobId]), 
+    }, [requestId, jobId]),
   );
 
   const handleFieldChange = (
@@ -1919,7 +1925,6 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     </View>
   );
 
-
   const assetCategories: AssetCategory[] = [
     {
       key: "assetsLand",
@@ -2096,8 +2101,9 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               {t("InspectionForm.Bank Name")} *
             </Text>
             <TouchableOpacity
-              className={`bg-[#F4F4F4] rounded-full px-4 py-4 flex-row justify-between items-center ${errors.bank ? "border border-red-500" : ""
-                }`}
+              className={`bg-[#F4F4F4] rounded-full px-4 py-4 flex-row justify-between items-center ${
+                errors.bank ? "border border-red-500" : ""
+              }`}
               onPress={() => setShowBankDropdown(true)}
             >
               <Text
@@ -2119,14 +2125,16 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               {t("InspectionForm.Branch Name")} *
             </Text>
             <TouchableOpacity
-              className={`bg-[#F4F4F4] rounded-full px-4 py-4 flex-row justify-between items-center ${errors.branch ? "border border-red-500" : ""
-                }`}
+              className={`bg-[#F4F4F4] rounded-full px-4 py-4 flex-row justify-between items-center ${
+                errors.branch ? "border border-red-500" : ""
+              }`}
               onPress={() => setShowBranchDropdown(true)}
               disabled={availableBranches.length === 0}
             >
               <Text
-                className={`${selectedBranch ? "text-black" : "text-[#7D7D7D]"
-                  }`}
+                className={`${
+                  selectedBranch ? "text-black" : "text-[#7D7D7D]"
+                }`}
               >
                 {selectedBranch || t("InspectionForm.Select Branch")}
               </Text>
@@ -2146,8 +2154,9 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               {t("InspectionForm.Existing debts of the farmer")} *
             </Text>
             <View
-              className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${errors.debts ? "border border-red-500" : ""
-                }`}
+              className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${
+                errors.debts ? "border border-red-500" : ""
+              }`}
             >
               <TextInput
                 placeholder={t("InspectionForm.Type here...")}
@@ -2182,7 +2191,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
                       setFinanceInfo({
                         jobId,
                         data: updatedFormData,
-                      })
+                      }),
                     );
 
                     return updatedFormData;
@@ -2403,16 +2412,17 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
 
                   {showLandWarning && (
                     <Text
-                      className={`${category.key === "assetsFarmTool" ? "" : ""
-                        } text-red-500 text-sm mt-2`}
+                      className={`${
+                        category.key === "assetsFarmTool" ? "" : ""
+                      } text-red-500 text-sm mt-2`}
                     >
                       {category.key === "assetsFarmTool"
                         ? t(
-                          `Error.Please specify any special farm tools utilized by the farmer.`,
-                        )
+                            `Error.Please specify any special farm tools utilized by the farmer.`,
+                          )
                         : t("Error.At least one", {
-                          category: category.label,
-                        })}
+                            category: category.label,
+                          })}
                     </Text>
                   )}
                 </View>
@@ -2490,45 +2500,13 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
             </View>
           </View>
         </Modal>
-        <View className="flex-row px-6 py-4 gap-4 bg-white border-t border-gray-200 ">
-          <TouchableOpacity
-            className="flex-1 bg-[#444444] rounded-full py-4 items-center"
-            onPress={() => navigation.goBack()}
-          >
-            <Text className="text-white text-base font-semibold">
-              {t("InspectionForm.Back")}
-            </Text>
-          </TouchableOpacity>
-          {isNextEnabled == true ? (
-            <View className="flex-1">
-              <TouchableOpacity className="flex-1 " onPress={handleNext}>
-                <LinearGradient
-                  colors={["#F35125", "#FF1D85"]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  className=" rounded-full py-4 items-center"
-                  style={{
-                    shadowColor: "#000",
-                    shadowOffset: { width: 0, height: 3 },
-                    shadowOpacity: 0.25,
-                    shadowRadius: 5,
-                    elevation: 6,
-                  }}
-                >
-                  <Text className="text-white text-base font-semibold">
-                    {t("InspectionForm.Next")}
-                  </Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <View className="flex-1 bg-gray-300 rounded-full py-4 items-center">
-              <Text className="text-white text-base font-semibold">
-                {t("InspectionForm.Next")}
-              </Text>
-            </View>
-          )}
-        </View>
+        <FormFooterButton
+          exitText={t("InspectionForm.Back")}
+          nextText={t("InspectionForm.Next")}
+          isNextEnabled={isNextEnabled}
+          onExit={() => navigation.goBack()}
+          onNext={handleNext}
+        />
       </View>
     </KeyboardAvoidingView>
   );
