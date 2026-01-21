@@ -454,7 +454,7 @@ const pendingCount = filteredVisits.filter((item) => {
       autoPlay
       loop
     />
-    <Text className="text-center text-gray-600 mt-2">
+    <Text className="text-center text-gray-600 mt-2 italic">
       {t("Visits.No Jobs Available")}
     </Text>
   </View>

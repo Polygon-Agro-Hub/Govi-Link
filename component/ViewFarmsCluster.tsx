@@ -233,7 +233,7 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
           <Text className="text-base font-semibold text-center">#{jobId}</Text>
         </View>
       </View>
-      {/* <View className="mt-4">
+      {/*  <View className="mt-4">
         <Text className="text-xl font-semibold text-center">{farmName}</Text>
         {visitsData.length > 0 && (
           <Text className="text-base text-center text-gray-500 mt-1">
