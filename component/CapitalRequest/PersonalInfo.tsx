@@ -25,8 +25,6 @@ import sriLankaData from "@/assets/json/provinceDistrict.json";
 import districtData from "@/assets/json/Districts.json";
 import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
 import { useCallback } from "react";
-import { LinearGradient } from "expo-linear-gradient";
-import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../types";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/services/store"; // Adjust path to your store

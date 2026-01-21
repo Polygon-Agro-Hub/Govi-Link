@@ -14,7 +14,6 @@ import {
 } from "react-native";
 import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTranslation } from "react-i18next";
 import Checkbox from "expo-checkbox";
 import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";

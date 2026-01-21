@@ -60,7 +60,6 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
 
   const animationRef = useRef<Animated.CompositeAnimation | null>(null);
 
-  // Start smooth countdown animation when component mounts
   useEffect(() => {
     startCountdownAnimation();
 
@@ -69,12 +68,12 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
         animationRef.current.stop();
       }
     };
-  }, []);
+  }, []); // ✅ Add empty dependency array
 
   // Start smooth countdown animation
   const startCountdownAnimation = () => {
     progressAnim.setValue(100);
-    countdownAnim.setValue(20); // Changed to 20
+    countdownAnim.setValue(20);
 
     if (animationRef.current) {
       animationRef.current.stop();
@@ -83,13 +82,13 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
     animationRef.current = Animated.parallel([
       Animated.timing(progressAnim, {
         toValue: 0,
-        duration: 20000, // Changed to 20 seconds (20000 milliseconds)
+        duration: 20000,
         easing: Easing.linear,
         useNativeDriver: false,
       }),
       Animated.timing(countdownAnim, {
         toValue: 0,
-        duration: 20000, // Changed to 20 seconds (20000 milliseconds)
+        duration: 20000,
         easing: Easing.linear,
         useNativeDriver: false,
       }),
@@ -112,7 +111,7 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
     return () => {
       countdownAnim.removeListener(countdownListener);
     };
-  }, []);
+  }, [countdownAnim]);
 
   const handleUndo = async () => {
     if (animationRef.current) {
