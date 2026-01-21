@@ -1,10 +1,9 @@
 import { StackNavigationProp } from "@react-navigation/stack";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
-  ScrollView,
   ActivityIndicator,
   Alert,
   Animated,
@@ -52,26 +51,45 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
   const [assigning, setAssigning] = useState(false);
   const [selectedOfficer, setSelectedOfficer] = useState<Officer | null>(null);
   const [showConfirmationModal, setShowConfirmationModal] = useState(true);
-  const [countdown, setCountdown] = useState(20); // Changed to 20 seconds
+  const [countdown, setCountdown] = useState(20);
 
   // Animated values for smooth progress
   const progressAnim = useRef(new Animated.Value(100)).current;
-  const countdownAnim = useRef(new Animated.Value(20)).current; // Changed to 20
+  const countdownAnim = useRef(new Animated.Value(20)).current;
 
   const animationRef = useRef<Animated.CompositeAnimation | null>(null);
 
-  useEffect(() => {
-    startCountdownAnimation();
+  // ✅ Stable handleAutoAssign using useCallback
+  const handleAutoAssign = useCallback(() => {
+    setShowConfirmationModal(false);
 
-    return () => {
-      if (animationRef.current) {
-        animationRef.current.stop();
-      }
-    };
-  }, []); // ✅ Add empty dependency array
+    // Mock auto assignment - UI only
+    setAssigning(true);
+    setTimeout(() => {
+      setAssigning(false);
+      Alert.alert(
+        t("Main.Success"),
+        t("ConfirmationCapitalRequest.AutoAssignSuccess"),
+        [
+          {
+            text: t("Main.ok"),
+            onPress: () => {
+              // Navigate to CapitalRequests page
+              navigation.navigate("Main", {
+                screen: "MainTabs",
+                params: {
+                  screen: "CapitalRequests",
+                },
+              });
+            },
+          },
+        ]
+      );
+    }, 1500);
+  }, [navigation, t]);
 
-  // Start smooth countdown animation
-  const startCountdownAnimation = () => {
+  // ✅ Stable startCountdownAnimation using useCallback
+  const startCountdownAnimation = useCallback(() => {
     progressAnim.setValue(100);
     countdownAnim.setValue(20);
 
@@ -99,9 +117,21 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
         handleAutoAssign();
       }
     });
-  };
+  }, [progressAnim, countdownAnim, handleAutoAssign]);
 
-  // Update countdown value based on animation
+  // ✅ Start smooth countdown animation when component mounts - ONLY ONCE
+  useEffect(() => {
+    startCountdownAnimation();
+
+    return () => {
+      if (animationRef.current) {
+        animationRef.current.stop();
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty array - runs only once on mount
+
+  // ✅ Update countdown value based on animation
   useEffect(() => {
     const countdownListener = countdownAnim.addListener(({ value }) => {
       const roundedValue = Math.ceil(value);
@@ -199,34 +229,6 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
     }, 1500);
   };
 
-  const handleAutoAssign = () => {
-    setShowConfirmationModal(false);
-
-    // Mock auto assignment - UI only
-    setAssigning(true);
-    setTimeout(() => {
-      setAssigning(false);
-      Alert.alert(
-        t("Main.Success"),
-        t("ConfirmationCapitalRequest.AutoAssignSuccess"),
-        [
-          {
-            text: t("Main.ok"),
-            onPress: () => {
-              // Navigate to CapitalRequests page
-              navigation.navigate("Main", {
-                screen: "MainTabs",
-                params: {
-                  screen: "CapitalRequests",
-                },
-              });
-            },
-          },
-        ]
-      );
-    }, 1500);
-  };
-
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -241,6 +243,9 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
   // Circle parameters
   const radius = 65;
   const circumference = 2 * Math.PI * radius;
+
+  // Animated Circle component
+  const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
   return (
     <View className="flex-1 bg-white">
@@ -348,8 +353,9 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
               <TouchableOpacity
                 onPress={handleUndo}
                 disabled={assigning}
-                className={`px-10 py-3 rounded-3xl items-center ml-3 mt-auto ${assigning ? "bg-gray-400" : "bg-black"
-                  }`}
+                className={`px-10 py-3 rounded-3xl items-center ml-3 mt-auto ${
+                  assigning ? "bg-gray-400" : "bg-black"
+                }`}
               >
                 {assigning ? (
                   <ActivityIndicator size="small" color="white" />
@@ -392,8 +398,5 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
     </View>
   );
 };
-
-// Animated Circle component
-const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 export default ConfirmationCapitalRequest;

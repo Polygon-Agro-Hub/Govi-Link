@@ -181,12 +181,12 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
 
     setIsNextEnabled(
       hasOwnStorageValid &&
-        facilityAccessValid &&
-        primaryProcessingValid &&
-        valueAdditionTechValid &&
-        marketLinkageValid &&
-        qualityStandardsValid &&
-        !hasErrors,
+      facilityAccessValid &&
+      primaryProcessingValid &&
+      valueAdditionTechValid &&
+      marketLinkageValid &&
+      qualityStandardsValid &&
+      !hasErrors,
     );
   }, [formData, errors]);
 
@@ -334,6 +334,7 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
           if (requestId) {
             const reqId = Number(requestId);
             if (!isNaN(reqId) && reqId > 0) {
+              // ✅ Call fetchInspectionData directly without adding it to dependencies
               const backendData = await fetchInspectionData(reqId);
 
               if (backendData) {
@@ -357,7 +358,7 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
       };
 
       loadData();
-    }, [requestId, dispatch, fetchInspectionData]),
+    }, [requestId, dispatch]),
   );
 
   // Handle field changes
@@ -525,7 +526,7 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
           contentContainerStyle={{ paddingBottom: 120 }}
         >
           <View className="h-6" />
-          
+
           <YesNoSelect
             label={t("InspectionForm.Does the farmer own storage facility")}
             required
