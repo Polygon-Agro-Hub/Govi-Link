@@ -10,23 +10,16 @@ import {
   KeyboardAvoidingView,
   Platform,
   Modal,
-  FlatList,
   Image,
 } from "react-native";
-import { Feather, FontAwesome6, MaterialIcons } from "@expo/vector-icons";
+import { Feather, FontAwesome6, AntDesign } from "@expo/vector-icons";
 import FormTabs from "../CapitalRequest/FormTabs";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { environment } from "@/environment/environment";
-import Checkbox from "expo-checkbox";
-import { AntDesign } from "@expo/vector-icons";
 import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
 import { useCallback } from "react";
-import { LinearGradient } from "expo-linear-gradient";
-import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../types";
-import * as ImagePicker from "expo-image-picker";
 import { CameraScreen } from "@/Items/CameraScreen";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/services/store";
@@ -35,23 +28,10 @@ import {
   updateIDProof,
   setIDProof,
   markAsExisting,
-  loadIDProofFromStorage, // ✅ Use the correct export name
   resetIDProofData,
   IDProofInfo,
 } from "@/store/IDproofSlice";
 import FormFooterButton from "./FormFooterButton";
-
-type StoredFormData = {
-  fields: Record<string, any>;
-  files: Record<
-    string,
-    {
-      uri: string;
-      name: string;
-      type: string;
-    }
-  >;
-};
 
 type IDProofProps = {
   navigation: any;
@@ -77,7 +57,7 @@ const UploadButton = ({
         <Feather name="rotate-ccw" size={22} color="#fff" />
       ) : (
         <FontAwesome6 name="camera" size={22} color="#fff" />
-      )}{" "}
+      )}
       <Text className="text-base text-white ml-3">{title}</Text>
     </TouchableOpacity>
 
@@ -102,15 +82,14 @@ const UploadButton = ({
 
 const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
   const route = useRoute<RouteProp<RootStackParamList, "IDProof">>();
-  const prevFormData = route.params?.formData;
   const { requestNumber, requestId } = route.params;
-  let jobId = requestNumber;
   const [isNextEnabled, setIsNextEnabled] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showCamera, setShowCamera] = useState(false);
   const [cameraSide, setCameraSide] = useState<"front" | "back" | null>(null);
   const [showIdProofDropdown, setShowIdProofDropdown] = useState(false);
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
+
   const idProofOptions = [
     { key: "NIC Number", label: "NIC Number" },
     { key: "Driving License ID", label: "Driving License" },
@@ -118,6 +97,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
 
   const dispatch = useDispatch();
 
+  // Get data from Redux store
   const formData = useSelector(
     (state: RootState) =>
       state.inspectionidproof.data[requestId] || {
@@ -133,114 +113,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
       state.inspectionidproof.isExisting[requestId] || false,
   );
 
-  const saveToBackend = async (
-    reqId: number,
-    tableName: string,
-    data: IDProofInfo,
-    isUpdate: boolean,
-  ): Promise<boolean> => {
-    try {
-      const formDataPayload = new FormData();
-      formDataPayload.append("reqId", reqId.toString());
-      formDataPayload.append("tableName", tableName);
-      formDataPayload.append(
-        "pType",
-        data.pType === "NIC Number" ? "NIC" : "License",
-      );
-      formDataPayload.append("pNumber", data.pNumber);
-
-      // ✅ Handle front image
-      if (data.frontImg) {
-        if (
-          data.frontImg.startsWith("file://") ||
-          data.frontImg.startsWith("content://")
-        ) {
-          // Local image - upload as file
-          formDataPayload.append("frontImg", {
-            uri: data.frontImg,
-            name: `front_${Date.now()}.jpg`,
-            type: "image/jpeg",
-          } as any);
-        } else {
-          // S3 URL - send as frontImg field (not frontImgUrl)
-          formDataPayload.append("frontImg", data.frontImg);
-        }
-      }
-
-      // ✅ Handle back image
-      if (data.backImg) {
-        if (
-          data.backImg.startsWith("file://") ||
-          data.backImg.startsWith("content://")
-        ) {
-          // Local image - upload as file
-          formDataPayload.append("backImg", {
-            uri: data.backImg,
-            name: `back_${Date.now()}.jpg`,
-            type: "image/jpeg",
-          } as any);
-        } else {
-          // S3 URL - send as backImg field (not backImgUrl)
-          formDataPayload.append("backImg", data.backImg);
-        }
-      }
-
-      const response = await axios.post(
-        `${environment.API_BASE_URL}api/capital-request/inspection/save`,
-        formDataPayload,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        },
-      );
-
-      if (response.data.success) {
-        // ✅ Update Redux with S3 URLs if returned
-        if (response.data.data.frontImg || response.data.data.backImg) {
-          const updates: Partial<IDProofInfo> = {};
-          if (response.data.data.frontImg)
-            updates.frontImg = response.data.data.frontImg;
-          if (response.data.data.backImg)
-            updates.backImg = response.data.data.backImg;
-
-          dispatch(updateIDProof({ requestId, updates }));
-
-          // Update AsyncStorage
-          const updatedData = { ...formData, ...updates };
-          await AsyncStorage.setItem(
-            `idproof_${requestId}`,
-            JSON.stringify(updatedData),
-          );
-        }
-
-        return true;
-      }
-
-      return false;
-    } catch (error: any) {
-      console.error(`❌ Error saving:`, error);
-      return false;
-    }
-  };
-
-  // Clear image
-  const handleClearImage = async (side: "front" | "back") => {
-    const updates = {
-      [side === "front" ? "frontImg" : "backImg"]: null,
-    };
-
-    dispatch(updateIDProof({ requestId, updates }));
-
-    // Update AsyncStorage
-    const updatedData = { ...formData, ...updates };
-    await AsyncStorage.setItem(
-      `idproof_${requestId}`,
-      JSON.stringify(updatedData),
-    );
-  };
-
-  // ✅ Add fetchIDProofData function here
+  // Fetch ID proof data from backend
   const fetchIDProofData = async (
     reqId: number,
   ): Promise<IDProofInfo | null> => {
@@ -279,19 +152,107 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
     }
   };
 
-  // Update isNextEnabled check
-  useEffect(() => {
-    if (
-      formData.frontImg &&
-      formData.backImg &&
-      formData.pNumber.trim().length >= 10 &&
-      !errors.nic
-    ) {
-      setIsNextEnabled(true);
-    } else {
-      setIsNextEnabled(false);
+  // Save to backend
+  const saveToBackend = async (
+    reqId: number,
+    tableName: string,
+    data: IDProofInfo,
+    isUpdate: boolean,
+  ): Promise<boolean> => {
+    try {
+      console.log(
+        `💾 Saving to backend (${isUpdate ? "UPDATE" : "INSERT"}):`,
+        tableName,
+      );
+
+      const formDataPayload = new FormData();
+      formDataPayload.append("reqId", reqId.toString());
+      formDataPayload.append("tableName", tableName);
+      formDataPayload.append(
+        "pType",
+        data.pType === "NIC Number" ? "NIC" : "License",
+      );
+      formDataPayload.append("pNumber", data.pNumber);
+
+      // Handle front image
+      if (data.frontImg) {
+        if (
+          data.frontImg.startsWith("file://") ||
+          data.frontImg.startsWith("content://")
+        ) {
+          // Local image - upload as file
+          formDataPayload.append("frontImg", {
+            uri: data.frontImg,
+            name: `front_${Date.now()}.jpg`,
+            type: "image/jpeg",
+          } as any);
+          console.log(`📤 Uploading new front image`);
+        } else if (
+          data.frontImg.startsWith("http://") ||
+          data.frontImg.startsWith("https://")
+        ) {
+          // S3 URL - send directly as frontImg (not frontImgUrl)
+          formDataPayload.append("frontImg", data.frontImg);
+          console.log(`🔗 Keeping existing front image URL: ${data.frontImg}`);
+        }
+      }
+
+      // Handle back image
+      if (data.backImg) {
+        if (
+          data.backImg.startsWith("file://") ||
+          data.backImg.startsWith("content://")
+        ) {
+          // Local image - upload as file
+          formDataPayload.append("backImg", {
+            uri: data.backImg,
+            name: `back_${Date.now()}.jpg`,
+            type: "image/jpeg",
+          } as any);
+          console.log(`📤 Uploading new back image`);
+        } else if (
+          data.backImg.startsWith("http://") ||
+          data.backImg.startsWith("https://")
+        ) {
+          // S3 URL - send directly as backImg (not backImgUrl)
+          formDataPayload.append("backImg", data.backImg);
+          console.log(`🔗 Keeping existing back image URL: ${data.backImg}`);
+        }
+      }
+
+      const response = await axios.post(
+        `${environment.API_BASE_URL}api/capital-request/inspection/save`,
+        formDataPayload,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
+      );
+
+      if (response.data.success) {
+        console.log(`✅ ID proof saved successfully`);
+
+        // Update Redux with S3 URLs if returned
+        if (response.data.data.frontImg || response.data.data.backImg) {
+          const updates: Partial<IDProofInfo> = {};
+          if (response.data.data.frontImg)
+            updates.frontImg = response.data.data.frontImg;
+          if (response.data.data.backImg)
+            updates.backImg = response.data.data.backImg;
+
+          dispatch(updateIDProof({ requestId, updates }));
+        }
+
+        return true;
+      }
+
+      return false;
+    } catch (error: any) {
+      console.error(`❌ Error saving ID proof:`, error);
+      return false;
     }
-  }, [formData.frontImg, formData.backImg, formData.pNumber, errors.nic]);
+  };
 
   // Load data on focus
   useFocusEffect(
@@ -300,6 +261,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
         try {
           dispatch(initializeIDProof({ requestId }));
 
+          // Try to fetch from backend
           if (requestId) {
             const reqId = Number(requestId);
             if (!isNaN(reqId) && reqId > 0) {
@@ -314,26 +276,12 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
                     isExisting: true,
                   }),
                 );
-
-                // Also save to AsyncStorage as backup
-                await AsyncStorage.setItem(
-                  `idproof_${requestId}`,
-                  JSON.stringify(backendData),
-                );
                 return;
               }
             }
           }
 
-          // Fallback to AsyncStorage
-          const stored = await AsyncStorage.getItem(`idproof_${requestId}`);
-          if (stored) {
-            const parsedData = JSON.parse(stored);
-            dispatch(loadIDProofFromStorage({ requestId, data: parsedData }));
-            console.log(`✅ Loaded ID proof from AsyncStorage`);
-          } else {
-            console.log("📝 No existing ID proof data - new entry");
-          }
+          console.log("📝 No existing ID proof data - new entry");
         } catch (error) {
           console.error("Failed to load ID proof data", error);
         }
@@ -343,26 +291,31 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
     }, [requestId, dispatch]),
   );
 
-  const transformIDProofForBackend = (data: any) => {
-    return {
-      pType: data.pType === "NIC Number" ? "NIC" : "License",
-      pNumber: data.pNumber,
-      frontImg: data.frontImg,
-      backImg: data.backImg,
-    };
-  };
+  // Validate form completion
+  useEffect(() => {
+    if (
+      formData.frontImg &&
+      formData.backImg &&
+      formData.pNumber.trim().length >= 10 &&
+      !errors.nic
+    ) {
+      setIsNextEnabled(true);
+    } else {
+      setIsNextEnabled(false);
+    }
+  }, [formData.frontImg, formData.backImg, formData.pNumber, errors.nic]);
 
+  // Handle camera
   const openCamera = (side: "front" | "back") => {
     setCameraSide(side);
     setShowCamera(true);
   };
 
-  const handleCameraClose = async (uri: string | null) => {
+  const handleCameraClose = (uri: string | null) => {
     setShowCamera(false);
 
     if (!uri || !cameraSide) return;
 
-    // ✅ Store URI directly in Redux
     const updates = {
       [cameraSide === "front" ? "frontImg" : "backImg"]: uri,
     };
@@ -374,177 +327,30 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
       }),
     );
 
-    // ✅ Also persist to AsyncStorage
-    const updatedData = { ...formData, ...updates };
-    await AsyncStorage.setItem(
-      `idproof_${requestId}`,
-      JSON.stringify(updatedData),
-    );
-
     console.log(`✅ ${cameraSide} image URI saved`);
     setCameraSide(null);
   };
 
-  const handleNext = async () => {
-    if (!formData.pType) {
-      // ✅ Use formData.pType
-      setErrors((prev) => ({
-        ...prev,
-        nic: t("Error.ID Proof Type is required"),
-      }));
-      Alert.alert(
-        t("Error.Validation Error"),
-        "• " + t("Error.ID Proof Type is required"),
-        [{ text: t("Main.ok") }],
-      );
-      return;
-    }
+  // Clear image
+  const handleClearImage = (side: "front" | "back") => {
+    const updates = {
+      [side === "front" ? "frontImg" : "backImg"]: null,
+    };
 
-    if (!formData.pNumber.trim()) {
-      // ✅ Use formData.pNumber
-      setErrors((prev) => ({
-        ...prev,
-        nic: t(`Error.${formData.pType} is required`),
-      }));
-      Alert.alert(
-        t("Error.Validation Error"),
-        "• " + t(`Error.${formData.pType} is required`),
-        [{ text: t("Main.ok") }],
-      );
-      return;
-    }
-
-    if (errors.nic) {
-      Alert.alert(t("Validation Error"), errors.nic);
-      return;
-    }
-
-    if (!formData?.frontImg || !formData?.backImg) {
-      Alert.alert(
-        t("Error.Validation Error"),
-        t("Error.Both ID images are required"),
-        [{ text: t("Main.ok") }],
-      );
-      return;
-    }
-
-    // ✅ Validate requestId exists
-    if (!route.params?.requestId) {
-      console.error("❌ requestId is missing!");
-      Alert.alert(
-        t("Error.Error"),
-        "Request ID is missing. Please go back and try again.",
-        [{ text: t("Main.ok") }],
-      );
-      return;
-    }
-
-    const reqId = Number(route.params.requestId);
-
-    console.log("🚀 Preparing to save ID Proof for requestId:", reqId);
-
-    // ✅ Validate it's a valid number
-    if (isNaN(reqId) || reqId <= 0) {
-      console.error("❌ Invalid requestId:", route.params.requestId);
-      Alert.alert(
-        t("Error.Error"),
-        "Invalid request ID. Please go back and try again.",
-        [{ text: t("Main.ok") }],
-      );
-      return;
-    }
-
-    console.log("✅ Using requestId:", reqId);
-
-    // Show loading indicator
-    Alert.alert(
-      t("InspectionForm.Saving"),
-      t("InspectionForm.Please wait..."),
-      [],
-      { cancelable: false },
-    );
-
-    // Save to backend
-    try {
-      console.log(
-        `🚀 Saving to backend (${isExistingData ? "UPDATE" : "INSERT"})`,
-      );
-
-      const saved = await saveToBackend(
-        reqId,
-        "inspectionidproof",
-        formData,
-        isExistingData,
-      );
-
-      if (saved) {
-        console.log("✅ ID Proof saved successfully to backend");
-        dispatch(markAsExisting({ requestId }));
-
-        Alert.alert(
-          t("Main.Success"),
-          t("InspectionForm.Data saved successfully"),
-          [
-            {
-              text: t("Main.ok"),
-              onPress: () => {
-                navigation.navigate("FinanceInfo", {
-                  formData,
-                  requestNumber,
-                  requestId: route.params.requestId,
-                });
-              },
-            },
-          ],
-        );
-      } else {
-        console.log("⚠️ Backend save failed, but continuing with local data");
-        Alert.alert(
-          t("Main.Warning"),
-          t("InspectionForm.Could not save to server. Data saved locally."),
-          [
-            {
-              text: t("Main.Continue"),
-              onPress: () => {
-                navigation.navigate("FinanceInfo", {
-                  formData,
-                  requestNumber,
-                  requestId: route.params.requestId,
-                });
-              },
-            },
-          ],
-        );
-      }
-    } catch (error) {
-      console.error("Error during final save:", error);
-      Alert.alert(
-        t("Main.Warning"),
-        t("InspectionForm.Could not save to server. Data saved locally."),
-        [
-          {
-            text: t("Main.Continue"),
-            onPress: () => {
-              navigation.navigate("FinanceInfo", {
-                formData,
-                requestNumber,
-                requestId: route.params.requestId,
-              });
-            },
-          },
-        ],
-      );
-    }
+    dispatch(updateIDProof({ requestId, updates }));
   };
 
+  // Validate NIC
   const validateNicNumber = (input: string) =>
     /^[0-9]{9}V$|^[0-9]{12}$/.test(input);
 
+  // Validate Driving License
   const validateDrivingLicense = (input: string) =>
     /^(?:[A-Z]{1,2}[0-9]{8,9}|[0-9]{10})$/.test(input);
 
-  const handleIdNumberChange = async (input: string) => {
-    if (!formData.pType) return; // ✅ Use formData.pType instead of selectedIdProof
+  // Handle ID number change
+  const handleIdNumberChange = (input: string) => {
+    if (!formData.pType) return;
 
     const rules =
       formData.pType === "NIC Number"
@@ -576,23 +382,144 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
 
     setErrors((prev) => ({ ...prev, nic: error }));
 
-    // ✅ Update Redux
     dispatch(
       updateIDProof({
         requestId,
         updates: { pNumber: value },
       }),
     );
+  };
 
-    // ✅ Save to AsyncStorage
-    try {
-      const updatedData = { ...formData, pNumber: value };
-      await AsyncStorage.setItem(
-        `idproof_${requestId}`,
-        JSON.stringify(updatedData),
+  // Handle next button
+  const handleNext = async () => {
+    if (!formData.pType) {
+      setErrors((prev) => ({
+        ...prev,
+        nic: t("Error.ID Proof Type is required"),
+      }));
+      Alert.alert(
+        t("Error.Validation Error"),
+        "• " + t("Error.ID Proof Type is required"),
+        [{ text: t("Main.ok") }],
       );
-    } catch (e) {
-      console.error("Failed to save ID number", e);
+      return;
+    }
+
+    if (!formData.pNumber.trim()) {
+      setErrors((prev) => ({
+        ...prev,
+        nic: t(`Error.${formData.pType} is required`),
+      }));
+      Alert.alert(
+        t("Error.Validation Error"),
+        "• " + t(`Error.${formData.pType} is required`),
+        [{ text: t("Main.ok") }],
+      );
+      return;
+    }
+
+    if (errors.nic) {
+      Alert.alert(t("Validation Error"), errors.nic);
+      return;
+    }
+
+    if (!formData?.frontImg || !formData?.backImg) {
+      Alert.alert(
+        t("Error.Validation Error"),
+        t("Error.Both ID images are required"),
+        [{ text: t("Main.ok") }],
+      );
+      return;
+    }
+
+    if (!route.params?.requestId) {
+      Alert.alert(
+        t("Error.Error"),
+        "Request ID is missing. Please go back and try again.",
+        [{ text: t("Main.ok") }],
+      );
+      return;
+    }
+
+    const reqId = Number(route.params.requestId);
+
+    if (isNaN(reqId) || reqId <= 0) {
+      Alert.alert(
+        t("Error.Error"),
+        "Invalid request ID. Please go back and try again.",
+        [{ text: t("Main.ok") }],
+      );
+      return;
+    }
+
+    Alert.alert(
+      t("InspectionForm.Saving"),
+      t("InspectionForm.Please wait..."),
+      [],
+      { cancelable: false },
+    );
+
+    try {
+      const saved = await saveToBackend(
+        reqId,
+        "inspectionidproof",
+        formData,
+        isExistingData,
+      );
+
+      if (saved) {
+        console.log("✅ ID Proof saved successfully to backend");
+        dispatch(markAsExisting({ requestId }));
+
+        Alert.alert(
+          t("Main.Success"),
+          t("InspectionForm.Data saved successfully"),
+          [
+            {
+              text: t("Main.ok"),
+              onPress: () => {
+                navigation.navigate("FinanceInfo", {
+                  requestNumber,
+                  requestId: route.params.requestId,
+                });
+              },
+            },
+          ],
+        );
+      } else {
+        Alert.alert(
+          t("Main.Warning"),
+          t("InspectionForm.Could not save to server. Data saved locally."),
+          [
+            {
+              text: t("Main.Continue"),
+              onPress: () => {
+                navigation.navigate("FinanceInfo", {
+                  requestNumber,
+                  requestId: route.params.requestId,
+                });
+              },
+            },
+          ],
+        );
+      }
+    } catch (error) {
+      console.error("Error during final save:", error);
+      Alert.alert(
+        t("Main.Warning"),
+        t("InspectionForm.Could not save to server. Data saved locally."),
+        [
+          {
+            text: t("Main.Continue"),
+            onPress: () => {
+              navigation.navigate("FinanceInfo", {
+                requestNumber,
+                requestId: route.params.requestId,
+              });
+            },
+          },
+        ],
+      );
     }
   };
 
@@ -645,15 +572,14 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
                 </Text>
               </Text>
               <View
-                className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
-                  errors.nic ? "border border-red-500" : ""
-                }`}
+                className={`bg-[#F6F6F6] rounded-full flex-row items-center ${errors.nic ? "border border-red-500" : ""
+                  }`}
               >
                 <TextInput
                   placeholder="----"
                   placeholderTextColor="#7D7D7D"
                   className="flex-1 px-2 py-4 text-base text-black ml-4"
-                  value={formData.pNumber} // ✅ Use formData.pNumber
+                  value={formData.pNumber}
                   onChangeText={handleIdNumberChange}
                   underlineColorAndroid="transparent"
                   maxLength={formData.pType === "NIC Number" ? 12 : 10}
@@ -668,7 +594,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
             </View>
           </View>
 
-          {formData.pType && ( // ✅ Use formData.pType
+          {formData.pType && (
             <View className="mt-6">
               <UploadButton
                 title={
@@ -677,10 +603,8 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
                     : t("InspectionForm.Driving License Front Photo")
                 }
                 onPress={() => openCamera("front")}
-                image={formData.frontImg} // ✅ Use formData.frontImg
-                onClear={async () => {
-                  await handleClearImage("front");
-                }}
+                image={formData.frontImg}
+                onClear={() => handleClearImage("front")}
               />
 
               <UploadButton
@@ -690,10 +614,8 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
                     : t("InspectionForm.Driving License Back Photo")
                 }
                 onPress={() => openCamera("back")}
-                image={formData.backImg} // ✅ Use formData.backImg
-                onClear={async () => {
-                  await handleClearImage("back");
-                }}
+                image={formData.backImg}
+                onClear={() => handleClearImage("back")}
               />
             </View>
           )}
@@ -720,38 +642,18 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
               <TouchableOpacity
                 key={option.key}
                 className="py-4 border-b border-gray-200"
-                onPress={async () => {
+                onPress={() => {
                   setShowIdProofDropdown(false);
                   setErrors({});
 
-                  const updatedFormData = {
-                    pType: option.key,
-                    pNumber: "",
-                    frontImg: null,
-                    backImg: null,
-                  };
-
                   dispatch(
-                    setIDProof({
+                    resetIDProofData({
                       requestId,
-                      data: updatedFormData,
-                      isExisting: false,
+                      pType: option.key,
                     }),
                   );
 
-                  // Save to AsyncStorage
-                  try {
-                    await AsyncStorage.setItem(
-                      `idproof_${requestId}`,
-                      JSON.stringify(updatedFormData),
-                    );
-                    console.log("Cleared ID proof data due to type change!");
-                  } catch (e) {
-                    console.error(
-                      "Failed to clear ID proof data in storage",
-                      e,
-                    );
-                  }
+                  console.log("Cleared ID proof data due to type change!");
                 }}
               >
                 <Text className="text-base text-black">{option.label}</Text>

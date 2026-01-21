@@ -20,7 +20,6 @@ import {
   MaterialIcons,
 } from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTranslation } from "react-i18next";
 import Checkbox from "expo-checkbox";
 import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
@@ -32,18 +31,16 @@ import { CameraScreen } from "@/Items/CameraScreen";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 import FormFooterButton from "./FormFooterButton";
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/services/store';
+import {
+  initializeCroppingSystems,
+  updateCroppingSystems,
+  setCroppingSystems,
+  markCroppingAsExisting,
+  CroppingSystemsData,
+} from '@/store/croppingSystemsSlice';
 
-type CroppingSystemsData = {
-  opportunity?: string[];
-  otherOpportunity?: string;
-  hasKnowlage?: "Yes" | "No";
-  prevExperince?: string;
-  opinion?: string;
-};
-
-type FormData = {
-  inspectioncropping?: CroppingSystemsData;
-};
 
 const YesNoSelect = ({
   label,
@@ -128,63 +125,62 @@ type CroppingSystemsProps = {
 
 const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
   const route = useRoute<RouteProp<RootStackParamList, "CroppingSystems">>();
-  const { requestNumber, requestId } = route.params; // ✅ Add requestId
-  const prevFormData = route.params?.formData;
-  const [formData, setFormData] = useState(prevFormData);
-  const { t, i18n } = useTranslation();
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isExistingData, setIsExistingData] = useState(false); // ✅ Add this
+  const { requestNumber, requestId } = route.params;
 
+  const dispatch = useDispatch();
+  const { t } = useTranslation();
+
+  // Get data from Redux
+  const formData = useSelector((state: RootState) =>
+    state.croppingSystems.data[requestId] || {
+      opportunity: [],
+      otherOpportunity: '',
+      hasKnowlage: undefined,
+      prevExperince: '',
+      opinion: '',
+    }
+  );
+
+  const isExistingData = useSelector((state: RootState) =>
+    state.croppingSystems.isExisting[requestId] || false
+  );
+
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [isNextEnabled, setIsNextEnabled] = useState(false);
   const [yesNoModalVisible, setYesNoModalVisible] = useState(false);
   const [activeYesNoField, setActiveYesNoField] = useState<string | null>(null);
-  const [overallSoilFertilityVisible, setOverallSoilFertilityVisible] =
-    useState(false);
+  const [overallSoilFertilityVisible, setOverallSoilFertilityVisible] = useState(false);
   console.log("finance", formData);
 
   useEffect(() => {
-    const cs = formData?.inspectioncropping ?? {};
-
     const isOpportunityValid =
-      cs.opportunity?.length > 0 &&
-      (!cs.opportunity.includes("Other") || cs.otherOpportunity?.trim());
+      (formData.opportunity?.length ?? 0) > 0 &&
+      (!formData.opportunity?.includes("Other") || !!formData.otherOpportunity?.trim());
 
     const isKnowledgeValid =
-      cs.hasKnowlage === "Yes" || cs.hasKnowlage === "No";
+      formData.hasKnowlage === "Yes" || formData.hasKnowlage === "No";
 
-    const isExperienceValid = !!cs.prevExperince;
-
-    const isOpinionValid = !!cs.opinion?.trim();
-
+    const isExperienceValid = !!formData.prevExperince;
+    const isOpinionValid = !!formData.opinion?.trim();
     const hasErrors = Object.values(errors).some(Boolean);
 
     setIsNextEnabled(
-      isOpportunityValid &&
+      !!(isOpportunityValid &&
         isKnowledgeValid &&
         isExperienceValid &&
         isOpinionValid &&
-        !hasErrors,
+        !hasErrors)
     );
   }, [formData, errors]);
 
   let jobId = requestNumber;
   console.log("jobid", jobId);
 
-  const updateFormData = async (updates: Partial<CroppingSystemsData>) => {
-    try {
-      const updatedFormData = {
-        ...formData,
-        inspectioncropping: {
-          ...formData.inspectioncropping,
-          ...updates,
-        },
-      };
-
-      setFormData(updatedFormData);
-      await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData));
-    } catch (e) {
-      console.log("AsyncStorage save failed", e);
-    }
+  const updateFormData = (updates: Partial<CroppingSystemsData>) => {
+    dispatch(updateCroppingSystems({
+      requestId,
+      updates,
+    }));
   };
 
   const fetchInspectionData = async (
@@ -339,7 +335,10 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
     useCallback(() => {
       const loadFormData = async () => {
         try {
-          // First, try to fetch from backend
+          // Initialize Redux state
+          dispatch(initializeCroppingSystems({ requestId }));
+
+          // Try to fetch from backend
           if (requestId) {
             const reqId = Number(requestId);
             if (!isNaN(reqId) && reqId > 0) {
@@ -352,81 +351,59 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
               if (backendData) {
                 console.log(`✅ Loaded cropping systems data from backend`);
 
-                // Update form with backend data
-                const updatedFormData = {
-                  ...formData,
-                  inspectioncropping: backendData,
-                };
+                // Save to Redux
+                dispatch(setCroppingSystems({
+                  requestId,
+                  data: backendData,
+                  isExisting: true,
+                }));
 
-                setFormData(updatedFormData);
-                setIsExistingData(true);
-
-                // Save to AsyncStorage as backup
-                await AsyncStorage.setItem(
-                  `${jobId}`,
-                  JSON.stringify(updatedFormData),
-                );
-
-                return; // Exit after loading from backend
+                return;
               }
             }
           }
 
-          // If no backend data, try AsyncStorage
-          console.log(`📂 Checking AsyncStorage for jobId: ${jobId}`);
-          const savedData = await AsyncStorage.getItem(`${jobId}`);
-
-          if (savedData) {
-            const parsedData = JSON.parse(savedData);
-            console.log(`✅ Loaded cropping systems data from AsyncStorage`);
-            setFormData(parsedData);
-            setIsExistingData(true);
-          } else {
-            // No data found anywhere - new entry
-            setIsExistingData(false);
-            console.log("📝 No existing cropping systems data - new entry");
-          }
+          console.log("📝 No existing cropping systems data - new entry");
         } catch (e) {
           console.error("Failed to load cropping systems form data", e);
-          setIsExistingData(false);
         }
       };
 
       loadFormData();
-    }, [requestId, jobId]),
+    }, [requestId, dispatch]),
   );
 
   const handleNext = async () => {
     const validationErrors: Record<string, string> = {};
-    const croppingInfo = formData.inspectioncropping;
 
-    // Validate required fields
-    if (!croppingInfo?.opportunity || croppingInfo.opportunity.length === 0) {
+    // Validate required fields - REMOVE .inspectioncropping
+    if (!formData.opportunity || formData.opportunity.length === 0) {
       validationErrors.opportunity = t(
         "Error.Please select at least one opportunity to go for",
       );
     }
     if (
-      croppingInfo?.opportunity?.includes("Other") &&
-      !croppingInfo?.otherOpportunity?.trim()
+      formData.opportunity?.includes("Other") &&
+      !formData.otherOpportunity?.trim()
     ) {
       validationErrors.opportunity = t(
         "Error.Please specify the other opportunity to go for",
       );
     }
-    if (!croppingInfo?.hasKnowlage) {
+    if (!formData.hasKnowlage) {
       validationErrors.hasKnowlage = t("Error.Knowledge field is required");
     }
-    if (!croppingInfo?.prevExperince) {
+    if (!formData.prevExperince) {
       validationErrors.prevExperince = t(
         "Error.Previous experience is required",
       );
     }
-    if (!croppingInfo?.opinion?.trim()) {
+    if (!formData.opinion?.trim()) {
       validationErrors.opinion = t(
         "Error.General opinion of your friends is required",
       );
     }
+
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
@@ -470,20 +447,18 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
     );
 
     try {
-      console.log(
-        `🚀 Saving to backend (${isExistingData ? "UPDATE" : "INSERT"})`,
-      );
-
       const saved = await saveToBackend(
         reqId,
         "inspectioncropping",
-        formData.inspectioncropping!,
+        formData, // Pass formData directly, not formData.inspectioncropping
         isExistingData,
       );
 
       if (saved) {
         console.log("✅ Cropping systems info saved successfully to backend");
-        setIsExistingData(true);
+
+        // Mark as existing in Redux
+        dispatch(markCroppingAsExisting({ requestId }));
 
         Alert.alert(
           t("Main.Success"),
@@ -493,15 +468,16 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
               text: t("Main.ok"),
               onPress: () => {
                 navigation.navigate("ProfitRisk", {
-                  formData,
+                  formData: { inspectioncropping: formData },
                   requestNumber,
-                  requestId: route.params.requestId,
+                  requestId,
                 });
               },
             },
           ],
         );
-      } else {
+      }
+      else {
         console.log("⚠️ Backend save failed, but continuing with local data");
         Alert.alert(
           t("Main.Warning"),
@@ -541,22 +517,11 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
     }
   };
 
-  const handleyesNOFieldChange = async (key: string, value: "Yes" | "No") => {
-    const updatedFormData = {
-      ...formData,
-      inspectioncropping: {
-        ...formData.inspectioncropping,
-        [key]: value,
-      },
-    };
-
-    setFormData(updatedFormData);
-
-    try {
-      await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData));
-    } catch (e) {
-      console.log("AsyncStorage save failed", e);
-    }
+  const handleyesNOFieldChange = (key: string, value: "Yes" | "No") => {
+    dispatch(updateCroppingSystems({
+      requestId,
+      updates: { [key]: value },
+    }));
   };
 
   return (
@@ -592,78 +557,54 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
               "Other",
             ].map((option) => {
               const selected =
-                formData.inspectioncropping?.opportunity?.includes(option) ||
+                formData.opportunity?.includes(option) ||
                 false;
 
               return (
                 <View key={option} className="flex-row items-center mb-4">
                   <Checkbox
                     value={selected}
-                    onValueChange={async () => {
-                      let updatedOptions =
-                        formData.inspectioncropping?.opportunity || [];
+                    onValueChange={() => {
+                      let updatedOptions = formData.opportunity || [];
 
                       if (selected) {
-                        updatedOptions = updatedOptions.filter(
-                          (o: any) => o !== option,
-                        );
+                        updatedOptions = updatedOptions.filter((o: any) => o !== option);
                       } else {
                         updatedOptions = [...updatedOptions, option];
                       }
 
-                      const updatedFormData = {
-                        ...formData,
-                        inspectioncropping: {
-                          ...formData.inspectioncropping,
-                          opportunity: updatedOptions,
-                          otherOpportunity:
-                            option === "Other" &&
-                            !updatedOptions.includes("Other")
-                              ? ""
-                              : formData.inspectioncropping?.otherOpportunity,
-                        },
+                      const updates: Partial<CroppingSystemsData> = {
+                        opportunity: updatedOptions,
                       };
 
-                      setFormData(updatedFormData);
+                      if (option === "Other" && !updatedOptions.includes("Other")) {
+                        updates.otherOpportunity = "";
+                      }
 
+                      dispatch(updateCroppingSystems({
+                        requestId,
+                        updates,
+                      }));
+
+                      // Validation logic...
                       let errorMsg = "";
-
-                      const opportunity =
-                        updatedFormData.inspectioncropping.opportunity || [];
-
-                      // Filter out "Other" to see if at least one real option is selected
-                      const validopportunity = opportunity.filter(
+                      const validopportunity = updatedOptions.filter(
                         (source: string) => source !== "Other",
                       );
 
                       if (validopportunity.length === 0) {
-                        // No real water source selected
-                        errorMsg = t(
-                          "Error.Please select at least one opportunity to go for",
-                        );
+                        errorMsg = t("Error.Please select at least one opportunity to go for");
                       } else if (
-                        opportunity.includes("Other") &&
-                        !updatedFormData.inspectioncropping.otherOpportunity?.trim()
+                        updatedOptions.includes("Other") &&
+                        !formData.otherOpportunity?.trim()
                       ) {
-                        // "Other" is selected but not specified
-                        errorMsg = t(
-                          "Error.Please specify the other opportunity to go for",
-                        );
+                        errorMsg = t("Error.Please specify the other opportunity to go for");
                       }
 
                       setErrors((prev) => ({
                         ...prev,
                         opportunity: errorMsg,
                       }));
-
-                      try {
-                        await AsyncStorage.setItem(
-                          `${jobId}`,
-                          JSON.stringify(updatedFormData),
-                        );
-                      } catch (e) {
-                        console.log("AsyncStorage save failed", e);
-                      }
                     }}
                     color={selected ? "#000" : undefined}
                   />
@@ -672,48 +613,32 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
               );
             })}
 
-            {formData.inspectioncropping?.opportunity?.includes("Other") && (
+            {formData.opportunity?.includes("Other") && (
               <TextInput
                 placeholder={t("InspectionForm.--Mention Other--")}
                 placeholderTextColor="#838B8C"
                 className="bg-[#F6F6F6] px-4 py-4 rounded-full text-black mb-2"
-                value={formData.inspectioncropping?.otherOpportunity || ""}
-                onChangeText={async (text) => {
-                  const updatedFormData = {
-                    ...formData,
-                    inspectioncropping: {
-                      ...formData.inspectioncropping,
-                      otherOpportunity: text,
-                    },
-                  };
-                  setFormData(updatedFormData);
+                value={formData.otherOpportunity || ""}
+                onChangeText={(text) => {
+                  dispatch(updateCroppingSystems({
+                    requestId,
+                    updates: { otherOpportunity: text },
+                  }));
+
+                  // Validation...
                   let errorMsg = "";
-                  const opportunity =
-                    updatedFormData.inspectioncropping.opportunity || [];
+                  const opportunity = formData.opportunity || [];
                   const validopportunity = opportunity.filter(
                     (source: string) => source !== "Other",
                   );
 
                   if (validopportunity.length === 0) {
-                    errorMsg = t(
-                      "Error.Please select at least one opportunity to go for",
-                    );
+                    errorMsg = t("Error.Please select at least one opportunity to go for");
                   } else if (opportunity.includes("Other") && !text.trim()) {
-                    errorMsg = t(
-                      "Error.Please specify the other opportunity to go for",
-                    );
+                    errorMsg = t("Error.Please specify the other opportunity to go for");
                   }
 
                   setErrors((prev) => ({ ...prev, opportunity: errorMsg }));
-
-                  try {
-                    await AsyncStorage.setItem(
-                      `${jobId}`,
-                      JSON.stringify(updatedFormData),
-                    );
-                  } catch (e) {
-                    console.log("AsyncStorage save failed", e);
-                  }
                 }}
               />
             )}
@@ -730,7 +655,7 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
               "InspectionForm.Does the farmer has the knowledge on cropping systems management",
             )}
             required
-            value={formData.inspectioncropping?.hasKnowlage || null}
+            value={formData.hasKnowlage || null}
             visible={yesNoModalVisible && activeYesNoField === "hasKnowlage"}
             onOpen={() => {
               setActiveYesNoField("hasKnowlage");
@@ -755,29 +680,21 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
               className="bg-[#F6F6F6] px-4 py-4 flex-row items-center justify-between rounded-full"
               onPress={() => {
                 setOverallSoilFertilityVisible(true);
-                setFormData({
-                  ...formData,
-                  inspectioncropping: {
-                    ...formData.inspectioncropping,
-                  },
-                });
               }}
             >
               <Text
                 className={
-                  formData.inspectioncropping?.prevExperince
+                  formData.prevExperince
                     ? "text-black"
                     : "text-[#A3A3A3]"
                 }
               >
-                {formData.inspectioncropping?.prevExperince
-                  ? t(
-                      `InspectionForm.${formData.inspectioncropping.prevExperince}`,
-                    )
+                {formData.prevExperince
+                  ? t(`InspectionForm.${formData.prevExperince}`)
                   : t("InspectionForm.--Select From Here--")}
               </Text>
 
-              {!formData.inspectioncropping?.prevExperince && (
+              {!formData.prevExperince && (
                 <AntDesign name="down" size={20} color="#838B8C" />
               )}
             </TouchableOpacity>
@@ -791,13 +708,12 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
               *
             </Text>
             <View
-              className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${
-                errors.debts ? "border border-red-500" : ""
-              }`}
+              className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${errors.debts ? "border border-red-500" : ""
+                }`}
             >
               <TextInput
                 placeholder={t("InspectionForm.Type here...")}
-                value={formData.inspectioncropping?.opinion || ""}
+                value={formData.opinion || ""}
                 onChangeText={(text) => {
                   let formattedText = text.replace(/^\s+/, "");
 
@@ -807,28 +723,19 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
                       formattedText.slice(1);
                   }
 
-                  setFormData((prev: FormData) => ({
-                    ...prev,
-                    inspectioncropping: {
-                      ...prev.inspectioncropping,
-                      opinion: formattedText,
-                    },
+                  dispatch(updateCroppingSystems({
+                    requestId,
+                    updates: { opinion: formattedText },
                   }));
 
                   let error = "";
                   if (!formattedText || formattedText.trim() === "") {
-                    error = t(
-                      "Error.General opinion of your friends is required",
-                    );
+                    error = t("Error.General opinion of your friends is required");
                   }
                   setErrors((prev) => ({
                     ...prev,
                     opinion: error,
                   }));
-
-                  updateFormData({
-                    opinion: formattedText,
-                  });
                 }}
                 keyboardType="default"
                 multiline={true}
@@ -873,25 +780,11 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
               <View key={item}>
                 <TouchableOpacity
                   className="py-4"
-                  onPress={async () => {
-                    const updatedFormData = {
-                      ...formData,
-                      inspectioncropping: {
-                        ...formData.inspectioncropping,
-                        prevExperince: item,
-                      },
-                    };
-
-                    setFormData(updatedFormData);
-
-                    try {
-                      await AsyncStorage.setItem(
-                        `${jobId}`,
-                        JSON.stringify(updatedFormData),
-                      );
-                    } catch (e) {
-                      console.log("AsyncStorage save failed", e);
-                    }
+                  onPress={() => {
+                    dispatch(updateCroppingSystems({
+                      requestId,
+                      updates: { prevExperince: item },
+                    }));
                     setOverallSoilFertilityVisible(false);
                   }}
                 >

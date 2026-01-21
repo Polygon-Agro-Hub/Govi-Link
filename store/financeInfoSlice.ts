@@ -38,7 +38,12 @@ const financeInfoSlice = createSlice({
       state,
       action: PayloadAction<{ jobId: string; data: FormData }>
     ) => {
-      state[action.payload.jobId] = action.payload.data;
+      const { jobId, data } = action.payload;
+      // Create a new object to avoid mutation issues
+      return {
+        ...state,
+        [jobId]: { ...data }
+      };
     },
     updateFinanceInfo: (
       state,
@@ -48,19 +53,22 @@ const financeInfoSlice = createSlice({
       }>
     ) => {
       const { jobId, updates } = action.payload;
-      if (state[jobId]) {
-        state[jobId].inspectionfinance = {
-          ...state[jobId].inspectionfinance,
-          ...updates,
-        };
-      } else {
-        state[jobId] = {
-          inspectionfinance: updates,
-        };
-      }
+      
+      return {
+        ...state,
+        [jobId]: {
+          ...state[jobId],
+          inspectionfinance: {
+            ...(state[jobId]?.inspectionfinance || {}),
+            ...updates,
+          },
+        },
+      };
     },
-    clearFinanceInfo: (state, action: PayloadAction<string>) => {
-      delete state[action.payload];
+    clearFinanceInfo: (state, action: PayloadAction<number>) => {
+      const newState = { ...state };
+      delete newState[action.payload];
+      return newState;
     },
   },
 });
