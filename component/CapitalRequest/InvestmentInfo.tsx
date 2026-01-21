@@ -26,15 +26,17 @@ import banksData from "@/assets/json/banks.json";
 import branchesData from "@/assets/json/branches.json";
 import axios from "axios";
 import { environment } from "@/environment/environment";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/services/store";
+import {
+  initializeInvestmentInfo,
+  updateInvestmentInfo,
+  setInvestmentInfo,
+  markInvestmentAsExisting,
+  InvestmentInfoData,
+} from "@/store/investmentInfoSlice";
+import FormFooterButton from "./FormFooterButton";
 
-type FormData = {
-  inspectioninvestment?: InvestmentInfoData;
-};
-type InvestmentInfoData = {
-  expected: number;
-  purpose: number;
-  repaymentMonth: number;
-};
 const Input = ({
   label,
   placeholder,
@@ -146,13 +148,26 @@ type InvestmentInfoProps = {
 
 const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
   const route = useRoute<RouteProp<RootStackParamList, "InvestmentInfo">>();
-  const { requestNumber, requestId } = route.params; // ✅ Add requestId
-  const prevFormData = route.params?.formData;
-  const [formData, setFormData] = useState(prevFormData);
+  const { requestNumber, requestId } = route.params;
+
+  const dispatch = useDispatch();
   const { t, i18n } = useTranslation();
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isExistingData, setIsExistingData] = useState(false); // ✅ Add this
   const [isNextEnabled, setIsNextEnabled] = useState(false);
+
+  // Get data from Redux
+  const formData = useSelector(
+    (state: RootState) =>
+      state.investmentInfo.data[requestId] || {
+        expected: 0,
+        purpose: "",
+        repaymentMonth: 0,
+      },
+  );
+
+  const isExistingData = useSelector(
+    (state: RootState) => state.investmentInfo.isExisting[requestId] || false,
+  );
 
   console.log("finance", formData);
 
@@ -168,7 +183,7 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
     ];
 
     const allFilled = requiredFields.every((key) => {
-      const value = formData.inspectioninvestment?.[key];
+      const value = formData[key];
       return (
         value !== null && value !== undefined && value.toString().trim() !== ""
       );
@@ -179,6 +194,62 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
 
     setIsNextEnabled(allFilled && !hasErrors);
   }, [formData, errors]);
+
+  // 5. REPLACE updateFormData - Remove AsyncStorage
+  const updateFormData = (updates: Partial<InvestmentInfoData>) => {
+    dispatch(
+      updateInvestmentInfo({
+        requestId,
+        updates,
+      }),
+    );
+  };
+
+  // 6. UPDATE useFocusEffect - Use Redux instead of AsyncStorage
+  useFocusEffect(
+    useCallback(() => {
+      const loadFormData = async () => {
+        try {
+          // Initialize Redux state
+          dispatch(initializeInvestmentInfo({ requestId }));
+
+          // Try to fetch from backend
+          if (requestId) {
+            const reqId = Number(requestId);
+            if (!isNaN(reqId) && reqId > 0) {
+              console.log(
+                `🔄 Attempting to fetch investment data from backend for reqId: ${reqId}`,
+              );
+
+              const backendData = await fetchInspectionData(reqId);
+
+              if (backendData) {
+                console.log(`✅ Loaded investment data from backend`);
+
+                // Save to Redux
+                dispatch(
+                  setInvestmentInfo({
+                    requestId,
+                    data: backendData,
+                    isExisting: true,
+                  }),
+                );
+
+                return; // Exit after loading from backend
+              }
+            }
+          }
+
+          // If no backend data, Redux already has initialized empty state
+          console.log("📝 No existing investment data - new entry");
+        } catch (e) {
+          console.error("Failed to load investment form data", e);
+        }
+      };
+
+      loadFormData();
+    }, [requestId, dispatch]),
+  );
 
   let jobId = requestNumber;
   console.log("jobid", jobId);
@@ -284,130 +355,44 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
     }
   };
 
-  const updateFormData = async (updates: Partial<InvestmentInfoData>) => {
-    try {
-      const updatedFormData = {
-        ...formData,
-        inspectioninvestment: {
-          ...formData.inspectioninvestment,
-          ...updates,
-        },
-      };
-
-      setFormData(updatedFormData);
-
-      await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData));
-    } catch (e) {
-      console.log("AsyncStorage save failed", e);
-    }
-  };
-
-  useFocusEffect(
-    useCallback(() => {
-      const loadFormData = async () => {
-        try {
-          // First, try to fetch from backend
-          if (requestId) {
-            const reqId = Number(requestId);
-            if (!isNaN(reqId) && reqId > 0) {
-              console.log(
-                `🔄 Attempting to fetch investment data from backend for reqId: ${reqId}`,
-              );
-
-              const backendData = await fetchInspectionData(reqId);
-
-              if (backendData) {
-                console.log(`✅ Loaded investment data from backend`);
-
-                // Update form with backend data
-                const updatedFormData = {
-                  ...formData,
-                  inspectioninvestment: backendData,
-                };
-
-                setFormData(updatedFormData);
-                setIsExistingData(true);
-
-                // Save to AsyncStorage as backup
-                await AsyncStorage.setItem(
-                  `${jobId}`,
-                  JSON.stringify(updatedFormData),
-                );
-
-                return; // Exit after loading from backend
-              }
-            }
-          }
-
-          // If no backend data, try AsyncStorage
-          console.log(`📂 Checking AsyncStorage for jobId: ${jobId}`);
-          const savedData = await AsyncStorage.getItem(`${jobId}`);
-
-          if (savedData) {
-            const parsedData = JSON.parse(savedData);
-            console.log(`✅ Loaded investment data from AsyncStorage`);
-            setFormData(parsedData);
-            setIsExistingData(true);
-          } else {
-            // No data found anywhere - new entry
-            setIsExistingData(false);
-            console.log("📝 No existing investment data - new entry");
-          }
-        } catch (e) {
-          console.error("Failed to load investment form data", e);
-          setIsExistingData(false);
-        }
-      };
-
-      loadFormData();
-    }, [requestId, jobId]),
-  );
-
+  // 7. UPDATE handleFieldChange
   const handleFieldChange = (
     key: keyof InvestmentInfoData,
     text: string,
     rules: ValidationRule,
   ) => {
-    const { value, error } = validateAndFormat(
-      text,
-      rules,
-      t,
-      formData.inspectioninvestment,
-      key,
+    const { value, error } = validateAndFormat(text, rules, t, formData, key);
+
+    // Update Redux
+    dispatch(
+      updateInvestmentInfo({
+        requestId,
+        updates: { [key]: value },
+      }),
     );
 
-    // Update nested investmentInfo
-    setFormData((prev: any) => ({
-      ...prev,
-      inspectioninvestment: {
-        ...prev.inspectioninvestment,
-        [key]: value,
-      },
-    }));
-
     setErrors((prev) => ({ ...prev, [key]: error || "" }));
-    updateFormData({ [key]: value });
   };
 
+  // 8. UPDATE handleNext - Mark as existing after save
   const handleNext = async () => {
     const validationErrors: Record<string, string> = {};
-    const investmentInfo = formData.inspectioninvestment;
 
     // Validate required fields
     if (
-      !investmentInfo?.expected ||
-      investmentInfo.expected.toString().trim() === "" ||
-      investmentInfo.expected === 0
+      !formData?.expected ||
+      formData.expected.toString().trim() === "" ||
+      formData.expected === 0
     ) {
       validationErrors.expected = t("Error.expected is required");
     }
-    if (!investmentInfo?.purpose || investmentInfo.purpose.trim() === "") {
+    if (!formData?.purpose || formData.purpose.trim() === "") {
       validationErrors.purpose = t("Error.purpose is required");
     }
     if (
-      !investmentInfo?.repaymentMonth ||
-      investmentInfo.repaymentMonth.toString().trim() === "" ||
-      investmentInfo.repaymentMonth === 0
+      !formData?.repaymentMonth ||
+      formData.repaymentMonth.toString().trim() === "" ||
+      formData.repaymentMonth === 0
     ) {
       validationErrors.repaymentMonth = t("Error.repaymentMonth is required");
     }
@@ -421,8 +406,8 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
       return;
     }
 
-    // ✅ Validate requestId exists
-    if (!route.params?.requestId) {
+    // Validate requestId exists
+    if (!requestId) {
       console.error("❌ requestId is missing!");
       Alert.alert(
         t("Error.Error"),
@@ -432,11 +417,11 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
       return;
     }
 
-    const reqId = Number(route.params.requestId);
+    const reqId = Number(requestId);
 
-    // ✅ Validate it's a valid number
+    // Validate it's a valid number
     if (isNaN(reqId) || reqId <= 0) {
-      console.error("❌ Invalid requestId:", route.params.requestId);
+      console.error("❌ Invalid requestId:", requestId);
       Alert.alert(
         t("Error.Error"),
         "Invalid request ID. Please go back and try again.",
@@ -464,13 +449,15 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
       const saved = await saveToBackend(
         reqId,
         "inspectioninvestment",
-        formData.inspectioninvestment!,
+        formData, // Now from Redux
         isExistingData,
       );
 
       if (saved) {
         console.log("✅ Investment info saved successfully to backend");
-        setIsExistingData(true);
+
+        // Mark as existing in Redux
+        dispatch(markInvestmentAsExisting({ requestId }));
 
         Alert.alert(
           t("Main.Success"),
@@ -480,9 +467,9 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
               text: t("Main.ok"),
               onPress: () => {
                 navigation.navigate("CultivationInfo", {
-                  formData,
+                  formData: { inspectioninvestment: formData },
                   requestNumber,
-                  requestId: route.params.requestId,
+                  requestId,
                 });
               },
             },
@@ -498,9 +485,9 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
               text: t("Main.Continue"),
               onPress: () => {
                 navigation.navigate("CultivationInfo", {
-                  formData,
+                  formData: { inspectioninvestment: formData },
                   requestNumber,
-                  requestId: route.params.requestId,
+                  requestId,
                 });
               },
             },
@@ -517,9 +504,9 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
             text: t("Main.Continue"),
             onPress: () => {
               navigation.navigate("CultivationInfo", {
-                formData,
+                formData: { inspectioninvestment: formData },
                 requestNumber,
-                requestId: route.params.requestId,
+                requestId,
               });
             },
           },
@@ -535,8 +522,6 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
     >
       <View className="flex-1 bg-[#F3F3F3] ">
         <StatusBar barStyle="dark-content" />
-
-        {/* Tabs */}
         <FormTabs activeKey="Investment Info" navigation={navigation} />
 
         <ScrollView
@@ -548,7 +533,7 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
           <Input
             label={t("InspectionForm.Expected investment by the farmer")}
             placeholder="0.00"
-            value={formData.inspectioninvestment?.expected?.toString() || ""}
+            value={formData.expected?.toString() || ""}
             onChangeText={(text) =>
               handleFieldChange("expected", text, {
                 required: true,
@@ -566,7 +551,7 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
               "InspectionForm.Purpose for investment required as per the farmer",
             )}
             placeholder="----"
-            value={formData.inspectioninvestment?.purpose}
+            value={formData.purpose}
             onChangeText={(text) =>
               handleFieldChange("purpose", text, {
                 required: true,
@@ -582,9 +567,7 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
               "InspectionForm.Expected repayment period as per the farmer in months",
             )}
             placeholder="----"
-            value={
-              formData.inspectioninvestment?.repaymentMonth?.toString() || ""
-            }
+            value={formData.repaymentMonth?.toString() || ""}
             onChangeText={(text) =>
               handleFieldChange("repaymentMonth", text, {
                 required: true,
@@ -597,45 +580,13 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
           />
         </ScrollView>
 
-        <View className="flex-row px-6 py-4 gap-4 bg-white border-t border-gray-200 ">
-          <TouchableOpacity
-            className="flex-1 bg-[#444444] rounded-full py-4 items-center"
-            onPress={() => navigation.goBack()}
-          >
-            <Text className="text-white text-base font-semibold">
-              {t("InspectionForm.Back")}
-            </Text>
-          </TouchableOpacity>
-          {isNextEnabled == true ? (
-            <View className="flex-1">
-              <TouchableOpacity className="flex-1 " onPress={handleNext}>
-                <LinearGradient
-                  colors={["#F35125", "#FF1D85"]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  className=" rounded-full py-4 items-center"
-                  style={{
-                    shadowColor: "#000",
-                    shadowOffset: { width: 0, height: 3 },
-                    shadowOpacity: 0.25,
-                    shadowRadius: 5,
-                    elevation: 6,
-                  }}
-                >
-                  <Text className="text-white text-base font-semibold">
-                    {t("InspectionForm.Next")}
-                  </Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <View className="flex-1 bg-gray-300 rounded-full py-4 items-center">
-              <Text className="text-white text-base font-semibold">
-                {t("InspectionForm.Next")}
-              </Text>
-            </View>
-          )}
-        </View>
+        <FormFooterButton
+          exitText={t("InspectionForm.Back")}
+          nextText={t("InspectionForm.Next")}
+          isNextEnabled={isNextEnabled}
+          onExit={() => navigation.goBack()}
+          onNext={handleNext}
+        />
       </View>
     </KeyboardAvoidingView>
   );
