@@ -399,6 +399,7 @@
   "Visits": {
     "Pending": "Pending",
     "Completed": "Completed",
+    "Ongoing":"Ongoing",
     "Request Placed": "Request Placed",
     "Request Reviewed": "Request Reviewed",
     "Finished": "Finished",

@@ -399,6 +399,7 @@
   "Visits": {
     "Pending": "පූර්ණ වෙමින්",
     "Completed": "සම්පූර්ණ කළා",
+    "Ongoing":"ක්‍රියාත්මකයි",
     "Request Placed": "ඉල්ලීම ඉදිරිපත් කළා",
     "Request Reviewed": "ඉල්ලීම සමාලෝචනය කළා",
     "Finished": "අවසන් කළා",
