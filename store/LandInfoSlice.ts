@@ -1,7 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Types
 export type LandImage = {
   uri: string;
   name: string;
@@ -25,20 +24,32 @@ export type LandInfoData = {
 type LandInfoState = {
   data: Record<string, LandInfoData>;
   isExisting: Record<string, boolean>;
+  currentRequestId: number | null; // ✅ Added
 };
 
 const initialState: LandInfoState = {
   data: {},
   isExisting: {},
+  currentRequestId: null, // ✅ Added
 };
 
 const landInfoSlice = createSlice({
   name: 'inspectionland',
   initialState,
   reducers: {
-    // Initialize land info for a specific requestId
+    // ✅ UPDATED with auto-clear
     initializeLandInfo: (state, action: PayloadAction<{ requestId: number }>) => {
       const { requestId } = action.payload;
+      
+      // ✅ Auto-clear when switching requests
+      if (state.currentRequestId !== null && state.currentRequestId !== requestId) {
+        console.log(`🗑️ [LandInfo] Clearing data for old request ${state.currentRequestId}`);
+        delete state.data[state.currentRequestId];
+        delete state.isExisting[state.currentRequestId];
+      }
+      
+      state.currentRequestId = requestId;
+      
       if (!state.data[requestId]) {
         state.data[requestId] = {
           landDiscription: '',
@@ -51,7 +62,6 @@ const landInfoSlice = createSlice({
       }
     },
 
-    // Set complete land info data
     setLandInfo: (
       state,
       action: PayloadAction<{
@@ -65,7 +75,6 @@ const landInfoSlice = createSlice({
       state.isExisting[requestId] = isExisting;
     },
 
-    // Update partial land info
     updateLandInfo: (
       state,
       action: PayloadAction<{
@@ -82,7 +91,6 @@ const landInfoSlice = createSlice({
       }
     },
 
-    // Add image to the images array
     addImage: (
       state,
       action: PayloadAction<{
@@ -99,7 +107,6 @@ const landInfoSlice = createSlice({
       }
     },
 
-    // Remove image from the images array by index
     removeImage: (
       state,
       action: PayloadAction<{
@@ -115,7 +122,6 @@ const landInfoSlice = createSlice({
       }
     },
 
-    // Update all images at once
     setImages: (
       state,
       action: PayloadAction<{
@@ -129,7 +135,6 @@ const landInfoSlice = createSlice({
       }
     },
 
-    // Update geo location
     setGeoLocation: (
       state,
       action: PayloadAction<{
@@ -143,13 +148,11 @@ const landInfoSlice = createSlice({
       }
     },
 
-    // Mark as existing data (UPDATE mode)
     markAsExisting: (state, action: PayloadAction<{ requestId: number }>) => {
       const { requestId } = action.payload;
       state.isExisting[requestId] = true;
     },
 
-    // Load from AsyncStorage
     loadLandInfoFromStorage: (
       state,
       action: PayloadAction<{
@@ -162,7 +165,6 @@ const landInfoSlice = createSlice({
       state.isExisting[requestId] = true;
     },
 
-    // Reset land info data for a specific requestId
     resetLandInfoData: (state, action: PayloadAction<{ requestId: number }>) => {
       const { requestId } = action.payload;
       state.data[requestId] = {
@@ -175,10 +177,10 @@ const landInfoSlice = createSlice({
       state.isExisting[requestId] = false;
     },
 
-    // Clear all land info data
     clearAllLandInfo: (state) => {
       state.data = {};
       state.isExisting = {};
+      state.currentRequestId = null; // ✅ Added
     },
   },
 });
@@ -199,7 +201,6 @@ export const {
 
 export default landInfoSlice.reducer;
 
-// Async thunk for saving to AsyncStorage
 export const saveLandInfoToStorage = async (
   requestId: number,
   data: LandInfoData
@@ -215,7 +216,6 @@ export const saveLandInfoToStorage = async (
   }
 };
 
-// Async thunk for loading from AsyncStorage
 export const loadLandInfoFromStorageAsync = async (
   requestId: number
 ): Promise<LandInfoData | null> => {

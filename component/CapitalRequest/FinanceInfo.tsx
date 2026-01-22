@@ -27,7 +27,7 @@ import branchesData from "@/assets/json/branches.json";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 import { useDispatch, useSelector } from "react-redux";
-import { setFinanceInfo, updateFinanceInfo } from "@/store/financeInfoSlice";
+import { initializeFinanceInfo, setFinanceInfo, updateFinanceInfo } from "@/store/financeInfoSlice";
 import { RootState } from "@/services/store";
 import FormFooterButton from "./FormFooterButton";
 
@@ -166,9 +166,13 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
 
   // Get data from Redux store
   const jobId = requestNumber;
-  const storedFormData = useSelector(
-    (state: RootState) => state.financeInfo[jobId],
-  );
+  const storedFormData = useSelector((state: RootState) => state.financeInfo.data[jobId]);
+
+// Also call initialize when component mounts
+useEffect(() => {
+  dispatch(initializeFinanceInfo({ requestId }));
+}, [requestId, dispatch]);
+
 
   const [formData, setFormData] = useState(
     prevFormData || storedFormData || {},

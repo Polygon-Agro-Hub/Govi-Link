@@ -17,19 +17,32 @@ type ProfitRiskState = {
   isExisting: {
     [requestId: number]: boolean;
   };
+  currentRequestId: number | null; // ✅ Added
 };
 
 const initialState: ProfitRiskState = {
   data: {},
   isExisting: {},
+  currentRequestId: null, // ✅ Added
 };
 
 const profitRiskSlice = createSlice({
   name: 'profitRisk',
   initialState,
   reducers: {
+    // ✅ UPDATED with auto-clear
     initializeProfitRisk: (state, action: PayloadAction<{ requestId: number }>) => {
       const { requestId } = action.payload;
+      
+      // ✅ Auto-clear when switching requests
+      if (state.currentRequestId !== null && state.currentRequestId !== requestId) {
+        console.log(`🗑️ [ProfitRisk] Clearing data for old request ${state.currentRequestId}`);
+        delete state.data[state.currentRequestId];
+        delete state.isExisting[state.currentRequestId];
+      }
+      
+      state.currentRequestId = requestId;
+      
       if (!state.data[requestId]) {
         state.data[requestId] = {
           profit: '',
@@ -89,6 +102,7 @@ const profitRiskSlice = createSlice({
     clearAllProfitRisk: (state) => {
       state.data = {};
       state.isExisting = {};
+      state.currentRequestId = null; // ✅ Added
     },
   },
 });

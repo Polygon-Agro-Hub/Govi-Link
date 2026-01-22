@@ -14,9 +14,11 @@ import { useTranslation } from "react-i18next";
 import { LinearGradient } from "expo-linear-gradient";
 import { MaterialIcons } from "@expo/vector-icons";
 import Svg, { Circle, G, Text as SvgText } from "react-native-svg";
-import { RouteProp, useRoute } from "@react-navigation/native";
+import { RouteProp, useRoute, useFocusEffect } from "@react-navigation/native";
 import { environment } from "@/environment/environment";
 import axios from "axios";
+import { useDispatch } from "react-redux";
+import { clearAllInspectionSlices } from "@/store/clearAllSlices";
 
 type ConfirmationCapitalRequestNavigationProps = StackNavigationProp<
   RootStackParamList,
@@ -27,18 +29,6 @@ interface ConfirmationCapitalRequestProps {
   navigation: ConfirmationCapitalRequestNavigationProps;
 }
 
-interface Officer {
-  id: number;
-  firstName: string;
-  firstNameSinhala: string;
-  firstNameTamil: string;
-  lastName: string;
-  lastNameSinhala: string;
-  lastNameTamil: string;
-  empId: string;
-  assigned: number;
-}
-
 const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
   navigation,
 }) => {
@@ -46,10 +36,9 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
     useRoute<RouteProp<RootStackParamList, "ConfirmationCapitalRequest">>();
   const { formData, requestNumber, requestId } = route.params;
 
-  const { t, i18n } = useTranslation();
-  const [loading, setLoading] = useState(false);
+  const { t } = useTranslation();
+  const dispatch = useDispatch();
   const [assigning, setAssigning] = useState(false);
-  const [selectedOfficer, setSelectedOfficer] = useState<Officer | null>(null);
   const [showConfirmationModal, setShowConfirmationModal] = useState(true);
   const [countdown, setCountdown] = useState(20);
 
@@ -58,9 +47,37 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
   const countdownAnim = useRef(new Animated.Value(20)).current;
 
   const animationRef = useRef<Animated.CompositeAnimation | null>(null);
+  const hasNavigatedRef = useRef(false); // ✅ Prevent multiple navigations
+  const isAnimationStartedRef = useRef(false); // ✅ Prevent animation restart
+
+  // In ConfirmationCapitalRequest.tsx - SIMPLEST FIX
+  const navigateToCapitalRequests = useCallback(() => {
+    if (hasNavigatedRef.current) {
+      console.log("⏭️ Already navigating, skipping");
+      return;
+    }
+
+    hasNavigatedRef.current = true;
+
+    // ✅ Just navigate - don't clear slices!
+    console.log("🚀 Navigating to CapitalRequests");
+    navigation.replace("Main", {
+      screen: "MainTabs",
+      params: {
+        screen: "CapitalRequests",
+      },
+    });
+
+  }, [navigation]);
 
   // ✅ Stable handleAutoAssign using useCallback
   const handleAutoAssign = useCallback(() => {
+    if (hasNavigatedRef.current) {
+      console.log("⏭️ Already navigating, skipping auto-assign");
+      return;
+    }
+
+    hasNavigatedRef.current = true;
     setShowConfirmationModal(false);
 
     // Mock auto assignment - UI only
@@ -73,23 +90,23 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
         [
           {
             text: t("Main.ok"),
-            onPress: () => {
-              // Navigate to CapitalRequests page
-              navigation.navigate("Main", {
-                screen: "MainTabs",
-                params: {
-                  screen: "CapitalRequests",
-                },
-              });
-            },
+            onPress: navigateToCapitalRequests,
           },
         ]
       );
     }, 1500);
-  }, [navigation, t]);
+  }, [t, navigateToCapitalRequests]);
 
   // ✅ Stable startCountdownAnimation using useCallback
   const startCountdownAnimation = useCallback(() => {
+    // ✅ Only start animation once
+    if (isAnimationStartedRef.current) {
+      console.log("⏭️ Animation already started, skipping");
+      return;
+    }
+
+    isAnimationStartedRef.current = true;
+
     progressAnim.setValue(100);
     countdownAnim.setValue(20);
 
@@ -119,17 +136,21 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
     });
   }, [progressAnim, countdownAnim, handleAutoAssign]);
 
-  // ✅ Start smooth countdown animation when component mounts - ONLY ONCE
+  // ✅ Start countdown animation - ONLY ONCE on mount
   useEffect(() => {
+    console.log("🎬 ConfirmationCapitalRequest mounted");
     startCountdownAnimation();
 
     return () => {
+      console.log("🛑 ConfirmationCapitalRequest unmounting");
       if (animationRef.current) {
         animationRef.current.stop();
       }
+      // ✅ Reset refs on unmount
+      isAnimationStartedRef.current = false;
+      hasNavigatedRef.current = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Empty array - runs only once on mount
+  }, [startCountdownAnimation]);
 
   // ✅ Update countdown value based on animation
   useEffect(() => {
@@ -143,7 +164,23 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
     };
   }, [countdownAnim]);
 
+  // ✅ Prevent refocusing from causing issues
+  useFocusEffect(
+    useCallback(() => {
+      console.log("👀 ConfirmationCapitalRequest focused");
+
+      return () => {
+        console.log("👋 ConfirmationCapitalRequest blurred");
+      };
+    }, [])
+  );
+
   const handleUndo = async () => {
+    if (hasNavigatedRef.current) {
+      console.log("⏭️ Already navigating, skipping undo");
+      return;
+    }
+
     if (animationRef.current) {
       animationRef.current.stop();
     }
@@ -171,15 +208,7 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
           [
             {
               text: t("Main.ok"),
-              onPress: () => {
-                // Navigate to CapitalRequests page
-                navigation.navigate("Main", {
-                  screen: "MainTabs",
-                  params: {
-                    screen: "CapitalRequests",
-                  },
-                });
-              },
+              onPress: navigateToCapitalRequests,
             },
           ]
         );
@@ -199,9 +228,15 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
   };
 
   const handleConfirmAndLeave = () => {
+    if (hasNavigatedRef.current) {
+      console.log("⏭️ Already navigating, skipping confirm");
+      return;
+    }
+
     if (animationRef.current) {
       animationRef.current.stop();
     }
+
     setShowConfirmationModal(false);
 
     // Mock assignment - UI only
@@ -214,15 +249,7 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
         [
           {
             text: t("Main.ok"),
-            onPress: () => {
-              // Navigate to CapitalRequests page
-              navigation.navigate("Main", {
-                screen: "MainTabs",
-                params: {
-                  screen: "CapitalRequests",
-                },
-              });
-            },
+            onPress: navigateToCapitalRequests,
           },
         ]
       );
@@ -253,16 +280,13 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
       <View className="flex-row items-center px-4 py-3 border-b border-gray-200">
         <TouchableOpacity
           onPress={() => {
+            if (hasNavigatedRef.current) {
+              return;
+            }
             if (showConfirmationModal) {
               handleUndo();
             } else {
-              // Navigate to CapitalRequests page
-              navigation.navigate("Main", {
-                screen: "MainTabs",
-                params: {
-                  screen: "CapitalRequests",
-                },
-              });
+              navigateToCapitalRequests();
             }
           }}
           className="bg-[#F6F6F680] rounded-full py-4 px-3"
@@ -352,10 +376,9 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
               {/* Undo Button */}
               <TouchableOpacity
                 onPress={handleUndo}
-                disabled={assigning}
-                className={`px-10 py-3 rounded-3xl items-center ml-3 mt-auto ${
-                  assigning ? "bg-gray-400" : "bg-black"
-                }`}
+                disabled={assigning || hasNavigatedRef.current}
+                className={`px-10 py-3 rounded-3xl items-center ml-3 mt-auto ${assigning || hasNavigatedRef.current ? "bg-gray-400" : "bg-black"
+                  }`}
               >
                 {assigning ? (
                   <ActivityIndicator size="small" color="white" />
@@ -373,12 +396,14 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
         <View className="px-12 pb-8 mt-auto mb-14">
           <TouchableOpacity
             onPress={handleConfirmAndLeave}
-            disabled={assigning}
+            disabled={assigning || hasNavigatedRef.current}
             className="w-full"
           >
             <LinearGradient
               colors={
-                assigning ? ["#CCCCCC", "#CCCCCC"] : ["#F2561D", "#FF1D85"]
+                assigning || hasNavigatedRef.current
+                  ? ["#CCCCCC", "#CCCCCC"]
+                  : ["#F2561D", "#FF1D85"]
               }
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}

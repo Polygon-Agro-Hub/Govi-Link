@@ -20,10 +20,6 @@ import { RootStackParamList } from "../types";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 import ConfirmationModal from "@/Items/ConfirmationModal";
-import { clearAllIDProof } from "@/store/IDproofSlice";
-import { clearAllPersonalInfo } from "@/store/personalInfoSlice";
-import { clearAllLandInfo } from "@/store/LandInfoSlice";
-import { clearLabourInfo } from "@/store/labourSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/services/store";
 import FormFooterButton from "./FormFooterButton";
@@ -33,15 +29,9 @@ import {
   updateHarvestStorageInfo,
   clearConditionalField,
   markAsExisting,
-  clearHarvestStorageInfo,
   HarvestStorageData,
 } from "@/store/HarvestStorageSlice";
-import { clearAllInvestmentInfo } from "@/store/investmentInfoSlice";
-import { clearFinanceInfo } from "@/store/financeInfoSlice";
-import { clearAllCroppingSystems } from "@/store/croppingSystemsSlice";
-import { clearEconomical } from "@/store/economicalSlice";
-import { clearAllCultivationInfo } from "@/store/cultivationInfoSlice";
-import { clearAllProfitRisk } from "@/store/profitRiskSlice";
+import { clearAllInspectionSlices } from "@/store/clearAllSlices";
 
 type HarvestStorageProps = {
   navigation: any;
@@ -132,12 +122,16 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
   const [yesNoModalVisible, setYesNoModalVisible] = useState(false);
   const [activeYesNoField, setActiveYesNoField] = useState<string | null>(null);
   const [isNextEnabled, setIsNextEnabled] = useState(false);
-  const [confirmationModalVisible, setConfirmationModalVisible] =
-    useState(false);
+  const [confirmationModalVisible, setConfirmationModalVisible] = useState(false);
   const [successModalVisible, setSuccessModalVisible] = useState(false);
   const [errorModalVisible, setErrorModalVisible] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const dispatch = useDispatch();
+
+  // ✅ Add refs to prevent loops
+  const isFetchingRef = useRef(false);
+  const hasNavigatedRef = useRef(false);
+  const isInitializedRef = useRef(false); // ✅ Track if data is already loaded
 
   // Get data from Redux store
   const formData = useSelector(
@@ -190,62 +184,6 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
     );
   }, [formData, errors]);
 
-  // Fetch harvest storage info from backend
-  const fetchInspectionData = useCallback(
-    async (reqId: number): Promise<HarvestStorageData | null> => {
-      try {
-        console.log(`🔍 Fetching harvest storage data for reqId: ${reqId}`);
-
-        const response = await axios.get(
-          `${environment.API_BASE_URL}api/capital-request/inspection/get`,
-          {
-            params: {
-              reqId,
-              tableName: "inspectionharveststorage",
-            },
-          },
-        );
-
-        if (response.data.success && response.data.data) {
-          console.log(
-            `✅ Fetched existing harvest storage data:`,
-            response.data.data,
-          );
-
-          const data = response.data.data;
-
-          const boolToYesNo = (val: any): "Yes" | "No" | undefined => {
-            if (val === 1 || val === "1" || val === true) return "Yes";
-            if (val === 0 || val === "0" || val === false) return "No";
-            return undefined;
-          };
-
-          return {
-            hasOwnStorage: boolToYesNo(data.hasOwnStorage),
-            ifNotHasFacilityAccess: boolToYesNo(data.ifNotHasFacilityAccess),
-            hasPrimaryProcessingAccess: boolToYesNo(
-              data.hasPrimaryProcessingAccess,
-            ),
-            knowsValueAdditionTech: boolToYesNo(data.knowsValueAdditionTech),
-            hasValueAddedMarketLinkage: boolToYesNo(
-              data.hasValueAddedMarketLinkage,
-            ),
-            awareOfQualityStandards: boolToYesNo(data.awareOfQualityStandards),
-          };
-        }
-
-        return null;
-      } catch (error: any) {
-        console.error(`❌ Error fetching harvest storage data:`, error);
-        if (error.response?.status === 404) {
-          console.log(`📝 No existing record - will create new`);
-        }
-        return null;
-      }
-    },
-    [],
-  );
-
   // Save to backend
   const saveToBackend = async (
     reqId: number,
@@ -271,7 +209,6 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
         transformedData.hasOwnStorage = yesNoToInt(data.hasOwnStorage);
       }
 
-      // Conditional field
       if (data.hasOwnStorage === "No" && data.ifNotHasFacilityAccess !== undefined) {
         transformedData.ifNotHasFacilityAccess = yesNoToInt(
           data.ifNotHasFacilityAccess,
@@ -323,22 +260,80 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
     }
   };
 
-  // Load data on focus
+  // ✅ CRITICAL FIX: Only load data ONCE per mount
   useFocusEffect(
     useCallback(() => {
+      // ✅ Reset navigation flag
+      hasNavigatedRef.current = false;
+
+      // ✅ SKIP if already initialized for this requestId
+      if (isInitializedRef.current) {
+        console.log("⏭️ Data already loaded for this screen, skipping fetch");
+        return;
+      }
+
+      const fetchInspectionData = async (
+        reqId: number,
+      ): Promise<HarvestStorageData | null> => {
+        try {
+          const response = await axios.get(
+            `${environment.API_BASE_URL}api/capital-request/inspection/get`,
+            {
+              params: {
+                reqId,
+                tableName: "inspectionharveststorage",
+              },
+            },
+          );
+
+          if (response.data.success && response.data.data) {
+            const data = response.data.data;
+
+            const boolToYesNo = (val: any): "Yes" | "No" | undefined => {
+              if (val === 1 || val === "1" || val === true) return "Yes";
+              if (val === 0 || val === "0" || val === false) return "No";
+              return undefined;
+            };
+
+            return {
+              hasOwnStorage: boolToYesNo(data.hasOwnStorage),
+              ifNotHasFacilityAccess: boolToYesNo(data.ifNotHasFacilityAccess),
+              hasPrimaryProcessingAccess: boolToYesNo(
+                data.hasPrimaryProcessingAccess,
+              ),
+              knowsValueAdditionTech: boolToYesNo(data.knowsValueAdditionTech),
+              hasValueAddedMarketLinkage: boolToYesNo(
+                data.hasValueAddedMarketLinkage,
+              ),
+              awareOfQualityStandards: boolToYesNo(data.awareOfQualityStandards),
+            };
+          }
+
+          return null;
+        } catch (error: any) {
+          if (error.response?.status !== 404) {
+            console.error(`❌ Error fetching harvest storage data:`, error);
+          }
+          return null;
+        }
+      };
+
       const loadData = async () => {
+        if (isFetchingRef.current) {
+          return;
+        }
+
+        isFetchingRef.current = true;
+
         try {
           dispatch(initializeHarvestStorage({ requestId }));
 
-          // Try to fetch from backend first
           if (requestId) {
             const reqId = Number(requestId);
             if (!isNaN(reqId) && reqId > 0) {
-              // ✅ Call fetchInspectionData directly without adding it to dependencies
               const backendData = await fetchInspectionData(reqId);
 
               if (backendData) {
-                console.log(`✅ Loaded harvest storage data from backend`);
                 dispatch(
                   setHarvestStorageInfo({
                     requestId,
@@ -346,22 +341,28 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
                     isExisting: true,
                   }),
                 );
-                return;
               }
             }
           }
 
-          console.log("📝 No existing harvest storage data - new entry");
+          // ✅ Mark as initialized
+          isInitializedRef.current = true;
         } catch (error) {
           console.error("Failed to load harvest storage data", error);
+        } finally {
+          isFetchingRef.current = false;
         }
       };
 
       loadData();
+
+      // ✅ Cleanup: Reset initialization flag when component unmounts
+      return () => {
+        isInitializedRef.current = false;
+      };
     }, [requestId, dispatch]),
   );
 
-  // Handle field changes
   const handleyesNOFieldChange = (key: string, value: "Yes" | "No") => {
     if (key === "hasOwnStorage" && value === "Yes") {
       dispatch(clearConditionalField({ requestId }));
@@ -375,16 +376,13 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
     );
   };
 
-  // Handle next button
   const handleNext = () => {
     const validationErrors: Record<string, string> = {};
 
-    // Validate required fields
     if (!formData?.hasOwnStorage) {
       validationErrors.hasOwnStorage = t("Error.Own storage field is required");
     }
 
-    // Conditional validation
     if (
       formData?.hasOwnStorage === "No" &&
       !formData?.ifNotHasFacilityAccess
@@ -458,11 +456,9 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
       setIsSaving(false);
 
       if (saved) {
-        console.log("✅ Harvest storage info saved successfully to backend");
         dispatch(markAsExisting({ requestId }));
         setSuccessModalVisible(true);
       } else {
-        console.log("⚠️ Backend save failed");
         setErrorModalVisible(true);
       }
     } catch (error) {
@@ -472,38 +468,19 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
     }
   };
 
-  const handleSuccessClose = async () => {
+  const handleSuccessClose = () => {
+    if (hasNavigatedRef.current) {
+      return;
+    }
+
+    hasNavigatedRef.current = true;
     setSuccessModalVisible(false);
 
-    try {
-      // Clear all Redux slices
-      console.log("🗑️ Clearing all Redux slices...");
-      dispatch(clearAllIDProof());
-      dispatch(clearAllPersonalInfo());
-      dispatch(clearAllLandInfo());
-      dispatch(clearLabourInfo({ requestId }));
-      dispatch(clearHarvestStorageInfo({ requestId }));
-      dispatch(clearAllInvestmentInfo());
-      dispatch(clearFinanceInfo(requestId));
-      dispatch(clearAllCroppingSystems());
-      dispatch(clearEconomical({ requestId }));
-      dispatch(clearAllCultivationInfo());
-      dispatch(clearAllProfitRisk());
-
-      console.log("✅ All Redux slices cleared successfully");
-
-      // Navigate to confirmation page
-      navigation.navigate("ConfirmationCapitalRequest", {
-        requestNumber: requestNumber,
-        requestId: requestId,
-      });
-    } catch (error) {
-      console.error("❌ Error during cleanup:", error);
-      navigation.navigate("ConfirmationCapitalRequest", {
-        requestNumber: requestNumber,
-        requestId: requestId,
-      });
-    }
+    // ✅ Just navigate - don't clear yet
+    navigation.replace("ConfirmationCapitalRequest", {
+      requestNumber: requestNumber,
+      requestId: requestId,
+    });
   };
 
   const handleErrorClose = () => {

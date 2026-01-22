@@ -13,19 +13,32 @@ export type LabourData = {
 interface LabourState {
   data: Record<string, LabourData>;
   isExisting: Record<string, boolean>;
+  currentRequestId: number | null; // ✅ Added
 }
 
 const initialState: LabourState = {
   data: {},
   isExisting: {},
+  currentRequestId: null, // ✅ Added
 };
 
 const labourSlice = createSlice({
   name: "labourInfo",
   initialState,
   reducers: {
+    // ✅ UPDATED with auto-clear
     initializeLabour: (state, action: PayloadAction<{ requestId: number }>) => {
       const { requestId } = action.payload;
+      
+      // ✅ Auto-clear when switching requests
+      if (state.currentRequestId !== null && state.currentRequestId !== requestId) {
+        console.log(`🗑️ [Labour] Clearing data for old request ${state.currentRequestId}`);
+        delete state.data[state.currentRequestId];
+        delete state.isExisting[state.currentRequestId];
+      }
+      
+      state.currentRequestId = requestId;
+      
       if (!state.data[requestId]) {
         state.data[requestId] = {};
         state.isExisting[requestId] = false;
@@ -91,6 +104,12 @@ const labourSlice = createSlice({
       delete state.data[requestId];
       delete state.isExisting[requestId];
     },
+    
+    clearAllLabour: (state) => {
+      state.data = {};
+      state.isExisting = {};
+      state.currentRequestId = null; // ✅ Added
+    },
   },
 });
 
@@ -101,6 +120,7 @@ export const {
   clearConditionalFields,
   markAsExisting,
   clearLabourInfo,
+  clearAllLabour,
 } = labourSlice.actions;
 
 export default labourSlice.reducer;

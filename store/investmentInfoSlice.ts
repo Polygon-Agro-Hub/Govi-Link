@@ -1,4 +1,3 @@
-// store/slices/investmentInfoSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export type InvestmentInfoData = {
@@ -14,6 +13,7 @@ interface InvestmentInfoState {
   isExisting: {
     [requestId: number]: boolean;
   };
+  currentRequestId: number | null; // ✅ Added
 }
 
 const initialInvestmentInfo: InvestmentInfoData = {
@@ -25,22 +25,32 @@ const initialInvestmentInfo: InvestmentInfoData = {
 const initialState: InvestmentInfoState = {
   data: {},
   isExisting: {},
+  currentRequestId: null, // ✅ Added
 };
 
 const investmentInfoSlice = createSlice({
   name: 'investmentInfo',
   initialState,
   reducers: {
-    // Initialize investment info for a request
+    // ✅ UPDATED with auto-clear
     initializeInvestmentInfo: (state, action: PayloadAction<{ requestId: number }>) => {
       const { requestId } = action.payload;
+      
+      // ✅ Auto-clear when switching requests
+      if (state.currentRequestId !== null && state.currentRequestId !== requestId) {
+        console.log(`🗑️ [InvestmentInfo] Clearing data for old request ${state.currentRequestId}`);
+        delete state.data[state.currentRequestId];
+        delete state.isExisting[state.currentRequestId];
+      }
+      
+      state.currentRequestId = requestId;
+      
       if (!state.data[requestId]) {
         state.data[requestId] = { ...initialInvestmentInfo };
         state.isExisting[requestId] = false;
       }
     },
 
-    // Update specific fields
     updateInvestmentInfo: (
       state,
       action: PayloadAction<{
@@ -58,7 +68,6 @@ const investmentInfoSlice = createSlice({
       };
     },
 
-    // Set complete investment info (used when loading from backend)
     setInvestmentInfo: (
       state,
       action: PayloadAction<{
@@ -72,7 +81,6 @@ const investmentInfoSlice = createSlice({
       state.isExisting[requestId] = isExisting;
     },
 
-    // Mark as existing data (for UPDATE operations)
     markInvestmentAsExisting: (
       state,
       action: PayloadAction<{ requestId: number }>
@@ -81,7 +89,6 @@ const investmentInfoSlice = createSlice({
       state.isExisting[requestId] = true;
     },
 
-    // Clear investment info for a request
     clearInvestmentInfo: (
       state,
       action: PayloadAction<{ requestId: number }>
@@ -91,10 +98,10 @@ const investmentInfoSlice = createSlice({
       delete state.isExisting[requestId];
     },
 
-    // Clear all investment info data
     clearAllInvestmentInfo: (state) => {
       state.data = {};
       state.isExisting = {};
+      state.currentRequestId = null; // ✅ Added
     },
   },
 });

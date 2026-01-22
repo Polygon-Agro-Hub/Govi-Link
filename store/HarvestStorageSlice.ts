@@ -12,22 +12,35 @@ export type HarvestStorageData = {
 interface HarvestStorageState {
   data: Record<number, HarvestStorageData>;
   isExisting: Record<number, boolean>;
+  currentRequestId: number | null; // ✅ Added
 }
 
 const initialState: HarvestStorageState = {
   data: {},
   isExisting: {},
+  currentRequestId: null, // ✅ Added
 };
 
 const harvestStorageSlice = createSlice({
   name: "harvestStorage",
   initialState,
   reducers: {
+    // ✅ UPDATED with auto-clear
     initializeHarvestStorage: (
       state,
       action: PayloadAction<{ requestId: number }>,
     ) => {
       const { requestId } = action.payload;
+      
+      // ✅ Auto-clear when switching requests
+      if (state.currentRequestId !== null && state.currentRequestId !== requestId) {
+        console.log(`🗑️ [HarvestStorage] Clearing data for old request ${state.currentRequestId}`);
+        delete state.data[state.currentRequestId];
+        delete state.isExisting[state.currentRequestId];
+      }
+      
+      state.currentRequestId = requestId;
+      
       if (!state.data[requestId]) {
         state.data[requestId] = {};
         state.isExisting[requestId] = false;
@@ -95,6 +108,7 @@ const harvestStorageSlice = createSlice({
     clearAllHarvestStorage: (state) => {
       state.data = {};
       state.isExisting = {};
+      state.currentRequestId = null; // ✅ Added
     },
   },
 });
