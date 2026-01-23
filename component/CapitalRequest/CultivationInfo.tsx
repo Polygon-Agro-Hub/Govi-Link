@@ -1,4 +1,4 @@
-// CultivationInfo.tsx - Complete Version WITHOUT Redux
+// CultivationInfo.tsx - Complete Version with Multiple Images Support
 import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
@@ -35,11 +35,9 @@ import {
   WaterImage,
 } from "@/database/inspectioncultivation";
 
-// Extend CultivationInfoData with index signature
-declare module "@/database/inspectioncultivation" {
-  interface CultivationInfo {
-    [key: string]: any;
-  }
+// Add index signature to allow string-based property access
+interface CultivationInfoExtended extends CultivationInfoData {
+  [key: string]: any;
 }
 
 const climateParameters = [
@@ -218,7 +216,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
   const { t } = useTranslation();
 
   // Local state for form data
-  const [formData, setFormData] = useState<CultivationInfoData>({
+  const [formData, setFormData] = useState<CultivationInfoExtended>({
     temperature: null,
     rainfall: null,
     sunShine: null,
@@ -232,7 +230,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
     soilfertility: "",
     waterSources: [],
     otherWaterSource: "",
-    waterImage: null,
+    waterImages: [], // Changed from waterImage: null
     isRecevieRainFall: undefined,
     isRainFallSuitableCrop: undefined,
     isRainFallSuitableCultivation: undefined,
@@ -298,8 +296,9 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
 
             // Update selections for climate parameters
             const savedSelections: Record<string, Selection> = {};
+            const extendedLocalData = localData as CultivationInfoExtended;
             climateParameters.forEach(({ key }) => {
-              savedSelections[key] = localData[key] ?? null;
+              savedSelections[key] = extendedLocalData[key] ?? null;
             });
             setSelections(savedSelections);
           } else {
@@ -346,7 +345,8 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
     );
 
     const hasErrors = Object.values(errors).some(Boolean);
-    const isImageValid = !!formData.waterImage;
+    const isImageValid =
+      formData.waterImages && formData.waterImages.length > 0; // Updated validation
 
     setIsNextEnabled(
       allClimateSelected &&
@@ -393,7 +393,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
     };
 
     if (newValue === null) {
-      delete updates[key];
+      delete updates[key as keyof CultivationInfoData];
     }
 
     updateFormData(updates);
@@ -418,7 +418,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
     updateFormData({ [key]: value } as any);
   };
 
-  // Handle camera close
+  // Handle camera close - UPDATED FOR MULTIPLE IMAGES
   const handleCameraClose = async (uri: string | null) => {
     setShowCamera(false);
 
@@ -430,17 +430,25 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
       type: "image/jpeg",
     };
 
-    updateFormData({ waterImage: fileObj });
-    setErrors((prev) => ({ ...prev, waterImage: "" }));
+    // Add new image to existing array
+    const updatedImages = [...(formData?.waterImages || []), fileObj];
+    updateFormData({ waterImages: updatedImages });
+    setErrors((prev) => ({ ...prev, waterImages: "" }));
   };
 
-  // Clear image
-  const onClearImage = () => {
-    updateFormData({ waterImage: null });
-    setErrors((prev) => ({
-      ...prev,
-      waterImage: t("Error.Image of the water source is required"),
-    }));
+  // Clear image - UPDATED TO REMOVE SPECIFIC IMAGE
+  const onClearImage = (index: number) => {
+    const updatedImages = formData.waterImages.filter((_, i) => i !== index);
+    updateFormData({ waterImages: updatedImages });
+
+    if (updatedImages.length === 0) {
+      setErrors((prev) => ({
+        ...prev,
+        waterImages: t(
+          "Error.At least one image of the water source is required",
+        ),
+      }));
+    }
   };
 
   // Handle water source toggle
@@ -507,7 +515,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
     setOverallSoilFertilityVisible(false);
   };
 
-  // Save to backend
+  // Save to backend - UPDATED FOR MULTIPLE IMAGES
   const saveToBackend = async (
     reqId: number,
     tableName: string,
@@ -579,27 +587,31 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
         apiFormData.append("otherWaterSource", data.otherWaterSource);
       }
 
-      // Water image - handle both S3 URLs and local files
-      if (data.waterImage) {
-        if (
-          data.waterImage.uri.startsWith("http://") ||
-          data.waterImage.uri.startsWith("https://")
-        ) {
-          apiFormData.append("waterImageUrl_0", data.waterImage.uri);
-          console.log(
-            `🔗 Keeping existing water image URL: ${data.waterImage.uri}`,
-          );
-        } else if (
-          data.waterImage.uri.startsWith("file://") ||
-          data.waterImage.uri.startsWith("content://")
-        ) {
-          apiFormData.append("waterImage", {
-            uri: data.waterImage.uri,
-            name: data.waterImage.name || `water_${Date.now()}.jpg`,
-            type: data.waterImage.type || "image/jpeg",
-          } as any);
-          console.log(`📤 Uploading new water image`);
-        }
+      // Water images - UPDATED TO HANDLE MULTIPLE IMAGES
+      if (data.waterImages && data.waterImages.length > 0) {
+        data.waterImages.forEach((image, index) => {
+          if (
+            image.uri.startsWith("http://") ||
+            image.uri.startsWith("https://")
+          ) {
+            // Existing S3 URL
+            apiFormData.append(`waterImageUrl_${index}`, image.uri);
+            console.log(
+              `🔗 Keeping existing water image URL ${index}: ${image.uri}`,
+            );
+          } else if (
+            image.uri.startsWith("file://") ||
+            image.uri.startsWith("content://")
+          ) {
+            // New local file to upload
+            apiFormData.append(`waterImage_${index}`, {
+              uri: image.uri,
+              name: image.name || `water_${Date.now()}_${index}.jpg`,
+              type: image.type || "image/jpeg",
+            } as any);
+            console.log(`📤 Uploading new water image ${index}`);
+          }
+        });
       }
 
       const response = await axios.post(
@@ -615,7 +627,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
       if (response.data.success) {
         console.log(`✅ Cultivation info saved successfully`);
 
-        // Update waterImage with S3 URL if returned
+        // Update waterImages with S3 URLs if returned
         if (response.data.data.waterImage) {
           let imageUrls = response.data.data.waterImage;
           if (typeof imageUrls === "string") {
@@ -627,14 +639,16 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
           }
 
           if (Array.isArray(imageUrls) && imageUrls.length > 0) {
-            const imageObject: WaterImage = {
-              uri: imageUrls[0],
-              name: imageUrls[0].split("/").pop() || "water.jpg",
-              type: "image/jpeg",
-            };
+            const imageObjects: WaterImage[] = imageUrls.map(
+              (url: string, index: number) => ({
+                uri: url,
+                name: url.split("/").pop() || `water_${index}.jpg`,
+                type: "image/jpeg",
+              }),
+            );
 
-            updateFormData({ waterImage: imageObject });
-            console.log("💾 Updated with S3 water image URL");
+            updateFormData({ waterImages: imageObjects });
+            console.log("💾 Updated with S3 water image URLs");
           }
         }
 
@@ -648,7 +662,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
     }
   };
 
-  // Handle next button
+  // Handle next button - UPDATED VALIDATION
   const handleNext = async () => {
     const validationErrors: Record<string, string> = {};
 
@@ -676,9 +690,9 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
         "Error.Overall soil fertility is required",
       );
     }
-    if (!formData?.waterImage) {
-      validationErrors.waterImage = t(
-        "Error.Image of the water source is required",
+    if (!formData?.waterImages || formData.waterImages.length === 0) {
+      validationErrors.waterImages = t(
+        "Error.At least one image of the water source is required",
       );
     }
 
@@ -798,7 +812,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
     }
   };
 
-  const image = formData?.waterImage?.uri;
+  const images = formData?.waterImages || [];
 
   return (
     <KeyboardAvoidingView
@@ -881,7 +895,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
           </View>
 
           {/* Fixed after this line */}
-          
+
           <YesNoSelect
             label={t(
               "InspectionForm.Is the crop / cropping system suitable for local soil type",
@@ -901,7 +915,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
           />
 
           <View className="mt-4" />
-          
+
           <Input
             label={t("InspectionForm.pH")}
             placeholder="----"
@@ -983,35 +997,38 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
                 setShowCamera(true);
               }}
             >
-              {image ? (
-                <Feather name="rotate-ccw" size={22} color="#fff" />
-              ) : (
-                <FontAwesome6 name="camera" size={22} color="#fff" />
-              )}{" "}
+              <FontAwesome6 name="camera" size={22} color="#fff" />
               <Text className="text-base text-white ml-3">
                 {t("InspectionForm.Capture Photos")}
               </Text>
             </TouchableOpacity>
 
-            {image && (
-              <View className="mt-8 relative">
-                <Image
-                  source={{ uri: image }}
-                  className="w-full h-48 rounded-2xl"
-                  resizeMode="cover"
-                />
+            {/* Display all images */}
+            {images.length > 0 && (
+              <View className="mt-4 flex-row flex-wrap">
+                {images.map((image, index) => (
+                  <View key={index} className="w-1/2 p-1 relative">
+                    <Image
+                      source={{ uri: image.uri }}
+                      className="w-full h-40 rounded-2xl"
+                      resizeMode="cover"
+                    />
 
-                <TouchableOpacity
-                  onPress={onClearImage}
-                  className="absolute top-2 right-2 bg-[#f21d1d] p-2 rounded-full"
-                >
-                  <AntDesign name="close" size={16} color="white" />
-                </TouchableOpacity>
+                    {/* Remove button */}
+                    <TouchableOpacity
+                      onPress={() => onClearImage(index)}
+                      className="absolute top-[-8] right-[-8] bg-[#f21d1d] p-2 rounded-full"
+                    >
+                      <AntDesign name="close" size={14} color="white" />
+                    </TouchableOpacity>
+                  </View>
+                ))}
               </View>
             )}
-            {errors.waterImage ? (
+
+            {errors.waterImages ? (
               <Text className="text-red-500 text-sm mt-2">
-                {errors.waterImage}
+                {errors.waterImages}
               </Text>
             ) : null}
           </View>
