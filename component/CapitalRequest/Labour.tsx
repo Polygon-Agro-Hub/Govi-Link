@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+// Labour.tsx - Fixed version with proper data handling
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
-  TextInput,
   ScrollView,
   TouchableOpacity,
   StatusBar,
@@ -10,27 +10,20 @@ import {
   KeyboardAvoidingView,
   Platform,
   Modal,
-  FlatList,
 } from "react-native";
-import { AntDesign, MaterialIcons } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
 import { useTranslation } from "react-i18next";
 import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
-import { useCallback } from "react";
 import { RootStackParamList } from "../types";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 import FormFooterButton from "./FormFooterButton";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/services/store";
 import {
-  initializeLabour,
-  setLabourInfo,
-  updateLabourInfo,
-  clearConditionalFields,
-  markAsExisting,
+  saveLabourInfo,
+  getLabourInfo,
   LabourData,
-} from "@/store/labourSlice";
+} from "@/database/inspectionlabour";
 
 type LabourProps = {
   navigation: any;
@@ -116,22 +109,84 @@ const YesNoSelect = ({
 const Labour: React.FC<LabourProps> = ({ navigation }) => {
   const route = useRoute<RouteProp<RootStackParamList, "Labour">>();
   const { requestNumber, requestId } = route.params;
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
+  
+  // Local state for form data
+  const [formData, setFormData] = useState<LabourData>({
+    isManageFamilyLabour: undefined,
+    isFamilyHiredLabourEquipped: undefined,
+    hasAdequateAlternativeLabour: undefined,
+    areThereMechanizationOptions: undefined,
+    isMachineryAvailable: undefined,
+    isMachineryAffordable: undefined,
+    isMachineryCostEffective: undefined,
+  });
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [yesNoModalVisible, setYesNoModalVisible] = useState(false);
   const [activeYesNoField, setActiveYesNoField] = useState<string | null>(null);
   const [isNextEnabled, setIsNextEnabled] = useState(false);
+  const [isExistingData, setIsExistingData] = useState(false);
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
 
-  const dispatch = useDispatch();
+  // Load data from SQLite when component mounts
+  useFocusEffect(
+    useCallback(() => {
+      const loadData = async () => {
+        if (!requestId) return;
 
-  // Get data from Redux store
-  const formData = useSelector(
-    (state: RootState) => state.labourInfo.data[requestId] || {},
+        try {
+          const reqId = Number(requestId);
+          const localData = await getLabourInfo(reqId);
+
+          if (localData) {
+            console.log('✅ Loaded labour info from SQLite:', localData);
+            
+            // Ensure proper data types
+            const normalizedData: LabourData = {
+              isManageFamilyLabour: localData.isManageFamilyLabour,
+              isFamilyHiredLabourEquipped: localData.isFamilyHiredLabourEquipped,
+              hasAdequateAlternativeLabour: localData.hasAdequateAlternativeLabour,
+              areThereMechanizationOptions: localData.areThereMechanizationOptions,
+              isMachineryAvailable: localData.isMachineryAvailable,
+              isMachineryAffordable: localData.isMachineryAffordable,
+              isMachineryCostEffective: localData.isMachineryCostEffective,
+            };
+            
+            setFormData(normalizedData);
+            setIsExistingData(true);
+          } else {
+            console.log('📝 No local labour data - new entry');
+            setIsExistingData(false);
+          }
+          setIsDataLoaded(true);
+        } catch (error) {
+          console.error('Failed to load labour info from SQLite:', error);
+          setIsDataLoaded(true);
+        }
+      };
+
+      loadData();
+    }, [requestId])
   );
 
-  const isExistingData = useSelector(
-    (state: RootState) => state.labourInfo.isExisting[requestId] || false,
-  );
+  // Auto-save to SQLite whenever formData changes (debounced)
+  useEffect(() => {
+    if (!isDataLoaded) return; // Don't auto-save during initial load
+    
+    const timer = setTimeout(async () => {
+      if (requestId) {
+        try {
+          await saveLabourInfo(Number(requestId), formData);
+          console.log('💾 Auto-saved labour info to SQLite');
+        } catch (err) {
+          console.error('Error auto-saving labour info:', err);
+        }
+      }
+    }, 500); // 500ms debounce
+
+    return () => clearTimeout(timer);
+  }, [formData, requestId, isDataLoaded]);
 
   // Validate form completion
   useEffect(() => {
@@ -182,59 +237,27 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
     );
   }, [formData, errors]);
 
-  // Fetch labour info from backend
-  const fetchInspectionData = async (
-    reqId: number,
-  ): Promise<LabourData | null> => {
-    try {
-      console.log(`🔍 Fetching labour data for reqId: ${reqId}`);
+  // Update form data
+  const updateFormData = (updates: Partial<LabourData>) => {
+    setFormData(prev => ({ ...prev, ...updates }));
+  };
 
-      const response = await axios.get(
-        `${environment.API_BASE_URL}api/capital-request/inspection/get`,
-        {
-          params: {
-            reqId,
-            tableName: "inspectionlabour",
-          },
-        },
-      );
+  // Handle Yes/No field changes
+  const handleyesNOFieldChange = (key: string, value: "Yes" | "No") => {
+    let updates: Partial<LabourData> = {
+      [key]: value,
+    };
 
-      if (response.data.success && response.data.data) {
-        console.log(`✅ Fetched existing labour data:`, response.data.data);
-
-        const data = response.data.data;
-
-        const boolToYesNo = (val: any): "Yes" | "No" | undefined => {
-          if (val === 1 || val === "1" || val === true) return "Yes";
-          if (val === 0 || val === "0" || val === false) return "No";
-          return undefined;
-        };
-
-        return {
-          isManageFamilyLabour: boolToYesNo(data.isManageFamilyLabour),
-          isFamilyHiredLabourEquipped: boolToYesNo(
-            data.isFamilyHiredLabourEquipped,
-          ),
-          hasAdequateAlternativeLabour: boolToYesNo(
-            data.hasAdequateAlternativeLabour,
-          ),
-          areThereMechanizationOptions: boolToYesNo(
-            data.areThereMechanizationOptions,
-          ),
-          isMachineryAvailable: boolToYesNo(data.isMachineryAvailable),
-          isMachineryAffordable: boolToYesNo(data.isMachineryAffordable),
-          isMachineryCostEffective: boolToYesNo(data.isMachineryCostEffective),
-        };
-      }
-
-      return null;
-    } catch (error: any) {
-      console.error(`❌ Error fetching labour data:`, error);
-      if (error.response?.status === 404) {
-        console.log(`📝 No existing record - will create new`);
-      }
-      return null;
+    // Clear conditional fields when base answer changes
+    if (key === "isManageFamilyLabour") {
+      updates = {
+        ...updates,
+        isFamilyHiredLabourEquipped: undefined,
+        hasAdequateAlternativeLabour: undefined,
+      };
     }
+
+    updateFormData(updates);
   };
 
   // Save to backend
@@ -326,68 +349,12 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
     }
   };
 
-  // Load data on focus
-  useFocusEffect(
-    useCallback(() => {
-      const loadData = async () => {
-        try {
-          dispatch(initializeLabour({ requestId }));
-
-          // Try to fetch from backend first
-          if (requestId) {
-            const reqId = Number(requestId);
-            if (!isNaN(reqId) && reqId > 0) {
-              const backendData = await fetchInspectionData(reqId);
-
-              if (backendData) {
-                console.log(`✅ Loaded labour data from backend`);
-                dispatch(
-                  setLabourInfo({
-                    requestId,
-                    data: backendData,
-                    isExisting: true,
-                  }),
-                );
-                return;
-              }
-            }
-          }
-
-          console.log("📝 No existing labour data - new entry");
-        } catch (error) {
-          console.error("Failed to load labour data", error);
-        }
-      };
-
-      loadData();
-    }, [requestId, dispatch]),
-  );
-
-  // Handle field changes
-  const handleyesNOFieldChange = (key: string, value: "Yes" | "No") => {
-    if (key === "isManageFamilyLabour") {
-      dispatch(
-        clearConditionalFields({
-          requestId,
-          familyLabourAnswer: value,
-        }),
-      );
-    }
-
-    dispatch(
-      updateLabourInfo({
-        requestId,
-        updates: { [key]: value },
-      }),
-    );
-  };
-
   // Handle next button
   const handleNext = async () => {
     const validationErrors: Record<string, string> = {};
 
     // Validate required fields
-    if (!formData?.isManageFamilyLabour) {
+    if (!formData.isManageFamilyLabour) {
       validationErrors.isManageFamilyLabour = t(
         "Error.Family labour field is required",
       );
@@ -395,8 +362,8 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
 
     // Conditional validation
     if (
-      formData?.isManageFamilyLabour === "Yes" &&
-      !formData?.isFamilyHiredLabourEquipped
+      formData.isManageFamilyLabour === "Yes" &&
+      !formData.isFamilyHiredLabourEquipped
     ) {
       validationErrors.isFamilyHiredLabourEquipped = t(
         "Error.Family/hired labour equipped field is required",
@@ -404,30 +371,30 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
     }
 
     if (
-      formData?.isManageFamilyLabour === "No" &&
-      !formData?.hasAdequateAlternativeLabour
+      formData.isManageFamilyLabour === "No" &&
+      !formData.hasAdequateAlternativeLabour
     ) {
       validationErrors.hasAdequateAlternativeLabour = t(
         "Error.Adequate alternative labour field is required",
       );
     }
 
-    if (!formData?.areThereMechanizationOptions) {
+    if (!formData.areThereMechanizationOptions) {
       validationErrors.areThereMechanizationOptions = t(
         "Error.Mechanization options field is required",
       );
     }
-    if (!formData?.isMachineryAvailable) {
+    if (!formData.isMachineryAvailable) {
       validationErrors.isMachineryAvailable = t(
         "Error.Machinery available field is required",
       );
     }
-    if (!formData?.isMachineryAffordable) {
+    if (!formData.isMachineryAffordable) {
       validationErrors.isMachineryAffordable = t(
         "Error.Machinery affordable field is required",
       );
     }
-    if (!formData?.isMachineryCostEffective) {
+    if (!formData.isMachineryCostEffective) {
       validationErrors.isMachineryCostEffective = t(
         "Error.Machinery cost effective field is required",
       );
@@ -442,7 +409,7 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
       return;
     }
 
-    if (!route.params?.requestId) {
+    if (!requestId) {
       Alert.alert(
         t("Error.Error"),
         "Request ID is missing. Please go back and try again.",
@@ -451,7 +418,7 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
       return;
     }
 
-    const reqId = Number(route.params.requestId);
+    const reqId = Number(requestId);
 
     if (isNaN(reqId) || reqId <= 0) {
       Alert.alert(
@@ -479,7 +446,7 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
 
       if (saved) {
         console.log("✅ Labour info saved successfully to backend");
-        dispatch(markAsExisting({ requestId }));
+        setIsExistingData(true);
 
         Alert.alert(
           t("Main.Success"),
@@ -490,7 +457,7 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
               onPress: () => {
                 navigation.navigate("HarvestStorage", {
                   requestNumber,
-                  requestId: route.params.requestId,
+                  requestId,
                 });
               },
             },
@@ -506,7 +473,7 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
               onPress: () => {
                 navigation.navigate("HarvestStorage", {
                   requestNumber,
-                  requestId: route.params.requestId,
+                  requestId,
                 });
               },
             },
@@ -524,7 +491,7 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
             onPress: () => {
               navigation.navigate("HarvestStorage", {
                 requestNumber,
-                requestId: route.params.requestId,
+                requestId,
               });
             },
           },
@@ -555,7 +522,7 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
               "InspectionForm.Can the farmer manage the proposed crop/cropping system through your family labour",
             )}
             required
-            value={formData?.isManageFamilyLabour || null}
+            value={formData.isManageFamilyLabour || null}
             visible={
               yesNoModalVisible && activeYesNoField === "isManageFamilyLabour"
             }
@@ -572,13 +539,13 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
             }
           />
 
-          {formData?.isManageFamilyLabour === "Yes" && (
+          {formData.isManageFamilyLabour === "Yes" && (
             <YesNoSelect
               label={t(
                 "InspectionForm.Is family/hired labour equipped to handle the proposed crop/cropping system",
               )}
               required
-              value={formData?.isFamilyHiredLabourEquipped || null}
+              value={formData.isFamilyHiredLabourEquipped || null}
               visible={
                 yesNoModalVisible &&
                 activeYesNoField === "isFamilyHiredLabourEquipped"
@@ -597,13 +564,13 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
             />
           )}
 
-          {formData?.isManageFamilyLabour === "No" && (
+          {formData.isManageFamilyLabour === "No" && (
             <YesNoSelect
               label={t(
                 "InspectionForm.If not, do you have adequate labours to manage the same",
               )}
               required
-              value={formData?.hasAdequateAlternativeLabour || null}
+              value={formData.hasAdequateAlternativeLabour || null}
               visible={
                 yesNoModalVisible &&
                 activeYesNoField === "hasAdequateAlternativeLabour"
@@ -627,7 +594,7 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
               "InspectionForm.Are there any mechanization options to substitute the labour",
             )}
             required
-            value={formData?.areThereMechanizationOptions || null}
+            value={formData.areThereMechanizationOptions || null}
             visible={
               yesNoModalVisible &&
               activeYesNoField === "areThereMechanizationOptions"
@@ -648,7 +615,7 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
           <YesNoSelect
             label={t("InspectionForm.Is machinery available")}
             required
-            value={formData?.isMachineryAvailable || null}
+            value={formData.isMachineryAvailable || null}
             visible={
               yesNoModalVisible && activeYesNoField === "isMachineryAvailable"
             }
@@ -668,7 +635,7 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
           <YesNoSelect
             label={t("InspectionForm.Is machinery affordable")}
             required
-            value={formData?.isMachineryAffordable || null}
+            value={formData.isMachineryAffordable || null}
             visible={
               yesNoModalVisible && activeYesNoField === "isMachineryAffordable"
             }
@@ -688,7 +655,7 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
           <YesNoSelect
             label={t("InspectionForm.Is machinery cost effective")}
             required
-            value={formData?.isMachineryCostEffective || null}
+            value={formData.isMachineryCostEffective || null}
             visible={
               yesNoModalVisible &&
               activeYesNoField === "isMachineryCostEffective"

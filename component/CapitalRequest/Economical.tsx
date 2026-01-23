@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+// Economical.tsx - Fixed version with proper data handling
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -14,20 +15,15 @@ import { AntDesign } from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
 import { useTranslation } from "react-i18next";
 import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
-import { useCallback } from "react";
 import { RootStackParamList } from "../types";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 import FormFooterButton from "./FormFooterButton";
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '@/services/store';
 import {
-  initializeEconomical,
-  updateEconomical,
-  setEconomical,
-  markEconomicalAsExisting,
+  saveEconomicalInfo,
+  getEconomicalInfo,
   EconomicalData,
-} from '@/store/economicalSlice';
+} from "@/database/inspectioneconomical";
 
 type EconomicalProps = {
   navigation: any;
@@ -113,36 +109,85 @@ const YesNoSelect = ({
 const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
   const route = useRoute<RouteProp<RootStackParamList, "Economical">>();
   const { requestNumber, requestId } = route.params;
-  
-  const dispatch = useDispatch();
   const { t } = useTranslation();
 
-  // Get data from Redux
-  const formData = useSelector((state: RootState) =>
-    state.economical.data[requestId] || {
-      isSuitaleSize: undefined,
-      isFinanceResource: undefined,
-      isAltRoutes: undefined,
-    }
-  );
-
-  const isExistingData = useSelector((state: RootState) =>
-    state.economical.isExisting[requestId] || false
-  );
+  // Local state for form data
+  const [formData, setFormData] = useState<EconomicalData>({
+    isSuitaleSize: undefined,
+    isFinanceResource: undefined,
+    isAltRoutes: undefined,
+  });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [yesNoModalVisible, setYesNoModalVisible] = useState(false);
   const [activeYesNoField, setActiveYesNoField] = useState<string | null>(null);
   const [isNextEnabled, setIsNextEnabled] = useState(false);
+  const [isExistingData, setIsExistingData] = useState(false);
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
 
-  console.log("economical", formData);
+  // Load data from SQLite when component mounts
+  useFocusEffect(
+    useCallback(() => {
+      const loadData = async () => {
+        if (!requestId) return;
 
+        try {
+          const reqId = Number(requestId);
+          const localData = await getEconomicalInfo(reqId);
+
+          if (localData) {
+            console.log("✅ Loaded economical info from SQLite:", localData);
+
+            // Ensure proper data types
+            const normalizedData: EconomicalData = {
+              isSuitaleSize: localData.isSuitaleSize,
+              isFinanceResource: localData.isFinanceResource,
+              isAltRoutes: localData.isAltRoutes,
+            };
+
+            setFormData(normalizedData);
+            setIsExistingData(true);
+          } else {
+            console.log("📝 No local economical data - new entry");
+            setIsExistingData(false);
+          }
+          setIsDataLoaded(true);
+        } catch (error) {
+          console.error("Failed to load economical info from SQLite:", error);
+          setIsDataLoaded(true);
+        }
+      };
+
+      loadData();
+    }, [requestId]),
+  );
+
+  // Auto-save to SQLite whenever formData changes (debounced)
+  useEffect(() => {
+    if (!isDataLoaded) return; // Don't auto-save during initial load
+
+    const timer = setTimeout(async () => {
+      if (requestId) {
+        try {
+          await saveEconomicalInfo(Number(requestId), formData);
+          console.log("💾 Auto-saved economical info to SQLite");
+        } catch (err) {
+          console.error("Error auto-saving economical info:", err);
+        }
+      }
+    }, 500); // 500ms debounce
+
+    return () => clearTimeout(timer);
+  }, [formData, requestId, isDataLoaded]);
+
+  // Validate form completion
   useEffect(() => {
     const isSuitaleSizeValid =
       formData.isSuitaleSize === "Yes" || formData.isSuitaleSize === "No";
 
     const isFinanceResourceValid =
-      formData.isFinanceResource === "Yes" || formData.isFinanceResource === "No";
+      formData.isFinanceResource === "Yes" ||
+      formData.isFinanceResource === "No";
 
     const isAltRoutesValid =
       formData.isAltRoutes === "Yes" || formData.isAltRoutes === "No";
@@ -153,74 +198,32 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
       isSuitaleSizeValid &&
         isFinanceResourceValid &&
         isAltRoutesValid &&
-        !hasErrors
+        !hasErrors,
     );
   }, [formData, errors]);
 
-  const fetchInspectionData = async (
-    reqId: number
-  ): Promise<EconomicalData | null> => {
-    try {
-      console.log(`🔍 Fetching economical data for reqId: ${reqId}`);
-
-      const response = await axios.get(
-        `${environment.API_BASE_URL}api/capital-request/inspection/get`,
-        {
-          params: {
-            reqId,
-            tableName: "inspectioneconomical",
-          },
-        }
-      );
-
-      console.log("📦 Raw response:", response.data);
-
-      if (response.data.success && response.data.data) {
-        console.log(`✅ Fetched existing economical data:`, response.data.data);
-
-        const data = response.data.data;
-
-        // Helper to convert boolean (0/1) to "Yes"/"No"
-        const boolToYesNo = (val: any): "Yes" | "No" | undefined => {
-          if (val === 1 || val === "1" || val === true) return "Yes";
-          if (val === 0 || val === "0" || val === false) return "No";
-          return undefined;
-        };
-
-        return {
-          isSuitaleSize: boolToYesNo(data.isSuitaleSize),
-          isFinanceResource: boolToYesNo(data.isFinanceResource),
-          isAltRoutes: boolToYesNo(data.isAltRoutes),
-        };
-      }
-
-      console.log(`📭 No existing economical data found for reqId: ${reqId}`);
-      return null;
-    } catch (error: any) {
-      console.error(`❌ Error fetching economical data:`, error);
-      console.error("Error details:", error.response?.data);
-
-      if (error.response?.status === 404) {
-        console.log(`📝 No existing record - will create new`);
-        return null;
-      }
-
-      return null;
-    }
+  // Update form data
+  const updateFormData = (updates: Partial<EconomicalData>) => {
+    setFormData((prev) => ({ ...prev, ...updates }));
   };
 
+  // Handle Yes/No field changes
+  const handleyesNOFieldChange = (key: string, value: "Yes" | "No") => {
+    updateFormData({ [key]: value } as any);
+  };
+
+  // Save to backend
   const saveToBackend = async (
     reqId: number,
     tableName: string,
     data: EconomicalData,
-    isUpdate: boolean
+    isUpdate: boolean,
   ): Promise<boolean> => {
     try {
       console.log(
         `💾 Saving to backend (${isUpdate ? "UPDATE" : "INSERT"}):`,
-        tableName
+        tableName,
       );
-      console.log(`📝 reqId being sent:`, reqId);
 
       // Yes/No fields
       const yesNoToInt = (val: any) =>
@@ -250,7 +253,7 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       if (response.data.success) {
@@ -262,73 +265,28 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
       }
     } catch (error: any) {
       console.error(`❌ Error saving ${tableName}:`, error);
-      if (error.response) {
-        console.error("Response data:", error.response.data);
-        console.error("Response status:", error.response.status);
-      }
       return false;
     }
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      const loadFormData = async () => {
-        try {
-          // Initialize Redux state
-          dispatch(initializeEconomical({ requestId }));
-
-          // Try to fetch from backend
-          if (requestId) {
-            const reqId = Number(requestId);
-            if (!isNaN(reqId) && reqId > 0) {
-              console.log(
-                `🔄 Attempting to fetch economical data from backend for reqId: ${reqId}`
-              );
-
-              const backendData = await fetchInspectionData(reqId);
-
-              if (backendData) {
-                console.log(`✅ Loaded economical data from backend`);
-
-                // Save to Redux
-                dispatch(setEconomical({
-                  requestId,
-                  data: backendData,
-                  isExisting: true,
-                }));
-
-                return;
-              }
-            }
-          }
-
-          console.log("📝 No existing economical data - new entry");
-        } catch (e) {
-          console.error("Failed to load economical form data", e);
-        }
-      };
-
-      loadFormData();
-    }, [requestId, dispatch])
-  );
-
+  // Handle next button
   const handleNext = async () => {
     const validationErrors: Record<string, string> = {};
 
     // Validate required fields
     if (!formData.isSuitaleSize) {
       validationErrors.isSuitaleSize = t(
-        "Error.Suitable size field is required"
+        "Error.Suitable size field is required",
       );
     }
     if (!formData.isFinanceResource) {
       validationErrors.isFinanceResource = t(
-        "Error.Finance resource field is required"
+        "Error.Finance resource field is required",
       );
     }
     if (!formData.isAltRoutes) {
       validationErrors.isAltRoutes = t(
-        "Error.Alternative routes field is required"
+        "Error.Alternative routes field is required",
       );
     }
 
@@ -341,25 +299,25 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
       return;
     }
 
-    // ✅ Validate requestId exists
-    if (!route.params?.requestId) {
+    // Validate requestId exists
+    if (!requestId) {
       console.error("❌ requestId is missing!");
       Alert.alert(
         t("Error.Error"),
         "Request ID is missing. Please go back and try again.",
-        [{ text: t("Main.ok") }]
+        [{ text: t("Main.ok") }],
       );
       return;
     }
 
-    const reqId = Number(route.params.requestId);
+    const reqId = Number(requestId);
 
     if (isNaN(reqId) || reqId <= 0) {
-      console.error("❌ Invalid requestId:", route.params.requestId);
+      console.error("❌ Invalid requestId:", requestId);
       Alert.alert(
         t("Error.Error"),
         "Invalid request ID. Please go back and try again.",
-        [{ text: t("Main.ok") }]
+        [{ text: t("Main.ok") }],
       );
       return;
     }
@@ -370,7 +328,7 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
       t("InspectionForm.Saving"),
       t("InspectionForm.Please wait..."),
       [],
-      { cancelable: false }
+      { cancelable: false },
     );
 
     try {
@@ -378,14 +336,12 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
         reqId,
         "inspectioneconomical",
         formData,
-        isExistingData
+        isExistingData,
       );
 
       if (saved) {
         console.log("✅ Economical info saved successfully to backend");
-
-        // Mark as existing in Redux
-        dispatch(markEconomicalAsExisting({ requestId }));
+        setIsExistingData(true);
 
         Alert.alert(
           t("Main.Success"),
@@ -395,13 +351,12 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
               text: t("Main.ok"),
               onPress: () => {
                 navigation.navigate("Labour", {
-                  formData: { inspectioneconomical: formData },
                   requestNumber,
                   requestId,
                 });
               },
             },
-          ]
+          ],
         );
       } else {
         console.log("⚠️ Backend save failed, but continuing with local data");
@@ -413,13 +368,12 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
               text: t("Main.Continue"),
               onPress: () => {
                 navigation.navigate("Labour", {
-                  formData: { inspectioneconomical: formData },
                   requestNumber,
-                  requestId: route.params.requestId,
+                  requestId,
                 });
               },
             },
-          ]
+          ],
         );
       }
     } catch (error) {
@@ -432,22 +386,14 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
             text: t("Main.Continue"),
             onPress: () => {
               navigation.navigate("Labour", {
-                formData: { inspectioneconomical: formData },
                 requestNumber,
-                requestId: route.params.requestId,
+                requestId,
               });
             },
           },
-        ]
+        ],
       );
     }
-  };
-
-  const handleyesNOFieldChange = (key: string, value: "Yes" | "No") => {
-    dispatch(updateEconomical({
-      requestId,
-      updates: { [key]: value },
-    }));
   };
 
   return (
@@ -467,9 +413,10 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
           contentContainerStyle={{ paddingBottom: 120 }}
         >
           <View className="h-6" />
+
           <YesNoSelect
             label={t(
-              "InspectionForm.Are the proposed crop/cropping systems suitable for the farmer's size of land holding"
+              "InspectionForm.Are the proposed crop/cropping systems suitable for the farmer's size of land holding",
             )}
             required
             value={formData.isSuitaleSize || null}
@@ -487,7 +434,7 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
 
           <YesNoSelect
             label={t(
-              "InspectionForm.Are the financial resources adequate to manage the proposed crop/cropping system"
+              "InspectionForm.Are the financial resources adequate to manage the proposed crop/cropping system",
             )}
             required
             value={formData.isFinanceResource || null}
@@ -506,9 +453,10 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
               handleyesNOFieldChange("isFinanceResource", value)
             }
           />
+
           <YesNoSelect
             label={t(
-              "InspectionForm.If not, can the farmer mobilize financial resources through alternative routes"
+              "InspectionForm.If not, can the farmer mobilize financial resources through alternative routes",
             )}
             required
             value={formData.isAltRoutes || null}
