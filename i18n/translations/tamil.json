@@ -681,7 +681,8 @@
     "You have filled out all the forms. If you need to make any changes, you can go back. Otherwise, continuing will take you to the confirmation step.": "நீங்கள் அனைத்து படிவங்களையும் பூர்த்தி செய்துள்ளீர்கள். மாற்றங்கள் செய்ய வேண்டுமெனில் பின்னால் செல்லலாம். இல்லையெனில் தொடர்வது உறுதிப்படுத்தல் படிக்கு அழைத்துச் செல்லும்.",
     "Inspection form completed successfully!": "ஆய்வு படிவம் வெற்றிகரமாக முடிக்கப்பட்டது!",
     "Could not save to server. Please try again.": "சேவையகத்தில் சேமிக்க முடியவில்லை. தயவுசெய்து மீண்டும் முயற்சிக்கவும்.",
-    "Go Back": "பின்னால் செல்லவும்"
+    "Go Back": "பின்னால் செல்லவும்",
+     "Account Holder Name":"கணக்கு வைத்திருப்பவரின் பெயர்"
   },
   "ConfirmationCapitalRequest": {
     "ConfirmSuccess": "உறுதிப்படுத்தல் வெற்றிகரமாக!",

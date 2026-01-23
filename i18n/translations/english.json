@@ -681,7 +681,8 @@
     "You have filled out all the forms. If you need to make any changes, you can go back. Otherwise, continuing will take you to the confirmation step.": "You have filled out all the forms. If you need to make any changes, you can go back. Otherwise, continuing will take you to the confirmation step.",
     "Inspection form completed successfully!": "Inspection form completed successfully!",
     "Could not save to server. Please try again.": "Could not save to server. Please try again.",
-    "Go Back": "Go Back"
+    "Go Back": "Go Back",
+    "Account Holder Name":"Account Holder's Name"
   },
   "ConfirmationCapitalRequest": {
     "ConfirmSuccess": "Confirmation successful!",

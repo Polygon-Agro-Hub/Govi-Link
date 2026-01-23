@@ -681,7 +681,8 @@
     "You have filled out all the forms. If you need to make any changes, you can go back. Otherwise, continuing will take you to the confirmation step.": "ඔබ සියලුම පෝරම පුරවා ඇත. වෙනස්කම් කිරීමට අවශ්‍ය නම් ආපසු යා හැක. එසේ නොමැති නම්, ඉදිරියට යාමෙන් තහවුරු කිරීමේ අදියරට ඔබව ගෙන යනු ඇත.",
     "Inspection form completed successfully!": "පරීක්ෂණ පෝරමය සාර්ථකව සම්පූර්ණ කර ඇත!",
     "Could not save to server. Please try again.": "සේවාදායකයට සුරකින්න නොහැකි විය. කරුණාකර නැවත උත්සාහ කරන්න.",
-    "Go Back": "ආපසු යන්න"
+    "Go Back": "ආපසු යන්න",
+    "Account Holder Name":"ගිණුම් හිමියාගේ නම"
   },
   "ConfirmationCapitalRequest": {
     "ConfirmSuccess": "තහවුරු කිරීම සාර්ථකයි!",
