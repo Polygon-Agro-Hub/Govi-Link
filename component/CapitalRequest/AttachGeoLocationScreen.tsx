@@ -60,7 +60,7 @@ const {t} = useTranslation();
         Alert.alert(
           t("Error.Permission Denied"),
           t("Error.Location permission is required to use this feature."),
-              [{ text: t("MAIN.OK") }]
+              [{ text: t("Main.ok") }]
         );
         setIsLoading(false);
         return;
@@ -91,7 +91,7 @@ const {t} = useTranslation();
       );
     } catch (error) {
       console.error("Error getting location:", error);
-      Alert.alert(t("Error.Error"), t("Error.Unable to get your current location"),[{ text: t("MAIN.OK") }] );
+      Alert.alert(t("Error.Error"), t("Error.Unable to get your current location"),[{ text: t("Main.ok") }] );
     } finally {
       setIsLoading(false);
     }

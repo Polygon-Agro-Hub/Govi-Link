@@ -122,7 +122,7 @@ const handleChangeProblem = (
 
   const handleSaveProblem = async (item: ProblemItem) => {
     if (!item.problem.trim() || !item.solution.trim()) {
-      Alert.alert(t("Error.Sorry"), t("CertificateSuggestions.Both problem and solution must be filled."), [{ text: t("MAIN.OK") }]);
+      Alert.alert(t("Error.Sorry"), t("CertificateSuggestions.Both problem and solution must be filled."), [{ text: t("Main.ok") }]);
       return;
     }
 
@@ -133,7 +133,7 @@ const handleChangeProblem = (
         Alert.alert(
           t("Error.Sorry"),
           t("Error.Your login session has expired. Please log in again to continue."),
-          [{ text: t("MAIN.OK") }]
+          [{ text: t("Main.ok") }]
         );
         return;
       }
@@ -171,12 +171,12 @@ const handleChangeProblem = (
         Alert.alert(
           t("Error.Sorry"),
           t("CertificateSuggestions.Failed to save problem."),
-          [{ text: t("MAIN.OK") }]
+          [{ text: t("Main.ok") }]
         );
       }
     } catch (err) {
       console.error("❌ Error saving/updating problem:", err);
-      Alert.alert(t("Error.Sorry"), t("Something went wrong while saving. try again later"), [{ text: t("MAIN.OK") }]);
+      Alert.alert(t("Error.Sorry"), t("Something went wrong while saving. try again later"), [{ text: t("Main.ok") }]);
     }finally{
             setLoading(false)
 
@@ -195,7 +195,7 @@ const handleChangeProblem = (
            Alert.alert(
           t("Error.Sorry"),
           t("Error.Your login session has expired. Please log in again to continue."),
-          [{ text: t("MAIN.OK") }]
+          [{ text: t("Main.ok") }]
         );
         return;
       }
@@ -280,7 +280,7 @@ const handleChangeProblem = (
             setIsButtonDisabled(false);
              setOtpSendLoading(false);
           } catch (error) {
-            Alert.alert(t("Main.error"), t("SignupForum.otpSendFailed"), [{ text: t("MAIN.OK") }]);
+            Alert.alert(t("Main.error"), t("SignupForum.otpSendFailed"), [{ text: t("Main.ok") }]);
             setOtpSendLoading(false);
           }finally{
             setOtpSendLoading(false);

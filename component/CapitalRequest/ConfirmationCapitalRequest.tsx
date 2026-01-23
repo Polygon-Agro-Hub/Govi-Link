@@ -1,10 +1,9 @@
 import { StackNavigationProp } from "@react-navigation/stack";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
-  ScrollView,
   ActivityIndicator,
   Alert,
   Animated,
@@ -16,6 +15,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import { MaterialIcons } from "@expo/vector-icons";
 import Svg, { Circle, G, Text as SvgText } from "react-native-svg";
 import { RouteProp, useRoute } from "@react-navigation/native";
+import { environment } from "@/environment/environment";
+import axios from "axios";
 
 type ConfirmationCapitalRequestNavigationProps = StackNavigationProp<
   RootStackParamList,
@@ -49,30 +50,48 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
   const [loading, setLoading] = useState(false);
   const [assigning, setAssigning] = useState(false);
   const [selectedOfficer, setSelectedOfficer] = useState<Officer | null>(null);
-  const [showConfirmationModal, setShowConfirmationModal] = useState(true); // Set to true to show countdown immediately
-  const [countdown, setCountdown] = useState(120); // Set to 2 minutes (120 seconds)
+  const [showConfirmationModal, setShowConfirmationModal] = useState(true);
+  const [countdown, setCountdown] = useState(20);
 
   // Animated values for smooth progress
   const progressAnim = useRef(new Animated.Value(100)).current;
-  const countdownAnim = useRef(new Animated.Value(120)).current;
+  const countdownAnim = useRef(new Animated.Value(20)).current;
 
   const animationRef = useRef<Animated.CompositeAnimation | null>(null);
 
-  // Start smooth countdown animation when component mounts
-  useEffect(() => {
-    startCountdownAnimation();
+  // ✅ Stable handleAutoAssign using useCallback
+  const handleAutoAssign = useCallback(() => {
+    setShowConfirmationModal(false);
 
-    return () => {
-      if (animationRef.current) {
-        animationRef.current.stop();
-      }
-    };
-  }, []);
+    // Mock auto assignment - UI only
+    setAssigning(true);
+    setTimeout(() => {
+      setAssigning(false);
+      Alert.alert(
+        t("Main.Success"),
+        t("ConfirmationCapitalRequest.AutoAssignSuccess"),
+        [
+          {
+            text: t("Main.ok"),
+            onPress: () => {
+              // Navigate to CapitalRequests page
+              navigation.navigate("Main", {
+                screen: "MainTabs",
+                params: {
+                  screen: "CapitalRequests",
+                },
+              });
+            },
+          },
+        ]
+      );
+    }, 1500);
+  }, [navigation, t]);
 
-  // Start smooth countdown animation
-  const startCountdownAnimation = () => {
+  // ✅ Stable startCountdownAnimation using useCallback
+  const startCountdownAnimation = useCallback(() => {
     progressAnim.setValue(100);
-    countdownAnim.setValue(120);
+    countdownAnim.setValue(20);
 
     if (animationRef.current) {
       animationRef.current.stop();
@@ -81,13 +100,13 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
     animationRef.current = Animated.parallel([
       Animated.timing(progressAnim, {
         toValue: 0,
-        duration: 120000, // 2 minutes in milliseconds
+        duration: 20000,
         easing: Easing.linear,
         useNativeDriver: false,
       }),
       Animated.timing(countdownAnim, {
         toValue: 0,
-        duration: 120000, // 2 minutes in milliseconds
+        duration: 20000,
         easing: Easing.linear,
         useNativeDriver: false,
       }),
@@ -98,9 +117,21 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
         handleAutoAssign();
       }
     });
-  };
+  }, [progressAnim, countdownAnim, handleAutoAssign]);
 
-  // Update countdown value based on animation
+  // ✅ Start smooth countdown animation when component mounts - ONLY ONCE
+  useEffect(() => {
+    startCountdownAnimation();
+
+    return () => {
+      if (animationRef.current) {
+        animationRef.current.stop();
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty array - runs only once on mount
+
+  // ✅ Update countdown value based on animation
   useEffect(() => {
     const countdownListener = countdownAnim.addListener(({ value }) => {
       const roundedValue = Math.ceil(value);
@@ -110,14 +141,61 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
     return () => {
       countdownAnim.removeListener(countdownListener);
     };
-  }, []);
+  }, [countdownAnim]);
 
-  const handleUndo = () => {
+  const handleUndo = async () => {
     if (animationRef.current) {
       animationRef.current.stop();
     }
-    setShowConfirmationModal(false);
-    setSelectedOfficer(null);
+
+    // Show loading
+    setAssigning(true);
+
+    try {
+      console.log(`🗑️ Deleting all inspection data for requestId: ${requestId}`);
+
+      const response = await axios.delete(
+        `${environment.API_BASE_URL}api/capital-request/inspection/delete/${requestId}`
+      );
+
+      if (response.data.success) {
+        console.log('✅ All inspection data deleted successfully');
+        console.log(`📊 Deleted from ${response.data.deletedTables.length} tables`);
+
+        setAssigning(false);
+        setShowConfirmationModal(false);
+
+        Alert.alert(
+          t("Main.Success"),
+          t("ConfirmationCapitalRequest.UndoSuccess"),
+          [
+            {
+              text: t("Main.ok"),
+              onPress: () => {
+                // Navigate to CapitalRequests page
+                navigation.navigate("Main", {
+                  screen: "MainTabs",
+                  params: {
+                    screen: "CapitalRequests",
+                  },
+                });
+              },
+            },
+          ]
+        );
+      } else {
+        throw new Error(response.data.message || 'Delete failed');
+      }
+    } catch (error: any) {
+      console.error('❌ Error deleting inspection data:', error);
+      setAssigning(false);
+
+      Alert.alert(
+        t("Main.Error"),
+        error.response?.data?.message || t("ConfirmationCapitalRequest.UndoFailed"),
+        [{ text: t("Main.ok") }]
+      );
+    }
   };
 
   const handleConfirmAndLeave = () => {
@@ -135,28 +213,16 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
         t("ConfirmationCapitalRequest.ConfirmSuccess"),
         [
           {
-            text: t("MAIN.OK"),
-            onPress: () => navigation.navigate("CapitalRequests"),
-          },
-        ]
-      );
-    }, 1500);
-  };
-
-  const handleAutoAssign = () => {
-    setShowConfirmationModal(false);
-
-    // Mock auto assignment - UI only
-    setAssigning(true);
-    setTimeout(() => {
-      setAssigning(false);
-      Alert.alert(
-        t("Main.Success"),
-        t("ConfirmationCapitalRequest.AutoAssignSuccess"),
-        [
-          {
-            text: t("MAIN.OK"),
-            onPress: () => navigation.navigate("CapitalRequests"),
+            text: t("Main.ok"),
+            onPress: () => {
+              // Navigate to CapitalRequests page
+              navigation.navigate("Main", {
+                screen: "MainTabs",
+                params: {
+                  screen: "CapitalRequests",
+                },
+              });
+            },
           },
         ]
       );
@@ -166,14 +232,20 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins.toString().padStart(2, "0")}:${secs
-      .toString()
-      .padStart(2, "0")}`;
+    if (mins > 0) {
+      return `${mins.toString().padStart(2, "0")}:${secs
+        .toString()
+        .padStart(2, "0")}`;
+    }
+    return `00:${secs.toString().padStart(2, "0")}`;
   };
 
   // Circle parameters
   const radius = 65;
   const circumference = 2 * Math.PI * radius;
+
+  // Animated Circle component
+  const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
   return (
     <View className="flex-1 bg-white">
@@ -184,7 +256,13 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
             if (showConfirmationModal) {
               handleUndo();
             } else {
-              navigation.navigate("CapitalRequests");
+              // Navigate to CapitalRequests page
+              navigation.navigate("Main", {
+                screen: "MainTabs",
+                params: {
+                  screen: "CapitalRequests",
+                },
+              });
             }
           }}
           className="bg-[#F6F6F680] rounded-full py-4 px-3"
@@ -320,8 +398,5 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
     </View>
   );
 };
-
-// Animated Circle component
-const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 export default ConfirmationCapitalRequest;

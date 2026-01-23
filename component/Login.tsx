@@ -63,7 +63,7 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
     Alert.alert(
       t("Error.Unauthorized Access"),
       t("Error.You are not authorized to access this system. Please use a valid Employee ID") ,
-      [{ text: t("MAIN.OK") }]
+      [{ text: t("Main.ok") }]
     );
     return false;
   }

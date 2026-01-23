@@ -11,9 +11,14 @@ import {
   Platform,
   Modal,
   FlatList,
-  Image
+  Image,
 } from "react-native";
-import { AntDesign, Feather, FontAwesome6, MaterialIcons } from "@expo/vector-icons";
+import {
+  AntDesign,
+  Feather,
+  FontAwesome6,
+  MaterialIcons,
+} from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTranslation } from "react-i18next";
@@ -26,6 +31,16 @@ import { RootStackParamList } from "../types";
 import { CameraScreen } from "@/Items/CameraScreen";
 import axios from "axios";
 import { environment } from "@/environment/environment";
+import FormFooterButton from "./FormFooterButton";
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/services/store';
+import {
+  initializeCultivationInfo,
+  updateCultivationInfo,
+  setCultivationInfo,
+  markCultivationAsExisting,
+  CultivationInfoData,
+} from '@/store/cultivationInfoSlice';
 
 const climateParameters = [
   { key: "temperature", label: "Temperature" },
@@ -40,34 +55,7 @@ const climateParameters = [
   },
 ];
 
-
 type Selection = "yes" | "no" | null;
-
-type FormData = {
-  inspectioncultivation?: CultivationInfoData;
-};
-type CultivationInfoData = {
-  soilType: string;
-  ph: number;
-  temperature?: "yes" | "no" | null;
-  rainfall?: "yes" | "no" | null;
-  sunShine?: "yes" | "no" | null;
-  humidity?: "yes" | "no" | null;
-  windVelocity?: "yes" | "no" | null;
-  windDirection?: "yes" | "no" | null;
-  zone?: "yes" | "no" | null;
-  isCropSuitale?: "Yes" | "No";
-  soilfertility?: string;
-  waterSources?: string[];
-  otherWaterSource?: string;
-  waterImage?: { uri: string; name: string; type: string } | null;
-  isRecevieRainFall?: "Yes" | "No";
-  isRainFallSuitableCrop?: "Yes" | "No";
-  isRainFallSuitableCultivation?: "Yes" | "No";
-  isElectrocityAvailable?: "Yes" | "No";
-  ispumpOrirrigation?: "Yes" | "No";
-  [key: string]: any;
-};
 
 const YesNoSelect = ({
   label,
@@ -201,7 +189,7 @@ const validateAndFormat = (
   rules: ValidationRule,
   t: any,
   formData: any,
-  currentKey: keyof typeof formData
+  currentKey: keyof typeof formData,
 ) => {
   let value = text;
   let error = "";
@@ -242,47 +230,69 @@ type CultivationInfoProps = {
 
 const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
   const route = useRoute<RouteProp<RootStackParamList, "CultivationInfo">>();
-  const { requestNumber, requestId } = route.params; // ✅ Add requestId
-  const prevFormData = route.params?.formData;
-  const [formData, setFormData] = useState(prevFormData);
+  const { requestNumber, requestId } = route.params;
+
+  const dispatch = useDispatch();
   const { t, i18n } = useTranslation();
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isExistingData, setIsExistingData] = useState(false); // ✅ Add this
   const [isNextEnabled, setIsNextEnabled] = useState(false);
   const [yesNoModalVisible, setYesNoModalVisible] = useState(false);
   const [activeYesNoField, setActiveYesNoField] = useState<string | null>(null);
-  const [overallSoilFertilityVisible, setOverallSoilFertilityVisible] =
-    useState(false);
-  console.log("finance", formData);
+  const [overallSoilFertilityVisible, setOverallSoilFertilityVisible] = useState(false);
+  const [showCamera, setShowCamera] = useState(false);
+  const [error, setError] = useState<string>("");
 
-  const [selections, setSelections] = useState<Record<string, Selection>>(() =>
-    climateParameters.reduce((acc, item) => {
-      acc[item.key] = null;
-      return acc;
-    }, {} as Record<string, Selection>)
+  // Get data from Redux
+  const formData = useSelector((state: RootState) =>
+    state.cultivationInfo.data[requestId] || {
+      soilType: '',
+      ph: 0,
+      temperature: null,
+      rainfall: null,
+      sunShine: null,
+      humidity: null,
+      windVelocity: null,
+      windDirection: null,
+      zone: null,
+      waterSources: [],
+      otherWaterSource: '',
+      waterImage: null,
+    }
   );
 
-  const [showCamera, setShowCamera] = useState(false);
-  const image = formData?.inspectioncultivation?.waterImage?.uri;
+  const isExistingData = useSelector((state: RootState) =>
+    state.cultivationInfo.isExisting[requestId] || false
+  );
+  console.log("cultivation data", formData);
+
+  const [selections, setSelections] = useState<Record<string, Selection>>(() =>
+    climateParameters.reduce(
+      (acc, item) => {
+        acc[item.key] = null;
+        return acc;
+      },
+      {} as Record<string, Selection>,
+    ),
+  );
+
+  const image = formData?.waterImage?.uri;
 
   useEffect(() => {
-    const cultivationInfo = formData?.inspectioncultivation || {};
-
     const allClimateSelected = climateParameters.every(
-      (param) => selections[param.key] === "yes" || selections[param.key] === "no"
+      (param) =>
+        selections[param.key] === "yes" || selections[param.key] === "no",
     );
 
-    const isPHValid = !!cultivationInfo.ph && !errors.ph;
-    const isSoilTypeValid = !!cultivationInfo.soilType && !errors.soilType;
+    const isPHValid = !!formData.ph && !errors.ph;
+    const isSoilTypeValid = !!formData.soilType && !errors.soilType;
 
-    const waterSources = cultivationInfo.waterSources || [];
+    const waterSources = formData.waterSources || [];
     const isWaterSourceValid =
       waterSources.length > 0 &&
       (!waterSources.includes("Other") ||
-        cultivationInfo.otherWaterSource?.trim());
+        !!formData.otherWaterSource?.trim());
 
-    const isOverallSoilFertilityValid =
-      !!cultivationInfo.soilfertility;
+    const isOverallSoilFertilityValid = !!formData.soilfertility;
 
     const yesNoFields = [
       "isCropSuitale",
@@ -294,11 +304,12 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
     ];
 
     const allYesNoSelected = yesNoFields.every(
-      (key) => cultivationInfo[key] === "Yes" || cultivationInfo[key] === "No"
+      (key) => (formData[key] === "Yes" || formData[key] === "No") ?? false,
     );
 
     const hasErrors = Object.values(errors).some(Boolean);
-    const isImageValid = !!cultivationInfo.waterImage;
+    const isImageValid = !!formData.waterImage;
+
     setIsNextEnabled(
       allClimateSelected &&
       isPHValid &&
@@ -307,48 +318,43 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
       isOverallSoilFertilityValid &&
       allYesNoSelected &&
       isImageValid &&
-      !hasErrors
+      !hasErrors,
     );
   }, [formData, selections, errors]);
 
-  let jobId = requestNumber;
-  console.log("jobid", jobId);
-
-  const updateFormData = async (updates: Partial<CultivationInfoData>) => {
-    try {
-      const updatedFormData = {
-        ...formData,
-        inspectioncultivation: {
-          ...formData.inspectioncultivation,
-          ...updates,
-        },
-      };
-
-      setFormData(updatedFormData);
-      await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData));
-    } catch (e) {
-      console.log("AsyncStorage save failed", e);
-    }
+  // 5. REPLACE updateFormData - Remove AsyncStorage
+  const updateFormData = (updates: Partial<CultivationInfoData>) => {
+    dispatch(updateCultivationInfo({
+      requestId,
+      updates,
+    }));
   };
 
-  const fetchInspectionData = async (reqId: number): Promise<CultivationInfoData | null> => {
+  const fetchInspectionData = async (
+    reqId: number,
+  ): Promise<CultivationInfoData | null> => {
     try {
-      console.log(`🔍 Fetching cultivation inspection data for reqId: ${reqId}`);
+      console.log(
+        `🔍 Fetching cultivation inspection data for reqId: ${reqId}`,
+      );
 
       const response = await axios.get(
         `${environment.API_BASE_URL}api/capital-request/inspection/get`,
         {
           params: {
             reqId,
-            tableName: 'inspectioncultivation'
-          }
-        }
+            tableName: "inspectioncultivation",
+          },
+        },
       );
 
-      console.log('📦 Raw response:', response.data);
+      console.log("📦 Raw response:", response.data);
 
       if (response.data.success && response.data.data) {
-        console.log(`✅ Fetched existing cultivation data:`, response.data.data);
+        console.log(
+          `✅ Fetched existing cultivation data:`,
+          response.data.data,
+        );
 
         const data = response.data.data;
 
@@ -356,7 +362,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
         const safeJsonParse = (field: any) => {
           if (!field) return [];
           if (Array.isArray(field)) return field;
-          if (typeof field === 'string') {
+          if (typeof field === "string") {
             try {
               const parsed = JSON.parse(field);
               return Array.isArray(parsed) ? parsed : [];
@@ -369,8 +375,8 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
 
         // Helper to convert boolean (0/1) to "Yes"/"No"
         const boolToYesNo = (val: any): "Yes" | "No" | undefined => {
-          if (val === 1 || val === '1' || val === true) return "Yes";
-          if (val === 0 || val === '0' || val === false) return "No";
+          if (val === 1 || val === "1" || val === true) return "Yes";
+          if (val === 0 || val === "0" || val === false) return "No";
           return undefined;
         };
 
@@ -381,33 +387,53 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
           if (imageUrls.length > 0) {
             waterImage = {
               uri: imageUrls[0],
-              name: imageUrls[0].split('/').pop() || 'water.jpg',
-              type: 'image/jpeg'
+              name: imageUrls[0].split("/").pop() || "water.jpg",
+              type: "image/jpeg",
             };
           }
         }
 
         return {
           // Climate parameters
-          temperature: data.temperature === 1 ? "yes" : data.temperature === 0 ? "no" : null,
-          rainfall: data.rainfall === 1 ? "yes" : data.rainfall === 0 ? "no" : null,
-          sunShine: data.sunShine === 1 ? "yes" : data.sunShine === 0 ? "no" : null,
-          humidity: data.humidity === 1 ? "yes" : data.humidity === 0 ? "no" : null,
-          windVelocity: data.windVelocity === 1 ? "yes" : data.windVelocity === 0 ? "no" : null,
-          windDirection: data.windDirection === 1 ? "yes" : data.windDirection === 0 ? "no" : null,
+          temperature:
+            data.temperature === 1
+              ? "yes"
+              : data.temperature === 0
+                ? "no"
+                : null,
+          rainfall:
+            data.rainfall === 1 ? "yes" : data.rainfall === 0 ? "no" : null,
+          sunShine:
+            data.sunShine === 1 ? "yes" : data.sunShine === 0 ? "no" : null,
+          humidity:
+            data.humidity === 1 ? "yes" : data.humidity === 0 ? "no" : null,
+          windVelocity:
+            data.windVelocity === 1
+              ? "yes"
+              : data.windVelocity === 0
+                ? "no"
+                : null,
+          windDirection:
+            data.windDirection === 1
+              ? "yes"
+              : data.windDirection === 0
+                ? "no"
+                : null,
           zone: data.zone === 1 ? "yes" : data.zone === 0 ? "no" : null,
 
           // Other fields
           isCropSuitale: boolToYesNo(data.isCropSuitale),
           ph: data.ph ? parseFloat(data.ph) : 0,
-          soilType: data.soilType || '',
-          soilfertility: data.soilfertility || '',
+          soilType: data.soilType || "",
+          soilfertility: data.soilfertility || "",
           waterSources: safeJsonParse(data.waterSources),
-          otherWaterSource: data.otherWaterSource || '',
+          otherWaterSource: data.otherWaterSource || "",
           waterImage: waterImage,
           isRecevieRainFall: boolToYesNo(data.isRecevieRainFall),
           isRainFallSuitableCrop: boolToYesNo(data.isRainFallSuitableCrop),
-          isRainFallSuitableCultivation: boolToYesNo(data.isRainFallSuitableCultivation),
+          isRainFallSuitableCultivation: boolToYesNo(
+            data.isRainFallSuitableCultivation,
+          ),
           isElectrocityAvailable: boolToYesNo(data.isElectrocityAvailable),
           ispumpOrirrigation: boolToYesNo(data.ispumpOrirrigation),
         };
@@ -417,7 +443,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
       return null;
     } catch (error: any) {
       console.error(`❌ Error fetching cultivation inspection data:`, error);
-      console.error('Error details:', error.response?.data);
+      console.error("Error details:", error.response?.data);
 
       if (error.response?.status === 404) {
         console.log(`📝 No existing record - will create new`);
@@ -432,18 +458,22 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
     reqId: number,
     tableName: string,
     data: CultivationInfoData,
-    isUpdate: boolean
+    isUpdate: boolean,
   ): Promise<boolean> => {
     try {
-      console.log(`💾 Saving to backend (${isUpdate ? 'UPDATE' : 'INSERT'}):`, tableName);
+      console.log(
+        `💾 Saving to backend (${isUpdate ? "UPDATE" : "INSERT"}):`,
+        tableName,
+      );
       console.log(`📝 reqId being sent:`, reqId);
 
       const apiFormData = new FormData();
-      apiFormData.append('reqId', reqId.toString());
-      apiFormData.append('tableName', tableName);
+      apiFormData.append("reqId", reqId.toString());
+      apiFormData.append("tableName", tableName);
 
       // Climate parameters (convert "yes"/"no" to 1/0)
-      const yesNoToBool = (val: any) => val === "yes" ? '1' : val === "no" ? '0' : null;
+      const yesNoToBool = (val: any) =>
+        val === "yes" ? "1" : val === "no" ? "0" : null;
 
       const appendIfNotNull = (key: string, value: any) => {
         if (value !== null && value !== undefined) {
@@ -451,55 +481,78 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
         }
       };
 
-      appendIfNotNull('temperature', yesNoToBool(data.temperature));
-      appendIfNotNull('rainfall', yesNoToBool(data.rainfall));
-      appendIfNotNull('sunShine', yesNoToBool(data.sunShine));
-      appendIfNotNull('humidity', yesNoToBool(data.humidity));
-      appendIfNotNull('windVelocity', yesNoToBool(data.windVelocity));
-      appendIfNotNull('windDirection', yesNoToBool(data.windDirection));
-      appendIfNotNull('zone', yesNoToBool(data.zone));
+      appendIfNotNull("temperature", yesNoToBool(data.temperature));
+      appendIfNotNull("rainfall", yesNoToBool(data.rainfall));
+      appendIfNotNull("sunShine", yesNoToBool(data.sunShine));
+      appendIfNotNull("humidity", yesNoToBool(data.humidity));
+      appendIfNotNull("windVelocity", yesNoToBool(data.windVelocity));
+      appendIfNotNull("windDirection", yesNoToBool(data.windDirection));
+      appendIfNotNull("zone", yesNoToBool(data.zone));
 
       // Yes/No fields
-      const yesNoToInt = (val: any) => val === "Yes" ? '1' : val === "No" ? '0' : null;
+      const yesNoToInt = (val: any) =>
+        val === "Yes" ? "1" : val === "No" ? "0" : null;
 
-      appendIfNotNull('isCropSuitale', yesNoToInt(data.isCropSuitale));
-      appendIfNotNull('isRecevieRainFall', yesNoToInt(data.isRecevieRainFall));
-      appendIfNotNull('isRainFallSuitableCrop', yesNoToInt(data.isRainFallSuitableCrop));
-      appendIfNotNull('isRainFallSuitableCultivation', yesNoToInt(data.isRainFallSuitableCultivation));
-      appendIfNotNull('isElectrocityAvailable', yesNoToInt(data.isElectrocityAvailable));
-      appendIfNotNull('ispumpOrirrigation', yesNoToInt(data.ispumpOrirrigation));
+      appendIfNotNull("isCropSuitale", yesNoToInt(data.isCropSuitale));
+      appendIfNotNull("isRecevieRainFall", yesNoToInt(data.isRecevieRainFall));
+      appendIfNotNull(
+        "isRainFallSuitableCrop",
+        yesNoToInt(data.isRainFallSuitableCrop),
+      );
+      appendIfNotNull(
+        "isRainFallSuitableCultivation",
+        yesNoToInt(data.isRainFallSuitableCultivation),
+      );
+      appendIfNotNull(
+        "isElectrocityAvailable",
+        yesNoToInt(data.isElectrocityAvailable),
+      );
+      appendIfNotNull(
+        "ispumpOrirrigation",
+        yesNoToInt(data.ispumpOrirrigation),
+      );
 
       // Other fields
-      apiFormData.append('ph', data.ph?.toString() || '0');
-      apiFormData.append('soilType', data.soilType || '');
-      apiFormData.append('soilfertility', data.soilfertility || '');
+      apiFormData.append("ph", data.ph?.toString() || "0");
+      apiFormData.append("soilType", data.soilType || "");
+      apiFormData.append("soilfertility", data.soilfertility || "");
 
       // Water sources (JSON array)
       if (data.waterSources && data.waterSources.length > 0) {
-        apiFormData.append('waterSources', JSON.stringify(data.waterSources));
+        apiFormData.append("waterSources", JSON.stringify(data.waterSources));
       }
 
       if (data.otherWaterSource) {
-        apiFormData.append('otherWaterSource', data.otherWaterSource);
+        apiFormData.append("otherWaterSource", data.otherWaterSource);
       }
 
       // Water image
       if (data.waterImage) {
-        if (typeof data.waterImage === 'string' || (data.waterImage.uri && (data.waterImage.uri.startsWith('http://') || data.waterImage.uri.startsWith('https://')))) {
-          const url = typeof data.waterImage === 'string' ? data.waterImage : data.waterImage.uri;
+        if (
+          typeof data.waterImage === "string" ||
+          (data.waterImage.uri &&
+            (data.waterImage.uri.startsWith("http://") ||
+              data.waterImage.uri.startsWith("https://")))
+        ) {
+          const url =
+            typeof data.waterImage === "string"
+              ? data.waterImage
+              : data.waterImage.uri;
           // ✅ Send as array in imageUrl_0 format (like inspectionland)
-          apiFormData.append('waterImageUrl_0', url);
+          apiFormData.append("waterImageUrl_0", url);
           console.log(`🔗 Keeping existing water image URL: ${url}`);
-        } else if (data.waterImage.uri && data.waterImage.uri.startsWith('file://')) {
-          apiFormData.append('waterImage', {
+        } else if (
+          data.waterImage.uri &&
+          data.waterImage.uri.startsWith("file://")
+        ) {
+          apiFormData.append("waterImage", {
             uri: data.waterImage.uri,
             name: data.waterImage.name || `water_${Date.now()}.jpg`,
-            type: data.waterImage.type || 'image/jpeg',
+            type: data.waterImage.type || "image/jpeg",
           } as any);
           console.log(`📤 Uploading new water image`);
         }
       }
-
 
       console.log(`📦 Sending FormData to backend`);
 
@@ -508,9 +561,9 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
         apiFormData,
         {
           headers: {
-            'Content-Type': 'multipart/form-data',
+            "Content-Type": "multipart/form-data",
           },
-        }
+        },
       );
 
       if (response.data.success) {
@@ -519,7 +572,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
         // Update waterImage with S3 URL if returned
         if (response.data.data.waterImage) {
           let imageUrls = response.data.data.waterImage;
-          if (typeof imageUrls === 'string') {
+          if (typeof imageUrls === "string") {
             try {
               imageUrls = JSON.parse(imageUrls);
             } catch (e) {
@@ -530,26 +583,17 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
           if (Array.isArray(imageUrls) && imageUrls.length > 0) {
             const imageObject = {
               uri: imageUrls[0],
-              name: imageUrls[0].split('/').pop() || 'water.jpg',
-              type: 'image/jpeg'
+              name: imageUrls[0].split("/").pop() || "water.jpg",
+              type: "image/jpeg",
             };
 
-            setFormData((prev: FormData) => ({
-              ...prev,
-              inspectioncultivation: {
-                ...(prev.inspectioncultivation || {}),
-                waterImage: imageObject
-              }
+            // Update Redux with S3 URL
+            dispatch(updateCultivationInfo({
+              requestId,
+              updates: { waterImage: imageObject },
             }));
 
-            await AsyncStorage.setItem(`${jobId}`, JSON.stringify({
-              ...formData,
-              inspectioncultivation: {
-                ...formData.inspectioncultivation,
-                waterImage: imageObject,
-              }
-            }));
-            console.log("💾 Updated AsyncStorage with S3 water image URL");
+            console.log("💾 Updated Redux with S3 water image URL");
           }
         }
 
@@ -597,11 +641,16 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
     useCallback(() => {
       const loadFormData = async () => {
         try {
-          // First, try to fetch from backend
+          // Initialize Redux state
+          dispatch(initializeCultivationInfo({ requestId }));
+
+          // Try to fetch from backend
           if (requestId) {
             const reqId = Number(requestId);
             if (!isNaN(reqId) && reqId > 0) {
-              console.log(`🔄 Attempting to fetch cultivation data from backend for reqId: ${reqId}`);
+              console.log(
+                `🔄 Attempting to fetch cultivation data from backend for reqId: ${reqId}`,
+              );
 
               const backendData = await fetchInspectionData(reqId);
 
@@ -615,90 +664,219 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
                 });
                 setSelections(savedSelections);
 
-                // Update form with backend data
-                const updatedFormData = {
-                  ...formData,
-                  inspectioncultivation: backendData
-                };
-
-                setFormData(updatedFormData);
-                setIsExistingData(true);
-
-                // Save to AsyncStorage as backup
-                await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData));
+                // Save to Redux
+                dispatch(setCultivationInfo({
+                  requestId,
+                  data: backendData,
+                  isExisting: true,
+                }));
 
                 return; // Exit after loading from backend
               }
             }
           }
 
-          // If no backend data, try AsyncStorage
-          console.log(`📂 Checking AsyncStorage for jobId: ${jobId}`);
-          const savedData = await AsyncStorage.getItem(`${jobId}`);
-
-          if (savedData) {
-            const parsedData = JSON.parse(savedData);
-            console.log(`✅ Loaded cultivation data from AsyncStorage`);
-            setFormData(parsedData);
-            setIsExistingData(true);
-
-            const savedSelections: Record<string, Selection> = {};
-            climateParameters.forEach(({ key }) => {
-              savedSelections[key] = parsedData.inspectioncultivation?.[key] ?? null;
-            });
-            setSelections(savedSelections);
-          } else {
-            // No data found anywhere - new entry
-            setIsExistingData(false);
-            console.log("📝 No existing cultivation data - new entry");
-          }
+          // If no backend data, Redux already has initialized empty state
+          console.log("📝 No existing cultivation data - new entry");
         } catch (e) {
           console.error("Failed to load cultivation form data", e);
-          setIsExistingData(false);
         }
       };
 
       loadFormData();
-    }, [requestId, jobId])
+    }, [requestId, dispatch]),
   );
-
 
   const handleFieldChange = (
     key: keyof CultivationInfoData,
     text: string,
-    rules: ValidationRule
+    rules: ValidationRule,
   ) => {
     const { value, error } = validateAndFormat(
       text,
       rules,
       t,
-      formData.inspectioncultivation,
-      key
+      formData,
+      key,
     );
 
-    setFormData((prev: any) => ({
-      ...prev,
-      inspectioncultivation: {
-        ...prev.inspectioncultivation,
-        [key]: value,
-      },
+    // Update Redux
+    dispatch(updateCultivationInfo({
+      requestId,
+      updates: { [key]: value },
     }));
 
     setErrors((prev) => ({ ...prev, [key]: error || "" }));
-    updateFormData({ [key]: value });
   };
+
+  // 8. UPDATE handleSelect - Remove AsyncStorage
+  const handleSelect = (key: string, value: Selection) => {
+    const currentValue = selections[key];
+    const newValue = currentValue === value ? null : value;
+
+    const updatedSelections = {
+      ...selections,
+      [key]: newValue,
+    };
+    setSelections(updatedSelections);
+
+    // Update Redux
+    const updates: Partial<CultivationInfoData> = {
+      [key]: newValue,
+    };
+
+    if (newValue === null) {
+      delete updates[key];
+    }
+
+    dispatch(updateCultivationInfo({
+      requestId,
+      updates,
+    }));
+
+    const nextMissing = climateParameters.find(
+      (p) => !updatedSelections[p.key],
+    );
+
+    if (nextMissing) {
+      setError(
+        t("Error.Please select Yes or No for", {
+          Missing: t(`InspectionForm.${nextMissing.label}`),
+        }),
+      );
+    } else {
+      setError("");
+    }
+  };
+
+  const handleyesNOFieldChange = (key: string, value: "Yes" | "No") => {
+    dispatch(updateCultivationInfo({
+      requestId,
+      updates: { [key]: value },
+    }));
+  };
+
+  const handleCameraClose = async (uri: string | null) => {
+    setShowCamera(false);
+
+    if (!uri) return;
+
+    const fileName = "waterImage";
+    const fileObj = await convertImageToFormData(uri, fileName);
+
+    if (!fileObj) return;
+
+    dispatch(updateCultivationInfo({
+      requestId,
+      updates: { waterImage: fileObj },
+    }));
+
+    setErrors((prev) => ({
+      ...prev,
+      waterImage: "",
+    }));
+  };
+
+  const onClearImage = () => {
+    dispatch(updateCultivationInfo({
+      requestId,
+      updates: { waterImage: null },
+    }));
+
+    setErrors((prev) => ({
+      ...prev,
+      waterImage: t("Error.Image of the water source is required"),
+    }));
+  };
+
+  const handleWaterSourceToggle = (option: string, selected: boolean) => {
+    let updatedOptions = formData.waterSources || [];
+
+    if (selected) {
+      updatedOptions = updatedOptions.filter((o: any) => o !== option);
+    } else {
+      updatedOptions = [...updatedOptions, option];
+    }
+
+    const updates: Partial<CultivationInfoData> = {
+      waterSources: updatedOptions,
+    };
+
+    // Clear otherWaterSource if "Other" is deselected
+    if (option === "Other" && !updatedOptions.includes("Other")) {
+      updates.otherWaterSource = "";
+    }
+
+    dispatch(updateCultivationInfo({
+      requestId,
+      updates,
+    }));
+
+    // VALIDATION
+    let errorMsg = "";
+    const validWaterSources = updatedOptions.filter(
+      (source: string) => source !== "Other",
+    );
+
+    if (validWaterSources.length === 0) {
+      errorMsg = t("Error.Please select at least one water source");
+    } else if (
+      updatedOptions.includes("Other") &&
+      !formData.otherWaterSource?.trim()
+    ) {
+      errorMsg = t("Error.Please specify the other water source");
+    }
+
+    setErrors((prev) => ({
+      ...prev,
+      waterSources: errorMsg,
+    }));
+  };
+
+  const handleOtherWaterSourceChange = (text: string) => {
+    dispatch(updateCultivationInfo({
+      requestId,
+      updates: { otherWaterSource: text },
+    }));
+
+    let errorMsg = "";
+    const waterSources = formData.waterSources || [];
+    const validWaterSources = waterSources.filter(
+      (source: string) => source !== "Other",
+    );
+
+    if (validWaterSources.length === 0) {
+      errorMsg = t("Error.Please select at least one water source");
+    } else if (waterSources.includes("Other") && !text.trim()) {
+      errorMsg = t("Error.Please specify the other water source");
+    }
+
+    setErrors((prev) => ({ ...prev, waterSources: errorMsg }));
+  };
+
+  const handleSoilFertilitySelect = (item: string) => {
+    dispatch(updateCultivationInfo({
+      requestId,
+      updates: { soilfertility: item },
+    }));
+    setOverallSoilFertilityVisible(false);
+  };
+
 
   const handleNext = async () => {
     const validationErrors: Record<string, string> = {};
-    const cultivationInfo = formData.inspectioncultivation;
+    const cultivationInfo = formData;
 
     // Validate climate parameters
     const allClimateSelected = climateParameters.every(
-      (param) => selections[param.key] === "yes" || selections[param.key] === "no"
+      (param) =>
+        selections[param.key] === "yes" || selections[param.key] === "no",
     );
 
     if (!allClimateSelected) {
-      validationErrors.climate = t("Error.Please select Yes or No for all climate parameters");
+      validationErrors.climate = t(
+        "Error.Please select Yes or No for all climate parameters",
+      );
     }
 
     // Validate other required fields
@@ -709,10 +887,14 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
       validationErrors.soilType = t("Error.soilType is required");
     }
     if (!cultivationInfo?.soilfertility) {
-      validationErrors.soilfertility = t("Error.Overall soil fertility is required");
+      validationErrors.soilfertility = t(
+        "Error.Overall soil fertility is required",
+      );
     }
     if (!cultivationInfo?.waterImage) {
-      validationErrors.waterImage = t("Error.Image of the water source is required");
+      validationErrors.waterImage = t(
+        "Error.Image of the water source is required",
+      );
     }
 
     // Validate Yes/No fields
@@ -725,7 +907,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
       "ispumpOrirrigation",
     ];
 
-    yesNoFields.forEach(field => {
+    yesNoFields.forEach((field) => {
       if (!cultivationInfo?.[field]) {
         validationErrors[field] = t(`Error.${field} is required`);
       }
@@ -735,7 +917,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
       setErrors(validationErrors);
       const errorMessage = "• " + Object.values(validationErrors).join("\n• ");
       Alert.alert(t("Error.Validation Error"), errorMessage, [
-        { text: t("MAIN.OK") },
+        { text: t("Main.ok") },
       ]);
       return;
     }
@@ -746,7 +928,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
       Alert.alert(
         t("Error.Error"),
         "Request ID is missing. Please go back and try again.",
-        [{ text: t("MAIN.OK") }]
+        [{ text: t("Main.ok") }],
       );
       return;
     }
@@ -758,7 +940,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
       Alert.alert(
         t("Error.Error"),
         "Invalid request ID. Please go back and try again.",
-        [{ text: t("MAIN.OK") }]
+        [{ text: t("Main.ok") }],
       );
       return;
     }
@@ -769,82 +951,85 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
       t("InspectionForm.Saving"),
       t("InspectionForm.Please wait..."),
       [],
-      { cancelable: false }
+      { cancelable: false },
     );
 
     try {
-      console.log(`🚀 Saving to backend (${isExistingData ? "UPDATE" : "INSERT"})`);
+      console.log(
+        `🚀 Saving to backend (${isExistingData ? "UPDATE" : "INSERT"})`,
+      );
 
       const saved = await saveToBackend(
         reqId,
         "inspectioncultivation",
-        formData.inspectioncultivation!,
-        isExistingData
+        formData, // Now from Redux
+        isExistingData,
       );
 
       if (saved) {
         console.log("✅ Cultivation info saved successfully to backend");
-        setIsExistingData(true);
+
+        // Mark as existing in Redux
+        dispatch(markCultivationAsExisting({ requestId }));
 
         Alert.alert(
-          t("MAIN.Success"),
+          t("Main.Success"),
           t("InspectionForm.Data saved successfully"),
           [
             {
-              text: t("MAIN.OK"),
+              text: t("Main.ok"),
               onPress: () => {
                 navigation.navigate("CroppingSystems", {
-                  formData,
+                  formData: { inspectioncultivation: formData },
                   requestNumber,
-                  requestId: route.params.requestId
+                  requestId,
                 });
               },
             },
-          ]
+          ],
         );
       } else {
         console.log("⚠️ Backend save failed, but continuing with local data");
         Alert.alert(
-          t("MAIN.Warning"),
+          t("Main.Warning"),
           t("InspectionForm.Could not save to server. Data saved locally."),
           [
             {
-              text: t("MAIN.Continue"),
+              text: t("Main.Continue"),
               onPress: () => {
                 navigation.navigate("CroppingSystems", {
                   formData,
                   requestNumber,
-                  requestId: route.params.requestId
+                  requestId: route.params.requestId,
                 });
               },
             },
-          ]
+          ],
         );
       }
     } catch (error) {
       console.error("Error during final save:", error);
       Alert.alert(
-        t("MAIN.Warning"),
+        t("Main.Warning"),
         t("InspectionForm.Could not save to server. Data saved locally."),
         [
           {
-            text: t("MAIN.Continue"),
+            text: t("Main.Continue"),
             onPress: () => {
               navigation.navigate("CroppingSystems", {
                 formData,
                 requestNumber,
-                requestId: route.params.requestId
+                requestId: route.params.requestId,
               });
             },
           },
-        ]
+        ],
       );
     }
   };
 
   console.log(selections);
 
-  const [error, setError] = useState<string>("");
 
   // const handleSelect = async (param: string, value: Selection) => {
   //   const currentValue = selections[param];
@@ -857,7 +1042,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
   //   setSelections(updatedSelections);
 
   //   const updatedSuitableParams = {
-  //     ...(formData.inspectioncultivation?.suitableForOverallLocalClimaticParameters ||
+  //     ...(formData?.suitableForOverallLocalClimaticParameters ||
   //       {}),
   //     [param]: newValue,
   //   };
@@ -867,7 +1052,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
   //   }
 
   //   const updatedCultivationInfo = {
-  //     ...formData.inspectioncultivation,
+  //     ...formData,
   //     suitableForOverallLocalClimaticParameters: updatedSuitableParams,
   //   };
 
@@ -897,110 +1082,11 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
   //   }
   // };
 
-  const handleSelect = async (key: string, value: Selection) => {
-    const currentValue = selections[key];
-    const newValue = currentValue === value ? null : value;
 
-    const updatedSelections = {
-      ...selections,
-      [key]: newValue,
-    };
-    setSelections(updatedSelections);
-
-    const updatedCultivationInfo = {
-      ...formData.inspectioncultivation,
-      [key]: newValue,
-    };
-
-    if (newValue === null) {
-      delete updatedCultivationInfo[key];
-    }
-
-    const updatedFormData = {
-      ...formData,
-      inspectioncultivation: updatedCultivationInfo,
-    };
-
-    setFormData(updatedFormData);
-
-    try {
-      await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData));
-    } catch (e) {
-      console.log("AsyncStorage save failed", e);
-    }
-
-    const nextMissing = climateParameters.find(
-      (p) => !updatedSelections[p.key]
-    );
-
-    if (nextMissing) {
-      setError(
-        t("Error.Please select Yes or No for", {
-          Missing: t(`InspectionForm.${nextMissing.label}`),
-        })
-      );
-    } else {
-      setError("");
-    }
-  };
-
-
-  const handleyesNOFieldChange = async (key: string, value: "Yes" | "No") => {
-    const updatedFormData = {
-      ...formData,
-      inspectioncultivation: {
-        ...formData.inspectioncultivation,
-        [key]: value,
-      },
-    };
-
-    setFormData(updatedFormData);
-
-    try {
-      await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData));
-    } catch (e) {
-      console.log("AsyncStorage save failed", e);
-    }
-  };
-
-
-  const handleCameraClose = async (uri: string | null) => {
-    setShowCamera(false);
-
-    // If camera closed without image → do nothing
-    if (!uri) return;
-
-    const fileName = "waterImage";
-    const fileObj = await convertImageToFormData(uri, fileName);
-
-    if (!fileObj) return;
-
-    const updatedFormData = {
-      ...formData,
-      inspectioncultivation: {
-        ...formData.inspectioncultivation,
-        waterImage: fileObj, // 🔁 REPLACED every time
-      },
-    };
-
-    setFormData(updatedFormData);
-    setErrors((prev) => ({
-      ...prev,
-      waterImage: "",
-    }));
-    try {
-      await AsyncStorage.setItem(
-        `${jobId}`,
-        JSON.stringify(updatedFormData)
-      );
-    } catch (e) {
-      console.log("AsyncStorage save failed", e);
-    }
-  };
 
   const convertImageToFormData = async (
     imageUri: string,
-    fieldName: string
+    fieldName: string,
   ) => {
     try {
       const extension = imageUri.split(".").pop() || "jpg";
@@ -1017,31 +1103,6 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
     }
   };
 
-  const onClearImage = async () => {
-    const updatedFormData = {
-      ...formData,
-      inspectioncultivation: {
-        ...formData.inspectioncultivation,
-        waterImage: null,
-      },
-    };
-
-    setFormData(updatedFormData);
-
-    setErrors((prev) => ({
-      ...prev,
-      waterImage: t("Error.Image of the water source is required"),
-    }));
-
-    try {
-      await AsyncStorage.setItem(
-        `${jobId}`,
-        JSON.stringify(updatedFormData)
-      );
-    } catch (e) {
-      console.log("AsyncStorage save failed", e);
-    }
-  };
 
   return (
     <KeyboardAvoidingView
@@ -1051,21 +1112,8 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
       <View className="flex-1 bg-[#F3F3F3] ">
         <StatusBar barStyle="dark-content" />
 
-        <View className="flex-row items-center justify-center py-4 mt-2">
-          <TouchableOpacity
-            className="absolute left-4 bg-[#E0E0E080] rounded-full p-4"
-            onPress={() => navigation.goBack()}
-          >
-            <AntDesign name="left" size={20} color="#000" />
-          </TouchableOpacity>
-
-          <Text className="text-lg font-semibold text-black">
-            {t("InspectionForm.Inspection Form")}
-          </Text>
-        </View>
-
         {/* Tabs */}
-        <FormTabs activeKey="Cultivation Info" />
+        <FormTabs activeKey="Cultivation Info" navigation={navigation} />
 
         <ScrollView
           className="flex-1 px-6 bg-white rounded-t-3xl"
@@ -1076,7 +1124,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
           <View>
             <Text className="text-sm text-[#070707] mb-2">
               {t(
-                "InspectionForm.Is the crop / cropping system suitable for overall local climatic parameters"
+                "InspectionForm.Is the crop / cropping system suitable for overall local climatic parameters",
               )}{" "}
               *
             </Text>
@@ -1139,16 +1187,11 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
 
           <YesNoSelect
             label={t(
-              "InspectionForm.Is the crop / cropping system suitable for local soil type"
+              "InspectionForm.Is the crop / cropping system suitable for local soil type",
             )}
             required
-            value={
-              formData.inspectioncultivation?.isCropSuitale || null
-            }
-            visible={
-              yesNoModalVisible &&
-              activeYesNoField === "isCropSuitale"
-            }
+            value={formData?.isCropSuitale || null}
+            visible={yesNoModalVisible && activeYesNoField === "isCropSuitale"}
             onOpen={() => {
               setActiveYesNoField("isCropSuitale");
               setYesNoModalVisible(true);
@@ -1157,15 +1200,13 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
               setYesNoModalVisible(false);
               setActiveYesNoField(null);
             }}
-            onSelect={(value) =>
-              handleyesNOFieldChange("isCropSuitale", value)
-            }
+            onSelect={(value) => handleyesNOFieldChange("isCropSuitale", value)}
           />
           <View className="mt-4" />
           <Input
             label={t("InspectionForm.pH")}
             placeholder="----"
-            value={formData.inspectioncultivation?.ph}
+            value={formData?.ph?.toString()}
             onChangeText={(text) =>
               handleFieldChange("ph", text, {
                 required: true,
@@ -1180,7 +1221,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
           <Input
             label={t("InspectionForm.Soil Type")}
             placeholder="----"
-            value={formData.inspectioncultivation?.soilType}
+            value={formData?.soilType}
             onChangeText={(text) =>
               handleFieldChange("soilType", text, {
                 required: true,
@@ -1194,71 +1235,18 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
           {/* Water Sources */}
           <View className="mt-2">
             <Text className="text-sm text-[#070707] mb-4">
-              {t("InspectionForm.Water sources")} <Text className="text-red-500">*</Text>
+              {t("InspectionForm.Water sources")}{" "}
+              <Text className="text-red-500">*</Text>
             </Text>
 
             {["Tanks", "Wells", "River", "Dams", "Other"].map((option) => {
-              const selected =
-                formData.inspectioncultivation?.waterSources?.includes(option) || false;
+              const selected = formData.waterSources?.includes(option) || false;
 
               return (
                 <View key={option} className="flex-row items-center mb-4">
                   <Checkbox
                     value={selected}
-                    onValueChange={async () => {
-                      let updatedOptions = formData.inspectioncultivation?.waterSources || [];
-
-                      if (selected) {
-                        updatedOptions = updatedOptions.filter((o: any) => o !== option);
-                      } else {
-                        updatedOptions = [...updatedOptions, option];
-                      }
-
-                      const updatedFormData = {
-                        ...formData,
-                        inspectioncultivation: {
-                          ...formData.inspectioncultivation,
-                          waterSources: updatedOptions,
-                          otherWaterSource:
-                            option === "Other" && !updatedOptions.includes("Other")
-                              ? ""
-                              : formData.inspectioncultivation?.otherWaterSource,
-                        },
-                      };
-
-                      setFormData(updatedFormData);
-
-                      // VALIDATION
-                      let errorMsg = "";
-
-                      const waterSources = updatedFormData.inspectioncultivation.waterSources || [];
-
-                      // Filter out "Other" to see if at least one real option is selected
-                      const validWaterSources = waterSources.filter((source: string) => source !== "Other");
-
-                      if (validWaterSources.length === 0) {
-                        // No real water source selected
-                        errorMsg = t("Error.Please select at least one water source");
-                      } else if (
-                        waterSources.includes("Other") &&
-                        !updatedFormData.inspectioncultivation.otherWaterSource?.trim()
-                      ) {
-                        // "Other" is selected but not specified
-                        errorMsg = t("Error.Please specify the other water source");
-                      }
-
-                      setErrors(prev => ({ ...prev, waterSources: errorMsg }));
-
-
-                      try {
-                        await AsyncStorage.setItem(
-                          `${jobId}`,
-                          JSON.stringify(updatedFormData)
-                        );
-                      } catch (e) {
-                        console.log("AsyncStorage save failed", e);
-                      }
-                    }}
+                    onValueChange={() => handleWaterSourceToggle(option, selected)}
                     color={selected ? "#000" : undefined}
                   />
                   <Text className="ml-2">{t(`InspectionForm.${option}`)}</Text>
@@ -1266,52 +1254,21 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
               );
             })}
 
-
-            {formData.inspectioncultivation?.waterSources?.includes("Other") && (
+            {formData.waterSources?.includes("Other") && (
               <TextInput
                 placeholder={t("InspectionForm.--Mention Other--")}
                 placeholderTextColor="#838B8C"
                 className="bg-[#F6F6F6] px-4 py-4 rounded-full text-black mb-2"
-                value={formData.inspectioncultivation?.otherWaterSource || ""}
-                onChangeText={(text) => {
-                  const updatedFormData = {
-                    ...formData,
-                    inspectioncultivation: {
-                      ...formData.inspectioncultivation,
-                      otherWaterSource: text,
-                    },
-                  };
-
-                  setFormData(updatedFormData);
-
-                  let errorMsg = "";
-                  const waterSources = updatedFormData.inspectioncultivation.waterSources || [];
-                  const validWaterSources = waterSources.filter(
-                    (source: string) => source !== "Other"
-                  );
-
-                  if (validWaterSources.length === 0) {
-                    errorMsg = t("Error.Please select at least one water source");
-                  } else if (waterSources.includes("Other") && !text.trim()) {
-                    errorMsg = t("Error.Please specify the other water source");
-                  }
-
-                  setErrors((prev) => ({ ...prev, waterSources: errorMsg }));
-
-                  // 3️⃣ Save to AsyncStorage in the background (don't await here)
-                  AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData)).catch(e =>
-                    console.log("AsyncStorage save failed", e)
-                  );
-                }}
-
+                value={formData.otherWaterSource || ""}
+                onChangeText={handleOtherWaterSourceChange}
               />
-
             )}
 
             {errors.waterSources ? (
-              <Text className="text-red-500 text-sm mt-1">{errors.waterSources}</Text>
+              <Text className="text-red-500 text-sm mt-1">
+                {errors.waterSources}
+              </Text>
             ) : null}
-
           </View>
 
           <View className="mb-2 mt-4">
@@ -1321,13 +1278,18 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
             </Text>
             <TouchableOpacity
               className="bg-[#1A1A1A] rounded-3xl px-6 py-4 flex-row justify-center items-center"
-              onPress={() => { setShowCamera(true); }}
+              onPress={() => {
+                setShowCamera(true);
+              }}
             >
               {image ? (
                 <Feather name="rotate-ccw" size={22} color="#fff" />
               ) : (
                 <FontAwesome6 name="camera" size={22} color="#fff" />
-              )}      <Text className="text-base text-white ml-3">{t("InspectionForm.Capture Photos")}</Text>
+              )}{" "}
+              <Text className="text-base text-white ml-3">
+                {t("InspectionForm.Capture Photos")}
+              </Text>
             </TouchableOpacity>
 
             {image && (
@@ -1347,7 +1309,9 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
               </View>
             )}
             {errors.waterImage ? (
-              <Text className="text-red-500 text-sm mt-2">{errors.waterImage}</Text>
+              <Text className="text-red-500 text-sm mt-2">
+                {errors.waterImage}
+              </Text>
             ) : null}
           </View>
           <View className="mt-2">
@@ -1359,31 +1323,24 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
             <TouchableOpacity
               className="bg-[#F6F6F6] px-4 py-4 flex-row items-center justify-between rounded-full"
               onPress={() => {
-                setOverallSoilFertilityVisible(true)
-                setFormData({
-                  ...formData,
-                  inspectioncultivation: {
-                    ...formData.inspectioncultivation
-                  },
-                })
-              }
-              }
+                setOverallSoilFertilityVisible(true);
+              }}
             >
               <Text
                 className={
-                  formData.inspectioncultivation?.soilfertility
+                  formData?.soilfertility
                     ? "text-black"
                     : "text-[#A3A3A3]"
                 }
               >
-                {formData.inspectioncultivation?.soilfertility
+                {formData?.soilfertility
                   ? t(
-                    `InspectionForm.${formData.inspectioncultivation.soilfertility}`
+                    `InspectionForm.${formData.soilfertility}`,
                   )
                   : t("InspectionForm.--Select From Here--")}
               </Text>
 
-              {!formData.inspectioncultivation?.soilfertility && (
+              {!formData?.soilfertility && (
                 <AntDesign name="down" size={20} color="#838B8C" />
               )}
             </TouchableOpacity>
@@ -1392,12 +1349,9 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
           <YesNoSelect
             label={t("InspectionForm.Does this land receive adequate rainfall")}
             required
-            value={
-              formData.inspectioncultivation?.isRecevieRainFall || null
-            }
+            value={formData?.isRecevieRainFall || null}
             visible={
-              yesNoModalVisible &&
-              activeYesNoField === "isRecevieRainFall"
+              yesNoModalVisible && activeYesNoField === "isRecevieRainFall"
             }
             onOpen={() => {
               setActiveYesNoField("isRecevieRainFall");
@@ -1413,22 +1367,17 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
           />
           <YesNoSelect
             label={t(
-              "InspectionForm.Is the distribution of rainfall suitable to grow identified crops"
+              "InspectionForm.Is the distribution of rainfall suitable to grow identified crops",
             )}
             required
             value={
-              formData.inspectioncultivation
-                ?.isRainFallSuitableCrop || null
+              formData?.isRainFallSuitableCrop || null
             }
             visible={
-              yesNoModalVisible &&
-              activeYesNoField ===
-              "isRainFallSuitableCrop"
+              yesNoModalVisible && activeYesNoField === "isRainFallSuitableCrop"
             }
             onOpen={() => {
-              setActiveYesNoField(
-                "isRainFallSuitableCrop"
-              );
+              setActiveYesNoField("isRainFallSuitableCrop");
               setYesNoModalVisible(true);
             }}
             onClose={() => {
@@ -1436,21 +1385,18 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
               setActiveYesNoField(null);
             }}
             onSelect={(value) =>
-              handleyesNOFieldChange(
-                "isRainFallSuitableCrop",
-                value
-              )
+              handleyesNOFieldChange("isRainFallSuitableCrop", value)
             }
           />
 
           <YesNoSelect
             label={t(
-              "InspectionForm.Is the water quality suitable for cultivation"
+              "InspectionForm.Is the water quality suitable for cultivation",
             )}
             required
             value={
-              formData.inspectioncultivation
-                ?.isRainFallSuitableCultivation || null
+              formData?.isRainFallSuitableCultivation ||
+              null
             }
             visible={
               yesNoModalVisible &&
@@ -1465,24 +1411,19 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
               setActiveYesNoField(null);
             }}
             onSelect={(value) =>
-              handleyesNOFieldChange(
-                "isRainFallSuitableCultivation",
-                value
-              )
+              handleyesNOFieldChange("isRainFallSuitableCultivation", value)
             }
           />
           <YesNoSelect
             label={t(
-              "InspectionForm.Is electricity available for lifting the water"
+              "InspectionForm.Is electricity available for lifting the water",
             )}
             required
             value={
-              formData.inspectioncultivation
-                ?.isElectrocityAvailable || null
+              formData?.isElectrocityAvailable || null
             }
             visible={
-              yesNoModalVisible &&
-              activeYesNoField === "isElectrocityAvailable"
+              yesNoModalVisible && activeYesNoField === "isElectrocityAvailable"
             }
             onOpen={() => {
               setActiveYesNoField("isElectrocityAvailable");
@@ -1493,25 +1434,18 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
               setActiveYesNoField(null);
             }}
             onSelect={(value) =>
-              handleyesNOFieldChange(
-                "isElectrocityAvailable",
-                value
-              )
+              handleyesNOFieldChange("isElectrocityAvailable", value)
             }
           />
 
           <YesNoSelect
             label={t(
-              "InspectionForm.Is there pump sets, micro irrigation systems"
+              "InspectionForm.Is there pump sets, micro irrigation systems",
             )}
             required
-            value={
-              formData.inspectioncultivation?.ispumpOrirrigation ||
-              null
-            }
+            value={formData?.ispumpOrirrigation || null}
             visible={
-              yesNoModalVisible &&
-              activeYesNoField === "ispumpOrirrigation"
+              yesNoModalVisible && activeYesNoField === "ispumpOrirrigation"
             }
             onOpen={() => {
               setActiveYesNoField("ispumpOrirrigation");
@@ -1522,104 +1456,42 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
               setActiveYesNoField(null);
             }}
             onSelect={(value) =>
-              handleyesNOFieldChange(
-                "ispumpOrirrigation",
-                value
-              )
+              handleyesNOFieldChange("ispumpOrirrigation", value)
             }
           />
         </ScrollView>
 
-        <View className="flex-row px-6 py-4 gap-4 bg-white border-t border-gray-200 ">
-          <TouchableOpacity
-            className="flex-1 bg-[#444444] rounded-full py-4 items-center"
-            onPress={() =>
-              navigation.goBack()
-            }
-          >
-            <Text className="text-white text-base font-semibold">
-              {t("InspectionForm.Back")}
-            </Text>
-          </TouchableOpacity>
-          {isNextEnabled == true ? (
-            <View className="flex-1">
-              <TouchableOpacity className="flex-1 " onPress={handleNext}>
-                <LinearGradient
-                  colors={["#F35125", "#FF1D85"]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  className=" rounded-full py-4 items-center"
-                  style={{
-                    shadowColor: "#000",
-                    shadowOffset: { width: 0, height: 3 },
-                    shadowOpacity: 0.25,
-                    shadowRadius: 5,
-                    elevation: 6,
-                  }}
-                >
-                  <Text className="text-white text-base font-semibold">
-                    {t("InspectionForm.Next")}
-                  </Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <View className="flex-1 bg-gray-300 rounded-full py-4 items-center">
-              <Text className="text-white text-base font-semibold">
-                {t("InspectionForm.Next")}
-              </Text>
-            </View>
-          )}
-        </View>
+        <FormFooterButton
+          exitText={t("InspectionForm.Back")}
+          nextText={t("InspectionForm.Next")}
+          isNextEnabled={isNextEnabled}
+          onExit={() => navigation.goBack()}
+          onNext={handleNext}
+        />
       </View>
       <Modal
         transparent
         animationType="fade"
         visible={overallSoilFertilityVisible}
-
       >
         <TouchableOpacity
           className="flex-1 bg-black/40 justify-center items-center"
           activeOpacity={1}
-          onPress={() => { setOverallSoilFertilityVisible(false) }}
+          onPress={() => {
+            setOverallSoilFertilityVisible(false);
+          }}
         >
           <View className="bg-white w-80 rounded-2xl overflow-hidden">
-            {[
-              "Excellent",
-              "Good",
-              "Could be improved with additional effort",
-              "Not Suitable",
-            ].map((item, index, arr) => (
+            {["Excellent", "Good", "Could be improved with additional effort", "Not Suitable"].map((item, index, arr) => (
               <View key={item}>
                 <TouchableOpacity
                   className="py-4"
-                  onPress={async () => {
-                    const updatedFormData = {
-                      ...formData,
-                      inspectioncultivation: {
-                        ...formData.inspectioncultivation,
-                        soilfertility: item,
-                      },
-                    };
-
-                    setFormData(updatedFormData);
-
-                    try {
-                      await AsyncStorage.setItem(
-                        `${jobId}`,
-                        JSON.stringify(updatedFormData)
-                      );
-                    } catch (e) {
-                      console.log("AsyncStorage save failed", e);
-                    }
-                    setOverallSoilFertilityVisible(false);
-                  }}
+                  onPress={() => handleSoilFertilitySelect(item)}
                 >
                   <Text className="text-center text-base text-black">
                     {t(`InspectionForm.${item}`)}
                   </Text>
                 </TouchableOpacity>
-
                 {index !== arr.length - 1 && (
                   <View className="h-px bg-gray-300 mx-4" />
                 )}
