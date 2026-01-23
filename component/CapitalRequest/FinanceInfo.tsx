@@ -13,7 +13,7 @@ import {
   Modal,
   FlatList,
 } from "react-native";
-import { AntDesign, MaterialIcons } from "@expo/vector-icons";
+import { AntDesign, FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import FormTabs from "../CapitalRequest/FormTabs";
 import { useTranslation } from "react-i18next";
 import Checkbox from "expo-checkbox";
@@ -71,7 +71,12 @@ const Input = ({
         keyboardType={keyboardType}
       />
     </View>
-    {error && <Text className="text-red-500 text-sm mt-1 ml-4">{error}</Text>}
+      {error && (
+      <View className="flex-row items-center mt-1 ml-4">
+        <FontAwesome name="exclamation-triangle" size={16} color="#EF4444" />
+        <Text className="text-red-500 text-sm ml-1"> {error}</Text>
+      </View>
+    )}
   </View>
 );
 
@@ -391,95 +396,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     }
   };
 
-  // Load data on focus
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     const loadFormData = async () => {
-  //       if (isDataLoadedRef.current) {
-  //         console.log("⏭️ Data already loaded, skipping...");
-  //         return;
-  //       }
 
-  //       try {
-  //         if (requestId) {
-  //           const reqId = Number(requestId);
-  //           if (!isNaN(reqId) && reqId > 0) {
-  //             // First try SQLite
-  //             const localData = await getFinanceInfo(reqId);
-
-  //             if (localData) {
-  //               console.log(`✅ Loaded data from SQLite`);
-  //               setFormData(localData);
-  //               setIsExistingData(true);
-
-  //               if (localData.bank) {
-  //                 setSelectedBank(localData.bank);
-  //                 const bankObj = banks.find((b) => b.name === localData.bank);
-  //                 if (bankObj) {
-  //                   const filteredBranches =
-  //                     (branchesData as any)[bankObj.id.toString()] || [];
-  //                   setAvailableBranches(filteredBranches);
-  //                 }
-  //               }
-
-  //               if (localData.branch) {
-  //                 setSelectedBranch(localData.branch);
-  //               }
-
-  //               isDataLoadedRef.current = true;
-  //               return;
-  //             }
-
-  //             // If no SQLite data, try backend
-  //             console.log(
-  //               `🔄 Attempting to fetch data from backend for reqId: ${reqId}`,
-  //             );
-  //             const backendData = await fetchInspectionData(reqId);
-
-  //             if (backendData) {
-  //               console.log(`✅ Loaded data from backend`);
-  //               setFormData(backendData);
-  //               setIsExistingData(true);
-
-  //               if (backendData.bank) {
-  //                 setSelectedBank(backendData.bank);
-  //                 const bankObj = banks.find(
-  //                   (b) => b.name === backendData.bank,
-  //                 );
-  //                 if (bankObj) {
-  //                   const filteredBranches =
-  //                     (branchesData as any)[bankObj.id.toString()] || [];
-  //                   setAvailableBranches(filteredBranches);
-  //                 }
-  //               }
-
-  //               if (backendData.branch) {
-  //                 setSelectedBranch(backendData.branch);
-  //               }
-
-  //               isDataLoadedRef.current = true;
-  //               return;
-  //             }
-  //           }
-  //         }
-
-  //         setIsExistingData(false);
-  //         console.log("📝 No existing data - new entry");
-  //         isDataLoadedRef.current = true;
-  //       } catch (e) {
-  //         console.error("Failed to load form data", e);
-  //         setIsExistingData(false);
-  //         isDataLoadedRef.current = true;
-  //       }
-  //     };
-
-  //     loadFormData();
-
-  //     return () => {
-  //       isDataLoadedRef.current = false;
-  //     };
-  //   }, [requestId]),
-  // );
   useFocusEffect(
     useCallback(() => {
       const loadFormData = async () => {

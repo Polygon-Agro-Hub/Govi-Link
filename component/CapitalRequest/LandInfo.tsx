@@ -672,15 +672,16 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
               <Text className="text-sm text-gray-600 mb-2">
                 {formData.images.length} image(s) captured
               </Text>
-              <View className="flex-row flex-wrap">
+              <View className="mt-4 flex-row flex-wrap">
                 {formData.images.map((img: LandImage, index: number) => (
                   <View
                     key={index}
-                    className="w-40 h-40 m-1 rounded-xl overflow-hidden relative"
+                  //  className="w-40 h-40 m-1 rounded-xl overflow-hidden relative"
+                  className="w-1/2 p-1 relative"
                   >
                     <Image
                       source={{ uri: img.uri }}
-                      className="w-full h-full rounded-xl"
+                      className="w-full h-40 rounded-2xl"
                     />
                     <TouchableOpacity
                       className="absolute top-1 right-1 bg-red-500 rounded-full w-6 h-6 justify-center items-center"

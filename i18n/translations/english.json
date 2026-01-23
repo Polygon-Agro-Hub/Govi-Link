@@ -703,6 +703,8 @@
     "PendingConfirmation": "Pending Confirmation",
     "AssignSuccess": "Assigned to {name} successfully!",
     "NoOfficersAvailable": "No officers available for assignment",
-    "HeaderOn": "Confirmation"
+    "HeaderOn": "Confirmation",
+    "UndoSuccess":"All inspection data deleted successfully",
+    "UndoFailed":"Deleting inspection data failed."
   }
 }
