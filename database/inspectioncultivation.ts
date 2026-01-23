@@ -58,7 +58,7 @@ export interface CultivationInfo {
   soilfertility: string;
   waterSources: string[];
   otherWaterSource: string;
-  waterImage: WaterImage | null;
+  waterImages: WaterImage[];
   isRecevieRainFall: "Yes" | "No" | undefined;
   isRainFallSuitableCrop: "Yes" | "No" | undefined;
   isRainFallSuitableCultivation: "Yes" | "No" | undefined;
@@ -157,10 +157,10 @@ export const saveCultivationInfo = (
       console.log("💧 Saving water sources count:", data.waterSources.length);
     }
 
-    // Water image
-    if (data.waterImage) {
-      dbData.waterImage = JSON.stringify([data.waterImage]);
-      console.log("📸 Saving water image");
+    // Water images (JSON array) - UPDATED FOR MULTIPLE IMAGES
+    if (data.waterImages && Array.isArray(data.waterImages)) {
+      dbData.waterImage = JSON.stringify(data.waterImages);
+      console.log("📸 Saving water images count:", data.waterImages.length);
     }
 
     console.log("💾 Database values to save:", dbData);
@@ -256,17 +256,17 @@ export const getCultivationInfo = (
         }
       }
 
-      // Parse water image
-      let waterImage: WaterImage | null = null;
+      // Parse water images - UPDATED FOR MULTIPLE IMAGES
+      let waterImages: WaterImage[] = [];
       if (row.waterImage) {
         try {
           const images = JSON.parse(row.waterImage);
-          if (Array.isArray(images) && images.length > 0) {
-            waterImage = images[0];
-            console.log("📸 Parsed water image");
+          if (Array.isArray(images)) {
+            waterImages = images;
+            console.log("📸 Parsed water images count:", waterImages.length);
           }
         } catch (e) {
-          console.error("❌ Failed to parse water image:", e);
+          console.error("❌ Failed to parse water images:", e);
         }
       }
 
@@ -291,7 +291,7 @@ export const getCultivationInfo = (
         soilfertility: row.soilfertility || "",
         waterSources,
         otherWaterSource: row.otherWaterSource || "",
-        waterImage,
+        waterImages,
         isRecevieRainFall: row.isRecevieRainFall as "Yes" | "No" | undefined,
         isRainFallSuitableCrop: row.isRainFallSuitableCrop as
           | "Yes"
