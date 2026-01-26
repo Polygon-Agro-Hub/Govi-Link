@@ -77,7 +77,8 @@
             "minSdkVersion": 24
           }
         }
-      ]
+      ],
+      "expo-sqlite"
     ],
     "extra": {
       "router": {

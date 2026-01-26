@@ -1,9 +1,15 @@
-import React, { useEffect, useRef } from "react";
-import { View, Text, TouchableOpacity, Platform, StatusBar } from "react-native";
+import React, { useRef } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Platform,
+  StatusBar,
+} from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp } from "@react-navigation/native";
 import { WebView } from "react-native-webview";
-import { AntDesign, MaterialIcons } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -36,7 +42,7 @@ const ViewLocationScreen: React.FC<ViewLocationScreenProps> = ({
 
   const lat = latitude || 7.2008;
   const lng = longitude || 79.8358;
- const {t} = useTranslation()
+  const { t } = useTranslation();
   const leafletHTML = `
     <!DOCTYPE html>
     <html>
@@ -90,20 +96,20 @@ const ViewLocationScreen: React.FC<ViewLocationScreenProps> = ({
   `;
 
   return (
- <View style={{ flex: 1, backgroundColor: "#fff" }}>
+    <View style={{ flex: 1, backgroundColor: "#fff" }}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
-        <View className="flex-row items-center justify-center py-4 mt-2">
-          <TouchableOpacity
-            className="absolute left-4 bg-[#F3F3F3] rounded-full p-4"
-            onPress={() => navigation.goBack()}
-          >
-            <AntDesign name="left" size={20} color="#000" />
-          </TouchableOpacity>
-          <Text className="text-lg font-semibold text-black">
-            {t("InspectionForm.View Geo Location")}
-          </Text>
-        </View>
+      <View className="flex-row items-center justify-center py-4 mt-2">
+        <TouchableOpacity
+          className="absolute left-4 bg-[#F3F3F3] rounded-full p-4"
+          onPress={() => navigation.goBack()}
+        >
+          <AntDesign name="left" size={20} color="#000" />
+        </TouchableOpacity>
+        <Text className="text-lg font-semibold text-black">
+          {t("InspectionForm.View Geo Location")}
+        </Text>
+      </View>
 
       {/* Map */}
       <View

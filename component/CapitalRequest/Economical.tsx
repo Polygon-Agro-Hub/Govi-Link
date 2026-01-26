@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+// Economical.tsx - Fixed version with proper data handling
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
-  TextInput,
   ScrollView,
   TouchableOpacity,
   StatusBar,
@@ -10,34 +10,25 @@ import {
   KeyboardAvoidingView,
   Platform,
   Modal,
-  FlatList,
 } from "react-native";
-import { AntDesign, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTranslation } from "react-i18next";
-import Checkbox from "expo-checkbox";
 import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
-import { useCallback } from "react";
-import { LinearGradient } from "expo-linear-gradient";
-import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../types";
 import axios from "axios";
 import { environment } from "@/environment/environment";
-
-type FormData = {
-  inspectioneconomical?: EconomicalData;
-};
-
-type EconomicalData = {
-  isSuitaleSize?: "Yes" | "No";
-  isFinanceResource?: "Yes" | "No";
-  isAltRoutes?: "Yes" | "No";
-};
+import FormFooterButton from "./FormFooterButton";
+import {
+  saveEconomicalInfo,
+  getEconomicalInfo,
+  EconomicalData,
+} from "@/database/inspectioneconomical";
 
 type EconomicalProps = {
   navigation: any;
 };
+
 const YesNoSelect = ({
   label,
   value,
@@ -114,31 +105,92 @@ const YesNoSelect = ({
     </>
   );
 };
+
 const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
   const route = useRoute<RouteProp<RootStackParamList, "Economical">>();
-  const { requestNumber, requestId } = route.params; // ✅ Add requestId
-  const prevFormData = route.params?.formData;
-  const [formData, setFormData] = useState(prevFormData);
-  const { t, i18n } = useTranslation();
+  const { requestNumber, requestId } = route.params;
+  const { t } = useTranslation();
+
+  // Local state for form data
+  const [formData, setFormData] = useState<EconomicalData>({
+    isSuitaleSize: undefined,
+    isFinanceResource: undefined,
+    isAltRoutes: undefined,
+  });
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [yesNoModalVisible, setYesNoModalVisible] = useState(false);
   const [activeYesNoField, setActiveYesNoField] = useState<string | null>(null);
-  const [isExistingData, setIsExistingData] = useState(false); // ✅ Add this
   const [isNextEnabled, setIsNextEnabled] = useState(false);
+  const [isExistingData, setIsExistingData] = useState(false);
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
 
-  console.log("finance", formData);
+  // Load data from SQLite when component mounts
+  useFocusEffect(
+    useCallback(() => {
+      const loadData = async () => {
+        if (!requestId) return;
 
+        try {
+          const reqId = Number(requestId);
+          const localData = await getEconomicalInfo(reqId);
+
+          if (localData) {
+            console.log("✅ Loaded economical info from SQLite:", localData);
+
+            // Ensure proper data types
+            const normalizedData: EconomicalData = {
+              isSuitaleSize: localData.isSuitaleSize,
+              isFinanceResource: localData.isFinanceResource,
+              isAltRoutes: localData.isAltRoutes,
+            };
+
+            setFormData(normalizedData);
+            setIsExistingData(true);
+          } else {
+            console.log("📝 No local economical data - new entry");
+            setIsExistingData(false);
+          }
+          setIsDataLoaded(true);
+        } catch (error) {
+          console.error("Failed to load economical info from SQLite:", error);
+          setIsDataLoaded(true);
+        }
+      };
+
+      loadData();
+    }, [requestId]),
+  );
+
+  // Auto-save to SQLite whenever formData changes (debounced)
   useEffect(() => {
-    const eco = formData?.inspectioneconomical ?? {};
+    if (!isDataLoaded) return; // Don't auto-save during initial load
 
+    const timer = setTimeout(async () => {
+      if (requestId) {
+        try {
+          await saveEconomicalInfo(Number(requestId), formData);
+          console.log("💾 Auto-saved economical info to SQLite");
+        } catch (err) {
+          console.error("Error auto-saving economical info:", err);
+        }
+      }
+    }, 500); // 500ms debounce
+
+    return () => clearTimeout(timer);
+  }, [formData, requestId, isDataLoaded]);
+
+  // Validate form completion
+  useEffect(() => {
     const isSuitaleSizeValid =
-      eco.isSuitaleSize === "Yes" || eco.isSuitaleSize === "No";
+      formData.isSuitaleSize === "Yes" || formData.isSuitaleSize === "No";
 
     const isFinanceResourceValid =
-      eco.isFinanceResource === "Yes" || eco.isFinanceResource === "No";
+      formData.isFinanceResource === "Yes" ||
+      formData.isFinanceResource === "No";
 
     const isAltRoutesValid =
-      eco.isAltRoutes === "Yes" || eco.isAltRoutes === "No";
+      formData.isAltRoutes === "Yes" || formData.isAltRoutes === "No";
 
     const hasErrors = Object.values(errors).some(Boolean);
 
@@ -146,95 +198,32 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
       isSuitaleSizeValid &&
         isFinanceResourceValid &&
         isAltRoutesValid &&
-        !hasErrors
+        !hasErrors,
     );
   }, [formData, errors]);
 
-  let jobId = requestNumber;
-  console.log("jobid", jobId);
-
-  const updateFormData = async (updates: Partial<EconomicalData>) => {
-    try {
-      const updatedFormData = {
-        ...formData,
-        inspectioneconomical: {
-          ...formData.inspectioneconomical,
-          ...updates,
-        },
-      };
-
-      setFormData(updatedFormData);
-
-      await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData));
-    } catch (e) {
-      console.log("AsyncStorage save failed", e);
-    }
+  // Update form data
+  const updateFormData = (updates: Partial<EconomicalData>) => {
+    setFormData((prev) => ({ ...prev, ...updates }));
   };
 
-  const fetchInspectionData = async (
-    reqId: number
-  ): Promise<EconomicalData | null> => {
-    try {
-      console.log(`🔍 Fetching economical data for reqId: ${reqId}`);
-
-      const response = await axios.get(
-        `${environment.API_BASE_URL}api/capital-request/inspection/get`,
-        {
-          params: {
-            reqId,
-            tableName: "inspectioneconomical",
-          },
-        }
-      );
-
-      console.log("📦 Raw response:", response.data);
-
-      if (response.data.success && response.data.data) {
-        console.log(`✅ Fetched existing economical data:`, response.data.data);
-
-        const data = response.data.data;
-
-        // Helper to convert boolean (0/1) to "Yes"/"No"
-        const boolToYesNo = (val: any): "Yes" | "No" | undefined => {
-          if (val === 1 || val === "1" || val === true) return "Yes";
-          if (val === 0 || val === "0" || val === false) return "No";
-          return undefined;
-        };
-
-        return {
-          isSuitaleSize: boolToYesNo(data.isSuitaleSize),
-          isFinanceResource: boolToYesNo(data.isFinanceResource),
-          isAltRoutes: boolToYesNo(data.isAltRoutes),
-        };
-      }
-
-      console.log(`📭 No existing economical data found for reqId: ${reqId}`);
-      return null;
-    } catch (error: any) {
-      console.error(`❌ Error fetching economical data:`, error);
-      console.error("Error details:", error.response?.data);
-
-      if (error.response?.status === 404) {
-        console.log(`📝 No existing record - will create new`);
-        return null;
-      }
-
-      return null;
-    }
+  // Handle Yes/No field changes
+  const handleyesNOFieldChange = (key: string, value: "Yes" | "No") => {
+    updateFormData({ [key]: value } as any);
   };
 
+  // Save to backend
   const saveToBackend = async (
     reqId: number,
     tableName: string,
     data: EconomicalData,
-    isUpdate: boolean
+    isUpdate: boolean,
   ): Promise<boolean> => {
     try {
       console.log(
         `💾 Saving to backend (${isUpdate ? "UPDATE" : "INSERT"}):`,
-        tableName
+        tableName,
       );
-      console.log(`📝 reqId being sent:`, reqId);
 
       // Yes/No fields
       const yesNoToInt = (val: any) =>
@@ -264,7 +253,7 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       if (response.data.success) {
@@ -276,93 +265,28 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
       }
     } catch (error: any) {
       console.error(`❌ Error saving ${tableName}:`, error);
-      if (error.response) {
-        console.error("Response data:", error.response.data);
-        console.error("Response status:", error.response.status);
-      }
       return false;
     }
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      const loadFormData = async () => {
-        try {
-          // First, try to fetch from backend
-          if (requestId) {
-            const reqId = Number(requestId);
-            if (!isNaN(reqId) && reqId > 0) {
-              console.log(
-                `🔄 Attempting to fetch economical data from backend for reqId: ${reqId}`
-              );
-
-              const backendData = await fetchInspectionData(reqId);
-
-              if (backendData) {
-                console.log(`✅ Loaded economical data from backend`);
-
-                // Update form with backend data
-                const updatedFormData = {
-                  ...formData,
-                  inspectioneconomical: backendData,
-                };
-
-                setFormData(updatedFormData);
-                setIsExistingData(true);
-
-                // Save to AsyncStorage as backup
-                await AsyncStorage.setItem(
-                  `${jobId}`,
-                  JSON.stringify(updatedFormData)
-                );
-
-                return; // Exit after loading from backend
-              }
-            }
-          }
-
-          // If no backend data, try AsyncStorage
-          console.log(`📂 Checking AsyncStorage for jobId: ${jobId}`);
-          const savedData = await AsyncStorage.getItem(`${jobId}`);
-
-          if (savedData) {
-            const parsedData = JSON.parse(savedData);
-            console.log(`✅ Loaded economical data from AsyncStorage`);
-            setFormData(parsedData);
-            setIsExistingData(true);
-          } else {
-            // No data found anywhere - new entry
-            setIsExistingData(false);
-            console.log("📝 No existing economical data - new entry");
-          }
-        } catch (e) {
-          console.error("Failed to load economical form data", e);
-          setIsExistingData(false);
-        }
-      };
-
-      loadFormData();
-    }, [requestId, jobId])
-  );
-
+  // Handle next button
   const handleNext = async () => {
     const validationErrors: Record<string, string> = {};
-    const economicalInfo = formData.inspectioneconomical;
 
     // Validate required fields
-    if (!economicalInfo?.isSuitaleSize) {
+    if (!formData.isSuitaleSize) {
       validationErrors.isSuitaleSize = t(
-        "Error.Suitable size field is required"
+        "Error.Suitable size field is required",
       );
     }
-    if (!economicalInfo?.isFinanceResource) {
+    if (!formData.isFinanceResource) {
       validationErrors.isFinanceResource = t(
-        "Error.Finance resource field is required"
+        "Error.Finance resource field is required",
       );
     }
-    if (!economicalInfo?.isAltRoutes) {
+    if (!formData.isAltRoutes) {
       validationErrors.isAltRoutes = t(
-        "Error.Alternative routes field is required"
+        "Error.Alternative routes field is required",
       );
     }
 
@@ -375,25 +299,25 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
       return;
     }
 
-    // ✅ Validate requestId exists
-    if (!route.params?.requestId) {
+    // Validate requestId exists
+    if (!requestId) {
       console.error("❌ requestId is missing!");
       Alert.alert(
         t("Error.Error"),
         "Request ID is missing. Please go back and try again.",
-        [{ text: t("Main.ok") }]
+        [{ text: t("Main.ok") }],
       );
       return;
     }
 
-    const reqId = Number(route.params.requestId);
+    const reqId = Number(requestId);
 
     if (isNaN(reqId) || reqId <= 0) {
-      console.error("❌ Invalid requestId:", route.params.requestId);
+      console.error("❌ Invalid requestId:", requestId);
       Alert.alert(
         t("Error.Error"),
         "Invalid request ID. Please go back and try again.",
-        [{ text: t("Main.ok") }]
+        [{ text: t("Main.ok") }],
       );
       return;
     }
@@ -404,19 +328,15 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
       t("InspectionForm.Saving"),
       t("InspectionForm.Please wait..."),
       [],
-      { cancelable: false }
+      { cancelable: false },
     );
 
     try {
-      console.log(
-        `🚀 Saving to backend (${isExistingData ? "UPDATE" : "INSERT"})`
-      );
-
       const saved = await saveToBackend(
         reqId,
         "inspectioneconomical",
-        formData.inspectioneconomical!,
-        isExistingData
+        formData,
+        isExistingData,
       );
 
       if (saved) {
@@ -431,13 +351,12 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
               text: t("Main.ok"),
               onPress: () => {
                 navigation.navigate("Labour", {
-                  formData,
                   requestNumber,
-                  requestId: route.params.requestId,
+                  requestId,
                 });
               },
             },
-          ]
+          ],
         );
       } else {
         console.log("⚠️ Backend save failed, but continuing with local data");
@@ -449,13 +368,12 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
               text: t("Main.Continue"),
               onPress: () => {
                 navigation.navigate("Labour", {
-                  formData,
                   requestNumber,
-                  requestId: route.params.requestId,
+                  requestId,
                 });
               },
             },
-          ]
+          ],
         );
       }
     } catch (error) {
@@ -468,32 +386,13 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
             text: t("Main.Continue"),
             onPress: () => {
               navigation.navigate("Labour", {
-                formData,
                 requestNumber,
-                requestId: route.params.requestId,
+                requestId,
               });
             },
           },
-        ]
+        ],
       );
-    }
-  };
-
-  const handleyesNOFieldChange = async (key: string, value: "Yes" | "No") => {
-    const updatedFormData = {
-      ...formData,
-      inspectioneconomical: {
-        ...formData.inspectioneconomical,
-        [key]: value,
-      },
-    };
-
-    setFormData(updatedFormData);
-
-    try {
-      await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData));
-    } catch (e) {
-      console.log("AsyncStorage save failed", e);
     }
   };
 
@@ -514,12 +413,13 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
           contentContainerStyle={{ paddingBottom: 120 }}
         >
           <View className="h-6" />
+
           <YesNoSelect
             label={t(
-              "InspectionForm.Are the proposed crop/cropping systems suitable for the farmer’s size of land holding"
+              "InspectionForm.Are the proposed crop/cropping systems suitable for the farmer's size of land holding",
             )}
             required
-            value={formData.inspectioneconomical?.isSuitaleSize || null}
+            value={formData.isSuitaleSize || null}
             visible={yesNoModalVisible && activeYesNoField === "isSuitaleSize"}
             onOpen={() => {
               setActiveYesNoField("isSuitaleSize");
@@ -534,10 +434,10 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
 
           <YesNoSelect
             label={t(
-              "InspectionForm.Are the financial resources adequate to manage the proposed crop/cropping system"
+              "InspectionForm.Are the financial resources adequate to manage the proposed crop/cropping system",
             )}
             required
-            value={formData.inspectioneconomical?.isFinanceResource || null}
+            value={formData.isFinanceResource || null}
             visible={
               yesNoModalVisible && activeYesNoField === "isFinanceResource"
             }
@@ -553,12 +453,13 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
               handleyesNOFieldChange("isFinanceResource", value)
             }
           />
+
           <YesNoSelect
             label={t(
-              "InspectionForm.If not, can the farmer mobilize financial resources through alternative routes"
+              "InspectionForm.If not, can the farmer mobilize financial resources through alternative routes",
             )}
             required
-            value={formData.inspectioneconomical?.isAltRoutes || null}
+            value={formData.isAltRoutes || null}
             visible={yesNoModalVisible && activeYesNoField === "isAltRoutes"}
             onOpen={() => {
               setActiveYesNoField("isAltRoutes");
@@ -572,53 +473,13 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
           />
         </ScrollView>
 
-        <View className="flex-row px-6 pb-4 gap-4 bg-white border-t border-gray-200">
-          {/* Back Button */}
-          <TouchableOpacity
-            className="flex-1 bg-[#444444] rounded-full py-4 flex-row items-center justify-center"
-            onPress={() => navigation.goBack()}
-          >
-            <Ionicons name="arrow-back" size={22} color="#fff" />
-            <Text className="text-white text-base font-semibold ml-2">
-              {t("InspectionForm.Back")}
-            </Text>
-          </TouchableOpacity>
-
-          {/* Next Button */}
-          {isNextEnabled ? (
-            <TouchableOpacity
-              className="flex-1"
-              onPress={handleNext}
-              activeOpacity={0.8}
-            >
-              <LinearGradient
-                colors={["#F35125", "#FF1D85"]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                className="rounded-full py-4 flex-row items-center justify-center"
-                style={{
-                  shadowColor: "#000",
-                  shadowOffset: { width: 0, height: 3 },
-                  shadowOpacity: 0.25,
-                  shadowRadius: 5,
-                  elevation: 6,
-                }}
-              >
-                <Text className="text-white text-base font-semibold mr-2">
-                  {t("InspectionForm.Next")}
-                </Text>
-                <Ionicons name="arrow-forward" size={22} color="#fff" />
-              </LinearGradient>
-            </TouchableOpacity>
-          ) : (
-            <View className="flex-1 bg-gray-300 rounded-full py-4 flex-row items-center justify-center">
-              <Text className="text-white text-base font-semibold mr-2">
-                {t("InspectionForm.Next")}
-              </Text>
-              <Ionicons name="arrow-forward" size={22} color="#fff" />
-            </View>
-          )}
-        </View>
+        <FormFooterButton
+          exitText={t("InspectionForm.Back")}
+          nextText={t("InspectionForm.Next")}
+          isNextEnabled={isNextEnabled}
+          onExit={() => navigation.goBack()}
+          onNext={handleNext}
+        />
       </View>
     </KeyboardAvoidingView>
   );
