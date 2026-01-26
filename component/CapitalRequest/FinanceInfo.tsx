@@ -1,4 +1,3 @@
-// FinanceInfo.tsx - Finance Info with SQLite (All Functions Preserved)
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   View,
