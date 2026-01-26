@@ -594,7 +594,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
             image.uri.startsWith("http://") ||
             image.uri.startsWith("https://")
           ) {
-            // Existing S3 URL
+            // Existing S3 URL - use the correct field name format
             apiFormData.append(`waterImageUrl_${index}`, image.uri);
             console.log(
               `🔗 Keeping existing water image URL ${index}: ${image.uri}`,
@@ -603,8 +603,8 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
             image.uri.startsWith("file://") ||
             image.uri.startsWith("content://")
           ) {
-            // New local file to upload
-            apiFormData.append(`waterImage_${index}`, {
+            // New local file to upload - send as an array with field name 'waterImage'
+            apiFormData.append("waterImage", {
               uri: image.uri,
               name: image.name || `water_${Date.now()}_${index}.jpg`,
               type: image.type || "image/jpeg",

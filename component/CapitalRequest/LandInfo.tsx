@@ -244,11 +244,12 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
       apiFormData.append("ownershipStatus", data.ownershipStatus || "");
       apiFormData.append("landDiscription", data.landDiscription || "");
 
-      // Add geo location
+      // Add geo location - ONLY send latitude and longitude
       if (data.geoLocation) {
         apiFormData.append("latitude", data.geoLocation.latitude.toString());
         apiFormData.append("longitude", data.geoLocation.longitude.toString());
-        apiFormData.append("locationName", data.geoLocation.locationName);
+        // ⚠️ REMOVE THIS LINE - Don't send locationName to backend
+        // apiFormData.append("locationName", data.geoLocation.locationName);
       }
 
       // Handle images - differentiate between S3 URLs and local files
@@ -676,8 +677,8 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
                 {formData.images.map((img: LandImage, index: number) => (
                   <View
                     key={index}
-                  //  className="w-40 h-40 m-1 rounded-xl overflow-hidden relative"
-                  className="w-1/2 p-1 relative"
+                    //  className="w-40 h-40 m-1 rounded-xl overflow-hidden relative"
+                    className="w-1/2 p-1 relative"
                   >
                     <Image
                       source={{ uri: img.uri }}
