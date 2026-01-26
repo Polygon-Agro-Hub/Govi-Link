@@ -6,6 +6,7 @@ import {
   View,
   Dimensions,
   TextInput,
+  ActivityIndicator,
 } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -70,6 +71,9 @@ import Economical from "@/component/CapitalRequest/Economical";
 import Labour from "@/component/CapitalRequest/Labour";
 import HarvestStorage from "@/component/CapitalRequest/HarvestStorage";
 import ConfirmationCapitalRequest from "@/component/CapitalRequest/ConfirmationCapitalRequest";
+
+// Import from our new database index
+import { initDatabase } from "@/database/index";
 
 LogBox.ignoreAllLogs(true);
 NativeWindStyleSheet.setOutput({ default: "native" });
@@ -175,7 +179,6 @@ function MainDrawer() {
         component={FieldOfficerDashboard}
         options={{ drawerItemStyle: { display: "none" } }}
       />
-      {/* <Drawer.Screen name="AddComplaint" component={AddComplaintScreen} options={{ drawerItemStyle: { display: "none" } }}/> */}
       <Drawer.Screen
         name="ViewAllVisits"
         component={ViewAllVisits}
@@ -302,7 +305,10 @@ function AppContent() {
             <Stack.Screen name="Economical" component={Economical} />
             <Stack.Screen name="Labour" component={Labour} />
             <Stack.Screen name="HarvestStorage" component={HarvestStorage} />
-            <Stack.Screen name="ConfirmationCapitalRequest" component={ConfirmationCapitalRequest} />
+            <Stack.Screen
+              name="ConfirmationCapitalRequest"
+              component={ConfirmationCapitalRequest}
+            />
           </Stack.Navigator>
         </NavigationContainer>
       </SafeAreaView>
@@ -311,6 +317,56 @@ function AppContent() {
 }
 
 export default function App() {
+  // ✅ SQLite Database Initialization State
+  const [dbReady, setDbReady] = useState(false);
+
+  // ✅ Initialize SQLite Database on App Start
+  useEffect(() => {
+    const initializeDatabase = () => {
+      try {
+        initDatabase(); // This now initializes ALL tables
+        console.log("✅ SQLite Database initialized successfully");
+        setDbReady(true);
+      } catch (error) {
+        console.error("❌ SQLite Database initialization failed:", error);
+        // Still set dbReady to true to allow app to continue
+        // You can show an alert here if needed
+        setDbReady(true);
+      }
+    };
+
+    initializeDatabase();
+  }, []);
+
+  // ✅ Show loading screen while database initializes
+  if (!dbReady) {
+    return (
+      <SafeAreaProvider>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "#fff",
+          }}
+        >
+          <ActivityIndicator size="large" color="#1A1A1A" />
+          <Text
+            style={{
+              marginTop: 16,
+              fontSize: 16,
+              color: "#666",
+              fontWeight: "500",
+            }}
+          >
+            Initializing database...
+          </Text>
+        </View>
+      </SafeAreaProvider>
+    );
+  }
+
+  // ✅ Normal App Rendering after DB is ready
   return (
     <SafeAreaProvider>
       <Provider store={store}>

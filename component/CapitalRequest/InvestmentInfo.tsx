@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+// InvestmentInfo.tsx - Without Redux, using SQLite
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -9,32 +10,19 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
-  Modal,
-  FlatList,
 } from "react-native";
-import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
 import { useTranslation } from "react-i18next";
-import Checkbox from "expo-checkbox";
 import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
-import { useCallback } from "react";
-import { LinearGradient } from "expo-linear-gradient";
-import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../types";
-import banksData from "@/assets/json/banks.json";
-import branchesData from "@/assets/json/branches.json";
 import axios from "axios";
 import { environment } from "@/environment/environment";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/services/store";
-import {
-  initializeInvestmentInfo,
-  updateInvestmentInfo,
-  setInvestmentInfo,
-  markInvestmentAsExisting,
-  InvestmentInfoData,
-} from "@/store/investmentInfoSlice";
 import FormFooterButton from "./FormFooterButton";
+import {
+  saveInvestmentInfo,
+  getInvestmentInfo,
+  InvestmentInfoData,
+} from "@/database/inspectioninvestment";
 
 const Input = ({
   label,
@@ -82,21 +70,18 @@ const Input = ({
 type ValidationRule = {
   required?: boolean;
   type?: "expected" | "repaymentMonth" | "purpose";
-  minLength?: number;
-  uniqueWith?: (keyof FormData)[];
 };
 
 const validateAndFormat = (
   text: string,
   rules: ValidationRule,
   t: any,
-  formData: any,
-  currentKey: keyof typeof formData,
 ) => {
   let value = text;
   let error = "";
 
   console.log("Validating:", value, rules);
+  
   if (rules.type === "expected") {
     value = value.replace(/[^0-9.]/g, "");
 
@@ -116,6 +101,7 @@ const validateAndFormat = (
       error = t(`Error.${rules.type} is required`);
     }
   }
+  
   if (rules.type === "repaymentMonth") {
     value = value.replace(/[^0-9]/g, "");
     if (value.startsWith("0")) {
@@ -148,32 +134,63 @@ type InvestmentInfoProps = {
 const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
   const route = useRoute<RouteProp<RootStackParamList, "InvestmentInfo">>();
   const { requestNumber, requestId } = route.params;
+  const { t } = useTranslation();
 
-  const dispatch = useDispatch();
-  const { t, i18n } = useTranslation();
+  // Local state for form data
+  const [formData, setFormData] = useState<InvestmentInfoData>({
+    expected: 0,
+    purpose: "",
+    repaymentMonth: 0,
+  });
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isNextEnabled, setIsNextEnabled] = useState(false);
+  const [isExistingData, setIsExistingData] = useState(false);
 
-  // Get data from Redux
-  const formData = useSelector(
-    (state: RootState) =>
-      state.investmentInfo.data[requestId] || {
-        expected: 0,
-        purpose: "",
-        repaymentMonth: 0,
-      },
+  // Auto-save to SQLite whenever formData changes (debounced)
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      if (requestId) {
+        try {
+          await saveInvestmentInfo(Number(requestId), formData);
+          console.log('💾 Auto-saved investment info to SQLite');
+        } catch (err) {
+          console.error('Error auto-saving investment info:', err);
+        }
+      }
+    }, 500); // 500ms debounce
+
+    return () => clearTimeout(timer);
+  }, [formData, requestId]);
+
+  // Load data from SQLite when component mounts
+  useFocusEffect(
+    useCallback(() => {
+      const loadData = async () => {
+        if (!requestId) return;
+
+        try {
+          const reqId = Number(requestId);
+          const localData = await getInvestmentInfo(reqId);
+
+          if (localData) {
+            console.log('✅ Loaded investment info from SQLite');
+            setFormData(localData);
+            setIsExistingData(true);
+          } else {
+            console.log('📝 No local investment data - new entry');
+            setIsExistingData(false);
+          }
+        } catch (error) {
+          console.error('Failed to load investment info from SQLite:', error);
+        }
+      };
+
+      loadData();
+    }, [requestId])
   );
 
-  const isExistingData = useSelector(
-    (state: RootState) => state.investmentInfo.isExisting[requestId] || false,
-  );
-
-  console.log("finance", formData);
-
-  const banks = banksData.map((bank) => ({
-    id: bank.ID,
-    name: bank.name,
-  }));
+  // Validate form completion
   useEffect(() => {
     const requiredFields: (keyof InvestmentInfoData)[] = [
       "expected",
@@ -184,75 +201,44 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
     const allFilled = requiredFields.every((key) => {
       const value = formData[key];
       return (
-        value !== null && value !== undefined && value.toString().trim() !== ""
+        value !== null && 
+        value !== undefined && 
+        value.toString().trim() !== "" &&
+        (key !== "expected" && key !== "repaymentMonth" ? true : Number(value) > 0)
       );
     });
-    console.log(allFilled);
+
     const hasErrors = Object.values(errors).some((err) => err !== "");
-    console.log(hasErrors);
 
     setIsNextEnabled(allFilled && !hasErrors);
   }, [formData, errors]);
 
-  // 5. REPLACE updateFormData - Remove AsyncStorage
+  // Update form data
   const updateFormData = (updates: Partial<InvestmentInfoData>) => {
-    dispatch(
-      updateInvestmentInfo({
-        requestId,
-        updates,
-      }),
-    );
+    setFormData(prev => ({ ...prev, ...updates }));
   };
 
-  // 6. UPDATE useFocusEffect - Use Redux instead of AsyncStorage
-  useFocusEffect(
-    useCallback(() => {
-      const loadFormData = async () => {
-        try {
-          // Initialize Redux state
-          dispatch(initializeInvestmentInfo({ requestId }));
+  // Handle field changes
+  const handleFieldChange = (
+    key: keyof InvestmentInfoData,
+    text: string,
+    rules: ValidationRule,
+  ) => {
+    const { value, error } = validateAndFormat(text, rules, t);
+    
+    // Convert to appropriate type
+    let processedValue: string | number = value;
+    if (key === "expected") {
+      processedValue = value ? parseFloat(value) : 0;
+    } else if (key === "repaymentMonth") {
+      processedValue = value ? parseInt(value, 10) : 0;
+    }
 
-          // Try to fetch from backend
-          if (requestId) {
-            const reqId = Number(requestId);
-            if (!isNaN(reqId) && reqId > 0) {
-              console.log(
-                `🔄 Attempting to fetch investment data from backend for reqId: ${reqId}`,
-              );
+    updateFormData({ [key]: processedValue as any });
+    setErrors((prev) => ({ ...prev, [key]: error || "" }));
+  };
 
-              const backendData = await fetchInspectionData(reqId);
-
-              if (backendData) {
-                console.log(`✅ Loaded investment data from backend`);
-
-                // Save to Redux
-                dispatch(
-                  setInvestmentInfo({
-                    requestId,
-                    data: backendData,
-                    isExisting: true,
-                  }),
-                );
-
-                return; // Exit after loading from backend
-              }
-            }
-          }
-
-          // If no backend data, Redux already has initialized empty state
-          console.log("📝 No existing investment data - new entry");
-        } catch (e) {
-          console.error("Failed to load investment form data", e);
-        }
-      };
-
-      loadFormData();
-    }, [requestId, dispatch]),
-  );
-
-  let jobId = requestNumber;
-  console.log("jobid", jobId);
-
+  // Fetch data from backend
   const fetchInspectionData = async (
     reqId: number,
   ): Promise<InvestmentInfoData | null> => {
@@ -300,6 +286,7 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
     }
   };
 
+  // Save to backend
   const saveToBackend = async (
     reqId: number,
     tableName: string,
@@ -311,7 +298,6 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
         `💾 Saving to backend (${isUpdate ? "UPDATE" : "INSERT"}):`,
         tableName,
       );
-      console.log(`📝 reqId being sent:`, reqId);
 
       const transformedData = {
         expected: data.expected?.toString() || "0",
@@ -346,34 +332,11 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
       }
     } catch (error: any) {
       console.error(`❌ Error saving ${tableName}:`, error);
-      if (error.response) {
-        console.error("Response data:", error.response.data);
-        console.error("Response status:", error.response.status);
-      }
       return false;
     }
   };
 
-  // 7. UPDATE handleFieldChange
-  const handleFieldChange = (
-    key: keyof InvestmentInfoData,
-    text: string,
-    rules: ValidationRule,
-  ) => {
-    const { value, error } = validateAndFormat(text, rules, t, formData, key);
-
-    // Update Redux
-    dispatch(
-      updateInvestmentInfo({
-        requestId,
-        updates: { [key]: value },
-      }),
-    );
-
-    setErrors((prev) => ({ ...prev, [key]: error || "" }));
-  };
-
-  // 8. UPDATE handleNext - Mark as existing after save
+  // Handle next button
   const handleNext = async () => {
     const validationErrors: Record<string, string> = {};
 
@@ -448,15 +411,13 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
       const saved = await saveToBackend(
         reqId,
         "inspectioninvestment",
-        formData, // Now from Redux
+        formData,
         isExistingData,
       );
 
       if (saved) {
         console.log("✅ Investment info saved successfully to backend");
-
-        // Mark as existing in Redux
-        dispatch(markInvestmentAsExisting({ requestId }));
+        setIsExistingData(true);
 
         Alert.alert(
           t("Main.Success"),
@@ -466,7 +427,6 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
               text: t("Main.ok"),
               onPress: () => {
                 navigation.navigate("CultivationInfo", {
-                  formData: { inspectioninvestment: formData },
                   requestNumber,
                   requestId,
                 });
@@ -484,7 +444,6 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
               text: t("Main.Continue"),
               onPress: () => {
                 navigation.navigate("CultivationInfo", {
-                  formData: { inspectioninvestment: formData },
                   requestNumber,
                   requestId,
                 });
@@ -503,7 +462,6 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
             text: t("Main.Continue"),
             onPress: () => {
               navigation.navigate("CultivationInfo", {
-                formData: { inspectioninvestment: formData },
                 requestNumber,
                 requestId,
               });
@@ -529,6 +487,7 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
           contentContainerStyle={{ paddingBottom: 120 }}
         >
           <View className="h-6" />
+          
           <Input
             label={t("InspectionForm.Expected investment by the farmer")}
             placeholder="0.00"

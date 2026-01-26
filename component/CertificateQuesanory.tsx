@@ -703,7 +703,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
             <View className="flex-row justify-between w-full space-x-4">
               <TouchableOpacity
                 onPress={() => setShowConfirmationModal(false)}
-                className="flex-row items-center px-12 py-3 rounded-full bg-[#444444]"
+                className="flex-row items-center px-8 py-3 rounded-full bg-[#444444]"
               >
                 <Text className="text-white font-semibold text-base">
                   {t("CertificateQuesanory.Cancel")}
@@ -720,7 +720,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
                   colors={["#F35125", "#FF1D85"]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
-                  className="flex-row items-center px-12 py-3 rounded-full"
+                  className="flex-row items-center px-7 mr-6 py-3 rounded-full"
                 >
                   <Text className="text-white font-semibold text-base">
                     {t("CertificateQuesanory.Continue")}
