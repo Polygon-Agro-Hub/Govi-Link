@@ -13,7 +13,7 @@ import {
   Modal,
   FlatList,
 } from "react-native";
-import { AntDesign, MaterialIcons } from "@expo/vector-icons";
+import { AntDesign, FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import FormTabs from "../CapitalRequest/FormTabs";
 import { useTranslation } from "react-i18next";
 import Checkbox from "expo-checkbox";
@@ -71,7 +71,12 @@ const Input = ({
         keyboardType={keyboardType}
       />
     </View>
-    {error && <Text className="text-red-500 text-sm mt-1 ml-4">{error}</Text>}
+      {error && (
+      <View className="flex-row items-center mt-1 ml-4">
+        <FontAwesome name="exclamation-triangle" size={16} color="#EF4444" />
+        <Text className="text-red-500 text-sm ml-1"> {error}</Text>
+      </View>
+    )}
   </View>
 );
 
@@ -184,7 +189,11 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
 
   // Validate form completion
   useEffect(() => {
-    const requiredFields = ["accHolder", "accountNumber"];
+    const requiredFields = [
+      "accHolder",
+      "accountNumber",
+      "confirmAccountNumber",
+    ];
 
     const allFilled = requiredFields.every((key) => {
       const value = formData[key as keyof FinanceInfoData];
@@ -193,33 +202,32 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
       );
     });
 
-    // Check assets including assetsFarmTool
-    const assetsError = (() => {
-      const assetKeys: (keyof FinanceInfoData)[] = [
-        "assetsLand",
-        "assetsBuilding",
-        "assetsVehicle",
-        "assetsMachinery",
-        "assetsFarmTool",
-      ];
+    // Check if account numbers match
+    const accountNumbersMatch =
+      formData.accountNumber === formData.confirmAccountNumber;
 
-      return assetKeys.some((key) => {
-        const value = formData[key];
-        if (key === "assetsFarmTool") {
-          return typeof value === "string" && value.trim() !== "";
-        } else {
-          return Array.isArray(value) && value.length > 0;
-        }
-      })
-        ? ""
-        : t("Error.At least one option must be selected.");
-    })();
+    // Check if at least one valid asset is selected
+    const hasAssets = hasValidAssetSelection();
 
-    const hasErrors = Object.values({ ...errors, assets: assetsError }).some(
+    // Check if bank and branch are selected
+    const hasBankInfo = !!(
+      formData.bank &&
+      formData.bank.trim() !== "" &&
+      formData.branch &&
+      formData.branch.trim() !== ""
+    );
+
+    const hasErrors = Object.values(errors).some(
       (err) => err && err.trim() !== "",
     );
 
-    setIsNextEnabled(allFilled && !hasErrors && !hasAssetWarnings());
+    setIsNextEnabled(
+      allFilled &&
+        accountNumbersMatch &&
+        hasAssets &&
+        hasBankInfo &&
+        !hasErrors,
+    );
   }, [formData, errors]);
 
   // Update form data
@@ -388,7 +396,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     }
   };
 
-  // Load data on focus
+
   useFocusEffect(
     useCallback(() => {
       const loadFormData = async () => {
@@ -408,6 +416,37 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
                 console.log(`✅ Loaded data from SQLite`);
                 setFormData(localData);
                 setIsExistingData(true);
+
+                // Update checkedAssets based on loaded data
+                const newCheckedAssets: Record<string, boolean> = {};
+                if (localData.assetsLand && localData.assetsLand.length > 0) {
+                  newCheckedAssets.assetsLand = true;
+                }
+                if (
+                  localData.assetsBuilding &&
+                  localData.assetsBuilding.length > 0
+                ) {
+                  newCheckedAssets.assetsBuilding = true;
+                }
+                if (
+                  localData.assetsVehicle &&
+                  localData.assetsVehicle.length > 0
+                ) {
+                  newCheckedAssets.assetsVehicle = true;
+                }
+                if (
+                  localData.assetsMachinery &&
+                  localData.assetsMachinery.length > 0
+                ) {
+                  newCheckedAssets.assetsMachinery = true;
+                }
+                if (
+                  localData.assetsFarmTool &&
+                  localData.assetsFarmTool.trim() !== ""
+                ) {
+                  newCheckedAssets.assetsFarmTool = true;
+                }
+                setCheckedAssets(newCheckedAssets);
 
                 if (localData.bank) {
                   setSelectedBank(localData.bank);
@@ -437,6 +476,40 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
                 console.log(`✅ Loaded data from backend`);
                 setFormData(backendData);
                 setIsExistingData(true);
+
+                // Update checkedAssets based on loaded backend data
+                const newCheckedAssets: Record<string, boolean> = {};
+                if (
+                  backendData.assetsLand &&
+                  backendData.assetsLand.length > 0
+                ) {
+                  newCheckedAssets.assetsLand = true;
+                }
+                if (
+                  backendData.assetsBuilding &&
+                  backendData.assetsBuilding.length > 0
+                ) {
+                  newCheckedAssets.assetsBuilding = true;
+                }
+                if (
+                  backendData.assetsVehicle &&
+                  backendData.assetsVehicle.length > 0
+                ) {
+                  newCheckedAssets.assetsVehicle = true;
+                }
+                if (
+                  backendData.assetsMachinery &&
+                  backendData.assetsMachinery.length > 0
+                ) {
+                  newCheckedAssets.assetsMachinery = true;
+                }
+                if (
+                  backendData.assetsFarmTool &&
+                  backendData.assetsFarmTool.trim() !== ""
+                ) {
+                  newCheckedAssets.assetsFarmTool = true;
+                }
+                setCheckedAssets(newCheckedAssets);
 
                 if (backendData.bank) {
                   setSelectedBank(backendData.bank);
@@ -518,6 +591,12 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     } else if (formData.confirmAccountNumber !== formData.accountNumber) {
       validationErrors.confirmAccountNumber = t(
         "Error.Account numbers do not match",
+      );
+    }
+    // Validate at least one valid asset selection
+    if (!hasValidAssetSelection()) {
+      validationErrors.assets = t(
+        "Error.At least one option must be selected.",
       );
     }
 
@@ -850,6 +929,26 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     });
   };
 
+  const hasValidAssetSelection = (): boolean => {
+    // Check if Special Farm Tool has text
+    if (formData.assetsFarmTool && formData.assetsFarmTool.trim() !== "") {
+      return true;
+    }
+
+    // Check if any category with sub-items has at least one sub-item selected
+    const categoryKeys: (keyof FinanceInfoData)[] = [
+      "assetsLand",
+      "assetsBuilding",
+      "assetsVehicle",
+      "assetsMachinery",
+    ];
+
+    return categoryKeys.some((key) => {
+      const value = formData[key];
+      return Array.isArray(value) && value.length > 0;
+    });
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -867,7 +966,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
           <View className="h-6" />
 
           <Input
-            label={t("InspectionForm.Account Holder's Name")}
+            label={t("InspectionForm.Account Holder Name")}
             placeholder="----"
             value={formData.accHolder || ""}
             onChangeText={(text) =>
@@ -1126,7 +1225,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
 
                   {/* FARM TOOL TEXTAREA */}
                   {category.key === "assetsFarmTool" && isChecked && (
-                    <View className="mt-2 bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ml-6">
+                    <View className="mt-2 bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ml-[-5%]">
                       <TextInput
                         placeholder={t("InspectionForm.Type here...")}
                         value={formData.assetsFarmTool || ""}

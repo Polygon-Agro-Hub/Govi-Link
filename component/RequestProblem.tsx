@@ -348,7 +348,7 @@ const handleAdviceChange = (text: string) => {
             </Text>
           </TouchableOpacity>
         {capturedImage && (
-          <Text className="text-center text-[#415CFF]">
+          <Text className="text-center text-[#415CFF] mt-3">
             {t("RequestProblem.Image Uploaded")}
           </Text>
         )}
