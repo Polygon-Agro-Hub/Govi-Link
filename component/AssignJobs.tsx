@@ -12,7 +12,8 @@ import {
   Alert,
   BackHandler,
     Animated, PanResponder,
-    Pressable
+    Pressable,
+    Image
 } from "react-native";
 import { RootStackParamList } from "@/component/types";
 import { useTranslation } from "react-i18next";
@@ -419,7 +420,7 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
                   isOverdueSelected ? "text-white" : "text-[#F83B4F]"
                 }`}
               >
-                {t("Visits.Over Due")}
+                 {t("Visits.Over Due")}
               </Text>
               {isOverdueSelected && (
                 <View className="bg-white rounded-full w-6 h-6 items-center justify-center">
@@ -510,7 +511,7 @@ className="flex-row p-3 rounded-full items-center justify-center min-w-[120px]"
               <View
                 className="border border-[#FF1D85] bg-white p-4 mb-4 rounded-lg"
                 style={{
-                  shadowColor: "#000",
+                  shadowColor: "#f7f2f2",
                   shadowOpacity: 0.05,
                   shadowRadius: 4,
                   elevation: 2,
@@ -551,14 +552,22 @@ className="flex-row p-3 rounded-full items-center justify-center min-w-[120px]"
           ))}
         </ScrollView>
       ) : (
-        <View className=" items-center justify-center mt-32">
-          <LottieView
+        <View className=" items-center justify-center mt-[60%]">
+          {/* <LottieView
             source={require("../assets/json/NoData.json")}
             style={{ width: 200, height: 200 }}
             autoPlay
             loop
-          />
-          <Text className="text-center text-gray-600 mt-2">
+          /> */}
+           <Image
+                       source={require("../assets/NoData.webp")}
+                       style={{
+                         width: 100,
+                         height: 100
+                       }}
+                       resizeMode="contain"
+                     />
+          <Text className="text-center text-gray-600 mt-1 italic">
             {t("Visits.No Jobs Available")}
           </Text>
         </View>

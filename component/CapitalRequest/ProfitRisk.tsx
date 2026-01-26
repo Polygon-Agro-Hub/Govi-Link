@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+// ProfitRisk.tsx - Fixed version with proper data handling
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -10,34 +11,20 @@ import {
   KeyboardAvoidingView,
   Platform,
   Modal,
-  FlatList,
 } from "react-native";
-import { AntDesign, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTranslation } from "react-i18next";
-import Checkbox from "expo-checkbox";
 import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
-import { useCallback } from "react";
-import { LinearGradient } from "expo-linear-gradient";
-import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../types";
 import axios from "axios";
 import { environment } from "@/environment/environment";
-
-type FormData = {
-  inspectionprofit?: ProfitRiskData;
-};
-
-type ProfitRiskData = {
-  profit?: string;
-  isProfitable?: "Yes" | "No";
-  isRisk?: "Yes" | "No";
-  risk?: string;
-  solution?: string;
-  manageRisk?: "Yes" | "No";
-  worthToTakeRisk?: string;
-};
+import FormFooterButton from "./FormFooterButton";
+import {
+  saveProfitInfo,
+  getProfitInfo,
+  ProfitRiskData,
+} from "@/database/inspectionprofit";
 
 const Input = ({
   label,
@@ -64,9 +51,8 @@ const Input = ({
       {required && <Text className="text-black">*</Text>}
     </Text>
     <View
-      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
-        error ? "border border-red-500" : ""
-      }`}
+      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${error ? "border border-red-500" : ""
+        }`}
     >
       <TextInput
         placeholder={placeholder}
@@ -158,24 +144,22 @@ const YesNoSelect = ({
     </>
   );
 };
+
 type ValidationRule = {
   required?: boolean;
   type?: "profit";
-  minLength?: number;
-  uniqueWith?: (keyof FormData)[];
 };
 
 const validateAndFormat = (
   text: string,
   rules: ValidationRule,
   t: any,
-  formData: any,
-  currentKey: keyof typeof formData
 ) => {
   let value = text;
   let error = "";
 
   console.log("Validating:", value, rules);
+  
   if (rules.type === "profit") {
     value = value.replace(/[^0-9.]/g, "");
 
@@ -206,40 +190,89 @@ type ProfitRiskProps = {
 
 const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
   const route = useRoute<RouteProp<RootStackParamList, "ProfitRisk">>();
-  const { requestNumber, requestId } = route.params; // ✅ Add requestId
-  const prevFormData = route.params?.formData;
-  const [formData, setFormData] = useState(prevFormData);
-  const { t, i18n } = useTranslation();
+  const { requestNumber, requestId } = route.params;
+  const { t } = useTranslation();
+
+  // Local state for form data
+  const [formData, setFormData] = useState<ProfitRiskData>({
+    profit: '',
+    isProfitable: undefined,
+    isRisk: undefined,
+    risk: '',
+    solution: '',
+    manageRisk: undefined,
+    worthToTakeRisk: '',
+  });
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [yesNoModalVisible, setYesNoModalVisible] = useState(false);
   const [activeYesNoField, setActiveYesNoField] = useState<string | null>(null);
-  const [isExistingData, setIsExistingData] = useState(false);
   const [isNextEnabled, setIsNextEnabled] = useState(false);
+  const [isExistingData, setIsExistingData] = useState(false);
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
 
-  console.log("finance", formData);
+  // Load data from SQLite when component mounts
+  useFocusEffect(
+    useCallback(() => {
+      const loadData = async () => {
+        if (!requestId) return;
 
-  // useEffect(() => {
-  //   const requiredFields: (keyof ProfitRiskData)[] = [
-  //     "expectedFromProposedCrop",
-  //   ];
+        try {
+          const reqId = Number(requestId);
+          const localData = await getProfitInfo(reqId);
 
-  //   const allFilled = requiredFields.every((key) => {
-  //     const value = formData.profitRisk?.[key];
-  //     return (
-  //       value !== null && value !== undefined && value.toString().trim() !== ""
-  //     );
-  //   });
-  //   console.log(allFilled);
-  //   const hasErrors = Object.values(errors).some((err) => err !== "");
-  //   console.log(hasErrors);
+          if (localData) {
+            console.log('✅ Loaded profit/risk info from SQLite:', localData);
+            
+            // Ensure proper data types
+            const normalizedData: ProfitRiskData = {
+              profit: localData.profit || '',
+              isProfitable: localData.isProfitable,
+              isRisk: localData.isRisk,
+              risk: localData.risk || '',
+              solution: localData.solution || '',
+              manageRisk: localData.manageRisk,
+              worthToTakeRisk: localData.worthToTakeRisk || '',
+            };
+            
+            setFormData(normalizedData);
+            setIsExistingData(true);
+          } else {
+            console.log('📝 No local profit/risk data - new entry');
+            setIsExistingData(false);
+          }
+          setIsDataLoaded(true);
+        } catch (error) {
+          console.error('Failed to load profit/risk info from SQLite:', error);
+          setIsDataLoaded(true);
+        }
+      };
 
-  //   setIsNextEnabled(allFilled && !hasErrors);
-  // }, [formData, errors]);
+      loadData();
+    }, [requestId])
+  );
 
+  // Auto-save to SQLite whenever formData changes (debounced)
   useEffect(() => {
-    const inspectionprofit = formData?.inspectionprofit;
+    if (!isDataLoaded) return; // Don't auto-save during initial load
+    
+    const timer = setTimeout(async () => {
+      if (requestId) {
+        try {
+          await saveProfitInfo(Number(requestId), formData);
+          console.log('💾 Auto-saved profit/risk info to SQLite');
+        } catch (err) {
+          console.error('Error auto-saving profit/risk info:', err);
+        }
+      }
+    }, 500); // 500ms debounce
 
-    if (!inspectionprofit) {
+    return () => clearTimeout(timer);
+  }, [formData, requestId, isDataLoaded]);
+
+  // Validate form completion
+  useEffect(() => {
+    if (!formData) {
       setIsNextEnabled(false);
       return;
     }
@@ -252,7 +285,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
       solution,
       manageRisk,
       worthToTakeRisk,
-    } = inspectionprofit;
+    } = formData;
 
     // ---------- BASE REQUIRED (ALWAYS) ----------
     const baseValid =
@@ -265,9 +298,9 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
     const risksYesValid =
       isRisk === "Yes"
         ? risk?.trim() !== "" &&
-          solution?.trim() !== "" &&
-          (manageRisk === "Yes" || manageRisk === "No") &&
-          worthToTakeRisk?.trim() !== ""
+        solution?.trim() !== "" &&
+        (manageRisk === "Yes" || manageRisk === "No") &&
+        worthToTakeRisk?.trim() !== ""
         : true;
 
     // ---------- IGNORE ERRORS WHEN RISKS = NO ----------
@@ -280,110 +313,69 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
     }
 
     const hasErrors = Object.values(filteredErrors).some(
-      (err) => err && err.length > 0
+      (err) => err && err.length > 0,
     );
 
     setIsNextEnabled(baseValid && risksYesValid && !hasErrors);
   }, [formData, errors]);
 
-  let jobId = requestNumber;
-  console.log("jobid", jobId);
+  // Update form data
+  const updateFormData = (updates: Partial<ProfitRiskData>) => {
+    setFormData(prev => ({ ...prev, ...updates }));
+  };
 
-  const updateFormData = async (updates: Partial<ProfitRiskData>) => {
-    try {
-      const updatedFormData = {
-        ...formData,
-        inspectionprofit: {
-          ...formData.inspectionprofit,
-          ...updates,
-        },
+  // Handle field changes
+  const handleFieldChange = (
+    key: keyof ProfitRiskData,
+    text: string,
+    rules: ValidationRule,
+  ) => {
+    const { value, error } = validateAndFormat(text, rules, t);
+    updateFormData({ [key]: value } as any);
+    setErrors((prev) => ({ ...prev, [key]: error || "" }));
+  };
+
+  // Handle Yes/No field changes
+  const handleyesNOFieldChange = (key: string, value: "Yes" | "No") => {
+    let updates: Partial<ProfitRiskData> = {
+      [key]: value,
+    };
+
+    // 🔥 CLEAR ALL RISK FIELDS WHEN "NO"
+    if (key === "isRisk" && value === "No") {
+      updates = {
+        ...updates,
+        risk: "",
+        solution: "",
+        manageRisk: undefined,
+        worthToTakeRisk: "",
       };
 
-      setFormData(updatedFormData);
-
-      await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData));
-    } catch (e) {
-      console.log("AsyncStorage save failed", e);
+      // clear related errors
+      setErrors((prev) => ({
+        ...prev,
+        risk: "",
+        solution: "",
+        manageRisk: "",
+        worthToTakeRisk: "",
+      }));
     }
+
+    updateFormData(updates);
   };
 
-  const fetchInspectionData = async (
-    reqId: number
-  ): Promise<ProfitRiskData | null> => {
-    try {
-      console.log(`🔍 Fetching profit/risk data for reqId: ${reqId}`);
-
-      const response = await axios.get(
-        `${environment.API_BASE_URL}api/capital-request/inspection/get`,
-        {
-          params: {
-            reqId,
-            tableName: "inspectionprofit",
-          },
-        }
-      );
-
-      console.log("📦 Raw response:", response.data);
-
-      if (response.data.success && response.data.data) {
-        console.log(
-          `✅ Fetched existing profit/risk data:`,
-          response.data.data
-        );
-
-        const data = response.data.data;
-
-        // Helper to convert boolean (0/1) to "Yes"/"No"
-        const boolToYesNo = (val: any): "Yes" | "No" | undefined => {
-          if (val === 1 || val === "1" || val === true) return "Yes";
-          if (val === 0 || val === "0" || val === false) return "No";
-          return undefined;
-        };
-
-        // ✅ Helper for VARCHAR fields that store "Yes"/"No"
-        const stringToYesNo = (val: any): "Yes" | "No" | undefined => {
-          if (val === "Yes" || val === "yes") return "Yes";
-          if (val === "No" || val === "no") return "No";
-          return undefined;
-        };
-
-        return {
-          profit: data.profit ? data.profit.toString() : "",
-          isProfitable: boolToYesNo(data.isProfitable),
-          isRisk: boolToYesNo(data.isRisk),
-          risk: data.risk || "",
-          solution: data.solution || "",
-          manageRisk: stringToYesNo(data.manageRisk), // ✅ Use string helper
-          worthToTakeRisk: data.worthToTakeRisk || "",
-        };
-      }
-
-      console.log(`📭 No existing profit/risk data found for reqId: ${reqId}`);
-      return null;
-    } catch (error: any) {
-      console.error(`❌ Error fetching profit/risk data:`, error);
-      console.error("Error details:", error.response?.data);
-
-      if (error.response?.status === 404) {
-        console.log(`📝 No existing record - will create new`);
-        return null;
-      }
-
-      return null;
-    }
-  };
+  // Save to backend
   const saveToBackend = async (
     reqId: number,
     tableName: string,
     data: ProfitRiskData,
-    isUpdate: boolean
+    isUpdate: boolean,
   ): Promise<boolean> => {
     try {
       console.log(
         `💾 Saving to backend (${isUpdate ? "UPDATE" : "INSERT"}):`,
-        tableName
+        tableName,
       );
-      console.log(`📝 reqId being sent:`, reqId);
 
       // Yes/No fields
       const yesNoToInt = (val: any) =>
@@ -440,7 +432,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       if (response.data.success) {
@@ -452,200 +444,54 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
       }
     } catch (error: any) {
       console.error(`❌ Error saving ${tableName}:`, error);
-      if (error.response) {
-        console.error("Response data:", error.response.data);
-        console.error("Response status:", error.response.status);
-      }
       return false;
     }
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      const loadFormData = async () => {
-        try {
-          // First, try to fetch from backend
-          if (requestId) {
-            const reqId = Number(requestId);
-            if (!isNaN(reqId) && reqId > 0) {
-              console.log(
-                `🔄 Attempting to fetch profit/risk data from backend for reqId: ${reqId}`
-              );
-
-              const backendData = await fetchInspectionData(reqId);
-
-              if (backendData) {
-                console.log(`✅ Loaded profit/risk data from backend`);
-
-                // Update form with backend data
-                const updatedFormData = {
-                  ...formData,
-                  inspectionprofit: backendData,
-                };
-
-                setFormData(updatedFormData);
-                setIsExistingData(true);
-
-                // Save to AsyncStorage as backup
-                await AsyncStorage.setItem(
-                  `${jobId}`,
-                  JSON.stringify(updatedFormData)
-                );
-
-                return; // Exit after loading from backend
-              }
-            }
-          }
-
-          // If no backend data, try AsyncStorage
-          console.log(`📂 Checking AsyncStorage for jobId: ${jobId}`);
-          const savedData = await AsyncStorage.getItem(`${jobId}`);
-
-          if (savedData) {
-            const parsedData = JSON.parse(savedData);
-            console.log(`✅ Loaded profit/risk data from AsyncStorage`);
-            setFormData(parsedData);
-            setIsExistingData(true);
-          } else {
-            // No data found anywhere - new entry
-            setIsExistingData(false);
-            console.log("📝 No existing profit/risk data - new entry");
-          }
-        } catch (e) {
-          console.error("Failed to load profit/risk form data", e);
-          setIsExistingData(false);
-        }
-      };
-
-      loadFormData();
-    }, [requestId, jobId])
-  );
-
-  const handleFieldChange = (
-    key: keyof ProfitRiskData,
-    text: string,
-    rules: ValidationRule
-  ) => {
-    const { value, error } = validateAndFormat(
-      text,
-      rules,
-      t,
-      formData.inspectionprofit,
-      key
-    );
-
-    // Update nested investmentInfo
-    setFormData((prev: any) => ({
-      ...prev,
-      inspectionprofit: {
-        ...prev.inspectionprofit,
-        [key]: value,
-      },
-    }));
-
-    setErrors((prev) => ({ ...prev, [key]: error || "" }));
-    updateFormData({ [key]: value });
-  };
-
-  // const handleyesNOFieldChange = async (key: string, value: "Yes" | "No") => {
-  //   const updatedFormData = {
-  //     ...formData,
-  //     profitRisk: {
-  //       ...formData.profitRisk,
-  //       [key]: value,
-  //     },
-  //   };
-
-  //   setFormData(updatedFormData);
-
-  //   try {
-  //     await AsyncStorage.setItem(`${jobId}`, JSON.stringify(updatedFormData));
-  //   } catch (e) {
-  //     console.log("AsyncStorage save failed", e);
-  //   }
-  // };
-
-  const handleyesNOFieldChange = async (key: string, value: "Yes" | "No") => {
-    let updatedProfitRisk = {
-      ...formData.inspectionprofit,
-      [key]: value,
-    };
-
-    // 🔥 CLEAR ALL RISK FIELDS WHEN "NO"
-    if (key === "isRisk" && value === "No") {
-      updatedProfitRisk = {
-        ...updatedProfitRisk,
-        risk: "",
-        solution: "",
-        manageRisk: "",
-        worthToTakeRisk: "",
-      };
-
-      // clear related errors
-      setErrors((prev) => ({
-        ...prev,
-        risk: "",
-        solution: "",
-        manageRisk: "",
-        worthToTakeRisk: "",
-      }));
-    }
-
-    setFormData((prev: any) => ({
-      ...prev,
-      inspectionprofit: updatedProfitRisk,
-    }));
-
-    await AsyncStorage.setItem(
-      `${jobId}`,
-      JSON.stringify({ ...formData, inspectionprofit: updatedProfitRisk })
-    );
-  };
-
+  // Handle next button
   const handleNext = async () => {
     const validationErrors: Record<string, string> = {};
-    const profitInfo = formData.inspectionprofit;
 
     // Validate required fields
     if (
-      !profitInfo?.profit ||
-      profitInfo.profit.trim() === "" ||
-      profitInfo.profit === "0"
+      !formData.profit ||
+      formData.profit.trim() === "" ||
+      formData.profit === "0"
     ) {
       validationErrors.profit = t("Error.profit is required");
     }
-    if (!profitInfo?.isProfitable) {
+    if (!formData.isProfitable) {
       validationErrors.isProfitable = t(
-        "Error.Profitability field is required"
+        "Error.Profitability field is required",
       );
     }
-    if (!profitInfo?.isRisk) {
+    if (!formData.isRisk) {
       validationErrors.isRisk = t("Error.Risk field is required");
     }
 
     // Conditional validation when isRisk is "Yes"
-    if (profitInfo?.isRisk === "Yes") {
-      if (!profitInfo?.risk || profitInfo.risk.trim() === "") {
+    if (formData.isRisk === "Yes") {
+      if (!formData.risk || formData.risk.trim() === "") {
         validationErrors.risk = t(
-          "Error.What are the risks you are anticipating in the proposed crop / cropping system is required"
+          "Error.What are the risks you are anticipating in the proposed crop / cropping system is required",
         );
       }
-      if (!profitInfo?.solution || profitInfo.solution.trim() === "") {
+      if (!formData.solution || formData.solution.trim() === "") {
         validationErrors.solution = t(
-          "Error.Do you have the solution is required"
+          "Error.Do you have the solution is required",
         );
       }
-      if (!profitInfo?.manageRisk) {
+      if (!formData.manageRisk) {
         validationErrors.manageRisk = t(
-          "Error.Can the farmer manage the risks is required"
+          "Error.Can the farmer manage the risks is required",
         );
       }
       if (
-        !profitInfo?.worthToTakeRisk ||
-        profitInfo.worthToTakeRisk.trim() === ""
+        !formData.worthToTakeRisk ||
+        formData.worthToTakeRisk.trim() === ""
       ) {
         validationErrors.worthToTakeRisk = t(
-          "Error.Is it worth to take the risks for anticipated profits is required"
+          "Error.Is it worth to take the risks for anticipated profits is required",
         );
       }
     }
@@ -659,25 +505,25 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
       return;
     }
 
-    // ✅ Validate requestId exists
-    if (!route.params?.requestId) {
+    // Validate requestId exists
+    if (!requestId) {
       console.error("❌ requestId is missing!");
       Alert.alert(
         t("Error.Error"),
         "Request ID is missing. Please go back and try again.",
-        [{ text: t("Main.ok") }]
+        [{ text: t("Main.ok") }],
       );
       return;
     }
 
-    const reqId = Number(route.params.requestId);
+    const reqId = Number(requestId);
 
     if (isNaN(reqId) || reqId <= 0) {
-      console.error("❌ Invalid requestId:", route.params.requestId);
+      console.error("❌ Invalid requestId:", requestId);
       Alert.alert(
         t("Error.Error"),
         "Invalid request ID. Please go back and try again.",
-        [{ text: t("Main.ok") }]
+        [{ text: t("Main.ok") }],
       );
       return;
     }
@@ -688,19 +534,15 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
       t("InspectionForm.Saving"),
       t("InspectionForm.Please wait..."),
       [],
-      { cancelable: false }
+      { cancelable: false },
     );
 
     try {
-      console.log(
-        `🚀 Saving to backend (${isExistingData ? "UPDATE" : "INSERT"})`
-      );
-
       const saved = await saveToBackend(
         reqId,
         "inspectionprofit",
-        formData.inspectionprofit!,
-        isExistingData
+        formData,
+        isExistingData,
       );
 
       if (saved) {
@@ -715,13 +557,12 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
               text: t("Main.ok"),
               onPress: () => {
                 navigation.navigate("Economical", {
-                  formData,
                   requestNumber,
-                  requestId: route.params.requestId,
+                  requestId,
                 });
               },
             },
-          ]
+          ],
         );
       } else {
         console.log("⚠️ Backend save failed, but continuing with local data");
@@ -733,13 +574,12 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
               text: t("Main.Continue"),
               onPress: () => {
                 navigation.navigate("Economical", {
-                  formData,
                   requestNumber,
-                  requestId: route.params.requestId,
+                  requestId,
                 });
               },
             },
-          ]
+          ],
         );
       }
     } catch (error) {
@@ -752,16 +592,16 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
             text: t("Main.Continue"),
             onPress: () => {
               navigation.navigate("Economical", {
-                formData,
                 requestNumber,
-                requestId: route.params.requestId,
+                requestId,
               });
             },
           },
-        ]
+        ],
       );
     }
   };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -779,12 +619,13 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
           contentContainerStyle={{ paddingBottom: 120 }}
         >
           <View className="h-6" />
+          
           <Input
             label={t(
-              "InspectionForm.How much profit are you expecting from the proposed crop/cropping system"
+              "InspectionForm.How much profit are you expecting from the proposed crop/cropping system",
             )}
             placeholder="0.00"
-            value={formData.inspectionprofit?.profit}
+            value={formData.profit}
             onChangeText={(text) =>
               handleFieldChange("profit", text, {
                 required: true,
@@ -799,10 +640,10 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
 
           <YesNoSelect
             label={t(
-              "InspectionForm.Is this profitable than the existing crop / cropping system"
+              "InspectionForm.Is this profitable than the existing crop / cropping system",
             )}
             required
-            value={formData.inspectionprofit?.isProfitable || null}
+            value={formData.isProfitable || null}
             visible={yesNoModalVisible && activeYesNoField === "isProfitable"}
             onOpen={() => {
               setActiveYesNoField("isProfitable");
@@ -818,7 +659,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
           <YesNoSelect
             label={t("InspectionForm.Are there any risks")}
             required
-            value={formData.inspectionprofit?.isRisk || null}
+            value={formData.isRisk || null}
             visible={yesNoModalVisible && activeYesNoField === "isRisk"}
             onOpen={() => {
               setActiveYesNoField("isRisk");
@@ -830,24 +671,24 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
             }}
             onSelect={(value) => handleyesNOFieldChange("isRisk", value)}
           />
-          {formData.inspectionprofit?.isRisk === "Yes" && (
+          
+          {formData.isRisk === "Yes" && (
             <>
               <View className="mt-4">
                 <Text className="text-sm text-[#070707] mb-2">
                   {t(
-                    "InspectionForm.What are the risks you are anticipating in the proposed crop / cropping system"
+                    "InspectionForm.What are the risks you are anticipating in the proposed crop / cropping system",
                   )}{" "}
                   <Text className="text-black">*</Text>
                 </Text>
 
                 <View
-                  className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${
-                    errors.risk ? "border border-red-500" : ""
-                  }`}
+                  className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${errors.risk ? "border border-red-500" : ""
+                    }`}
                 >
                   <TextInput
                     placeholder={t("InspectionForm.Type here...")}
-                    value={formData.inspectionprofit?.risk || ""}
+                    value={formData.risk || ""}
                     onChangeText={(text) => {
                       let formattedText = text.replace(/^\s+/, "");
 
@@ -857,27 +698,17 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
                           formattedText.slice(1);
                       }
 
-                      setFormData((prev: any) => ({
-                        ...prev,
-                        inspectionprofit: {
-                          ...prev.inspectionprofit,
-                          risk: formattedText,
-                        },
-                      }));
+                      updateFormData({ risk: formattedText });
 
                       setErrors((prev) => ({
                         ...prev,
                         risk:
                           formattedText.trim() === ""
                             ? t(
-                                "Error.What are the risks you are anticipating in the proposed crop / cropping system is required"
-                              )
+                              "Error.What are the risks you are anticipating in the proposed crop / cropping system is required",
+                            )
                             : "",
                       }));
-
-                      updateFormData({
-                        risk: formattedText,
-                      });
                     }}
                     multiline
                     textAlignVertical="top"
@@ -899,13 +730,12 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
                 </Text>
 
                 <View
-                  className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${
-                    errors.solution ? "border border-red-500" : ""
-                  }`}
+                  className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${errors.solution ? "border border-red-500" : ""
+                    }`}
                 >
                   <TextInput
                     placeholder={t("InspectionForm.Type here...")}
-                    value={formData.inspectionprofit?.solution || ""}
+                    value={formData.solution || ""}
                     onChangeText={(text) => {
                       let formattedText = text.replace(/^\s+/, "");
 
@@ -914,14 +744,6 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
                           formattedText.charAt(0).toUpperCase() +
                           formattedText.slice(1);
                       }
-
-                      setFormData((prev: any) => ({
-                        ...prev,
-                        inspectionprofit: {
-                          ...prev.inspectionprofit,
-                          solution: formattedText,
-                        },
-                      }));
 
                       setErrors((prev) => ({
                         ...prev,
@@ -951,7 +773,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
               <YesNoSelect
                 label={t("InspectionForm.Can the farmer manage the risks")}
                 required
-                value={formData.inspectionprofit?.manageRisk || null}
+                value={formData.manageRisk || null}
                 visible={yesNoModalVisible && activeYesNoField === "manageRisk"}
                 onOpen={() => {
                   setActiveYesNoField("manageRisk");
@@ -969,19 +791,18 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
               <View className="mt-4">
                 <Text className="text-sm text-[#070707] mb-2">
                   {t(
-                    "InspectionForm.Is it worth to take the risks for anticipated profits"
+                    "InspectionForm.Is it worth to take the risks for anticipated profits",
                   )}{" "}
                   <Text className="text-black">*</Text>
                 </Text>
 
                 <View
-                  className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${
-                    errors.worthToTakeRisk ? "border border-red-500" : ""
-                  }`}
+                  className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${errors.worthToTakeRisk ? "border border-red-500" : ""
+                    }`}
                 >
                   <TextInput
                     placeholder={t("InspectionForm.Type here...")}
-                    value={formData.inspectionprofit?.worthToTakeRisk || ""}
+                    value={formData.worthToTakeRisk || ""}
                     onChangeText={(text) => {
                       let formattedText = text.replace(/^\s+/, "");
 
@@ -991,21 +812,13 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
                           formattedText.slice(1);
                       }
 
-                      setFormData((prev: any) => ({
-                        ...prev,
-                        inspectionprofit: {
-                          ...prev.inspectionprofit,
-                          worthToTakeRisk: formattedText,
-                        },
-                      }));
-
                       setErrors((prev) => ({
                         ...prev,
                         worthToTakeRisk:
                           formattedText.trim() === ""
                             ? t(
-                                "Error.Is it worth to take the risks for anticipated profits is required"
-                              )
+                              "Error.Is it worth to take the risks for anticipated profits is required",
+                            )
                             : "",
                       }));
 
@@ -1029,53 +842,13 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
           )}
         </ScrollView>
 
-        <View className="flex-row px-6 pb-4 gap-4 bg-white border-t border-gray-200">
-          {/* Back Button */}
-          <TouchableOpacity
-            className="flex-1 bg-[#444444] rounded-full py-4 flex-row items-center justify-center"
-            onPress={() => navigation.goBack()}
-          >
-            <Ionicons name="arrow-back" size={22} color="#fff" />
-            <Text className="text-white text-base font-semibold ml-2">
-              {t("InspectionForm.Back")}
-            </Text>
-          </TouchableOpacity>
-
-          {/* Next Button */}
-          {isNextEnabled ? (
-            <TouchableOpacity
-              className="flex-1"
-              onPress={handleNext}
-              activeOpacity={0.8}
-            >
-              <LinearGradient
-                colors={["#F35125", "#FF1D85"]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                className="rounded-full py-4 flex-row items-center justify-center"
-                style={{
-                  shadowColor: "#000",
-                  shadowOffset: { width: 0, height: 3 },
-                  shadowOpacity: 0.25,
-                  shadowRadius: 5,
-                  elevation: 6,
-                }}
-              >
-                <Text className="text-white text-base font-semibold mr-2">
-                  {t("InspectionForm.Next")}
-                </Text>
-                <Ionicons name="arrow-forward" size={22} color="#fff" />
-              </LinearGradient>
-            </TouchableOpacity>
-          ) : (
-            <View className="flex-1 bg-gray-300 rounded-full py-4 flex-row items-center justify-center">
-              <Text className="text-white text-base font-semibold mr-2">
-                {t("InspectionForm.Next")}
-              </Text>
-              <Ionicons name="arrow-forward" size={22} color="#fff" />
-            </View>
-          )}
-        </View>
+        <FormFooterButton
+          exitText={t("InspectionForm.Back")}
+          nextText={t("InspectionForm.Next")}
+          isNextEnabled={isNextEnabled}
+          onExit={() => navigation.goBack()}
+          onNext={handleNext}
+        />
       </View>
     </KeyboardAvoidingView>
   );
