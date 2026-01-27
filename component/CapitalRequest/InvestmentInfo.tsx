@@ -49,9 +49,8 @@ const Input = ({
       {required && <Text className="text-black">*</Text>}
     </Text>
     <View
-      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
-        error ? "border border-red-500" : ""
-      }`}
+      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${error ? "border border-red-500" : ""
+        }`}
     >
       <TextInput
         placeholder={placeholder}
@@ -69,7 +68,7 @@ const Input = ({
 
 type ValidationRule = {
   required?: boolean;
-  type?: "expected" | "repaymentMonth" | "purpose";
+  type?: "expected" | "repaymentMonth" | "purpose" | "text";
 };
 
 const validateAndFormat = (
@@ -81,7 +80,7 @@ const validateAndFormat = (
   let error = "";
 
   console.log("Validating:", value, rules);
-  
+
   if (rules.type === "expected") {
     value = value.replace(/[^0-9.]/g, "");
 
@@ -101,7 +100,7 @@ const validateAndFormat = (
       error = t(`Error.${rules.type} is required`);
     }
   }
-  
+
   if (rules.type === "repaymentMonth") {
     value = value.replace(/[^0-9]/g, "");
     if (value.startsWith("0")) {
@@ -112,12 +111,14 @@ const validateAndFormat = (
     }
   }
 
-  if (rules.type === "purpose") {
+  if (rules.type === "purpose" || rules.type === "text") {
     value = value.replace(/^\s+/, "");
-    value = value.replace(/[^a-zA-Z\s]/g, "");
+    if (rules.type === "purpose") {
+      value = value.replace(/[^a-zA-Z\s]/g, "");
 
-    if (value.length > 0) {
-      value = value.charAt(0).toUpperCase() + value.slice(1);
+      if (value.length > 0) {
+        value = value.charAt(0).toUpperCase() + value.slice(1);
+      }
     }
     if (rules.required && value.trim().length === 0) {
       error = t(`Error.${rules.type} is required`);
@@ -201,8 +202,8 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
     const allFilled = requiredFields.every((key) => {
       const value = formData[key];
       return (
-        value !== null && 
-        value !== undefined && 
+        value !== null &&
+        value !== undefined &&
         value.toString().trim() !== "" &&
         (key !== "expected" && key !== "repaymentMonth" ? true : Number(value) > 0)
       );
@@ -225,7 +226,7 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
     rules: ValidationRule,
   ) => {
     const { value, error } = validateAndFormat(text, rules, t);
-    
+
     // Convert to appropriate type
     let processedValue: string | number = value;
     if (key === "expected") {
@@ -487,11 +488,11 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
           contentContainerStyle={{ paddingBottom: 120 }}
         >
           <View className="h-6" />
-          
+
           <Input
             label={t("InspectionForm.Expected investment by the farmer")}
-            placeholder="0.00"
-            value={formData.expected?.toString() || ""}
+            placeholder=""
+            value={formData.expected ? formData.expected.toString() : ""}
             onChangeText={(text) =>
               handleFieldChange("expected", text, {
                 required: true,
@@ -513,7 +514,7 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
             onChangeText={(text) =>
               handleFieldChange("purpose", text, {
                 required: true,
-                type: "purpose",
+                type: "text", // Changed from "purpose" to "text" to allow all characters
               })
             }
             required

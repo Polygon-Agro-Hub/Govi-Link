@@ -549,7 +549,11 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
                 placeholderTextColor="#838B8C"
                 className="bg-[#F6F6F6] px-4 py-4 rounded-full text-black mb-2"
                 value={formData.otherOpportunity || ""}
-                onChangeText={handleOtherOpportunityChange}
+                onChangeText={(text) => {
+                  // Remove leading spaces but allow spaces in the middle and end
+                  const trimmedText = text.replace(/^\s+/, '');
+                  handleOtherOpportunityChange(trimmedText);
+                }}
               />
             )}
 

@@ -227,22 +227,31 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
     }
   };
 
-  const handleConfirmAndLeave = () => {
-    if (hasNavigatedRef.current) {
-      console.log("⏭️ Already navigating, skipping confirm");
-      return;
-    }
+  const handleConfirmAndLeave = async () => {
+  if (hasNavigatedRef.current) {
+    console.log("⏭️ Already navigating, skipping confirm");
+    return;
+  }
 
-    if (animationRef.current) {
-      animationRef.current.stop();
-    }
+  if (animationRef.current) {
+    animationRef.current.stop();
+  }
 
-    setShowConfirmationModal(false);
+  setShowConfirmationModal(false);
+  setAssigning(true);
 
-    // Mock assignment - UI only
-    setAssigning(true);
-    setTimeout(() => {
+  try {
+    console.log(`✅ Confirming and leaving request ID: ${requestId}`);
+
+    const response = await axios.patch(
+      `${environment.API_BASE_URL}api/capital-request/confirm-leave/${requestId}`
+    );
+
+    if (response.data.success) {
+      console.log('✅ Request confirmed and audited date updated');
+      
       setAssigning(false);
+      
       Alert.alert(
         t("Main.Success"),
         t("ConfirmationCapitalRequest.ConfirmSuccess"),
@@ -253,8 +262,20 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
           },
         ]
       );
-    }, 1500);
-  };
+    } else {
+      throw new Error(response.data.message || 'Confirmation failed');
+    }
+  } catch (error: any) {
+    console.error('❌ Error confirming request:', error);
+    setAssigning(false);
+
+    Alert.alert(
+      t("Main.Error"),
+      error.response?.data?.message || t("ConfirmationCapitalRequest.ConfirmFailed"),
+      [{ text: t("Main.ok") }]
+    );
+  }
+};
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);

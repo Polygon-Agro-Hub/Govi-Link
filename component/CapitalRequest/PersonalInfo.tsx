@@ -24,10 +24,10 @@ import districtData from "@/assets/json/Districts.json";
 import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../types";
 import FormFooterButton from "./FormFooterButton";
-import { 
-  savePersonalInfo, 
-  getPersonalInfo, 
-  PersonalInfo 
+import {
+  savePersonalInfo,
+  getPersonalInfo,
+  PersonalInfo
 } from "@/database/inspectionpersonal";
 
 interface District {
@@ -64,9 +64,8 @@ const Input = ({
       {label} {required && <Text className="text-black">*</Text>}
     </Text>
     <View
-      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
-        error ? "border border-red-500" : ""
-      }`}
+      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${error ? "border border-red-500" : ""
+        }`}
     >
       {isMobile ? (
         <View className="flex-row flex-1 items-center">
@@ -165,7 +164,7 @@ const validateAndFormat = (
       } else if (rules.uniqueWith) {
         const isDuplicate = rules.uniqueWith.some(
           (key) =>
-            formData[key]?.toLowerCase().trim() === value.toLowerCase().trim() && 
+            formData[key]?.toLowerCase().trim() === value.toLowerCase().trim() &&
             key !== currentKey
         );
         if (isDuplicate) error = t("Error.Email addresses cannot be the same");
@@ -188,7 +187,7 @@ const validateAndFormat = (
     } else if (rules.uniqueWith) {
       const isDuplicate = rules.uniqueWith.some(
         (key) =>
-          formData[key]?.replace(/[^0-9]/g, "").replace(/^0+/, "") === numbersOnly && 
+          formData[key]?.replace(/[^0-9]/g, "").replace(/^0+/, "") === numbersOnly &&
           key !== currentKey
       );
       if (isDuplicate) error = t("Error.Phone numbers cannot be the same");
@@ -301,8 +300,8 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             );
             setDisplayProvince(
               provinceObj
-                ? provinceObj.name[i18n.language as keyof typeof provinceObj.name] || 
-                  provinceObj.name.en
+                ? provinceObj.name[i18n.language as keyof typeof provinceObj.name] ||
+                provinceObj.name.en
                 : ""
             );
 
@@ -311,8 +310,8 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             );
             setDisplayCountry(
               countryObj
-                ? countryObj.name[i18n.language as keyof typeof countryObj.name] || 
-                  countryObj.name.en
+                ? countryObj.name[i18n.language as keyof typeof countryObj.name] ||
+                countryObj.name.en
                 : localData.country || "Sri Lanka"
             );
           } else {
@@ -331,8 +330,8 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
   // Validate form completion
   useEffect(() => {
     const requiredFields: (keyof PersonalInfo)[] = [
-      "firstName", "lastName", "otherName", "callName", 
-      "phone1", "familyPhone", "email1", "house", 
+      "firstName", "lastName", "otherName", "callName",
+      "phone1", "familyPhone", "email1", "house",
       "street", "cityName", "district", "province", "country"
     ];
 
@@ -467,8 +466,8 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors((prev) => ({ ...prev, ...validationErrors }));
-      Alert.alert(t("Error.Validation Error"), 
-        "• " + Object.values(validationErrors).join("\n• "), 
+      Alert.alert(t("Error.Validation Error"),
+        "• " + Object.values(validationErrors).join("\n• "),
         [{ text: t("Main.ok") }]
       );
       return;
@@ -485,7 +484,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
       return;
     }
 
-    Alert.alert(t("InspectionForm.Saving"), t("InspectionForm.Please wait..."), [], 
+    Alert.alert(t("InspectionForm.Saving"), t("InspectionForm.Please wait..."), [],
       { cancelable: false }
     );
 
@@ -507,7 +506,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
         },
       ]);
     } else {
-      Alert.alert(t("Main.Warning"), 
+      Alert.alert(t("Main.Warning"),
         t("InspectionForm.Could not save to server. Data saved locally."), [
         {
           text: t("Main.Continue"),
@@ -824,7 +823,10 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             placeholder="----"
             value={formData.house}
             onChangeText={(text) =>
-              handleFieldChange("house", text, { required: true, type: "house" })
+              handleFieldChange("house", text, {
+                required: true,
+                type: "alphanumericWithSpecial" // or "text"
+              })
             }
             required
             error={errors.house}
@@ -968,7 +970,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
               setCountrySearch,
               t("AddOfficer.SearchCountry") || "Search country..."
             )}
-            
+
             <FlatList
               data={getFilteredCountries()}
               renderItem={({ item }) => (
