@@ -54,23 +54,23 @@ import OtpverificationRequestAudit from "@/component/OtpverificationRequestAudit
 import ChangePassword from "@/component/ChangePassword";
 import ComplainHistory from "@/component/ComplainHistory";
 import AssignJobs from "@/component/AssignJobs";
-import CapitalRequests from "@/component/ChiefFieldOfficer/CapitalRequests";
-import RequestDetails from "@/component/ChiefFieldOfficer/RequestDetails";
+import CapitalRequests from "@/component/CapitalRequest/CapitalRequestsList";
+import RequestDetails from "@/component/CapitalRequest/RequestLetter";
 import AssignJobOfficerList from "@/component/AssignJobOfficerList";
-import PersonalInfo from "@/component/CapitalRequest/PersonalInfo";
-import IDProof from "@/component/CapitalRequest/IDProof";
-import FinanceInfo from "@/component/CapitalRequest/FinanceInfo";
-import LandInfo from "@/component/CapitalRequest/LandInfo";
-import AttachGeoLocationScreen from "@/component/CapitalRequest/AttachGeoLocationScreen";
-import ViewLocationScreen from "@/component/CapitalRequest/ViewLocationScreen";
-import InvestmentInfo from "@/component/CapitalRequest/InvestmentInfo";
-import CultivationInfo from "@/component/CapitalRequest/CultivationInfo";
-import CroppingSystems from "@/component/CapitalRequest/CroppingSystems";
-import ProfitRisk from "@/component/CapitalRequest/ProfitRisk";
-import Economical from "@/component/CapitalRequest/Economical";
-import Labour from "@/component/CapitalRequest/Labour";
-import HarvestStorage from "@/component/CapitalRequest/HarvestStorage";
-import ConfirmationCapitalRequest from "@/component/CapitalRequest/ConfirmationCapitalRequest";
+import PersonalInfo from "@/component/InspectionForms/PersonalInfo";
+import IDProof from "@/component/InspectionForms/IDProof";
+import FinanceInfo from "@/component/InspectionForms/FinanceInfo";
+import LandInfo from "@/component/InspectionForms/LandInfo";
+import AttachGeoLocationScreen from "@/component/InspectionForms/AttachGeoLocationScreen";
+import ViewLocationScreen from "@/component/InspectionForms/ViewLocationScreen";
+import InvestmentInfo from "@/component/InspectionForms/InvestmentInfo";
+import CultivationInfo from "@/component/InspectionForms/CultivationInfo";
+import CroppingSystems from "@/component/InspectionForms/CroppingSystems";
+import ProfitRisk from "@/component/InspectionForms/ProfitRisk";
+import Economical from "@/component/InspectionForms/Economical";
+import Labour from "@/component/InspectionForms/Labour";
+import HarvestStorage from "@/component/InspectionForms/HarvestStorage";
+import ConfirmationCapitalRequest from "@/component/InspectionForms/ConfirmationCapitalRequest";
 
 // Import from our new database index
 import { initDatabase } from "@/database/index";
@@ -90,15 +90,6 @@ NativeWindStyleSheet.setOutput({ default: "native" });
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
 const Tab = createBottomTabNavigator();
-
-// Example Screen
-function HomeScreen() {
-  return (
-    <View className="flex-1 items-center justify-center bg-blue-100">
-      <Text className="text-2xl font-bold text-blue-800">Home Screen</Text>
-    </View>
-  );
-}
 
 function MainTabs() {
   const jobRole = useSelector((state: RootState) => state.auth.jobRole);
@@ -151,6 +142,7 @@ function MainTabs() {
           />
           <Tab.Screen name="Profile" component={ProfileScreen} />
           <Tab.Screen name="ViewAllVisits" component={ViewAllVisits} />
+          <Tab.Screen name="CapitalRequests" component={CapitalRequests} />
         </>
       )}
     </Tab.Navigator>

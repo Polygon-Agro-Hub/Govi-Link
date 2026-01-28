@@ -14,11 +14,12 @@ import { useTranslation } from "react-i18next";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../types";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { FontAwesome6 } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import CustomHeader from "../Common/CustomHeader";
 
 type RequestDetailsNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -28,7 +29,6 @@ type RequestDetailsNavigationProp = StackNavigationProp<
 interface RequestDetailsProps {
   navigation: RequestDetailsNavigationProp;
 }
-
 
 interface RequestData {
   id: number;
@@ -44,12 +44,12 @@ interface RequestData {
   cropNameEnglish: string;
   cropNameSinhala: string;
   cropNameTamil: string;
-  startDate: string
+  startDate: string;
 }
 
 type ProjectDetailsProps = {
   label: string;
-  value: string;
+  value: React.ReactNode;
 };
 
 const ProjectDetails: React.FC<ProjectDetailsProps> = ({ label, value }) => {
@@ -60,27 +60,18 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ label, value }) => {
       </View>
 
       <View className="flex-1">
-        <Text className="text-base text-[#070707]">
-          {label} :
-        </Text>
-        <Text className="text-base text-[#070707]">
-          {value}
-        </Text>
+        <Text className="text-base text-[#070707]">{label} :</Text>
+        <Text className="text-base text-[#070707]">{value}</Text>
       </View>
     </View>
   );
 };
 
-
-const RequestDetails: React.FC<RequestDetailsProps> = ({
-  navigation,
-}) => {
+const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
   const route = useRoute<RouteProp<RootStackParamList, "RequestDetails">>();
   const { requestId, requestNumber } = route.params;
   const [loading, setLoading] = useState(true);
-  const [requestData, setRequestData] = useState<RequestData | null>(
-    null
-  );
+  const [requestData, setRequestData] = useState<RequestData | null>(null);
   const { t, i18n } = useTranslation();
 
   useEffect(() => {
@@ -98,75 +89,34 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
         `${environment.API_BASE_URL}api/capital-request/requests/${requestId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
-      console.log('Requests', response.data.requests)
+      console.log("Requests", response.data.requests);
       // In real implementation, fetch by requestId
       setRequestData(response.data.requests[0] || null);
-
     } catch (error) {
       console.error("Failed to fetch request details:", error);
       Alert.alert("Error", "Failed to load request details");
-
     } finally {
       setLoading(false);
     }
   };
 
-  const handleApprove = () => {
-    Alert.alert(
-      "Approve Request",
-      "Are you sure you want to approve this request?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Approve",
-          style: "default",
-          onPress: () => {
-            // Handle approve logic
-            Alert.alert(
-              "Request Approved",
-              "The loan request has been approved successfully"
-            );
-          },
-        },
-      ]
-    );
-  };
-
-  const handleReject = () => {
-    Alert.alert(
-      "Reject Request",
-      "Are you sure you want to reject this request?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Reject",
-          style: "destructive",
-          onPress: () => {
-            // Handle reject logic
-            Alert.alert(
-              "Request Rejected",
-              "The loan request has been rejected"
-            );
-          },
-        },
-      ]
-    );
-  };
-
   const handleDial = (phoneNumber: string) => {
     const phoneUrl = `tel:${phoneNumber}`;
     Linking.openURL(phoneUrl).catch((err) =>
-      console.error("Failed to open dial pad:", err)
+      console.error("Failed to open dial pad:", err),
     );
   };
-  
+
   if (loading) {
     return (
       <View className="flex-1 bg-white justify-center items-center">
         <ActivityIndicator size="large" color="#21202B" />
-        <Text className="mt-4 text-[#565559]"> {t("CapitalRequests.LoadingRequests")}</Text>
+        <Text className="mt-4 text-[#565559]">
+          {" "}
+          {t("CapitalRequests.LoadingRequests")}
+        </Text>
       </View>
     );
   }
@@ -179,28 +129,20 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
     );
   }
 
+  const formatNumber = (value: number | string) =>
+    Number(value).toLocaleString("en-US");
+
   return (
     <View className="flex-1 bg-white">
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
-      {/* Header */}
-      <View className="flex-row items-center px-4 py-3">
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          className="bg-[#F6F6F680] rounded-full py-4 px-3"
-        >
-          <MaterialIcons
-            name="arrow-back-ios"
-            size={24}
-            color="black"
-            style={{ marginLeft: 10 }}
-          />
-        </TouchableOpacity>
-        <Text className="text-lg font-bold text-black text-center flex-1">
-          {t("RequestLetter.Request Letter")}
-        </Text>
-        <View style={{ width: 55 }} />
-      </View>
+      <CustomHeader
+        title={t("RequestLetter.Request Letter")}
+        navigation={navigation}
+        showBackButton={true}
+        showLanguageSelector={false}
+        onBackPress={() => navigation.goBack()}
+      />
 
       <ScrollView
         className="flex-1 bg-white"
@@ -215,12 +157,9 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
           </Text>
 
           <Text className="text-base mb-4 text-[#070707] leading-6">
-            {/* I, {requestData.farmerName}, a farmer from {t(`Districts.${requestData.district}`)},
-            am writing to formally request an agricultural loan for the upcoming
-            cultivation season. */}
             {t("RequestLetter.IRequestFarm", {
               farmerName: requestData.farmerName,
-              district: t(`Districts.${requestData.district}`)
+              district: t(`Districts.${requestData.district}`),
             })}
           </Text>
 
@@ -244,39 +183,74 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
             <View className="">
               <ProjectDetails
                 label={t("RequestLetter.District")}
-                value={t(`Districts.${requestData.district}`)}
+                value={
+                  <Text className="font-bold">
+                    {t(`Districts.${requestData.district}`)}
+                  </Text>
+                }
               />
+
               <ProjectDetails
                 label={t("RequestLetter.Crop")}
-                value={i18n.language === "si"
-                  ? requestData.cropNameSinhala
-                  : i18n.language === "ta"
-                    ? requestData.cropNameTamil
-                    : requestData.cropNameEnglish}
+                value={
+                  <Text className="font-bold">
+                    {i18n.language === "si"
+                      ? requestData.cropNameSinhala
+                      : i18n.language === "ta"
+                        ? requestData.cropNameTamil
+                        : requestData.cropNameEnglish}
+                  </Text>
+                }
               />
 
               <ProjectDetails
                 label={t("RequestLetter.Extent")}
-                value={t("RequestLetter.Extentdetails", {
-                  hectare: requestData.extentha,
-                  acres: requestData.extentac,
-                  perches: requestData.extentp
-                })}
+                value={
+                  <>
+                    <Text className="font-bold">{requestData.extentha}</Text>
+                    <Text> {t("RequestLetter.hectare")}, </Text>
+
+                    <Text className="font-bold">{requestData.extentac}</Text>
+                    <Text>
+                      {" "}
+                      {t("RequestLetter.acres")}, {t("RequestLetter.and")}{" "}
+                    </Text>
+
+                    <Text className="font-bold">{requestData.extentp}</Text>
+                    <Text> {t("RequestLetter.perches")}</Text>
+                  </>
+                }
               />
 
               <ProjectDetails
                 label={t("RequestLetter.Expected Investment")}
-                value={`${t("RequestLetter.Rs")}. ${requestData.investment}`}
+                value={
+                  <>
+                    <Text>{t("RequestLetter.Rs")} </Text>
+                    <Text className="font-bold">
+                      {formatNumber(requestData.investment)}
+                    </Text>
+                  </>
+                }
               />
 
               <ProjectDetails
                 label={t("RequestLetter.Expected Yield")}
-                value={`${requestData.expectedYield} ${t("RequestLetter.kg")}`}
+                value={
+                  <>
+                    <Text className="font-bold">
+                      {requestData.expectedYield}
+                    </Text>
+                    <Text> {t("RequestLetter.kg")}</Text>
+                  </>
+                }
               />
 
               <ProjectDetails
                 label={t("RequestLetter.Cultivation Start Date")}
-                value={requestData.startDate}
+                value={
+                  <Text className="font-bold">{requestData.startDate}</Text>
+                }
               />
             </View>
           </View>
@@ -286,14 +260,13 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
           </Text>
 
           <Text className="text-base mb-4 text-black leading-6">
-            {t("RequestLetter.I have attached the necessary documents for your perusal.")}
+            {t(
+              "RequestLetter.I have attached the necessary documents for your perusal.",
+            )}
           </Text>
 
           {/* Sample Images */}
           <View className="my-4">
-            {/* <Text className="text-base text-black mb-2">
-              Attached Documents:
-            </Text> */}
             <View className="flex-row justify-between w-full">
               <Image
                 source={require("../../assets/request-letter.png")}
@@ -309,12 +282,16 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
           </View>
 
           <Text className="text-base  mt-2 text-black leading-6">
-            {t("RequestLetter.I am confident in the success of this venture and request")}
+            {t(
+              "RequestLetter.I am confident in the success of this venture and request",
+            )}
           </Text>
 
           {/* Signature */}
           <View className="mt-8 mb-8">
-            <Text className="text-base text-black ">{t("RequestLetter.Sincerely")},</Text>
+            <Text className="text-base text-black ">
+              {t("RequestLetter.Sincerely")},
+            </Text>
             <Text className="text-base text-black">
               {requestData.farmerName}
             </Text>
@@ -323,59 +300,8 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
             </Text>
           </View>
         </View>
-
-        {/* Action Buttons */}
-        {/* <View className="mb-20">
-          <View
-            style={{
-              height: 1,
-              backgroundColor: "#fff",
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.1,
-              shadowRadius: 3,
-              elevation: 3,
-            }}
-          />
-
-          <View className="px-12 flex-col w-full gap-4 mt-4">
-            <TouchableOpacity
-              onPress={handleReject}
-              className="bg-[#444444] rounded-3xl px-6 py-4 w-full items-center"
-              style={{
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 3 },
-                shadowOpacity: 0.25,
-                shadowRadius: 5,
-                elevation: 6,
-              }}
-            >
-              <Text className="text-white text-lg font-semibold">Reject</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={handleApprove} className="w-full">
-              <LinearGradient
-                colors={["#F35125", "#FF1D85"]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                className="rounded-3xl px-6 py-4 w-full items-center"
-                style={{
-                  shadowColor: "#000",
-                  shadowOffset: { width: 0, height: 3 },
-                  shadowOpacity: 0.25,
-                  shadowRadius: 5,
-                  elevation: 6,
-                }}
-              >
-                <Text className="text-white text-lg font-semibold">
-                  Approve
-                </Text>
-              </LinearGradient>
-            </TouchableOpacity>
-          </View>
-        </View> */}
       </ScrollView>
-      <View className=" bottom-4 bg-white " >
+      <View className=" bottom-4 bg-white ">
         <View
           style={{
             height: 1,
@@ -387,30 +313,30 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
             elevation: 3,
           }}
         />
-                                                  <TouchableOpacity
-                          className="flex "
-                          onPress={() => handleDial(requestData.phoneNumber)}
-                        >
-                          <View className="flex-row mt-4 self-center items-center justify-center border border-[#F83B4F] rounded-full px-6 w-[50%] py-2">
-                            <Ionicons name="call" size={20} color="#F83B4F" />
-                            <Text className="text-base font-semibold  ml-2">
-                              {t("VisitPopup.Get Call")}
-                            </Text>
-                          </View>
-                        </TouchableOpacity>
         <TouchableOpacity
-          //  onPress={() => navigation.navigate("PersonalInfo", {requestNumber})} 
+          className="flex "
+          onPress={() => handleDial(requestData.phoneNumber)}
+        >
+          <View className="flex-row mt-4 self-center items-center justify-center border border-[#F83B4F] rounded-full px-6 w-[50%] py-3">
+            <FontAwesome6 name="phone-volume" size={20} color="#F83B4F" />
+            <Text className="text-base font-semibold  ml-2">
+              {t("VisitPopup.Get Call")}
+            </Text>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity
           onPress={async () => {
             try {
               navigation.navigate("PersonalInfo", {
                 requestNumber,
-                requestId: requestData.id
+                requestId: requestData.id,
               });
             } catch (e) {
               console.log("Error clearing AsyncStorage:", e);
             }
           }}
-          className="w-[80%] mt-4 self-center">
+          className="w-[80%] mt-4 self-center"
+        >
           <LinearGradient
             colors={["#F35125", "#FF1D85"]}
             start={{ x: 0, y: 0 }}

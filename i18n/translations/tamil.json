@@ -400,7 +400,7 @@
     "Pending": "Pending",
     "Completed": "Completed",
     "Request Placed": "Request Placed",
-    "Ongoing":"Ongoing",
+    "Ongoing": "Ongoing",
     "Request Reviewed": "Request Reviewed",
     "Finished": "Finished",
     "Over Due": "Over Due",
@@ -500,7 +500,8 @@
     "I am confident in the success of this venture and request": "இந்த முயற்சி வெற்றியடையும் என நம்புகிறேன். எனது கடன் விண்ணப்பத்தை விரைவாக அனுமதிக்குமாறு பணிவுடன் கேட்டுக்கொள்கிறேன். உங்கள் நேரத்திற்கும் கவனத்திற்கும் நன்றி.",
     "Sincerely": "மரியாதையுடன்",
     "Investment Request": "முதலீட்டு கோரிக்கை",
-    "Saved Draft": "வரைவாக சேமிக்கப்பட்டது"
+    "Saved Draft": "வரைவாக சேமிக்கப்பட்டது",
+    "and": "மற்றும்"
   },
   "InspectionForm": {
     "Personal Info": "தனிப்பட்ட தகவல்கள்",
@@ -682,7 +683,7 @@
     "Inspection form completed successfully!": "ஆய்வு படிவம் வெற்றிகரமாக முடிக்கப்பட்டது!",
     "Could not save to server. Please try again.": "சேவையகத்தில் சேமிக்க முடியவில்லை. தயவுசெய்து மீண்டும் முயற்சிக்கவும்.",
     "Go Back": "பின்னால் செல்லவும்",
-     "Account Holder Name":"கணக்கு வைத்திருப்பவரின் பெயர்"
+    "Account Holder Name": "கணக்கு வைத்திருப்பவரின் பெயர்"
   },
   "ConfirmationCapitalRequest": {
     "ConfirmSuccess": "உறுதிப்படுத்தல் வெற்றிகரமாக!",
@@ -704,7 +705,7 @@
     "AssignSuccess": "{name} க்கு வெற்றிகரமாக ஒதுக்கப்பட்டது!",
     "NoOfficersAvailable": "ஒதுக்கீட்டிற்கு அதிகாரிகள் இல்லை",
     "HeaderOn": "உறுதிப்படுத்தல்",
-    "UndoSuccess":"அனைத்து ஆய்வுத் தரவும் வெற்றிகரமாக நீக்கப்பட்டது.",
-    "UndoFailed":"ஆய்வுத் தரவை நீக்க முடியவில்லை."
+    "UndoSuccess": "அனைத்து ஆய்வுத் தரவும் வெற்றிகரமாக நீக்கப்பட்டது.",
+    "UndoFailed": "ஆய்வுத் தரவை நீக்க முடியவில்லை."
   }
 }

@@ -14,7 +14,7 @@ import {
   FlatList,
 } from "react-native";
 import { MaterialIcons, AntDesign } from "@expo/vector-icons";
-import FormTabs from "../CapitalRequest/FormTabs";
+import FormTabs from "./FormTabs";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { environment } from "@/environment/environment";
