@@ -19,7 +19,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 import { useDispatch } from "react-redux";
-import { clearAllInspectionSlices } from "@/store/clearAllSlices";
+import CustomHeader from "../Common/CustomHeader";
 
 type CapitalRequestsNavigationProps = StackNavigationProp<
   RootStackParamList,
@@ -45,7 +45,7 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [highlightedJobs, setHighlightedJobs] = useState<string[]>([]);
 
-  // ✅ Prevent infinite refetches
+  // Prevent infinite refetches
   const isFetchingRef = useRef(false);
 
   const loadStoredJobs = async (requests: Request[]) => {
@@ -65,7 +65,10 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
               Object.keys(parsed.inspectioncultivation).length > 0
             );
           } catch (e) {
-            console.warn(`Failed to parse AsyncStorage value for key ${key}`, e);
+            console.warn(
+              `Failed to parse AsyncStorage value for key ${key}`,
+              e,
+            );
             return false;
           }
         })
@@ -86,9 +89,8 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
   }, [requests]);
 
   const fetchCapitalRequests = async (search: string = "") => {
-    // ✅ Prevent concurrent fetches
+    // Prevent concurrent fetches
     if (isFetchingRef.current) {
-      console.log("⏭️ Already fetching, skipping");
       return;
     }
 
@@ -109,7 +111,7 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
         `${environment.API_BASE_URL}api/capital-request/requests`,
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
       console.log("Requests", response.data.requests);
 
@@ -132,22 +134,20 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
     fetchCapitalRequests(searchQuery);
   }, [searchQuery]);
 
-  // ✅ Only fetch on initial focus, not on every focus
+  // Only fetch on initial focus, not on every focus
   useFocusEffect(
     useCallback(() => {
-      console.log("📱 CapitalRequests screen focused");
       fetchCapitalRequests(searchQuery);
-
       return () => {
-        console.log("👋 CapitalRequests screen blurred");
       };
-    }, [searchQuery])
+    }, [searchQuery]),
   );
 
-  // ✅ Handle navigation to RequestDetails (starting a new inspection)
-  const handleNavigateToRequestDetails = (requestId: number, requestNumber: string) => {
-    console.log(`🚀 Starting new inspection for request ${requestNumber}`);
-    
+  // Handle navigation to RequestDetails (starting a new inspection)
+  const handleNavigateToRequestDetails = (
+    requestId: number,
+    requestNumber: string,
+  ) => {
     navigation.navigate("RequestDetails", {
       requestId: requestId,
       requestNumber: requestNumber,
@@ -169,27 +169,16 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
     <View className="flex-1 bg-white">
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
-      {/* Header */}
-      <View className="flex-row items-center px-4 py-3">
-        <TouchableOpacity
-          onPress={() => navigation.navigate("ManageOfficers")}
-          className="bg-[#F6F6F680] rounded-full py-4 px-3"
-        >
-          <MaterialIcons
-            name="arrow-back-ios"
-            size={24}
-            color="black"
-            style={{ marginLeft: 10 }}
-          />
-        </TouchableOpacity>
-        <Text className="text-lg font-bold text-black text-center flex-1">
-          {t("CapitalRequests.CapitalRequests")}
-        </Text>
-        <View style={{ width: 55 }} />
-      </View>
+      <CustomHeader
+        title={t("CapitalRequests.CapitalRequests")}
+        navigation={navigation}
+        showBackButton={true}
+        showLanguageSelector={false}
+        onBackPress={() => navigation.goBack()}
+      />
 
       <ScrollView
-        className="flex-1 bg-white"
+        className="flex-1 bg-white mb-20"
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
@@ -215,12 +204,16 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
               <TouchableOpacity
                 key={`${request.id}-${index}`}
                 className=""
-                onPress={() => handleNavigateToRequestDetails(request.id, request.jobId)}
+                onPress={() =>
+                  handleNavigateToRequestDetails(request.id, request.jobId)
+                }
               >
                 <View
                   className="bg-[#ADADAD1A] rounded-3xl p-4 flex-row items-center justify-between"
                   style={{
-                    borderWidth: highlightedJobs.includes(request.jobId) ? 1 : 0,
+                    borderWidth: highlightedJobs.includes(request.jobId)
+                      ? 1
+                      : 0,
                     borderColor: highlightedJobs.includes(request.jobId)
                       ? "#FA4064"
                       : "transparent",
