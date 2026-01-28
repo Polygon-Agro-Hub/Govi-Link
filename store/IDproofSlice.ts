@@ -1,11 +1,10 @@
-// store/idProofSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export type IDProofInfo = {
   pType: string;
   pNumber: string;
-  frontImg: string | null; // URI string (file:// or https://)
-  backImg: string | null;  // URI string (file:// or https://)
+  frontImg: string | null;
+  backImg: string | null;
 };
 
 interface IDProofState {
@@ -15,6 +14,7 @@ interface IDProofState {
   isExisting: {
     [requestId: string]: boolean;
   };
+  currentRequestId: number | null; // ✅ Added
 }
 
 const initialIDProofInfo: IDProofInfo = {
@@ -27,22 +27,32 @@ const initialIDProofInfo: IDProofInfo = {
 const initialState: IDProofState = {
   data: {},
   isExisting: {},
+  currentRequestId: null, // ✅ Added
 };
 
 const idProofSlice = createSlice({
   name: 'idProof',
   initialState,
   reducers: {
-    // Initialize ID proof for a request
+    // ✅ UPDATED with auto-clear
     initializeIDProof: (state, action: PayloadAction<{ requestId: number }>) => {
       const { requestId } = action.payload;
+      
+      // ✅ Auto-clear when switching requests
+      if (state.currentRequestId !== null && state.currentRequestId !== requestId) {
+        console.log(`🗑️ [IDProof] Clearing data for old request ${state.currentRequestId}`);
+        delete state.data[state.currentRequestId];
+        delete state.isExisting[state.currentRequestId];
+      }
+      
+      state.currentRequestId = requestId;
+      
       if (!state.data[requestId]) {
         state.data[requestId] = { ...initialIDProofInfo };
         state.isExisting[requestId] = false;
       }
     },
 
-    // Update specific fields
     updateIDProof: (
       state,
       action: PayloadAction<{
@@ -60,7 +70,6 @@ const idProofSlice = createSlice({
       };
     },
 
-    // Set complete ID proof info (used when loading from backend)
     setIDProof: (
       state,
       action: PayloadAction<{
@@ -74,7 +83,6 @@ const idProofSlice = createSlice({
       state.isExisting[requestId] = isExisting;
     },
 
-    // Mark as existing data (for UPDATE operations)
     markAsExisting: (
       state,
       action: PayloadAction<{ requestId: number }>
@@ -83,7 +91,6 @@ const idProofSlice = createSlice({
       state.isExisting[requestId] = true;
     },
 
-    // Clear ID proof for a request
     clearIDProof: (
       state,
       action: PayloadAction<{ requestId: string }>
@@ -93,13 +100,12 @@ const idProofSlice = createSlice({
       delete state.isExisting[requestId];
     },
 
-    // Clear all ID proof data
     clearAllIDProof: (state) => {
       state.data = {};
       state.isExisting = {};
+      state.currentRequestId = null; // ✅ Added
     },
 
-    // Load from AsyncStorage
     loadIDProofFromStorage: (
       state,
       action: PayloadAction<{
@@ -111,7 +117,6 @@ const idProofSlice = createSlice({
       state.data[requestId] = data;
     },
 
-    // Reset ID proof when type changes
     resetIDProofData: (
       state,
       action: PayloadAction<{

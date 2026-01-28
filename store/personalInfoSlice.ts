@@ -1,4 +1,3 @@
-// store/slices/personalInfoSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export type PersonalInfo = {
@@ -22,14 +21,13 @@ export type PersonalInfo = {
 };
 
 interface PersonalInfoState {
-  // Store data by requestId
   data: {
     [requestId: string]: PersonalInfo;
   };
-  // Track which requests have existing backend data (UPDATE vs INSERT)
   isExisting: {
     [requestId: string]: boolean;
   };
+  currentRequestId: number | null; // ✅ Added
 }
 
 const initialPersonalInfo: PersonalInfo = {
@@ -55,22 +53,32 @@ const initialPersonalInfo: PersonalInfo = {
 const initialState: PersonalInfoState = {
   data: {},
   isExisting: {},
+  currentRequestId: null, // ✅ Added
 };
 
 const personalInfoSlice = createSlice({
   name: 'personalInfo',
   initialState,
   reducers: {
-    // Initialize personal info for a request
+    // ✅ UPDATED with auto-clear
     initializePersonalInfo: (state, action: PayloadAction<{ requestId: number }>) => {
       const { requestId } = action.payload;
+      
+      // ✅ Auto-clear when switching requests
+      if (state.currentRequestId !== null && state.currentRequestId !== requestId) {
+        console.log(`🗑️ [PersonalInfo] Clearing data for old request ${state.currentRequestId}`);
+        delete state.data[state.currentRequestId];
+        delete state.isExisting[state.currentRequestId];
+      }
+      
+      state.currentRequestId = requestId;
+      
       if (!state.data[requestId]) {
         state.data[requestId] = { ...initialPersonalInfo };
         state.isExisting[requestId] = false;
       }
     },
 
-    // Update specific fields
     updatePersonalInfo: (
       state,
       action: PayloadAction<{
@@ -88,7 +96,6 @@ const personalInfoSlice = createSlice({
       };
     },
 
-    // Set complete personal info (used when loading from backend)
     setPersonalInfo: (
       state,
       action: PayloadAction<{
@@ -102,7 +109,6 @@ const personalInfoSlice = createSlice({
       state.isExisting[requestId] = isExisting;
     },
 
-    // Mark as existing data (for UPDATE operations)
     markAsExisting: (
       state,
       action: PayloadAction<{ requestId: number }>
@@ -111,7 +117,6 @@ const personalInfoSlice = createSlice({
       state.isExisting[requestId] = true;
     },
 
-    // Clear personal info for a request
     clearPersonalInfo: (
       state,
       action: PayloadAction<{ requestId: string }>
@@ -121,10 +126,10 @@ const personalInfoSlice = createSlice({
       delete state.isExisting[requestId];
     },
 
-    // Clear all personal info data
     clearAllPersonalInfo: (state) => {
       state.data = {};
       state.isExisting = {};
+      state.currentRequestId = null; // ✅ Added
     },
   },
 });

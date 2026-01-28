@@ -945,6 +945,34 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
             error={errors.soilType}
           />
 
+                    <View className="mt-2">
+            <Text className="text-sm text-[#070707] mb-2">
+              {t("InspectionForm.Overall soil fertility")}{" "}
+              <Text className="text-red-500">*</Text>
+            </Text>
+
+            <TouchableOpacity
+              className="bg-[#F6F6F6] px-4 py-4 flex-row items-center justify-between rounded-full"
+              onPress={() => {
+                setOverallSoilFertilityVisible(true);
+              }}
+            >
+              <Text
+                className={
+                  formData?.soilfertility ? "text-black" : "text-[#A3A3A3]"
+                }
+              >
+                {formData?.soilfertility
+                  ? t(`InspectionForm.${formData.soilfertility}`)
+                  : t("InspectionForm.--Select From Here--")}
+              </Text>
+
+              {!formData?.soilfertility && (
+                <AntDesign name="down" size={20} color="#838B8C" />
+              )}
+            </TouchableOpacity>
+          </View>
+
           {/* Water Sources */}
           <View className="mt-2">
             <Text className="text-sm text-[#070707] mb-4">
@@ -1031,34 +1059,6 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
                 {errors.waterImages}
               </Text>
             ) : null}
-          </View>
-
-          <View className="mt-2">
-            <Text className="text-sm text-[#070707] mb-2">
-              {t("InspectionForm.Overall soil fertility")}{" "}
-              <Text className="text-red-500">*</Text>
-            </Text>
-
-            <TouchableOpacity
-              className="bg-[#F6F6F6] px-4 py-4 flex-row items-center justify-between rounded-full"
-              onPress={() => {
-                setOverallSoilFertilityVisible(true);
-              }}
-            >
-              <Text
-                className={
-                  formData?.soilfertility ? "text-black" : "text-[#A3A3A3]"
-                }
-              >
-                {formData?.soilfertility
-                  ? t(`InspectionForm.${formData.soilfertility}`)
-                  : t("InspectionForm.--Select From Here--")}
-              </Text>
-
-              {!formData?.soilfertility && (
-                <AntDesign name="down" size={20} color="#838B8C" />
-              )}
-            </TouchableOpacity>
           </View>
 
           <YesNoSelect

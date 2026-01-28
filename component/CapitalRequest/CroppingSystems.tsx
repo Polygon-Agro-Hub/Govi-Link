@@ -502,7 +502,7 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
           <View className="mt-2">
             <Text className="text-sm text-[#070707] mb-4">
               {t("InspectionForm.An opportunity to go for")}{" "}
-              <Text className="text-red-500">*</Text>
+              <Text className="text-black">*</Text>
             </Text>
 
             {[
@@ -549,7 +549,11 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
                 placeholderTextColor="#838B8C"
                 className="bg-[#F6F6F6] px-4 py-4 rounded-full text-black mb-2"
                 value={formData.otherOpportunity || ""}
-                onChangeText={handleOtherOpportunityChange}
+                onChangeText={(text) => {
+                  // Remove leading spaces but allow spaces in the middle and end
+                  const trimmedText = text.replace(/^\s+/, '');
+                  handleOtherOpportunityChange(trimmedText);
+                }}
               />
             )}
 
@@ -583,7 +587,7 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
               {t(
                 "InspectionForm.What is your previous experiences with regard to the crop/cropping systems that the farmer is planning to choose",
               )}{" "}
-              <Text className="text-red-500">*</Text>
+              <Text className="text-black">*</Text>
             </Text>
 
             <TouchableOpacity
