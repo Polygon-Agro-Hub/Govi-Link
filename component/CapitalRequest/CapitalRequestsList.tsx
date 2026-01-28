@@ -19,7 +19,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 import { useDispatch } from "react-redux";
-import CustomHeader from "../Common/CustomHeader";
+import { clearAllInspectionSlices } from "@/store/clearAllSlices";
+import { hasDraft, initPersonalTable } from "@/database/inspectionpersonal"; // Import the function to check drafts
 
 type CapitalRequestsNavigationProps = StackNavigationProp<
   RootStackParamList,
@@ -43,54 +44,63 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [requests, setRequests] = useState<Request[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [highlightedJobs, setHighlightedJobs] = useState<string[]>([]);
+  const [draftRequestIds, setDraftRequestIds] = useState<number[]>([]); // Track draft IDs
 
-  // Prevent infinite refetches
+  // ✅ Prevent infinite refetches
   const isFetchingRef = useRef(false);
 
-  const loadStoredJobs = async (requests: Request[]) => {
+  // ✅ Initialize database on component mount
+  useEffect(() => {
+    console.log("🗄️ Initializing database tables...");
     try {
-      const keys = requests.map((req) => `${req.jobId}`);
-      const keyValues = await AsyncStorage.multiGet(keys);
+      initPersonalTable();
+      console.log("✅ Database initialized successfully");
+    } catch (error) {
+      console.error("❌ Failed to initialize database:", error);
+    }
+  }, []);
 
-      const jobsWithinspectioncultivation = keyValues
-        .filter(([key, value]) => {
-          if (!value) return false;
-          try {
-            const parsed = JSON.parse(value);
-            console.log(parsed);
+  // ✅ Check SQLite for draft records
+  const checkForDrafts = (requests: Request[]) => {
+    console.log("🔍 Starting draft check for", requests.length, "requests");
+    try {
+      const drafts: number[] = [];
 
-            return (
-              parsed.inspectioncultivation &&
-              Object.keys(parsed.inspectioncultivation).length > 0
-            );
-          } catch (e) {
-            console.warn(
-              `Failed to parse AsyncStorage value for key ${key}`,
-              e,
-            );
-            return false;
-          }
-        })
-        .map(([key]) => key);
+      for (const request of requests) {
+        console.log(`🔎 Checking request ID: ${request.id} (jobId: ${request.jobId})`);
+        const isDraft = hasDraft(request.id);
+        console.log(`   → hasDraft returned: ${isDraft}`);
+        
+        if (isDraft) {
+          drafts.push(request.id);
+          console.log(`   ✅ Added ${request.id} to drafts`);
+        }
+      }
 
-      setHighlightedJobs(jobsWithinspectioncultivation);
-      console.log("Highlighted jobs:", jobsWithinspectioncultivation);
-    } catch (e) {
-      console.error("Failed to load stored jobs", e);
+      console.log("📊 Total drafts found:", drafts.length);
+      console.log("📋 Draft request IDs:", drafts);
+      setDraftRequestIds(drafts);
+    } catch (error) {
+      console.error("❌ Failed to check for drafts:", error);
     }
   };
 
-  // Call after fetching requests
+  // ✅ Call checkForDrafts after fetching requests
   useEffect(() => {
+    console.log("🔄 useEffect triggered - requests.length:", requests.length);
     if (requests.length > 0) {
-      loadStoredJobs(requests);
+      console.log("✅ Calling checkForDrafts...");
+      checkForDrafts(requests);
+    } else {
+      console.log("⚠️ No requests, clearing draft IDs");
+      setDraftRequestIds([]);
     }
   }, [requests]);
 
   const fetchCapitalRequests = async (search: string = "") => {
-    // Prevent concurrent fetches
+    // ✅ Prevent concurrent fetches
     if (isFetchingRef.current) {
+      console.log("⏭️ Already fetching, skipping");
       return;
     }
 
@@ -99,8 +109,6 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
     try {
       setLoading(true);
 
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
       const token = await AsyncStorage.getItem("token");
       if (!token) {
         isFetchingRef.current = false;
@@ -111,7 +119,7 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
         `${environment.API_BASE_URL}api/capital-request/requests`,
         {
           headers: { Authorization: `Bearer ${token}` },
-        },
+        }
       );
       console.log("Requests", response.data.requests);
 
@@ -134,20 +142,22 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
     fetchCapitalRequests(searchQuery);
   }, [searchQuery]);
 
-  // Only fetch on initial focus, not on every focus
+  // ✅ Only fetch on initial focus, not on every focus
   useFocusEffect(
     useCallback(() => {
+      console.log("📱 CapitalRequests screen focused");
       fetchCapitalRequests(searchQuery);
+
       return () => {
+        console.log("👋 CapitalRequests screen blurred");
       };
-    }, [searchQuery]),
+    }, [searchQuery])
   );
 
-  // Handle navigation to RequestDetails (starting a new inspection)
-  const handleNavigateToRequestDetails = (
-    requestId: number,
-    requestNumber: string,
-  ) => {
+  // ✅ Handle navigation to RequestDetails (starting a new inspection)
+  const handleNavigateToRequestDetails = (requestId: number, requestNumber: string) => {
+    console.log(`🚀 Starting new inspection for request ${requestNumber}`);
+    
     navigation.navigate("RequestDetails", {
       requestId: requestId,
       requestNumber: requestNumber,
@@ -169,16 +179,27 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
     <View className="flex-1 bg-white">
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
-      <CustomHeader
-        title={t("CapitalRequests.CapitalRequests")}
-        navigation={navigation}
-        showBackButton={true}
-        showLanguageSelector={false}
-        onBackPress={() => navigation.goBack()}
-      />
+      {/* Header */}
+      <View className="flex-row items-center px-4 py-3">
+        <TouchableOpacity
+          onPress={() => navigation.navigate("ManageOfficers")}
+          className="bg-[#F6F6F680] rounded-full py-4 px-3"
+        >
+          <MaterialIcons
+            name="arrow-back-ios"
+            size={24}
+            color="black"
+            style={{ marginLeft: 10 }}
+          />
+        </TouchableOpacity>
+        <Text className="text-lg font-bold text-black text-center flex-1">
+          {t("CapitalRequests.CapitalRequests")}
+        </Text>
+        <View style={{ width: 55 }} />
+      </View>
 
       <ScrollView
-        className="flex-1 bg-white mb-20"
+        className="flex-1 bg-white"
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
@@ -200,56 +221,54 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
               </Text>
             </View>
           ) : (
-            requests.map((request, index) => (
-              <TouchableOpacity
-                key={`${request.id}-${index}`}
-                className=""
-                onPress={() =>
-                  handleNavigateToRequestDetails(request.id, request.jobId)
-                }
-              >
-                <View
-                  className="bg-[#ADADAD1A] rounded-3xl p-4 flex-row items-center justify-between"
-                  style={{
-                    borderWidth: highlightedJobs.includes(request.jobId)
-                      ? 1
-                      : 0,
-                    borderColor: highlightedJobs.includes(request.jobId)
-                      ? "#FA4064"
-                      : "transparent",
-                  }}
+            requests.map((request, index) => {
+              const isDraft = draftRequestIds.includes(request.id);
+              
+              return (
+                <TouchableOpacity
+                  key={`${request.id}-${index}`}
+                  className=""
+                  onPress={() => handleNavigateToRequestDetails(request.id, request.jobId)}
                 >
-                  {/* Left side content */}
-                  <View className="flex-1">
-                    <View className="flex-row space-x-2 items-baseline">
-                      <Text className="text-[#000000] text-base">
-                        #{request.jobId}
-                      </Text>
-                      {highlightedJobs.includes(request.jobId) && (
-                        <Text className=" font-bold  text-[#FA345A] ">
-                          ({t("RequestLetter.Saved Draft")})
+                  <View
+                    className="bg-[#ADADAD1A] rounded-3xl p-4 flex-row items-center justify-between"
+                    style={{
+                      borderWidth: isDraft ? 1 : 0,
+                      borderColor: isDraft ? "#FA4064" : "transparent",
+                    }}
+                  >
+                    {/* Left side content */}
+                    <View className="flex-1">
+                      <View className="flex-row space-x-2 items-baseline">
+                        <Text className="text-[#000000] text-base">
+                          #{request.jobId}
                         </Text>
-                      )}
+                        {isDraft && (
+                          <Text className="font-bold text-[#FA345A]">
+                            ({t("RequestLetter.Saved Draft")})
+                          </Text>
+                        )}
+                      </View>
+
+                      <Text className="text-[#212121] text-lg font-medium mt-1">
+                        {request.farmerName}
+                      </Text>
+
+                      <Text className="text-[#4E6393] text-sm mt-1">
+                        {t("RequestLetter.Investment Request")}
+                      </Text>
                     </View>
 
-                    <Text className="text-[#212121] text-lg font-medium mt-1">
-                      {request.farmerName}
-                    </Text>
-
-                    <Text className="text-[#4E6393] text-sm mt-1">
-                      {t("RequestLetter.Investment Request")}
-                    </Text>
+                    {/* Right side arrow button */}
+                    <MaterialIcons
+                      name="keyboard-arrow-right"
+                      size={40}
+                      color="#000"
+                    />
                   </View>
-
-                  {/* Right side arrow button */}
-                  <MaterialIcons
-                    name="keyboard-arrow-right"
-                    size={40}
-                    color="#000"
-                  />
-                </View>
-              </TouchableOpacity>
-            ))
+                </TouchableOpacity>
+              );
+            })
           )}
         </View>
       </ScrollView>
