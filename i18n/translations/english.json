@@ -124,7 +124,10 @@
     "Value must be greater than 0": "Value must be greater than 0",
     "What are the risks you are anticipating in the proposed crop / cropping system is required": "What are the risks you are anticipating in the proposed crop / cropping system is required",
     "Do you have the solution is required": "Do you have the solution is required",
-    "Is it worth to take the risks for anticipated profits is required": "Is it worth to take the risks for anticipated profits is required"
+    "Is it worth to take the risks for anticipated profits is required": "Is it worth to take the risks for anticipated profits is required",
+    "Land number must be 9 digits long": "Land number must be 9 digits long",
+    "Land number must start with 0": "Land number must start with 0",
+    "Invalid land number format": "Invalid land number format"
   },
   "Login": {
     "Welcome": "Welcome!",

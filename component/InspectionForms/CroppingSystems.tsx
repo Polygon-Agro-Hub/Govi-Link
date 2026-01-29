@@ -490,7 +490,28 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
         <StatusBar barStyle="dark-content" />
 
         {/* Tabs */}
-        <FormTabs activeKey="Cropping Systems" navigation={navigation} />
+        <FormTabs
+          activeKey="Cropping Systems"
+          navigation={navigation}
+          onTabPress={(key) => {
+            const routesMap: Record<string, string> = {
+              "Personal Info": "PersonalInfo",
+              "ID Proof": "IDProof",
+              "Finance Info": "FinanceInfo",
+              "Land Info": "LandInfo",
+              "Investment Info": "InvestmentInfo",
+              "Cultivation Info": "CultivationInfo"
+            };
+
+            const route = routesMap[key];
+            if (route) {
+              navigation.navigate(route, {
+                requestId,
+                requestNumber,
+              });
+            }
+          }}
+        />
 
         <ScrollView
           className="flex-1 px-6 bg-white rounded-t-3xl"
@@ -551,7 +572,7 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
                 value={formData.otherOpportunity || ""}
                 onChangeText={(text) => {
                   // Remove leading spaces but allow spaces in the middle and end
-                  const trimmedText = text.replace(/^\s+/, '');
+                  const trimmedText = text.replace(/^\s+/, "");
                   handleOtherOpportunityChange(trimmedText);
                 }}
               />

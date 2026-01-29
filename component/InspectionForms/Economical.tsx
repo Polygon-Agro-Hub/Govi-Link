@@ -405,7 +405,30 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
         <StatusBar barStyle="dark-content" />
 
         {/* Tabs */}
-        <FormTabs activeKey="Economical" navigation={navigation} />
+        <FormTabs
+          activeKey="Economical"
+          navigation={navigation}
+          onTabPress={(key) => {
+            const routesMap: Record<string, string> = {
+              "Personal Info": "PersonalInfo",
+              "ID Proof": "IDProof",
+              "Finance Info": "FinanceInfo",
+              "Land Info": "LandInfo",
+              "Investment Info": "InvestmentInfo",
+              "Cultivation Info": "CultivationInfo",
+              "Cropping Systems": "CroppingSystems",
+              "Profit & Risk": "ProfitRisk",
+            };
+
+            const route = routesMap[key];
+            if (route) {
+              navigation.navigate(route, {
+                requestId,
+                requestNumber,
+              });
+            }
+          }}
+        />
 
         <ScrollView
           className="flex-1 px-6 bg-white rounded-t-3xl"

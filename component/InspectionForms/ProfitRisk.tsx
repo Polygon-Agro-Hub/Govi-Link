@@ -51,8 +51,9 @@ const Input = ({
       {required && <Text className="text-black">*</Text>}
     </Text>
     <View
-      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${error ? "border border-red-500" : ""
-        }`}
+      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
+        error ? "border border-red-500" : ""
+      }`}
     >
       <TextInput
         placeholder={placeholder}
@@ -150,16 +151,12 @@ type ValidationRule = {
   type?: "profit";
 };
 
-const validateAndFormat = (
-  text: string,
-  rules: ValidationRule,
-  t: any,
-) => {
+const validateAndFormat = (text: string, rules: ValidationRule, t: any) => {
   let value = text;
   let error = "";
 
   console.log("Validating:", value, rules);
-  
+
   if (rules.type === "profit") {
     value = value.replace(/[^0-9.]/g, "");
 
@@ -195,13 +192,13 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
 
   // Local state for form data
   const [formData, setFormData] = useState<ProfitRiskData>({
-    profit: '',
+    profit: "",
     isProfitable: undefined,
     isRisk: undefined,
-    risk: '',
-    solution: '',
+    risk: "",
+    solution: "",
     manageRisk: undefined,
-    worthToTakeRisk: '',
+    worthToTakeRisk: "",
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -222,47 +219,47 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
           const localData = await getProfitInfo(reqId);
 
           if (localData) {
-            console.log('✅ Loaded profit/risk info from SQLite:', localData);
-            
+            console.log("✅ Loaded profit/risk info from SQLite:", localData);
+
             // Ensure proper data types
             const normalizedData: ProfitRiskData = {
-              profit: localData.profit || '',
+              profit: localData.profit || "",
               isProfitable: localData.isProfitable,
               isRisk: localData.isRisk,
-              risk: localData.risk || '',
-              solution: localData.solution || '',
+              risk: localData.risk || "",
+              solution: localData.solution || "",
               manageRisk: localData.manageRisk,
-              worthToTakeRisk: localData.worthToTakeRisk || '',
+              worthToTakeRisk: localData.worthToTakeRisk || "",
             };
-            
+
             setFormData(normalizedData);
             setIsExistingData(true);
           } else {
-            console.log('📝 No local profit/risk data - new entry');
+            console.log("📝 No local profit/risk data - new entry");
             setIsExistingData(false);
           }
           setIsDataLoaded(true);
         } catch (error) {
-          console.error('Failed to load profit/risk info from SQLite:', error);
+          console.error("Failed to load profit/risk info from SQLite:", error);
           setIsDataLoaded(true);
         }
       };
 
       loadData();
-    }, [requestId])
+    }, [requestId]),
   );
 
   // Auto-save to SQLite whenever formData changes (debounced)
   useEffect(() => {
     if (!isDataLoaded) return; // Don't auto-save during initial load
-    
+
     const timer = setTimeout(async () => {
       if (requestId) {
         try {
           await saveProfitInfo(Number(requestId), formData);
-          console.log('💾 Auto-saved profit/risk info to SQLite');
+          console.log("💾 Auto-saved profit/risk info to SQLite");
         } catch (err) {
-          console.error('Error auto-saving profit/risk info:', err);
+          console.error("Error auto-saving profit/risk info:", err);
         }
       }
     }, 500); // 500ms debounce
@@ -298,9 +295,9 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
     const risksYesValid =
       isRisk === "Yes"
         ? risk?.trim() !== "" &&
-        solution?.trim() !== "" &&
-        (manageRisk === "Yes" || manageRisk === "No") &&
-        worthToTakeRisk?.trim() !== ""
+          solution?.trim() !== "" &&
+          (manageRisk === "Yes" || manageRisk === "No") &&
+          worthToTakeRisk?.trim() !== ""
         : true;
 
     // ---------- IGNORE ERRORS WHEN RISKS = NO ----------
@@ -321,7 +318,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
 
   // Update form data
   const updateFormData = (updates: Partial<ProfitRiskData>) => {
-    setFormData(prev => ({ ...prev, ...updates }));
+    setFormData((prev) => ({ ...prev, ...updates }));
   };
 
   // Handle field changes
@@ -486,10 +483,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
           "Error.Can the farmer manage the risks is required",
         );
       }
-      if (
-        !formData.worthToTakeRisk ||
-        formData.worthToTakeRisk.trim() === ""
-      ) {
+      if (!formData.worthToTakeRisk || formData.worthToTakeRisk.trim() === "") {
         validationErrors.worthToTakeRisk = t(
           "Error.Is it worth to take the risks for anticipated profits is required",
         );
@@ -611,7 +605,29 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
         <StatusBar barStyle="dark-content" />
 
         {/* Tabs */}
-        <FormTabs activeKey="Profit & Risk" navigation={navigation} />
+        <FormTabs
+          activeKey="Profit & Risk"
+          navigation={navigation}
+          onTabPress={(key) => {
+            const routesMap: Record<string, string> = {
+              "Personal Info": "PersonalInfo",
+              "ID Proof": "IDProof",
+              "Finance Info": "FinanceInfo",
+              "Land Info": "LandInfo",
+              "Investment Info": "InvestmentInfo",
+              "Cultivation Info": "CultivationInfo",
+              "Cropping Systems": "CroppingSystems",
+            };
+
+            const route = routesMap[key];
+            if (route) {
+              navigation.navigate(route, {
+                requestId,
+                requestNumber,
+              });
+            }
+          }}
+        />
 
         <ScrollView
           className="flex-1 px-6 bg-white rounded-t-3xl"
@@ -619,7 +635,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
           contentContainerStyle={{ paddingBottom: 120 }}
         >
           <View className="h-6" />
-          
+
           <Input
             label={t(
               "InspectionForm.How much profit are you expecting from the proposed crop/cropping system",
@@ -671,7 +687,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
             }}
             onSelect={(value) => handleyesNOFieldChange("isRisk", value)}
           />
-          
+
           {formData.isRisk === "Yes" && (
             <>
               <View className="mt-4">
@@ -683,8 +699,9 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
                 </Text>
 
                 <View
-                  className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${errors.risk ? "border border-red-500" : ""
-                    }`}
+                  className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${
+                    errors.risk ? "border border-red-500" : ""
+                  }`}
                 >
                   <TextInput
                     placeholder={t("InspectionForm.Type here...")}
@@ -705,8 +722,8 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
                         risk:
                           formattedText.trim() === ""
                             ? t(
-                              "Error.What are the risks you are anticipating in the proposed crop / cropping system is required",
-                            )
+                                "Error.What are the risks you are anticipating in the proposed crop / cropping system is required",
+                              )
                             : "",
                       }));
                     }}
@@ -730,8 +747,9 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
                 </Text>
 
                 <View
-                  className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${errors.solution ? "border border-red-500" : ""
-                    }`}
+                  className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${
+                    errors.solution ? "border border-red-500" : ""
+                  }`}
                 >
                   <TextInput
                     placeholder={t("InspectionForm.Type here...")}
@@ -797,8 +815,9 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
                 </Text>
 
                 <View
-                  className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${errors.worthToTakeRisk ? "border border-red-500" : ""
-                    }`}
+                  className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${
+                    errors.worthToTakeRisk ? "border border-red-500" : ""
+                  }`}
                 >
                   <TextInput
                     placeholder={t("InspectionForm.Type here...")}
@@ -817,8 +836,8 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
                         worthToTakeRisk:
                           formattedText.trim() === ""
                             ? t(
-                              "Error.Is it worth to take the risks for anticipated profits is required",
-                            )
+                                "Error.Is it worth to take the risks for anticipated profits is required",
+                              )
                             : "",
                       }));
 

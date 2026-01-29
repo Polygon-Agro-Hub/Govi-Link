@@ -455,7 +455,25 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
     >
       <View className="flex-1 bg-[#F3F3F3]">
         <StatusBar barStyle="dark-content" />
-        <FormTabs activeKey="Land Info" navigation={navigation} />
+        <FormTabs
+          activeKey="Land Info"
+          navigation={navigation}
+          onTabPress={(key) => {
+            const routesMap: Record<string, string> = {
+              "Personal Info": "PersonalInfo",
+              "ID Proof": "IDProof",
+              "Finance Info": "FinanceInfo",
+            };
+
+            const route = routesMap[key];
+            if (route) {
+              navigation.navigate(route, {
+                requestId,
+                requestNumber,
+              });
+            }
+          }}
+        />
 
         <ScrollView
           className="flex-1 px-6 bg-white rounded-t-3xl"

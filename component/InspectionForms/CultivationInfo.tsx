@@ -821,7 +821,27 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
     >
       <View className="flex-1 bg-[#F3F3F3]">
         <StatusBar barStyle="dark-content" />
-        <FormTabs activeKey="Cultivation Info" navigation={navigation} />
+        <FormTabs
+          activeKey="Cultivation Info"
+          navigation={navigation}
+          onTabPress={(key) => {
+            const routesMap: Record<string, string> = {
+              "Personal Info": "PersonalInfo",
+              "ID Proof": "IDProof",
+              "Finance Info": "FinanceInfo",
+              "Land Info": "LandInfo",
+              "Investment Info": "InvestmentInfo",
+            };
+
+            const route = routesMap[key];
+            if (route) {
+              navigation.navigate(route, {
+                requestId,
+                requestNumber,
+              });
+            }
+          }}
+        />
 
         <ScrollView
           className="flex-1 px-6 bg-white rounded-t-3xl"
@@ -945,7 +965,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
             error={errors.soilType}
           />
 
-                    <View className="mt-2">
+          <View className="mt-2">
             <Text className="text-sm text-[#070707] mb-2">
               {t("InspectionForm.Overall soil fertility")}{" "}
               <Text className="text-red-500">*</Text>

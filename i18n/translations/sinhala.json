@@ -124,7 +124,10 @@
     "Value must be greater than 0": "අගය 0 ට වඩා වැඩි විය යුතුය.",
     "What are the risks you are anticipating in the proposed crop / cropping system is required": "යෝජිත බෝග/බෝග ක්‍රමය අවශ්‍ය වන විට ඔබ අපේක්ෂා කරන අවදානම් මොනවාද?",
     "Do you have the solution is required": "අවශ්‍ය විසඳුම ඔබ ළඟ තිබේද අවශ්‍යයි",
-    "Is it worth to take the risks for anticipated profits is required": "අපේක්ෂිත ලාභ සඳහා අවදානම් ගැනීම වටී ද යන්න අවශ්‍යයි."
+    "Is it worth to take the risks for anticipated profits is required": "අපේක්ෂිත ලාභ සඳහා අවදානම් ගැනීම වටී ද යන්න අවශ්‍යයි.",
+    "Land number must be 9 digits long": "භූමි දුරකථන අංකය අංක 9ක් විය යුතුය",
+    "Land number number must start with 0": "භූමි දුරකථන අංකය 0 න් ආරම්භ විය යුතුය",
+    "Invalid land number format": "භූමි දුරකථන අංකය වැරදියි"
   },
   "Login": {
     "Welcome": "සාදරයෙන් පිළිගනිමු!",

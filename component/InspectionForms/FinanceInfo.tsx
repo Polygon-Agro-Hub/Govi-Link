@@ -12,7 +12,7 @@ import {
   Modal,
   FlatList,
 } from "react-native";
-import { AntDesign, FontAwesome, MaterialIcons } from "@expo/vector-icons";
+import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
 import { useTranslation } from "react-i18next";
 import Checkbox from "expo-checkbox";
@@ -70,7 +70,7 @@ const Input = ({
         keyboardType={keyboardType}
       />
     </View>
-      {error && (
+    {error && (
       <View className="flex-row items-center mt-1 ml-4">
         <FontAwesome name="exclamation-triangle" size={16} color="#EF4444" />
         <Text className="text-red-500 text-sm ml-1"> {error}</Text>
@@ -394,7 +394,6 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
       return null;
     }
   };
-
 
   useFocusEffect(
     useCallback(() => {
@@ -915,19 +914,6 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     },
   ];
 
-  // Check if any selected category has no sub-items
-  const hasAssetWarnings = (): boolean => {
-    return assetCategories.some((category) => {
-      const isCategorySelected = formData.hasOwnProperty(category.key);
-      return (
-        isCategorySelected &&
-        category.key !== "assetsFarmTool" &&
-        ((formData[category.key as keyof FinanceInfoData] as string[]) || [])
-          .length === 0
-      );
-    });
-  };
-
   const hasValidAssetSelection = (): boolean => {
     // Check if Special Farm Tool has text
     if (formData.assetsFarmTool && formData.assetsFarmTool.trim() !== "") {
@@ -955,7 +941,24 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     >
       <View className="flex-1 bg-[#F3F3F3]">
         <StatusBar barStyle="dark-content" />
-        <FormTabs activeKey="Finance Info" navigation={navigation} />
+        <FormTabs
+          activeKey="Finance Info"
+          navigation={navigation}
+          onTabPress={(key) => {
+            const routesMap: Record<string, string> = {
+              "Personal Info": "PersonalInfo",
+              "ID Proof": "IDProof",
+            };
+
+            const route = routesMap[key];
+            if (route) {
+              navigation.navigate(route, {
+                requestId,
+                requestNumber,
+              });
+            }
+          }}
+        />
 
         <ScrollView
           className="flex-1 px-6 bg-white rounded-t-3xl"

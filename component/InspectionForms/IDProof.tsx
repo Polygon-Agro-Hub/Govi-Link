@@ -22,7 +22,11 @@ import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../types";
 import { CameraScreen } from "@/Items/CameraScreen";
 import FormFooterButton from "./FormFooterButton";
-import { saveIDProof, getIDProof, IDProofInfo } from  "@/database/inspectionidproof";
+import {
+  saveIDProof,
+  getIDProof,
+  IDProofInfo,
+} from "@/database/inspectionidproof";
 
 type IDProofProps = {
   navigation: any;
@@ -101,9 +105,9 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
       if (requestId) {
         try {
           await saveIDProof(Number(requestId), formData);
-          console.log('💾 Auto-saved ID proof to SQLite');
+          console.log("💾 Auto-saved ID proof to SQLite");
         } catch (err) {
-          console.error('Error auto-saving ID proof:', err);
+          console.error("Error auto-saving ID proof:", err);
         }
       }
     }, 500); // 500ms debounce
@@ -122,20 +126,20 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
           const localData = await getIDProof(reqId);
 
           if (localData) {
-            console.log('✅ Loaded ID proof from SQLite');
+            console.log("✅ Loaded ID proof from SQLite");
             setFormData(localData);
             setIsExistingData(true);
           } else {
-            console.log('📝 No local ID proof data - new entry');
+            console.log("📝 No local ID proof data - new entry");
             setIsExistingData(false);
           }
         } catch (error) {
-          console.error('Failed to load ID proof from SQLite:', error);
+          console.error("Failed to load ID proof from SQLite:", error);
         }
       };
 
       loadData();
-    }, [requestId])
+    }, [requestId]),
   );
 
   // Validate form completion
@@ -154,7 +158,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
 
   // Update form data
   const updateFormData = (updates: Partial<IDProofInfo>) => {
-    setFormData(prev => ({ ...prev, ...updates }));
+    setFormData((prev) => ({ ...prev, ...updates }));
   };
 
   // Handle camera
@@ -216,7 +220,9 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
     if (rules.required && value.trim().length === 0) {
       error = t(`Error.${rules.type} is required`);
     } else if (formData.pType === "NIC Number" && !validateNicNumber(value)) {
-      error = t("Error.NIC Number must be 9 digits followed by 'V' or 12 digits.");
+      error = t(
+        "Error.NIC Number must be 9 digits followed by 'V' or 12 digits.",
+      );
     } else if (
       formData.pType === "Driving License ID" &&
       !validateDrivingLicense(value)
@@ -236,12 +242,18 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
     isUpdate: boolean,
   ): Promise<boolean> => {
     try {
-      console.log(`💾 Saving to backend (${isUpdate ? "UPDATE" : "INSERT"}):`, tableName);
+      console.log(
+        `💾 Saving to backend (${isUpdate ? "UPDATE" : "INSERT"}):`,
+        tableName,
+      );
 
       const formDataPayload = new FormData();
       formDataPayload.append("reqId", reqId.toString());
       formDataPayload.append("tableName", tableName);
-      formDataPayload.append("pType", data.pType === "NIC Number" ? "NIC" : "License");
+      formDataPayload.append(
+        "pType",
+        data.pType === "NIC Number" ? "NIC" : "License",
+      );
       formDataPayload.append("pNumber", data.pNumber);
 
       // Handle front image
@@ -306,8 +318,10 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
         // Update local state with S3 URLs if returned
         if (response.data.data.frontImg || response.data.data.backImg) {
           const updates: Partial<IDProofInfo> = {};
-          if (response.data.data.frontImg) updates.frontImg = response.data.data.frontImg;
-          if (response.data.data.backImg) updates.backImg = response.data.data.backImg;
+          if (response.data.data.frontImg)
+            updates.frontImg = response.data.data.frontImg;
+          if (response.data.data.backImg)
+            updates.backImg = response.data.data.backImg;
 
           updateFormData(updates);
         }
@@ -332,7 +346,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
       Alert.alert(
         t("Error.Validation Error"),
         "• " + t("Error.ID Proof Type is required"),
-        [{ text: t("Main.ok") }]
+        [{ text: t("Main.ok") }],
       );
       return;
     }
@@ -345,7 +359,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
       Alert.alert(
         t("Error.Validation Error"),
         "• " + t(`Error.${formData.pType} is required`),
-        [{ text: t("Main.ok") }]
+        [{ text: t("Main.ok") }],
       );
       return;
     }
@@ -359,7 +373,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
       Alert.alert(
         t("Error.Validation Error"),
         t("Error.Both ID images are required"),
-        [{ text: t("Main.ok") }]
+        [{ text: t("Main.ok") }],
       );
       return;
     }
@@ -368,7 +382,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
       Alert.alert(
         t("Error.Error"),
         "Request ID is missing. Please go back and try again.",
-        [{ text: t("Main.ok") }]
+        [{ text: t("Main.ok") }],
       );
       return;
     }
@@ -379,7 +393,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
       Alert.alert(
         t("Error.Error"),
         "Invalid request ID. Please go back and try again.",
-        [{ text: t("Main.ok") }]
+        [{ text: t("Main.ok") }],
       );
       return;
     }
@@ -388,11 +402,16 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
       t("InspectionForm.Saving"),
       t("InspectionForm.Please wait..."),
       [],
-      { cancelable: false }
+      { cancelable: false },
     );
 
     // Save to backend
-    const saved = await saveToBackend(reqId, "inspectionidproof", formData, isExistingData);
+    const saved = await saveToBackend(
+      reqId,
+      "inspectionidproof",
+      formData,
+      isExistingData,
+    );
 
     if (saved) {
       console.log("✅ ID Proof saved successfully to backend");
@@ -411,7 +430,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
               });
             },
           },
-        ]
+        ],
       );
     } else {
       Alert.alert(
@@ -427,7 +446,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
               });
             },
           },
-        ]
+        ],
       );
     }
   };
@@ -439,7 +458,22 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
     >
       <View className="flex-1 bg-[#F3F3F3]">
         <StatusBar barStyle="dark-content" />
-        <FormTabs activeKey="ID Proof" navigation={navigation} />
+        <FormTabs
+          activeKey="ID Proof"
+          navigation={navigation}
+          onTabPress={(key) => {
+            const routesMap: Record<string, string> = {
+              "Personal Info": "PersonalInfo",
+            };
+            const route = routesMap[key];
+            if (route) {
+              navigation.navigate(route, {
+                requestId,
+                requestNumber,
+              });
+            }
+          }}
+        />
 
         <ScrollView
           className="flex-1 px-6 bg-white rounded-t-3xl"
@@ -450,7 +484,9 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
 
           <View className="relative mb-4">
             <Text className="text-sm text-[#070707] mb-2">
-              <Text className="text-black">{t("InspectionForm.ID Proof Type")} *</Text>
+              <Text className="text-black">
+                {t("InspectionForm.ID Proof Type")} *
+              </Text>
             </Text>
             <TouchableOpacity
               onPress={() => setShowIdProofDropdown(true)}
@@ -494,7 +530,9 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
                 />
               </View>
               {errors.nic && (
-                <Text className="text-red-500 text-sm mt-1 ml-2">{errors.nic}</Text>
+                <Text className="text-red-500 text-sm mt-1 ml-2">
+                  {errors.nic}
+                </Text>
               )}
             </View>
           </View>

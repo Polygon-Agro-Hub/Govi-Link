@@ -110,7 +110,7 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
   const route = useRoute<RouteProp<RootStackParamList, "Labour">>();
   const { requestNumber, requestId } = route.params;
   const { t } = useTranslation();
-  
+
   // Local state for form data
   const [formData, setFormData] = useState<LabourData>({
     isManageFamilyLabour: undefined,
@@ -140,47 +140,50 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
           const localData = await getLabourInfo(reqId);
 
           if (localData) {
-            console.log('✅ Loaded labour info from SQLite:', localData);
-            
+            console.log("✅ Loaded labour info from SQLite:", localData);
+
             // Ensure proper data types
             const normalizedData: LabourData = {
               isManageFamilyLabour: localData.isManageFamilyLabour,
-              isFamilyHiredLabourEquipped: localData.isFamilyHiredLabourEquipped,
-              hasAdequateAlternativeLabour: localData.hasAdequateAlternativeLabour,
-              areThereMechanizationOptions: localData.areThereMechanizationOptions,
+              isFamilyHiredLabourEquipped:
+                localData.isFamilyHiredLabourEquipped,
+              hasAdequateAlternativeLabour:
+                localData.hasAdequateAlternativeLabour,
+              areThereMechanizationOptions:
+                localData.areThereMechanizationOptions,
               isMachineryAvailable: localData.isMachineryAvailable,
               isMachineryAffordable: localData.isMachineryAffordable,
               isMachineryCostEffective: localData.isMachineryCostEffective,
             };
-            
+
             setFormData(normalizedData);
             setIsExistingData(true);
           } else {
-            console.log('📝 No local labour data - new entry');
+            console.log("📝 No local labour data - new entry");
             setIsExistingData(false);
           }
           setIsDataLoaded(true);
         } catch (error) {
-          console.error('Failed to load labour info from SQLite:', error);
+          console.error("Failed to load labour info from SQLite:", error);
           setIsDataLoaded(true);
         }
       };
 
       loadData();
-    }, [requestId])
+    }, [requestId]),
   );
 
   // Auto-save to SQLite whenever formData changes (debounced)
   useEffect(() => {
     if (!isDataLoaded) return; // Don't auto-save during initial load
-    
+
     const timer = setTimeout(async () => {
       if (requestId) {
         try {
           await saveLabourInfo(Number(requestId), formData);
-          console.log('💾 Auto-saved labour info to SQLite');
+          console.log("💾 Auto-saved labour info to SQLite");
         } catch (err) {
-          console.error('Error auto-saving labour info:', err);
+          console.error("Error auto-saving labour info:", err);
         }
       }
     }, 500); // 500ms debounce
@@ -239,7 +242,7 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
 
   // Update form data
   const updateFormData = (updates: Partial<LabourData>) => {
-    setFormData(prev => ({ ...prev, ...updates }));
+    setFormData((prev) => ({ ...prev, ...updates }));
   };
 
   // Handle Yes/No field changes
@@ -508,7 +511,31 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
       <View className="flex-1 bg-[#F3F3F3] ">
         <StatusBar barStyle="dark-content" />
 
-        <FormTabs activeKey="Labour" navigation={navigation} />
+        <FormTabs
+          activeKey="Labour"
+          navigation={navigation}
+          onTabPress={(key) => {
+            const routesMap: Record<string, string> = {
+              "Personal Info": "PersonalInfo",
+              "ID Proof": "IDProof",
+              "Finance Info": "FinanceInfo",
+              "Land Info": "LandInfo",
+              "Investment Info": "InvestmentInfo",
+              "Cultivation Info": "CultivationInfo",
+              "Cropping Systems": "CroppingSystems",
+              "Profit & Risk": "ProfitRisk",
+              Economical: "Economical",
+            };
+
+            const route = routesMap[key];
+            if (route) {
+              navigation.navigate(route, {
+                requestId,
+                requestNumber,
+              });
+            }
+          }}
+        />
 
         <ScrollView
           className="flex-1 px-6 bg-white rounded-t-3xl"
@@ -516,7 +543,7 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
           contentContainerStyle={{ paddingBottom: 120 }}
         >
           <View className="h-6" />
-          
+
           <YesNoSelect
             label={t(
               "InspectionForm.Can the farmer manage the proposed crop/cropping system through your family labour",

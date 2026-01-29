@@ -146,8 +146,11 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
           const localData = await getHarvestStorageInfo(reqId);
 
           if (localData) {
-            console.log("✅ Loaded harvest storage info from SQLite:", localData);
-            
+            console.log(
+              "✅ Loaded harvest storage info from SQLite:",
+              localData,
+            );
+
             // Ensure proper data types
             const normalizedData: HarvestStorageData = {
               hasOwnStorage: localData.hasOwnStorage,
@@ -157,7 +160,7 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
               hasValueAddedMarketLinkage: localData.hasValueAddedMarketLinkage,
               awareOfQualityStandards: localData.awareOfQualityStandards,
             };
-            
+
             setFormData(normalizedData);
             setIsExistingData(true);
           } else {
@@ -181,7 +184,7 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
   // Auto-save to SQLite whenever formData changes (debounced)
   useEffect(() => {
     if (!isDataLoaded) return; // Don't auto-save during initial load
-    
+
     const timer = setTimeout(async () => {
       if (requestId) {
         try {
@@ -466,7 +469,32 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
       <View className="flex-1 bg-[#F3F3F3] ">
         <StatusBar barStyle="dark-content" />
 
-        <FormTabs activeKey="Harvest Storage" navigation={navigation} />
+        <FormTabs
+          activeKey="Harvest Storage"
+          navigation={navigation}
+          onTabPress={(key) => {
+            const routesMap: Record<string, string> = {
+              "Personal Info": "PersonalInfo",
+              "ID Proof": "IDProof",
+              "Finance Info": "FinanceInfo",
+              "Land Info": "LandInfo",
+              "Investment Info": "InvestmentInfo",
+              "Cultivation Info": "CultivationInfo",
+              "Cropping Systems": "CroppingSystems",
+              "Profit & Risk": "ProfitRisk",
+              "Economical": "Economical",
+              "Labour": "Labour",
+            };
+
+            const route = routesMap[key];
+            if (route) {
+              navigation.navigate(route, {
+                requestId,
+                requestNumber,
+              });
+            }
+          }}
+        />
 
         <ScrollView
           className="flex-1 px-6 bg-white rounded-t-3xl"

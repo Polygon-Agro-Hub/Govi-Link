@@ -49,8 +49,9 @@ const Input = ({
       {required && <Text className="text-black">*</Text>}
     </Text>
     <View
-      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${error ? "border border-red-500" : ""
-        }`}
+      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
+        error ? "border border-red-500" : ""
+      }`}
     >
       <TextInput
         placeholder={placeholder}
@@ -71,11 +72,7 @@ type ValidationRule = {
   type?: "expected" | "repaymentMonth" | "purpose" | "text";
 };
 
-const validateAndFormat = (
-  text: string,
-  rules: ValidationRule,
-  t: any,
-) => {
+const validateAndFormat = (text: string, rules: ValidationRule, t: any) => {
   let value = text;
   let error = "";
 
@@ -154,9 +151,9 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
       if (requestId) {
         try {
           await saveInvestmentInfo(Number(requestId), formData);
-          console.log('💾 Auto-saved investment info to SQLite');
+          console.log("💾 Auto-saved investment info to SQLite");
         } catch (err) {
-          console.error('Error auto-saving investment info:', err);
+          console.error("Error auto-saving investment info:", err);
         }
       }
     }, 500); // 500ms debounce
@@ -175,20 +172,20 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
           const localData = await getInvestmentInfo(reqId);
 
           if (localData) {
-            console.log('✅ Loaded investment info from SQLite');
+            console.log("✅ Loaded investment info from SQLite");
             setFormData(localData);
             setIsExistingData(true);
           } else {
-            console.log('📝 No local investment data - new entry');
+            console.log("📝 No local investment data - new entry");
             setIsExistingData(false);
           }
         } catch (error) {
-          console.error('Failed to load investment info from SQLite:', error);
+          console.error("Failed to load investment info from SQLite:", error);
         }
       };
 
       loadData();
-    }, [requestId])
+    }, [requestId]),
   );
 
   // Validate form completion
@@ -205,7 +202,9 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
         value !== null &&
         value !== undefined &&
         value.toString().trim() !== "" &&
-        (key !== "expected" && key !== "repaymentMonth" ? true : Number(value) > 0)
+        (key !== "expected" && key !== "repaymentMonth"
+          ? true
+          : Number(value) > 0)
       );
     });
 
@@ -216,7 +215,7 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
 
   // Update form data
   const updateFormData = (updates: Partial<InvestmentInfoData>) => {
-    setFormData(prev => ({ ...prev, ...updates }));
+    setFormData((prev) => ({ ...prev, ...updates }));
   };
 
   // Handle field changes
@@ -480,7 +479,26 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
     >
       <View className="flex-1 bg-[#F3F3F3] ">
         <StatusBar barStyle="dark-content" />
-        <FormTabs activeKey="Investment Info" navigation={navigation} />
+        <FormTabs
+          activeKey="Investment Info"
+          navigation={navigation}
+          onTabPress={(key) => {
+            const routesMap: Record<string, string> = {
+              "Personal Info": "PersonalInfo",
+              "ID Proof": "IDProof",
+              "Finance Info": "FinanceInfo",
+              "Land Info": "LandInfo",
+            };
+
+            const route = routesMap[key];
+            if (route) {
+              navigation.navigate(route, {
+                requestId,
+                requestNumber,
+              });
+            }
+          }}
+        />
 
         <ScrollView
           className="flex-1 px-6 bg-white rounded-t-3xl"

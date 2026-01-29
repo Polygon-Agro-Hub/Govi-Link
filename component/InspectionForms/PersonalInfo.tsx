@@ -27,7 +27,7 @@ import FormFooterButton from "./FormFooterButton";
 import {
   savePersonalInfo,
   getPersonalInfo,
-  PersonalInfo
+  PersonalInfo,
 } from "@/database/inspectionpersonal";
 
 interface District {
@@ -64,8 +64,9 @@ const Input = ({
       {label} {required && <Text className="text-black">*</Text>}
     </Text>
     <View
-      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${error ? "border border-red-500" : ""
-        }`}
+      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
+        error ? "border border-red-500" : ""
+      }`}
     >
       {isMobile ? (
         <View className="flex-row flex-1 items-center">
@@ -132,7 +133,16 @@ const validateAndFormat = (
   let error = "";
 
   // Name fields validation
-  if (["firstName", "lastName", "otherName", "callName", "cityName", "street"].includes(rules.type || "")) {
+  if (
+    [
+      "firstName",
+      "lastName",
+      "otherName",
+      "callName",
+      "cityName",
+      "street",
+    ].includes(rules.type || "")
+  ) {
     value = value.replace(/^\s+/, "").replace(/[^a-zA-Z\s]/g, "");
     if (value.length > 0) {
       value = value.charAt(0).toUpperCase() + value.slice(1);
@@ -158,14 +168,15 @@ const validateAndFormat = (
     } else if (value.length > 0) {
       if (!validateEmail(value)) {
         const domain = value.toLowerCase().split("@")[1];
-        error = domain === "gmail.com" || domain === "googlemail.com"
-          ? t("Error.Invalid Gmail address")
-          : t("Error.Invalid email address Example");
+        error =
+          domain === "gmail.com" || domain === "googlemail.com"
+            ? t("Error.Invalid Gmail address")
+            : t("Error.Invalid email address Example");
       } else if (rules.uniqueWith) {
         const isDuplicate = rules.uniqueWith.some(
           (key) =>
-            formData[key]?.toLowerCase().trim() === value.toLowerCase().trim() &&
-            key !== currentKey
+            formData[key]?.toLowerCase().trim() ===
+              value.toLowerCase().trim() && key !== currentKey,
         );
         if (isDuplicate) error = t("Error.Email addresses cannot be the same");
       }
@@ -187,8 +198,8 @@ const validateAndFormat = (
     } else if (rules.uniqueWith) {
       const isDuplicate = rules.uniqueWith.some(
         (key) =>
-          formData[key]?.replace(/[^0-9]/g, "").replace(/^0+/, "") === numbersOnly &&
-          key !== currentKey
+          formData[key]?.replace(/[^0-9]/g, "").replace(/^0+/, "") ===
+            numbersOnly && key !== currentKey,
       );
       if (isDuplicate) error = t("Error.Phone numbers cannot be the same");
     }
@@ -201,12 +212,13 @@ const validateAndFormat = (
     value = numbersOnly;
 
     if (numbersOnly.length !== 0 && numbersOnly.length < 9) {
-      error = t("Error.Phone number must be 9 digits long");
+      // Use specific landline error message
+      error = t("Error.Land number must be 9 digits long");
     } else if (rules.uniqueWith && numbersOnly.length > 0) {
       const isDuplicate = rules.uniqueWith.some(
         (key) =>
-          formData[key]?.replace(/[^0-9]/g, "").replace(/^0+/, "") === numbersOnly &&
-          key !== currentKey
+          formData[key]?.replace(/[^0-9]/g, "").replace(/^0+/, "") ===
+            numbersOnly && key !== currentKey,
       );
       if (isDuplicate) error = t("Error.Phone numbers cannot be the same");
     }
@@ -252,7 +264,9 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showCountryDropdown, setShowCountryDropdown] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState("Sri Lanka");
-  const [displayCountry, setDisplayCountry] = useState(t("InspectionForm.Sri Lanka"));
+  const [displayCountry, setDisplayCountry] = useState(
+    t("InspectionForm.Sri Lanka"),
+  );
   const [countrySearch, setCountrySearch] = useState("");
   const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
   const [isNextEnabled, setIsNextEnabled] = useState(false);
@@ -266,9 +280,9 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
       if (requestId) {
         try {
           savePersonalInfo(Number(requestId), formData);
-          console.log('💾 Auto-saved to SQLite');
+          console.log("💾 Auto-saved to SQLite");
         } catch (err) {
-          console.error('Error auto-saving:', err);
+          console.error("Error auto-saving:", err);
         }
       }
     }, 500); // 500ms debounce
@@ -287,7 +301,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           const localData = getPersonalInfo(reqId);
 
           if (localData) {
-            console.log('✅ Loaded from SQLite');
+            console.log("✅ Loaded from SQLite");
             setFormData(localData);
             setSelectedDistrict(localData.district);
             setSelectedCountry(localData.country || "Sri Lanka");
@@ -296,48 +310,62 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
 
             // Set display values
             const provinceObj = sriLankaData["Sri Lanka"].provinces.find(
-              (prov) => prov.name.en === localData.province
+              (prov) => prov.name.en === localData.province,
             );
             setDisplayProvince(
               provinceObj
-                ? provinceObj.name[i18n.language as keyof typeof provinceObj.name] ||
-                provinceObj.name.en
-                : ""
+                ? provinceObj.name[
+                    i18n.language as keyof typeof provinceObj.name
+                  ] || provinceObj.name.en
+                : "",
             );
 
             const countryObj = countryData.find(
-              (c) => c.name.en === localData.country
+              (c) => c.name.en === localData.country,
             );
             setDisplayCountry(
               countryObj
-                ? countryObj.name[i18n.language as keyof typeof countryObj.name] ||
-                countryObj.name.en
-                : localData.country || "Sri Lanka"
+                ? countryObj.name[
+                    i18n.language as keyof typeof countryObj.name
+                  ] || countryObj.name.en
+                : localData.country || "Sri Lanka",
             );
           } else {
-            console.log('📝 No local data - new entry');
+            console.log("📝 No local data - new entry");
             setIsExistingData(false);
           }
         } catch (error) {
-          console.error('Failed to load from SQLite:', error);
+          console.error("Failed to load from SQLite:", error);
         }
       };
 
       loadData();
-    }, [requestId, i18n.language])
+    }, [requestId, i18n.language]),
   );
 
   // Validate form completion
   useEffect(() => {
     const requiredFields: (keyof PersonalInfo)[] = [
-      "firstName", "lastName", "otherName", "callName",
-      "phone1", "familyPhone", "email1", "house",
-      "street", "cityName", "district", "province", "country"
+      "firstName",
+      "lastName",
+      "otherName",
+      "callName",
+      "phone1",
+      "familyPhone",
+      "email1",
+      "house",
+      "street",
+      "cityName",
+      "district",
+      "province",
+      "country",
     ];
 
     const allFilled = requiredFields.every((key) => {
       const value = formData[key];
-      return value !== null && value !== undefined && value.toString().trim() !== "";
+      return (
+        value !== null && value !== undefined && value.toString().trim() !== ""
+      );
     });
 
     const hasErrors = Object.keys(errors).length > 0;
@@ -346,7 +374,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
 
   // Update form data and auto-save
   const updateFormData = (updates: Partial<PersonalInfo>) => {
-    setFormData(prev => ({ ...prev, ...updates }));
+    setFormData((prev) => ({ ...prev, ...updates }));
   };
 
   const handleFieldChange = (
@@ -423,7 +451,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
       const response = await axios.post(
         `${environment.API_BASE_URL}api/capital-request/inspection/save`,
         { reqId, tableName, ...transformedData },
-        { headers: { "Content-Type": "application/json" } }
+        { headers: { "Content-Type": "application/json" } },
       );
 
       return response.data.success;
@@ -435,9 +463,19 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
 
   const handleNext = async () => {
     const requiredFields: (keyof PersonalInfo)[] = [
-      "firstName", "lastName", "otherName", "callName",
-      "phone1", "familyPhone", "email1", "house",
-      "street", "cityName", "district", "province", "country"
+      "firstName",
+      "lastName",
+      "otherName",
+      "callName",
+      "phone1",
+      "familyPhone",
+      "email1",
+      "house",
+      "street",
+      "cityName",
+      "district",
+      "province",
+      "country",
     ];
 
     // Validate
@@ -447,12 +485,23 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
       let error = "";
 
       if ((key === "district" || key === "province") && !value) {
-        error = t(`Error.${key.charAt(0).toUpperCase() + key.slice(1)} is required`);
+        error = t(
+          `Error.${key.charAt(0).toUpperCase() + key.slice(1)} is required`,
+        );
       } else {
         let rules: ValidationRule = { required: true, type: key as any };
-        if (key.startsWith("phone") || key.includes("Phone") || key.includes("land")) {
-          rules.uniqueWith = ["phone1", "phone2", "familyPhone", "landHome", "landWork"]
-            .filter((k) => k !== key) as any;
+        if (
+          key.startsWith("phone") ||
+          key.includes("Phone") ||
+          key.includes("land")
+        ) {
+          rules.uniqueWith = [
+            "phone1",
+            "phone2",
+            "familyPhone",
+            "landHome",
+            "landWork",
+          ].filter((k) => k !== key) as any;
         }
         if (key.includes("email")) {
           rules.uniqueWith = key === "email1" ? ["email2"] : ["email1"];
@@ -466,59 +515,79 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors((prev) => ({ ...prev, ...validationErrors }));
-      Alert.alert(t("Error.Validation Error"),
+      Alert.alert(
+        t("Error.Validation Error"),
         "• " + Object.values(validationErrors).join("\n• "),
-        [{ text: t("Main.ok") }]
+        [{ text: t("Main.ok") }],
       );
       return;
     }
 
     if (!requestId) {
-      Alert.alert(t("Error.Error"), "Request ID is missing", [{ text: t("Main.ok") }]);
+      Alert.alert(t("Error.Error"), "Request ID is missing", [
+        { text: t("Main.ok") },
+      ]);
       return;
     }
 
     const reqId = Number(requestId);
     if (isNaN(reqId) || reqId <= 0) {
-      Alert.alert(t("Error.Error"), "Invalid request ID", [{ text: t("Main.ok") }]);
+      Alert.alert(t("Error.Error"), "Invalid request ID", [
+        { text: t("Main.ok") },
+      ]);
       return;
     }
 
-    Alert.alert(t("InspectionForm.Saving"), t("InspectionForm.Please wait..."), [],
-      { cancelable: false }
+    Alert.alert(
+      t("InspectionForm.Saving"),
+      t("InspectionForm.Please wait..."),
+      [],
+      { cancelable: false },
     );
 
     // Save to backend
-    const saved = await saveToBackend(reqId, "inspectionpersonal", formData, isExistingData);
+    const saved = await saveToBackend(
+      reqId,
+      "inspectionpersonal",
+      formData,
+      isExistingData,
+    );
 
     if (saved) {
       setIsExistingData(true);
-      Alert.alert(t("Main.Success"), t("InspectionForm.Data saved successfully"), [
-        {
-          text: t("Main.ok"),
-          onPress: () => {
-            navigation.navigate("IDProof", {
-              formData: { inspectionpersonal: formData },
-              requestNumber,
-              requestId,
-            });
+      Alert.alert(
+        t("Main.Success"),
+        t("InspectionForm.Data saved successfully"),
+        [
+          {
+            text: t("Main.ok"),
+            onPress: () => {
+              navigation.navigate("IDProof", {
+                formData: { inspectionpersonal: formData },
+                requestNumber,
+                requestId,
+              });
+            },
           },
-        },
-      ]);
+        ],
+      );
     } else {
-      Alert.alert(t("Main.Warning"),
-        t("InspectionForm.Could not save to server. Data saved locally."), [
-        {
-          text: t("Main.Continue"),
-          onPress: () => {
-            navigation.navigate("IDProof", {
-              formData: { inspectionpersonal: formData },
-              requestNumber,
-              requestId,
-            });
+      Alert.alert(
+        t("Main.Warning"),
+        t("InspectionForm.Could not save to server. Data saved locally."),
+        [
+          {
+            text: t("Main.Continue"),
+            onPress: () => {
+              navigation.navigate("IDProof", {
+                formData: { inspectionpersonal: formData },
+                requestNumber,
+                requestId,
+              });
+            },
           },
-        },
-      ]);
+        ],
+      );
     }
   };
 
@@ -532,7 +601,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
         (d) =>
           d.en.toLowerCase().includes(searchTerm) ||
           d.si.includes(districtSearch) ||
-          d.ta.includes(districtSearch)
+          d.ta.includes(districtSearch),
       );
     }
     return countryDistricts;
@@ -543,11 +612,12 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
   const selectDistrict = (district: { en: string; si: string; ta: string }) => {
     setSelectedDistrict(district.en);
     const province = sriLankaData["Sri Lanka"].provinces.find((prov) =>
-      prov.districts.some((d) => d.en === district.en)
+      prov.districts.some((d) => d.en === district.en),
     );
 
     const displayProv = province
-      ? province.name[i18n.language as keyof typeof province.name] || province.name.en
+      ? province.name[i18n.language as keyof typeof province.name] ||
+        province.name.en
       : "";
 
     setSelectedProvince(province?.name.en || null);
@@ -572,21 +642,31 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
       (c) =>
         c.name.en.toLowerCase().includes(term) ||
         c.name.si.includes(countrySearch) ||
-        c.name.ta.includes(countrySearch)
+        c.name.ta.includes(countrySearch),
     );
   };
 
-  const getTranslatedDistrict = (district: { en: string; si: string; ta: string }) => {
+  const getTranslatedDistrict = (district: {
+    en: string;
+    si: string;
+    ta: string;
+  }) => {
     const lang = i18n.language;
     return district[lang as keyof typeof district] || district.en;
   };
 
-  const renderDistrictItem = ({ item }: { item: { en: string; si: string; ta: string } }) => (
+  const renderDistrictItem = ({
+    item,
+  }: {
+    item: { en: string; si: string; ta: string };
+  }) => (
     <TouchableOpacity
       className="px-4 py-3 border-b border-gray-200"
       onPress={() => selectDistrict(item)}
     >
-      <Text className="text-base text-gray-800">{getTranslatedDistrict(item)}</Text>
+      <Text className="text-base text-gray-800">
+        {getTranslatedDistrict(item)}
+      </Text>
     </TouchableOpacity>
   );
 
@@ -616,7 +696,8 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
     setDisplayProvince("");
     setSelectedCountry(country.name.en);
     const display =
-      country.name[i18n.language as keyof typeof country.name] || country.name.en;
+      country.name[i18n.language as keyof typeof country.name] ||
+      country.name.en;
     setDisplayCountry(display);
     updateFormData({
       country: country.name.en,
@@ -677,7 +758,10 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             placeholder="----"
             value={formData.firstName}
             onChangeText={(text) =>
-              handleFieldChange("firstName", text, { required: true, type: "firstName" })
+              handleFieldChange("firstName", text, {
+                required: true,
+                type: "firstName",
+              })
             }
             required
             error={errors.firstName}
@@ -687,7 +771,10 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             placeholder="----"
             value={formData.lastName}
             onChangeText={(text) =>
-              handleFieldChange("lastName", text, { required: true, type: "lastName" })
+              handleFieldChange("lastName", text, {
+                required: true,
+                type: "lastName",
+              })
             }
             required
             error={errors.lastName}
@@ -697,7 +784,10 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             placeholder="----"
             value={formData.otherName}
             onChangeText={(text) =>
-              handleFieldChange("otherName", text, { required: true, type: "otherName" })
+              handleFieldChange("otherName", text, {
+                required: true,
+                type: "otherName",
+              })
             }
             required
             error={errors.otherName}
@@ -707,7 +797,10 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             placeholder="----"
             value={formData.callName}
             onChangeText={(text) =>
-              handleFieldChange("callName", text, { required: true, type: "callName" })
+              handleFieldChange("callName", text, {
+                required: true,
+                type: "callName",
+              })
             }
             required
             error={errors.callName}
@@ -825,7 +918,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             onChangeText={(text) =>
               handleFieldChange("house", text, {
                 required: true,
-                type: "alphanumericWithSpecial" // or "text"
+                type: "alphanumericWithSpecial", // or "text"
               })
             }
             required
@@ -836,7 +929,10 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             placeholder="----"
             value={formData.street}
             onChangeText={(text) =>
-              handleFieldChange("street", text, { required: true, type: "street" })
+              handleFieldChange("street", text, {
+                required: true,
+                type: "street",
+              })
             }
             required
             error={errors.street}
@@ -846,7 +942,10 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             placeholder="----"
             value={formData.cityName}
             onChangeText={(text) =>
-              handleFieldChange("cityName", text, { required: true, type: "cityName" })
+              handleFieldChange("cityName", text, {
+                required: true,
+                type: "cityName",
+              })
             }
             required
             error={errors.cityName}
@@ -854,14 +953,18 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
 
           <View className="relative mb-4">
             <Text className="text-sm text-[#070707] mb-1">
-              <Text className="text-black">{t("InspectionForm.Country")} *</Text>
+              <Text className="text-black">
+                {t("InspectionForm.Country")} *
+              </Text>
             </Text>
             <TouchableOpacity
               onPress={() => setShowCountryDropdown(true)}
               activeOpacity={0.8}
             >
               <View className="bg-[#F6F6F6] rounded-full px-5 py-4 flex-row items-center justify-between">
-                <Text className={`text-base ${selectedCountry ? "text-black" : "text-[#838B8C]"}`}>
+                <Text
+                  className={`text-base ${selectedCountry ? "text-black" : "text-[#838B8C]"}`}
+                >
                   {displayCountry || t("InspectionForm.-- Select Country --")}
                 </Text>
                 <AntDesign name="down" size={20} color="#838B8C" />
@@ -873,14 +976,18 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             <>
               <View className="relative mb-4">
                 <Text className="text-sm text-[#070707] mb-1">
-                  <Text className="text-black">{t("InspectionForm.District")} *</Text>
+                  <Text className="text-black">
+                    {t("InspectionForm.District")} *
+                  </Text>
                 </Text>
                 <TouchableOpacity
                   onPress={() => setShowDistrictDropdown(true)}
                   activeOpacity={0.8}
                 >
                   <View className="bg-[#F6F6F6] rounded-full px-5 py-4 flex-row items-center justify-between">
-                    <Text className={`text-base ${selectedDistrict ? "text-black" : "text-[#838B8C]"}`}>
+                    <Text
+                      className={`text-base ${selectedDistrict ? "text-black" : "text-[#838B8C]"}`}
+                    >
                       {selectedDistrict
                         ? t(`Districts.${selectedDistrict}`)
                         : t("InspectionForm.-- Select District --")}
@@ -889,16 +996,24 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
                   </View>
                 </TouchableOpacity>
                 {errors.district && (
-                  <Text className="text-red-500 text-sm mt-1 ml-4">{errors.district}</Text>
+                  <Text className="text-red-500 text-sm mt-1 ml-4">
+                    {errors.district}
+                  </Text>
                 )}
               </View>
               <View className="relative mb-4">
                 <Text className="text-sm text-[#070707] mb-1">
-                  <Text className="text-black">{t("InspectionForm.Province")}</Text>
+                  <Text className="text-black">
+                    {t("InspectionForm.Province")}
+                  </Text>
                 </Text>
                 <View className="bg-[#F6F6F6] rounded-full px-5 py-4">
-                  <Text className={`text-base ${selectedProvince ? "text-black" : "text-[#838B8C]"}`}>
-                    {selectedProvince ? displayProvince : t("InspectionForm.-- Select Province --")}
+                  <Text
+                    className={`text-base ${selectedProvince ? "text-black" : "text-[#838B8C]"}`}
+                  >
+                    {selectedProvince
+                      ? displayProvince
+                      : t("InspectionForm.-- Select Province --")}
                   </Text>
                 </View>
               </View>
@@ -924,7 +1039,9 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
         <View className="flex-1 bg-black/50 justify-center items-center">
           <View className="bg-white rounded-2xl w-11/12 max-h-3/4">
             <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
-              <Text className="text-lg font-semibold">{t("AddOfficer.SelectDistricts")}</Text>
+              <Text className="text-lg font-semibold">
+                {t("AddOfficer.SelectDistricts")}
+              </Text>
               <TouchableOpacity onPress={() => setShowDistrictDropdown(false)}>
                 <MaterialIcons name="close" size={24} color="#666" />
               </TouchableOpacity>
@@ -959,7 +1076,9 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
         <View className="flex-1 bg-black/50 justify-center items-center">
           <View className="bg-white rounded-2xl w-11/12 max-h-3/4">
             <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
-              <Text className="text-lg font-semibold">{t("AddOfficer.SelectCountry")}</Text>
+              <Text className="text-lg font-semibold">
+                {t("AddOfficer.SelectCountry")}
+              </Text>
               <TouchableOpacity onPress={() => setShowCountryDropdown(false)}>
                 <MaterialIcons name="close" size={24} color="#666" />
               </TouchableOpacity>
@@ -968,7 +1087,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             {renderSearchInput(
               countrySearch,
               setCountrySearch,
-              t("AddOfficer.SearchCountry") || "Search country..."
+              t("AddOfficer.SearchCountry") || "Search country...",
             )}
 
             <FlatList
@@ -981,9 +1100,12 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
                   <Text className="text-2xl mr-3">{item.emoji}</Text>
                   <View className="flex-1">
                     <Text className="text-base text-gray-800 font-medium">
-                      {item.name[i18n.language as keyof typeof item.name] || item.name.en}
+                      {item.name[i18n.language as keyof typeof item.name] ||
+                        item.name.en}
                     </Text>
-                    <Text className="text-sm text-gray-600">{item.dial_code}</Text>
+                    <Text className="text-sm text-gray-600">
+                      {item.dial_code}
+                    </Text>
                   </View>
                 </TouchableOpacity>
               )}

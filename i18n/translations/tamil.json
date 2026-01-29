@@ -124,7 +124,10 @@
     "Value must be greater than 0": "Value must be greater than 0",
     "What are the risks you are anticipating in the proposed crop / cropping system is required": "What are the risks you are anticipating in the proposed crop / cropping system is required",
     "Do you have the solution is required": "Do you have the solution is required",
-    "Is it worth to take the risks for anticipated profits is required": "Is it worth to take the risks for anticipated profits is required"
+    "Is it worth to take the risks for anticipated profits is required": "Is it worth to take the risks for anticipated profits is required",
+    "Land number must be 9 digits long": "நில எண்ணில் 9 இலக்கங்கள் இருக்க வேண்டும்",
+    "Land number must start with 0": "நில எண் 0-இல் தொடங்க வேண்டும்",
+    "Invalid land number format": "தவறான நில எண் வடிவம்"
   },
   "Login": {
     "Welcome": "வரவேற்கிறோம்",
