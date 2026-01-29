@@ -45,6 +45,8 @@ interface RequestData {
   cropNameSinhala: string;
   cropNameTamil: string;
   startDate: string;
+  nicFront: string | null;
+  nicBack: string | null;
 }
 
 type ProjectDetailsProps = {
@@ -81,18 +83,16 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
   const fetchRequestDetails = async () => {
     try {
       setLoading(true);
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
       const token = await AsyncStorage.getItem("token");
       if (!token) return;
+      
       const response = await axios.get(
         `${environment.API_BASE_URL}api/capital-request/requests/${requestId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
       );
-      console.log("Requests", response.data.requests);
-      // In real implementation, fetch by requestId
+      console.log("Request details:", response.data.requests);
       setRequestData(response.data.requests[0] || null);
     } catch (error) {
       console.error("Failed to fetch request details:", error);
@@ -131,6 +131,9 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
 
   const formatNumber = (value: number | string) =>
     Number(value).toLocaleString("en-US");
+
+  // Check if NIC images exist
+  const hasNicImages = requestData.nicFront || requestData.nicBack;
 
   return (
     <View className="flex-1 bg-white">
@@ -265,21 +268,31 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
             )}
           </Text>
 
-          {/* Sample Images */}
-          <View className="my-4">
-            <View className="flex-row justify-between w-full">
-              <Image
-                source={require("../../assets/request-letter.png")}
-                className="w-[48%] h-40 rounded-lg border border-gray-300"
-                resizeMode="cover"
-              />
-              <Image
-                source={require("../../assets/request-letter.png")}
-                className="w-[48%] h-40 rounded-lg border border-gray-300"
-                resizeMode="cover"
-              />
+          {/* NIC Images - Show if available */}
+          {hasNicImages && (
+            <View className="my-4">
+              <View className="flex-row justify-between w-full">
+                {requestData.nicFront && (
+                  <View className="w-[48%]">
+                    <Image
+                      source={{ uri: requestData.nicFront }}
+                      className="w-full h-40 rounded-lg border border-gray-300"
+                      resizeMode="cover"
+                    />
+                  </View>
+                )}
+                {requestData.nicBack && (
+                  <View className={requestData.nicFront ? "w-[48%]" : "w-full"}>
+                    <Image
+                      source={{ uri: requestData.nicBack }}
+                      className="w-full h-40 rounded-lg border border-gray-300"
+                      resizeMode="cover"
+                    />
+                  </View>
+                )}
+              </View>
             </View>
-          </View>
+          )}
 
           <Text className="text-base  mt-2 text-black leading-6">
             {t(
