@@ -166,6 +166,23 @@ export const clearPersonalInfo = (requestId: number): void => {
   }
 };
 
+export const hasDraft = (requestId: number): boolean => {
+  console.log(`🔍 Checking for draft of request ${requestId}...`);
+  try {
+    const row = db.getFirstSync<{ requestId: number }>(
+      "SELECT requestId FROM inspectionpersonal WHERE requestId = ?",
+      [requestId],
+    );
+    
+    const exists = row !== null;
+    console.log(`✅ Draft check for request ${requestId}:`, exists);
+    return exists;
+  } catch (error) {
+    console.error(`❌ Error checking draft for request ${requestId}:`, error);
+    return false;
+  }
+};
+
 // Get all personal info records (for debugging/admin purposes)
 export const getAllPersonalInfo = () => {
   try {

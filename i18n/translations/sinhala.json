@@ -399,7 +399,7 @@
   "Visits": {
     "Pending": "පූර්ණ වෙමින්",
     "Completed": "සම්පූර්ණ කළා",
-    "Ongoing":"ක්‍රියාත්මකයි",
+    "Ongoing": "ක්‍රියාත්මකයි",
     "Request Placed": "ඉල්ලීම ඉදිරිපත් කළා",
     "Request Reviewed": "ඉල්ලීම සමාලෝචනය කළා",
     "Finished": "අවසන් කළා",
@@ -500,7 +500,8 @@
     "I am confident in the success of this venture and request": "මෙම ව්‍යාපාරයේ සාර්ථකත්වය ගැන මට විශ්වාසයි, ඒ වගේම මගේ ණය අයදුම්පත හැකි ඉක්මනින් අනුමත කරන ලෙස මම ඔබෙන් ඉල්ලා සිටිමි. ඔබගේ කාලය සහ සැලකිල්ල වෙනුවෙන් ස්තූතියි.",
     "Sincerely": "අවංකව",
     "Investment Request": "ආයෝජන ඉල්ලීම",
-    "Saved Draft": "සුරැකි කෙටුම්පත"
+    "Saved Draft": "සුරැකි කෙටුම්පත",
+    "and": "සහ"
   },
   "InspectionForm": {
     "Personal Info": "පුද්ගලික තොරතුරු",
@@ -682,7 +683,7 @@
     "Inspection form completed successfully!": "පරීක්ෂණ පෝරමය සාර්ථකව සම්පූර්ණ කර ඇත!",
     "Could not save to server. Please try again.": "සේවාදායකයට සුරකින්න නොහැකි විය. කරුණාකර නැවත උත්සාහ කරන්න.",
     "Go Back": "ආපසු යන්න",
-    "Account Holder Name":"ගිණුම් හිමියාගේ නම"
+    "Account Holder Name": "ගිණුම් හිමියාගේ නම"
   },
   "ConfirmationCapitalRequest": {
     "ConfirmSuccess": "තහවුරු කිරීම සාර්ථකයි!",
@@ -704,7 +705,7 @@
     "AssignSuccess": "{name} වෙත සාර්ථකව නියම කරන ලදී!",
     "NoOfficersAvailable": "නියම කිරීම සඳහා නිලධාරීන් නොමැත",
     "HeaderOn": "තහවුරු කිරීම",
-    "UndoSuccess":"සියලුම පරීක්ෂණ දත්ත සාර්ථකව මකා දමන ලදී.",
-    "UndoFailed":"පරීක්ෂණ දත්ත මැකීම අසාර්ථක විය."
+    "UndoSuccess": "සියලුම පරීක්ෂණ දත්ත සාර්ථකව මකා දමන ලදී.",
+    "UndoFailed": "පරීක්ෂණ දත්ත මැකීම අසාර්ථක විය."
   }
 }

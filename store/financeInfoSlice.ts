@@ -25,26 +25,49 @@ type FormData = {
 };
 
 type FinanceInfoState = {
-  [jobId: string]: FormData;
+  data: {
+    [jobId: string]: FormData;
+  };
+  currentRequestId: number | null; // ✅ Added
 };
 
-const initialState: FinanceInfoState = {};
+const initialState: FinanceInfoState = {
+  data: {},
+  currentRequestId: null, // ✅ Added
+};
 
 const financeInfoSlice = createSlice({
   name: 'financeInfo',
   initialState,
   reducers: {
+    // ✅ NEW: Initialize action with auto-clear
+    initializeFinanceInfo: (state, action: PayloadAction<{ requestId: number }>) => {
+      const { requestId } = action.payload;
+      
+      // ✅ Auto-clear when switching requests
+      if (state.currentRequestId !== null && state.currentRequestId !== requestId) {
+        console.log(`🗑️ [FinanceInfo] Clearing data for old request ${state.currentRequestId}`);
+        delete state.data[state.currentRequestId];
+      }
+      
+      state.currentRequestId = requestId;
+      
+      if (!state.data[requestId]) {
+        state.data[requestId] = {
+          requestId,
+          inspectionfinance: {},
+        };
+      }
+    },
+
     setFinanceInfo: (
       state,
       action: PayloadAction<{ jobId: string; data: FormData }>
     ) => {
       const { jobId, data } = action.payload;
-      // Create a new object to avoid mutation issues
-      return {
-        ...state,
-        [jobId]: { ...data }
-      };
+      state.data[jobId] = { ...data };
     },
+
     updateFinanceInfo: (
       state,
       action: PayloadAction<{
@@ -54,25 +77,38 @@ const financeInfoSlice = createSlice({
     ) => {
       const { jobId, updates } = action.payload;
       
-      return {
-        ...state,
-        [jobId]: {
-          ...state[jobId],
-          inspectionfinance: {
-            ...(state[jobId]?.inspectionfinance || {}),
-            ...updates,
-          },
+      if (!state.data[jobId]) {
+        state.data[jobId] = {
+          inspectionfinance: {},
+        };
+      }
+      
+      state.data[jobId] = {
+        ...state.data[jobId],
+        inspectionfinance: {
+          ...(state.data[jobId]?.inspectionfinance || {}),
+          ...updates,
         },
       };
     },
+
     clearFinanceInfo: (state, action: PayloadAction<number>) => {
-      const newState = { ...state };
-      delete newState[action.payload];
-      return newState;
+      delete state.data[action.payload];
+    },
+
+    clearAllFinanceInfo: (state) => {
+      state.data = {};
+      state.currentRequestId = null; // ✅ Added
     },
   },
 });
 
-export const { setFinanceInfo, updateFinanceInfo, clearFinanceInfo } =
-  financeInfoSlice.actions;
+export const { 
+  initializeFinanceInfo, // ✅ Export new action
+  setFinanceInfo, 
+  updateFinanceInfo, 
+  clearFinanceInfo,
+  clearAllFinanceInfo, // ✅ Export new action
+} = financeInfoSlice.actions;
+
 export default financeInfoSlice.reducer;

@@ -1,4 +1,3 @@
-// store/slices/cultivationInfoSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 type Selection = "yes" | "no" | null;
@@ -27,14 +26,13 @@ export type CultivationInfoData = {
 };
 
 interface CultivationInfoState {
-  // Store data by requestId
   data: {
     [requestId: number]: CultivationInfoData;
   };
-  // Track which requests have existing backend data (UPDATE vs INSERT)
   isExisting: {
     [requestId: number]: boolean;
   };
+  currentRequestId: number | null; // ✅ Added
 }
 
 const initialCultivationInfo: CultivationInfoData = {
@@ -62,22 +60,32 @@ const initialCultivationInfo: CultivationInfoData = {
 const initialState: CultivationInfoState = {
   data: {},
   isExisting: {},
+  currentRequestId: null, // ✅ Added
 };
 
 const cultivationInfoSlice = createSlice({
   name: 'cultivationInfo',
   initialState,
   reducers: {
-    // Initialize cultivation info for a request
+    // ✅ UPDATED with auto-clear
     initializeCultivationInfo: (state, action: PayloadAction<{ requestId: number }>) => {
       const { requestId } = action.payload;
+      
+      // ✅ Auto-clear when switching requests
+      if (state.currentRequestId !== null && state.currentRequestId !== requestId) {
+        console.log(`🗑️ [CultivationInfo] Clearing data for old request ${state.currentRequestId}`);
+        delete state.data[state.currentRequestId];
+        delete state.isExisting[state.currentRequestId];
+      }
+      
+      state.currentRequestId = requestId;
+      
       if (!state.data[requestId]) {
         state.data[requestId] = { ...initialCultivationInfo };
         state.isExisting[requestId] = false;
       }
     },
 
-    // Update specific fields
     updateCultivationInfo: (
       state,
       action: PayloadAction<{
@@ -95,7 +103,6 @@ const cultivationInfoSlice = createSlice({
       };
     },
 
-    // Set complete cultivation info (used when loading from backend)
     setCultivationInfo: (
       state,
       action: PayloadAction<{
@@ -109,7 +116,6 @@ const cultivationInfoSlice = createSlice({
       state.isExisting[requestId] = isExisting;
     },
 
-    // Mark as existing data (for UPDATE operations)
     markCultivationAsExisting: (
       state,
       action: PayloadAction<{ requestId: number }>
@@ -118,7 +124,6 @@ const cultivationInfoSlice = createSlice({
       state.isExisting[requestId] = true;
     },
 
-    // Clear cultivation info for a request
     clearCultivationInfo: (
       state,
       action: PayloadAction<{ requestId: number }>
@@ -128,10 +133,10 @@ const cultivationInfoSlice = createSlice({
       delete state.isExisting[requestId];
     },
 
-    // Clear all cultivation info data
     clearAllCultivationInfo: (state) => {
       state.data = {};
       state.isExisting = {};
+      state.currentRequestId = null; // ✅ Added
     },
   },
 });

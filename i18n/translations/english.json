@@ -399,7 +399,7 @@
   "Visits": {
     "Pending": "Pending",
     "Completed": "Completed",
-    "Ongoing":"Ongoing",
+    "Ongoing": "Ongoing",
     "Request Placed": "Request Placed",
     "Request Reviewed": "Request Reviewed",
     "Finished": "Finished",
@@ -500,7 +500,8 @@
     "I am confident in the success of this venture and request": "I am confident in the success of this venture and request you to kindly approve my loan application at the earliest. Thank you for your time and consideration.",
     "Sincerely": "Sincerely",
     "Investment Request": "Investment Request",
-    "Saved Draft": "Saved Draft"
+    "Saved Draft": "Saved Draft",
+    "and": "and"
   },
   "InspectionForm": {
     "Personal Info": "Personal Info",
@@ -601,7 +602,7 @@
     "View Here": "View Here",
     "Attached": "Attached",
     "Expected investment by the farmer": "Expected investment by the farmer",
-    "Rs": "Rs.",
+    "Rs": "(Rs.)",
     "Purpose for investment required as per the farmer": "Purpose for investment required as per the farmer",
     "Expected repayment period as per the farmer in months": "Expected repayment period as per the farmer in months",
     "Temperature": "Temperature",
@@ -654,7 +655,7 @@
     "Do you have the solution": "Do you have the solution?",
     "Can the farmer manage the risks": "Can the farmer manage the risks?",
     "Is it worth to take the risks for anticipated profits": "Is it worth to take the risks for anticipated profits?",
-    "Are the proposed crop/cropping systems suitable for the farmer’s size of land holding": "Are the proposed crop/cropping systems suitable for the farmer’s size of land holding?",
+    "Are the proposed crop/cropping systems suitable for the farmer's size of land holding": "Are the proposed crop/cropping systems suitable for the farmer`s size of land holding?",
     "Are the financial resources adequate to manage the proposed crop/cropping system": "Are the financial resources adequate to manage the proposed crop/cropping system?",
     "If not, can the farmer mobilize financial resources through alternative routes": "If not, can the farmer mobilize financial resources through alternative routes?",
     "Can the farmer manage the proposed crop/cropping system through your family labour": "Can the farmer manage the proposed crop/cropping system through your family labour?",
@@ -682,7 +683,7 @@
     "Inspection form completed successfully!": "Inspection form completed successfully!",
     "Could not save to server. Please try again.": "Could not save to server. Please try again.",
     "Go Back": "Go Back",
-    "Account Holder Name":"Account Holder's Name"
+    "Account Holder Name": "Account Holder's Name"
   },
   "ConfirmationCapitalRequest": {
     "ConfirmSuccess": "Confirmation successful!",
@@ -704,7 +705,7 @@
     "AssignSuccess": "Assigned to {name} successfully!",
     "NoOfficersAvailable": "No officers available for assignment",
     "HeaderOn": "Confirmation",
-    "UndoSuccess":"All inspection data deleted successfully",
-    "UndoFailed":"Deleting inspection data failed."
+    "UndoSuccess": "All inspection data deleted successfully",
+    "UndoFailed": "Deleting inspection data failed."
   }
 }
