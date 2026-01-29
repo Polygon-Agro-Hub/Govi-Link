@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,8 +6,6 @@ import {
   TouchableOpacity,
   ScrollView,
   StatusBar,
-  Modal,
-  FlatList,
   KeyboardAvoidingView,
   Platform,
   Alert,
@@ -28,24 +26,35 @@ import { environment } from "@/environment/environment";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
 import { useFocusEffect, RouteProp, useRoute } from "@react-navigation/native";
+import CustomHeader from "../common/CustomHeader";
+import GlobalSearchModal from "@/component/common/GlobalSearchModal";
+import { useModal } from "@/hooks/useModal";
 
 type AddOfficerStep1NavigationProp = StackNavigationProp<
   RootStackParamList,
   "AddOfficerStep1"
 >;
-type AddOfficerStep1RouteProp = RouteProp<RootStackParamList, "AddOfficerStep1">;
+type AddOfficerStep1RouteProp = RouteProp<
+  RootStackParamList,
+  "AddOfficerStep1"
+>;
 
 interface AddOfficerStep1ScreenProps {
   navigation: AddOfficerStep1NavigationProp;
-  // route: { params: { isnew?: boolean } };
 }
 
 const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
-  navigation}) => {
-      const route = useRoute<AddOfficerStep1RouteProp>();
-    
+  navigation,
+}) => {
+  const route = useRoute<AddOfficerStep1RouteProp>();
   const { isnew } = route.params;
   const { t } = useTranslation();
+
+  // Modal hooks
+  const districtModal = useModal();
+  const countryCodeModal1 = useModal();
+  const countryCodeModal2 = useModal();
+
   const [type, setType] = useState<"Permanent" | "Temporary">("Permanent");
   const [languages, setLanguages] = useState({
     Sinhala: true,
@@ -73,18 +82,15 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
 
   // District dropdown states - MULTI SELECT
   const [selectedDistricts, setSelectedDistricts] = useState<string[]>([]);
-  const [showDistrictDropdown, setShowDistrictDropdown] = useState(false);
-  const [districtSearch, setDistrictSearch] = useState("");
+  const [cfoDistricts, setCfoDistricts] = useState<string[]>([]);
 
   // Country code dropdown states
   const [selectedCountryCode1, setSelectedCountryCode1] = useState("+94");
   const [selectedCountryCode2, setSelectedCountryCode2] = useState("+94");
-  const [showCountryCodeDropdown1, setShowCountryCodeDropdown1] =
-    useState(false);
-  const [showCountryCodeDropdown2, setShowCountryCodeDropdown2] =
-    useState(false);
-const [cfoDistricts, setCfoDistricts] = useState<string[]>([]);
-console.log(cfoDistricts)
+  const [currentCountryCodeModal, setCurrentCountryCodeModal] = useState<
+    "phone1" | "phone2"
+  >("phone1");
+
   // Sri Lanka districts with translations
   const districts = [
     { en: "Ampara", si: "අම්පාර", ta: "அம்பாறை" },
@@ -114,29 +120,27 @@ console.log(cfoDistricts)
     { en: "Vavuniya", si: "වවුනියාව", ta: "வவுனியா" },
   ];
 
-    useFocusEffect(
-      React.useCallback(() => {
- fetchCFOdistricts()
- console.log("focus effect step 1", isnew)
-      if(isnew===true){
-        setFirstNameEN("")
-        setLastNameEN("")
-        setFirstNameSI("")
-        setLastNameSI("")
-        setFirstNameTA("")
-        setLastNameTA("")
-        setPhone1("")
-        setPhone2("")
-        setNic("")
-        setEmail("")
-        setErrors({})
-               setSelectedDistricts([])
-setProfileImage(null)
+  useFocusEffect(
+    useCallback(() => {
+      fetchCFOdistricts();
+      console.log("focus effect step 1", isnew);
+      if (isnew === true) {
+        setFirstNameEN("");
+        setLastNameEN("");
+        setFirstNameSI("");
+        setLastNameSI("");
+        setFirstNameTA("");
+        setLastNameTA("");
+        setPhone1("");
+        setPhone2("");
+        setNic("");
+        setEmail("");
+        setErrors({});
+        setSelectedDistricts([]);
+        setProfileImage(null);
       }
-
-      }, [isnew])
-    );
-  
+    }, [isnew]),
+  );
 
   const fetchCFOdistricts = async () => {
     try {
@@ -145,9 +149,9 @@ setProfileImage(null)
         Alert.alert(
           t("Error.Sorry"),
           t(
-            "Error.Your login session has expired. Please log in again to continue."
+            "Error.Your login session has expired. Please log in again to continue.",
           ),
-                [{ text: t("Main.ok") }]
+          [{ text: t("Main.ok") }],
         );
         return;
       }
@@ -156,45 +160,46 @@ setProfileImage(null)
           `${environment.API_BASE_URL}api/auth/user-districts`,
           {
             headers: { Authorization: `Bearer ${token}` },
-          }
+          },
         );
-         const districts = response.data?.data;
-    //  if (Array.isArray(response.data.data)) {
-    //   setCfoDistricts(response.data.data);
+        const districts = response.data?.data;
         if (Array.isArray(districts)) {
-      setCfoDistricts(districts);
-      // ✅ If only one district, auto select it
-      if (districts.length === 1) {
-        setSelectedDistricts(districts);
-      }
-    } else {
-      console.warn("Unexpected districts format:", response.data);
-    }
-
+          setCfoDistricts(districts);
+          if (districts.length === 1) {
+            setSelectedDistricts(districts);
+          }
+        } else {
+          console.warn("Unexpected districts format:", response.data);
+        }
       }
     } catch (error: any) {
       console.error("Failed to fetch user profile:", error);
-    } 
+    }
   };
 
+  const getFilteredCFODistricts = () => {
+    if (!cfoDistricts || cfoDistricts.length === 0) return [];
+    return districts.filter((d) => cfoDistricts.includes(d.en));
+  };
 
-const getFilteredCFODistricts = () => {
-  if (!cfoDistricts || cfoDistricts.length === 0) return [];
+  // Prepare districts data for GlobalSearchModal
+  const getDistrictsData = () => {
+    const availableDistricts = getFilteredCFODistricts();
+    return availableDistricts.map((district) => ({
+      label: getTranslatedDistrict(district),
+      value: district.en,
+      ...district,
+    }));
+  };
 
-  let filtered = districts.filter((d) => cfoDistricts.includes(d.en));
-
-  if (districtSearch) {
-    const searchTerm = districtSearch.toLowerCase();
-    filtered = filtered.filter(
-      (d) =>
-        d.en.toLowerCase().includes(searchTerm) ||
-        d.si.includes(districtSearch) ||
-        d.ta.includes(districtSearch)
-    );
-  }
-
-  return filtered;
-};
+  // Prepare country data for GlobalSearchModal
+  const getCountryData = () => {
+    return countryData.map((country) => ({
+      label: getTranslatedCountry(country),
+      value: country.dial_code,
+      ...country,
+    }));
+  };
 
   // Mark field as touched
   const markFieldAsTouched = (fieldName: string) => {
@@ -209,17 +214,18 @@ const getFilteredCFODistricts = () => {
       return newErrors;
     });
   };
+
   const validateGmailLocalPart = (localPart: string): boolean => {
     const validCharsRegex = /^[a-zA-Z0-9.+]+$/;
     if (!validCharsRegex.test(localPart)) {
       return false;
     }
 
-    if (localPart.startsWith('.') || localPart.endsWith('.')) {
+    if (localPart.startsWith(".") || localPart.endsWith(".")) {
       return false;
     }
 
-    if (localPart.includes('..')) {
+    if (localPart.includes("..")) {
       return false;
     }
 
@@ -229,25 +235,25 @@ const getFilteredCFODistricts = () => {
 
     return true;
   };
+
   // Validation functions
   const validateEmail = (email: string): boolean => {
-    const generalEmailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const generalEmailRegex =
+      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
     if (!generalEmailRegex.test(email)) {
       return false;
     }
 
     const emailLower = email.toLowerCase();
-    const [localPart, domain] = emailLower.split('@');
+    const [localPart, domain] = emailLower.split("@");
+    const allowedTLDs = [".com", ".gov", ".lk"];
 
-    const allowedSpecificDomains = ['gmail.com', 'googlemail.com', 'yahoo.com'];
-    const allowedTLDs = ['.com', '.gov', '.lk'];
-
-    if (domain === 'gmail.com' || domain === 'googlemail.com') {
+    if (domain === "gmail.com" || domain === "googlemail.com") {
       return validateGmailLocalPart(localPart);
     }
 
-    if (domain === 'yahoo.com') {
+    if (domain === "yahoo.com") {
       return true;
     }
 
@@ -260,75 +266,80 @@ const getFilteredCFODistricts = () => {
     return false;
   };
 
-  const validateNIC = (nic: string): boolean => {
-    return /^\d{9}[Vv]?$|^\d{12}$/.test(nic);
-  };
-
   const validatePhoneNumber = (phone: string): boolean => {
     return /^7[0-9]{8}$/.test(phone);
   };
 
-const handleNameENChange = (text: string, fieldName: string) => {
-  const filteredText = text.replace(/[^a-zA-Z\s]/g, "");
-  const capitalizedText =
-    filteredText.charAt(0).toUpperCase() + filteredText.slice(1);
-let errorname = ""
-  // ---------- SET VALUE ----------
-  switch (fieldName) {
-    case "firstNameEN":
-      setFirstNameEN(capitalizedText);
-      errorname = "First name"
-      break;
-    case "lastNameEN":
-      setLastNameEN(capitalizedText);
-      errorname = "Last name"
-      break;
-    case "firstNameSI":
-      setFirstNameSI(capitalizedText);
-      errorname = "Sinhala first name"
-      break;
-    case "lastNameSI":
-      setLastNameSI(capitalizedText);
-      errorname = "Sinhala last name"
-      break;
-    case "firstNameTA":
-      setFirstNameTA(capitalizedText);
-      errorname = "Tamil first name"
-      break;
-    case "lastNameTA":
-      setLastNameTA(capitalizedText);
-      errorname = "Tamil last name"
-      break;
-  }
-
-  // ---------- VALIDATION ----------
-  if (capitalizedText.length === 0) {
-    setErrors((prev) => ({
-      ...prev,
-      [fieldName]: t(`Error.${errorname} is required`),
-    }));
-  } else {
-    setErrors((prev) => {
-      const updated = { ...prev };
-      delete updated[fieldName];
-      return updated;
-    });
-  }
-};
-
-  // Field change handlers with validation on blur
-  const handleFirstNameENChange = (text: string) => {
-    clearFieldError("firstNameEN");
+  const handleNameENChange = (text: string, fieldName: string) => {
     const filteredText = text.replace(/[^a-zA-Z\s]/g, "");
     const capitalizedText =
       filteredText.charAt(0).toUpperCase() + filteredText.slice(1);
-    setFirstNameEN(capitalizedText);
-      if (capitalizedText.length === 0) {
-    setErrors((prev) => ({
-      ...prev,
-      firstNameEN: t("Error.First name is required"),
-    }));
-  }
+    let errorname = "";
+    switch (fieldName) {
+      case "firstNameEN":
+        setFirstNameEN(capitalizedText);
+        errorname = "First name";
+        break;
+      case "lastNameEN":
+        setLastNameEN(capitalizedText);
+        errorname = "Last name";
+        break;
+      case "firstNameSI":
+        setFirstNameSI(capitalizedText);
+        errorname = "Sinhala first name";
+        break;
+      case "lastNameSI":
+        setLastNameSI(capitalizedText);
+        errorname = "Sinhala last name";
+        break;
+      case "firstNameTA":
+        setFirstNameTA(capitalizedText);
+        errorname = "Tamil first name";
+        break;
+      case "lastNameTA":
+        setLastNameTA(capitalizedText);
+        errorname = "Tamil last name";
+        break;
+    }
+
+    if (capitalizedText.length === 0) {
+      setErrors((prev) => ({
+        ...prev,
+        [fieldName]: t(`Error.${errorname} is required`),
+      }));
+    } else {
+      setErrors((prev) => {
+        const updated = { ...prev };
+        delete updated[fieldName];
+        return updated;
+      });
+    }
+  };
+
+  const handleUnicodeNameChange = (text: string, fieldName: string) => {
+    switch (fieldName) {
+      case "firstNameSI":
+        setFirstNameSI(text);
+        break;
+      case "lastNameSI":
+        setLastNameSI(text);
+        break;
+      case "firstNameTA":
+        setFirstNameTA(text);
+        break;
+      case "lastNameTA":
+        setLastNameTA(text);
+        break;
+    }
+
+    if (!text.trim()) {
+      setErrors((prev) => ({
+        ...prev,
+        [fieldName]: t("Error.Field is required"),
+      }));
+    } else {
+      clearFieldError(fieldName);
+    }
   };
 
   const handleFirstNameENBlur = () => {
@@ -343,20 +354,6 @@ let errorname = ""
     }
   };
 
-  const handleLastNameENChange = (text: string) => {
-    clearFieldError("lastNameEN");
-    const filteredText = text.replace(/[^a-zA-Z\s]/g, "");
-    const capitalizedText =
-      filteredText.charAt(0).toUpperCase() + filteredText.slice(1);
-    setLastNameEN(capitalizedText);
-      if (capitalizedText.length === 0) {
-    setErrors((prev) => ({
-      ...prev,
-      lastNameEN: t("Error.Last name is required"),
-    }));
-  }
-  };
-
   const handleLastNameENBlur = () => {
     markFieldAsTouched("lastNameEN");
     if (!lastNameEN.trim()) {
@@ -369,171 +366,175 @@ let errorname = ""
     }
   };
 
-const clearSamePhoneErrors = (p1: string, p2: string) => {
-  console.log("clearsamephone", p1, p2)
-  if (p1 && p2 && p1 !== p2) {
-    console.log("clearsamephone inside", p1, p2)
-    setErrors((prev) => ({
-      ...prev,
-      phone1:
-        prev.phone1 === t("Error.Phone numbers cannot be the same")
-          ? ""
-          : prev.phone1,
-      phone2:
-        prev.phone2 === t("Error.Phone numbers cannot be the same")
-          ? ""
-          : prev.phone2,
-    }));
-  }
-};
-
+  const clearSamePhoneErrors = (p1: string, p2: string) => {
+    if (p1 && p2 && p1 !== p2) {
+      setErrors((prev) => ({
+        ...prev,
+        phone1:
+          prev.phone1 === t("Error.Phone numbers cannot be the same")
+            ? ""
+            : prev.phone1,
+        phone2:
+          prev.phone2 === t("Error.Phone numbers cannot be the same")
+            ? ""
+            : prev.phone2,
+      }));
+    }
+  };
 
   const handlePhone1Change = (input: string) => {
-          clearFieldError("phone1");
-  markFieldAsTouched("phone1");
+    clearFieldError("phone1");
+    markFieldAsTouched("phone1");
     let numbersOnly = input.replace(/[^0-9]/g, "");
     if (numbersOnly.startsWith("0")) {
       numbersOnly = numbersOnly.replace(/^0+/, "");
     }
     setPhone1(numbersOnly);
 
-  clearSamePhoneErrors(numbersOnly, phone1);
+    clearSamePhoneErrors(numbersOnly, phone1);
 
- if (numbersOnly.length === 0) {
-        setErrors((prev) => ({
-            ...prev,
-            phone1: "",
-        }));
-    }       else if (numbersOnly.startsWith("7") && numbersOnly && numbersOnly === phone2) {
-        setErrors((prev) => ({
-            ...prev,
-            phone1: t("Error.Phone numbers cannot be the same"),
-        }));
-        return;
-    }else if (!numbersOnly.startsWith("7")) {
-        setErrors((prev) => ({
-            ...prev,
-            phone1: t("Error.Invalid phone number"),
-        }));
+    if (numbersOnly.length === 0) {
+      setErrors((prev) => ({
+        ...prev,
+        phone1: "",
+      }));
+    } else if (
+      numbersOnly.startsWith("7") &&
+      numbersOnly &&
+      numbersOnly === phone2
+    ) {
+      setErrors((prev) => ({
+        ...prev,
+        phone1: t("Error.Phone numbers cannot be the same"),
+      }));
+      return;
+    } else if (!numbersOnly.startsWith("7")) {
+      setErrors((prev) => ({
+        ...prev,
+        phone1: t("Error.Invalid phone number"),
+      }));
     } else if (numbersOnly.length < 9) {
-      console.log("hit 4")
-        setErrors((prev) => ({
-            ...prev,
-            phone1: t("Error.Phone number must be 9 digits long"),
-        }));
+      setErrors((prev) => ({
+        ...prev,
+        phone1: t("Error.Phone number must be 9 digits long"),
+      }));
     } else if (!validatePhoneNumber(numbersOnly)) {
-        setErrors((prev) => ({
-            ...prev,
-            phone1: t("Error.Invalid phone number"),
-        }));
+      setErrors((prev) => ({
+        ...prev,
+        phone1: t("Error.Invalid phone number"),
+      }));
     } else {
-            console.log("hit")
-
-        // Clear errors if valid
-        setErrors((prev) => ({
-            ...prev,
-            phone1: "",
-        }));
-              checkPhoneExists(selectedCountryCode1, numbersOnly, "phone1");
-
+      setErrors((prev) => ({
+        ...prev,
+        phone1: "",
+      }));
+      checkPhoneExists(selectedCountryCode1, numbersOnly, "phone1");
     }
   };
 
   const handlePhone2Change = (input: string) => {
-       clearFieldError("phone2");
+    clearFieldError("phone2");
     let numbersOnly = input.replace(/[^0-9]/g, "");
     if (numbersOnly.startsWith("0")) {
       numbersOnly = numbersOnly.replace(/^0+/, "");
     }
-      markFieldAsTouched("phone2");
-        clearSamePhoneErrors(numbersOnly, phone1);
+    markFieldAsTouched("phone2");
+    clearSamePhoneErrors(numbersOnly, phone1);
 
     setPhone2(numbersOnly);
-     if (numbersOnly.length === 0) {
-        setErrors((prev) => ({
-            ...prev,
-            phone2: "",
-        }));
-
-    }  else if (numbersOnly.startsWith("7") && numbersOnly && numbersOnly === phone1) {
-        setErrors((prev) => ({
-            ...prev,
-            phone2: t("Error.Phone numbers cannot be the same"),
-        }));
-        return;
-      }
-      else if (!numbersOnly.startsWith("7")) {
-        setErrors((prev) => ({
-            ...prev,
-            phone2: t("Error.Invalid phone number"),
-        }));
+    if (numbersOnly.length === 0) {
+      setErrors((prev) => ({
+        ...prev,
+        phone2: "",
+      }));
+    } else if (
+      numbersOnly.startsWith("7") &&
+      numbersOnly &&
+      numbersOnly === phone1
+    ) {
+      setErrors((prev) => ({
+        ...prev,
+        phone2: t("Error.Phone numbers cannot be the same"),
+      }));
+      return;
+    } else if (!numbersOnly.startsWith("7")) {
+      setErrors((prev) => ({
+        ...prev,
+        phone2: t("Error.Invalid phone number"),
+      }));
     } else if (numbersOnly.length < 9) {
-        setErrors((prev) => ({
-            ...prev,
-            phone2: t("Error.Phone number must be 9 digits long"),
-        }));
+      setErrors((prev) => ({
+        ...prev,
+        phone2: t("Error.Phone number must be 9 digits long"),
+      }));
     } else if (!validatePhoneNumber(numbersOnly)) {
-        setErrors((prev) => ({
-            ...prev,
-            phone2: t("Error.Invalid phone number"),
-        }));
+      setErrors((prev) => ({
+        ...prev,
+        phone2: t("Error.Invalid phone number"),
+      }));
     } else {
-        // Clear errors if valid
-        setErrors((prev) => ({
-            ...prev,
-            phone2: "",
-        }));
-              checkPhoneExists(selectedCountryCode2, numbersOnly, "phone2");
-
+      setErrors((prev) => ({
+        ...prev,
+        phone2: "",
+      }));
+      checkPhoneExists(selectedCountryCode2, numbersOnly, "phone2");
     }
   };
 
-
   const validateNicNumber = (input: string) =>
     /^[0-9]{9}V$|^[0-9]{12}$/.test(input);
+
   const handleNICChange = (input: string) => {
     const filteredInput = input.replace(/[^0-9Vv]/g, "");
     const normalizedInput = filteredInput.replace(/[vV]/g, "V");
     setNic(normalizedInput);
-      markFieldAsTouched("nic");
+    markFieldAsTouched("nic");
     if (normalizedInput.length === 0) {
-        setErrors((prev) => ({
-            ...prev,
-            nic: "",
-        }));
+      setErrors((prev) => ({
+        ...prev,
+        nic: "",
+      }));
     } else if (!validateNicNumber(normalizedInput)) {
-      setErrors((prev) => ({ ...prev, nic: t("Error.NIC Number must be 9 digits followed by 'V' or 12 digits.")}))
+      setErrors((prev) => ({
+        ...prev,
+        nic: t(
+          "Error.NIC Number must be 9 digits followed by 'V' or 12 digits.",
+        ),
+      }));
     } else {
-              setErrors((prev) => ({
-            ...prev,
-            nic: "",
-        }));
+      setErrors((prev) => ({
+        ...prev,
+        nic: "",
+      }));
       checkNICExists(normalizedInput);
     }
   };
 
   const handleEmailChange = (input: string) => {
-        clearFieldError('email');
-        markFieldAsTouched("email");
+    clearFieldError("email");
+    markFieldAsTouched("email");
     const trimmedInput = input.trim();
     setEmail(trimmedInput);
-        if (!validateEmail(trimmedInput)) {
+    if (!validateEmail(trimmedInput)) {
       const emailLower = trimmedInput.toLowerCase();
-      const domain = emailLower.split('@')[1];
+      const domain = emailLower.split("@")[1];
 
-      if (domain === 'gmail.com' || domain === 'googlemail.com') {
-         setErrors((prev) => ({ ...prev, email: t("Error.Invalid Gmail address")}))
+      if (domain === "gmail.com" || domain === "googlemail.com") {
+        setErrors((prev) => ({
+          ...prev,
+          email: t("Error.Invalid Gmail address"),
+        }));
       } else {
-       setErrors((prev) => ({ ...prev, email: t("Error.Invalid email address Example")}))
-
+        setErrors((prev) => ({
+          ...prev,
+          email: t("Error.Invalid email address Example"),
+        }));
       }
       return;
     }
- checkEmailExists(trimmedInput);
+    checkEmailExists(trimmedInput);
   };
 
-
-  // Handle blur for other fields
   const handleFirstNameSIBlur = () => {
     markFieldAsTouched("firstNameSI");
     if (!firstNameSI.trim()) {
@@ -585,19 +586,17 @@ const clearSamePhoneErrors = (p1: string, p2: string) => {
   // Profile image picker
   const pickProfileImage = async () => {
     try {
-      // Request permissions
       const { status } =
         await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== "granted") {
         Alert.alert(
           t("Error.Permission Denied"),
           t("Error.Gallery permission is required"),
-                [{ text: t("Main.ok") }]
+          [{ text: t("Main.ok") }],
         );
         return;
       }
 
-      // Launch image picker
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
@@ -610,104 +609,104 @@ const clearSamePhoneErrors = (p1: string, p2: string) => {
       }
     } catch (error) {
       console.error("Error picking image:", error);
-      Alert.alert(t("Error.Error"), t("Error.Failed to pick image"),[{ text: t("Main.ok") }]);
+      Alert.alert(t("Error.Error"), t("Error.Failed to pick image"), [
+        { text: t("Main.ok") },
+      ]);
     }
   };
 
-
   const checkNICExists = async (nicNumber: string): Promise<boolean> => {
-    console.log(nicNumber)
-  try {
-    setIsValidating(true);
-    const token = await AsyncStorage.getItem("token");
-    const response = await axios.get(
-      `${environment.API_BASE_URL}api/officer/field-officers/check-nic/${nicNumber}`,
-      {
-        headers: { Authorization: `Bearer ${token}` },
+    try {
+      setIsValidating(true);
+      const token = await AsyncStorage.getItem("token");
+      const response = await axios.get(
+        `${environment.API_BASE_URL}api/officer/field-officers/check-nic/${nicNumber}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+
+      if (response.data.exists) {
+        setErrors((prev) => ({
+          ...prev,
+          nic: t("Error.This NIC is already registered in the system."),
+        }));
+        return true;
       }
-    );
-
-    if (response.data.exists) {
-      setErrors((prev) => ({ ...prev, nic: t("Error.This NIC is already registered in the system.") }));
-      return true; // Error found
+      return false;
+    } catch (error) {
+      console.error("Error checking NIC:", error);
+      return false;
+    } finally {
+      setIsValidating(false);
     }
-    return false; // No error
-  } catch (error) {
-    console.error("Error checking NIC:", error);
-    return false;
-  } finally {
-    setIsValidating(false);
-  }
-};
+  };
 
-const checkEmailExists = async (email: string): Promise<boolean> => {
-  try {
-    setIsValidating(true);
-    const token = await AsyncStorage.getItem("token");
-    const response = await axios.get(
-      `${environment.API_BASE_URL}api/officer/field-officers/check-email/${email}`,
-      {
-        headers: { Authorization: `Bearer ${token}` },
+  const checkEmailExists = async (email: string): Promise<boolean> => {
+    try {
+      setIsValidating(true);
+      const token = await AsyncStorage.getItem("token");
+      const response = await axios.get(
+        `${environment.API_BASE_URL}api/officer/field-officers/check-email/${email}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+
+      if (response.data.exists) {
+        setErrors((prev) => ({
+          ...prev,
+          email: t("Error.Email already exists"),
+        }));
+        return true;
       }
-    );
-
-    if (response.data.exists) {
-      setErrors((prev) => ({
-        ...prev,
-        email: t("Error.Email already exists"),
-      }));
-      return true; // Error found
+      return false;
+    } catch (error) {
+      console.error("Error checking email:", error);
+      return false;
+    } finally {
+      setIsValidating(false);
     }
-    return false; // No error
-  } catch (error) {
-    console.error("Error checking email:", error);
-    return false;
-  } finally {
-    setIsValidating(false);
-  }
-};
+  };
 
-const checkPhoneExists = async (
-  phoneCode: string,
-  phoneNumber: string,
-  field: string
-): Promise<boolean> => {
-  if (!phoneNumber.trim()) {
-    return false;
-  }
-console.log("hit 2")
-  try {
-    setIsValidating(true);
-    const token = await AsyncStorage.getItem("token");
-    const response = await axios.get(
-      `${environment.API_BASE_URL}api/officer/field-officers/check-phone/${phoneCode}/${phoneNumber}`,
-      {
-        headers: { Authorization: `Bearer ${token}` },
+  const checkPhoneExists = async (
+    phoneCode: string,
+    phoneNumber: string,
+    field: string,
+  ): Promise<boolean> => {
+    if (!phoneNumber.trim()) {
+      return false;
+    }
+    try {
+      setIsValidating(true);
+      const token = await AsyncStorage.getItem("token");
+      const response = await axios.get(
+        `${environment.API_BASE_URL}api/officer/field-officers/check-phone/${phoneCode}/${phoneNumber}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+
+      if (response.data.exists) {
+        setErrors((prev) => ({
+          ...prev,
+          [field]:
+            field === "phone1"
+              ? t("Error.Phone already exists")
+              : t("Error.Phone 2 already exists"),
+        }));
+        return true;
+      } else {
+        clearFieldError(field);
+        return false;
       }
-    );
-
-    if (response.data.exists) {
-      setErrors((prev) => ({
-        ...prev,
-        [field]:
-          field === "phone1"
-            ? t("Error.Phone already exists")
-            : t("Error.Phone 2 already exists"),
-      }));
-      return true; // Error found
-    } else {
-            console.log("hit3")
-
-      clearFieldError(field);
-      return false; // No error
+    } catch (error) {
+      console.error("Error checking phone:", error);
+      return false;
+    } finally {
+      setIsValidating(false);
     }
-  } catch (error) {
-    console.error("Error checking phone:", error);
-    return false;
-  } finally {
-    setIsValidating(false);
-  }
-};
+  };
 
   const toggleLanguage = (lang: keyof typeof languages) => {
     clearFieldError("languages");
@@ -740,51 +739,14 @@ console.log("hit 2")
     return country.name[lang as keyof typeof country.name] || country.name.en;
   };
 
-  // Filter districts based on search
-  const getFilteredDistricts = () => {
-    if (!districtSearch) return districts;
+  // Handle district selection from modal
+  const handleDistrictSelect = (selectedValues: string[]) => {
+    setSelectedDistricts(selectedValues);
+    districtModal.hide();
 
-    return districts.filter((district) => {
-      const searchTerm = districtSearch.toLowerCase();
-      return (
-        district.en.toLowerCase().includes(searchTerm) ||
-        district.si.includes(districtSearch) ||
-        district.ta.includes(districtSearch) ||
-        getTranslatedDistrict(district).toLowerCase().includes(searchTerm)
-      );
-    });
-  };
-
-  // Toggle district selection
-  const toggleDistrictSelection = (district: {
-    en: string;
-    si: string;
-    ta: string;
-  }) => {
-    const districtKey = district.en;
-    setSelectedDistricts((prev) => {
-      if (prev.includes(districtKey)) {
-        return prev.filter((d) => d !== districtKey);
-      } else {
-        return [...prev, districtKey];
-      }
-    });
-  };
-
-  // Clear all selected districts
-  const clearAllDistricts = () => {
-    setSelectedDistricts([]);
-  };
-
-  // Clear search
-  const clearSearch = () => {
-    setDistrictSearch("");
-  };
-
-  // Handle modal close
-  const handleDistrictModalClose = () => {
+    // Validate after selection
     markFieldAsTouched("districts");
-    if (selectedDistricts.length === 0) {
+    if (selectedValues.length === 0) {
       setErrors((prev) => ({
         ...prev,
         districts: t("Error.At least one district is required"),
@@ -792,8 +754,30 @@ console.log("hit 2")
     } else {
       clearFieldError("districts");
     }
-    setDistrictSearch("");
-    setShowDistrictDropdown(false);
+  };
+
+  // Handle country code selection
+  const handleCountryCodeSelect = (selectedValues: string[]) => {
+    if (selectedValues.length > 0) {
+      const selectedCode = selectedValues[0];
+      if (currentCountryCodeModal === "phone1") {
+        setSelectedCountryCode1(selectedCode);
+        countryCodeModal1.hide();
+      } else {
+        setSelectedCountryCode2(selectedCode);
+        countryCodeModal2.hide();
+      }
+    }
+  };
+
+  // Open country code modal
+  const openCountryCodeModal = (phoneType: "phone1" | "phone2") => {
+    setCurrentCountryCodeModal(phoneType);
+    if (phoneType === "phone1") {
+      countryCodeModal1.show();
+    } else {
+      countryCodeModal2.show();
+    }
   };
 
   // Get display text for districts
@@ -823,57 +807,84 @@ console.log("hit 2")
         ? getTranslatedDistrict(district2)
         : selectedDistricts[1];
       return `${name1}, ${name2} +${selectedDistricts.length - 2} ${t(
-        "AddOfficer.more"
+        "AddOfficer.more",
       )}`;
     }
   };
 
+  // Custom render item for district selection with checkbox
+  const renderDistrictItem = (item: any, isSelected: boolean) => (
+    <TouchableOpacity
+      className="px-4 py-3 border-b border-gray-200 flex-row justify-between items-center"
+      onPress={() => handleDistrictSelect([item.value])}
+    >
+      <Text className="text-base text-gray-800">{item.label}</Text>
+      <Checkbox
+        value={isSelected}
+        onValueChange={() => handleDistrictSelect([item.value])}
+        color={isSelected ? "#21202B" : undefined}
+      />
+    </TouchableOpacity>
+  );
+
+  // Custom render item for country code selection
+  const renderCountryCodeItem = (item: any, isSelected: boolean) => (
+    <TouchableOpacity
+      className="px-4 py-3 border-b border-gray-200 flex-row items-center"
+      onPress={() => handleCountryCodeSelect([item.value])}
+    >
+      <Text className="text-2xl mr-3">{item.emoji}</Text>
+      <View className="flex-1 flex-row items-center justify-between">
+        <Text className="text-sm text-gray-600">{item.value}</Text>
+        <Text className="text-base text-gray-800 font-medium">
+          {item.label}
+        </Text>
+      </View>
+      {isSelected && <MaterialIcons name="check" size={20} color="#21202B" />}
+    </TouchableOpacity>
+  );
+
   // Validate all fields before proceeding
   const validateStep1 = () => {
-  const newErrors: Record<string, string> = {};
+    const newErrors: Record<string, string> = {};
 
-  if (!firstNameEN.trim())
-    newErrors.firstNameEN = t("Error.First name is required");
-  if (!lastNameEN.trim())
-    newErrors.lastNameEN = t("Error.Last name is required");
-  if (!firstNameSI.trim())
-    newErrors.firstNameSI = t("Error.Sinhala first name is required");
-  if (!lastNameSI.trim())
-    newErrors.lastNameSI = t("Error.Sinhala last name is required");
-  if (!firstNameTA.trim())
-    newErrors.firstNameTA = t("Error.Tamil first name is required");
-  if (!lastNameTA.trim())
-    newErrors.lastNameTA = t("Error.Tamil last name is required");
-  if (!phone1.trim())
-    newErrors.phone1 = t("Error.Phone number is required");
-  if (!nic.trim())
-    newErrors.nic = t("Error.NIC is required");
-  if (!email.trim())
-    newErrors.email = t("Error.Email is required");
-  if (selectedDistricts.length === 0)
-    newErrors.districts = t("Error.At least one district is required");
-  if (Object.values(languages).every((val) => !val))
-    newErrors.languages = t("Error.At least one language is required");
+    if (!firstNameEN.trim())
+      newErrors.firstNameEN = t("Error.First name is required");
+    if (!lastNameEN.trim())
+      newErrors.lastNameEN = t("Error.Last name is required");
+    if (!firstNameSI.trim())
+      newErrors.firstNameSI = t("Error.Sinhala first name is required");
+    if (!lastNameSI.trim())
+      newErrors.lastNameSI = t("Error.Sinhala last name is required");
+    if (!firstNameTA.trim())
+      newErrors.firstNameTA = t("Error.Tamil first name is required");
+    if (!lastNameTA.trim())
+      newErrors.lastNameTA = t("Error.Tamil last name is required");
+    if (!phone1.trim()) newErrors.phone1 = t("Error.Phone number is required");
+    if (!nic.trim()) newErrors.nic = t("Error.NIC is required");
+    if (!email.trim()) newErrors.email = t("Error.Email is required");
+    if (selectedDistricts.length === 0)
+      newErrors.districts = t("Error.At least one district is required");
+    if (Object.values(languages).every((val) => !val))
+      newErrors.languages = t("Error.At least one language is required");
 
-  if (phone1 && !validatePhoneNumber(phone1))
-    newErrors.phone1 = t("Error.Invalid phone number");
-  if (phone2 && !validatePhoneNumber(phone2))
-    newErrors.phone2 = t("Error.Invalid phone number");
-  if (nic && !validateNicNumber(nic))
-    newErrors.nic = t("Error.Invalid NIC format");
-  if (email && !validateEmail(email))
-    newErrors.email = t("Error.Invalid email address");
-  if (phone1 && phone2 && phone1 === phone2)
-    newErrors.phone2 = t("Error.Phone numbers cannot be the same");
+    if (phone1 && !validatePhoneNumber(phone1))
+      newErrors.phone1 = t("Error.Invalid phone number");
+    if (phone2 && !validatePhoneNumber(phone2))
+      newErrors.phone2 = t("Error.Invalid phone number");
+    if (nic && !validateNicNumber(nic))
+      newErrors.nic = t("Error.Invalid NIC format");
+    if (email && !validateEmail(email))
+      newErrors.email = t("Error.Invalid email address");
+    if (phone1 && phone2 && phone1 === phone2)
+      newErrors.phone2 = t("Error.Phone numbers cannot be the same");
 
-  setErrors(newErrors);
-  return newErrors; // ✅ return actual errors
-};
-
+    setErrors(newErrors);
+    return newErrors;
+  };
 
   // Clear all form data function
   const clearFormData = () => {
-    // Reset all form fields
     setType("Permanent");
     setLanguages({
       Sinhala: true,
@@ -894,8 +905,6 @@ console.log("hit 2")
     setSelectedDistricts([]);
     setSelectedCountryCode1("+94");
     setSelectedCountryCode2("+94");
-
-    // Clear errors and touched states
     setErrors({});
     setTouched({});
   };
@@ -906,163 +915,97 @@ console.log("hit 2")
     navigation.navigate("ManageOfficers");
   };
 
-const handleNext = async () => {
-  Keyboard.dismiss()
-  const allFields = [
-    "firstNameEN",
-    "lastNameEN",
-    "firstNameSI",
-    "lastNameSI",
-    "firstNameTA",
-    "lastNameTA",
-    "phone1",
-    "nic",
-    "email",
-    "districts",
-  ];
-  allFields.forEach((field) => markFieldAsTouched(field));
-  const validationErrors = validateStep1(); // ✅ use returned errors
+  const handleNext = async () => {
+    Keyboard.dismiss();
+    const allFields = [
+      "firstNameEN",
+      "lastNameEN",
+      "firstNameSI",
+      "lastNameSI",
+      "firstNameTA",
+      "lastNameTA",
+      "phone1",
+      "nic",
+      "email",
+      "districts",
+    ];
+    allFields.forEach((field) => markFieldAsTouched(field));
+    const validationErrors = validateStep1();
 
-  if (Object.keys(validationErrors).length > 0) {
-    const errorMessage = Object.values(validationErrors).join("\n• ");
-
-       Alert.alert(
-      t("Error.Validation Error"),
-      `• ${errorMessage}`,
-      [{ text: t("Main.ok") }]
-    );
-    return;
-  }
-
-  if (isValidating) {
-    Alert.alert(
-      t("Error.Please Wait"),
-      t("Error.Validating your information, please wait..."),
-            [{ text: t("Main.ok") }]
-    );
-    return;
-  }
-
-  setLoading(true);
-  
-  try {
-    // Perform all API validations and collect results
-    const hasNicError = await checkNICExists(nic);
-    const hasEmailError = await checkEmailExists(email);
-    const hasPhone1Error = await checkPhoneExists(selectedCountryCode1, phone1, "phone1");
-    const hasPhone2Error = phone2.trim() 
-      ? await checkPhoneExists(selectedCountryCode2, phone2, "phone2")
-      : false;
-
-    // If any API validation failed, show error and stop
-    if (hasNicError || hasEmailError || hasPhone1Error || hasPhone2Error) {
-      Alert.alert(
-        t("Error.Validation Error"),
-        t("Error.Please fix all errors before proceeding"),
-              [{ text: t("Main.ok") }]
-      );
-      setLoading(false);
+    if (Object.keys(validationErrors).length > 0) {
+      const errorMessage = Object.values(validationErrors).join("\n• ");
+      Alert.alert(t("Error.Validation Error"), `• ${errorMessage}`, [
+        { text: t("Main.ok") },
+      ]);
       return;
     }
 
-    // All validations passed
-    const formData = {
-      empType: type,
-      languages,
-      assignDistrict: selectedDistricts,
-      firstName: firstNameEN,
-      lastName: lastNameEN,
-      firstNameSinhala: firstNameSI,
-      lastNameSinhala: lastNameSI,
-      firstNameTamil: firstNameTA,
-      lastNameTamil: lastNameTA,
-      phoneCode1: selectedCountryCode1,
-      phoneNumber1: phone1,
-      phoneCode2: selectedCountryCode2,
-      phoneNumber2: phone2,
-      nic,
-      email,
-      profileImage,
-    };
-console.log("Form Data:", formData);
-    setLoading(false);
-    navigation.navigate("AddOfficerStep2", { formData, isnewsecondstep:isnew });
-  } catch (error) {
-    console.error("Validation error:", error);
-    setLoading(false);
-    Alert.alert(
-      t("Error.Error"),
-      t("Error.An error occurred during validation"),
-            [{ text: t("Main.ok") }]
-    );
-  }
-};
+    if (isValidating) {
+      Alert.alert(
+        t("Error.Please Wait"),
+        t("Error.Validating your information, please wait..."),
+        [{ text: t("Main.ok") }],
+      );
+      return;
+    }
 
-  const renderDistrictItem = ({
-    item,
-  }: {
-    item: { en: string; si: string; ta: string };
-  }) => (
-    <TouchableOpacity
-      className="px-4 py-3 border-b border-gray-200 flex-row justify-between items-center"
-      onPress={() => toggleDistrictSelection(item)}
-    >
-      <Text className="text-base text-gray-800">
-        {getTranslatedDistrict(item)}
-      </Text>
-      <Checkbox
-        value={selectedDistricts.includes(item.en)}
-        onValueChange={() => toggleDistrictSelection(item)}
-        color={selectedDistricts.includes(item.en) ? "#21202B" : undefined}
-      />
-    </TouchableOpacity>
-  );
+    setLoading(true);
 
-  // Search input component for districts
-  const renderDistrictSearchInput = () => (
-    <View className="px-4 py-2 border-b border-gray-200">
-      <View className="bg-gray-100 rounded-lg px-3 flex-row items-center">
-        <MaterialIcons name="search" size={20} color="#666" />
-        <TextInput
-          placeholder={t("AddOfficer.SearchDistrict") || "Search district..."}
-          value={districtSearch}
-          onChangeText={setDistrictSearch}
-          className="flex-1 ml-2 text-base"
-          placeholderTextColor="#666"
-        />
-        {districtSearch ? (
-          <TouchableOpacity onPress={clearSearch}>
-            <MaterialIcons name="close" size={20} color="#666" />
-          </TouchableOpacity>
-        ) : null}
-      </View>
-    </View>
-  );
+    try {
+      const hasNicError = await checkNICExists(nic);
+      const hasEmailError = await checkEmailExists(email);
+      const hasPhone1Error = await checkPhoneExists(
+        selectedCountryCode1,
+        phone1,
+        "phone1",
+      );
+      const hasPhone2Error = phone2.trim()
+        ? await checkPhoneExists(selectedCountryCode2, phone2, "phone2")
+        : false;
 
-  // Updated renderCountryCodeItem with translated country names
-  const renderCountryCodeItem = (
-    { item }: { item: any },
-    setCode: Function,
-    setShow: Function
-  ) => (
-    <TouchableOpacity
-      className="px-4 py-3 border-b border-gray-200"
-      onPress={() => {
-        setCode(item.dial_code);
-        setShow(false);
-      }}
-    >
-      <View className="flex-row items-center justify-between">
-        <View className="flex-row items-center">
-          <Text className="text-2xl mr-3">{item.emoji}</Text>
-          <Text className="text-sm text-gray-600">{item.dial_code}</Text>
-        </View>
-        <Text className="text-base text-gray-800 font-medium">
-          {getTranslatedCountry(item)}
-        </Text>
-      </View>
-    </TouchableOpacity>
-  );
+      if (hasNicError || hasEmailError || hasPhone1Error || hasPhone2Error) {
+        Alert.alert(
+          t("Error.Validation Error"),
+          t("Error.Please fix all errors before proceeding"),
+          [{ text: t("Main.ok") }],
+        );
+        setLoading(false);
+        return;
+      }
+
+      const formData = {
+        empType: type,
+        languages,
+        assignDistrict: selectedDistricts,
+        firstName: firstNameEN,
+        lastName: lastNameEN,
+        firstNameSinhala: firstNameSI,
+        lastNameSinhala: lastNameSI,
+        firstNameTamil: firstNameTA,
+        lastNameTamil: lastNameTA,
+        phoneCode1: selectedCountryCode1,
+        phoneNumber1: phone1,
+        phoneCode2: selectedCountryCode2,
+        phoneNumber2: phone2,
+        nic,
+        email,
+        profileImage,
+      };
+      setLoading(false);
+      navigation.navigate("AddOfficerStep2", {
+        formData,
+        isnewsecondstep: isnew,
+      });
+    } catch (error) {
+      console.error("Validation error:", error);
+      setLoading(false);
+      Alert.alert(
+        t("Error.Error"),
+        t("Error.An error occurred during validation"),
+        [{ text: t("Main.ok") }],
+      );
+    }
+  };
 
   return (
     <KeyboardAvoidingView
@@ -1070,35 +1013,22 @@ console.log("Form Data:", formData);
       style={{ flex: 1, backgroundColor: "white" }}
     >
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+      <CustomHeader
+        title={t("AddOfficer.AddOfficer")}
+        navigation={navigation}
+        showBackButton={true}
+        showLanguageSelector={false}
+        onBackPress={() => navigation.navigate("ManageOfficers")}
+      />
       <ScrollView
         contentContainerStyle={{ paddingBottom: 100 }}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
-        <View className="flex-row items-center px-4 py-3">
-          <TouchableOpacity
-            onPress={() => navigation.navigate("ManageOfficers")}
-            className="bg-[#F6F6F680] rounded-full py-4 px-3"
-          >
-            <MaterialIcons
-              name="arrow-back-ios"
-              size={24}
-              color="black"
-              style={{ marginLeft: 10 }}
-            />
-          </TouchableOpacity>
-          <Text className="text-lg font-bold text-black text-center flex-1">
-            {t("AddOfficer.AddOfficer")}
-          </Text>
-          <View style={{ width: 55 }} />
-        </View>
-
         {/* Profile Picture */}
         <View className="items-center mt-6">
           <TouchableOpacity onPress={pickProfileImage}>
             <View className="relative">
-              {/* Round image */}
               <View className="w-20 h-20 bg-gray-300 rounded-full overflow-hidden items-center justify-center">
                 {profileImage ? (
                   <Image
@@ -1110,8 +1040,6 @@ console.log("Form Data:", formData);
                   <Ionicons name="person" size={40} color="#fff" />
                 )}
               </View>
-
-              {/* Pencil icon */}
               <View className="absolute bottom-0 right-0 w-6 h-6 bg-gray-800 rounded-full items-center justify-center">
                 <Ionicons name="pencil" size={14} color="#fff" />
               </View>
@@ -1120,8 +1048,8 @@ console.log("Form Data:", formData);
         </View>
 
         {/* Type */}
-        <View className="p-4 ">
-          <View className="px-6 mt-6 items-center ">
+        <View className="p-2">
+          <View className="px-2 mt-6 items-center ">
             <View className="flex flex-row items-center space-x-2 justify-between">
               <Text className="text-base font-medium">
                 {t("AddOfficer.Type")}:
@@ -1178,7 +1106,7 @@ console.log("Form Data:", formData);
                       {t(`AddOfficer.${lang}`)}
                     </Text>
                   </View>
-                )
+                ),
               )}
             </View>
             {errors.languages && (
@@ -1191,7 +1119,7 @@ console.log("Form Data:", formData);
           <View className="border border-[#ADADAD] border-b-0 mt-4"></View>
 
           {/* Form Fields */}
-          <View className="px-6 mt-4 space-y-4">
+          <View className="px-2 mt-4 space-y-4">
             {/* District Dropdown - MULTI SELECT */}
             <View>
               <TouchableOpacity
@@ -1200,7 +1128,7 @@ console.log("Form Data:", formData);
                     ? "border border-red-500"
                     : ""
                 }`}
-                onPress={() => setShowDistrictDropdown(true)}
+                onPress={districtModal.show}
               >
                 <Text
                   className={`${
@@ -1272,9 +1200,9 @@ console.log("Form Data:", formData);
                     : ""
                 }`}
                 value={firstNameSI}
-                // onChangeText={setFirstNameSI}
-                                onChangeText={(text) => handleNameENChange(text, "firstNameSI")}
-
+                onChangeText={(text) =>
+                  handleUnicodeNameChange(text, "firstNameSI")
+                }
                 onBlur={handleFirstNameSIBlur}
                 underlineColorAndroid="transparent"
               />
@@ -1295,8 +1223,9 @@ console.log("Form Data:", formData);
                     : ""
                 }`}
                 value={lastNameSI}
-                // onChangeText={setLastNameSI}
-                onChangeText={(text) => handleNameENChange(text, "lastNameSI")}
+                onChangeText={(text) =>
+                  handleUnicodeNameChange(text, "lastNameSI")
+                }
                 onBlur={handleLastNameSIBlur}
                 underlineColorAndroid="transparent"
               />
@@ -1317,8 +1246,9 @@ console.log("Form Data:", formData);
                     : ""
                 }`}
                 value={firstNameTA}
-                // onChangeText={setFirstNameTA}
-                onChangeText={(text) => handleNameENChange(text, "firstNameTA")}
+                onChangeText={(text) =>
+                  handleUnicodeNameChange(text, "firstNameTA")
+                }
                 onBlur={handleFirstNameTABlur}
                 underlineColorAndroid="transparent"
               />
@@ -1339,8 +1269,9 @@ console.log("Form Data:", formData);
                     : ""
                 }`}
                 value={lastNameTA}
-                  onChangeText={(text) => handleNameENChange(text, "lastNameTA")}
-
+                onChangeText={(text) =>
+                  handleUnicodeNameChange(text, "lastNameTA")
+                }
                 onBlur={handleLastNameTABlur}
                 underlineColorAndroid="transparent"
               />
@@ -1353,14 +1284,14 @@ console.log("Form Data:", formData);
           </View>
           <View className="border border-[#ADADAD] border-b-0 mt-4"></View>
 
-          <View className="px-6 mt-4 space-y-4">
+          <View className="px-2 mt-4 space-y-4">
             {/* Phone Numbers */}
             <View>
               <View className="flex-row space-x-2">
                 {/* Phone 1 Country Code */}
                 <TouchableOpacity
                   className="bg-[#F4F4F4] rounded-2xl px-4 py-4 w-20 flex-row justify-between items-center"
-                  onPress={() => setShowCountryCodeDropdown1(true)}
+                  onPress={() => openCountryCodeModal("phone1")}
                 >
                   <Text className="text-black">{selectedCountryCode1}</Text>
                   <MaterialIcons
@@ -1381,7 +1312,6 @@ console.log("Form Data:", formData);
                     }`}
                     value={phone1}
                     onChangeText={handlePhone1Change}
-                    // onBlur={handlePhone1Blur}
                     keyboardType="phone-pad"
                     underlineColorAndroid="transparent"
                     maxLength={9}
@@ -1400,7 +1330,7 @@ console.log("Form Data:", formData);
                 {/* Phone 2 Country Code */}
                 <TouchableOpacity
                   className="bg-[#F4F4F4] rounded-2xl px-4 py-4 w-20 flex-row justify-between items-center"
-                  onPress={() => setShowCountryCodeDropdown2(true)}
+                  onPress={() => openCountryCodeModal("phone2")}
                 >
                   <Text className="text-black">{selectedCountryCode2}</Text>
                   <MaterialIcons
@@ -1421,7 +1351,6 @@ console.log("Form Data:", formData);
                     }`}
                     value={phone2}
                     onChangeText={handlePhone2Change}
-                    // onBlur={handlePhone2Blur}
                     keyboardType="phone-pad"
                     underlineColorAndroid="transparent"
                     maxLength={9}
@@ -1444,7 +1373,6 @@ console.log("Form Data:", formData);
                 }`}
                 value={nic}
                 onChangeText={handleNICChange}
-                // onBlur={handleNICBlur}
                 underlineColorAndroid="transparent"
                 maxLength={12}
                 autoCapitalize="characters"
@@ -1465,7 +1393,6 @@ console.log("Form Data:", formData);
                 }`}
                 value={email}
                 onChangeText={handleEmailChange}
-                // onBlur={handleEmailBlur}
                 keyboardType="email-address"
                 autoCapitalize="none"
                 underlineColorAndroid="transparent"
@@ -1479,7 +1406,7 @@ console.log("Form Data:", formData);
           </View>
 
           {/* Buttons */}
-          <View className="px-6 flex-col w-full gap-4 mt-4">
+          <View className="px-2 flex-col w-full gap-4 mt-4">
             <TouchableOpacity
               className="bg-[#D9D9D9] rounded-3xl px-6 py-4 w-full items-center"
               onPress={handleCancel}
@@ -1502,128 +1429,53 @@ console.log("Form Data:", formData);
         </View>
       </ScrollView>
 
-      {/* District Dropdown Modal - MULTI SELECT with Search */}
-      <Modal
-        visible={showDistrictDropdown}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={handleDistrictModalClose}
-      >
-        <View className="flex-1 bg-black/50 justify-center items-center">
-          <View className="bg-white rounded-2xl w-11/12 max-h-3/4">
-            <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
-              <View>
-                <Text className="text-lg font-semibold">
-                  {t("AddOfficer.SelectDistricts")}
-                </Text>
-              </View>
-              <View className="flex-row items-center">
-                <TouchableOpacity onPress={handleDistrictModalClose}>
-                  <MaterialIcons name="close" size={24} color="#666" />
-                </TouchableOpacity>
-              </View>
-            </View>
+      {/* District Selection Modal using GlobalSearchModal */}
+      <GlobalSearchModal
+        visible={districtModal.isVisible}
+        onClose={districtModal.hide}
+        title={t("AddOfficer.SelectDistricts")}
+        data={getDistrictsData()}
+        selectedItems={selectedDistricts}
+        onSelect={handleDistrictSelect}
+        searchPlaceholder={t("AddOfficer.SearchDistrict")}
+        doneButtonText={t("AddOfficer.Done")}
+        noResultsText={t("AddOfficer.NoDistrictsFound")}
+        multiSelect={true}
+        renderItem={renderDistrictItem}
+        searchKeys={["label", "en", "si", "ta"]}
+      />
 
-            {/* Search Bar */}
-            {renderDistrictSearchInput()}
+      {/* Country Code Selection Modal 1 using GlobalSearchModal */}
+      <GlobalSearchModal
+        visible={countryCodeModal1.isVisible}
+        onClose={countryCodeModal1.hide}
+        title={t("AddOfficer.SelectCountryCode")}
+        data={getCountryData()}
+        selectedItems={[selectedCountryCode1]}
+        onSelect={handleCountryCodeSelect}
+        searchPlaceholder={t("AddOfficer.SearchCountry")}
+        doneButtonText={t("AddOfficer.Select")}
+        noResultsText={t("AddOfficer.NoCountriesFound")}
+        multiSelect={false}
+        renderItem={renderCountryCodeItem}
+        searchKeys={["label", "value", "name.en", "name.si", "name.ta"]}
+      />
 
-            <FlatList
-                  data={getFilteredCFODistricts()}
-    keyExtractor={(item) => item.en}
-    renderItem={renderDistrictItem}
-              showsVerticalScrollIndicator={false}
-              className="max-h-64"
-              ListEmptyComponent={
-                <View className="px-4 py-8 items-center">
-                  <Text className="text-gray-500 text-base">
-                    {t("AddOfficer.NoDistrictsFound") || "No districts found"}
-                  </Text>
-                </View>
-              }
-            />
-            <View className="px-4 py-3 border-t border-gray-200">
-              <TouchableOpacity
-                className="bg-[#21202B] rounded-xl py-3 items-center"
-                onPress={handleDistrictModalClose}
-              >
-                <Text className="text-white font-semibold text-base">
-                  {t("AddOfficer.Done")}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
-
-      {/* Country Code Dropdown Modal 1 with Flags */}
-      <Modal
-        visible={showCountryCodeDropdown1}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setShowCountryCodeDropdown1(false)}
-      >
-        <View className="flex-1 bg-black/50 justify-center items-center">
-          <View className="bg-white rounded-2xl w-11/12 max-h-80">
-            <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
-              <Text className="text-lg font-semibold">
-                {t("AddOfficer.SelectCountryCode")}
-              </Text>
-              <TouchableOpacity
-                onPress={() => setShowCountryCodeDropdown1(false)}
-              >
-                <MaterialIcons name="close" size={24} color="#666" />
-              </TouchableOpacity>
-            </View>
-            <FlatList
-              data={countryData}
-              renderItem={({ item }) =>
-                renderCountryCodeItem(
-                  { item },
-                  setSelectedCountryCode1,
-                  setShowCountryCodeDropdown1
-                )
-              }
-              keyExtractor={(item) => item.code}
-              showsVerticalScrollIndicator={false}
-            />
-          </View>
-        </View>
-      </Modal>
-
-      {/* Country Code Dropdown Modal 2 with Flags */}
-      <Modal
-        visible={showCountryCodeDropdown2}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setShowCountryCodeDropdown2(false)}
-      >
-        <View className="flex-1 bg-black/50 justify-center items-center">
-          <View className="bg-white rounded-2xl w-11/12 max-h-80">
-            <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
-              <Text className="text-lg font-semibold">
-                {t("AddOfficer.SelectCountryCode")}
-              </Text>
-              <TouchableOpacity
-                onPress={() => setShowCountryCodeDropdown2(false)}
-              >
-                <MaterialIcons name="close" size={24} color="#666" />
-              </TouchableOpacity>
-            </View>
-            <FlatList
-              data={countryData}
-              renderItem={({ item }) =>
-                renderCountryCodeItem(
-                  { item },
-                  setSelectedCountryCode2,
-                  setShowCountryCodeDropdown2
-                )
-              }
-              keyExtractor={(item) => item.code}
-              showsVerticalScrollIndicator={false}
-            />
-          </View>
-        </View>
-      </Modal>
+      {/* Country Code Selection Modal 2 using GlobalSearchModal */}
+      <GlobalSearchModal
+        visible={countryCodeModal2.isVisible}
+        onClose={countryCodeModal2.hide}
+        title={t("AddOfficer.SelectCountryCode")}
+        data={getCountryData()}
+        selectedItems={[selectedCountryCode2]}
+        onSelect={handleCountryCodeSelect}
+        searchPlaceholder={t("AddOfficer.SearchCountry")}
+        doneButtonText={t("AddOfficer.Select")}
+        noResultsText={t("AddOfficer.NoCountriesFound")}
+        multiSelect={false}
+        renderItem={renderCountryCodeItem}
+        searchKeys={["label", "value", "name.en", "name.si", "name.ta"]}
+      />
     </KeyboardAvoidingView>
   );
 };

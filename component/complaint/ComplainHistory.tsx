@@ -7,14 +7,13 @@ import {
   Alert,
   Modal,
   KeyboardAvoidingView,
-  BackHandler,
   ActivityIndicator,
 } from "react-native";
 import axios from "axios";
 import { StatusBar, Platform } from "react-native";
 import { useTranslation } from "react-i18next";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "./types";
+import { RootStackParamList } from "../types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { environment } from "@/environment/environment";
 import {
@@ -26,8 +25,9 @@ import LottieView from "lottie-react-native";
 import { useSelector } from "react-redux";
 import { selectUserPersonal } from "@/store/authSlice";
 import { useFocusEffect } from "@react-navigation/native";
-import { useDispatch } from "react-redux";
 import { t } from "i18next";
+import CustomHeader from "../common/CustomHeader";
+import LoadingPage from "../common/LoadingPage";
 
 interface complainItem {
   id: number;
@@ -60,7 +60,8 @@ const ExpandableText: React.FC<{ text: string; maxLength?: number }> = ({
   if (!text) return null;
 
   const shouldTruncate = text.length > maxLength;
-  const displayText = expanded || !shouldTruncate ? text : `${text.substring(0, maxLength)}...`;
+  const displayText =
+    expanded || !shouldTruncate ? text : `${text.substring(0, maxLength)}...`;
 
   return (
     <Text className="self-start mb-4">
@@ -68,7 +69,9 @@ const ExpandableText: React.FC<{ text: string; maxLength?: number }> = ({
       {shouldTruncate && (
         <TouchableOpacity onPress={() => setExpanded(!expanded)}>
           <Text className="text-blue-500 font-semibold ml-1 mb-[-4]">
-            {expanded ? t("ComplainHistory.See less"): t("ComplainHistory.See more")}
+            {expanded
+              ? t("ComplainHistory.See less")
+              : t("ComplainHistory.See more")}
           </Text>
         </TouchableOpacity>
       )}
@@ -81,11 +84,11 @@ const ComplainHistory: React.FC<ComplainHistoryProps> = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [complainReply, setComplainReply] = useState<string | null>(null);
-  const [selectedComplain, setSelectedComplain] = useState<complainItem | null>(null);
+  const [selectedComplain, setSelectedComplain] = useState<complainItem | null>(
+    null,
+  );
   const { t, i18n } = useTranslation();
-  const dispatch = useDispatch();
   const userPersonalData = useSelector(selectUserPersonal);
-  console.log(userPersonalData);
 
   const [profile, setProfile] = useState<{
     firstName: string;
@@ -108,7 +111,7 @@ const ComplainHistory: React.FC<ComplainHistoryProps> = ({ navigation }) => {
           lastNameTamil: userPersonalData.lastNameTamil || "",
         });
       }
-    }, [userPersonalData])
+    }, [userPersonalData]),
   );
 
   const fetchOngoingCultivations = async () => {
@@ -121,10 +124,9 @@ const ComplainHistory: React.FC<ComplainHistoryProps> = ({ navigation }) => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
       setComplains(res.data);
-      console.log("responted data......", res.data);
     } catch (err) {
       console.error("Error fetching complains:", err);
     } finally {
@@ -167,7 +169,9 @@ const ComplainHistory: React.FC<ComplainHistoryProps> = ({ navigation }) => {
       setSelectedComplain(complain);
       setModalVisible(true);
     } else {
-      Alert.alert(t("Main.Sorry"), t("ComplainHistory.No Reply"), [{ text: t("Main.ok") }])
+      Alert.alert(t("Main.Sorry"), t("ComplainHistory.No Reply"), [
+        { text: t("Main.ok") },
+      ]);
     }
   };
 
@@ -177,38 +181,24 @@ const ComplainHistory: React.FC<ComplainHistoryProps> = ({ navigation }) => {
       enabled
       style={{ flex: 1, backgroundColor: "#F9F9FA" }}
     >
+      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+      <CustomHeader
+        title={t("ComplainHistory.Complaint History")}
+        navigation={navigation}
+        showBackButton={true}
+        showLanguageSelector={false}
+        onBackPress={() => navigation.goBack()}
+      />
       <View className="flex-1 bg-white">
-        <View
-          className="flex-row items-center justify-between"
-          style={{ paddingHorizontal: wp(4), paddingVertical: hp(2) }}
-        >
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <AntDesign
-              name="left"
-              size={24}
-              color="#000502"
-              style={{
-                paddingHorizontal: wp(3),
-                paddingVertical: hp(1.5),
-                backgroundColor: "#F6F6F680",
-                borderRadius: 50,
-              }}
-            />
-          </TouchableOpacity>
-          <Text className="font-bold text-lg">
-            {t("ComplainHistory.Complaint History")}
-          </Text>
-          <View style={{ width: 22 }} />
-        </View>
-
         {loading ? (
-          <View className="flex-1 justify-center items-center">
-            <ActivityIndicator size="large" color="#FF1D85" />
-          </View>
+          <LoadingPage
+            message={t("ComplainHistory.Loading Complaints...")}
+            fullScreen={true}
+          />
         ) : complains.length === 0 ? (
           <View className="flex-1 items-center justify-center -mt-[70%]">
             <LottieView
-              source={require("../assets/json/NoData.json")}
+              source={require("@/assets/json/NoData.json")}
               style={{ width: wp(50), height: hp(50) }}
               autoPlay
               loop
@@ -219,19 +209,20 @@ const ComplainHistory: React.FC<ComplainHistoryProps> = ({ navigation }) => {
           </View>
         ) : (
           <ScrollView
-            className="p-4 flex-1"
+            className="px-4 flex-1"
             contentContainerStyle={{ paddingBottom: hp(4) }}
           >
             {complains.map((complain) => (
               <View
                 key={complain.id}
-                className="bg-white p-6 my-2 rounded-xl shadow-md border border-[#dfdfdfcc]"
+                className="bg-white p-4 my-2 rounded-xl shadow-md border border-[#dfdfdfcc]"
               >
-                <Text className="self-start mb-4 font-semibold">
+                <Text className="self-start mb-2 font-semibold">
                   {t("ComplainHistory.RefNo")} : {complain.refNo || "N/A"}
                 </Text>
-                <Text className="self-start mb-4 text-[#6E6E6E]">
-                  {t("ComplainHistory.Sent")} {formatDateTime(complain.createdAt)}
+                <Text className="self-start mb-2 text-[#6E6E6E]">
+                  {t("ComplainHistory.Sent")}{" "}
+                  {formatDateTime(complain.createdAt)}
                 </Text>
 
                 {/* Use ExpandableText component here */}
@@ -277,32 +268,35 @@ const ComplainHistory: React.FC<ComplainHistoryProps> = ({ navigation }) => {
           <View
             className="flex-1 items-center bg-white bg-opacity-50"
             style={{
-              paddingTop: Platform.OS === "android" ? StatusBar.currentHeight || 0 : 0,
+              paddingTop:
+                Platform.OS === "android" ? StatusBar.currentHeight || 0 : 0,
             }}
           >
             <ScrollView
-              className="bg-white rounded-lg shadow-lg w-full max-w-md"
+              className="bg-white rounded-lg shadow-lg w-full"
               contentContainerStyle={{ padding: 24, paddingBottom: 70 }}
               showsVerticalScrollIndicator={false}
             >
               {/* Close Button */}
               <TouchableOpacity
-                className="absolute top-1 right-4 bg-gray-200 p-2 rounded-full"
+                className="absolute top-0 right-4 bg-gray-400 p-2 rounded-full"
                 onPress={() => setModalVisible(false)}
               >
-                <AntDesign name="close" size={18} color="gray" />
+                <AntDesign name="close" size={18} color="white" />
               </TouchableOpacity>
 
-              <View className="mt-4">
+              <View className="mt-8">
                 <Text className="text-gray-800 text-base leading-relaxed text-left">
                   {i18n.language === "si"
                     ? `හිතවත් ${profile?.firstNameSinhala || ""} ${profile?.lastNameSinhala || ""},\n\nඔබගේ පැමිණිල්ල විසඳා ඇති බව අපි ඔබට සතුටින් දැනුම් දෙමු.\n\n${complainReply || "Loading..."}\n\nඔබට තවත් ගැටළු හෝ ප්‍රශ්න තිබේ නම්, අප හා සම්බන්ධ වන්න. ඔබගේ ඉවසීම සහ අවබෝධය සඳහා ස්තූතියි.\n\nමෙයට,\nPolygon පාරිභෝගික සහාය කණ්ඩායම`
                     : i18n.language === "ta"
-                    ? `நம்பிக்கை  ${profile?.firstNameTamil || ""} ${profile?.lastNameTamil || ""},\n\nஉங்களால் தீர்க்கப்பட்டதாக நாங்கள் உங்களுக்கு மகிழ்ச்சியுடன் தெரிவிக்கிறோம்.\n\n${complainReply || "Loading..."}\n\nஉங்களுக்கு மேலும் சிக்கல்கள் அல்லது பிரச்சனைகள் இருந்தால், நீங்கள் தொடர்பு கொள்ள வேண்டும். உங்கள் பொறுமை மற்றும் புரிதலுக்கு நன்றி.\n\nஇதற்கு,\nஇதற்கு, பாலிகோன் ஆதரவு குழு`
-                    : `Dear ${profile?.firstName || ""} ${profile?.lastName || ""},\n\nWe are pleased to inform you that your complaint has been resolved.\n\n${complainReply || "Loading..."}\n\nIf you have any further concerns or questions, feel free to reach out.\nThank you for your patience and understanding.\n\nSincerely,\nPolygon Agro Customer Support Team`}
+                      ? `நம்பிக்கை  ${profile?.firstNameTamil || ""} ${profile?.lastNameTamil || ""},\n\nஉங்களால் தீர்க்கப்பட்டதாக நாங்கள் உங்களுக்கு மகிழ்ச்சியுடன் தெரிவிக்கிறோம்.\n\n${complainReply || "Loading..."}\n\nஉங்களுக்கு மேலும் சிக்கல்கள் அல்லது பிரச்சனைகள் இருந்தால், நீங்கள் தொடர்பு கொள்ள வேண்டும். உங்கள் பொறுமை மற்றும் புரிதலுக்கு நன்றி.\n\nஇதற்கு,\nஇதற்கு, பாலிகோன் ஆதரவு குழு`
+                      : `Dear ${profile?.firstName || ""} ${profile?.lastName || ""},\n\nWe are pleased to inform you that your complaint has been resolved.\n\n${complainReply || "Loading..."}\n\nIf you have any further concerns or questions, feel free to reach out.\nThank you for your patience and understanding.\n\nSincerely,\nPolygon Agro Customer Support Team`}
                 </Text>
                 {selectedComplain?.replyTime && (
-                  <Text className="mb-3 mt-1">{formatDate(selectedComplain.replyTime)}</Text>
+                  <Text className="mb-3 mt-1">
+                    {formatDate(selectedComplain.replyTime)}
+                  </Text>
                 )}
               </View>
             </ScrollView>

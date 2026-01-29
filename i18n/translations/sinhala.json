@@ -174,7 +174,8 @@
     "Failed to submit complaint. Please try again.": "පැමිණිල්ල එක් කිරීම අසාර්ථකයි. කරුණාකර නැවත උත්සාහ කරන්න.",
     "Please select a category.": "කරුණාකර කාණ්ඩයක් තෝරන්න.",
     "Please enter your complaint.": "කරුණාකර ඔබේ පැමිණිල්ල ඇතුළත් කරන්න.",
-    "Add the Complaint here..": "පැමිණිල්ල මෙතනට එකතු කරන්න.."
+    "Add the Complaint here..": "පැමිණිල්ල මෙතනට එකතු කරන්න..",
+    "Submitting...": "යොමු කරමින් පවතී..."
   },
   "Profile": {
     "Employee ID": "පරිශීලක අංකය",
@@ -437,7 +438,8 @@
     "Opened": "විවෘත කළා",
     "Closed": "වසා දමන ලදී",
     "See more...": "තවත් බලන්න...",
-    "See less": "අඩුවෙන් බලන්න..."
+    "See less": "අඩුවෙන් බලන්න...",
+    "Loading Complaints...": "පැමිණිලි පූරණය වෙමින් පවතී..."
   },
   "CapitalRequests": {
     "CapitalRequests": "මූල්‍ය ඉල්ලීම්",

@@ -10,10 +10,10 @@ import {
   Platform,
   ActivityIndicator,
   Alert,
-  Keyboard
+  Keyboard,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "./types";
+import { RootStackParamList } from "../types";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -22,10 +22,13 @@ import axios from "axios";
 import { environment } from "@/environment/environment";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
-import DropDownPicker from "react-native-dropdown-picker";
-import { AntDesign } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { useFocusEffect } from "@react-navigation/native";
+import CustomHeader from "../common/CustomHeader";
+import GlobalSearchModal from "../common/GlobalSearchModal";
+import { useModal } from "@/hooks/useModal";
+import { AntDesign, MaterialIcons } from "@expo/vector-icons";
+import { StatusBar } from "expo-status-bar";
 
 type AddComplaintScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -36,36 +39,31 @@ interface AddComplaintScreenProps {
   navigation: AddComplaintScreenNavigationProp;
 }
 
-const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({ navigation }) => {
+const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
+  navigation,
+}) => {
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [complaintText, setComplaintText] = useState<string>("");
-  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [category, setCategory] = useState<any[]>([]);
-  const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [searchValue, setSearchValue] = useState('');
-  const [filteredCategory, setFilteredCategory] = useState<any[]>([]);
   const { t } = useTranslation();
+
+  // Use modal hook for category selection
+  const categoryModal = useModal();
 
   // Clear form when screen comes into focus
   useFocusEffect(
     React.useCallback(() => {
-      // Reset form state when screen is focused
       resetForm();
-      
-      // Cleanup function (optional)
-      return () => {
-        // Any cleanup if needed
-      };
-    }, [])
+      return () => {};
+    }, []),
   );
 
   // Reset form function
   const resetForm = () => {
     setSelectedCategory("");
     setComplaintText("");
-    setSearchValue("");
-    setOpen(false);
+    categoryModal.hide();
   };
 
   // Handle back button press
@@ -74,23 +72,23 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({ navigation }) =
     navigation.goBack();
   };
 
+  // Fetch complaint categories from API
   useEffect(() => {
     const fetchComplainCategory = async () => {
       try {
         const response = await axios.get(
-          `${environment.API_BASE_URL}api/complaint/get-complain-category`
+          `${environment.API_BASE_URL}api/complaint/get-complain-category`,
         );
-        console.log("response", response.data);
         if (response.data.status === "success") {
           const mappedCategories = response.data.data
             .map((item: any) => ({
+              label: item.categoryEnglish,
+              value: item.id,
               key: item.id,
-              value: item.categoryEnglish
             }))
             .filter((item: { key: any }) => item.key);
 
           setCategory(mappedCategories);
-          setFilteredCategory(mappedCategories); // Initialize filtered list
         }
       } catch (error) {
         console.error(error);
@@ -101,13 +99,13 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({ navigation }) =
   }, []);
 
   const handleSubmit = async () => {
-    Keyboard.dismiss()
+    Keyboard.dismiss();
     // Check if both fields are empty
     if (!selectedCategory && !complaintText.trim()) {
       Alert.alert(
         t("Error.error"),
         t("AddComplaint.Please fill out all fields."),
-        [{ text: t("Main.ok") }]
+        [{ text: t("Main.ok") }],
       );
       return;
     }
@@ -117,7 +115,7 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({ navigation }) =
       Alert.alert(
         t("Error.error"),
         t("AddComplaint.Please select a category."),
-        [{ text: t("Main.ok") }]
+        [{ text: t("Main.ok") }],
       );
       return;
     }
@@ -127,7 +125,7 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({ navigation }) =
       Alert.alert(
         t("Error.error"),
         t("AddComplaint.Please enter your complaint."),
-        [{ text: t("Main.ok") }]
+        [{ text: t("Main.ok") }],
       );
       return;
     }
@@ -137,13 +135,13 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({ navigation }) =
       if (!storedToken) {
         Alert.alert(
           t("Error.Sorry"),
-          t("Error.Your login session has expired. Please log in again to continue."),
-          [{ text: t("Main.ok") }]
+          t(
+            "Error.Your login session has expired. Please log in again to continue.",
+          ),
+          [{ text: t("Main.ok") }],
         );
         return;
       }
-
-      console.log(selectedCategory, complaintText);
       setLoading(true);
       const apiUrl = `${environment.API_BASE_URL}api/complaint/add-complaint`;
 
@@ -158,15 +156,15 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({ navigation }) =
           headers: {
             Authorization: `Bearer ${storedToken}`,
           },
-        }
+        },
       );
 
       Alert.alert(
         t("Main.Success"),
         t("AddComplaint.Complaint submitted successfully!"),
-        [{ text: t("Main.ok") }]
+        [{ text: t("Main.ok") }],
       );
-      resetForm(); // Use resetForm instead of individual setters
+      resetForm();
       navigation.navigate("Main", { screen: "Dashboard" });
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -174,47 +172,32 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({ navigation }) =
         Alert.alert(
           t("Error.Sorry"),
           t("AddComplaint.Failed to submit complaint. Please try again."),
-          [{ text: t("Main.ok") }]
+          [{ text: t("Main.ok") }],
         );
       } else {
         console.error("An unknown error occurred.");
-        Alert.alert(t("Error.Sorry"), t("Main.somethingWentWrong"), [{ text: t("Main.ok") }]);
+        Alert.alert(t("Error.Sorry"), t("Main.somethingWentWrong"), [
+          { text: t("Main.ok") },
+        ]);
       }
     } finally {
       setLoading(false);
     }
-  }
+  };
 
-  // Also add this useEffect to sync when category changes
-  useEffect(() => {
-    setFilteredCategory(category);
-  }, [category]);
-
-  const handleSearchChange = (text: string) => {
-    let filteredText = text;
-
-    // Remove leading spaces
-    if (filteredText.startsWith(' ')) {
-      filteredText = filteredText.replace(/^\s+/, '');
+  // Handle category selection from modal
+  const handleCategorySelect = (selectedValues: string[]) => {
+    if (selectedValues.length > 0) {
+      setSelectedCategory(selectedValues[0]);
     }
+  };
 
-    // Allow only letters, numbers, and spaces
-    filteredText = filteredText.replace(/[^a-zA-Z0-9\s]/g, '');
-
-    // Clean up multiple spaces
-    filteredText = filteredText.replace(/\s+/g, ' ');
-
-    setSearchValue(filteredText);
-
-    // Filter categories based on cleaned search text
-    if (filteredText.trim() === '') {
-      setFilteredCategory(category); // Show all if search is empty
-    } else {
-      const filtered = category.filter(item =>
-        item.value.toLowerCase().includes(filteredText.toLowerCase())
-      );
-      setFilteredCategory(filtered);
-    }
+  // Get selected category label
+  const getSelectedLabel = () => {
+    const selected = category.find((item) => item.value === selectedCategory);
+    return selected
+      ? selected.label
+      : t("AddComplaint.Select Complaint Category");
   };
 
   return (
@@ -223,29 +206,26 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({ navigation }) =
       keyboardVerticalOffset={Platform.select({ ios: 60, android: 0 })}
       style={{ flex: 1, backgroundColor: "white" }}
     >
+      <StatusBar style="dark" backgroundColor="#fff" />
+      <CustomHeader
+        title={""}
+        navigation={navigation}
+        showBackButton={true}
+        showLanguageSelector={false}
+        onBackPress={handleBackPress}
+      />
       <ScrollView
         keyboardShouldPersistTaps="handled"
-        style={{ paddingHorizontal: wp(4) }}
+        style={{ paddingHorizontal: wp(4), paddingVertical: hp(4) }}
         className="flex-1 bg-white"
       >
-        <View>
-          <TouchableOpacity
-            style={{ paddingHorizontal: wp(2), paddingVertical: hp(2) }}
-            onPress={handleBackPress}
-          >
-            <View className="w-9 h-9 bg-[#F6F6F680] rounded-full justify-center items-center">
-              <AntDesign name="left" size={20} color="black" />
-            </View>
-          </TouchableOpacity>
-        </View>
-
         <View className="flex-1 p-4">
           <View className="items-center mb-6 -mt-12">
             <Image
-              source={require("../assets/add complaint.webp")}
+              source={require("@/assets/images/complaint/add-complaint.webp")}
               style={{
                 width: 280,
-                height: 200
+                height: 200,
               }}
               resizeMode="contain"
             />
@@ -254,55 +234,22 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({ navigation }) =
             </Text>
           </View>
 
-          <DropDownPicker
-            open={open}
-            setOpen={setOpen}
-            value={selectedCategory}
-            setValue={setSelectedCategory}
-            items={filteredCategory.map(item => ({
-              label: item.value,
-              value: item.key
-            }))}
-            searchable={true}
-            searchPlaceholder={t("AddComplaint.Search category...")}
-            placeholder={t("AddComplaint.Select Complaint Category")}
+          {/* Custom Dropdown Trigger using GlobalSearchModal */}
+          <TouchableOpacity
+            onPress={categoryModal.show}
+            className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-full px-5 flex-row items-center justify-between"
             style={{
-              borderColor: "#fff",
-              borderRadius: 15,
-              height: 50,
-              backgroundColor: "#F6F6F6",
+              height: 55,
+              borderRadius: 25,
             }}
-            dropDownContainerStyle={{
-              borderColor: "#fff",
-              backgroundColor: "#F6F6F6",
-              maxHeight: 500,
-            }}
-            textStyle={{
-              color: "#434343",
-              fontSize: 14,
-            }}
-            searchTextInputStyle={{
-              borderColor: "#0c0c0cff",
-              color: "#434343",
-            }}
-            searchContainerStyle={{
-              borderBottomColor: "#E5E7EB",
-            }}
-            listItemLabelStyle={{
-              fontSize: 12,
-            }}
-            zIndex={3000}
-            zIndexInverse={1000}
-            listMode="SCROLLVIEW"
-            searchTextInputProps={{
-              onChangeText: handleSearchChange,
-              value: searchValue,
-            }}
-            onClose={() => {
-              // Reset search value when dropdown closes
-              setTimeout(() => setSearchValue(''), 100);
-            }}
-          />
+          >
+            <Text
+              className={`text-base ${selectedCategory ? "text-black" : "text-[#434343]"}`}
+            >
+              {getSelectedLabel()}
+            </Text>
+            <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
+          </TouchableOpacity>
 
           <Text className="text-center text-black mb-4 mt-4">
             -- {t("AddComplaint.We will get back to you within 2 days")} --
@@ -318,26 +265,19 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({ navigation }) =
               className="text-black bg-white border border-[#9DB2CE] rounded-lg p-4 min-h-[280px]"
               value={complaintText}
               onChangeText={(text) => {
-                // Prevent leading spaces
-                if (text.startsWith(' ')) {
-                  return; // Don't update state if text starts with space
+                if (text.startsWith(" ")) {
+                  return;
                 }
-
-                // Check if first character is alphabetic only (no numbers or special characters)
                 if (text.length > 0) {
                   const firstChar = text.charAt(0);
                   const isAlphabetic = /^[a-zA-Z]$/.test(firstChar);
-
                   if (!isAlphabetic) {
-                    return; // Don't update state if first character is not alphabetic
+                    return;
                   }
-
-                  // Capitalize first letter if it's the first character
                   if (text.length === 1) {
                     text = text.toUpperCase();
                   }
                 }
-
                 setComplaintText(text);
               }}
               autoCapitalize="sentences"
@@ -353,10 +293,15 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({ navigation }) =
               colors={["#F2561D", "#FF1D85"]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
-              className="py-3 rounded-full items-center"
+              className="py-3 rounded-full flex-row items-center justify-center"
             >
               {loading ? (
-                <ActivityIndicator size="small" color="#fff" />
+                <>
+                  <ActivityIndicator size="small" color="#fff" />
+                  <Text className="text-white text-lg font-bold ml-2">
+                    {t("AddComplaint.Submitting...")}
+                  </Text>
+                </>
               ) : (
                 <Text className="text-white text-lg font-bold">
                   {t("AddComplaint.Submit")}
@@ -366,6 +311,20 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({ navigation }) =
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      {/* GlobalSearchModal for Category Selection */}
+      <GlobalSearchModal
+        visible={categoryModal.isVisible}
+        onClose={categoryModal.hide}
+        title={t("AddComplaint.Select Complaint Category")}
+        data={category}
+        selectedItems={selectedCategory ? [selectedCategory] : []}
+        onSelect={handleCategorySelect}
+        searchPlaceholder={t("AddComplaint.Search category...")}
+        doneButtonText={t("AddComplaint.Done") || "Done"}
+        noResultsText={t("AddComplaint.No categories found")}
+        multiSelect={false}
+      />
     </KeyboardAvoidingView>
   );
 };

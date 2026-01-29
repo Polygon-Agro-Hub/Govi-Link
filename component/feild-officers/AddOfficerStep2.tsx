@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,8 +6,6 @@ import {
   TouchableOpacity,
   ScrollView,
   StatusBar,
-  Modal,
-  FlatList,
   KeyboardAvoidingView,
   Platform,
   Alert,
@@ -22,7 +20,10 @@ import banksData from "@/assets/json/banks.json";
 import branchesData from "@/assets/json/branches.json";
 import { useTranslation } from "react-i18next";
 import i18n from "@/i18n/i18n";
-import { RouteProp, useRoute,useFocusEffect } from "@react-navigation/native";
+import { RouteProp, useRoute, useFocusEffect } from "@react-navigation/native";
+import GlobalSearchModal from "@/component/common/GlobalSearchModal";
+import { useModal } from "@/hooks/useModal";
+import CustomHeader from "@/component/common/CustomHeader";
 
 type AddOfficerStep2NavigationProps = StackNavigationProp<
   RootStackParamList,
@@ -117,8 +118,15 @@ const sriLankaData = {
 const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
   const { t } = useTranslation();
   const route = useRoute<RouteProp<RootStackParamList, "AddOfficerStep2">>();
-  // const { formData: step1Data, isnewsecondstep } = route.params as RouteParams;
-const { formData: step1Data, isnewsecondstep} = route.params ?? {};
+  const { formData: step1Data, isnewsecondstep } = route.params ?? {};
+
+  // Modal hooks for all dropdowns
+  const countryModal = useModal();
+  const provinceModal = useModal();
+  const districtModal = useModal();
+  const bankModal = useModal();
+  const branchModal = useModal();
+
   // Address states - store English values for backend
   const [housePlotNo, setHousePlotNo] = useState("");
   const [streetName, setStreetName] = useState("");
@@ -144,20 +152,6 @@ const { formData: step1Data, isnewsecondstep} = route.params ?? {};
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
 
-  // Dropdown states
-  const [showCountryDropdown, setShowCountryDropdown] = useState(false);
-  const [showProvinceDropdown, setShowProvinceDropdown] = useState(false);
-  const [showDistrictDropdown, setShowDistrictDropdown] = useState(false);
-  const [showBankDropdown, setShowBankDropdown] = useState(false);
-  const [showBranchDropdown, setShowBranchDropdown] = useState(false);
-
-  // Search states
-  const [countrySearch, setCountrySearch] = useState("");
-  const [provinceSearch, setProvinceSearch] = useState("");
-  const [districtSearch, setDistrictSearch] = useState("");
-  const [bankSearch, setBankSearch] = useState("");
-  const [branchSearch, setBranchSearch] = useState("");
-
   // Available provinces and districts based on country selection
   const [availableProvinces, setAvailableProvinces] = useState<
     Array<{ name: { en: string; si: string; ta: string } }>
@@ -171,38 +165,31 @@ const { formData: step1Data, isnewsecondstep} = route.params ?? {};
     Array<{ ID: number; name: string }>
   >([]);
 
-
-      useFocusEffect(
-        React.useCallback(() => {
-   console.log("focus effect", isnewsecondstep)
-        if(isnewsecondstep===true){
-           setHousePlotNo("")
-           setStreetName("")
-           setCity("");
-           setSelectedProvince("")
-           setSelectedDistrict("")
-           setCommissionAmount("")
-           setAccountHolderName("")
-           setAccountNumber("")
-           setConfirmAccountNumber("")
-           setSelectedBank("")
-           setSelectedBranch("")
-           setShowCountryDropdown(false)
-           setShowProvinceDropdown(false)
-           setShowDistrictDropdown(false)
-           setShowBankDropdown(false)
-           setShowBranchDropdown(false)
-              setErrors({})
-        }
-  
-        }, [isnewsecondstep])
-      );
-    
   // Process banks data
   const banks = banksData.map((bank) => ({
     id: bank.ID,
     name: bank.name,
   }));
+
+  useFocusEffect(
+    useCallback(() => {
+      console.log("focus effect", isnewsecondstep);
+      if (isnewsecondstep === true) {
+        setHousePlotNo("");
+        setStreetName("");
+        setCity("");
+        setSelectedProvince("");
+        setSelectedDistrict("");
+        setCommissionAmount("");
+        setAccountHolderName("");
+        setAccountNumber("");
+        setConfirmAccountNumber("");
+        setSelectedBank("");
+        setSelectedBranch("");
+        setErrors({});
+      }
+    }, [isnewsecondstep]),
+  );
 
   // Get current language
   const getCurrentLanguage = () => {
@@ -237,6 +224,49 @@ const { formData: step1Data, isnewsecondstep} = route.params ?? {};
     return district[lang as keyof typeof district] || district.en;
   };
 
+  // Prepare data functions for GlobalSearchModal
+  const getCountriesData = () => {
+    return sortCountriesAlphabetically(countryData).map((country) => ({
+      label: getTranslatedCountry(country),
+      value: country.name.en,
+      emoji: country.emoji,
+      dial_code: country.dial_code,
+      ...country,
+    }));
+  };
+
+  const getProvincesData = () => {
+    return sortProvincesAlphabetically(availableProvinces).map((province) => ({
+      label: getTranslatedProvince(province),
+      value: province.name.en,
+      ...province,
+    }));
+  };
+
+  const getDistrictsData = () => {
+    return sortDistrictsAlphabetically(availableDistricts).map((district) => ({
+      label: getTranslatedDistrict(district),
+      value: district.en,
+      ...district,
+    }));
+  };
+
+  const getBanksData = () => {
+    return sortBanksAlphabetically(banks).map((bank) => ({
+      label: bank.name,
+      value: bank.name,
+      id: bank.id,
+    }));
+  };
+
+  const getBranchesData = () => {
+    return sortBranchesAlphabetically(availableBranches).map((branch) => ({
+      label: branch.name,
+      value: branch.name,
+      ID: branch.ID,
+    }));
+  };
+
   // Clear specific field error
   const clearFieldError = (fieldName: string) => {
     setErrors((prev) => {
@@ -249,91 +279,80 @@ const { formData: step1Data, isnewsecondstep} = route.params ?? {};
   // Field change handlers
   const handleHousePlotNoChange = (text: string) => {
     clearFieldError("housePlotNo");
-      if (text.length === 0) {
-    setErrors((prev) => ({
-      ...prev,
-      housePlotNo: t("Error.House/Plot number is required"),
-    }));
-  } 
+    if (text.length === 0) {
+      setErrors((prev) => ({
+        ...prev,
+        housePlotNo: t("Error.House/Plot number is required"),
+      }));
+    }
     setHousePlotNo(text);
   };
 
   const handleStreetNameChange = (text: string) => {
     clearFieldError("streetName");
     const capitalizedText = text.charAt(0).toUpperCase() + text.slice(1);
-       if (text.length === 0) {
-    setErrors((prev) => ({
-      ...prev,
-      streetName: t("Error.Street name is required"),
-    }))
-  }
+    if (text.length === 0) {
+      setErrors((prev) => ({
+        ...prev,
+        streetName: t("Error.Street name is required"),
+      }));
+    }
     setStreetName(capitalizedText);
   };
 
   const handleCityChange = (text: string) => {
     clearFieldError("city");
-           if (text.length === 0) {
-    setErrors((prev) => ({
-      ...prev,
-      city: t("Error.City is required"),
-    }))
-  }
+    if (text.length === 0) {
+      setErrors((prev) => ({
+        ...prev,
+        city: t("Error.City is required"),
+      }));
+    }
     const capitalizedText = text.charAt(0).toUpperCase() + text.slice(1);
     setCity(capitalizedText);
   };
 
-  // const handleCommissionAmountChange = (text: string) => {
-  //   clearFieldError("commissionAmount");
-  //   // Allow only numbers and decimal point
-  //   const filteredText = text.replace(/[^0-9.]/g, "");
-  //   setCommissionAmount(filteredText);
-  // };
-const handleCommissionAmountChange = (text: string) => {
-  clearFieldError("commissionAmount");
-       if (text.length === 0) {
-    setErrors((prev) => ({
-      ...prev,
-      commissionAmount: t("Error.Commission amount is required"),
-    }))
-  }
-  // Allow only numbers and one dot
-  let filteredText = text.replace(/[^0-9.]/g, "");
+  const handleCommissionAmountChange = (text: string) => {
+    clearFieldError("commissionAmount");
+    if (text.length === 0) {
+      setErrors((prev) => ({
+        ...prev,
+        commissionAmount: t("Error.Commission amount is required"),
+      }));
+    }
+    let filteredText = text.replace(/[^0-9.]/g, "");
 
-  // Prevent multiple dots
-  const dotCount = (filteredText.match(/\./g) || []).length;
-  if (dotCount > 1) return;
+    const dotCount = (filteredText.match(/\./g) || []).length;
+    if (dotCount > 1) return;
 
-  // Allow empty
-  if (filteredText === "") {
-    setCommissionAmount("");
-    return;
-  }
+    if (filteredText === "") {
+      setCommissionAmount("");
+      return;
+    }
 
-  const value = Number(filteredText);
+    const value = Number(filteredText);
 
-  // ❌ If greater than 100 → show error and stop
-  if (!isNaN(value) && value > 100) {
-    setErrors((prev) => ({
-      ...prev,
-      commissionAmount: t("Error.Commission amount cannot exceed 100"),
-    }));
-    return;
-  }
+    if (!isNaN(value) && value > 100) {
+      setErrors((prev) => ({
+        ...prev,
+        commissionAmount: t("Error.Commission amount cannot exceed 100"),
+      }));
+      return;
+    }
 
-  // ❌ Prevent negative
-  if (value < 0) return;
+    if (value < 0) return;
 
-  setCommissionAmount(filteredText);
-};
+    setCommissionAmount(filteredText);
+  };
 
   const handleAccountHolderNameChange = (text: string) => {
     clearFieldError("accountHolderName");
-           if (text.length === 0) {
-    setErrors((prev) => ({
-      ...prev,
-      accountHolderName: t("Error.Account holder name is required"),
-    }))
-  }
+    if (text.length === 0) {
+      setErrors((prev) => ({
+        ...prev,
+        accountHolderName: t("Error.Account holder name is required"),
+      }));
+    }
     const filteredText = text.replace(/[^a-zA-Z\s]/g, "");
     const capitalizedText =
       filteredText.charAt(0).toUpperCase() + filteredText.slice(1);
@@ -342,127 +361,82 @@ const handleCommissionAmountChange = (text: string) => {
 
   const handleAccountNumberChange = (text: string) => {
     clearFieldError("accountNumber");
-           if (text.length === 0) {
-    setErrors((prev) => ({
-      ...prev,
-      accountNumber: t("Error.Account number is required"),
-    }))
-  }
+    if (text.length === 0) {
+      setErrors((prev) => ({
+        ...prev,
+        accountNumber: t("Error.Account number is required"),
+      }));
+    }
     const numbersOnly = text.replace(/[^0-9]/g, "");
     setAccountNumber(numbersOnly);
   };
 
   const handleConfirmAccountNumberChange = (text: string) => {
     clearFieldError("confirmAccountNumber");
-           if (text.length === 0) {
-    setErrors((prev) => ({
-      ...prev,
-      confirmAccountNumber: t("Error.Confirm account number is required"),
-    }))
-  }if (text.length !== 0 && accountNumber && text !== accountNumber) {
+    if (text.length === 0) {
+      setErrors((prev) => ({
+        ...prev,
+        confirmAccountNumber: t("Error.Confirm account number is required"),
+      }));
+    }
+    if (text.length !== 0 && accountNumber && text !== accountNumber) {
       setErrors((prev) => ({
         ...prev,
         confirmAccountNumber: t("Error.Account numbers do not match"),
-      }) );
-  }
+      }));
+    }
     const numbersOnly = text.replace(/[^0-9]/g, "");
     setConfirmAccountNumber(numbersOnly);
   };
 
-  const getFilteredCountries = () => {
-  if (!countrySearch) return sortCountriesAlphabetically(countryData);
-  return sortCountriesAlphabetically(
-    countryData.filter((country) =>
-      getTranslatedCountry(country)
-        .toLowerCase()
-        .includes(countrySearch.toLowerCase())
-    )
-  );
-};
+  // Sorting functions
+  const sortCountriesAlphabetically = (countries: any[]) => {
+    return [...countries].sort((a, b) => {
+      const nameA = getTranslatedCountry(a).toLowerCase();
+      const nameB = getTranslatedCountry(b).toLowerCase();
+      return nameA.localeCompare(nameB);
+    });
+  };
 
-const getFilteredProvinces = () => {
-  if (!provinceSearch) return sortProvincesAlphabetically(availableProvinces);
-  return sortProvincesAlphabetically(
-    availableProvinces.filter((province) =>
-      getTranslatedProvince(province)
-        .toLowerCase()
-        .includes(provinceSearch.toLowerCase())
-    )
-  );
-};
+  const sortProvincesAlphabetically = (
+    provinces: Array<{ name: { en: string; si: string; ta: string } }>,
+  ) => {
+    return [...provinces].sort((a, b) => {
+      const nameA = getTranslatedProvince(a).toLowerCase();
+      const nameB = getTranslatedProvince(b).toLowerCase();
+      return nameA.localeCompare(nameB);
+    });
+  };
 
-const getFilteredDistricts = () => {
-  if (!districtSearch) return sortDistrictsAlphabetically(availableDistricts);
-  return sortDistrictsAlphabetically(
-    availableDistricts.filter((district) =>
-      getTranslatedDistrict(district)
-        .toLowerCase()
-        .includes(districtSearch.toLowerCase())
-    )
-  );
-};
+  const sortDistrictsAlphabetically = (
+    districts: Array<{ en: string; si: string; ta: string }>,
+  ) => {
+    return [...districts].sort((a, b) => {
+      const nameA = getTranslatedDistrict(a).toLowerCase();
+      const nameB = getTranslatedDistrict(b).toLowerCase();
+      return nameA.localeCompare(nameB);
+    });
+  };
 
-  const getFilteredBanks = () => {
-  if (!bankSearch) return sortBanksAlphabetically(banks);
-  return sortBanksAlphabetically(
-    banks.filter((bank) =>
-      bank.name.toLowerCase().includes(bankSearch.toLowerCase())
-    )
-  );
-};
+  const sortBanksAlphabetically = (
+    banks: Array<{ id: number; name: string }>,
+  ) => {
+    return [...banks].sort((a, b) => {
+      const nameA = a.name.toLowerCase();
+      const nameB = b.name.toLowerCase();
+      return nameA.localeCompare(nameB);
+    });
+  };
 
-const getFilteredBranches = () => {
-  if (!branchSearch) return sortBranchesAlphabetically(availableBranches);
-  return sortBranchesAlphabetically(
-    availableBranches.filter((branch) =>
-      branch.name.toLowerCase().includes(branchSearch.toLowerCase())
-    )
-  );
-};
-
-const sortCountriesAlphabetically = (countries: any[]) => {
-  return [...countries].sort((a, b) => {
-    const nameA = getTranslatedCountry(a).toLowerCase();
-    const nameB = getTranslatedCountry(b).toLowerCase();
-    return nameA.localeCompare(nameB);
-  });
-};
-
-// Sort provinces by translated name
-const sortProvincesAlphabetically = (provinces: Array<{ name: { en: string; si: string; ta: string } }>) => {
-  return [...provinces].sort((a, b) => {
-    const nameA = getTranslatedProvince(a).toLowerCase();
-    const nameB = getTranslatedProvince(b).toLowerCase();
-    return nameA.localeCompare(nameB);
-  });
-};
-
-// Sort districts by translated name
-const sortDistrictsAlphabetically = (districts: Array<{ en: string; si: string; ta: string }>) => {
-  return [...districts].sort((a, b) => {
-    const nameA = getTranslatedDistrict(a).toLowerCase();
-    const nameB = getTranslatedDistrict(b).toLowerCase();
-    return nameA.localeCompare(nameB);
-  });
-};
-
-// Sort banks by name
-const sortBanksAlphabetically = (banks: Array<{ id: number; name: string }>) => {
-  return [...banks].sort((a, b) => {
-    const nameA = a.name.toLowerCase();
-    const nameB = b.name.toLowerCase();
-    return nameA.localeCompare(nameB);
-  });
-};
-
-// Sort branches by name
-const sortBranchesAlphabetically = (branches: Array<{ ID: number; name: string }>) => {
-  return [...branches].sort((a, b) => {
-    const nameA = a.name.toLowerCase();
-    const nameB = b.name.toLowerCase();
-    return nameA.localeCompare(nameB);
-  });
-};
+  const sortBranchesAlphabetically = (
+    branches: Array<{ ID: number; name: string }>,
+  ) => {
+    return [...branches].sort((a, b) => {
+      const nameA = a.name.toLowerCase();
+      const nameB = b.name.toLowerCase();
+      return nameA.localeCompare(nameB);
+    });
+  };
 
   // Update display values when language changes
   useEffect(() => {
@@ -479,7 +453,7 @@ const sortBranchesAlphabetically = (branches: Array<{ ID: number; name: string }
     // Update province display
     if (selectedProvince) {
       const province = sriLankaData.provinces.find(
-        (p) => p.name.en === selectedProvince
+        (p) => p.name.en === selectedProvince,
       );
       if (province) {
         setDisplayProvince(getTranslatedProvince(province));
@@ -532,7 +506,7 @@ const sortBranchesAlphabetically = (branches: Array<{ ID: number; name: string }
   useEffect(() => {
     if (selectedProvince && selectedCountry === "Sri Lanka") {
       const province = sriLankaData.provinces.find(
-        (p) => p.name.en === selectedProvince
+        (p) => p.name.en === selectedProvince,
       );
       setAvailableDistricts(province ? province.districts : []);
       setSelectedDistrict("");
@@ -554,65 +528,129 @@ const sortBranchesAlphabetically = (branches: Array<{ ID: number; name: string }
     }
   }, [selectedBank]);
 
-  // Reset search when modal closes
-  const handleModalClose = (modalType: string) => {
-    switch (modalType) {
-      case "country":
-        setCountrySearch("");
-        setShowCountryDropdown(false);
-        break;
-      case "province":
-        setProvinceSearch("");
-        setShowProvinceDropdown(false);
-        break;
-      case "district":
-        setDistrictSearch("");
-        setShowDistrictDropdown(false);
-        break;
-      case "bank":
-        setBankSearch("");
-        setShowBankDropdown(false);
-        break;
-      case "branch":
-        setBranchSearch("");
-        setShowBranchDropdown(false);
-        break;
+  // Handle dropdown selections
+  const handleCountrySelect = (selectedValues: string[]) => {
+    if (selectedValues.length > 0) {
+      const country = countryData.find((c) => c.name.en === selectedValues[0]);
+      if (country) {
+        setSelectedCountry(country.name.en);
+        setDisplayCountry(getTranslatedCountry(country));
+        clearFieldError("country");
+      }
     }
+    countryModal.hide();
   };
 
-  // Handle dropdown selections with error clearing
-  const handleCountrySelect = (country: any) => {
-    setSelectedCountry(country.name.en);
-    setDisplayCountry(getTranslatedCountry(country));
-    clearFieldError("country");
-    handleModalClose("country");
+  const handleProvinceSelect = (selectedValues: string[]) => {
+    if (selectedValues.length > 0) {
+      const province = availableProvinces.find(
+        (p) => p.name.en === selectedValues[0],
+      );
+      if (province) {
+        setSelectedProvince(province.name.en);
+        setDisplayProvince(getTranslatedProvince(province));
+        clearFieldError("province");
+      }
+    }
+    provinceModal.hide();
   };
 
-  const handleProvinceSelect = (province: { name: { en: string; si: string; ta: string } }) => {
-    setSelectedProvince(province.name.en);
-    setDisplayProvince(getTranslatedProvince(province));
-    clearFieldError("province");
-    handleModalClose("province");
+  const handleDistrictSelect = (selectedValues: string[]) => {
+    if (selectedValues.length > 0) {
+      const district = availableDistricts.find(
+        (d) => d.en === selectedValues[0],
+      );
+      if (district) {
+        setSelectedDistrict(district.en);
+        setDisplayDistrict(getTranslatedDistrict(district));
+        clearFieldError("district");
+      }
+    }
+    districtModal.hide();
   };
 
-  const handleDistrictSelect = (district: { en: string; si: string; ta: string }) => {
-    setSelectedDistrict(district.en);
-    setDisplayDistrict(getTranslatedDistrict(district));
-    clearFieldError("district");
-    handleModalClose("district");
+  const handleBankSelect = (selectedValues: string[]) => {
+    if (selectedValues.length > 0) {
+      setSelectedBank(selectedValues[0]);
+      clearFieldError("bank");
+    }
+    bankModal.hide();
   };
 
-  const handleBankSelect = (bank: { id: number; name: string }) => {
-    setSelectedBank(bank.name);
-    clearFieldError("bank");
-    handleModalClose("bank");
+  const handleBranchSelect = (selectedValues: string[]) => {
+    if (selectedValues.length > 0) {
+      setSelectedBranch(selectedValues[0]);
+      clearFieldError("branch");
+    }
+    branchModal.hide();
   };
 
-  const handleBranchSelect = (branch: { ID: number; name: string }) => {
-    setSelectedBranch(branch.name);
-    clearFieldError("branch");
-    handleModalClose("branch");
-  };
+  // Custom render items for GlobalSearchModal
+  const renderCountryItem = (item: any, isSelected: boolean) => (
+    <TouchableOpacity
+      className="px-4 py-3 border-b border-gray-200 flex-row items-center"
+      onPress={() => handleCountrySelect([item.value])}
+    >
+      <Text className="text-2xl mr-3">{item.emoji}</Text>
+      <View className="flex-1">
+        <Text className="text-base text-gray-800 font-medium">
+          {item.label}
+        </Text>
+        <Text className="text-sm text-gray-600">{item.dial_code}</Text>
+      </View>
+      {isSelected && (
+        <MaterialIcons name="check" size={20} color="#21202B" />
+      )}
+    </TouchableOpacity>
+  );
+
+  const renderProvinceItem = (item: any, isSelected: boolean) => (
+    <TouchableOpacity
+      className="px-4 py-3 border-b border-gray-200"
+      onPress={() => handleProvinceSelect([item.value])}
+    >
+      <Text className="text-base text-gray-800">{item.label}</Text>
+      {isSelected && (
+        <MaterialIcons name="check" size={20} color="#21202B" />
+      )}
+    </TouchableOpacity>
+  );
+
+  const renderDistrictItem = (item: any, isSelected: boolean) => (
+    <TouchableOpacity
+      className="px-4 py-3 border-b border-gray-200"
+      onPress={() => handleDistrictSelect([item.value])}
+    >
+      <Text className="text-base text-gray-800">{item.label}</Text>
+      {isSelected && (
+        <MaterialIcons name="check" size={20} color="#21202B" />
+      )}
+    </TouchableOpacity>
+  );
+
+  const renderBankItem = (item: any, isSelected: boolean) => (
+    <TouchableOpacity
+      className="px-4 py-3 border-b border-gray-200"
+      onPress={() => handleBankSelect([item.value])}
+    >
+      <Text className="text-base text-gray-800">{item.label}</Text>
+      {isSelected && (
+        <MaterialIcons name="check" size={20} color="#21202B" />
+      )}
+    </TouchableOpacity>
+  );
+
+  const renderBranchItem = (item: any, isSelected: boolean) => (
+    <TouchableOpacity
+      className="px-4 py-3 border-b border-gray-200"
+      onPress={() => handleBranchSelect([item.value])}
+    >
+      <Text className="text-base text-gray-800">{item.label}</Text>
+      {isSelected && (
+        <MaterialIcons name="check" size={20} color="#21202B" />
+      )}
+    </TouchableOpacity>
+  );
 
   // Validate all fields before proceeding
   const validateStep2 = () => {
@@ -632,55 +670,46 @@ const sortBranchesAlphabetically = (branches: Array<{ ID: number; name: string }
       newErrors.accountHolderName = t("Error.Account holder name is required");
     if (!accountNumber.trim())
       newErrors.accountNumber = t("Error.Account number is required");
-if (!confirmAccountNumber.trim())
-  newErrors.confirmAccountNumber = t(
-    "Error.Confirm account number is required"
-  );
+    if (!confirmAccountNumber.trim())
+      newErrors.confirmAccountNumber = t(
+        "Error.Confirm account number is required",
+      );
 
-if (
-  accountNumber.trim() &&
-  confirmAccountNumber.trim() &&
-  accountNumber !== confirmAccountNumber
-) {
-  newErrors.confirmAccountNumber = t(
-    "Error.Account numbers do not match"
-  );
-}
+    if (
+      accountNumber.trim() &&
+      confirmAccountNumber.trim() &&
+      accountNumber !== confirmAccountNumber
+    ) {
+      newErrors.confirmAccountNumber = t("Error.Account numbers do not match");
+    }
     if (!selectedBank) newErrors.bank = t("Error.Bank is required");
     if (!selectedBranch) newErrors.branch = t("Error.Branch is required");
 
     if (commissionAmount && isNaN(parseFloat(commissionAmount))) {
       newErrors.commissionAmount = t(
-        "Error.Commission amount must be a number"
+        "Error.Commission amount must be a number",
       );
     }
-    if(commissionAmount && parseFloat(commissionAmount) > 100){
-      newErrors.commissionAmount = t(
-        "Error.Commission amount cannot exceed 100"
-      );
+    if (commissionAmount && parseFloat(commissionAmount) > 100) {
+      newErrors.commissionAmount = t("Error.Commission amount cannot exceed 100");
     }
 
-    // setErrors(newErrors);
-    // return Object.keys(newErrors).length === 0;
-     setErrors(newErrors);
-  return newErrors;
+    setErrors(newErrors);
+    return newErrors;
   };
 
   const handleNext = () => {
     Keyboard.dismiss();
-const validationErrors = validateStep2(); // ✅ use returned errors
+    const validationErrors = validateStep2();
 
-  if (Object.keys(validationErrors).length > 0) {
-    const errorMessage = Object.values(validationErrors).join("\n• ");
+    if (Object.keys(validationErrors).length > 0) {
+      const errorMessage = Object.values(validationErrors).join("\n• ");
+      Alert.alert(t("Error.Validation Error"), `• ${errorMessage}`, [
+        { text: t("Main.ok") },
+      ]);
+      return;
+    }
 
-       Alert.alert(
-      t("Error.Validation Error"),
-      `• ${errorMessage}`,
-      [{ text: t("Main.ok") }]
-    );
-    return;
-  }
-    // Prepare form data for next step
     const step2Data = {
       house: housePlotNo,
       street: streetName,
@@ -695,107 +724,16 @@ const validationErrors = validateStep2(); // ✅ use returned errors
       branch: selectedBranch,
     };
 
-    // Combine step1 and step2 data
     const combinedData = {
       ...step1Data,
       ...step2Data,
     };
 
-    navigation.navigate("AddOfficerStep3", { formData: combinedData, isnewthirdstep:isnewsecondstep });
+    navigation.navigate("AddOfficerStep3", {
+      formData: combinedData,
+      isnewthirdstep: isnewsecondstep,
+    });
   };
-
-  // Render functions for dropdown items
-  const renderCountryItem = ({ item }: { item: any }) => (
-    <TouchableOpacity
-      className="px-4 py-3 border-b border-gray-200 rounded-2xl flex-row items-center"
-      onPress={() => handleCountrySelect(item)}
-    >
-      <Text className="text-2xl mr-3">{item.emoji}</Text>
-      <View className="flex-1">
-        <Text className="text-base text-gray-800 font-medium">
-          {getTranslatedCountry(item)}
-        </Text>
-        <Text className="text-sm text-gray-600">{item.dial_code}</Text>
-      </View>
-    </TouchableOpacity>
-  );
-
-  const renderProvinceItem = ({
-    item,
-  }: {
-    item: { name: { en: string; si: string; ta: string } };
-  }) => (
-    <TouchableOpacity
-      className="px-4 py-3 border-b border-gray-200 rounded-2xl"
-      onPress={() => handleProvinceSelect(item)}
-    >
-      <Text className="text-base text-gray-800">
-        {getTranslatedProvince(item)}
-      </Text>
-    </TouchableOpacity>
-  );
-
-  const renderDistrictItem = ({
-    item,
-  }: {
-    item: { en: string; si: string; ta: string };
-  }) => (
-    <TouchableOpacity
-      className="px-4 py-3 border-b border-gray-200 rounded-2xl"
-      onPress={() => handleDistrictSelect(item)}
-    >
-      <Text className="text-base text-gray-800">
-        {getTranslatedDistrict(item)}
-      </Text>
-    </TouchableOpacity>
-  );
-
-  const renderBankItem = ({ item }: { item: { id: number; name: string } }) => (
-    <TouchableOpacity
-      className="px-4 py-3 border-b border-gray-200 rounded-2xl"
-      onPress={() => handleBankSelect(item)}
-    >
-      <Text className="text-base text-gray-800">{item.name}</Text>
-    </TouchableOpacity>
-  );
-
-  const renderBranchItem = ({
-    item,
-  }: {
-    item: { ID: number; name: string };
-  }) => (
-    <TouchableOpacity
-      className="px-4 py-3 border-b border-gray-200 rounded-2xl"
-      onPress={() => handleBranchSelect(item)}
-    >
-      <Text className="text-base text-gray-800">{item.name}</Text>
-    </TouchableOpacity>
-  );
-
-  // Search input component
-  const renderSearchInput = (
-    value: string,
-    onChangeText: (text: string) => void,
-    placeholder: string
-  ) => (
-    <View className="px-4 py-2 border-b border-gray-200">
-      <View className="bg-gray-100 rounded-lg px-3 flex-row items-center">
-        <MaterialIcons name="search" size={20} color="#666" />
-        <TextInput
-          placeholder={placeholder}
-          value={value}
-          onChangeText={onChangeText}
-          className="flex-1 ml-2 text-base"
-          placeholderTextColor="#666"
-        />
-        {value ? (
-          <TouchableOpacity onPress={() => onChangeText("")}>
-            <MaterialIcons name="close" size={20} color="#666" />
-          </TouchableOpacity>
-        ) : null}
-      </View>
-    </View>
-  );
 
   return (
     <KeyboardAvoidingView
@@ -803,32 +741,23 @@ const validationErrors = validateStep2(); // ✅ use returned errors
       style={{ flex: 1, backgroundColor: "white" }}
     >
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+      
+      <CustomHeader
+        title={t("AddOfficer.AddOfficer")}
+        navigation={navigation}
+        showBackButton={true}
+        showLanguageSelector={false}
+        onBackPress={() => navigation.navigate("AddOfficerStep1", { isnew: false })}
+      />
+
       <ScrollView
         contentContainerStyle={{ paddingBottom: 100 }}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
-        <View className="flex-row items-center px-4 py-3">
-          <TouchableOpacity
-            onPress={() => navigation.navigate("AddOfficerStep1", {isnew:false})}
-            className="bg-[#F6F6F680] rounded-full py-4 px-3"
-          >
-            <MaterialIcons
-              name="arrow-back-ios"
-              size={24}
-              color="black"
-              style={{ marginLeft: 10 }}
-            />
-          </TouchableOpacity>
-          <Text className="text-lg font-bold text-black text-center flex-1">
-            {t("AddOfficer.AddOfficer")}
-          </Text>
-          <View style={{ width: 55 }} />
-        </View>
-        <View className="p-4">
+        <View className="p-2">
           {/* Address Section */}
-          <View className="px-6 mt-4">
+          <View className="px-2 mt-4">
             <View className="space-y-4">
               <View>
                 <TextInput
@@ -887,7 +816,7 @@ const validationErrors = validateStep2(); // ✅ use returned errors
                   className={`bg-[#F4F4F4] rounded-2xl px-4 py-3 flex-row justify-between items-center ${
                     errors.country ? "border border-red-500" : ""
                   }`}
-                  onPress={() => setShowCountryDropdown(true)}
+                  onPress={countryModal.show}
                 >
                   <Text
                     className={`${
@@ -915,7 +844,7 @@ const validationErrors = validateStep2(); // ✅ use returned errors
                   className={`bg-[#F4F4F4] rounded-2xl px-4 py-3 flex-row justify-between items-center ${
                     errors.province ? "border border-red-500" : ""
                   }`}
-                  onPress={() => setShowProvinceDropdown(true)}
+                  onPress={provinceModal.show}
                   disabled={availableProvinces.length === 0}
                 >
                   <Text
@@ -944,7 +873,7 @@ const validationErrors = validateStep2(); // ✅ use returned errors
                   className={`bg-[#F4F4F4] rounded-2xl px-4 py-3 flex-row justify-between items-center ${
                     errors.district ? "border border-red-500" : ""
                   }`}
-                  onPress={() => setShowDistrictDropdown(true)}
+                  onPress={districtModal.show}
                   disabled={availableDistricts.length === 0}
                 >
                   <Text
@@ -972,7 +901,7 @@ const validationErrors = validateStep2(); // ✅ use returned errors
           <View className="border border-[#ADADAD] border-b-0 mt-6"></View>
 
           {/* Bank Details Section */}
-          <View className="px-6 mt-6">
+          <View className="px-2 mt-6">
             <View className="space-y-4">
               <View>
                 <TextInput
@@ -1051,7 +980,7 @@ const validationErrors = validateStep2(); // ✅ use returned errors
                   className={`bg-[#F4F4F4] rounded-2xl px-4 py-3 flex-row justify-between items-center ${
                     errors.bank ? "border border-red-500" : ""
                   }`}
-                  onPress={() => setShowBankDropdown(true)}
+                  onPress={bankModal.show}
                 >
                   <Text
                     className={`${
@@ -1079,7 +1008,7 @@ const validationErrors = validateStep2(); // ✅ use returned errors
                   className={`bg-[#F4F4F4] rounded-2xl px-4 py-3 flex-row justify-between items-center ${
                     errors.branch ? "border border-red-500" : ""
                   }`}
-                  onPress={() => setShowBranchDropdown(true)}
+                  onPress={branchModal.show}
                   disabled={availableBranches.length === 0}
                 >
                   <Text
@@ -1105,10 +1034,12 @@ const validationErrors = validateStep2(); // ✅ use returned errors
           </View>
 
           {/* Buttons */}
-          <View className="px-6 flex-col w-full gap-4 mt-4">
+          <View className="px-2 flex-col w-full gap-4 mt-4">
             <TouchableOpacity
               className="bg-[#D9D9D9] rounded-3xl px-6 py-4 w-full items-center"
-              onPress={() => navigation.navigate("AddOfficerStep1",{isnew:false})}
+              onPress={() =>
+                navigation.navigate("AddOfficerStep1", { isnew: false })
+              }
             >
               <Text className="text-[#686868] font-semibold">
                 {t("AddOfficer.GoBack")}
@@ -1132,170 +1063,85 @@ const validationErrors = validateStep2(); // ✅ use returned errors
         </View>
       </ScrollView>
 
-      {/* Country Dropdown Modal */}
-      <Modal
-        visible={showCountryDropdown}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => handleModalClose("country")}
-      >
-        <View className="flex-1 bg-black/50 justify-center items-center">
-          <View className="bg-white rounded-2xl w-11/12 max-h-3/4">
-            <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
-              <Text className="text-lg font-semibold">
-                {t("AddOfficer.SelectCountry")}
-              </Text>
-              <TouchableOpacity onPress={() => handleModalClose("country")}>
-                <MaterialIcons name="close" size={24} color="#666" />
-              </TouchableOpacity>
-            </View>
-            {renderSearchInput(
-              countrySearch,
-              setCountrySearch,
-              t("AddOfficer.SearchCountry") || "Search country..."
-            )}
-            <FlatList
-              data={getFilteredCountries()}
-              renderItem={renderCountryItem}
-              keyExtractor={(item) => item.code}
-              showsVerticalScrollIndicator={false}
-              className="max-h-96"
-            />
-          </View>
-        </View>
-      </Modal>
+      {/* Country Selection Modal using GlobalSearchModal */}
+      <GlobalSearchModal
+        visible={countryModal.isVisible}
+        onClose={countryModal.hide}
+        title={t("AddOfficer.SelectCountry")}
+        data={getCountriesData()}
+        selectedItems={[selectedCountry]}
+        onSelect={handleCountrySelect}
+        searchPlaceholder={t("AddOfficer.SearchCountry")}
+        doneButtonText={t("AddOfficer.Select")}
+        noResultsText={t("AddOfficer.NoCountriesFound")}
+        multiSelect={false}
+        renderItem={renderCountryItem}
+        searchKeys={["label", "value", "name.en", "name.si", "name.ta"]}
+      />
 
-      {/* Province Dropdown Modal */}
-      <Modal
-        visible={showProvinceDropdown}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => handleModalClose("province")}
-      >
-        <View className="flex-1 bg-black/50 justify-center items-center">
-          <View className="bg-white rounded-2xl w-11/12 max-h-3/4">
-            <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
-              <Text className="text-lg font-semibold">
-                {t("AddOfficer.SelectProvince")}
-              </Text>
-              <TouchableOpacity onPress={() => handleModalClose("province")}>
-                <MaterialIcons name="close" size={24} color="#666" />
-              </TouchableOpacity>
-            </View>
-            {renderSearchInput(
-              provinceSearch,
-              setProvinceSearch,
-              t("AddOfficer.SearchProvince") || "Search province..."
-            )}
-            <FlatList
-              data={getFilteredProvinces()}
-              renderItem={renderProvinceItem}
-              keyExtractor={(item, index) => index.toString()}
-              showsVerticalScrollIndicator={false}
-              className="max-h-96"
-            />
-          </View>
-        </View>
-      </Modal>
+      {/* Province Selection Modal using GlobalSearchModal */}
+      <GlobalSearchModal
+        visible={provinceModal.isVisible}
+        onClose={provinceModal.hide}
+        title={t("AddOfficer.SelectProvince")}
+        data={getProvincesData()}
+        selectedItems={[selectedProvince]}
+        onSelect={handleProvinceSelect}
+        searchPlaceholder={t("AddOfficer.SearchProvince")}
+        doneButtonText={t("AddOfficer.Select")}
+        noResultsText={t("AddOfficer.NoProvincesFound")}
+        multiSelect={false}
+        renderItem={renderProvinceItem}
+        searchKeys={["label", "value", "name.en", "name.si", "name.ta"]}
+      />
 
-      {/* District Dropdown Modal */}
-      <Modal
-        visible={showDistrictDropdown}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => handleModalClose("district")}
-      >
-        <View className="flex-1 bg-black/50 justify-center items-center">
-          <View className="bg-white rounded-2xl w-11/12 max-h-3/4">
-            <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
-              <Text className="text-lg font-semibold">
-                {t("AddOfficer.SelectDistrict")}
-              </Text>
-              <TouchableOpacity onPress={() => handleModalClose("district")}>
-                <MaterialIcons name="close" size={24} color="#666" />
-              </TouchableOpacity>
-            </View>
-            {renderSearchInput(
-              districtSearch,
-              setDistrictSearch,
-              t("AddOfficer.SearchDistrict") || "Search district..."
-            )}
-            <FlatList
-              data={getFilteredDistricts()}
-              renderItem={renderDistrictItem}
-              keyExtractor={(item, index) => index.toString()}
-              showsVerticalScrollIndicator={false}
-              className="max-h-96"
-            />
-          </View>
-        </View>
-      </Modal>
+      {/* District Selection Modal using GlobalSearchModal */}
+      <GlobalSearchModal
+        visible={districtModal.isVisible}
+        onClose={districtModal.hide}
+        title={t("AddOfficer.SelectDistrict")}
+        data={getDistrictsData()}
+        selectedItems={[selectedDistrict]}
+        onSelect={handleDistrictSelect}
+        searchPlaceholder={t("AddOfficer.SearchDistrict")}
+        doneButtonText={t("AddOfficer.Select")}
+        noResultsText={t("AddOfficer.NoDistrictsFound")}
+        multiSelect={false}
+        renderItem={renderDistrictItem}
+        searchKeys={["label", "value", "en", "si", "ta"]}
+      />
 
-      {/* Bank Dropdown Modal */}
-      <Modal
-        visible={showBankDropdown}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => handleModalClose("bank")}
-      >
-        <View className="flex-1 bg-black/50 justify-center items-center">
-          <View className="bg-white rounded-2xl w-11/12 max-h-3/4">
-            <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
-              <Text className="text-lg font-semibold">
-                {t("AddOfficer.SelectBank")}
-              </Text>
-              <TouchableOpacity onPress={() => handleModalClose("bank")}>
-                <MaterialIcons name="close" size={24} color="#666" />
-              </TouchableOpacity>
-            </View>
-            {renderSearchInput(
-              bankSearch,
-              setBankSearch,
-              t("AddOfficer.SearchBank") || "Search bank..."
-            )}
-            <FlatList
-              data={getFilteredBanks()}
-              renderItem={renderBankItem}
-              keyExtractor={(item) => item.id.toString()}
-              showsVerticalScrollIndicator={false}
-              className="max-h-96"
-            />
-          </View>
-        </View>
-      </Modal>
+      {/* Bank Selection Modal using GlobalSearchModal */}
+      <GlobalSearchModal
+        visible={bankModal.isVisible}
+        onClose={bankModal.hide}
+        title={t("AddOfficer.SelectBank")}
+        data={getBanksData()}
+        selectedItems={[selectedBank]}
+        onSelect={handleBankSelect}
+        searchPlaceholder={t("AddOfficer.SearchBank")}
+        doneButtonText={t("AddOfficer.Select")}
+        noResultsText={t("AddOfficer.NoBanksFound")}
+        multiSelect={false}
+        renderItem={renderBankItem}
+        searchKeys={["label", "value"]}
+      />
 
-      {/* Branch Dropdown Modal */}
-      <Modal
-        visible={showBranchDropdown}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => handleModalClose("branch")}
-      >
-        <View className="flex-1 bg-black/50 justify-center items-center">
-          <View className="bg-white rounded-2xl w-11/12 max-h-3/4">
-            <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
-              <Text className="text-lg font-semibold">
-                {t("AddOfficer.SelectBranch")}
-              </Text>
-              <TouchableOpacity onPress={() => handleModalClose("branch")}>
-                <MaterialIcons name="close" size={24} color="#666" />
-              </TouchableOpacity>
-            </View>
-            {renderSearchInput(
-              branchSearch,
-              setBranchSearch,
-              t("AddOfficer.SearchBranch") || "Search branch..."
-            )}
-            <FlatList
-              data={getFilteredBranches()}
-              renderItem={renderBranchItem}
-              keyExtractor={(item) => item.ID.toString()}
-              showsVerticalScrollIndicator={false}
-              className="max-h-96"
-            />
-          </View>
-        </View>
-      </Modal>
+      {/* Branch Selection Modal using GlobalSearchModal */}
+      <GlobalSearchModal
+        visible={branchModal.isVisible}
+        onClose={branchModal.hide}
+        title={t("AddOfficer.SelectBranch")}
+        data={getBranchesData()}
+        selectedItems={[selectedBranch]}
+        onSelect={handleBranchSelect}
+        searchPlaceholder={t("AddOfficer.SearchBranch")}
+        doneButtonText={t("AddOfficer.Select")}
+        noResultsText={t("AddOfficer.NoBranchesFound")}
+        multiSelect={false}
+        renderItem={renderBranchItem}
+        searchKeys={["label", "value"]}
+      />
     </KeyboardAvoidingView>
   );
 };

@@ -422,7 +422,7 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
             source={
               profile?.profileImg
                 ? { uri: profile.profileImg }
-                : require("../../assets/myprofile.webp")
+                : require("@/assets/images/auth/my-profile.webp")
             }
             className="w-16 h-16 rounded-full mr-3"
           />

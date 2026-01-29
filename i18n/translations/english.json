@@ -174,7 +174,8 @@
     "Failed to submit complaint. Please try again.": "Failed to submit complaint. Please try again.",
     "Please select a category.": "Please select a category.",
     "Please enter your complaint.": "Please enter your complaint.",
-    "Add the Complaint here..": "Add the Complaint here.."
+    "Add the Complaint here..": "Add the Complaint here..",
+    "Submitting...": "Submitting..."
   },
   "Profile": {
     "Employee ID": "Employee ID",
@@ -395,7 +396,7 @@
     "NotApprovedYet": "Not Approved yet",
     "LoadingOfficers": "Loading officers...",
     "SearchOfficers": "Search officers by name, ID or status...",
-    "NoOfficers": "No officers found",
+    "NoOfficers": "No Officers Found",
     "NoOfficersFound": "No officers match your search",
     "Approved": "Approved"
   },
@@ -437,7 +438,8 @@
     "Opened": "Opened",
     "Closed": "Closed",
     "See more": "See more...",
-    "See less": "See less..."
+    "See less": "See less...",
+    "Loading Complaints...": "Loading complaints..."
   },
   "CapitalRequests": {
     "CapitalRequests": "Capital Requests",

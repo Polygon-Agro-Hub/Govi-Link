@@ -19,8 +19,11 @@ import axios from "axios";
 import { environment } from "@/environment/environment";
 import { useFocusEffect } from "@react-navigation/native";
 import i18n from "@/i18n/i18n";
+import NoDataComponent from "@/component/common/NoDataComponent";
+import LoadingPage from "../common/LoadingPage";
+import CustomHeader from "../common/CustomHeader";
 
-const UserProfileImage = require("@/assets/user-profile.png");
+const UserProfileImage = require("@/assets/images/feild-officers/user-profile.webp");
 
 type ManageOfficersNavigationProps = StackNavigationProp<
   RootStackParamList,
@@ -48,7 +51,6 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [officers, setOfficers] = useState<Officer[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
 
   const getName = (officer: Officer) => {
     if (!officer) return "";
@@ -75,7 +77,7 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
     });
   };
 
-  const fetchFieldOfficers = async (search: string = "") => {
+  const fetchFieldOfficers = async () => {
     try {
       setLoading(true);
       const token = await AsyncStorage.getItem("token");
@@ -84,18 +86,15 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
         Alert.alert(
           t("Error.Sorry"),
           t(
-            "Error.Your login session has expired. Please log in again to continue."
+            "Error.Your login session has expired. Please log in again to continue.",
           ),
-          [{ text: t("Main.ok") }]
+          [{ text: t("Main.ok") }],
         );
         navigation.navigate("Login");
         return;
       }
 
-      let url = `${environment.API_BASE_URL}api/officer/get-field-officers`;
-      if (search.trim() !== "") {
-        url += `?search=${encodeURIComponent(search)}`;
-      }
+      const url = `${environment.API_BASE_URL}api/officer/get-field-officers`;
 
       const response = await axios.get(url, {
         headers: { Authorization: `Bearer ${token}` },
@@ -115,18 +114,15 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
         Alert.alert(
           t("Error.Sorry"),
           t(
-            "Error.Your login session has expired. Please log in again to continue."
+            "Error.Your login session has expired. Please log in again to continue.",
           ),
-          [{ text: t("Main.ok") }]
+          [{ text: t("Main.ok") }],
         );
         navigation.navigate("Login");
       } else {
-        // Alert.alert(
-        //   t("Error.Error"),
-        //   error.response?.data?.message || t("Error.FailedToLoadOfficers")
-        // );
-              Alert.alert(t("Error.Error"), t("Error.somethingWentWrong"),[{ text: t("Main.ok") }]);
-        
+        Alert.alert(t("Error.Error"), t("Error.somethingWentWrong"), [
+          { text: t("Main.ok") },
+        ]);
       }
     } finally {
       setLoading(false);
@@ -136,13 +132,13 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    fetchFieldOfficers(searchQuery);
-  }, [searchQuery]);
+    fetchFieldOfficers();
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
-      fetchFieldOfficers(searchQuery);
-    }, [searchQuery])
+      fetchFieldOfficers();
+    }, []),
   );
 
   const getStatusColor = (status: string) => {
@@ -177,12 +173,10 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
 
   if (loading && !refreshing) {
     return (
-      <View className="flex-1 bg-white justify-center items-center">
-        <ActivityIndicator size="large" color="#21202B" />
-        <Text className="mt-4 text-[#565559]">
-          {t("ManageOfficers.LoadingOfficers")}
-        </Text>
-      </View>
+      <LoadingPage
+        message={t("ManageOfficers.LoadingOfficers")}
+        fullScreen={true}
+      />
     );
   }
 
@@ -193,15 +187,13 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
   return (
     <View className="flex-1 bg-white">
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-
-      {/* Header */}
-      <View className="bg-white px-6 py-4 border-b border-[#E5E5E5]">
-        <View className="flex-row items-center justify-center">
-          <Text className="text-lg font-bold text-black text-center">
-            {t("ManageOfficers.Officers")}
-          </Text>
-        </View>
-      </View>
+      <CustomHeader
+        title={t("ManageOfficers.Officers")}
+        navigation={navigation}
+        showBackButton={false}
+        showLanguageSelector={false}
+        showBottomBorder={true}
+      />
 
       <ScrollView
         className="flex-1 bg-white"
@@ -209,9 +201,9 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 100 }}
+        contentContainerStyle={{ paddingBottom: 100, flexGrow: 1 }}
       >
-        <View className="px-6 py-4 space-y-3">
+        <View className="px-4 py-4 space-y-3 flex-1">
           <Text className="mt-2 text-[#21202B] text-base">
             <Text className="font-bold">
               {t("ManageOfficers.OfficersList")}{" "}
@@ -222,18 +214,7 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
           </Text>
 
           {officers.length === 0 ? (
-            <View className="justify-center items-center py-10">
-              <Image
-                source={require("../../assets/no tasks.webp")}
-                style={{ width: 120, height: 90 }}
-                resizeMode="contain"
-              />
-              <Text className="italic text-[#787878] mt-4">
-                {searchQuery
-                  ? t("ManageOfficers.NoOfficersFound")
-                  : t("ManageOfficers.NoOfficers")}
-              </Text>
-            </View>
+            <NoDataComponent message={t("ManageOfficers.NoOfficers")} />
           ) : (
             officers.map((officer, index) => (
               <View
@@ -298,19 +279,19 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
 
       {/* Floating Add Button */}
       <TouchableOpacity
-        className="absolute bottom-20 right-6 items-center justify-center"
+        className="absolute bottom-20 right-4 items-center justify-center"
         style={{
-          width: 80,
-          height: 80,
+          width: 70,
+          height: 70,
           borderRadius: 50,
           backgroundColor: "#21202B",
           elevation: 50,
         }}
         onPress={() => {
-          navigation.navigate("AddOfficerStep1", {isnew:true});
+          navigation.navigate("AddOfficerStep1", { isnew: true });
         }}
       >
-        <Ionicons name="add" size={50} color="#fff" />
+        <Ionicons name="add" size={45} color="#fff" />
       </TouchableOpacity>
     </View>
   );

@@ -12,7 +12,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "./types";
+import { RootStackParamList } from "../types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { environment } from "@/environment/environment";
@@ -21,8 +21,7 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { LinearGradient } from "expo-linear-gradient";
-import { AxiosError } from "axios";
-import { AntDesign } from "@expo/vector-icons";
+import { Entypo } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import i18n from "@/i18n/i18n";
 
@@ -54,14 +53,6 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
     empId: "",
     image: "",
   });
-  console.log(formData);
-  const [profileImage, setProfileImage] = useState<string | null>(null);
-  const [token, setToken] = useState<string | null>(null);
-  const [orderCount, setOrderCount] = useState<number>(0);
-  const [customerCount, setCustomerCount] = useState<number>(0);
-  const [points, setPoints] = useState<number>(0);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [loading, setLoading] = useState(false);
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -70,6 +61,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
     };
     fetchUserProfile();
   }, []);
+
   const getUserProfile = async () => {
     try {
       const storedToken = await AsyncStorage.getItem("token");
@@ -77,113 +69,15 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
         Alert.alert("Error", "No authentication token found");
         return;
       }
-      setToken(storedToken);
 
       const response = await axios.get(
         `${environment.API_BASE_URL}api/auth/my-profile`,
-        { headers: { Authorization: `Bearer ${storedToken}` } }
+        { headers: { Authorization: `Bearer ${storedToken}` } },
       );
 
       setFormData(response.data.data);
     } catch (error) {
       console.error(error);
-    }
-  };
-
-  const handleInputChange = (key: string, value: string) => {
-    setFormData((prevState) => ({
-      ...prevState,
-      [key]: value,
-    }));
-  };
-
-  const handleUpdate = async () => {
-    if (isSubmitting) return;
-
-    setIsSubmitting(true);
-    try {
-      if (!token) {
-        Alert.alert("Error", "You are not authenticated");
-        return;
-      }
-
-      const dataToSend = {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-        //    phoneNumber1: formData.phoneNumber1,
-        houseNumber: formData.house,
-        streetName: formData.street,
-        city: formData.city,
-        nic: formData.nic,
-      };
-
-      const response = await axios.put(
-        `${environment.API_BASE_URL}api/auth/user-updateUser`,
-        dataToSend,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      Alert.alert("Success", "Profile updated successfully!");
-    } catch (error) {
-      if (error instanceof AxiosError && error.response?.data) {
-        // Handle specific validation errors with user-friendly messages
-        const errorData = error.response.data;
-
-        // Check if there are validation errors
-        if (errorData.errors && Array.isArray(errorData.errors)) {
-          // Process each error to make it user-friendly
-          const userFriendlyErrors = errorData.errors.map((err: string) => {
-            // Check for NIC pattern error
-            if (err.includes('"NIC"') && err.includes("pattern")) {
-              return "NIC must be either 12 digits or 9 digits followed by 'V'";
-            }
-            // Check for phone number format
-            else if (err.includes('"phoneNumber')) {
-              return "Phone number must be in the correct format";
-            }
-            // Check for email format
-            else if (err.includes('"email"')) {
-              return "Please enter a valid email address";
-            }
-            // For other fields, extract the field name from the error message
-            else {
-              // Extract field name from error like "\"firstName\" is required"
-              const fieldMatch = err.match(/"([^"]+)"/);
-              const fieldName = fieldMatch ? fieldMatch[1] : "field";
-
-              // Make field name more readable (camelCase to Title Case with spaces)
-              const readableFieldName = fieldName.replace(/([A-Z])/g, " $1");
-
-              return err.includes("required")
-                ? `${readableFieldName} is required`
-                : `There's an issue with ${readableFieldName.toLowerCase()}`;
-            }
-          });
-
-          // Show alert with all user-friendly errors
-          Alert.alert("Validation Error", userFriendlyErrors.join("\n"), [
-            { text: "OK" },
-          ]);
-        } else {
-          // Generic error message
-          Alert.alert("Error", errorData.message || "Failed to update profile");
-        }
-        console.error("Update error details:", errorData);
-      } else {
-        Alert.alert(
-          "Error",
-          "Failed to update profile. Please try again later."
-        );
-        console.error("Update error:", error);
-      }
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -211,18 +105,6 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
     return `${firstName} ${lastName}`.trim();
   };
 
-  // Show loading screen while data is being fetched
-  if (loading) {
-    return (
-      <View className="flex-1 bg-white justify-center items-center">
-        <ActivityIndicator></ActivityIndicator>
-        <Text className="text-[#6839CF]  font-semibold mt-4">
-          Loading Profile...
-        </Text>
-      </View>
-    );
-  }
-
   return (
     <View className="flex-1 bg-white">
       <KeyboardAvoidingView
@@ -236,10 +118,10 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
           >
-            <View className="">
+            <View>
               <View className="relative">
                 <ImageBackground
-                  source={require("../assets/profilebg.webp")}
+                  source={require("@/assets/images/auth/profile-bg.webp")}
                   resizeMode="cover"
                   style={{
                     width: "100%",
@@ -253,24 +135,23 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
               <View className="ml-3">
                 <TouchableOpacity
                   onPress={() => navigation.goBack()}
-                  style={{ position: "absolute", top: hp(2), left: wp(4) }}
+                  style={{ position: "absolute", top: hp(2) }}
                 >
-                  <AntDesign
-                    name="left"
-                    size={22}
-                    color="black"
+                  <Entypo
+                    name="chevron-left"
+                    size={25}
+                    color={"black"}
                     style={{
                       backgroundColor: "#F6F6F680",
                       borderRadius: 50,
-                      padding: wp(3),
+                      padding: wp(2.5),
                     }}
                   />
                 </TouchableOpacity>
               </View>
 
               <View
-                className="bg-white rounded-t-3xl pt-6"
-                style={{ marginTop: hp(25), paddingHorizontal: wp(6) }}
+                className="bg-white rounded-t-3xl pt-4 mt-48"
               >
                 <View className="items-center" style={{ marginTop: -hp(12) }}>
                   <TouchableOpacity className="relative">
@@ -285,11 +166,11 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                         onError={(e) =>
                           console.log("Image load error:", e.nativeEvent.error)
                         }
-                        defaultSource={require("../assets/myprofile.webp")}
+                        defaultSource={require("@/assets/images/auth/my-profile.webp")}
                       />
                     ) : (
                       <Image
-                        source={require("../assets/myprofile.webp")}
+                        source={require("@/assets/images/auth/my-profile.webp")}
                         style={{
                           width: wp(34),
                           height: wp(34),
@@ -304,8 +185,8 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                     i18n.language === "si"
                       ? "text-xl"
                       : i18n.language === "ta"
-                      ? "text-lg"
-                      : "text-2xl"
+                        ? "text-lg"
+                        : "text-2xl"
                   } font-bold mb-8`}
                   >
                     {getLocalizedName()}
@@ -313,13 +194,13 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                 </View>
               </View>
 
-              <View className="bg-white px-4">
-                <View className="px-5 mb-8">
+              <View className="bg-white">
+                <View className="px-4 mb-8">
                   <View className="mb-4">
                     <Text className="text-black mb-1">
                       {t("Profile.Employee ID")}
                     </Text>
-                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-2xl px-4 py-3 text-[#8492A3]">
+                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-4 py-4 text-[#8492A3]">
                       {formData.empId}
                     </Text>
                   </View>
@@ -328,12 +209,12 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                     <Text className="text-black mb-1">
                       {t("Profile.First Name")}
                     </Text>
-                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-2xl px-4 py-3 text-[#8492A3]">
+                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-4 py-4 text-[#8492A3]">
                       {i18n.language === "si"
                         ? formData.firstNameSinhala
                         : i18n.language === "ta"
-                        ? formData.firstNameTamil
-                        : formData.firstName}
+                          ? formData.firstNameTamil
+                          : formData.firstName}
                     </Text>
                   </View>
 
@@ -341,12 +222,12 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                     <Text className="text-black mb-1">
                       {t("Profile.Last Name")}
                     </Text>
-                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-2xl px-4 py-3 text-[#8492A3]">
+                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-4 py-4 text-[#8492A3]">
                       {i18n.language === "si"
                         ? formData.lastNameSinhala
                         : i18n.language === "ta"
-                        ? formData.lastNameTamil
-                        : formData.lastName}
+                          ? formData.lastNameTamil
+                          : formData.lastName}
                     </Text>
                   </View>
 
@@ -354,7 +235,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                     <Text className="text-black mb-1">
                       {t("Profile.Phone Number - 1")}
                     </Text>
-                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-2xl px-4 py-3 text-[#8492A3]">
+                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-4 py-4 text-[#8492A3]">
                       {formData.phoneNumber1}
                     </Text>
                   </View>
@@ -363,7 +244,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                     <Text className="text-black mb-1">
                       {t("Profile.Phone Number - 2")}
                     </Text>
-                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-2xl px-4 py-3 text-[#8492A3]">
+                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-4 py-4 text-[#8492A3]">
                       {formData.phoneNumber2 || "---"}
                     </Text>
                   </View>
@@ -372,7 +253,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                     <Text className="text-black mb-1">
                       {t("Profile.NIC Number")}
                     </Text>
-                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-2xl px-4 py-3 text-[#8492A3]">
+                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-4 py-4 text-[#8492A3]">
                       {formData.nic}
                     </Text>
                   </View>
@@ -382,7 +263,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                       {t("Profile.Email Address")}
                     </Text>
 
-                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-2xl px-4 py-3 text-[#8492A3]">
+                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-4 py-4 text-[#8492A3]">
                       {formData.email}
                     </Text>
                   </View>
@@ -391,7 +272,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                     <Text className="text-black mb-1">
                       {t("Profile.Building / House No")}
                     </Text>
-                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-2xl px-4 py-3 text-[#8492A3]">
+                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-4 py-4 text-[#8492A3]">
                       {formData.house}
                     </Text>
                   </View>
@@ -400,14 +281,14 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                     <Text className="text-black mb-1">
                       {t("Profile.Street Name")}
                     </Text>
-                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-2xl px-4 py-3 text-[#8492A3]">
+                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-4 py-4 text-[#8492A3]">
                       {formData.street}
                     </Text>
                   </View>
 
                   <View className="mb-14">
                     <Text className="text-black mb-1">{t("Profile.City")}</Text>
-                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-2xl px-4 py-3 text-[#8492A3]">
+                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-4 py-4 text-[#8492A3]">
                       {formData.city}
                     </Text>
                   </View>

@@ -19,6 +19,7 @@ import axios from "axios";
 import { environment } from "@/environment/environment";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { RouteProp, useRoute,useFocusEffect } from "@react-navigation/native";
+import CustomHeader from "../common/CustomHeader";
 
 type AddOfficerStep3NavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -156,9 +157,6 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
       newErrors.passbook = t("Error.Passbook image is required");
     if (!contractImage)
       newErrors.contract = t("Error.Contract image is required");
-
-    // setErrors(newErrors);
-    // return Object.keys(newErrors).length === 0;
     setErrors(newErrors);
   return newErrors;
   };
@@ -281,8 +279,6 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
         }
       }
 
-      console.log("Submitting form data with profile image...");
-
       // Submit to backend
       const response = await axios.post(
         `${environment.API_BASE_URL}api/officer/create-field-officer`,
@@ -383,34 +379,22 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
       style={{ flex: 1, backgroundColor: "white" }}
     >
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+       <CustomHeader
+        title={t("AddOfficer.AddOfficer")}
+        navigation={navigation}
+        showBackButton={true}
+        showLanguageSelector={false}
+        onBackPress={handleGoBack}
+      />
       <ScrollView
         contentContainerStyle={{ paddingBottom: 100 }}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
-        <View className="flex-row items-center px-4 py-3">
-          <TouchableOpacity
-            onPress={handleGoBack}
-            className="bg-[#F6F6F680] rounded-full py-4 px-3"
-            disabled={loading}
-          >
-            <MaterialIcons
-              name="arrow-back-ios"
-              size={24}
-              color="black"
-              style={{ marginLeft: 10 }}
-            />
-          </TouchableOpacity>
-          <Text className="text-lg font-bold text-black text-center flex-1">
-            {t("AddOfficer.AddOfficer")}
-          </Text>
-          <View style={{ width: 55 }} />
-        </View>
 
         {/* Document Upload Section */}
         <View className="p-4">
-          <View className="px-6 mt-4">
+          <View className="mt-4">
             <UploadButton
               title={t("AddOfficer.NICFrontImage")}
               type="nicFront"
@@ -445,7 +429,7 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
           </View>
 
           {/* Buttons */}
-          <View className="px-6 flex-col w-full gap-4 mt-4">
+          <View className="flex-col w-full gap-4 mt-4">
             <TouchableOpacity
               className="bg-[#D9D9D9] rounded-3xl px-6 py-4 w-full items-center"
               onPress={handleGoBack}

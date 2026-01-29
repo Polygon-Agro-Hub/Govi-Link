@@ -174,7 +174,8 @@
     "Failed to submit complaint. Please try again.": "புகாரை சேர்க்க முடியவில்லை. தயவுசெய்து மீண்டும் முயற்சிக்கவும்.",
     "Please select a category.": "ஒரு வகையைத் தேர்ந்தெடுக்கவும்.",
     "Please enter your complaint.": "உங்கள் புகாரை உள்ளிடவும்.",
-    "Add the Complaint here..": "Add the Complaint here.."
+    "Add the Complaint here..": "Add the Complaint here..",
+    "Submitting...": "சமர்ப்பித்து கொண்டிருக்கிறது..."
   },
   "Profile": {
     "Employee ID": "பணியாளர் அடையாள எண்",
@@ -437,7 +438,8 @@
     "Opened": "திறக்கப்பட்டது",
     "Closed": "மூடப்பட்டது",
     "See more...": "மேலும் காண்க...",
-    "See less": "குறைவாகப் பாருங்கள்..."
+    "See less": "குறைவாகப் பாருங்கள்...",
+    "Loading Complaints...": "புகார்கள் ஏற்றப்படுகிறது..."
   },
   "CapitalRequests": {
     "CapitalRequests": "மூலதன கோரிக்கைகள்",
