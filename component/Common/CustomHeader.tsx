@@ -20,6 +20,7 @@ interface CustomHeaderProps {
   onLanguageChange?: (language: string) => void;
   onLogoutPress?: () => void;
   dark?: boolean;
+  showBottomBorder?: boolean;
 }
 
 const CustomHeader: React.FC<CustomHeaderProps> = ({
@@ -32,6 +33,7 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
   onLanguageChange,
   onLogoutPress,
   dark = false,
+  showBottomBorder = false,
 }) => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState("EN");
@@ -69,9 +71,10 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
 
   return (
     <View
-      className={`flex-row items-center justify-between px-4 py-3 relative ${
-        dark ? "bg-black" : "bg-white"
-      }`}
+      className={`flex-row items-center justify-between px-4 py-3 relative
+    ${dark ? "bg-black" : "bg-white"}
+    ${showBottomBorder ? "border-b border-[#E5E5E5]" : ""}
+  `}
     >
       <View style={{ width: wp(15) }}>
         {showBackButton && navigation && (

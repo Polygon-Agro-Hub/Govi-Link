@@ -80,6 +80,7 @@
     "Unauthorized Access": "අනවසර ප්‍රවේශය",
     "You are not authorized to access this system. Please use a valid Employee ID": "ඔබ මෙම පද්ධතියට ප්‍රවේශ වීමට අවසර නොමැත. කරුණාකර වලංගු සේවක හැඳුනුම්පතක් භාවිතා කරන්න.",
     "This EMP ID is not approved.": "මෙම සේවක හැඳුනුම්පත අනුමත කර නොමැත.",
+    "This Employee ID is Rejected":"මෙම සේවක හැඳුනුම්පත ප්‍රතික්ෂේප කර ඇත.",
     "Please Wait": "කරුණාකර රැඳී සිටින්න",
     "Validating your information, please wait...": "ඔබගේ තොරතුරු තහවුරු කරන තෙක් රැඳී සිටින්න...",
     "firstName is required": "පළමු නම අවශ්‍යයි",
@@ -124,7 +125,10 @@
     "Value must be greater than 0": "අගය 0 ට වඩා වැඩි විය යුතුය.",
     "What are the risks you are anticipating in the proposed crop / cropping system is required": "යෝජිත බෝග/බෝග ක්‍රමය අවශ්‍ය වන විට ඔබ අපේක්ෂා කරන අවදානම් මොනවාද?",
     "Do you have the solution is required": "අවශ්‍ය විසඳුම ඔබ ළඟ තිබේද අවශ්‍යයි",
-    "Is it worth to take the risks for anticipated profits is required": "අපේක්ෂිත ලාභ සඳහා අවදානම් ගැනීම වටී ද යන්න අවශ්‍යයි."
+    "Is it worth to take the risks for anticipated profits is required": "අපේක්ෂිත ලාභ සඳහා අවදානම් ගැනීම වටී ද යන්න අවශ්‍යයි.",
+    "Land number must be 9 digits long": "භූමි දුරකථන අංකය අංක 9ක් විය යුතුය",
+    "Land number number must start with 0": "භූමි දුරකථන අංකය 0 න් ආරම්භ විය යුතුය",
+    "Invalid land number format": "භූමි දුරකථන අංකය වැරදියි"
   },
   "Login": {
     "Welcome": "සාදරයෙන් පිළිගනිමු!",
@@ -171,7 +175,8 @@
     "Failed to submit complaint. Please try again.": "පැමිණිල්ල එක් කිරීම අසාර්ථකයි. කරුණාකර නැවත උත්සාහ කරන්න.",
     "Please select a category.": "කරුණාකර කාණ්ඩයක් තෝරන්න.",
     "Please enter your complaint.": "කරුණාකර ඔබේ පැමිණිල්ල ඇතුළත් කරන්න.",
-    "Add the Complaint here..": "පැමිණිල්ල මෙතනට එකතු කරන්න.."
+    "Add the Complaint here..": "පැමිණිල්ල මෙතනට එකතු කරන්න..",
+    "Submitting...": "යොමු කරමින් පවතී..."
   },
   "Profile": {
     "Employee ID": "පරිශීලක අංකය",
@@ -434,7 +439,8 @@
     "Opened": "විවෘත කළා",
     "Closed": "වසා දමන ලදී",
     "See more...": "තවත් බලන්න...",
-    "See less": "අඩුවෙන් බලන්න..."
+    "See less": "අඩුවෙන් බලන්න...",
+    "Loading Complaints...": "පැමිණිලි පූරණය වෙමින් පවතී..."
   },
   "CapitalRequests": {
     "CapitalRequests": "මූල්‍ය ඉල්ලීම්",

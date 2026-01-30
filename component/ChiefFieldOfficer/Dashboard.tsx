@@ -146,8 +146,6 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
     [],
   );
   const [loadingVisitsdrafts, setLoadingVisitsdrafts] = useState(false);
-  console.log("officer draft visit", draftVisits);
-  console.log("officer  visit", visitsData);
   const [currentDraftIndex, setCurrentDraftIndex] = useState(0);
   const draftFlatListRef = useRef<FlatList>(null);
   const openDrawer = () => {
@@ -159,10 +157,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
     cropcardPadding: screenWidth < width ? 0 : 25,
     dynamicMarginLeft: screenWidth < 376 ? "-ml-5" : "",
   };
-
   const translateY = useRef(new Animated.Value(0)).current;
-  const currentTranslateY = useRef(0);
-  console.log(translateY);
 
   const panResponder = useRef(
     PanResponder.create({
@@ -380,7 +375,6 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
       );
 
       const { visits, draftVisits } = response.data.data;
-      console.log("Fetched visits:", visits, draftVisits);
 
       // Filter visits to exclude those with 20% or more completion
       const filteredVisits = visits.filter((visit: VisitsData) => {
@@ -460,7 +454,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
             source={
               profile?.profileImg
                 ? { uri: profile.profileImg }
-                : require("../../assets/myprofile.webp")
+                : require("@/assets/images/auth/my-profile.webp")
             }
             className="w-16 h-16 rounded-full mr-3"
           />

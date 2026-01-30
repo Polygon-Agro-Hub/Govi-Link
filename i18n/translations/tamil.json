@@ -80,6 +80,7 @@
     "Unauthorized Access": "Unauthorized Access",
     "You are not authorized to access this system. Please use a valid Employee ID": "You are not authorized to access this system. Please use a valid Employee ID",
     "This EMP ID is not approved.": "This EMP ID is not approved.",
+    "This Employee ID is Rejected":"This Employee ID is Rejected",
     "Please Wait": "Please Wait",
     "Validating your information, please wait...": "Validating your information, please wait...",
     "firstName is required": "First name is required",
@@ -124,7 +125,10 @@
     "Value must be greater than 0": "Value must be greater than 0",
     "What are the risks you are anticipating in the proposed crop / cropping system is required": "What are the risks you are anticipating in the proposed crop / cropping system is required",
     "Do you have the solution is required": "Do you have the solution is required",
-    "Is it worth to take the risks for anticipated profits is required": "Is it worth to take the risks for anticipated profits is required"
+    "Is it worth to take the risks for anticipated profits is required": "Is it worth to take the risks for anticipated profits is required",
+    "Land number must be 9 digits long": "நில எண்ணில் 9 இலக்கங்கள் இருக்க வேண்டும்",
+    "Land number must start with 0": "நில எண் 0-இல் தொடங்க வேண்டும்",
+    "Invalid land number format": "தவறான நில எண் வடிவம்"
   },
   "Login": {
     "Welcome": "வரவேற்கிறோம்",
@@ -171,7 +175,8 @@
     "Failed to submit complaint. Please try again.": "புகாரை சேர்க்க முடியவில்லை. தயவுசெய்து மீண்டும் முயற்சிக்கவும்.",
     "Please select a category.": "ஒரு வகையைத் தேர்ந்தெடுக்கவும்.",
     "Please enter your complaint.": "உங்கள் புகாரை உள்ளிடவும்.",
-    "Add the Complaint here..": "Add the Complaint here.."
+    "Add the Complaint here..": "Add the Complaint here..",
+    "Submitting...": "சமர்ப்பித்து கொண்டிருக்கிறது..."
   },
   "Profile": {
     "Employee ID": "பணியாளர் அடையாள எண்",
@@ -434,7 +439,8 @@
     "Opened": "திறக்கப்பட்டது",
     "Closed": "மூடப்பட்டது",
     "See more...": "மேலும் காண்க...",
-    "See less": "குறைவாகப் பாருங்கள்..."
+    "See less": "குறைவாகப் பாருங்கள்...",
+    "Loading Complaints...": "புகார்கள் ஏற்றப்படுகிறது..."
   },
   "CapitalRequests": {
     "CapitalRequests": "மூலதன கோரிக்கைகள்",
