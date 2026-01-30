@@ -124,7 +124,10 @@
     "Value must be greater than 0": "Value must be greater than 0",
     "What are the risks you are anticipating in the proposed crop / cropping system is required": "What are the risks you are anticipating in the proposed crop / cropping system is required",
     "Do you have the solution is required": "Do you have the solution is required",
-    "Is it worth to take the risks for anticipated profits is required": "Is it worth to take the risks for anticipated profits is required"
+    "Is it worth to take the risks for anticipated profits is required": "Is it worth to take the risks for anticipated profits is required",
+    "Land number must be 9 digits long": "Land number must be 9 digits long",
+    "Land number must start with 0": "Land number must start with 0",
+    "Invalid land number format": "Invalid land number format"
   },
   "Login": {
     "Welcome": "Welcome!",
@@ -171,7 +174,8 @@
     "Failed to submit complaint. Please try again.": "Failed to submit complaint. Please try again.",
     "Please select a category.": "Please select a category.",
     "Please enter your complaint.": "Please enter your complaint.",
-    "Add the Complaint here..": "Add the Complaint here.."
+    "Add the Complaint here..": "Add the Complaint here..",
+    "Submitting...": "Submitting..."
   },
   "Profile": {
     "Employee ID": "Employee ID",
@@ -392,7 +396,7 @@
     "NotApprovedYet": "Not Approved yet",
     "LoadingOfficers": "Loading officers...",
     "SearchOfficers": "Search officers by name, ID or status...",
-    "NoOfficers": "No officers found",
+    "NoOfficers": "No Officers Found",
     "NoOfficersFound": "No officers match your search",
     "Approved": "Approved"
   },
@@ -434,7 +438,8 @@
     "Opened": "Opened",
     "Closed": "Closed",
     "See more": "See more...",
-    "See less": "See less..."
+    "See less": "See less...",
+    "Loading Complaints...": "Loading complaints..."
   },
   "CapitalRequests": {
     "CapitalRequests": "Capital Requests",
