@@ -133,7 +133,7 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
     Alert.alert(
       t("Error.Sorry"),
       t("Otpverification.Please enter the 5-digit OTP sent to your phone."),
-      [{ text: t("MAIN.OK") }]
+      [{ text: t("Main.ok") }]
     );
     return;
   }
@@ -172,7 +172,7 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
       Alert.alert(
         t("Main.No Internet Connection"),
         t("Main.Please turn on Mobile Data or Wi-Fi to continue."),
-        [{ text: t("MAIN.OK") }]
+        [{ text: t("Main.ok") }]
       );
       return;
     }
@@ -188,7 +188,7 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
           Alert.alert(
             t("Error.Sorry"),
             t("Otpverification.Audit completion failed. Please try again."),
-            [{ text: t("MAIN.OK") }]
+            [{ text: t("Main.ok") }]
           );
         }
         break;
@@ -217,7 +217,7 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
                       Alert.alert(
             t("Otpverification.Invalid OTP"),
             t("Otpverification.The OTP you entered is incorrect. Please try again."),
-            [{ text: t("MAIN.OK") }]
+            [{ text: t("Main.ok") }]
           );
         }
         break;
@@ -234,7 +234,7 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
         Alert.alert(
           t("Error.Sorry"),
            t("Main.somethingWentWrong"),
-           [{ text: t("MAIN.OK") }]
+           [{ text: t("Main.ok") }]
         );
       }
     } catch (error: any) {
@@ -251,13 +251,13 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
       Alert.alert(
         t("Error.Sorry"),
         t("Otpverification.Your OTP is invalid or expired."),
-        [{ text: t("MAIN.OK") }]
+        [{ text: t("Main.ok") }]
       );
     } else {
       Alert.alert(
                  t("Error.Sorry"),
            t("Main.somethingWentWrong"),
-           [{ text: t("MAIN.OK") }]
+           [{ text: t("Main.ok") }]
       );
     }
   }
@@ -301,7 +301,7 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
       Alert.alert(
         t("Otpverification.Success"),
         t("Otpverification.A new OTP has been sent to your mobile number."),
-        [{ text: t("MAIN.OK") }]
+        [{ text: t("Main.ok") }]
       );
       setTimer(240);
       setDisabledResend(true);
@@ -309,14 +309,14 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
       Alert.alert(
         t("Error.Sorry"),
         t("Otpverification.We couldn’t send the OTP. Please try again later."),
-        [{ text: t("MAIN.OK") }]
+        [{ text: t("Main.ok") }]
       );
     }
   } catch (error) {
     Alert.alert(
            t("Error.Sorry"),
            t("Main.somethingWentWrong"),
-           [{ text: t("MAIN.OK") }]
+           [{ text: t("Main.ok") }]
     );
   }
 };
@@ -329,7 +329,7 @@ const handleComplete = async (): Promise<boolean> => {
              Alert.alert(
                 t("Error.Sorry"),
                 t("Error.Your login session has expired. Please log in again to continue."),
-                [{ text: t("MAIN.OK") }]
+                [{ text: t("Main.ok") }]
               );
                     return false;
     }

@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "GoviLink",
-    "slug": "GoviLink",
+    "name": "GoViLink",
+    "slug": "GoViLink",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/favicon-icon.png",
@@ -20,6 +20,9 @@
         "foregroundImage": "./assets/favicon-icon.png",
         "backgroundColor": "#ffffff"
       },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false,
+      "package": "com.polygonagro.GoviLink",
       "softwareKeyboardLayoutMode": "pan",
       "versionCode": 9,
       "compileSdkVersion": 35,
@@ -29,6 +32,8 @@
         "INTERNET",
         "CAMERA",
         "RECORD_AUDIO",
+        "READ_MEDIA_IMAGES",
+        "READ_MEDIA_VIDEO",
         "WRITE_EXTERNAL_STORAGE",
         "ACCESS_COARSE_LOCATION",
         "ACCESS_FINE_LOCATION",
@@ -36,15 +41,17 @@
         "WAKE_LOCK",
         "RECEIVE_BOOT_COMPLETED",
         "LOCATION",
+        "ACCESS_BACKGROUND_LOCATION",
         "ACCESS_WIFI_STATE",
+        "CHANGE_WIFI_STATE",
         "ACCESS_NETWORK_STATE",
+        "CHANGE_NETWORK_STATE",
+        "SYSTEM_ALERT_WINDOW",
         "FOREGROUND_SERVICE",
         "NOTIFICATIONS",
+        "WRITE_EXTERNAL_STORAGE",
         "CALL_PHONE"
-      ],
-      "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false,
-      "package": "com.polygonagro.GoviLink"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon-icon.png"
@@ -67,30 +74,18 @@
           "android": {
             "compileSdkVersion": 35,
             "targetSdkVersion": 35,
-            "minSdkVersion": 24,
-            "ndkVersion": "28.0.12433566",
-            "enableProguardInReleaseBuilds": true,
-            "packagingOptions": {
-              "jniLibs": {
-                "useLegacyPackaging": false
-              }
-            },
-            "gradleProperties": {
-              "android.useAndroidX": "true",
-              "android.enableJetifier": "true",
-              "ANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES": "true"
-            },
-            "enableMinifyInReleaseBuilds": true
+            "minSdkVersion": 24
           }
         }
-      ]
+      ],
+      "expo-sqlite"
     ],
     "extra": {
       "router": {
         "origin": false
       },
       "eas": {
-        "projectId": "40186f33-48b8-44ef-ab85-fe2b6be02549"
+        "projectId": "d51afbb6-3a6d-45a4-bcb7-bb3332088c63"
       }
     },
     "expo-camera": {
