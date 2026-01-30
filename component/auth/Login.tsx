@@ -148,6 +148,7 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
       );
 
       const data = await response.json();
+      console.log("response", data);
 
       if (!response.ok || !data.success) {
         setLoading(false);
@@ -166,6 +167,11 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
           Alert.alert(
             t("Error.error"),
             t("Error.This EMP ID is not approved."),
+          );
+        } else if (message.includes("rejected")) {
+          Alert.alert(
+            t("Error.error"),
+            t("Error.This Employee ID is Rejected"),
           );
         } else {
           Alert.alert(t("Error.error"), t("Main.somethingWentWrong"));
