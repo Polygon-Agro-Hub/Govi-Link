@@ -24,7 +24,7 @@
       "predictiveBackGestureEnabled": false,
       "package": "com.polygonagro.GoviLink",
       "softwareKeyboardLayoutMode": "pan",
-      "versionCode": 12,
+      "versionCode": 9,
       "compileSdkVersion": 35,
       "targetSdkVersion": 35,
       "minSdkVersion": 24,
@@ -83,6 +83,9 @@
     "extra": {
       "router": {
         "origin": false
+      },
+      "eas": {
+        "projectId": "d51afbb6-3a6d-45a4-bcb7-bb3332088c63"
       }
     },
     "expo-camera": {
