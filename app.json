@@ -24,7 +24,7 @@
       "predictiveBackGestureEnabled": false,
       "package": "com.polygonagro.GoviLink",
       "softwareKeyboardLayoutMode": "pan",
-      "versionCode": 9,
+      "versionCode": 10,
       "compileSdkVersion": 35,
       "targetSdkVersion": 35,
       "minSdkVersion": 24,
@@ -32,8 +32,6 @@
         "INTERNET",
         "CAMERA",
         "RECORD_AUDIO",
-        "READ_MEDIA_IMAGES",
-        "READ_MEDIA_VIDEO",
         "WRITE_EXTERNAL_STORAGE",
         "ACCESS_COARSE_LOCATION",
         "ACCESS_FINE_LOCATION",
@@ -41,15 +39,10 @@
         "WAKE_LOCK",
         "RECEIVE_BOOT_COMPLETED",
         "LOCATION",
-        "ACCESS_BACKGROUND_LOCATION",
         "ACCESS_WIFI_STATE",
-        "CHANGE_WIFI_STATE",
         "ACCESS_NETWORK_STATE",
-        "CHANGE_NETWORK_STATE",
-        "SYSTEM_ALERT_WINDOW",
         "FOREGROUND_SERVICE",
         "NOTIFICATIONS",
-        "WRITE_EXTERNAL_STORAGE",
         "CALL_PHONE"
       ]
     },
@@ -85,7 +78,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "d51afbb6-3a6d-45a4-bcb7-bb3332088c63"
+        "projectId": "b615c522-b216-4fbd-aff8-e900b9dcf646"
       }
     },
     "expo-camera": {
