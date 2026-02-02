@@ -541,16 +541,17 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
               *
             </Text>
             <View
-              className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${
-                errors.landDiscription ? "border border-red-500" : ""
-              }`}
+              className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${errors.landDiscription ? "border border-red-500" : ""
+                }`}
             >
               <TextInput
                 placeholder={t("InspectionForm.Type here...")}
                 value={formData.landDiscription}
                 onChangeText={(text) => {
+                  // Remove leading whitespace only, preserve line breaks
                   let formattedText = text.replace(/^\s+/, "");
-                  if (formattedText.length > 0) {
+                  if (formattedText.length > 0 && !text.startsWith('\n')) {
+                    // Only capitalize if not starting with a line break
                     formattedText =
                       formattedText.charAt(0).toUpperCase() +
                       formattedText.slice(1);
