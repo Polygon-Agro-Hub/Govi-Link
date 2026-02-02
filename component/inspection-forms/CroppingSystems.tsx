@@ -298,9 +298,14 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
 
       appendIfNotNull("hasKnowlage", yesNoToInt(data.hasKnowlage));
 
-      // JSON array field
+      // JSON array field - filter out "Other" before sending
       if (data.opportunity && data.opportunity.length > 0) {
-        apiFormData.append("opportunity", JSON.stringify(data.opportunity));
+        const filteredOpportunities = data.opportunity.filter(
+          (item) => item !== "Other"
+        );
+        if (filteredOpportunities.length > 0) {
+          apiFormData.append("opportunity", JSON.stringify(filteredOpportunities));
+        }
       }
 
       // Text fields
@@ -647,9 +652,11 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
                 placeholder={t("InspectionForm.Type here...")}
                 value={formData.opinion || ""}
                 onChangeText={(text) => {
+                  // Only remove leading whitespace on the first line, preserve line breaks
                   let formattedText = text.replace(/^\s+/, "");
 
-                  if (formattedText.length > 0) {
+                  // Only capitalize if there's text and it's not starting with a line break
+                  if (formattedText.length > 0 && !text.startsWith('\n')) {
                     formattedText =
                       formattedText.charAt(0).toUpperCase() +
                       formattedText.slice(1);
