@@ -28,7 +28,7 @@ import {
 } from "react-native-responsive-screen";
 import NetInfo from "@react-native-community/netinfo";
 import { LinearGradient } from "expo-linear-gradient";
-import CustomHeader from "../Common/CustomHeader";
+import CustomHeader from "../common/CustomHeader";
 
 type LoginNavigationProp = StackNavigationProp<RootStackParamList, "Login">;
 
