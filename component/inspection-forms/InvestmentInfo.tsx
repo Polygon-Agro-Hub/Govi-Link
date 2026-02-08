@@ -49,9 +49,8 @@ const Input = ({
       {required && <Text className="text-black">*</Text>}
     </Text>
     <View
-      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
-        error ? "border border-red-500" : ""
-      }`}
+      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${error ? "border border-red-500" : ""
+        }`}
     >
       <TextInput
         placeholder={placeholder}
@@ -472,6 +471,16 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
     }
   };
 
+  const formatWithCommas = (value: string): string => {
+    if (!value) return "";
+
+    // Remove any existing commas
+    const numericValue = value.replace(/,/g, "");
+
+    // Add commas as thousand separators
+    return numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -510,13 +519,15 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
           <Input
             label={t("InspectionForm.Expected investment by the farmer")}
             placeholder=""
-            value={formData.expected ? formData.expected.toString() : ""}
-            onChangeText={(text) =>
-              handleFieldChange("expected", text, {
+            value={formData.expected ? formatWithCommas(formData.expected.toString()) : ""}
+            onChangeText={(text) => {
+              // Remove commas before processing
+              const numericValue = text.replace(/,/g, "");
+              handleFieldChange("expected", numericValue, {
                 required: true,
                 type: "expected",
-              })
-            }
+              });
+            }}
             required
             extra={t("InspectionForm.Rs")}
             keyboardType={"phone-pad"}
