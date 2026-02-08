@@ -632,7 +632,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
         <ScrollView
           className="flex-1 px-6 bg-white rounded-t-3xl"
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 120 }}
+          contentContainerStyle={{ paddingBottom: 80 }}
         >
           <View className="h-6" />
 
