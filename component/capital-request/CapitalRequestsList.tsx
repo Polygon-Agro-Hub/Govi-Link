@@ -182,7 +182,7 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
       {/* Header */}
       <View className="flex-row items-center px-4 py-3">
         <TouchableOpacity
-          onPress={() => navigation.navigate("ManageOfficers")}
+          onPress={() => navigation.navigate("Dashboard")}
           className="bg-[#F6F6F680] rounded-full py-4 px-3"
         >
           <MaterialIcons
