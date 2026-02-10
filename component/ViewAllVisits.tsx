@@ -184,12 +184,12 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation }) => {
 
   useFocusEffect(
     useCallback(() => {
-      setSelectedDate(today); // ensure current date is selected
+      setSelectedDate(today); 
       setIsOverdueSelected(false);
       setTimeout(() => {
         if (scrollRef.current) {
           scrollRef.current.scrollTo({
-            x: 0, // today is first in array, so no offset needed
+            x: 0, 
             animated: true,
           });
         }
@@ -260,27 +260,6 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation }) => {
     );
   };
 
-  const updateStatus = async (feildauditId: number, jobId: any) => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-
-      if (token) {
-        const response = await axios.post(
-          `${environment.API_BASE_URL}api/cluster-audit/status/onGoing/${feildauditId}`,
-          { jobId }, // Empty body
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
-        );
-        console.log("Status updated:", response.data);
-        // Optionally refresh the visits data after updating
-        await fetchVisits();
-      }
-    } catch (error) {
-      console.error("Failed to update status:", error);
-    }
-  };
-
   return (
     <View className="flex-1 bg-[#F5F7FB] pt-4">
       {/* Header */}
@@ -290,8 +269,8 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation }) => {
       <View className="flex-row p-2 ml-4">
         <TouchableOpacity
           onPress={() => {
-            setIsOverdueSelected(true); // select overdue
-            setSelectedDate(dayjs()); // optional: reset date
+            setIsOverdueSelected(true); 
+            setSelectedDate(dayjs());
           }}
         >
           <LinearGradient
@@ -392,17 +371,22 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation }) => {
                   // ---------- CLUSTER LOGIC ----------
                   if (item.propose === "Cluster" && item.totalClusterCount) {
                     if (item.completedClusterCount === item.totalClusterCount) {
-                      return 4;
+                      return 5;
                     }
 
                     if (
                       item.completedClusterCount !== undefined &&
                       item.completedClusterCount > 0
                     ) {
-                      return item.completionPercentage < "20" ? 2 : 3;
+                      const completionPercentage = parseFloat(
+                        item.completionPercentage,
+                      );
+                      if (completionPercentage >= 10) {
+                        return 2;
+                      }
                     }
 
-                    return 1;
+                    return 3;
                   }
 
                   // ---------- NON-CLUSTER LOGIC ----------
@@ -410,14 +394,18 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation }) => {
                     item.status === "Completed" ||
                     item.status === "Finished"
                   ) {
-                    return 3; // bottom
+                    return 5;
                   }
 
-                  if (item.status === "Pending" || item.status === "Ongoing") {
-                    return 1; // top
+                  if (item.status === "Ongoing") {
+                    return 1;
                   }
 
-                  return 2; // middle
+                  if (item.status === "Pending") {
+                    return 3;
+                  }
+
+                  return 4;
                 };
 
                 return getStatusRank(a) - getStatusRank(b);
@@ -711,7 +699,7 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation }) => {
                     selectedItem?.farmerId &&
                     selectedItem?.propose === "Individual"
                   ) {
-                    updateStatus(selectedItem.id, selectedItem.jobId);
+                    // updateStatus(selectedItem.id, selectedItem.jobId);
                     navigation.navigate("QRScanner", {
                       farmerId: selectedItem.farmerId,
                       jobId: selectedItem.jobId,
@@ -725,8 +713,8 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation }) => {
                       screenName: "ViewAllVisits",
                     });
                   } else if (selectedItem?.propose === "Requested") {
-                    updateStatus(selectedItem.id, selectedItem.jobId);
-                    console.log("hitt Request");
+                    // updateStatus(selectedItem.id, selectedItem.jobId);
+                    // console.log("hitt Request");
                     navigation.navigate("QRScaneerRequstAudit", {
                       farmerId: selectedItem.farmerId,
                       govilinkjobid: selectedItem.id,

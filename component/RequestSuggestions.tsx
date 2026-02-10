@@ -418,9 +418,9 @@ const handleChangeProblem = (
           </View>
         </ScrollView>
       )}
-    {/* */ }  <View className="flex-row justify-between p-4 border-t border-gray-200">
+  <View className="flex-row justify-between p-4 border-t border-gray-200 px-6">
         <TouchableOpacity
-          className="flex-row items-center bg-[#444444] px-10 py-3 rounded-full"
+          className="flex-row items-center bg-[#444444] px-9 py-3 rounded-full "
           onPress={() => navigation.goBack()}
         >
           <AntDesign name="arrow-left" size={20} color="#fff" />
@@ -429,7 +429,7 @@ const handleChangeProblem = (
           </Text>
         </TouchableOpacity>
             {loading || editingId !== null  ? (
-                <View className="flex-row items-center px-12 py-3 rounded-full bg-[#C4C4C4]">
+                <View className="flex-row items-center bg-[#444444] px-9 py-3 rounded-full ">
           <Text className="mr-2 text-white font-semibold text-base">{t("CertificateQuesanory.Next")}</Text>
           <AntDesign name="arrow-right" size={20} color="#fff" />
         </View>
@@ -471,7 +471,7 @@ const handleChangeProblem = (
             colors={["#F35125", "#FF1D85"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
-            className="flex-row items-center px-12 py-3 rounded-full"
+            className="flex-row items-center px-9 py-3 rounded-full"
           >
 
           <Text className="mr-4 text-white font-semibold text-base">

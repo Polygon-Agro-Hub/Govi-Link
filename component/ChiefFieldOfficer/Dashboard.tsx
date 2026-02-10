@@ -439,12 +439,15 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
       : text;
   };
   return (
-    <ScrollView
-      className={`flex-1 bg-white p-3  `}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-    >
+    <View className="flex-1 bg-white">
+  <ScrollView
+    className="bg-white p-3"
+    refreshControl={
+      <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+    }
+    showsVerticalScrollIndicator={true}
+    contentContainerStyle={{ flexGrow: 1, paddingBottom: 50 }}
+  >
       <View className="flex flex-row ">
         <TouchableOpacity
           className="flex-row items-center mb-4 p-4"
@@ -1103,6 +1106,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
         </View>
       </Modal>
     </ScrollView>
+    </View>
   );
 };
 

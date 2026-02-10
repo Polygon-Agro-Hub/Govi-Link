@@ -215,27 +215,6 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
     );
   };
 
-  const updateStatus = async () => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-
-      if (token) {
-        const response = await axios.post(
-          `${environment.API_BASE_URL}api/cluster-audit/status/onGoing/${feildauditId}`,
-          { jobId },
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
-        );
-        console.log("Status updated:", response.data);
-        // Optionally refresh the visits data after updating
-        await fetchclusteVisits();
-      }
-    } catch (error) {
-      console.error("Failed to update status:", error);
-    }
-  };
-
   return (
     <View className="flex-1 bg-white">
       <View className="flex-row items-center px-4 py-4 bg-white shadow-sm border-b border-[#E5E5E5]">
@@ -259,13 +238,22 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
             const farmsLeft = visitsData.filter(
               (v) => v.isCompleted !== 1,
             ).length;
-            console.log("Farms left:", farmsLeft);
+
+            // Calculate 20% of incomplete farms, rounded up
+            const displayCount = Math.ceil(farmsLeft * 0.2);
+
+            console.log(
+              "Farms left:",
+              farmsLeft,
+              "Display count (20%):",
+              displayCount,
+            );
 
             return (
               <Text className="text-base text-center text-gray-500 mt-1">
-                {farmsLeft === 1
+                {displayCount === 1
                   ? t("Visits.1 farm left to finish")
-                  : t("Visits.farms left to finish", { count: farmsLeft })}
+                  : t("Visits.farms left to finish", { count: displayCount })}
               </Text>
             );
           })()}
@@ -290,11 +278,11 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
 
                   <View className="flex-row">
                     <Text
-                      className={`text-black font-semibold ${i18n.language === "si" ? "text-base" : i18n.language === "ta" ? "text-base" : "text-lg"}`}
+                      className={`text-black font-semibold ${i18n.language === "si" ? "text-base" : i18n.language === "ta" ? "text-base" : "text-base"}`}
                     >
                       {t("Visits.ID")} :
                     </Text>
-                    <Text className="text-black text-lg font-semibold ml-2">
+                    <Text className="text-black text-base font-semibold ml-2">
                       {item.regCode}
                     </Text>
                   </View>
@@ -497,7 +485,7 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
                 onPress={() => {
                   setShowPopup(false);
 
-                  updateStatus();
+                  //  updateStatus();
 
                   if (selectedItem?.farmerId) {
                     navigation.navigate("QRScanner", {

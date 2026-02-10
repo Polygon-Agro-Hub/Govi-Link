@@ -1,4 +1,4 @@
-import React, { useState, useEffect , useCallback} from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -11,7 +11,7 @@ import {
   Image,
   Modal,
   BackHandler,
-  ActivityIndicator
+  ActivityIndicator,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp, useRoute, useFocusEffect } from "@react-navigation/native";
@@ -41,7 +41,8 @@ interface RequestProblemProps {
 
 const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
   const route = useRoute<RequestProblemRouteProp>();
-  const { govilinkjobid, jobId, farmerId, farmerMobile, screenName } = route.params;
+  const { govilinkjobid, jobId, farmerId, farmerMobile, screenName } =
+    route.params;
   console.log("RequestProblem Params:", govilinkjobid, jobId, screenName);
   const { t } = useTranslation();
 
@@ -55,13 +56,15 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
   console.log("Captured Image:", capturedImage);
   const [countdown, setCountdown] = useState(3);
   const [isButtonEnabled, setIsButtonEnabled] = useState(false);
-const [existingProblem, setExistingProblem] = useState<{
-  id: string;
-  farmerFeedback: string;
-  advice: string;
-  image?: string;
-} | null>(null);
-const [existingProblemId, setExistingProblemId] = useState<string | null>(null);
+  const [existingProblem, setExistingProblem] = useState<{
+    id: string;
+    farmerFeedback: string;
+    advice: string;
+    image?: string;
+  } | null>(null);
+  const [existingProblemId, setExistingProblemId] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     if (capturedImage) {
@@ -80,8 +83,7 @@ const [existingProblemId, setExistingProblemId] = useState<string | null>(null);
     }
   }, [capturedImage]);
 
-
-   useEffect(() => {
+  useEffect(() => {
     fetchProblem();
   }, []);
 
@@ -93,7 +95,7 @@ const [existingProblemId, setExistingProblemId] = useState<string | null>(null);
 
       const response = await axios.get(
         `${environment.API_BASE_URL}api/request-audit/get-problem/${govilinkjobid}`,
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
       if (response.data.success && response.data.data) {
@@ -112,164 +114,179 @@ const [existingProblemId, setExistingProblemId] = useState<string | null>(null);
     }
   };
 
-    const handleNext = async () => {
-  if (!farmerFeedback.trim() || !advice.trim()) {
-    Alert.alert(
-      t("Error.Sorry"),
-      t("CertificateSuggestions.Both problem and solution must be filled."),
-      [{ text: t("Main.ok") }]
-    );
-    return;
-  }
-
-  const farmerFeedbackChanged = !existingProblem || farmerFeedback !== existingProblem.farmerFeedback;
-  const adviceChanged = !existingProblem || advice !== existingProblem.advice;
-const imageChanged =
-  (capturedImage && !existingProblem?.image) ||
-  (capturedImage && existingProblem?.image && capturedImage !== existingProblem.image); 
-
-
-  if (!farmerFeedbackChanged && !adviceChanged && !imageChanged) {
-               navigation.navigate("RequestSuggestions", { jobId, farmerId, govilinkjobid, farmerMobile  });
-    return;
-  }
-
-  try {
-    setLoading(true);
-    const token = await AsyncStorage.getItem("token");
-    if (!token) {
+  const handleNext = async () => {
+    if (!farmerFeedback.trim() || !advice.trim()) {
       Alert.alert(
         t("Error.Sorry"),
-        t("Main.Your login session has expired. Please log in again to continue."),
-        [{ text: t("Main.ok") }]
+        t("CertificateSuggestions.Both problem and solution must be filled."),
+        [{ text: t("Main.ok") }],
       );
       return;
     }
 
-    const formData = new FormData();
-    formData.append("farmerFeedback", farmerFeedback);
-    formData.append("advice", advice);
+    const farmerFeedbackChanged =
+      !existingProblem || farmerFeedback !== existingProblem.farmerFeedback;
+    const adviceChanged = !existingProblem || advice !== existingProblem.advice;
+    const imageChanged =
+      (capturedImage && !existingProblem?.image) ||
+      (capturedImage &&
+        existingProblem?.image &&
+        capturedImage !== existingProblem.image);
 
-    if (imageChanged && capturedImage) {
-      const filename = capturedImage.split("/").pop() || "upload.jpg";
-      const match = /\.(\w+)$/.exec(filename);
-      const type = match ? `image/${match[1]}` : `image`;
-      formData.append("image", {
-        uri: capturedImage,
-        name: filename,
-        type,
-      } as any);
-    }
-
-    let response;
-
-    if (existingProblemId) {
-      // Update existing
-      response = await axios.put(
-        `${environment.API_BASE_URL}api/request-audit/update-problem/${existingProblemId}`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-    } else {
-      // Save new
-      response = await axios.post(
-        `${environment.API_BASE_URL}api/request-audit/save-problem/${govilinkjobid}`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-    }
-
-    if (response.data.success) {
-      Alert.alert(
-        t("Success"),
-        existingProblemId
-          ? t("RequestProblem.Problem updated successfully.")
-          : t("RequestProblem.Problem saved successfully.")
-      );
-
-      // Update existingProblem state after successful update
-      setExistingProblem({
-        id: existingProblemId || response.data.id,
-        farmerFeedback,
-        advice,
-        image: capturedImage || undefined,
+    if (!farmerFeedbackChanged && !adviceChanged && !imageChanged) {
+      navigation.navigate("RequestSuggestions", {
+        jobId,
+        farmerId,
+        govilinkjobid,
+        farmerMobile,
       });
-      setExistingProblemId(existingProblemId || response.data.id);
-            navigation.navigate("RequestSuggestions", { jobId, farmerId, govilinkjobid, farmerMobile  });
-
-    } else {
-      Alert.alert(
-        t("Error.Sorry"),
-        t("RequestProblem.Failed to save problem. Please try again."),
-        [{ text: t("Main.ok") }]
-      );
+      return;
     }
-  } catch (err) {
-    console.error("❌ Error saving/updating problem:", err);
-    Alert.alert(t("Error.Sorry"), t("Main.somethingWentWrong"), [{ text: t("Main.ok") }]);
-  } finally {
-    setLoading(false);
-  }
-};
+
+    try {
+      setLoading(true);
+      const token = await AsyncStorage.getItem("token");
+      if (!token) {
+        Alert.alert(
+          t("Error.Sorry"),
+          t(
+            "Main.Your login session has expired. Please log in again to continue.",
+          ),
+          [{ text: t("Main.ok") }],
+        );
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("farmerFeedback", farmerFeedback);
+      formData.append("advice", advice);
+
+      if (imageChanged && capturedImage) {
+        const filename = capturedImage.split("/").pop() || "upload.jpg";
+        const match = /\.(\w+)$/.exec(filename);
+        const type = match ? `image/${match[1]}` : `image`;
+        formData.append("image", {
+          uri: capturedImage,
+          name: filename,
+          type,
+        } as any);
+      }
+
+      let response;
+
+      if (existingProblemId) {
+        // Update existing
+        response = await axios.put(
+          `${environment.API_BASE_URL}api/request-audit/update-problem/${existingProblemId}`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "multipart/form-data",
+            },
+          },
+        );
+      } else {
+        // Save new
+        response = await axios.post(
+          `${environment.API_BASE_URL}api/request-audit/save-problem/${govilinkjobid}`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "multipart/form-data",
+            },
+          },
+        );
+      }
+
+      if (response.data.success) {
+        Alert.alert(
+          t("Success"),
+          existingProblemId
+            ? t("RequestProblem.Problem updated successfully.")
+            : t("RequestProblem.Problem saved successfully."),
+        );
+
+        // Update existingProblem state after successful update
+        setExistingProblem({
+          id: existingProblemId || response.data.id,
+          farmerFeedback,
+          advice,
+          image: capturedImage || undefined,
+        });
+        setExistingProblemId(existingProblemId || response.data.id);
+        navigation.navigate("RequestSuggestions", {
+          jobId,
+          farmerId,
+          govilinkjobid,
+          farmerMobile,
+        });
+      } else {
+        Alert.alert(
+          t("Error.Sorry"),
+          t("RequestProblem.Failed to save problem. Please try again."),
+          [{ text: t("Main.ok") }],
+        );
+      }
+    } catch (err) {
+      console.error("❌ Error saving/updating problem:", err);
+      Alert.alert(t("Error.Sorry"), t("Main.somethingWentWrong"), [
+        { text: t("Main.ok") },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleCameraClose = (imageUri: string | null) => {
-  setShowCamera(false);
-  if (imageUri) {
-    console.log("Captured Image URI:", imageUri);
-    setCapturedImage(imageUri);
-    setShowCameraModal(true);
-  }
-};
+    setShowCamera(false);
+    if (imageUri) {
+      console.log("Captured Image URI:", imageUri);
+      setCapturedImage(imageUri);
+      setShowCameraModal(true);
+    }
+  };
 
-useFocusEffect(
-  useCallback(() => {
-    const onBackPress = () => {
-      // Navigate to screenName with params
-      // navigation.navigate("Main", {screen:screenName})
-                  navigation.navigate("Main", {
-        screen: "MainTabs",
-        params: {
-          screen: screenName
-        }})
-      return true; // prevent default back behavior
-    };
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        // Navigate to screenName with params
+        // navigation.navigate("Main", {screen:screenName})
+        navigation.navigate("Main", {
+          screen: "MainTabs",
+          params: {
+            screen: screenName,
+          },
+        });
+        return true; // prevent default back behavior
+      };
 
-    const subscription = BackHandler.addEventListener(
-      "hardwareBackPress",
-      onBackPress
-    );
+      const subscription = BackHandler.addEventListener(
+        "hardwareBackPress",
+        onBackPress,
+      );
 
-    // Cleanup
-    return () => subscription.remove();
-  }, [ screenName])
-);
+      // Cleanup
+      return () => subscription.remove();
+    }, [screenName]),
+  );
 
-const handleFarmerFeedbackChange = (text: string) => {
+  const handleFarmerFeedbackChange = (text: string) => {
     text = text.replace(/^\s+/, "");
-  if (text.length > 0) {
-    text = text.charAt(0).toUpperCase() + text.slice(1);
-  }
-  setFarmerFeedback(text);
-};
+    if (text.length > 0) {
+      text = text.charAt(0).toUpperCase() + text.slice(1);
+    }
+    setFarmerFeedback(text);
+  };
 
-const handleAdviceChange = (text: string) => {
+  const handleAdviceChange = (text: string) => {
     text = text.replace(/^\s+/, "");
-  if (text.length > 0) {
-    text = text.charAt(0).toUpperCase() + text.slice(1);
-  }
-  setAdvice(text);
-};
-
+    if (text.length > 0) {
+      text = text.charAt(0).toUpperCase() + text.slice(1);
+    }
+    setAdvice(text);
+  };
 
   return (
     <KeyboardAvoidingView
@@ -280,13 +297,14 @@ const handleAdviceChange = (text: string) => {
         <TouchableOpacity
           className="bg-[#F6F6F680] rounded-full p-2 justify-center w-10 z-20"
           // onPress={() => navigation.navigate("Main", {screen:screenName})}
-                onPress={() =>             
-                      navigation.navigate("Main", {
-        screen: "MainTabs",
-        params: {
-          screen: screenName
-        }
-      }) }
+          onPress={() =>
+            navigation.navigate("Main", {
+              screen: "MainTabs",
+              params: {
+                screen: screenName,
+              },
+            })
+          }
         >
           <AntDesign name="left" size={22} color="#000" />
         </TouchableOpacity>
@@ -299,7 +317,7 @@ const handleAdviceChange = (text: string) => {
       <View className="px-6 mt-6">
         <Text className="text-center text-[#3B424C]">
           {t(
-            "CertificateSuggestions.Please mention identified problems and suggestions you made below."
+            "CertificateSuggestions.Please mention identified problems and suggestions you made below.",
           )}
         </Text>
       </View>
@@ -310,9 +328,9 @@ const handleAdviceChange = (text: string) => {
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ paddingBottom: 120 }}
       >
-               <Text className="text-base font-semibold mb-2 mt-1">
-                      {t("RequestProblem.FarmerSay")}
-                    </Text>
+        <Text className="text-base font-semibold mb-2 mt-1">
+          {t("RequestProblem.FarmerSay")}
+        </Text>
         <TextInput
           className="border border-[#9DB2CE] rounded-md p-2 mb-4"
           multiline
@@ -320,7 +338,7 @@ const handleAdviceChange = (text: string) => {
           textAlignVertical="top"
           value={farmerFeedback}
           // onChangeText={setFarmerFeedback}
-           onChangeText={handleFarmerFeedbackChange}
+          onChangeText={handleFarmerFeedbackChange}
           style={{ minHeight: 130 }}
         />
 
@@ -335,18 +353,18 @@ const handleAdviceChange = (text: string) => {
           textAlignVertical="top"
           value={advice}
           // onChangeText={setAdvice}
-            onChangeText={handleAdviceChange}
+          onChangeText={handleAdviceChange}
           style={{ minHeight: 130 }}
         />
-          <TouchableOpacity
-            onPress={() => setShowCamera(true)}
-            className="bg-black rounded-3xl w-[50%] self-center py-3 items-center justify-center flex-row space-x-4"
-          >
- <FontAwesome6 name="camera" size={24} color="white" />
-             <Text className="text-white font-semibold text-sm">
-              {t("RequestProblem.Photo")}
-            </Text>
-          </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => setShowCamera(true)}
+          className="bg-black rounded-3xl w-[50%] self-center py-3 items-center justify-center flex-row space-x-4"
+        >
+          <FontAwesome6 name="camera" size={24} color="white" />
+          <Text className="text-white font-semibold text-sm">
+            {t("RequestProblem.Photo")}
+          </Text>
+        </TouchableOpacity>
         {capturedImage && (
           <Text className="text-center text-[#415CFF] mt-3">
             {t("RequestProblem.Image Uploaded")}
@@ -355,10 +373,10 @@ const handleAdviceChange = (text: string) => {
       </ScrollView>
 
       {/* Footer */}
-      <View className="flex-row justify-between p-4 border-t border-gray-200 ">
+      <View className="flex-row justify-between p-4 border-t border-gray-200 px-6">
         <TouchableOpacity
-          className="flex-row items-center bg-[#444444] px-12 py-3 rounded-full "
-          onPress={() =>   navigation.navigate("Main", {screen:screenName})}
+          className="flex-row items-center bg-[#444444] px-9 py-3 rounded-full "
+          onPress={() => navigation.navigate("Main", { screen: screenName })}
         >
           <AntDesign name="arrow-left" size={20} color="#fff" />
           <Text className="ml-4 text-white font-semibold text-base">
@@ -375,16 +393,20 @@ const handleAdviceChange = (text: string) => {
             colors={["#F35125", "#FF1D85"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
-            className="flex-row items-center px-12 py-3 rounded-full"
+            className="flex-row items-center px-9 py-3 rounded-full"
           >
-            {loading ?
-            <ActivityIndicator  size="small" color="#fff" style={{ marginRight: 8 }} />
-            : 
-                    <Text className="mr-4 text-white font-semibold text-base">
+            {loading ? (
+              <ActivityIndicator
+                size="small"
+                color="#fff"
+                style={{ marginRight: 8 }}
+              />
+            ) : (
+              <Text className="mr-4 text-white font-semibold text-base">
                 {t("CertificateQuesanory.Next")}
-            </Text>
-            }
-    
+              </Text>
+            )}
+
             <AntDesign name="arrow-right" size={20} color="#fff" />
           </LinearGradient>
         </TouchableOpacity>

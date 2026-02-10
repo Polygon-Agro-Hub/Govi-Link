@@ -626,7 +626,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
                     )}
                   </TouchableOpacity>
 
-                  <View className="flex-row justify-between items-center mr-4">
+                  <View className="flex-row justify-between items-center mr-5">
                     <Text className="flex-1  ">{getLocalizedQuestion(q)}</Text>
                   </View>
                 </View>
@@ -636,15 +636,20 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
         </>
       )}
 
-      <View className="flex-row justify-between p-4 border-t border-gray-200">
+      <View className="flex-row justify-between p-4 border-t border-gray-200 px-6">
         <TouchableOpacity
-          className="flex-row items-center bg-[#444444] px-12 py-3 rounded-full"
+          className="flex-row items-center bg-[#444444] px-9 py-3 rounded-full"
           onPress={() => {
-            navigation.navigate("Main", { screen: screenName });
+            navigation.navigate("Main", {
+              screen: "MainTabs",
+              params: {
+                screen: "ViewAllVisits",
+              },
+            })
           }}
         >
           <AntDesign name="arrow-left" size={20} color="#fff" />
-          <Text className="ml-4 text-white font-semibold text-base">
+          <Text className="ml-4 text-white font-semibold text-base ">
             {t("CertificateQuesanory.Exit")}
           </Text>
         </TouchableOpacity>
@@ -658,7 +663,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
             colors={["#F35125", "#FF1D85"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
-            className="flex-row items-center px-12 py-3 rounded-full"
+            className="flex-row items-center px-9 py-3 rounded-full"
           >
             <Text className="mr-4 text-white font-semibold text-base">
               {t("CertificateQuesanory.Next")}
@@ -695,7 +700,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
             <View className="flex-row justify-between w-full space-x-4">
               <TouchableOpacity
                 onPress={() => setShowConfirmationModal(false)}
-                className="flex-row items-center px-8 py-3 rounded-full bg-[#444444]"
+                className="flex-row items-center px-8 py-3 rounded-full bg-[#444444]  "
               >
                 <Text className="text-white font-semibold text-base">
                   {t("CertificateQuesanory.Cancel")}
@@ -712,7 +717,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
                   colors={["#F35125", "#FF1D85"]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
-                  className="flex-row items-center px-7 mr-6 py-3 rounded-full"
+                  className="flex-row items-center px-7  py-3 rounded-full mr-2 "
                 >
                   <Text className="text-white font-semibold text-base">
                     {t("CertificateQuesanory.Continue")}
@@ -813,7 +818,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
               }}
               className="mt-4"
             >
-              <Text className="text-gray-400 text-sm">
+              <Text className="text-[#434343] underline text-sm">
                 {t("CertificateQuesanory.Cancel")}
               </Text>
             </TouchableOpacity>

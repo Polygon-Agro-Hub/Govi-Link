@@ -54,7 +54,12 @@ const FormTabs: React.FC<FormTabsProps> = ({
         {/* Back button */}
         <View style={{ width: wp(15) }}>
           <TouchableOpacity
-            onPress={() => navigation.goBack()}
+            onPress={() => navigation.navigate("Main", {
+              screen: "MainTabs",
+              params: {
+                screen: "CapitalRequests",
+              },
+            })}
             className="items-start"
           >
             <Entypo
