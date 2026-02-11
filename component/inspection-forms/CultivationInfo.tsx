@@ -1,4 +1,3 @@
-// CultivationInfo.tsx - Complete Version with Multiple Images Support
 import React, { useState, useEffect, useCallback } from "react";
 import {
   View,

@@ -11,7 +11,6 @@ import {
   Pressable,
   Modal,
   BackHandler,
-  TouchableWithoutFeedback,
   Linking,
   Alert,
   Dimensions,
@@ -152,6 +151,8 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
   const translateY = useRef(new Animated.Value(0)).current;
   const currentTranslateY = useRef(0);
   console.log(translateY);
+
+  console.log("profile dashboard", profile);
 
   const panResponder = useRef(
     PanResponder.create({
@@ -452,7 +453,11 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
                 </Text>
               </Text>
               <TouchableOpacity
-                onPress={() => navigation.navigate("ViewAllVisits")}
+                onPress={() =>
+                  navigation.navigate("ViewAllVisits", {
+                    officerId: profile?.empId ?? "",
+                  })
+                }
               >
                 <Text className="text-pink-500 font-semibold">
                   {t("Dashboard.View All")}
@@ -771,7 +776,11 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
       )}
       <View className="mt-8 mx-8">
         <TouchableOpacity
-          onPress={() => navigation.navigate("ViewAllVisits")}
+          onPress={() =>
+            navigation.navigate("ViewAllVisits", {
+              officerId: profile?.empId ?? "",
+            })
+          }
           className="bg-[#FFE5D6] rounded-lg p-3 h-28 mr-4 w-full flex-row justify-between items-center"
           style={{
             shadowColor: "#000",

@@ -1,4 +1,3 @@
-// InvestmentInfo.tsx - Without Redux, using SQLite
 import React, { useState, useEffect, useCallback } from "react";
 import {
   View,

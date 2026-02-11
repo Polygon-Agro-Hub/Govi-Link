@@ -1,4 +1,3 @@
-// ProfitRisk.tsx - Fixed version with proper data handling
 import React, { useState, useEffect, useCallback } from "react";
 import {
   View,

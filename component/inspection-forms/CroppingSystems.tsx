@@ -1,4 +1,3 @@
-// CroppingSystems.tsx - Fixed version with proper data handling
 import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
@@ -301,10 +300,13 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
       // JSON array field - filter out "Other" before sending
       if (data.opportunity && data.opportunity.length > 0) {
         const filteredOpportunities = data.opportunity.filter(
-          (item) => item !== "Other"
+          (item) => item !== "Other",
         );
         if (filteredOpportunities.length > 0) {
-          apiFormData.append("opportunity", JSON.stringify(filteredOpportunities));
+          apiFormData.append(
+            "opportunity",
+            JSON.stringify(filteredOpportunities),
+          );
         }
       }
 
@@ -505,7 +507,7 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
               "Finance Info": "FinanceInfo",
               "Land Info": "LandInfo",
               "Investment Info": "InvestmentInfo",
-              "Cultivation Info": "CultivationInfo"
+              "Cultivation Info": "CultivationInfo",
             };
 
             const route = routesMap[key];
@@ -656,7 +658,7 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
                   let formattedText = text.replace(/^\s+/, "");
 
                   // Only capitalize if there's text and it's not starting with a line break
-                  if (formattedText.length > 0 && !text.startsWith('\n')) {
+                  if (formattedText.length > 0 && !text.startsWith("\n")) {
                     formattedText =
                       formattedText.charAt(0).toUpperCase() +
                       formattedText.slice(1);

@@ -23,14 +23,18 @@ import axios from "axios";
 import { environment } from "@/environment/environment";
 import { Ionicons, FontAwesome6 } from "@expo/vector-icons";
 import LottieView from "lottie-react-native";
+import { RouteProp, useRoute } from "@react-navigation/native";
 
 type ViewAllVisitsNavigationProps = StackNavigationProp<
   RootStackParamList,
   "ViewAllVisits"
 >;
 
+type ViewAllVisitsRouteProp = RouteProp<RootStackParamList, "ViewAllVisits">;
+
 interface ViewAllVisitsProps {
   navigation: ViewAllVisitsNavigationProps;
+  route: ViewAllVisitsRouteProp;
 }
 
 interface VisitItem {
@@ -59,15 +63,17 @@ interface VisitItem {
   totalClusterCount?: number;
 }
 
-const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation }) => {
+const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
   const { t, i18n } = useTranslation();
+  const officerId = route.params?.officerId ?? "";
+
+  console.log("officer id", officerId);
 
   const today = dayjs();
-  const currentDay = today.date(); // 31
+  const currentDay = today.date();
   console.log("Today date:", currentDay);
 
   const [selectedDate, setSelectedDate] = useState(dayjs());
-  // const [selectedMonth] = useState(today.format("MMMM, YYYY"));
   const monthNames: Record<string, string[]> = {
     en: [
       "January",
@@ -126,9 +132,9 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation }) => {
   const filteredVisits = visits.filter((v) => {
     const visitDate = dayjs(v.sheduleDate);
     if (isOverdueSelected) {
-      return visitDate.isBefore(today, "day"); // all overdue visits
+      return visitDate.isBefore(today, "day");
     } else {
-      return visitDate.isSame(selectedDate, "day"); // selected date visits
+      return visitDate.isSame(selectedDate, "day");
     }
   });
   const [showPopup, setShowPopup] = useState(false);
@@ -136,7 +142,7 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation }) => {
 
   const scrollRef = React.useRef<ScrollView>(null);
 
-  const ITEM_WIDTH = 0; // width + margin of each date item, adjust if neede
+  const ITEM_WIDTH = 0;
 
   const translateY = useRef(new Animated.Value(0)).current;
   const currentTranslateY = useRef(0);
@@ -184,12 +190,12 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation }) => {
 
   useFocusEffect(
     useCallback(() => {
-      setSelectedDate(today); 
+      setSelectedDate(today);
       setIsOverdueSelected(false);
       setTimeout(() => {
         if (scrollRef.current) {
           scrollRef.current.scrollTo({
-            x: 0, 
+            x: 0,
             animated: true,
           });
         }
@@ -260,16 +266,31 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation }) => {
     );
   };
 
+  const shouldShowBackButton =
+    officerId && officerId.toString().startsWith("FIO");
+
   return (
     <View className="flex-1 bg-[#F5F7FB] pt-4">
       {/* Header */}
-      <Text className="text-lg font-semibold text-center m text-[#000]">
-        {selectedMonth}
-      </Text>
+      <View className="flex-row items-center justify-center px-4 mb-2">
+        {shouldShowBackButton && (
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            className="absolute left-4 bg-[#EAEAEA] rounded-full h-8 w-8 items-center justify-center"
+          >
+            <Ionicons name="chevron-back" size={24} color="#000" />
+          </TouchableOpacity>
+        )}
+        <View className="items-center">
+          <Text className="text-lg font-semibold text-[#000]">
+            {selectedMonth}
+          </Text>
+        </View>
+      </View>
       <View className="flex-row p-2 ml-4">
         <TouchableOpacity
           onPress={() => {
-            setIsOverdueSelected(true); 
+            setIsOverdueSelected(true);
             setSelectedDate(dayjs());
           }}
         >
@@ -700,6 +721,11 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation }) => {
                     selectedItem?.propose === "Individual"
                   ) {
                     // updateStatus(selectedItem.id, selectedItem.jobId);
+                    console.log(
+                      "hitt Request",
+                      selectedItem.id,
+                      selectedItem.jobId,
+                    );
                     navigation.navigate("QRScanner", {
                       farmerId: selectedItem.farmerId,
                       jobId: selectedItem.jobId,
@@ -714,7 +740,11 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation }) => {
                     });
                   } else if (selectedItem?.propose === "Requested") {
                     // updateStatus(selectedItem.id, selectedItem.jobId);
-                    // console.log("hitt Request");
+                    console.log(
+                      "hitt Request",
+                      selectedItem.id,
+                      selectedItem.jobId,
+                    );
                     navigation.navigate("QRScaneerRequstAudit", {
                       farmerId: selectedItem.farmerId,
                       govilinkjobid: selectedItem.id,

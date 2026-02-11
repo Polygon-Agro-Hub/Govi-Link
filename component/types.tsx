@@ -14,7 +14,7 @@ export type RootStackParamList = {
   FieldOfficerDashboard: undefined;
   Profile: undefined;
   AddComplaint: undefined;
-  ViewAllVisits: undefined;
+  ViewAllVisits: {officerId :string};
   ComplainHistory: undefined;
   AssignJobs: undefined;
   CapitalRequests: undefined;

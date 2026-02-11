@@ -1,4 +1,3 @@
-// HarvestStorage.tsx - Fixed version with proper data handling
 import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
@@ -664,15 +663,7 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
         onClose={handleErrorClose}
       />
 
-      {isSaving && (
-        <View className="absolute inset-0 bg-black/50 justify-center items-center">
-          <View className="bg-white p-6 rounded-2xl">
-            <Text className="text-base text-black">
-              {t("InspectionForm.Saving...")}
-            </Text>
-          </View>
-        </View>
-      )}
+   
     </KeyboardAvoidingView>
   );
 };

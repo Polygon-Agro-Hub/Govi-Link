@@ -18,6 +18,7 @@ import { RouteProp, useRoute, useFocusEffect } from "@react-navigation/native";
 import { environment } from "@/environment/environment";
 import axios from "axios";
 import { useDispatch } from "react-redux";
+import { deleteAllInspectionData } from '@/database/deleteInspectionData';
 import { clearAllInspectionSlices } from "@/store/clearAllSlices";
 
 type ConfirmationCapitalRequestNavigationProps = StackNavigationProp<
@@ -175,57 +176,113 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
     }, [])
   );
 
+  // const handleUndo = async () => {
+  //   if (hasNavigatedRef.current) {
+  //     console.log("⏭️ Already navigating, skipping undo");
+  //     return;
+  //   }
+
+  //   if (animationRef.current) {
+  //     animationRef.current.stop();
+  //   }
+
+  //   // Show loading
+  //   setAssigning(true);
+
+  //   try {
+  //     console.log(`🗑️ Deleting all inspection data for requestId: ${requestId}`);
+
+  //     const response = await axios.delete(
+  //       `${environment.API_BASE_URL}api/capital-request/inspection/delete/${requestId}`
+  //     );
+
+  //     if (response.data.success) {
+  //       console.log('✅ All inspection data deleted successfully');
+  //       console.log(`📊 Deleted from ${response.data.deletedTables.length} tables`);
+
+  //       setAssigning(false);
+  //       setShowConfirmationModal(false);
+
+  //       Alert.alert(
+  //         t("Main.Success"),
+  //         t("ConfirmationCapitalRequest.UndoSuccess"),
+  //         [
+  //           {
+  //             text: t("Main.ok"),
+  //             onPress: navigateToCapitalRequests,
+  //           },
+  //         ]
+  //       );
+  //     } else {
+  //       throw new Error(response.data.message || 'Delete failed');
+  //     }
+  //   } catch (error: any) {
+  //     console.error('❌ Error deleting inspection data:', error);
+  //     setAssigning(false);
+
+  //     Alert.alert(
+  //       t("Main.Error"),
+  //       error.response?.data?.message || t("ConfirmationCapitalRequest.UndoFailed"),
+  //       [{ text: t("Main.ok") }]
+  //     );
+  //   }
+  // };
+
   const handleUndo = async () => {
-    if (hasNavigatedRef.current) {
-      console.log("⏭️ Already navigating, skipping undo");
-      return;
-    }
+  if (hasNavigatedRef.current) {
+    console.log("⏭️ Already navigating, skipping undo");
+    return;
+  }
 
-    if (animationRef.current) {
-      animationRef.current.stop();
-    }
+  if (animationRef.current) {
+    animationRef.current.stop();
+  }
 
-    // Show loading
-    setAssigning(true);
+  setAssigning(true);
 
-    try {
-      console.log(`🗑️ Deleting all inspection data for requestId: ${requestId}`);
+  try {
+    console.log(`🗑️ Deleting all inspection data for requestId: ${requestId}`);
 
-      const response = await axios.delete(
-        `${environment.API_BASE_URL}api/capital-request/inspection/delete/${requestId}`
-      );
+    //Delete from backend database
+    const response = await axios.delete(
+      `${environment.API_BASE_URL}api/capital-request/inspection/delete/${requestId}`
+    );
 
-      if (response.data.success) {
-        console.log('✅ All inspection data deleted successfully');
-        console.log(`📊 Deleted from ${response.data.deletedTables.length} tables`);
+    if (response.data.success) {
+      console.log('✅ Backend data deleted successfully');
+      console.log(`📊 Deleted from ${response.data.deletedTables.length} backend tables`);
 
-        setAssigning(false);
-        setShowConfirmationModal(false);
+      // Delete from local SQLite database
+      await deleteAllInspectionData(requestId.toString());
+      console.log('✅ Local SQLite data deleted successfully');
 
-        Alert.alert(
-          t("Main.Success"),
-          t("ConfirmationCapitalRequest.UndoSuccess"),
-          [
-            {
-              text: t("Main.ok"),
-              onPress: navigateToCapitalRequests,
-            },
-          ]
-        );
-      } else {
-        throw new Error(response.data.message || 'Delete failed');
-      }
-    } catch (error: any) {
-      console.error('❌ Error deleting inspection data:', error);
       setAssigning(false);
+      setShowConfirmationModal(false);
 
       Alert.alert(
-        t("Main.Error"),
-        error.response?.data?.message || t("ConfirmationCapitalRequest.UndoFailed"),
-        [{ text: t("Main.ok") }]
+        t("Main.Success"),
+        t("ConfirmationCapitalRequest.UndoSuccess"),
+        [
+          {
+            text: t("Main.ok"),
+            onPress: navigateToCapitalRequests,
+          },
+        ]
       );
+    } else {
+      throw new Error(response.data.message || 'Delete failed');
     }
-  };
+  } catch (error: any) {
+    console.error('❌ Error deleting inspection data:', error);
+    setAssigning(false);
+
+    Alert.alert(
+      t("Main.Error"),
+      error.response?.data?.message || t("ConfirmationCapitalRequest.UndoFailed"),
+      [{ text: t("Main.ok") }]
+    );
+  }
+};
 
   const handleConfirmAndLeave = async () => {
   if (hasNavigatedRef.current) {

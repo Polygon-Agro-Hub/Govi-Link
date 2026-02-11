@@ -1,4 +1,3 @@
-// LandInfo.tsx - Land Info with SQLite
 import React, { useState, useEffect, useCallback } from "react";
 import {
   View,

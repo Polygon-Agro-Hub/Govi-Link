@@ -1,4 +1,3 @@
-// IDProof.tsx - ID Proof with SQLite
 import React, { useState, useEffect, useCallback } from "react";
 import {
   View,

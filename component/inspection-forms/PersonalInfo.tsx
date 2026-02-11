@@ -1,4 +1,3 @@
-// InspectionForm1.tsx - Personal Info with SQLite (COMPLETE)
 import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
