@@ -85,14 +85,14 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
       setLoading(true);
       const token = await AsyncStorage.getItem("token");
       if (!token) return;
-      
+
       const response = await axios.get(
         `${environment.API_BASE_URL}api/capital-request/requests/${requestId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
       );
-      console.log("Request details:", response.data.requests);
+
       setRequestData(response.data.requests[0] || null);
     } catch (error) {
       console.error("Failed to fetch request details:", error);
@@ -132,7 +132,6 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
   const formatNumber = (value: number | string) =>
     Number(value).toLocaleString("en-US");
 
-  // Check if NIC images exist
   const hasNicImages = requestData.nicFront || requestData.nicBack;
 
   return (
@@ -152,9 +151,7 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 20 }}
       >
-        {/* Request Letter Content */}
         <View className="mx-6 my-4 bg-white rounded-lg p-2">
-          {/* Letter Content */}
           <Text className="text-base mb-4 text-[#070707] leading-6">
             {t("RequestLetter.Dear Sir/Madam")}
           </Text>
@@ -181,7 +178,6 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
             {t("RequestLetter.The project details are as follows")}
           </Text>
 
-          {/* Project Details */}
           <View className="space-y-3 mb-6">
             <View className="">
               <ProjectDetails
@@ -268,7 +264,6 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
             )}
           </Text>
 
-          {/* NIC Images - Show if available */}
           {hasNicImages && (
             <View className="my-4">
               <View className="flex-row justify-between w-full">
@@ -300,7 +295,6 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
             )}
           </Text>
 
-          {/* Signature */}
           <View className="mt-8 mb-8">
             <Text className="text-base text-black ">
               {t("RequestLetter.Sincerely")},
@@ -345,7 +339,7 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
                 requestId: requestData.id,
               });
             } catch (e) {
-              console.log("Error clearing AsyncStorage:", e);
+              console.log("Error clearing AsyncStorage (Request Letter):", e);
             }
           }}
           className="w-[80%] mt-4 self-center"

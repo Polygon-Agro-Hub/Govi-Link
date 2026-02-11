@@ -16,18 +16,13 @@ import {
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp, useRoute, useFocusEffect } from "@react-navigation/native";
 import { RootStackParamList } from "./types";
-import { AntDesign, FontAwesome5, FontAwesome6 } from "@expo/vector-icons";
+import { AntDesign, FontAwesome6 } from "@expo/vector-icons";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
 import { useTranslation } from "react-i18next";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
 import { environment } from "@/environment/environment";
 import { CameraScreen } from "@/Items/CameraScreen";
-import { Icon } from "react-native-paper";
 
 type RequestProblemNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -43,17 +38,17 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
   const route = useRoute<RequestProblemRouteProp>();
   const { govilinkjobid, jobId, farmerId, farmerMobile, screenName } =
     route.params;
-  console.log("RequestProblem Params:", govilinkjobid, jobId, screenName);
+
   const { t } = useTranslation();
 
   const [farmerFeedback, setFarmerFeedback] = useState("");
   const [advice, setAdvice] = useState("");
-  const [image, setImage] = useState<string | null>(null);
+
   const [loading, setLoading] = useState(false);
   const [showCameraModal, setShowCameraModal] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
-  console.log("Captured Image:", capturedImage);
+
   const [countdown, setCountdown] = useState(3);
   const [isButtonEnabled, setIsButtonEnabled] = useState(false);
   const [existingProblem, setExistingProblem] = useState<{
@@ -100,15 +95,15 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
 
       if (response.data.success && response.data.data) {
         const saved = response.data.data;
-        console.log("Fetched Problem", saved);
+
         setFarmerFeedback(saved.farmerFeedback);
         setAdvice(saved.advice);
         setExistingProblem(saved);
-        setExistingProblemId(saved.id); // Save ID for update
+        setExistingProblemId(saved.id);
         if (saved.image) setCapturedImage(saved.image);
       }
     } catch (err) {
-      console.error("❌ Error fetching problem:", err);
+      console.error(" Error fetching problem:", err);
     } finally {
       setLoading(false);
     }
@@ -175,7 +170,6 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
       let response;
 
       if (existingProblemId) {
-        // Update existing
         response = await axios.put(
           `${environment.API_BASE_URL}api/request-audit/update-problem/${existingProblemId}`,
           formData,
@@ -187,7 +181,6 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
           },
         );
       } else {
-        // Save new
         response = await axios.post(
           `${environment.API_BASE_URL}api/request-audit/save-problem/${govilinkjobid}`,
           formData,
@@ -208,7 +201,6 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
             : t("RequestProblem.Problem saved successfully."),
         );
 
-        // Update existingProblem state after successful update
         setExistingProblem({
           id: existingProblemId || response.data.id,
           farmerFeedback,
@@ -230,7 +222,7 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
         );
       }
     } catch (err) {
-      console.error("❌ Error saving/updating problem:", err);
+      console.error(" Error saving/updating problem:", err);
       Alert.alert(t("Error.Sorry"), t("Main.somethingWentWrong"), [
         { text: t("Main.ok") },
       ]);
@@ -242,7 +234,6 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
   const handleCameraClose = (imageUri: string | null) => {
     setShowCamera(false);
     if (imageUri) {
-      console.log("Captured Image URI:", imageUri);
       setCapturedImage(imageUri);
       setShowCameraModal(true);
     }
@@ -251,15 +242,13 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
-        // Navigate to screenName with params
-        // navigation.navigate("Main", {screen:screenName})
         navigation.navigate("Main", {
           screen: "MainTabs",
           params: {
             screen: screenName,
           },
         });
-        return true; // prevent default back behavior
+        return true;
       };
 
       const subscription = BackHandler.addEventListener(
@@ -267,7 +256,6 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
         onBackPress,
       );
 
-      // Cleanup
       return () => subscription.remove();
     }, [screenName]),
   );
@@ -296,7 +284,6 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
       <View className="flex-row items-center px-4 py-4 bg-white shadow-sm border-b border-[#E5E5E5]">
         <TouchableOpacity
           className="bg-[#F6F6F680] rounded-full p-2 justify-center w-10 z-20"
-          // onPress={() => navigation.navigate("Main", {screen:screenName})}
           onPress={() =>
             navigation.navigate("Main", {
               screen: "MainTabs",
@@ -322,7 +309,6 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
         </Text>
       </View>
 
-      {/* Body */}
       <ScrollView
         className="p-6 flex-1"
         keyboardShouldPersistTaps="handled"
@@ -337,7 +323,6 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
           placeholder={t("CertificateSuggestions.Type here...")}
           textAlignVertical="top"
           value={farmerFeedback}
-          // onChangeText={setFarmerFeedback}
           onChangeText={handleFarmerFeedbackChange}
           style={{ minHeight: 130 }}
         />
@@ -352,7 +337,6 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
           placeholder={t("CertificateSuggestions.Type here...")}
           textAlignVertical="top"
           value={advice}
-          // onChangeText={setAdvice}
           onChangeText={handleAdviceChange}
           style={{ minHeight: 130 }}
         />
@@ -372,7 +356,6 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
         )}
       </ScrollView>
 
-      {/* Footer */}
       <View className="flex-row justify-between p-4 border-t border-gray-200 px-6">
         <TouchableOpacity
           className="flex-row items-center bg-[#444444] px-9 py-3 rounded-full "

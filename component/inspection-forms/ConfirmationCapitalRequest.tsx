@@ -17,9 +17,7 @@ import Svg, { Circle, G, Text as SvgText } from "react-native-svg";
 import { RouteProp, useRoute, useFocusEffect } from "@react-navigation/native";
 import { environment } from "@/environment/environment";
 import axios from "axios";
-import { useDispatch } from "react-redux";
-import { deleteAllInspectionData } from '@/database/deleteInspectionData';
-import { clearAllInspectionSlices } from "@/store/clearAllSlices";
+import { deleteAllInspectionData } from "@/database/deleteInspectionData";
 
 type ConfirmationCapitalRequestNavigationProps = StackNavigationProp<
   RootStackParamList,
@@ -38,50 +36,40 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
   const { formData, requestNumber, requestId } = route.params;
 
   const { t } = useTranslation();
-  const dispatch = useDispatch();
   const [assigning, setAssigning] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(true);
   const [countdown, setCountdown] = useState(20);
 
-  // Animated values for smooth progress
   const progressAnim = useRef(new Animated.Value(100)).current;
   const countdownAnim = useRef(new Animated.Value(20)).current;
 
   const animationRef = useRef<Animated.CompositeAnimation | null>(null);
-  const hasNavigatedRef = useRef(false); // ✅ Prevent multiple navigations
-  const isAnimationStartedRef = useRef(false); // ✅ Prevent animation restart
+  const hasNavigatedRef = useRef(false);
+  const isAnimationStartedRef = useRef(false);
 
-  // In ConfirmationCapitalRequest.tsx - SIMPLEST FIX
   const navigateToCapitalRequests = useCallback(() => {
     if (hasNavigatedRef.current) {
-      console.log("⏭️ Already navigating, skipping");
       return;
     }
 
     hasNavigatedRef.current = true;
 
-    // ✅ Just navigate - don't clear slices!
-    console.log("🚀 Navigating to CapitalRequests");
     navigation.replace("Main", {
       screen: "MainTabs",
       params: {
         screen: "CapitalRequests",
       },
     });
-
   }, [navigation]);
 
-  // ✅ Stable handleAutoAssign using useCallback
   const handleAutoAssign = useCallback(() => {
     if (hasNavigatedRef.current) {
-      console.log("⏭️ Already navigating, skipping auto-assign");
       return;
     }
 
     hasNavigatedRef.current = true;
     setShowConfirmationModal(false);
 
-    // Mock auto assignment - UI only
     setAssigning(true);
     setTimeout(() => {
       setAssigning(false);
@@ -93,16 +81,13 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
             text: t("Main.ok"),
             onPress: navigateToCapitalRequests,
           },
-        ]
+        ],
       );
     }, 1500);
   }, [t, navigateToCapitalRequests]);
 
-  // ✅ Stable startCountdownAnimation using useCallback
   const startCountdownAnimation = useCallback(() => {
-    // ✅ Only start animation once
     if (isAnimationStartedRef.current) {
-      console.log("⏭️ Animation already started, skipping");
       return;
     }
 
@@ -137,23 +122,19 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
     });
   }, [progressAnim, countdownAnim, handleAutoAssign]);
 
-  // ✅ Start countdown animation - ONLY ONCE on mount
   useEffect(() => {
-    console.log("🎬 ConfirmationCapitalRequest mounted");
     startCountdownAnimation();
 
     return () => {
-      console.log("🛑 ConfirmationCapitalRequest unmounting");
       if (animationRef.current) {
         animationRef.current.stop();
       }
-      // ✅ Reset refs on unmount
+
       isAnimationStartedRef.current = false;
       hasNavigatedRef.current = false;
     };
   }, [startCountdownAnimation]);
 
-  // ✅ Update countdown value based on animation
   useEffect(() => {
     const countdownListener = countdownAnim.addListener(({ value }) => {
       const roundedValue = Math.ceil(value);
@@ -165,174 +146,109 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
     };
   }, [countdownAnim]);
 
-  // ✅ Prevent refocusing from causing issues
   useFocusEffect(
     useCallback(() => {
-      console.log("👀 ConfirmationCapitalRequest focused");
+      console.log("ConfirmationCapitalRequest focused");
 
       return () => {
-        console.log("👋 ConfirmationCapitalRequest blurred");
+        console.log("ConfirmationCapitalRequest blurred");
       };
-    }, [])
+    }, []),
   );
 
-  // const handleUndo = async () => {
-  //   if (hasNavigatedRef.current) {
-  //     console.log("⏭️ Already navigating, skipping undo");
-  //     return;
-  //   }
-
-  //   if (animationRef.current) {
-  //     animationRef.current.stop();
-  //   }
-
-  //   // Show loading
-  //   setAssigning(true);
-
-  //   try {
-  //     console.log(`🗑️ Deleting all inspection data for requestId: ${requestId}`);
-
-  //     const response = await axios.delete(
-  //       `${environment.API_BASE_URL}api/capital-request/inspection/delete/${requestId}`
-  //     );
-
-  //     if (response.data.success) {
-  //       console.log('✅ All inspection data deleted successfully');
-  //       console.log(`📊 Deleted from ${response.data.deletedTables.length} tables`);
-
-  //       setAssigning(false);
-  //       setShowConfirmationModal(false);
-
-  //       Alert.alert(
-  //         t("Main.Success"),
-  //         t("ConfirmationCapitalRequest.UndoSuccess"),
-  //         [
-  //           {
-  //             text: t("Main.ok"),
-  //             onPress: navigateToCapitalRequests,
-  //           },
-  //         ]
-  //       );
-  //     } else {
-  //       throw new Error(response.data.message || 'Delete failed');
-  //     }
-  //   } catch (error: any) {
-  //     console.error('❌ Error deleting inspection data:', error);
-  //     setAssigning(false);
-
-  //     Alert.alert(
-  //       t("Main.Error"),
-  //       error.response?.data?.message || t("ConfirmationCapitalRequest.UndoFailed"),
-  //       [{ text: t("Main.ok") }]
-  //     );
-  //   }
-  // };
-
   const handleUndo = async () => {
-  if (hasNavigatedRef.current) {
-    console.log("⏭️ Already navigating, skipping undo");
-    return;
-  }
+    if (hasNavigatedRef.current) {
+      return;
+    }
 
-  if (animationRef.current) {
-    animationRef.current.stop();
-  }
+    if (animationRef.current) {
+      animationRef.current.stop();
+    }
 
-  setAssigning(true);
+    setAssigning(true);
 
-  try {
-    console.log(`🗑️ Deleting all inspection data for requestId: ${requestId}`);
+    try {
+      const response = await axios.delete(
+        `${environment.API_BASE_URL}api/capital-request/inspection/delete/${requestId}`,
+      );
 
-    //Delete from backend database
-    const response = await axios.delete(
-      `${environment.API_BASE_URL}api/capital-request/inspection/delete/${requestId}`
-    );
+      if (response.data.success) {
+        await deleteAllInspectionData(requestId.toString());
 
-    if (response.data.success) {
-      console.log('✅ Backend data deleted successfully');
-      console.log(`📊 Deleted from ${response.data.deletedTables.length} backend tables`);
+        setAssigning(false);
+        setShowConfirmationModal(false);
 
-      // Delete from local SQLite database
-      await deleteAllInspectionData(requestId.toString());
-      console.log('✅ Local SQLite data deleted successfully');
-
+        Alert.alert(
+          t("Main.Success"),
+          t("ConfirmationCapitalRequest.UndoSuccess"),
+          [
+            {
+              text: t("Main.ok"),
+              onPress: navigateToCapitalRequests,
+            },
+          ],
+        );
+      } else {
+        throw new Error(response.data.message || "Delete failed");
+      }
+    } catch (error: any) {
+      console.error("Error deleting inspection data:", error);
       setAssigning(false);
-      setShowConfirmationModal(false);
 
       Alert.alert(
-        t("Main.Success"),
-        t("ConfirmationCapitalRequest.UndoSuccess"),
-        [
-          {
-            text: t("Main.ok"),
-            onPress: navigateToCapitalRequests,
-          },
-        ]
+        t("Main.Error"),
+        error.response?.data?.message ||
+          t("ConfirmationCapitalRequest.UndoFailed"),
+        [{ text: t("Main.ok") }],
       );
-    } else {
-      throw new Error(response.data.message || 'Delete failed');
     }
-  } catch (error: any) {
-    console.error('❌ Error deleting inspection data:', error);
-    setAssigning(false);
-
-    Alert.alert(
-      t("Main.Error"),
-      error.response?.data?.message || t("ConfirmationCapitalRequest.UndoFailed"),
-      [{ text: t("Main.ok") }]
-    );
-  }
-};
+  };
 
   const handleConfirmAndLeave = async () => {
-  if (hasNavigatedRef.current) {
-    console.log("⏭️ Already navigating, skipping confirm");
-    return;
-  }
-
-  if (animationRef.current) {
-    animationRef.current.stop();
-  }
-
-  setShowConfirmationModal(false);
-  setAssigning(true);
-
-  try {
-    console.log(`✅ Confirming and leaving request ID: ${requestId}`);
-
-    const response = await axios.patch(
-      `${environment.API_BASE_URL}api/capital-request/confirm-leave/${requestId}`
-    );
-
-    if (response.data.success) {
-      console.log('✅ Request confirmed and audited date updated');
-      
-      setAssigning(false);
-      
-      Alert.alert(
-        t("Main.Success"),
-        t("ConfirmationCapitalRequest.ConfirmSuccess"),
-        [
-          {
-            text: t("Main.ok"),
-            onPress: navigateToCapitalRequests,
-          },
-        ]
-      );
-    } else {
-      throw new Error(response.data.message || 'Confirmation failed');
+    if (hasNavigatedRef.current) {
+      return;
     }
-  } catch (error: any) {
-    console.error('❌ Error confirming request:', error);
-    setAssigning(false);
 
-    Alert.alert(
-      t("Main.Error"),
-      error.response?.data?.message || t("ConfirmationCapitalRequest.ConfirmFailed"),
-      [{ text: t("Main.ok") }]
-    );
-  }
-};
+    if (animationRef.current) {
+      animationRef.current.stop();
+    }
+
+    setShowConfirmationModal(false);
+    setAssigning(true);
+
+    try {
+      const response = await axios.patch(
+        `${environment.API_BASE_URL}api/capital-request/confirm-leave/${requestId}`,
+      );
+
+      if (response.data.success) {
+        setAssigning(false);
+
+        Alert.alert(
+          t("Main.Success"),
+          t("ConfirmationCapitalRequest.ConfirmSuccess"),
+          [
+            {
+              text: t("Main.ok"),
+              onPress: navigateToCapitalRequests,
+            },
+          ],
+        );
+      } else {
+        throw new Error(response.data.message || "Confirmation failed");
+      }
+    } catch (error: any) {
+      console.error("Error confirming request:", error);
+      setAssigning(false);
+
+      Alert.alert(
+        t("Main.Error"),
+        error.response?.data?.message ||
+          t("ConfirmationCapitalRequest.ConfirmFailed"),
+        [{ text: t("Main.ok") }],
+      );
+    }
+  };
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -345,16 +261,13 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
     return `00:${secs.toString().padStart(2, "0")}`;
   };
 
-  // Circle parameters
   const radius = 65;
   const circumference = 2 * Math.PI * radius;
 
-  // Animated Circle component
   const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
   return (
     <View className="flex-1 bg-white">
-      {/* Single Header - Always visible */}
       <View className="flex-row items-center px-4 py-3 border-b border-gray-200">
         <TouchableOpacity
           onPress={() => {
@@ -386,11 +299,8 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
         <View style={{ width: 55 }} />
       </View>
 
-      {/* Show only confirmation modal content (no officer list) */}
       <View className="flex-1 bg-white">
-        {/* Countdown Section */}
         <View className="flex justify-center items-center px-6 mt-6">
-          {/* Circular Countdown */}
           <View className="items-center mb-8">
             <Svg width={150} height={150}>
               <G rotation="-90" origin="75, 75">
@@ -430,7 +340,6 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
             </Svg>
           </View>
 
-          {/* Instruction Text */}
           <Text className="text-md text-center text-[#4E6393] mb-1 leading-6">
             {t("ConfirmationCapitalRequest.CountdownInstruction1")}{" "}
             <Text className="underline font-semibold text-black">
@@ -442,7 +351,6 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
             {t("ConfirmationCapitalRequest.CountdownInstruction3")}
           </Text>
 
-          {/* Request Information Box */}
           <View className="w-full bg-[#ADADAD1A] p-4 rounded-xl mb-8">
             <View className="flex-row justify-center items-center">
               <View className="flex-1">
@@ -451,12 +359,14 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
                 </Text>
               </View>
 
-              {/* Undo Button */}
               <TouchableOpacity
                 onPress={handleUndo}
                 disabled={assigning || hasNavigatedRef.current}
-                className={`px-10 py-3 rounded-3xl items-center ml-3 mt-auto ${assigning || hasNavigatedRef.current ? "bg-gray-400" : "bg-black"
-                  }`}
+                className={`px-10 py-3 rounded-3xl items-center ml-3 mt-auto ${
+                  assigning || hasNavigatedRef.current
+                    ? "bg-gray-400"
+                    : "bg-black"
+                }`}
               >
                 {assigning ? (
                   <ActivityIndicator size="small" color="white" />
@@ -470,7 +380,6 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
           </View>
         </View>
 
-        {/* Confirm & Leave Button */}
         <View className="px-12 pb-8 mt-auto mb-14">
           <TouchableOpacity
             onPress={handleConfirmAndLeave}

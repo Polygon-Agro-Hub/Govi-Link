@@ -23,7 +23,7 @@ import axios from "axios";
 import { environment } from "@/environment/environment";
 import { Ionicons, FontAwesome6 } from "@expo/vector-icons";
 import LottieView from "lottie-react-native";
-import { RouteProp, useRoute } from "@react-navigation/native";
+import { RouteProp } from "@react-navigation/native";
 
 type ViewAllVisitsNavigationProps = StackNavigationProp<
   RootStackParamList,
@@ -67,11 +67,8 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
   const { t, i18n } = useTranslation();
   const officerId = route.params?.officerId ?? "";
 
-  console.log("officer id", officerId);
-
   const today = dayjs();
   const currentDay = today.date();
-  console.log("Today date:", currentDay);
 
   const [selectedDate, setSelectedDate] = useState(dayjs());
   const monthNames: Record<string, string[]> = {
@@ -142,11 +139,7 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
 
   const scrollRef = React.useRef<ScrollView>(null);
 
-  const ITEM_WIDTH = 0;
-
   const translateY = useRef(new Animated.Value(0)).current;
-  const currentTranslateY = useRef(0);
-  console.log(translateY);
 
   const panResponder = useRef(
     PanResponder.create({
@@ -159,20 +152,17 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
 
       onPanResponderRelease: (_, g) => {
         if (g.dy > 120) {
-          console.log("hit1");
           setShowPopup(false);
           Animated.timing(translateY, {
             toValue: 600,
             duration: 100,
             useNativeDriver: true,
           }).start(() => {
-            console.log("hit3");
             translateY.setValue(0);
             setShowPopup(false);
             setSelectedItem(null);
           });
         } else {
-          console.log("hit4");
           Animated.spring(translateY, {
             toValue: 0,
             useNativeDriver: true,
@@ -207,12 +197,6 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
   }, [selectedDate, isOverdueSelected]);
 
   const fetchVisits = async () => {
-    console.log(
-      "Fetching visits for date:",
-      selectedDate.format("YYYY-MM-DD"),
-      "Overdue:",
-      isOverdueSelected,
-    );
     setLoading(true);
     try {
       const token = await AsyncStorage.getItem("token");
@@ -225,7 +209,6 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
           },
         );
         setVisits(response.data.data);
-        console.log("VISIT:", response.data.data);
       }
     } catch (error) {
       console.error("Failed to fetch officer visits:", error);
@@ -234,7 +217,6 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
     }
   };
 
-  // Count pending and ongoing visits
   const pendingCount = filteredVisits.filter((item) => {
     if (item.propose === "Cluster" && item.totalClusterCount) {
       return (
@@ -271,7 +253,6 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
 
   return (
     <View className="flex-1 bg-[#F5F7FB] pt-4">
-      {/* Header */}
       <View className="flex-row items-center justify-center px-4 mb-2">
         {shouldShowBackButton && (
           <TouchableOpacity
@@ -323,7 +304,6 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
           </LinearGradient>
         </TouchableOpacity>
 
-        {/* Horizontal Date Selector */}
         <ScrollView
           ref={scrollRef}
           horizontal
@@ -389,7 +369,6 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
             [...filteredVisits]
               .sort((a, b) => {
                 const getStatusRank = (item: VisitItem) => {
-                  // ---------- CLUSTER LOGIC ----------
                   if (item.propose === "Cluster" && item.totalClusterCount) {
                     if (item.completedClusterCount === item.totalClusterCount) {
                       return 5;
@@ -410,7 +389,6 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
                     return 3;
                   }
 
-                  // ---------- NON-CLUSTER LOGIC ----------
                   if (
                     item.status === "Completed" ||
                     item.status === "Finished"
@@ -720,12 +698,6 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
                     selectedItem?.farmerId &&
                     selectedItem?.propose === "Individual"
                   ) {
-                    // updateStatus(selectedItem.id, selectedItem.jobId);
-                    console.log(
-                      "hitt Request",
-                      selectedItem.id,
-                      selectedItem.jobId,
-                    );
                     navigation.navigate("QRScanner", {
                       farmerId: selectedItem.farmerId,
                       jobId: selectedItem.jobId,
@@ -739,12 +711,6 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
                       screenName: "ViewAllVisits",
                     });
                   } else if (selectedItem?.propose === "Requested") {
-                    // updateStatus(selectedItem.id, selectedItem.jobId);
-                    console.log(
-                      "hitt Request",
-                      selectedItem.id,
-                      selectedItem.jobId,
-                    );
                     navigation.navigate("QRScaneerRequstAudit", {
                       farmerId: selectedItem.farmerId,
                       govilinkjobid: selectedItem.id,

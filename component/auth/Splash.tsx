@@ -34,13 +34,10 @@ const Splash: React.FC = () => {
       useNativeDriver: false,
     });
 
-    // Start animation
     animation.start(async () => {
-      // After progress completes, check token
       await handleTokenCheck();
     });
 
-    // Cleanup
     return () => {
       progressAnim.removeListener(listenerId);
       animation.stop();

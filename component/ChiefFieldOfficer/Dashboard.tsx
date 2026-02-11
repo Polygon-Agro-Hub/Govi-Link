@@ -65,11 +65,10 @@ interface VisitsData {
   clusterId: number;
   farmId: number;
   id: number;
-  // Add these fields that come from the API
   tickCompleted?: number;
   photoCompleted?: number;
   totalCompleted?: number;
-  completionPercentage?: string; // This comes as string from API
+  completionPercentage?: string;
   status?: string;
   completedClusterCount: number;
   totalClusterCount: number;
@@ -170,20 +169,17 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
 
       onPanResponderRelease: (_, g) => {
         if (g.dy > 120) {
-          console.log("hit1");
           setShowPopup(false);
           Animated.timing(translateY, {
             toValue: 600,
             duration: 100,
             useNativeDriver: true,
           }).start(() => {
-            console.log("hit3");
             translateY.setValue(0);
             setShowPopup(false);
             setSelectedItem(null);
           });
         } else {
-          console.log("hit4");
           Animated.spring(translateY, {
             toValue: 0,
             useNativeDriver: true,
@@ -226,7 +222,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
       setCurrentDraftIndex(validIndex);
     } catch (error) {
       draftFlatListRef.current.scrollToOffset({
-        offset: validIndex * 320, // width of item
+        offset: validIndex * 320,
         animated: true,
       });
     }
@@ -273,20 +269,14 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
 
   useEffect(() => {
     fetchUserProfile();
-    // fetchVisits();
-    // fetchVisitsDraft()
+
     fetchAllVisits();
   }, []);
 
   const onRefresh = useCallback(async () => {
     try {
       setRefreshing(true);
-      await Promise.all([
-        fetchUserProfile(),
-        // fetchVisits(),
-        // fetchVisitsDraft(),
-        fetchAllVisits(),
-      ]);
+      await Promise.all([fetchUserProfile(), fetchAllVisits()]);
     } catch (error) {
       console.error("Refresh error:", error);
     } finally {
@@ -334,10 +324,6 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
   };
 
   useEffect(() => {
-    console.log("🎯 Loading States:", { loadingVisitsdrafts });
-  }, [loadingVisitsdrafts]);
-
-  useEffect(() => {
     const backAction = () => {
       if (showPopup) {
         setShowPopup(false);
@@ -376,24 +362,19 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
 
       const { visits, draftVisits } = response.data.data;
 
-      // Filter visits to exclude those with 20% or more completion
       const filteredVisits = visits.filter((visit: VisitsData) => {
-        // For cluster audits
         if (visit.propose === "Cluster") {
           if (
             visit.completedClusterCount !== undefined &&
             visit.totalClusterCount !== undefined &&
             visit.completionPercentage !== undefined
           ) {
-            // Calculate percentage from completed/total clusters
             const percentage =
               (visit.completedClusterCount / visit.totalClusterCount) * 100;
-            return percentage < 20; // Show only if less than 20% complete
+            return percentage < 20;
           }
-          return true; // Show if no completion data
-        }
-        // For individual/requested audits
-        else {
+          return true;
+        } else {
           let completionPercentage = 0;
 
           if (visit.completionPercentage) {
@@ -410,7 +391,6 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                 : 0;
           }
 
-          // Show only if less than 20% complete or no completion data
           return completionPercentage < 20 || visit.status === "Pending";
         }
       });
@@ -529,17 +509,14 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                   className=""
                   ref={flatListRef}
                   horizontal
-                  data={filteredVisitsData} // Use filtered data here
+                  data={filteredVisitsData}
                   keyExtractor={(item, index) => `${item.jobId}-${index}`}
                   showsHorizontalScrollIndicator={false}
                   renderItem={({ item }) => {
                     let displayStatus = "";
                     let isDisabled = false;
 
-                    // CLUSTER AUDIT LOGIC
                     if (item.propose === "Cluster") {
-                      // Since we already filtered by 20%, all clusters shown will be < 20% complete
-                      // So we can assume they're not disabled
                       if (
                         item.totalClusterCount !== undefined &&
                         item.completedClusterCount !== undefined
@@ -550,9 +527,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                         displayStatus = t("Visits.Pending");
                         isDisabled = false;
                       }
-                    }
-                    // INDIVIDUAL/REQUESTED AUDIT LOGIC
-                    else {
+                    } else {
                       let completionPercentage = 0;
 
                       if (item.completionPercentage) {
@@ -574,7 +549,6 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                             : 0;
                       }
 
-                      // Since we filtered by < 20%, all items should be not disabled
                       isDisabled = false;
                       displayStatus = t(`Visits.${item.status || "Pending"}`);
                     }
@@ -594,10 +568,6 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                         disabled={isDisabled}
                         onPress={() => {
                           if (isDisabled) {
-                            console.log(
-                              "Navigation blocked - item is disabled:",
-                              item.jobId,
-                            );
                             return;
                           }
 
@@ -720,9 +690,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
             </View>
 
             <View>
-              {/* Drafts done for only individual audit */}
               {draftVisits.length > 0 ? (
-                // <View className="flex-row items-center">
                 <View
                   className="flex-row"
                   style={{
@@ -731,7 +699,6 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                     alignItems: "center",
                   }}
                 >
-                  {/* Left Arrow */}
                   <TouchableOpacity
                     disabled={currentDraftIndex <= 0}
                     onPress={() => scrollDraftToIndex(currentDraftIndex - 1)}
@@ -744,7 +711,6 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                     />
                   </TouchableOpacity>
 
-                  {/* Drafts FlatList */}
                   <FlatList
                     ref={draftFlatListRef}
                     horizontal
@@ -849,7 +815,6 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                     )}
                   />
 
-                  {/* Right Arrow */}
                   <TouchableOpacity
                     disabled={currentDraftIndex >= draftVisits.length - 1}
                     onPress={() => scrollDraftToIndex(currentDraftIndex + 1)}
@@ -1079,7 +1044,6 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                         screenName: "Dashboard",
                       });
                     } else if (selectedItem?.propose === "Requested") {
-                      console.log("hitt Request");
                       navigation.navigate("QRScaneerRequstAudit", {
                         farmerId: selectedItem.farmerId,
                         govilinkjobid: selectedItem.id,

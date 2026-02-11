@@ -20,7 +20,7 @@ import { environment } from "@/environment/environment";
 import { useTranslation } from "react-i18next";
 import { LinearGradient } from "expo-linear-gradient";
 import { CameraScreen } from "@/Items/CameraScreen";
-import ContentLoader, { Rect, Circle } from "react-content-loader/native";
+import ContentLoader, { Rect } from "react-content-loader/native";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -167,13 +167,6 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
   );
   const [loaingCertificate, setloaingCertificate] = useState(true);
 
-  // Calculate allChecked and noneChecked
-  const allChecked =
-    questions.length > 0 &&
-    questions.every(
-      (q) => q.officerTickResult === 1 || q.officerUploadImage != null,
-    );
-
   const noneChecked =
     questions.length > 0 &&
     questions.every(
@@ -185,12 +178,11 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(
     null,
   );
-  const [showCameraScreen, setShowCameraScreen] = useState(false);
+
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [countdown, setCountdown] = useState(3);
   const [isButtonEnabled, setIsButtonEnabled] = useState(false);
 
-  // New state for the confirmation modal
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 
   useEffect(() => {
@@ -211,12 +203,6 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
   }, [capturedImage]);
 
   useEffect(() => {
-    console.log(
-      "Farmer ID from QR:",
-      certificationpaymentId,
-      farmId,
-      clusterId,
-    );
     const fetchQuestions = async () => {
       try {
         const token = await AsyncStorage.getItem("token");
@@ -257,8 +243,6 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
   };
 
   const handleCheck = async (q: Question) => {
-    console.log("Toggle check for question:", q.id);
-
     try {
       const token = await AsyncStorage.getItem("token");
       if (!token) {
@@ -337,7 +321,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
 
       await updateTickResult(q, newTickResult, token);
     } catch (err) {
-      console.error("❌ Error updating tickResult:", err);
+      console.error(" Error updating tickResult:", err);
       Alert.alert(
         t("Error.error"),
         t("CertificateQuesanory.Something went wrong while updating question."),
@@ -376,7 +360,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
         }
       }
     } catch (err) {
-      console.error("❌ Error updating tickResult:", err);
+      console.error(" Error updating tickResult:", err);
       Alert.alert(
         t("Error.error"),
         t("CertificateQuesanory.Something went wrong while updating question."),
@@ -388,7 +372,6 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
   };
 
   const handleSubmitPhoto = async (q: Question) => {
-    console.log("image upload", q);
     if (!capturedImage || !selectedQuestion) return;
 
     try {
@@ -461,7 +444,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
         );
       }
     } catch (err) {
-      console.error("❌ Upload photo failed:", err);
+      console.error("Upload photo failed:", err);
       Alert.alert(
         t("Error.error"),
         t("CertificateQuesanory.Failed to complete task, Please try again"),
@@ -475,18 +458,15 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
   const handleCameraClose = (imageUri: string | null) => {
     setShowCamera(false);
     if (imageUri) {
-      console.log("Captured Image URI:", imageUri);
       setCapturedImage(imageUri);
       setShowCameraModal(true);
     }
   };
 
   const handleNextButtonPress = () => {
-    // If no tasks are completed, show confirmation modal
     if (noneChecked) {
       setShowConfirmationModal(true);
     } else {
-      // Proceed to next page
       navigateToNextPage();
     }
   };
@@ -645,7 +625,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
               params: {
                 screen: "ViewAllVisits",
               },
-            })
+            });
           }}
         >
           <AntDesign name="arrow-left" size={20} color="#fff" />
@@ -654,7 +634,6 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
           </Text>
         </TouchableOpacity>
 
-        {/* Next Button - Always enabled */}
         <TouchableOpacity
           onPress={handleNextButtonPress}
           className="rounded-full overflow-hidden"
@@ -673,7 +652,6 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
         </TouchableOpacity>
       </View>
 
-      {/* Confirmation Modal for None Checked */}
       <Modal
         visible={showConfirmationModal}
         animationType="fade"

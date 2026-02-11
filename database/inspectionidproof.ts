@@ -2,7 +2,6 @@ import * as SQLite from "expo-sqlite";
 
 const db = SQLite.openDatabaseSync("inspection.db");
 
-// Initialize ID proof table
 export const initIDProofTable = () => {
   try {
     db.execSync(
@@ -16,9 +15,9 @@ export const initIDProofTable = () => {
         updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
       );`,
     );
-    console.log("✅ ID proof table created/verified");
+    console.log("ID proof table created/verified");
   } catch (error) {
-    console.error("❌ Error initializing ID proof table:", error);
+    console.error(" Error initializing ID proof table:", error);
     throw error;
   }
 };
@@ -30,13 +29,13 @@ export interface IDProofInfo {
   backImg: string | null;
 }
 
-// Save or update ID proof
+
 export const saveIDProof = (
   requestId: number,
   data: Partial<IDProofInfo>,
 ): void => {
   try {
-    // Check if record exists
+    
     const existing = db.getFirstSync<{ requestId: number }>(
       "SELECT requestId FROM inspectionidproof WHERE requestId = ?",
       [requestId],
@@ -57,7 +56,7 @@ export const saveIDProof = (
         `UPDATE inspectionidproof SET ${fields}, updatedAt = ? WHERE requestId = ?`,
         values,
       );
-      console.log("✅ ID proof updated in SQLite");
+      console.log("ID proof updated in SQLite");
     } else {
       // INSERT
       const fields = [
@@ -80,15 +79,15 @@ export const saveIDProof = (
         `INSERT INTO inspectionidproof (${fields}) VALUES (${placeholders})`,
         values,
       );
-      console.log("✅ ID proof inserted into SQLite");
+      console.log("ID proof inserted into SQLite");
     }
   } catch (error) {
-    console.error("❌ Error saving ID proof:", error);
+    console.error("Error saving ID proof:", error);
     throw error;
   }
 };
 
-// Get ID proof
+
 export const getIDProof = (requestId: number): IDProofInfo | null => {
   try {
     const row = db.getFirstSync<any>(
@@ -97,7 +96,7 @@ export const getIDProof = (requestId: number): IDProofInfo | null => {
     );
 
     if (row) {
-      console.log("✅ ID proof loaded from SQLite");
+      
       return {
         pType: row.pType || "",
         pNumber: row.pNumber || "",
@@ -106,28 +105,28 @@ export const getIDProof = (requestId: number): IDProofInfo | null => {
       };
     }
 
-    console.log("📭 No ID proof found in SQLite");
+  
     return null;
   } catch (error) {
-    console.error("❌ Error fetching ID proof:", error);
+    console.error(" Error fetching ID proof:", error);
     return null;
   }
 };
 
-// Clear ID proof for a specific request
+
 export const clearIDProof = (requestId: number): void => {
   try {
     db.runSync("DELETE FROM inspectionidproof WHERE requestId = ?", [
       requestId,
     ]);
-    console.log("🗑️ Cleared ID proof for request:", requestId);
+   
   } catch (error) {
-    console.error("❌ Error clearing ID proof:", error);
+    console.error(" Error clearing ID proof:", error);
     throw error;
   }
 };
 
-// Get all ID proof records
+
 export const getAllIDProofs = () => {
   try {
     const rows = db.getAllSync<any>(
@@ -135,7 +134,7 @@ export const getAllIDProofs = () => {
     );
     return rows;
   } catch (error) {
-    console.error("❌ Error fetching all ID proofs:", error);
+    console.error(" Error fetching all ID proofs:", error);
     return [];
   }
 };

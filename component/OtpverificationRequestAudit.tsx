@@ -2,15 +2,12 @@ import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
-  SafeAreaView,
   Image,
   TextInput,
   TouchableOpacity,
   Alert,
   Keyboard,
 } from "react-native";
-import { StatusBar } from "expo-status-bar";
-
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -20,14 +17,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { environment } from "@/environment/environment";
 import { useTranslation } from "react-i18next";
 import { Dimensions } from "react-native";
-import { Modal } from "react-native";
-import { Animated } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { ScrollView } from "react-native-gesture-handler";
 import NetInfo from "@react-native-community/netinfo";
 import { LinearGradient } from "expo-linear-gradient";
-
-const { width: screenWidth } = Dimensions.get("window");
 
 type RootStackParamList = {
   OtpVerification: undefined;
@@ -41,10 +34,7 @@ interface SuccessModalProps {
 
 const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
   const { farmerMobile, jobId, govilinkjobid } = route.params;
-  console.log("audit complete", farmerMobile, jobId, govilinkjobid);
-
   const [otpCode, setOtpCode] = useState<string>("");
-  const [maskedCode, setMaskedCode] = useState<string>("XXXXX");
   const [referenceId, setReferenceId] = useState<string | null>(null);
   const [timer, setTimer] = useState<number>(240);
   const [isVerified, setIsVerified] = useState<boolean>(false);
@@ -52,7 +42,6 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
   const { t, i18n } = useTranslation();
   const [language, setLanguage] = useState("en");
   const [isOtpValid, setIsOtpValid] = useState<boolean>(false);
-  const [modalVisible, setModalVisible] = useState(false);
   const [verificationAttempts, setVerificationAttempts] = useState<number>(0);
   const [isOtpExpired, setIsOtpExpired] = useState<boolean>(false);
 
@@ -86,7 +75,7 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
       return () => clearInterval(interval);
     } else if (timer === 0 && !isVerified) {
       setDisabledResend(false);
-      setIsOtpExpired(true); // Mark OTP as expired when timer reaches 0
+      setIsOtpExpired(true);
     }
   }, [timer, isVerified]);
 
@@ -156,11 +145,11 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
         );
         return;
       }
-      // Handle different OTP verification responses
+
       switch (statusCode) {
-        case "1000": // ✅ Success
+        case "1000":
           setIsVerified(true);
-          const completeSuccess = await handleComplete(); // wait for completion
+          const completeSuccess = await handleComplete();
 
           if (completeSuccess) {
             navigation.navigate("OtpverificationSuccess");
@@ -173,11 +162,10 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
           }
           break;
 
-        case "1001": // Invalid or expired OTP
+        case "1001":
           setVerificationAttempts((prev) => prev + 1);
 
           if (verificationAttempts >= 2) {
-            // After multiple failed attempts, suggest resending
             Alert.alert(
               t("Otpverification.Invalid OTP"),
               t("Otpverification.Your OTP is invalid or expired."),
@@ -206,7 +194,7 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
             );
           }
           break;
-        case "1002": // ⏰ Expired
+        case "1002":
           setIsOtpExpired(true);
           Alert.alert(
             t("Otpverification.OTP Expired"),
@@ -250,7 +238,7 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
   };
   const handleResendOTP = async () => {
     await AsyncStorage.removeItem("referenceId");
-    console.log("Phone Number:", farmerMobile);
+
     try {
       const apiUrl = "https://api.getshoutout.com/otpservice/send";
       const headers = {
@@ -328,17 +316,14 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
         },
       );
 
-      console.log("📩 API Response:", response.data);
-
       if (response.status === 200 && response.data?.success) {
-        console.log("✅ Audit completion successful");
         return true;
       } else {
-        console.warn("⚠️ Audit completion failed:", response.data);
+        console.warn(" Audit completion failed:", response.data);
         return false;
       }
     } catch (err) {
-      console.error("❌ Error updating audit completion:", err);
+      console.error(" Error updating audit completion:", err);
       return false;
     }
   };
@@ -413,7 +398,7 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
             <TextInput
               key={index}
               ref={(el: TextInput | null) => {
-                inputRefs.current[index] = el; // assign to array
+                inputRefs.current[index] = el;
               }}
               className={`w-12 h-12 text-lg text-center rounded-lg ${
                 otpCode[index]

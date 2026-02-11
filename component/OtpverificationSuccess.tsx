@@ -58,7 +58,6 @@ const OtpverificationSuccess: React.FC = ({ navigation }: any) => {
         </Text>
         <Text
           className="text-[#AAAAAA] mt-5 text-center px-12"
-          // style={{ fontSize: 20 }}
           style={[
             i18n.language === "si"
               ? { fontSize: 16 }
@@ -76,7 +75,6 @@ const OtpverificationSuccess: React.FC = ({ navigation }: any) => {
           onPress={() => navigation.navigate("Main")}
         >
           <Text
-            //   style={{ fontSize: 20 }}
             style={[
               i18n.language === "si"
                 ? { fontSize: 18 }

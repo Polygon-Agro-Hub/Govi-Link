@@ -4,7 +4,6 @@ import {
   Text,
   TextInput,
   ScrollView,
-  TouchableOpacity,
   StatusBar,
   Alert,
   KeyboardAvoidingView,
@@ -48,8 +47,9 @@ const Input = ({
       {required && <Text className="text-black">*</Text>}
     </Text>
     <View
-      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${error ? "border border-red-500" : ""
-        }`}
+      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
+        error ? "border border-red-500" : ""
+      }`}
     >
       <TextInput
         placeholder={placeholder}
@@ -73,8 +73,6 @@ type ValidationRule = {
 const validateAndFormat = (text: string, rules: ValidationRule, t: any) => {
   let value = text;
   let error = "";
-
-  console.log("Validating:", value, rules);
 
   if (rules.type === "expected") {
     value = value.replace(/[^0-9.]/g, "");
@@ -131,8 +129,6 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
   const route = useRoute<RouteProp<RootStackParamList, "InvestmentInfo">>();
   const { requestNumber, requestId } = route.params;
   const { t } = useTranslation();
-
-  // Local state for form data
   const [formData, setFormData] = useState<InvestmentInfoData>({
     expected: 0,
     purpose: "",
@@ -143,23 +139,20 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
   const [isNextEnabled, setIsNextEnabled] = useState(false);
   const [isExistingData, setIsExistingData] = useState(false);
 
-  // Auto-save to SQLite whenever formData changes (debounced)
   useEffect(() => {
     const timer = setTimeout(async () => {
       if (requestId) {
         try {
           await saveInvestmentInfo(Number(requestId), formData);
-          console.log("💾 Auto-saved investment info to SQLite");
         } catch (err) {
           console.error("Error auto-saving investment info:", err);
         }
       }
-    }, 500); // 500ms debounce
+    }, 500);
 
     return () => clearTimeout(timer);
   }, [formData, requestId]);
 
-  // Load data from SQLite when component mounts
   useFocusEffect(
     useCallback(() => {
       const loadData = async () => {
@@ -170,11 +163,9 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
           const localData = await getInvestmentInfo(reqId);
 
           if (localData) {
-            console.log("✅ Loaded investment info from SQLite");
             setFormData(localData);
             setIsExistingData(true);
           } else {
-            console.log("📝 No local investment data - new entry");
             setIsExistingData(false);
           }
         } catch (error) {
@@ -186,7 +177,6 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
     }, [requestId]),
   );
 
-  // Validate form completion
   useEffect(() => {
     const requiredFields: (keyof InvestmentInfoData)[] = [
       "expected",
@@ -211,12 +201,10 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
     setIsNextEnabled(allFilled && !hasErrors);
   }, [formData, errors]);
 
-  // Update form data
   const updateFormData = (updates: Partial<InvestmentInfoData>) => {
     setFormData((prev) => ({ ...prev, ...updates }));
   };
 
-  // Handle field changes
   const handleFieldChange = (
     key: keyof InvestmentInfoData,
     text: string,
@@ -224,7 +212,6 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
   ) => {
     const { value, error } = validateAndFormat(text, rules, t);
 
-    // Convert to appropriate type
     let processedValue: string | number = value;
     if (key === "expected") {
       processedValue = value ? parseFloat(value) : 0;
@@ -236,55 +223,6 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
     setErrors((prev) => ({ ...prev, [key]: error || "" }));
   };
 
-  // Fetch data from backend
-  const fetchInspectionData = async (
-    reqId: number,
-  ): Promise<InvestmentInfoData | null> => {
-    try {
-      console.log(`🔍 Fetching investment inspection data for reqId: ${reqId}`);
-
-      const response = await axios.get(
-        `${environment.API_BASE_URL}api/capital-request/inspection/get`,
-        {
-          params: {
-            reqId,
-            tableName: "inspectioninvestment",
-          },
-        },
-      );
-
-      console.log("📦 Raw response:", response.data);
-
-      if (response.data.success && response.data.data) {
-        console.log(`✅ Fetched existing investment data:`, response.data.data);
-
-        const data = response.data.data;
-
-        return {
-          expected: data.expected ? parseFloat(data.expected) : 0,
-          purpose: data.purpose || "",
-          repaymentMonth: data.repaymentMonth
-            ? parseInt(data.repaymentMonth)
-            : 0,
-        };
-      }
-
-      console.log(`📭 No existing investment data found for reqId: ${reqId}`);
-      return null;
-    } catch (error: any) {
-      console.error(`❌ Error fetching investment inspection data:`, error);
-      console.error("Error details:", error.response?.data);
-
-      if (error.response?.status === 404) {
-        console.log(`📝 No existing record - will create new`);
-        return null;
-      }
-
-      return null;
-    }
-  };
-
-  // Save to backend
   const saveToBackend = async (
     reqId: number,
     tableName: string,
@@ -292,11 +230,6 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
     isUpdate: boolean,
   ): Promise<boolean> => {
     try {
-      console.log(
-        `💾 Saving to backend (${isUpdate ? "UPDATE" : "INSERT"}):`,
-        tableName,
-      );
-
       const transformedData = {
         expected: data.expected?.toString() || "0",
         purpose: data.purpose || "",
@@ -304,8 +237,6 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
           ? parseInt(data.repaymentMonth.toString())
           : 0,
       };
-
-      console.log(`📦 Transformed data:`, transformedData);
 
       const response = await axios.post(
         `${environment.API_BASE_URL}api/capital-request/inspection/save`,
@@ -322,23 +253,20 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
       );
 
       if (response.data.success) {
-        console.log(`✅ ${tableName} ${response.data.operation}d successfully`);
         return true;
       } else {
-        console.error(`❌ ${tableName} save failed:`, response.data.message);
+        console.error(` ${tableName} save failed:`, response.data.message);
         return false;
       }
     } catch (error: any) {
-      console.error(`❌ Error saving ${tableName}:`, error);
+      console.error(` Error saving ${tableName}:`, error);
       return false;
     }
   };
 
-  // Handle next button
   const handleNext = async () => {
     const validationErrors: Record<string, string> = {};
 
-    // Validate required fields
     if (
       !formData?.expected ||
       formData.expected.toString().trim() === "" ||
@@ -366,9 +294,8 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
       return;
     }
 
-    // Validate requestId exists
     if (!requestId) {
-      console.error("❌ requestId is missing!");
+      console.error(" requestId is missing!");
       Alert.alert(
         t("Error.Error"),
         "Request ID is missing. Please go back and try again.",
@@ -379,9 +306,8 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
 
     const reqId = Number(requestId);
 
-    // Validate it's a valid number
     if (isNaN(reqId) || reqId <= 0) {
-      console.error("❌ Invalid requestId:", requestId);
+      console.error(" Invalid requestId:", requestId);
       Alert.alert(
         t("Error.Error"),
         "Invalid request ID. Please go back and try again.",
@@ -390,9 +316,6 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
       return;
     }
 
-    console.log("✅ Using requestId:", reqId);
-
-    // Show loading indicator
     Alert.alert(
       t("InspectionForm.Saving"),
       t("InspectionForm.Please wait..."),
@@ -400,12 +323,7 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
       { cancelable: false },
     );
 
-    // Save to backend
     try {
-      console.log(
-        `🚀 Saving to backend (${isExistingData ? "UPDATE" : "INSERT"})`,
-      );
-
       const saved = await saveToBackend(
         reqId,
         "inspectioninvestment",
@@ -414,7 +332,6 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
       );
 
       if (saved) {
-        console.log("✅ Investment info saved successfully to backend");
         setIsExistingData(true);
 
         Alert.alert(
@@ -433,7 +350,6 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
           ],
         );
       } else {
-        console.log("⚠️ Backend save failed, but continuing with local data");
         Alert.alert(
           t("Main.Warning"),
           t("InspectionForm.Could not save to server. Data saved locally."),
@@ -473,10 +389,8 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
   const formatWithCommas = (value: string): string => {
     if (!value) return "";
 
-    // Remove any existing commas
     const numericValue = value.replace(/,/g, "");
 
-    // Add commas as thousand separators
     return numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   };
 
@@ -518,7 +432,11 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
           <Input
             label={t("InspectionForm.Expected investment by the farmer")}
             placeholder=""
-            value={formData.expected ? formatWithCommas(formData.expected.toString()) : ""}
+            value={
+              formData.expected
+                ? formatWithCommas(formData.expected.toString())
+                : ""
+            }
             onChangeText={(text) => {
               // Remove commas before processing
               const numericValue = text.replace(/,/g, "");
@@ -542,7 +460,7 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
             onChangeText={(text) =>
               handleFieldChange("purpose", text, {
                 required: true,
-                type: "text", // Changed from "purpose" to "text" to allow all characters
+                type: "text",
               })
             }
             required

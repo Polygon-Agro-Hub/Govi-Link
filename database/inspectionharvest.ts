@@ -2,7 +2,6 @@ import * as SQLite from "expo-sqlite";
 
 const db = SQLite.openDatabaseSync("inspection.db");
 
-// Initialize harvest storage table
 export const initHarvestStorageTable = () => {
   try {
     db.execSync(
@@ -16,11 +15,11 @@ export const initHarvestStorageTable = () => {
         awareOfQualityStandards TEXT,
         createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
         updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
-      );`
+      );`,
     );
-    console.log("✅ Harvest Storage table created/verified");
+    console.log(" Harvest Storage table created/verified");
   } catch (error) {
-    console.error("❌ Error initializing harvest storage table:", error);
+    console.error("Error initializing harvest storage table:", error);
     throw error;
   }
 };
@@ -34,39 +33,32 @@ export interface HarvestStorageData {
   awareOfQualityStandards: "Yes" | "No" | undefined;
 }
 
-// Helper to convert stored value to "Yes"/"No"
 const toYesNo = (val: any): "Yes" | "No" | undefined => {
   if (val === null || val === undefined || val === "") return undefined;
-  
-  // Handle string values
+
   if (typeof val === "string") {
     if (val === "Yes" || val === "yes" || val === "1") return "Yes";
     if (val === "No" || val === "no" || val === "0") return "No";
   }
-  
-  // Handle numeric values
+
   if (val === 1 || val === true) return "Yes";
   if (val === 0 || val === false) return "No";
-  
+
   return undefined;
 };
 
-// Save or update harvest storage info
 export const saveHarvestStorageInfo = (
   requestId: number,
-  data: Partial<HarvestStorageData>
+  data: Partial<HarvestStorageData>,
 ): void => {
   try {
-    // Check if record exists
     const existing = db.getFirstSync<{ requestId: number }>(
       "SELECT requestId FROM inspectionharveststorage WHERE requestId = ?",
-      [requestId]
+      [requestId],
     );
 
-    // Prepare data for storage - store Yes/No as TEXT
     const storageData: any = { ...data };
-    
-    // Convert Yes/No to TEXT for storage
+
     if (data.hasOwnStorage !== undefined) {
       storageData.hasOwnStorage = data.hasOwnStorage;
     }
@@ -87,7 +79,6 @@ export const saveHarvestStorageInfo = (
     }
 
     if (existing) {
-      // UPDATE existing record
       const fields = Object.keys(storageData)
         .map((key) => `${key} = ?`)
         .join(", ");
@@ -99,11 +90,10 @@ export const saveHarvestStorageInfo = (
 
       db.runSync(
         `UPDATE inspectionharveststorage SET ${fields}, updatedAt = ? WHERE requestId = ?`,
-        values as SQLite.SQLiteBindParams
+        values as SQLite.SQLiteBindParams,
       );
-      console.log("✅ Harvest Storage info updated in SQLite");
+      console.log(" Harvest Storage info updated in SQLite");
     } else {
-      // INSERT new record
       const fields = [
         "requestId",
         ...Object.keys(storageData),
@@ -122,29 +112,26 @@ export const saveHarvestStorageInfo = (
 
       db.runSync(
         `INSERT INTO inspectionharveststorage (${fields}) VALUES (${placeholders})`,
-        values as SQLite.SQLiteBindParams
+        values as SQLite.SQLiteBindParams,
       );
-      console.log("✅ Harvest Storage info inserted into SQLite");
+      console.log("Harvest Storage info inserted into SQLite");
     }
   } catch (error) {
-    console.error("❌ Error saving harvest storage info:", error);
+    console.error("Error saving harvest storage info:", error);
     throw error;
   }
 };
 
-// Get harvest storage info
 export const getHarvestStorageInfo = (
-  requestId: number
+  requestId: number,
 ): HarvestStorageData | null => {
   try {
     const row = db.getFirstSync<any>(
       "SELECT * FROM inspectionharveststorage WHERE requestId = ?",
-      [requestId]
+      [requestId],
     );
 
     if (row) {
-      console.log("✅ Raw SQLite data:", row);
-      
       const result = {
         hasOwnStorage: toYesNo(row.hasOwnStorage),
         ifNotHasFacilityAccess: toYesNo(row.ifNotHasFacilityAccess),
@@ -153,39 +140,34 @@ export const getHarvestStorageInfo = (
         hasValueAddedMarketLinkage: toYesNo(row.hasValueAddedMarketLinkage),
         awareOfQualityStandards: toYesNo(row.awareOfQualityStandards),
       };
-      
-      console.log("✅ Parsed harvest storage info:", result);
+
       return result;
     }
 
-    console.log("📭 No harvest storage info found in SQLite");
     return null;
   } catch (error) {
-    console.error("❌ Error fetching harvest storage info:", error);
+    console.error("Error fetching harvest storage info:", error);
     return null;
   }
 };
 
-// Clear harvest storage info for a specific request
 export const clearHarvestStorageInfo = (requestId: number): void => {
   try {
     db.runSync("DELETE FROM inspectionharveststorage WHERE requestId = ?", [
       requestId,
     ]);
-    console.log("🗑️ Cleared harvest storage info for request:", requestId);
   } catch (error) {
-    console.error("❌ Error clearing harvest storage info:", error);
+    console.error(" Error clearing harvest storage info:", error);
     throw error;
   }
 };
 
-// Get all harvest storage info records
 export const getAllHarvestStorageInfo = () => {
   try {
     const rows = db.getAllSync<any>(
-      "SELECT * FROM inspectionharveststorage ORDER BY updatedAt DESC"
+      "SELECT * FROM inspectionharveststorage ORDER BY updatedAt DESC",
     );
-    return rows.map(row => ({
+    return rows.map((row) => ({
       ...row,
       hasOwnStorage: toYesNo(row.hasOwnStorage),
       ifNotHasFacilityAccess: toYesNo(row.ifNotHasFacilityAccess),
@@ -195,7 +177,7 @@ export const getAllHarvestStorageInfo = () => {
       awareOfQualityStandards: toYesNo(row.awareOfQualityStandards),
     }));
   } catch (error) {
-    console.error("❌ Error fetching all harvest storage info:", error);
+    console.error(" Error fetching all harvest storage info:", error);
     return [];
   }
 };

@@ -2,15 +2,12 @@ import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
-  SafeAreaView,
   Image,
   TextInput,
   TouchableOpacity,
   Alert,
   Keyboard,
 } from "react-native";
-import { StatusBar } from "expo-status-bar";
-
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -20,8 +17,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { environment } from "@/environment/environment";
 import { useTranslation } from "react-i18next";
 import { Dimensions } from "react-native";
-import { Modal } from "react-native";
-import { Animated } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { ScrollView } from "react-native-gesture-handler";
 import NetInfo from "@react-native-community/netinfo";
@@ -54,10 +49,9 @@ interface SuccessModalProps {
 
 const Otpverification: React.FC = ({ navigation, route }: any) => {
   const { farmerMobile, jobId, isClusterAudit, farmId, auditId } = route.params;
-  console.log("audit complete", auditId, farmId, isClusterAudit);
 
   const [otpCode, setOtpCode] = useState<string>("");
-  const [maskedCode, setMaskedCode] = useState<string>("XXXXX");
+
   const [referenceId, setReferenceId] = useState<string | null>(null);
   const [timer, setTimer] = useState<number>(240);
   const [isVerified, setIsVerified] = useState<boolean>(false);
@@ -65,7 +59,7 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
   const { t, i18n } = useTranslation();
   const [language, setLanguage] = useState("en");
   const [isOtpValid, setIsOtpValid] = useState<boolean>(false);
-  const [modalVisible, setModalVisible] = useState(false);
+
   const [verificationAttempts, setVerificationAttempts] = useState<number>(0);
   const [isOtpExpired, setIsOtpExpired] = useState<boolean>(false);
 
@@ -99,24 +93,9 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
       return () => clearInterval(interval);
     } else if (timer === 0 && !isVerified) {
       setDisabledResend(false);
-      setIsOtpExpired(true); // Mark OTP as expired when timer reaches 0
+      setIsOtpExpired(true);
     }
   }, [timer, isVerified]);
-
-  // const handleOtpChange = (text: string, index: number) => {
-  //   const updatedOtpCode = otpCode.split("");
-  //   updatedOtpCode[index] = text;
-  //   setOtpCode(updatedOtpCode.join(""));
-
-  //   setIsOtpValid(updatedOtpCode.length === 5 && !updatedOtpCode.includes(""));
-
-  //   if (text && inputRefs.current[index + 1]) {
-  //     inputRefs.current[index + 1]?.focus();
-  //   }
-  //   if (updatedOtpCode.length === 5) {
-  //     Keyboard.dismiss();
-  //   }
-  // };
 
   const handleVerify = async () => {
     const code = otpCode;
@@ -169,11 +148,11 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
         );
         return;
       }
-      // Handle different OTP verification responses
+
       switch (statusCode) {
-        case "1000": // ✅ Success
+        case "1000":
           setIsVerified(true);
-          const completeSuccess = await handleComplete(); // wait for completion
+          const completeSuccess = await handleComplete();
 
           if (completeSuccess) {
             navigation.navigate("OtpverificationSuccess");
@@ -186,11 +165,10 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
           }
           break;
 
-        case "1001": // Invalid or expired OTP
+        case "1001":
           setVerificationAttempts((prev) => prev + 1);
 
           if (verificationAttempts >= 2) {
-            // After multiple failed attempts, suggest resending
             Alert.alert(
               t("Otpverification.Invalid OTP"),
               t("Otpverification.Your OTP is invalid or expired."),
@@ -219,7 +197,7 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
             );
           }
           break;
-        case "1002": // ⏰ Expired
+        case "1002":
           setIsOtpExpired(true);
           Alert.alert(
             t("Otpverification.OTP Expired"),
@@ -263,7 +241,7 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
   };
   const handleResendOTP = async () => {
     await AsyncStorage.removeItem("referenceId");
-    console.log("Phone Number:", farmerMobile);
+
     try {
       const apiUrl = "https://api.getshoutout.com/otpservice/send";
       const headers = {
@@ -332,7 +310,6 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
       }
 
       const payload = { isClusterAudit, farmId };
-      console.log("🚀 Sending completion request:", payload);
 
       const response = await axios.put(
         `${environment.API_BASE_URL}api/officer/complete/${auditId}`,
@@ -340,17 +317,14 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
         { headers: { Authorization: `Bearer ${token}` } },
       );
 
-      console.log("📩 API Response:", response.data);
-
       if (response.status === 200 && response.data?.success) {
-        console.log("✅ Audit completion successful");
         return true;
       } else {
-        console.warn("⚠️ Audit completion failed:", response.data);
+        console.warn(" Audit completion failed:", response.data);
         return false;
       }
     } catch (err) {
-      console.error("❌ Error updating audit completion:", err);
+      console.error("Error updating audit completion:", err);
       return false;
     }
   };
@@ -366,7 +340,7 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
       inputRefs.current[index + 1]?.focus();
     }
     if (updatedOtpCode.length === 5) {
-      Keyboard.dismiss(); // Only closes when all 5 digits entered
+      Keyboard.dismiss();
     }
   };
 
@@ -442,20 +416,12 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
           </Text>
         </View>
 
-        {/* 
-          <View className="mt-2">
-            <Text className="text-md text-[#FF1D85] text-center ">
-              {farmerMobile}
-            </Text>
-          </View> */}
-
         <View className="flex-row justify-center gap-3 mt-4 px-4">
           {Array.from({ length: 5 }).map((_, index) => (
             <TextInput
               key={index}
-              // ref={(el) => (inputRefs.current[index] = el as TextInput)}
               ref={(el: TextInput | null) => {
-                inputRefs.current[index] = el; // assign to array
+                inputRefs.current[index] = el;
               }}
               className={`w-12 h-12 text-lg text-center rounded-lg ${
                 otpCode[index]
@@ -466,7 +432,6 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
               maxLength={1}
               value={otpCode[index] || ""}
               onChangeText={(text) => handleOtpChange(text, index)}
-              // placeholder={maskedCode[index] || "_"}
               placeholderTextColor="lightgray"
               onKeyPress={(e) => handleKeyPress(e, index)}
             />

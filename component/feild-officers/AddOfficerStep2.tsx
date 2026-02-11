@@ -39,7 +39,6 @@ interface RouteParams {
   isnewsecondstep?: boolean;
 }
 
-// Sri Lanka provinces and districts data
 const sriLankaData = {
   provinces: [
     {
@@ -119,40 +118,29 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
   const { t } = useTranslation();
   const route = useRoute<RouteProp<RootStackParamList, "AddOfficerStep2">>();
   const { formData: step1Data, isnewsecondstep } = route.params ?? {};
-
-  // Modal hooks for all dropdowns
   const countryModal = useModal();
   const provinceModal = useModal();
   const districtModal = useModal();
   const bankModal = useModal();
   const branchModal = useModal();
-
-  // Address states - store English values for backend
   const [housePlotNo, setHousePlotNo] = useState("");
   const [streetName, setStreetName] = useState("");
   const [city, setCity] = useState("");
   const [selectedCountry, setSelectedCountry] = useState("Sri Lanka");
   const [selectedProvince, setSelectedProvince] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
-
-  // Display states - for showing translated values
   const [displayCountry, setDisplayCountry] = useState("Sri Lanka");
   const [displayProvince, setDisplayProvince] = useState("");
   const [displayDistrict, setDisplayDistrict] = useState("");
-
-  // Bank details states
   const [commissionAmount, setCommissionAmount] = useState("");
   const [accountHolderName, setAccountHolderName] = useState("");
   const [accountNumber, setAccountNumber] = useState("");
   const [confirmAccountNumber, setConfirmAccountNumber] = useState("");
   const [selectedBank, setSelectedBank] = useState("");
   const [selectedBranch, setSelectedBranch] = useState("");
-
-  // Validation states
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
 
-  // Available provinces and districts based on country selection
   const [availableProvinces, setAvailableProvinces] = useState<
     Array<{ name: { en: string; si: string; ta: string } }>
   >([]);
@@ -160,12 +148,10 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
     Array<{ en: string; si: string; ta: string }>
   >([]);
 
-  // Available branches based on bank selection
   const [availableBranches, setAvailableBranches] = useState<
     Array<{ ID: number; name: string }>
   >([]);
 
-  // Process banks data
   const banks = banksData.map((bank) => ({
     id: bank.ID,
     name: bank.name,
@@ -173,7 +159,6 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
 
   useFocusEffect(
     useCallback(() => {
-      console.log("focus effect", isnewsecondstep);
       if (isnewsecondstep === true) {
         setHousePlotNo("");
         setStreetName("");
@@ -191,12 +176,10 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
     }, [isnewsecondstep]),
   );
 
-  // Get current language
   const getCurrentLanguage = () => {
     return i18n.language || "en";
   };
 
-  // Get translated country name for display
   const getTranslatedCountry = (country: {
     name: { en: string; si: string; ta: string };
   }) => {
@@ -204,7 +187,6 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
     return country.name[lang as keyof typeof country.name] || country.name.en;
   };
 
-  // Get translated province name for display
   const getTranslatedProvince = (province: {
     name: { en: string; si: string; ta: string };
   }) => {
@@ -214,7 +196,6 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
     );
   };
 
-  // Get translated district name for display
   const getTranslatedDistrict = (district: {
     en: string;
     si: string;
@@ -224,7 +205,6 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
     return district[lang as keyof typeof district] || district.en;
   };
 
-  // Prepare data functions for GlobalSearchModal
   const getCountriesData = () => {
     return sortCountriesAlphabetically(countryData).map((country) => ({
       label: getTranslatedCountry(country),
@@ -267,7 +247,6 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
     }));
   };
 
-  // Clear specific field error
   const clearFieldError = (fieldName: string) => {
     setErrors((prev) => {
       const newErrors = { ...prev };
@@ -276,7 +255,6 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
     });
   };
 
-  // Field change handlers
   const handleHousePlotNoChange = (text: string) => {
     clearFieldError("housePlotNo");
     if (text.length === 0) {
@@ -389,7 +367,6 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
     setConfirmAccountNumber(numbersOnly);
   };
 
-  // Sorting functions
   const sortCountriesAlphabetically = (countries: any[]) => {
     return [...countries].sort((a, b) => {
       const nameA = getTranslatedCountry(a).toLowerCase();
@@ -438,9 +415,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
     });
   };
 
-  // Update display values when language changes
   useEffect(() => {
-    // Update country display
     if (selectedCountry === "Sri Lanka") {
       const country = countryData.find((c) => c.name.en === "Sri Lanka");
       if (country) {
@@ -450,7 +425,6 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
       setDisplayCountry(selectedCountry);
     }
 
-    // Update province display
     if (selectedProvince) {
       const province = sriLankaData.provinces.find(
         (p) => p.name.en === selectedProvince,
@@ -462,7 +436,6 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
       setDisplayProvince("");
     }
 
-    // Update district display
     if (selectedDistrict) {
       const allDistricts = sriLankaData.provinces.flatMap((p) => p.districts);
       const district = allDistricts.find((d) => d.en === selectedDistrict);
@@ -474,7 +447,6 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
     }
   }, [selectedCountry, selectedProvince, selectedDistrict, i18n.language]);
 
-  // Filter branches by selected bank
   const getBranchesByBank = (bankName: string) => {
     const bank = banks.find((b) => b.name === bankName);
     if (!bank) return [];
@@ -488,7 +460,6 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
     }));
   };
 
-  // Update available provinces when country changes
   useEffect(() => {
     if (selectedCountry === "Sri Lanka") {
       setAvailableProvinces(sriLankaData.provinces);
@@ -502,7 +473,6 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
     }
   }, [selectedCountry]);
 
-  // Update available districts when province changes
   useEffect(() => {
     if (selectedProvince && selectedCountry === "Sri Lanka") {
       const province = sriLankaData.provinces.find(
@@ -516,7 +486,6 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
     }
   }, [selectedProvince, selectedCountry]);
 
-  // Update available branches when bank changes
   useEffect(() => {
     if (selectedBank) {
       const branches = getBranchesByBank(selectedBank);
@@ -528,7 +497,6 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
     }
   }, [selectedBank]);
 
-  // Handle dropdown selections
   const handleCountrySelect = (selectedValues: string[]) => {
     if (selectedValues.length > 0) {
       const country = countryData.find((c) => c.name.en === selectedValues[0]);
@@ -585,7 +553,6 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
     branchModal.hide();
   };
 
-  // Custom render items for GlobalSearchModal
   const renderCountryItem = (item: any, isSelected: boolean) => (
     <TouchableOpacity
       className="px-4 py-3 border-b border-gray-200 flex-row items-center"
@@ -598,9 +565,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
         </Text>
         <Text className="text-sm text-gray-600">{item.dial_code}</Text>
       </View>
-      {isSelected && (
-        <MaterialIcons name="check" size={20} color="#21202B" />
-      )}
+      {isSelected && <MaterialIcons name="check" size={20} color="#21202B" />}
     </TouchableOpacity>
   );
 
@@ -610,9 +575,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
       onPress={() => handleProvinceSelect([item.value])}
     >
       <Text className="text-base text-gray-800">{item.label}</Text>
-      {isSelected && (
-        <MaterialIcons name="check" size={20} color="#21202B" />
-      )}
+      {isSelected && <MaterialIcons name="check" size={20} color="#21202B" />}
     </TouchableOpacity>
   );
 
@@ -622,9 +585,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
       onPress={() => handleDistrictSelect([item.value])}
     >
       <Text className="text-base text-gray-800">{item.label}</Text>
-      {isSelected && (
-        <MaterialIcons name="check" size={20} color="#21202B" />
-      )}
+      {isSelected && <MaterialIcons name="check" size={20} color="#21202B" />}
     </TouchableOpacity>
   );
 
@@ -634,9 +595,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
       onPress={() => handleBankSelect([item.value])}
     >
       <Text className="text-base text-gray-800">{item.label}</Text>
-      {isSelected && (
-        <MaterialIcons name="check" size={20} color="#21202B" />
-      )}
+      {isSelected && <MaterialIcons name="check" size={20} color="#21202B" />}
     </TouchableOpacity>
   );
 
@@ -646,13 +605,10 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
       onPress={() => handleBranchSelect([item.value])}
     >
       <Text className="text-base text-gray-800">{item.label}</Text>
-      {isSelected && (
-        <MaterialIcons name="check" size={20} color="#21202B" />
-      )}
+      {isSelected && <MaterialIcons name="check" size={20} color="#21202B" />}
     </TouchableOpacity>
   );
 
-  // Validate all fields before proceeding
   const validateStep2 = () => {
     const newErrors: Record<string, string> = {};
 
@@ -691,7 +647,9 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
       );
     }
     if (commissionAmount && parseFloat(commissionAmount) > 100) {
-      newErrors.commissionAmount = t("Error.Commission amount cannot exceed 100");
+      newErrors.commissionAmount = t(
+        "Error.Commission amount cannot exceed 100",
+      );
     }
 
     setErrors(newErrors);
@@ -741,13 +699,15 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
       style={{ flex: 1, backgroundColor: "white" }}
     >
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-      
+
       <CustomHeader
         title={t("AddOfficer.AddOfficer")}
         navigation={navigation}
         showBackButton={true}
         showLanguageSelector={false}
-        onBackPress={() => navigation.navigate("AddOfficerStep1", { isnew: false })}
+        onBackPress={() =>
+          navigation.navigate("AddOfficerStep1", { isnew: false })
+        }
       />
 
       <ScrollView
@@ -1063,7 +1023,6 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
         </View>
       </ScrollView>
 
-      {/* Country Selection Modal using GlobalSearchModal */}
       <GlobalSearchModal
         visible={countryModal.isVisible}
         onClose={countryModal.hide}
@@ -1079,7 +1038,6 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
         searchKeys={["label", "value", "name.en", "name.si", "name.ta"]}
       />
 
-      {/* Province Selection Modal using GlobalSearchModal */}
       <GlobalSearchModal
         visible={provinceModal.isVisible}
         onClose={provinceModal.hide}
@@ -1095,7 +1053,6 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
         searchKeys={["label", "value", "name.en", "name.si", "name.ta"]}
       />
 
-      {/* District Selection Modal using GlobalSearchModal */}
       <GlobalSearchModal
         visible={districtModal.isVisible}
         onClose={districtModal.hide}
@@ -1111,7 +1068,6 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
         searchKeys={["label", "value", "en", "si", "ta"]}
       />
 
-      {/* Bank Selection Modal using GlobalSearchModal */}
       <GlobalSearchModal
         visible={bankModal.isVisible}
         onClose={bankModal.hide}
@@ -1127,7 +1083,6 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
         searchKeys={["label", "value"]}
       />
 
-      {/* Branch Selection Modal using GlobalSearchModal */}
       <GlobalSearchModal
         visible={branchModal.isVisible}
         onClose={branchModal.hide}

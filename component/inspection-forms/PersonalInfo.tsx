@@ -63,8 +63,9 @@ const Input = ({
       {label} {required && <Text className="text-black">*</Text>}
     </Text>
     <View
-      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${error ? "border border-red-500" : ""
-        }`}
+      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
+        error ? "border border-red-500" : ""
+      }`}
     >
       {isMobile ? (
         <View className="flex-row flex-1 items-center">
@@ -130,7 +131,6 @@ const validateAndFormat = (
   let value = text;
   let error = "";
 
-  // Name fields validation
   if (
     [
       "firstName",
@@ -150,7 +150,6 @@ const validateAndFormat = (
     }
   }
 
-  // House number validation
   if (rules.type === "house") {
     value = value.replace(/[^a-zA-Z0-9 ]/g, "").replace(/^\s+/, "");
     if (rules.required && value.trim().length === 0) {
@@ -158,7 +157,6 @@ const validateAndFormat = (
     }
   }
 
-  // Email validation
   if (rules.type === "email1" || rules.type === "email2") {
     value = value.trim();
     if (value.length === 0 && rules.type === "email1") {
@@ -174,21 +172,19 @@ const validateAndFormat = (
         const isDuplicate = rules.uniqueWith.some(
           (key) =>
             formData[key]?.toLowerCase().trim() ===
-            value.toLowerCase().trim() && key !== currentKey,
+              value.toLowerCase().trim() && key !== currentKey,
         );
         if (isDuplicate) error = t("Error.Email addresses cannot be the same");
       }
     }
   }
 
-  // Phone validation
   if (["phone1", "phone2", "familyPhone"].includes(rules.type || "")) {
     let numbersOnly = value.replace(/[^0-9]/g, "").replace(/^0+/, "");
     if (numbersOnly.length > 9) numbersOnly = numbersOnly.slice(0, 9);
     value = numbersOnly;
 
     if (numbersOnly.length === 0) {
-      // Only show error for required fields (phone1 and familyPhone)
       if (rules.type === "phone1" || rules.type === "familyPhone") {
         error = t("Error.Phone number is required");
       }
@@ -200,26 +196,24 @@ const validateAndFormat = (
       const isDuplicate = rules.uniqueWith.some(
         (key) =>
           formData[key]?.replace(/[^0-9]/g, "").replace(/^0+/, "") ===
-          numbersOnly && key !== currentKey,
+            numbersOnly && key !== currentKey,
       );
       if (isDuplicate) error = t("Error.Phone numbers cannot be the same");
     }
   }
 
-  // Landline validation
   if (rules.type === "landHome" || rules.type === "landWork") {
     let numbersOnly = value.replace(/[^0-9]/g, "").replace(/^0+/, "");
     if (numbersOnly.length > 9) numbersOnly = numbersOnly.slice(0, 9);
     value = numbersOnly;
 
     if (numbersOnly.length !== 0 && numbersOnly.length < 9) {
-      // Use specific landline error message
       error = t("Error.Land number must be 9 digits long");
     } else if (rules.uniqueWith && numbersOnly.length > 0) {
       const isDuplicate = rules.uniqueWith.some(
         (key) =>
           formData[key]?.replace(/[^0-9]/g, "").replace(/^0+/, "") ===
-          numbersOnly && key !== currentKey,
+            numbersOnly && key !== currentKey,
       );
       if (isDuplicate) error = t("Error.Phone numbers cannot be the same");
     }
@@ -237,7 +231,6 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
   const { requestNumber, requestId } = route.params;
   const { t, i18n } = useTranslation();
 
-  // Local state for form data
   const [formData, setFormData] = useState<PersonalInfo>({
     firstName: "",
     lastName: "",
@@ -275,23 +268,20 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
 
   const districts: DistrictsMap = districtData;
 
-  // Auto-save to SQLite whenever formData changes (debounced)
   useEffect(() => {
     const timer = setTimeout(() => {
       if (requestId) {
         try {
           savePersonalInfo(Number(requestId), formData);
-          console.log("💾 Auto-saved to SQLite");
         } catch (err) {
           console.error("Error auto-saving:", err);
         }
       }
-    }, 500); // 500ms debounce
+    }, 500);
 
     return () => clearTimeout(timer);
   }, [formData, requestId]);
 
-  // Load data from SQLite when component mounts
   useFocusEffect(
     useCallback(() => {
       const loadData = async () => {
@@ -302,22 +292,20 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           const localData = getPersonalInfo(reqId);
 
           if (localData) {
-            console.log("✅ Loaded from SQLite");
             setFormData(localData);
             setSelectedDistrict(localData.district);
             setSelectedCountry(localData.country || "Sri Lanka");
             setSelectedProvince(localData.province);
             setIsExistingData(true);
 
-            // Set display values
             const provinceObj = sriLankaData["Sri Lanka"].provinces.find(
               (prov) => prov.name.en === localData.province,
             );
             setDisplayProvince(
               provinceObj
                 ? provinceObj.name[
-                i18n.language as keyof typeof provinceObj.name
-                ] || provinceObj.name.en
+                    i18n.language as keyof typeof provinceObj.name
+                  ] || provinceObj.name.en
                 : "",
             );
 
@@ -327,12 +315,11 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             setDisplayCountry(
               countryObj
                 ? countryObj.name[
-                i18n.language as keyof typeof countryObj.name
-                ] || countryObj.name.en
+                    i18n.language as keyof typeof countryObj.name
+                  ] || countryObj.name.en
                 : localData.country || "Sri Lanka",
             );
           } else {
-            console.log("📝 No local data - new entry");
             setIsExistingData(false);
           }
         } catch (error) {
@@ -344,7 +331,6 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
     }, [requestId, i18n.language]),
   );
 
-  // Validate form completion
   useEffect(() => {
     const requiredFields: (keyof PersonalInfo)[] = [
       "firstName",
@@ -373,7 +359,6 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
     setIsNextEnabled(allFilled && !hasErrors);
   }, [formData, errors]);
 
-  // Update form data and auto-save
   const updateFormData = (updates: Partial<PersonalInfo>) => {
     setFormData((prev) => ({ ...prev, ...updates }));
   };
@@ -418,7 +403,6 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
     });
   };
 
-  // Transform for backend
   const transformForBackend = (data: PersonalInfo) => ({
     firstName: data.firstName,
     lastName: data.lastName,
@@ -439,7 +423,6 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
     country: data.country,
   });
 
-  // Save to backend (only called on Next button)
   const saveToBackend = async (
     reqId: number,
     tableName: string,
@@ -479,7 +462,6 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
       "country",
     ];
 
-    // Validate
     const validationErrors: Record<string, string> = {};
     requiredFields.forEach((key) => {
       let value = formData[key];
@@ -592,7 +574,6 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
     }
   };
 
-  // District/Country dropdown functions
   const getFilteredDistricts = () => {
     const countryDistricts = districts[selectedCountry] || [];
     if (countryDistricts.length === 0) return [];
@@ -618,7 +599,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
 
     const displayProv = province
       ? province.name[i18n.language as keyof typeof province.name] ||
-      province.name.en
+        province.name.en
       : "";
 
     setSelectedProvince(province?.name.en || null);

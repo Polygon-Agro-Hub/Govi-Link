@@ -18,7 +18,7 @@ import { environment } from "@/environment/environment";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
 import { useTranslation } from "react-i18next";
-import ContentLoader, { Rect, Circle } from "react-content-loader/native";
+import ContentLoader, { Rect } from "react-content-loader/native";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -61,13 +61,62 @@ const LoadingSkeleton = () => {
         backgroundColor="#f3f3f3"
         foregroundColor="#ecebeb"
       >
-          <Rect x={wp("7%")} y={hp("2%")} rx="10" ry="10" width={wp("86%")} height={hp("8%")} />
-          <Rect x={wp("7%")} y={hp("12%")} rx="10" ry="10" width={wp("86%")} height={hp("8%")} />
-          <Rect x={wp("7%")} y={hp("22%")} rx="10" ry="10" width={wp("86%")} height={hp("8%")} />
-          <Rect x={wp("7%")} y={hp("32%")} rx="10" ry="10" width={wp("86%")} height={hp("8%")} />
-          <Rect x={wp("7%")} y={hp("42%")} rx="10" ry="10" width={wp("86%")} height={hp("8%")} />
-          <Rect x={wp("7%")} y={hp("52%")} rx="10" ry="10" width={wp("86%")} height={hp("8%")} />
-          <Rect x={wp("7%")} y={hp("62%")} rx="10" ry="10" width={wp("86%")} height={hp("8%")} />
+        <Rect
+          x={wp("7%")}
+          y={hp("2%")}
+          rx="10"
+          ry="10"
+          width={wp("86%")}
+          height={hp("8%")}
+        />
+        <Rect
+          x={wp("7%")}
+          y={hp("12%")}
+          rx="10"
+          ry="10"
+          width={wp("86%")}
+          height={hp("8%")}
+        />
+        <Rect
+          x={wp("7%")}
+          y={hp("22%")}
+          rx="10"
+          ry="10"
+          width={wp("86%")}
+          height={hp("8%")}
+        />
+        <Rect
+          x={wp("7%")}
+          y={hp("32%")}
+          rx="10"
+          ry="10"
+          width={wp("86%")}
+          height={hp("8%")}
+        />
+        <Rect
+          x={wp("7%")}
+          y={hp("42%")}
+          rx="10"
+          ry="10"
+          width={wp("86%")}
+          height={hp("8%")}
+        />
+        <Rect
+          x={wp("7%")}
+          y={hp("52%")}
+          rx="10"
+          ry="10"
+          width={wp("86%")}
+          height={hp("8%")}
+        />
+        <Rect
+          x={wp("7%")}
+          y={hp("62%")}
+          rx="10"
+          ry="10"
+          width={wp("86%")}
+          height={hp("8%")}
+        />
       </ContentLoader>
     </View>
   );
@@ -76,8 +125,15 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
   navigation,
 }) => {
   const route = useRoute<CertificateSuggestionsRouteProp>();
-  const { jobId, certificationpaymentId, slavequestionnaireId, farmerMobile,isClusterAudit ,farmId, auditId} = route.params;
-  console.log(farmerMobile)
+  const {
+    jobId,
+    slavequestionnaireId,
+    farmerMobile,
+    isClusterAudit,
+    farmId,
+    auditId,
+  } = route.params;
+
   const { t, i18n } = useTranslation();
   const [problems, setProblems] = useState<ProblemItem[]>([
     { id: Date.now(), problem: "", solution: "", saved: false },
@@ -85,9 +141,8 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
 
   const [editingId, setEditingId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
-    const [isButtonDisabled, setIsButtonDisabled] = useState(true); // Button disabled state
+  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [OtpSendLoading, setOtpSendLoading] = useState(false);
-  console.log(loading)
 
   const handleAddProblem = () => {
     setProblems((prev) => [
@@ -104,31 +159,37 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
   const handleChangeProblem = (
     id: number,
     field: "problem" | "solution",
-    value: string
+    value: string,
   ) => {
-  value = value.replace(/^\s+/, "");
-  if (value.length > 0) {
-    value = value.charAt(0).toUpperCase() + value.slice(1);
-  }
+    value = value.replace(/^\s+/, "");
+    if (value.length > 0) {
+      value = value.charAt(0).toUpperCase() + value.slice(1);
+    }
     setProblems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, [field]: value } : item))
+      prev.map((item) => (item.id === id ? { ...item, [field]: value } : item)),
     );
   };
 
   const handleSaveProblem = async (item: ProblemItem) => {
     if (!item.problem.trim() || !item.solution.trim()) {
-      Alert.alert(t("Error.Sorry"), t("CertificateSuggestions.Both problem and solution must be filled."),[{ text: t("Main.ok") }]);
+      Alert.alert(
+        t("Error.Sorry"),
+        t("CertificateSuggestions.Both problem and solution must be filled."),
+        [{ text: t("Main.ok") }],
+      );
       return;
     }
 
     try {
-          setLoading(true);
+      setLoading(true);
       const token = await AsyncStorage.getItem("token");
       if (!token) {
         Alert.alert(
           t("Error.Sorry"),
-          t("Error.Your login session has expired. Please log in again to continue."),
-          [{ text: t("Main.ok") }]
+          t(
+            "Error.Your login session has expired. Please log in again to continue.",
+          ),
+          [{ text: t("Main.ok") }],
         );
         return;
       }
@@ -141,7 +202,7 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
             problem: item.problem,
             solution: item.solution,
           },
-          { headers: { Authorization: `Bearer ${token}` } }
+          { headers: { Authorization: `Bearer ${token}` } },
         );
       } else {
         response = await axios.post(
@@ -151,29 +212,30 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
             solution: item.solution,
             slavequestionnaireId,
           },
-          { headers: { Authorization: `Bearer ${token}` } }
+          { headers: { Authorization: `Bearer ${token}` } },
         );
       }
 
       if (response.data.success) {
         setProblems((prev) =>
           prev.map((p) =>
-            p.id === item.id ? { ...p, saved: true, id: response.data.id } : p
-          )
+            p.id === item.id ? { ...p, saved: true, id: response.data.id } : p,
+          ),
         );
         setEditingId(null);
       } else {
         Alert.alert(
           t("Error.Sorry"),
           t("CertificateSuggestions.Failed to save problem."),
-          [{ text: t("Main.ok") }]
+          [{ text: t("Main.ok") }],
         );
       }
     } catch (err) {
-      console.error("❌ Error saving/updating problem:", err);
-      Alert.alert(t("Error.Sorry"), t("Main.somethingWentWrong"), [{ text: t("Main.ok") }]);
-
-    }finally{
+      console.error("Error saving/updating problem:", err);
+      Alert.alert(t("Error.Sorry"), t("Main.somethingWentWrong"), [
+        { text: t("Main.ok") },
+      ]);
+    } finally {
       setLoading(false);
     }
   };
@@ -182,107 +244,106 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
     fetchProblems();
   }, []);
 
-const fetchProblems = async () => {
-  try {
-    setLoading(true);
-    const token = await AsyncStorage.getItem("token");
-    if (!token) {
-      Alert.alert(
-        t("Error.Sorry"),
-        t("Error.Your login session has expired. Please log in again to continue."),
-        [{ text: t("Main.ok") }]
-      );
-      return;
-    }
-
-    const response = await axios.get(
-      `${environment.API_BASE_URL}api/officer/get-problems/${slavequestionnaireId}`,
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-
-    if (response.data.success) {
-      const fetchedProblems = response.data.data.map((p: any) => ({
-        id: p.id,
-        problem: p.problem,
-        solution: p.solution,
-        saved: true,
-      }));
-
-      // If no fetched problems, keep initial empty problem
-      if (fetchedProblems.length === 0) {
-        setProblems([
-          { id: Date.now(), problem: "", solution: "", saved: false },
-        ]);
-      } else {
-        setProblems(fetchedProblems);
+  const fetchProblems = async () => {
+    try {
+      setLoading(true);
+      const token = await AsyncStorage.getItem("token");
+      if (!token) {
+        Alert.alert(
+          t("Error.Sorry"),
+          t(
+            "Error.Your login session has expired. Please log in again to continue.",
+          ),
+          [{ text: t("Main.ok") }],
+        );
+        return;
       }
+
+      const response = await axios.get(
+        `${environment.API_BASE_URL}api/officer/get-problems/${slavequestionnaireId}`,
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+
+      if (response.data.success) {
+        const fetchedProblems = response.data.data.map((p: any) => ({
+          id: p.id,
+          problem: p.problem,
+          solution: p.solution,
+          saved: true,
+        }));
+
+        if (fetchedProblems.length === 0) {
+          setProblems([
+            { id: Date.now(), problem: "", solution: "", saved: false },
+          ]);
+        } else {
+          setProblems(fetchedProblems);
+        }
+      }
+    } catch (err) {
+      console.error(" Error fetching problems:", err);
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    console.error("❌ Error fetching problems:", err);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   const handleCancelEdit = (id: number) => {
     fetchProblems();
     setEditingId(null);
   };
 
-  const handleNext = async ()=>{
-    console.log(farmerMobile)
-     setOtpSendLoading(true)
-      try {
-            const apiUrl = "https://api.getshoutout.com/otpservice/send";
+  const handleNext = async () => {
+    setOtpSendLoading(true);
+    try {
+      const apiUrl = "https://api.getshoutout.com/otpservice/send";
 
-            const headers = {
-              Authorization: `Apikey ${environment.SHOUTOUT_API_KEY}`,
-              "Content-Type": "application/json",
-            };
+      const headers = {
+        Authorization: `Apikey ${environment.SHOUTOUT_API_KEY}`,
+        "Content-Type": "application/json",
+      };
 
-            let otpMessage = "";
-            if(i18n.language === "en"){
-              otpMessage = `Your GoviLink OTP is {{code}}`;
-            }else if(i18n.language === "si"){
-              otpMessage = `ඔබේ GoviLink OTP මුරපදය {{code}} වේ.`;
-            }else if(i18n.language === "ta"){
-              otpMessage = `உங்கள் GoviLink OTP {{code}} ஆகும்.`;
-            }
-            
-            const body = {
-              source: "PolygonAgro",
-              transport: "sms",
-              content: {
-                sms: otpMessage,
-              },
-              destination: farmerMobile,
-            };
+      let otpMessage = "";
+      if (i18n.language === "en") {
+        otpMessage = `Your GoviLink OTP is {{code}}`;
+      } else if (i18n.language === "si") {
+        otpMessage = `ඔබේ GoviLink OTP මුරපදය {{code}} වේ.`;
+      } else if (i18n.language === "ta") {
+        otpMessage = `உங்கள் GoviLink OTP {{code}} ஆகும்.`;
+      }
 
-            const otpResponse = await axios.post(apiUrl, body, { headers });
+      const body = {
+        source: "PolygonAgro",
+        transport: "sms",
+        content: {
+          sms: otpMessage,
+        },
+        destination: farmerMobile,
+      };
 
-            await AsyncStorage.setItem(
-              "referenceId",
-              otpResponse.data.referenceId
-            );
+      const otpResponse = await axios.post(apiUrl, body, { headers });
 
-            navigation.navigate("Otpverification", {
-              farmerMobile: farmerMobile,
-              jobId:jobId,
-              farmId,
-              auditId,
-              isClusterAudit
-            });
-            setIsButtonDisabled(false);
-             setOtpSendLoading(false);
-          }  catch (error) {
-                      Alert.alert(t("Main.error"), t("SignupForum.otpSendFailed"), [{
-                         text: t("Main.ok") ,
-                      }]);
-                      setOtpSendLoading(false);
-                    }finally{
-                      setOtpSendLoading(false);
-                    }
-  }
+      await AsyncStorage.setItem("referenceId", otpResponse.data.referenceId);
+
+      navigation.navigate("Otpverification", {
+        farmerMobile: farmerMobile,
+        jobId: jobId,
+        farmId,
+        auditId,
+        isClusterAudit,
+      });
+      setIsButtonDisabled(false);
+      setOtpSendLoading(false);
+    } catch (error) {
+      Alert.alert(t("Main.error"), t("SignupForum.otpSendFailed"), [
+        {
+          text: t("Main.ok"),
+        },
+      ]);
+      setOtpSendLoading(false);
+    } finally {
+      setOtpSendLoading(false);
+    }
+  };
   return (
     <KeyboardAvoidingView
       className="flex-1 bg-white"
@@ -304,7 +365,7 @@ const fetchProblems = async () => {
       <View className="px-6 mt-6">
         <Text className="text-center text-[#3B424C]">
           {t(
-            "CertificateSuggestions.Please mention identified problems and suggestions you made below."
+            "CertificateSuggestions.Please mention identified problems and suggestions you made below.",
           )}
         </Text>
       </View>
@@ -321,7 +382,8 @@ const fetchProblems = async () => {
               {item.saved && editingId !== item.id ? (
                 <View className="flex-row justify-between items-center border border-[#9DB2CE] p-4 rounded-md">
                   <Text className="text-base font-semibold">
-                    {t("CertificateSuggestions.Problem")} : {(index + 1).toString().padStart(2, "0")}
+                    {t("CertificateSuggestions.Problem")} :{" "}
+                    {(index + 1).toString().padStart(2, "0")}
                   </Text>
                   <TouchableOpacity
                     onPress={() => handleEditProblem(item.id)}
@@ -337,8 +399,8 @@ const fetchProblems = async () => {
               ) : (
                 <>
                   <Text className="text-base font-semibold mb-2 text-center">
-                   {t("CertificateSuggestions.Problem")} : {(index + 1).toString().padStart(2, "0")}
-
+                    {t("CertificateSuggestions.Problem")} :{" "}
+                    {(index + 1).toString().padStart(2, "0")}
                   </Text>
 
                   <View className="border border-[#9DB2CE] p-4 rounded-md">
@@ -382,14 +444,14 @@ const fetchProblems = async () => {
                           : t("CertificateSuggestions.Save Problem")}
                       </Text>
                     </TouchableOpacity>
-                      <TouchableOpacity
-                        className="bg-[#C4C4C4] p-4 rounded-3xl w-full flex-1 justify-center items-center mt-2"
-                        onPress={() => handleCancelEdit(item.id)}
-                      >
-                        <Text className="text-white text-center font-semibold text-base">
-                          {t("CertificateQuesanory.Cancel")}
-                        </Text>
-                      </TouchableOpacity>
+                    <TouchableOpacity
+                      className="bg-[#C4C4C4] p-4 rounded-3xl w-full flex-1 justify-center items-center mt-2"
+                      onPress={() => handleCancelEdit(item.id)}
+                    >
+                      <Text className="text-white text-center font-semibold text-base">
+                        {t("CertificateQuesanory.Cancel")}
+                      </Text>
+                    </TouchableOpacity>
                   </View>
                 </>
               )}
@@ -405,7 +467,7 @@ const fetchProblems = async () => {
               onPress={handleAddProblem}
               disabled={editingId !== null || problems.some((p) => !p.saved)}
             >
-                            <Entypo name="plus" size={30} color="white" />
+              <Entypo name="plus" size={30} color="white" />
 
               <Text className="text-white text-center font-semibold text-base">
                 {t("CertificateSuggestions.Add more")}
@@ -424,64 +486,61 @@ const fetchProblems = async () => {
             {t("CertificateQuesanory.Back")}
           </Text>
         </TouchableOpacity>
-            {loading || editingId !== null  ? (
-                <View className="flex-row items-center px-9 py-3 rounded-full bg-[#C4C4C4] ">
-          <Text className="mr-2 text-white font-semibold text-base">{t("CertificateQuesanory.Next")}</Text>
-          <AntDesign name="arrow-right" size={20} color="#fff" />
-        </View>
-            ): 
-            (
-
-        <>
-        <TouchableOpacity
-        disabled={loading}
-          onPress={() => {
-            const hasUnsaved = problems.some(
-              (p) =>
-                !p.saved &&
-                (p.problem.trim() !== "" || p.solution.trim() !== "")
-            );
-
-            if (hasUnsaved) {
-              Alert.alert(
-                t("CertificateSuggestions.Unsaved Problem"),
-                t(
-                  "CertificateSuggestions.You have unsaved problems. Do you want to continue without saving?"
-                ),
-                [
-                  { text: t("CertificateQuesanory.Cancel"), style: "cancel" },
-                  {
-                    text: t("CertificateSuggestions.Continue"),
-                    onPress: () =>  handleNext(),
-                  },
-                ]
-              );
-            } else {
-              // Safe to navigate
-              handleNext()
-            }
-          }}
-          className="rounded-full overflow-hidden"
-        >
-          <LinearGradient
-            colors={["#F35125", "#FF1D85"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            className="flex-row items-center px-9 py-3 rounded-full"
-          >
-
-          <Text className="mr-4 text-white font-semibold text-base">
+        {loading || editingId !== null ? (
+          <View className="flex-row items-center px-9 py-3 rounded-full bg-[#C4C4C4] ">
+            <Text className="mr-2 text-white font-semibold text-base">
               {t("CertificateQuesanory.Next")}
             </Text>
             <AntDesign name="arrow-right" size={20} color="#fff" />
-     
+          </View>
+        ) : (
+          <>
+            <TouchableOpacity
+              disabled={loading}
+              onPress={() => {
+                const hasUnsaved = problems.some(
+                  (p) =>
+                    !p.saved &&
+                    (p.problem.trim() !== "" || p.solution.trim() !== ""),
+                );
 
-  
-          </LinearGradient>
-        </TouchableOpacity>
-               </>
-            )}
-
+                if (hasUnsaved) {
+                  Alert.alert(
+                    t("CertificateSuggestions.Unsaved Problem"),
+                    t(
+                      "CertificateSuggestions.You have unsaved problems. Do you want to continue without saving?",
+                    ),
+                    [
+                      {
+                        text: t("CertificateQuesanory.Cancel"),
+                        style: "cancel",
+                      },
+                      {
+                        text: t("CertificateSuggestions.Continue"),
+                        onPress: () => handleNext(),
+                      },
+                    ],
+                  );
+                } else {
+                  handleNext();
+                }
+              }}
+              className="rounded-full overflow-hidden"
+            >
+              <LinearGradient
+                colors={["#F35125", "#FF1D85"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                className="flex-row items-center px-9 py-3 rounded-full"
+              >
+                <Text className="mr-4 text-white font-semibold text-base">
+                  {t("CertificateQuesanory.Next")}
+                </Text>
+                <AntDesign name="arrow-right" size={20} color="#fff" />
+              </LinearGradient>
+            </TouchableOpacity>
+          </>
+        )}
       </View>
     </KeyboardAvoidingView>
   );

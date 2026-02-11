@@ -2,7 +2,6 @@ import * as SQLite from "expo-sqlite";
 
 const db = SQLite.openDatabaseSync("inspection.db");
 
-// Initialize personal info table
 export const initPersonalTable = () => {
   try {
     db.execSync(
@@ -29,9 +28,9 @@ export const initPersonalTable = () => {
         updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
       );`,
     );
-    console.log("✅ Personal info table created/verified");
+    console.log("Personal info table created/verified");
   } catch (error) {
-    console.error("❌ Error initializing personal info table:", error);
+    console.error("Error initializing personal info table:", error);
     throw error;
   }
 };
@@ -56,20 +55,17 @@ export interface PersonalInfo {
   country: string;
 }
 
-// Save or update personal info
 export const savePersonalInfo = (
   requestId: number,
   data: Partial<PersonalInfo>,
 ): void => {
   try {
-    // Check if record exists
     const existing = db.getFirstSync<{ requestId: number }>(
       "SELECT requestId FROM inspectionpersonal WHERE requestId = ?",
       [requestId],
     );
 
     if (existing) {
-      // UPDATE existing record
       const fields = Object.keys(data)
         .map((key) => `${key} = ?`)
         .join(", ");
@@ -83,9 +79,8 @@ export const savePersonalInfo = (
         `UPDATE inspectionpersonal SET ${fields}, updatedAt = ? WHERE requestId = ?`,
         values,
       );
-      console.log("✅ Personal info updated in SQLite");
+      console.log("Personal info updated in SQLite");
     } else {
-      // INSERT new record
       const fields = [
         "requestId",
         ...Object.keys(data),
@@ -106,15 +101,14 @@ export const savePersonalInfo = (
         `INSERT INTO inspectionpersonal (${fields}) VALUES (${placeholders})`,
         values,
       );
-      console.log("✅ Personal info inserted into SQLite");
+      console.log("Personal info inserted into SQLite");
     }
   } catch (error) {
-    console.error("❌ Error saving personal info:", error);
+    console.error("Error saving personal info:", error);
     throw error;
   }
 };
 
-// Get personal info
 export const getPersonalInfo = (requestId: number): PersonalInfo | null => {
   try {
     const row = db.getFirstSync<any>(
@@ -123,7 +117,6 @@ export const getPersonalInfo = (requestId: number): PersonalInfo | null => {
     );
 
     if (row) {
-      console.log("✅ Personal info loaded from SQLite");
       return {
         firstName: row.firstName || "",
         lastName: row.lastName || "",
@@ -145,45 +138,40 @@ export const getPersonalInfo = (requestId: number): PersonalInfo | null => {
       };
     }
 
-    console.log("📭 No personal info found in SQLite");
     return null;
   } catch (error) {
-    console.error("❌ Error fetching personal info:", error);
+    console.error("Error fetching personal info:", error);
     return null;
   }
 };
 
-// Clear personal info for a specific request
 export const clearPersonalInfo = (requestId: number): void => {
   try {
     db.runSync("DELETE FROM inspectionpersonal WHERE requestId = ?", [
       requestId,
     ]);
-    console.log("🗑️ Cleared personal info for request:", requestId);
   } catch (error) {
-    console.error("❌ Error clearing personal info:", error);
+    console.error("Error clearing personal info:", error);
     throw error;
   }
 };
 
 export const hasDraft = (requestId: number): boolean => {
-  console.log(`🔍 Checking for draft of request ${requestId}...`);
   try {
     const row = db.getFirstSync<{ requestId: number }>(
       "SELECT requestId FROM inspectionpersonal WHERE requestId = ?",
       [requestId],
     );
-    
+
     const exists = row !== null;
-    console.log(`✅ Draft check for request ${requestId}:`, exists);
+
     return exists;
   } catch (error) {
-    console.error(`❌ Error checking draft for request ${requestId}:`, error);
+    console.error(` Error checking draft for request ${requestId}:`, error);
     return false;
   }
 };
 
-// Get all personal info records (for debugging/admin purposes)
 export const getAllPersonalInfo = () => {
   try {
     const rows = db.getAllSync<any>(
@@ -191,7 +179,7 @@ export const getAllPersonalInfo = () => {
     );
     return rows;
   } catch (error) {
-    console.error("❌ Error fetching all personal info:", error);
+    console.error(" Error fetching all personal info:", error);
     return [];
   }
 };

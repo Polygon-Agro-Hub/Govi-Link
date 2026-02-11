@@ -46,18 +46,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
     auditId,
     screenName,
   } = route.params;
-  console.log(
-    "farmerID",
-    farmerId,
-    jobId,
-    certificationpaymentId,
-    farmerMobile,
-    clusterId,
-    farmId,
-    isClusterAudit,
-    auditId,
-    screenName,
-  );
+
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanned, setScanned] = useState<boolean>(false);
   const [showPermissionModal, setShowPermissionModal] =
@@ -69,7 +58,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
     useState<boolean>(false);
 
   const [unsuccessfulLoadingBarWidth, setUnsuccessfulLoadingBarWidth] =
-    useState(new Animated.Value(100)); // Start with 100%
+    useState(new Animated.Value(100));
 
   useEffect(() => {
     const getCameraPermissions = async () => {
@@ -88,7 +77,6 @@ const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
     return unsubscribe;
   }, [navigation]);
 
-  // Update status API call
   const updateStatus = async (feildauditId: number, jobId: any) => {
     try {
       const token = await AsyncStorage.getItem("token");
@@ -101,34 +89,24 @@ const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
             headers: { Authorization: `Bearer ${token}` },
           },
         );
-        console.log("Status updated:", response.data);
       }
     } catch (error) {
       console.error("Failed to update status:", error);
     }
   };
 
-  // Handle QR scan
   const handleBarCodeScanned = async ({
     data,
   }: {
     type: string;
     data: string;
   }) => {
-    setScanned(true); // Set the scanned flag to true
+    setScanned(true);
 
     try {
-      // console.log("Scanned Data:", data);
-      // console.log("Data Type:", typeof data);
-
       const qrData = JSON.parse(data);
 
-      console.log("Parsed QR Code Data:", qrData);
-      console.log("Parsed Type:", typeof qrData);
-
       const userId = qrData.userInfo?.id;
-
-      //  console.log("User ID:", userId);
 
       if (!userId) {
         throw new Error(t("QRScanner.User ID not found in QR code"));
@@ -137,7 +115,6 @@ const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
         throw new Error(t("QRScanner.Wrong QR code"));
       }
       if (userId == farmerId) {
-        // Call updateStatus API on successful QR scan
         if (auditId && jobId) {
           await updateStatus(auditId, jobId);
         }
@@ -153,8 +130,6 @@ const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
           screenName: screenName,
         });
       }
-
-      // navigation.navigate("FarmerQr" as any, { userId });
     } catch (error) {
       console.error("QR Parsing Error:", error);
       setErrorMessage(
@@ -164,14 +139,13 @@ const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
       );
       setIsUnsuccessfulModalVisible(true);
 
-      unsuccessfulLoadingBarWidth.setValue(100); // Reset width to 100%
+      unsuccessfulLoadingBarWidth.setValue(100);
       Animated.timing(unsuccessfulLoadingBarWidth, {
-        toValue: 0, // Animate to 0 (empty bar)
-        duration: 5000, // 5 seconds duration
+        toValue: 0,
+        duration: 5000,
         useNativeDriver: false,
       }).start();
 
-      // After 5 seconds (for the bar animation), close the modal and navigate
       setTimeout(() => {
         setIsUnsuccessfulModalVisible(false);
         setErrorMessage(null);
@@ -179,17 +153,12 @@ const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
     }
   };
 
-  const handleError = (err: any) => {
-    console.error("QR Reader Error:", err);
-  };
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
-        // Navigate to screenName with params
         if (screenName === "AssignJobs") {
           navigation.goBack();
         } else {
-          // navigation.navigate("Main", {screen:screenName})
           navigation.navigate("Main", {
             screen: "MainTabs",
             params: {
@@ -205,7 +174,6 @@ const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
         onBackPress,
       );
 
-      // Cleanup
       return () => subscription.remove();
     }, [screenName]),
   );
@@ -286,7 +254,6 @@ const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
             if (screenName === "AssignJobs") {
               navigation.goBack();
             } else {
-              // navigation.navigate("Main", { screen: screenName });
               navigation.navigate("Main", {
                 screen: "MainTabs",
                 params: {
@@ -336,14 +303,13 @@ const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
         />
       </View>
 
-      {/* "Tap to Scan Again" button */}
       {scanned && (
         <View
           style={{ position: "absolute", bottom: 100, alignSelf: "center" }}
         >
           <TouchableOpacity
             onPress={() => {
-              setScanned(false); // Reset the scanned state
+              setScanned(false);
             }}
           >
             <LinearGradient
@@ -379,7 +345,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
               </Text>
               <View className="mb-4">
                 <Image
-                  source={require("../assets/error.png")} // Replace with your own error image
+                  source={require("../assets/error.png")}
                   className="w-32 h-32"
                   resizeMode="contain"
                 />
@@ -389,7 +355,6 @@ const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
               </Text>
             </View>
 
-            {/* Red Loading Bar at bottom */}
             <View className="absolute bottom-0 left-0 w-full h-2 bg-gray-300">
               <Animated.View
                 className="h-full bg-red-500"

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -8,7 +8,6 @@ import {
   StatusBar,
   Image,
   Alert,
-  ActivityIndicator,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -277,7 +276,6 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
         </View>
       </ScrollView>
 
-      {/* Floating Add Button */}
       <TouchableOpacity
         className="absolute bottom-20 right-4 items-center justify-center"
         style={{

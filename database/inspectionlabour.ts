@@ -2,7 +2,6 @@ import * as SQLite from "expo-sqlite";
 
 const db = SQLite.openDatabaseSync("inspection.db");
 
-// Initialize labour table
 export const initLabourTable = () => {
   try {
     db.execSync(
@@ -19,9 +18,9 @@ export const initLabourTable = () => {
         updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
       );`,
     );
-    console.log("✅ Labour table created/verified");
+    console.log(" Labour table created/verified");
   } catch (error) {
-    console.error("❌ Error initializing labour table:", error);
+    console.error("Error initializing labour table:", error);
     throw error;
   }
 };
@@ -36,50 +35,46 @@ export interface LabourData {
   isMachineryCostEffective: "Yes" | "No" | undefined;
 }
 
-// Helper to convert stored value to "Yes"/"No"
 const toYesNo = (val: any): "Yes" | "No" | undefined => {
   if (val === null || val === undefined || val === "") return undefined;
-  
-  // Handle string values
+
   if (typeof val === "string") {
     if (val === "Yes" || val === "yes" || val === "1") return "Yes";
     if (val === "No" || val === "no" || val === "0") return "No";
   }
-  
-  // Handle numeric values
+
   if (val === 1 || val === true) return "Yes";
   if (val === 0 || val === false) return "No";
-  
+
   return undefined;
 };
 
-// Save or update labour info
 export const saveLabourInfo = (
   requestId: number,
   data: Partial<LabourData>,
 ): void => {
   try {
-    // Check if record exists
     const existing = db.getFirstSync<{ requestId: number }>(
       "SELECT requestId FROM inspectionlabour WHERE requestId = ?",
       [requestId],
     );
 
-    // Prepare data for storage - store Yes/No as TEXT
     const storageData: any = { ...data };
-    
-    // Convert Yes/No to TEXT for storage
+
     if (data.isManageFamilyLabour !== undefined) {
       storageData.isManageFamilyLabour = data.isManageFamilyLabour;
     }
     if (data.isFamilyHiredLabourEquipped !== undefined) {
-      storageData.isFamilyHiredLabourEquipped = data.isFamilyHiredLabourEquipped;
+      storageData.isFamilyHiredLabourEquipped =
+        data.isFamilyHiredLabourEquipped;
     }
     if (data.hasAdequateAlternativeLabour !== undefined) {
-      storageData.hasAdequateAlternativeLabour = data.hasAdequateAlternativeLabour;
+      storageData.hasAdequateAlternativeLabour =
+        data.hasAdequateAlternativeLabour;
     }
     if (data.areThereMechanizationOptions !== undefined) {
-      storageData.areThereMechanizationOptions = data.areThereMechanizationOptions;
+      storageData.areThereMechanizationOptions =
+        data.areThereMechanizationOptions;
     }
     if (data.isMachineryAvailable !== undefined) {
       storageData.isMachineryAvailable = data.isMachineryAvailable;
@@ -92,7 +87,6 @@ export const saveLabourInfo = (
     }
 
     if (existing) {
-      // UPDATE existing record
       const fields = Object.keys(storageData)
         .map((key) => `${key} = ?`)
         .join(", ");
@@ -106,7 +100,7 @@ export const saveLabourInfo = (
         `UPDATE inspectionlabour SET ${fields}, updatedAt = ? WHERE requestId = ?`,
         values as SQLite.SQLiteBindParams,
       );
-      console.log("✅ Labour info updated in SQLite");
+      console.log("Labour info updated in SQLite");
     } else {
       // INSERT new record
       const fields = [
@@ -129,15 +123,14 @@ export const saveLabourInfo = (
         `INSERT INTO inspectionlabour (${fields}) VALUES (${placeholders})`,
         values as SQLite.SQLiteBindParams,
       );
-      console.log("✅ Labour info inserted into SQLite");
+      console.log("Labour info inserted into SQLite");
     }
   } catch (error) {
-    console.error("❌ Error saving labour info:", error);
+    console.error("Error saving labour info:", error);
     throw error;
   }
 };
 
-// Get labour info
 export const getLabourInfo = (requestId: number): LabourData | null => {
   try {
     const row = db.getFirstSync<any>(
@@ -146,8 +139,6 @@ export const getLabourInfo = (requestId: number): LabourData | null => {
     );
 
     if (row) {
-      console.log("✅ Raw SQLite data:", row);
-      
       const result = {
         isManageFamilyLabour: toYesNo(row.isManageFamilyLabour),
         isFamilyHiredLabourEquipped: toYesNo(row.isFamilyHiredLabourEquipped),
@@ -157,39 +148,32 @@ export const getLabourInfo = (requestId: number): LabourData | null => {
         isMachineryAffordable: toYesNo(row.isMachineryAffordable),
         isMachineryCostEffective: toYesNo(row.isMachineryCostEffective),
       };
-      
-      console.log("✅ Parsed labour info:", result);
+
       return result;
     }
 
-    console.log("📭 No labour info found in SQLite");
     return null;
   } catch (error) {
-    console.error("❌ Error fetching labour info:", error);
+    console.error(" Error fetching labour info:", error);
     return null;
   }
 };
 
-// Clear labour info for a specific request
 export const clearLabourInfo = (requestId: number): void => {
   try {
-    db.runSync("DELETE FROM inspectionlabour WHERE requestId = ?", [
-      requestId,
-    ]);
-    console.log("🗑️ Cleared labour info for request:", requestId);
+    db.runSync("DELETE FROM inspectionlabour WHERE requestId = ?", [requestId]);
   } catch (error) {
     console.error("❌ Error clearing labour info:", error);
     throw error;
   }
 };
 
-// Get all labour info records
 export const getAllLabourInfo = () => {
   try {
     const rows = db.getAllSync<any>(
       "SELECT * FROM inspectionlabour ORDER BY updatedAt DESC",
     );
-    return rows.map(row => ({
+    return rows.map((row) => ({
       ...row,
       isManageFamilyLabour: toYesNo(row.isManageFamilyLabour),
       isFamilyHiredLabourEquipped: toYesNo(row.isFamilyHiredLabourEquipped),
@@ -200,7 +184,7 @@ export const getAllLabourInfo = () => {
       isMachineryCostEffective: toYesNo(row.isMachineryCostEffective),
     }));
   } catch (error) {
-    console.error("❌ Error fetching all labour info:", error);
+    console.error("Error fetching all labour info:", error);
     return [];
   }
 };

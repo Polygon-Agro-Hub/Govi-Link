@@ -43,7 +43,6 @@ const QRScaneerRequstAudit: React.FC<QRScaneerRequstAuditProps> = ({
   const route = useRoute<QRScaneerRequstAuditRouteProp>();
   const { farmerId, govilinkjobid, jobId, farmerMobile, screenName } =
     route.params;
-  console.log("farmerID", farmerId, govilinkjobid, jobId);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanned, setScanned] = useState<boolean>(false);
   const [showPermissionModal, setShowPermissionModal] =
@@ -55,7 +54,7 @@ const QRScaneerRequstAudit: React.FC<QRScaneerRequstAuditProps> = ({
     useState<boolean>(false);
 
   const [unsuccessfulLoadingBarWidth, setUnsuccessfulLoadingBarWidth] =
-    useState(new Animated.Value(100)); // Start with 100%
+    useState(new Animated.Value(100));
 
   useEffect(() => {
     const getCameraPermissions = async () => {
@@ -74,7 +73,6 @@ const QRScaneerRequstAudit: React.FC<QRScaneerRequstAuditProps> = ({
     return unsubscribe;
   }, [navigation]);
 
-  // Update status API call
   const updateStatus = async (feildauditId: number, jobId: any) => {
     try {
       const token = await AsyncStorage.getItem("token");
@@ -87,14 +85,12 @@ const QRScaneerRequstAudit: React.FC<QRScaneerRequstAuditProps> = ({
             headers: { Authorization: `Bearer ${token}` },
           },
         );
-        console.log("Status updated:", response.data);
       }
     } catch (error) {
       console.error("Failed to update status:", error);
     }
   };
 
-  // Handle QR scan
   const handleBarCodeScanned = async ({
     data,
   }: {
@@ -104,17 +100,9 @@ const QRScaneerRequstAudit: React.FC<QRScaneerRequstAuditProps> = ({
     setScanned(true);
 
     try {
-      // console.log("Scanned Data:", data);
-      // console.log("Data Type:", typeof data);
-
       const qrData = JSON.parse(data);
 
-      console.log("Parsed QR Code Data:", qrData);
-      console.log("Parsed Type:", typeof qrData);
-
       const userId = qrData.userInfo?.id;
-
-      //  console.log("User ID:", userId);
 
       if (!userId) {
         throw new Error(t("QRScanner.User ID not found in QR code"));
@@ -135,8 +123,6 @@ const QRScaneerRequstAudit: React.FC<QRScaneerRequstAuditProps> = ({
           screenName: screenName,
         });
       }
-
-      // navigation.navigate("FarmerQr" as any, { userId });
     } catch (error) {
       console.error("QR Parsing Error:", error);
       setErrorMessage(
@@ -163,7 +149,6 @@ const QRScaneerRequstAudit: React.FC<QRScaneerRequstAuditProps> = ({
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
-        // navigation.navigate("Main", {screen:screenName})
         navigation.navigate("Main", {
           screen: "MainTabs",
           params: {
@@ -178,7 +163,6 @@ const QRScaneerRequstAudit: React.FC<QRScaneerRequstAuditProps> = ({
         onBackPress,
       );
 
-      // Cleanup
       return () => subscription.remove();
     }, [screenName]),
   );
@@ -304,14 +288,13 @@ const QRScaneerRequstAudit: React.FC<QRScaneerRequstAuditProps> = ({
         />
       </View>
 
-      {/* "Tap to Scan Again" button */}
       {scanned && (
         <View
           style={{ position: "absolute", bottom: 100, alignSelf: "center" }}
         >
           <TouchableOpacity
             onPress={() => {
-              setScanned(false); // Reset the scanned state
+              setScanned(false);
             }}
           >
             <LinearGradient
@@ -347,7 +330,7 @@ const QRScaneerRequstAudit: React.FC<QRScaneerRequstAuditProps> = ({
               </Text>
               <View className="mb-4">
                 <Image
-                  source={require("../assets/error.png")} // Replace with your own error image
+                  source={require("../assets/error.png")}
                   className="w-32 h-32"
                   resizeMode="contain"
                 />
@@ -357,7 +340,6 @@ const QRScaneerRequstAudit: React.FC<QRScaneerRequstAuditProps> = ({
               </Text>
             </View>
 
-            {/* Red Loading Bar at bottom */}
             <View className="absolute bottom-0 left-0 w-full h-2 bg-gray-300">
               <Animated.View
                 className="h-full bg-red-500"

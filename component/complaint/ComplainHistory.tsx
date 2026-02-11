@@ -7,7 +7,6 @@ import {
   Alert,
   Modal,
   KeyboardAvoidingView,
-  ActivityIndicator,
 } from "react-native";
 import axios from "axios";
 import { StatusBar, Platform } from "react-native";
@@ -50,10 +49,9 @@ interface ComplainHistoryProps {
   navigation: ComplainHistoryNavigationProp;
 }
 
-// Component to handle truncated text with See More/See Less
 const ExpandableText: React.FC<{ text: string; maxLength?: number }> = ({
   text,
-  maxLength = 150, // Default max length before truncating
+  maxLength = 150,
 }) => {
   const [expanded, setExpanded] = useState(false);
 
@@ -144,7 +142,7 @@ const ComplainHistory: React.FC<ComplainHistoryProps> = ({ navigation }) => {
     const hours = date.getHours();
     const minutes = date.getMinutes();
     const ampm = hours >= 12 ? "PM" : "AM";
-    const hour12 = hours % 12 || 12; // Convert 0 to 12
+    const hour12 = hours % 12 || 12;
     const minuteStr = minutes.toString().padStart(2, "0");
     const timeStr = `${hour12}.${minuteStr}${ampm}`;
 
@@ -225,7 +223,6 @@ const ComplainHistory: React.FC<ComplainHistoryProps> = ({ navigation }) => {
                   {formatDateTime(complain.createdAt)}
                 </Text>
 
-                {/* Use ExpandableText component here */}
                 <ExpandableText text={complain.complain || ""} />
 
                 <View className="flex-row justify-between items-center">
@@ -277,7 +274,6 @@ const ComplainHistory: React.FC<ComplainHistoryProps> = ({ navigation }) => {
               contentContainerStyle={{ padding: 24, paddingBottom: 70 }}
               showsVerticalScrollIndicator={false}
             >
-              {/* Close Button */}
               <TouchableOpacity
                 className="absolute top-0 right-4 bg-gray-400 p-2 rounded-full"
                 onPress={() => setModalVisible(false)}
