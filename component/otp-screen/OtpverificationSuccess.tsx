@@ -38,7 +38,7 @@ const OtpverificationSuccess: React.FC = ({ navigation }: any) => {
 
       <View className="flex-1 justify-center items-center">
         <LottieView
-          source={require("../assets/json/verify.json")}
+          source={require("../../assets/json/verify.json")}
           autoPlay
           loop
           style={{ width: 300, height: 300 }}

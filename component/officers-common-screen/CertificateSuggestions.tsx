@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp, useRoute } from "@react-navigation/native";
-import { RootStackParamList } from "./types";
+import { RootStackParamList } from "../types";
 import { AntDesign, Entypo, FontAwesome5 } from "@expo/vector-icons";
 import axios from "axios";
 import { environment } from "@/environment/environment";
@@ -23,18 +23,18 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-type RequestSuggestionsNavigationProp = StackNavigationProp<
+type CertificateSuggestionsNavigationProp = StackNavigationProp<
   RootStackParamList,
-  "RequestSuggestions"
+  "CertificateSuggestions"
 >;
 
-type RequestSuggestionsRouteProp = RouteProp<
+type CertificateSuggestionsRouteProp = RouteProp<
   RootStackParamList,
-  "RequestSuggestions"
+  "CertificateSuggestions"
 >;
 
-interface RequestSuggestionsProps {
-  navigation: RequestSuggestionsNavigationProp;
+interface CertificateSuggestionsProps {
+  navigation: CertificateSuggestionsNavigationProp;
 }
 
 interface ProblemItem {
@@ -121,11 +121,19 @@ const LoadingSkeleton = () => {
     </View>
   );
 };
-const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
+const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
   navigation,
 }) => {
-  const route = useRoute<RequestSuggestionsRouteProp>();
-  const { govilinkjobid, jobId, farmerMobile } = route.params;
+  const route = useRoute<CertificateSuggestionsRouteProp>();
+  const {
+    jobId,
+    slavequestionnaireId,
+    farmerMobile,
+    isClusterAudit,
+    farmId,
+    auditId,
+  } = route.params;
+
   const { t, i18n } = useTranslation();
   const [problems, setProblems] = useState<ProblemItem[]>([
     { id: Date.now(), problem: "", solution: "", saved: false },
@@ -154,7 +162,6 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
     value: string,
   ) => {
     value = value.replace(/^\s+/, "");
-
     if (value.length > 0) {
       value = value.charAt(0).toUpperCase() + value.slice(1);
     }
@@ -190,7 +197,7 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
       let response;
       if (item.saved) {
         response = await axios.put(
-          `${environment.API_BASE_URL}api/request-audit/update-identifyproblem/${item.id}`,
+          `${environment.API_BASE_URL}api/officer/update-problem/${item.id}`,
           {
             problem: item.problem,
             solution: item.solution,
@@ -199,11 +206,11 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
         );
       } else {
         response = await axios.post(
-          `${environment.API_BASE_URL}api/request-audit/save-identifyproblem`,
+          `${environment.API_BASE_URL}api/officer/save-problem`,
           {
             problem: item.problem,
             solution: item.solution,
-            govilinkjobid,
+            slavequestionnaireId,
           },
           { headers: { Authorization: `Bearer ${token}` } },
         );
@@ -225,11 +232,9 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
       }
     } catch (err) {
       console.error("Error saving/updating problem:", err);
-      Alert.alert(
-        t("Error.Sorry"),
-        t("Something went wrong while saving. try again later"),
-        [{ text: t("Main.ok") }],
-      );
+      Alert.alert(t("Error.Sorry"), t("Main.somethingWentWrong"), [
+        { text: t("Main.ok") },
+      ]);
     } finally {
       setLoading(false);
     }
@@ -255,7 +260,7 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
       }
 
       const response = await axios.get(
-        `${environment.API_BASE_URL}api/request-audit/get-identifyproblems/${govilinkjobid}`,
+        `${environment.API_BASE_URL}api/officer/get-problems/${slavequestionnaireId}`,
         { headers: { Authorization: `Bearer ${token}` } },
       );
 
@@ -274,7 +279,6 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
         } else {
           setProblems(fetchedProblems);
         }
-      } else {
       }
     } catch (err) {
       console.error(" Error fetching problems:", err);
@@ -320,23 +324,26 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
 
       await AsyncStorage.setItem("referenceId", otpResponse.data.referenceId);
 
-      navigation.navigate("OtpverificationRequestAudit", {
+      navigation.navigate("Otpverification", {
         farmerMobile: farmerMobile,
         jobId: jobId,
-        govilinkjobid: govilinkjobid,
+        farmId,
+        auditId,
+        isClusterAudit,
       });
       setIsButtonDisabled(false);
       setOtpSendLoading(false);
     } catch (error) {
       Alert.alert(t("Main.error"), t("SignupForum.otpSendFailed"), [
-        { text: t("Main.ok") },
+        {
+          text: t("Main.ok"),
+        },
       ]);
       setOtpSendLoading(false);
     } finally {
       setOtpSendLoading(false);
     }
   };
-
   return (
     <KeyboardAvoidingView
       className="flex-1 bg-white"
@@ -452,7 +459,7 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
           ))}
           <View className="items-center mt-2">
             <TouchableOpacity
-              className={`bg-[#1A1A1A] p-4 rounded-3xl flex justify-center items-center flex-row ${
+              className={`bg-[#1A1A1A] p-4 flex-row rounded-3xl flex justify-center items-center ${
                 editingId !== null || problems.some((p) => !p.saved)
                   ? "opacity-50"
                   : ""
@@ -461,7 +468,8 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
               disabled={editingId !== null || problems.some((p) => !p.saved)}
             >
               <Entypo name="plus" size={30} color="white" />
-              <Text className="text-white text-center font-semibold text-base ml-1">
+
+              <Text className="text-white text-center font-semibold text-base">
                 {t("CertificateSuggestions.Add more")}
               </Text>
             </TouchableOpacity>
@@ -479,7 +487,7 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
           </Text>
         </TouchableOpacity>
         {loading || editingId !== null ? (
-          <View className="flex-row items-center bg-[#444444] px-9 py-3 rounded-full ">
+          <View className="flex-row items-center px-9 py-3 rounded-full bg-[#C4C4C4] ">
             <Text className="mr-2 text-white font-semibold text-base">
               {t("CertificateQuesanory.Next")}
             </Text>
@@ -538,4 +546,4 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
   );
 };
 
-export default RequestSuggestions;
+export default CertificateSuggestions;

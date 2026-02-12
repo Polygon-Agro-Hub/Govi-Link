@@ -531,7 +531,7 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
           ) : (
             <View className="flex-1 items-center justify-center mt-32">
               <LottieView
-                source={require("../assets/json/NoData.json")}
+                source={require("../../assets/json/NoData.json")}
                 style={{ width: 200, height: 200 }}
                 autoPlay
                 loop

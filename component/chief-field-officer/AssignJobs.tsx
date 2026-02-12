@@ -533,7 +533,7 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
       ) : (
         <View className=" items-center justify-center mt-[60%]">
           <Image
-            source={require("../assets/NoData.webp")}
+            source={require("../../assets/NoData.webp")}
             style={{
               width: 100,
               height: 100,

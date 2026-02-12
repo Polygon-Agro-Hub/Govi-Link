@@ -11,38 +11,42 @@ import {
   Pressable,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "./types";
+import { RootStackParamList } from "../types";
 import { CameraView, Camera } from "expo-camera";
 import { useTranslation } from "react-i18next";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
-import { useRoute, RouteProp } from "@react-navigation/native";
+import { useRoute, RouteProp, useFocusEffect } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
-import { useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 
-type QRScaneerRequstAuditNavigationProp = StackNavigationProp<
+type QRScannerNavigationProp = StackNavigationProp<
   RootStackParamList,
-  "QRScaneerRequstAudit"
+  "QRScanner"
 >;
-type QRScaneerRequstAuditRouteProp = RouteProp<
-  RootStackParamList,
-  "QRScaneerRequstAudit"
->;
+type QRScannerRouteProp = RouteProp<RootStackParamList, "QRScanner">;
 
-interface QRScaneerRequstAuditProps {
-  navigation: QRScaneerRequstAuditNavigationProp;
+interface QRScannerProps {
+  navigation: QRScannerNavigationProp;
 }
 
 const { width } = Dimensions.get("window");
 const scanningAreaSize = width * 0.8;
-const QRScaneerRequstAudit: React.FC<QRScaneerRequstAuditProps> = ({
-  navigation,
-}) => {
-  const route = useRoute<QRScaneerRequstAuditRouteProp>();
-  const { farmerId, govilinkjobid, jobId, farmerMobile, screenName } =
-    route.params;
+const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
+  const route = useRoute<QRScannerRouteProp>();
+  const {
+    farmerId,
+    jobId,
+    certificationpaymentId,
+    farmerMobile,
+    clusterId,
+    farmId,
+    isClusterAudit,
+    auditId,
+    screenName,
+  } = route.params;
+
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanned, setScanned] = useState<boolean>(false);
   const [showPermissionModal, setShowPermissionModal] =
@@ -80,7 +84,7 @@ const QRScaneerRequstAudit: React.FC<QRScaneerRequstAuditProps> = ({
       if (token) {
         const response = await axios.post(
           `${environment.API_BASE_URL}api/cluster-audit/status/onGoing/${feildauditId}`,
-          { jobId, govilinkjobid },
+          { jobId },
           {
             headers: { Authorization: `Bearer ${token}` },
           },
@@ -111,15 +115,18 @@ const QRScaneerRequstAudit: React.FC<QRScaneerRequstAuditProps> = ({
         throw new Error(t("QRScanner.Wrong QR code"));
       }
       if (userId == farmerId) {
-        if (farmerId !== undefined) {
-          await updateStatus(govilinkjobid ?? 0, jobId);
+        if (auditId && jobId) {
+          await updateStatus(auditId, jobId);
         }
 
-        navigation.navigate("RequestProblem", {
+        navigation.navigate("CertificateQuesanory", {
           jobId,
-          farmerId,
-          govilinkjobid,
+          certificationpaymentId,
           farmerMobile,
+          clusterId,
+          farmId,
+          isClusterAudit,
+          auditId,
           screenName: screenName,
         });
       }
@@ -149,12 +156,16 @@ const QRScaneerRequstAudit: React.FC<QRScaneerRequstAuditProps> = ({
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
-        navigation.navigate("Main", {
-          screen: "MainTabs",
-          params: {
-            screen: screenName,
-          },
-        });
+        if (screenName === "AssignJobs") {
+          navigation.goBack();
+        } else {
+          navigation.navigate("Main", {
+            screen: "MainTabs",
+            params: {
+              screen: screenName,
+            },
+          });
+        }
         return true;
       };
 
@@ -239,14 +250,18 @@ const QRScaneerRequstAudit: React.FC<QRScaneerRequstAuditProps> = ({
       <View className="flex-row items-center px-4 py-4 bg-white shadow-sm">
         <TouchableOpacity
           className="bg-[#F6F6F680] rounded-full p-2 justify-center w-10 z-20 "
-          onPress={() =>
-            navigation.navigate("Main", {
-              screen: "MainTabs",
-              params: {
-                screen: screenName,
-              },
-            })
-          }
+          onPress={() => {
+            if (screenName === "AssignJobs") {
+              navigation.goBack();
+            } else {
+              navigation.navigate("Main", {
+                screen: "MainTabs",
+                params: {
+                  screen: screenName,
+                },
+              });
+            }
+          }}
         >
           <AntDesign name="left" size={22} color="#000" />
         </TouchableOpacity>
@@ -330,7 +345,7 @@ const QRScaneerRequstAudit: React.FC<QRScaneerRequstAuditProps> = ({
               </Text>
               <View className="mb-4">
                 <Image
-                  source={require("../assets/error.png")}
+                  source={require("../../assets/error.png")}
                   className="w-32 h-32"
                   resizeMode="contain"
                 />
@@ -353,4 +368,4 @@ const QRScaneerRequstAudit: React.FC<QRScaneerRequstAuditProps> = ({
   );
 };
 
-export default QRScaneerRequstAudit;
+export default QRScanner;

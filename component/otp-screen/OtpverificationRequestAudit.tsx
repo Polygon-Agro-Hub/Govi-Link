@@ -22,36 +22,19 @@ import { ScrollView } from "react-native-gesture-handler";
 import NetInfo from "@react-native-community/netinfo";
 import { LinearGradient } from "expo-linear-gradient";
 
-const { width: screenWidth } = Dimensions.get("window");
-
 type RootStackParamList = {
   OtpVerification: undefined;
   NextScreen: undefined;
 };
-
-interface userItem {
-  firstName: string;
-  lastName: string;
-  phoneNumber: number;
-  NICnumber: string;
-  district: string;
-  accNumber: string;
-  accHolderName: string;
-  bankName: string;
-  branchName: string;
-  PreferdLanguage: string;
-}
 
 interface SuccessModalProps {
   visible: boolean;
   onClose: () => void;
 }
 
-const Otpverification: React.FC = ({ navigation, route }: any) => {
-  const { farmerMobile, jobId, isClusterAudit, farmId, auditId } = route.params;
-
+const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
+  const { farmerMobile, jobId, govilinkjobid } = route.params;
   const [otpCode, setOtpCode] = useState<string>("");
-
   const [referenceId, setReferenceId] = useState<string | null>(null);
   const [timer, setTimer] = useState<number>(240);
   const [isVerified, setIsVerified] = useState<boolean>(false);
@@ -59,7 +42,6 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
   const { t, i18n } = useTranslation();
   const [language, setLanguage] = useState("en");
   const [isOtpValid, setIsOtpValid] = useState<boolean>(false);
-
   const [verificationAttempts, setVerificationAttempts] = useState<number>(0);
   const [isOtpExpired, setIsOtpExpired] = useState<boolean>(false);
 
@@ -96,6 +78,21 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
       setIsOtpExpired(true);
     }
   }, [timer, isVerified]);
+
+  const handleOtpChange = (text: string, index: number) => {
+    const updatedOtpCode = otpCode.split("");
+    updatedOtpCode[index] = text;
+    setOtpCode(updatedOtpCode.join(""));
+
+    setIsOtpValid(updatedOtpCode.length === 5 && !updatedOtpCode.includes(""));
+
+    if (text && inputRefs.current[index + 1]) {
+      inputRefs.current[index + 1]?.focus();
+    }
+    if (updatedOtpCode.length === 5) {
+      Keyboard.dismiss();
+    }
+  };
 
   const handleVerify = async () => {
     const code = otpCode;
@@ -309,12 +306,14 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
         return false;
       }
 
-      const payload = { isClusterAudit, farmId };
-
       const response = await axios.put(
-        `${environment.API_BASE_URL}api/officer/complete/${auditId}`,
-        payload,
-        { headers: { Authorization: `Bearer ${token}` } },
+        `${environment.API_BASE_URL}api/request-audit/complete/${govilinkjobid}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
       );
 
       if (response.status === 200 && response.data?.success) {
@@ -324,24 +323,15 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
         return false;
       }
     } catch (err) {
-      console.error("Error updating audit completion:", err);
+      console.error(" Error updating audit completion:", err);
       return false;
     }
   };
 
-  const handleOtpChange = (text: string, index: number) => {
-    const updatedOtpCode = otpCode.split("");
-    updatedOtpCode[index] = text;
-    setOtpCode(updatedOtpCode.join(""));
-
-    setIsOtpValid(updatedOtpCode.length === 5 && !updatedOtpCode.includes(""));
-
-    if (text && inputRefs.current[index + 1]) {
-      inputRefs.current[index + 1]?.focus();
-    }
-    if (updatedOtpCode.length === 5) {
-      Keyboard.dismiss();
-    }
+  const formatTime = (time: number) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = time % 60;
+    return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
   };
 
   const handleKeyPress = (e: any, index: number) => {
@@ -359,19 +349,6 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
         inputRefs.current[index - 1]?.focus();
       }
     }
-  };
-
-  const formatTime = (time: number) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = time % 60;
-    return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
-  };
-
-  const dynamicStyles = {
-    imageWidth: screenWidth < 400 ? wp(28) : wp(35),
-    imageHeight: screenWidth < 400 ? wp(28) : wp(28),
-    margingTopForImage: screenWidth < 400 ? wp(1) : wp(16),
-    margingTopForBtn: screenWidth < 400 ? wp(0) : wp(10),
   };
 
   return (
@@ -397,7 +374,7 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
 
       <View className="flex justify-center items-center">
         <Image
-          source={require("../assets/otpverify.webp")}
+          source={require("../../assets/otpverify.webp")}
           style={{
             width: 500,
             height: 150,
@@ -487,4 +464,4 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
   );
 };
 
-export default Otpverification;
+export default OtpverificationRequestAudit;

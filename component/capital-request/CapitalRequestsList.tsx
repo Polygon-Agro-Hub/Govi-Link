@@ -163,7 +163,7 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
 
       <View className="flex-row items-center px-4 py-3">
         <TouchableOpacity
-          onPress={() => navigation.navigate("Dashboard")}
+          onPress={() => navigation.goBack()}
           className="bg-[#F6F6F680] rounded-full py-4 px-3"
         >
           <MaterialIcons
