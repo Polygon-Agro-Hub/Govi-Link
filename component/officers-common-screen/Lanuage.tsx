@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { View, Text, Image, TouchableOpacity, BackHandler } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "./types";
+import { RootStackParamList } from "../types";
 import { LanguageContext } from "@/context/LanguageContext";
 import {
   widthPercentageToDP as wp,
@@ -11,7 +11,7 @@ import {
 import { useFocusEffect } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 
-const lg = require("../assets/language.webp");
+const lg = require("../../assets/language.webp");
 type LanuageScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
   "Lanuage"

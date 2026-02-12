@@ -27,7 +27,7 @@ import { navigationRef } from "../navigationRef";
 import { LanguageProvider } from "@/context/LanguageContext";
 import NavigationBar from "@/Items/NavigationBar";
 import Splash from "@/component/auth/Splash";
-import Lanuage from "@/component/Lanuage";
+import Lanuage from "@/component/officers-common-screen/Lanuage";
 import Login from "@/component/auth/Login";
 import Dashboard from "@/component/chief-field-officer/Dashboard";
 import { NativeWindStyleSheet } from "nativewind";
