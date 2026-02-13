@@ -34,6 +34,7 @@ interface RequestData {
   id: number;
   jobId: string;
   extentha: number;
+  farmerId: number;
   extentac: number;
   extentp: number;
   district: string;
@@ -47,6 +48,9 @@ interface RequestData {
   startDate: string;
   nicFront: string | null;
   nicBack: string | null;
+  lndPlot: string;
+  lndStreet: string;
+  lndCity: string;
 }
 
 type ProjectDetailsProps = {
@@ -308,41 +312,66 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
           </View>
         </View>
       </ScrollView>
-      <View className=" bottom-4 bg-white ">
-        <View
-          style={{
-            height: 1,
-            backgroundColor: "#fff",
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.1,
-            shadowRadius: 3,
-            elevation: 3,
-          }}
-        />
+      <View
+        className=" bg-white rounded-t-3xl"
+        style={{
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.15,
+          shadowRadius: 8,
+          elevation: 10,
+        }}
+      >
+        <View className="self-center items-center justify-center mt-2">
+          <View className="h-[3px] w-[100px] bg-[#D0D0D0] rounded-full" />
+          <View className="h-[3px] w-[50px] bg-[#D0D0D0] rounded-full mt-1" />
+        </View>
+        {/* Job ID */}
+        <View className="self-center items-center justify-center mt-5">
+          <Text className="text-base text-[#747474]">#{requestData.jobId}</Text>
+        </View>
+
+        {/* Get Call Button */}
         <TouchableOpacity
-          className="flex "
+          className="flex"
           onPress={() => handleDial(requestData.phoneNumber)}
         >
           <View className="flex-row mt-4 self-center items-center justify-center border border-[#F83B4F] rounded-full px-6 w-[50%] py-3">
             <FontAwesome6 name="phone-volume" size={20} color="#F83B4F" />
-            <Text className="text-base font-semibold  ml-2">
+            <Text className="text-base font-semibold ml-2">
               {t("VisitPopup.Get Call")}
             </Text>
           </View>
         </TouchableOpacity>
+
+        {/* Address Section */}
+        <View className="self-center items-center justify-center mt-5">
+          <Text className="text-[#4E6393]">Address :</Text>
+        </View>
+        <View className="self-center items-center justify-center mt-1">
+          <Text className="text-black">
+            {requestData.lndPlot}, {requestData.lndStreet},
+          </Text>
+        </View>
+        <View className="self-center items-center justify-center mt-1">
+          <Text className="text-black">{requestData.lndCity}</Text>
+        </View>
+
+        {/* Start Button */}
+        {/* Start Button */}
         <TouchableOpacity
           onPress={async () => {
             try {
-              navigation.navigate("PersonalInfo", {
-                requestNumber,
+              navigation.navigate("CapitalRequstQRScanner", {
+                farmerId: requestData.farmerId,
                 requestId: requestData.id,
+                requestNumber,
               });
             } catch (e) {
-              console.log("Error clearing AsyncStorage (Request Letter):", e);
+              console.log("Error navigating to QR Scanner:", e);
             }
           }}
-          className="w-[80%] mt-4 self-center"
+          className="w-[80%] mt-4 mb-4 self-center"
         >
           <LinearGradient
             colors={["#F35125", "#FF1D85"]}

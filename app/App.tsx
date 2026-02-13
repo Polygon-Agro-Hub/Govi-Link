@@ -70,6 +70,7 @@ import Economical from "@/component/inspection-forms/Economical";
 import Labour from "@/component/inspection-forms/Labour";
 import HarvestStorage from "@/component/inspection-forms/HarvestStorage";
 import ConfirmationCapitalRequest from "@/component/inspection-forms/ConfirmationCapitalRequest";
+import CapitalRequstQRScanner from "@/component/qr-screen/CapitalRequstQRScanner";
 
 import { initDatabase } from "@/database/index";
 
@@ -293,6 +294,7 @@ function AppContent() {
             <Stack.Screen name="Economical" component={Economical} />
             <Stack.Screen name="Labour" component={Labour} />
             <Stack.Screen name="HarvestStorage" component={HarvestStorage} />
+            <Stack.Screen name="CapitalRequstQRScanner" component={CapitalRequstQRScanner} />
             <Stack.Screen
               name="ConfirmationCapitalRequest"
               component={ConfirmationCapitalRequest}
