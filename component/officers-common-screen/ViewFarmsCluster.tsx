@@ -12,13 +12,13 @@ import {
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp, useRoute } from "@react-navigation/native";
-import { RootStackParamList } from "./types";
+import { RootStackParamList } from "../types";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 import { useTranslation } from "react-i18next";
-import ContentLoader, { Rect, Circle } from "react-content-loader/native";
+import ContentLoader, { Rect } from "react-content-loader/native";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -128,21 +128,12 @@ const LoadingSkeleton = () => {
 const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
   const route = useRoute<ViewFarmsClusterProp>();
   const { jobId, farmName, feildauditId, screenName } = route.params;
-  console.log("indi or clus", screenName);
-
-  console.log(jobId, farmName, feildauditId);
   const { t, i18n } = useTranslation();
   const [visitsData, setVisitsData] = useState<VisitsData[]>([]);
-  const [loadingQuestionId, setLoadingQuestionId] = useState<number | null>(
-    null,
-  );
   const [loaingCertificate, setloaingCertificate] = useState(true);
   const [showPopup, setShowPopup] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
-
   const translateY = useRef(new Animated.Value(0)).current;
-  const currentTranslateY = useRef(0);
-  console.log(translateY);
 
   const panResponder = useRef(
     PanResponder.create({
@@ -155,20 +146,17 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
 
       onPanResponderRelease: (_, g) => {
         if (g.dy > 120) {
-          console.log("hit1");
           setShowPopup(false);
           Animated.timing(translateY, {
             toValue: 600,
             duration: 100,
             useNativeDriver: true,
           }).start(() => {
-            console.log("hit3");
             translateY.setValue(0);
             setShowPopup(false);
             setSelectedItem(null);
           });
         } else {
-          console.log("hit4");
           Animated.spring(translateY, {
             toValue: 0,
             useNativeDriver: true,
@@ -195,7 +183,7 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
             headers: { Authorization: `Bearer ${token}` },
           },
         );
-        console.log(response.data.data);
+
         setVisitsData(response.data.data);
         setloaingCertificate(false);
       }
@@ -213,27 +201,6 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
     Linking.openURL(phoneUrl).catch((err) =>
       console.error("Failed to open dial pad:", err),
     );
-  };
-
-  const updateStatus = async () => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-
-      if (token) {
-        const response = await axios.post(
-          `${environment.API_BASE_URL}api/cluster-audit/status/onGoing/${feildauditId}`,
-          { jobId },
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
-        );
-        console.log("Status updated:", response.data);
-        // Optionally refresh the visits data after updating
-        await fetchclusteVisits();
-      }
-    } catch (error) {
-      console.error("Failed to update status:", error);
-    }
   };
 
   return (
@@ -259,13 +226,14 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
             const farmsLeft = visitsData.filter(
               (v) => v.isCompleted !== 1,
             ).length;
-            console.log("Farms left:", farmsLeft);
+
+            const displayCount = Math.ceil(farmsLeft * 0.2);
 
             return (
               <Text className="text-base text-center text-gray-500 mt-1">
-                {farmsLeft === 1
+                {displayCount === 1
                   ? t("Visits.1 farm left to finish")
-                  : t("Visits.farms left to finish", { count: farmsLeft })}
+                  : t("Visits.farms left to finish", { count: displayCount })}
               </Text>
             );
           })()}
@@ -286,20 +254,17 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
                   activeOpacity={0.8}
                   className="bg-white border border-[#9DB2CE] rounded-xl px-5 py-4 mb-3 mx-3 flex-row justify-between items-center"
                 >
-                  {/* Left side — ID */}
-
                   <View className="flex-row">
                     <Text
-                      className={`text-black font-semibold ${i18n.language === "si" ? "text-base" : i18n.language === "ta" ? "text-base" : "text-lg"}`}
+                      className={`text-black font-semibold ${i18n.language === "si" ? "text-base" : i18n.language === "ta" ? "text-base" : "text-base"}`}
                     >
                       {t("Visits.ID")} :
                     </Text>
-                    <Text className="text-black text-lg font-semibold ml-2">
+                    <Text className="text-black text-base font-semibold ml-2">
                       {item.regCode}
                     </Text>
                   </View>
 
-                  {/* Right side — Button / Status */}
                   {item.isCompleted === 1 ? (
                     <View className="bg-[#000] rounded-full p-2">
                       <AntDesign name="check" size={16} color="#fff" />
@@ -497,8 +462,6 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
                 onPress={() => {
                   setShowPopup(false);
 
-                  updateStatus();
-
                   if (selectedItem?.farmerId) {
                     navigation.navigate("QRScanner", {
                       farmerId: selectedItem.farmerId,
@@ -530,9 +493,6 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
                     marginBottom: 30,
                   }}
                 >
-                  {/* <Text className="text-white text-lg font-semibold">
-                        {t("VisitPopup.Start")}
-                      </Text> */}
                   <Text
                     className={`text-white  font-semibold ${i18n.language === "si" ? "text-base" : i18n.language === "ta" ? "text-base" : "text-lg"}`}
                   >

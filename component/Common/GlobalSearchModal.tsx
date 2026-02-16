@@ -44,12 +44,10 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
   const [filteredData, setFilteredData] = useState(data);
   const [selectedValues, setSelectedValues] = useState<string[]>(selectedItems);
 
-  // Initialize selected values
   useEffect(() => {
     setSelectedValues(selectedItems);
   }, [selectedItems, visible]);
 
-  // Filter data based on search
   useEffect(() => {
     if (!searchValue.trim()) {
       setFilteredData(data);
@@ -71,7 +69,7 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
 
   const handleItemPress = (value: string) => {
     let newSelectedValues: string[];
-    
+
     if (multiSelect) {
       if (selectedValues.includes(value)) {
         newSelectedValues = selectedValues.filter((v) => v !== value);
@@ -81,9 +79,9 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
     } else {
       newSelectedValues = [value];
     }
-    
+
     setSelectedValues(newSelectedValues);
-    
+
     if (!multiSelect) {
       onSelect(newSelectedValues);
       onClose();
@@ -105,9 +103,7 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
       onPress={() => handleItemPress(item.value)}
     >
       <Text className="text-base text-gray-800">{item.label}</Text>
-      {isSelected && (
-        <MaterialIcons name="check" size={20} color="#21202B" />
-      )}
+      {isSelected && <MaterialIcons name="check" size={20} color="#21202B" />}
     </TouchableOpacity>
   );
 
@@ -142,7 +138,6 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
     >
       <View className="flex-1 bg-black/50 justify-center items-center">
         <View className="bg-white rounded-2xl w-11/12 max-h-3/4">
-          {/* Header */}
           <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
             <View>
               <Text className="text-lg font-semibold">{title}</Text>
@@ -157,17 +152,18 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
             </TouchableOpacity>
           </View>
 
-          {/* Search Bar */}
           {renderSearchInput()}
 
-          {/* List */}
           <FlatList
             data={filteredData}
             keyExtractor={(item) => item.value}
             renderItem={({ item }) => {
               const isSelected = selectedValues.includes(item.value);
               if (renderItem) {
-                return renderItem(item, isSelected) as React.ReactElement | null;
+                return renderItem(
+                  item,
+                  isSelected,
+                ) as React.ReactElement | null;
               }
               return renderDefaultItem(item, isSelected);
             }}
@@ -175,14 +171,11 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
             className="max-h-64"
             ListEmptyComponent={
               <View className="px-4 py-8 items-center">
-                <Text className="text-gray-500 text-base">
-                  {noResultsText}
-                </Text>
+                <Text className="text-gray-500 text-base">{noResultsText}</Text>
               </View>
             }
           />
 
-          {/* Done Button (only for multi-select) */}
           {multiSelect && (
             <View className="px-4 py-3 border-t border-gray-200">
               <TouchableOpacity

@@ -18,7 +18,7 @@ import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { RouteProp, useRoute,useFocusEffect } from "@react-navigation/native";
+import { RouteProp, useRoute, useFocusEffect } from "@react-navigation/native";
 import CustomHeader from "../common/CustomHeader";
 
 type AddOfficerStep3NavigationProp = StackNavigationProp<
@@ -38,52 +38,43 @@ interface RouteParams {
 const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
   const { t } = useTranslation();
   const route = useRoute<RouteProp<RootStackParamList, "AddOfficerStep3">>();
-  const { formData , isnewthirdstep} = route.params as RouteParams;
-
-  // State for uploaded images
+  const { formData, isnewthirdstep } = route.params as RouteParams;
   const [nicFrontImage, setNicFrontImage] = useState<string | null>(null);
   const [nicBackImage, setNicBackImage] = useState<string | null>(null);
   const [passbookImage, setPassbookImage] = useState<string | null>(null);
   const [contractImage, setContractImage] = useState<string | null>(null);
-
-  // State for file names
   const [nicFrontFileName, setNicFrontFileName] = useState<string | null>(null);
   const [nicBackFileName, setNicBackFileName] = useState<string | null>(null);
   const [passbookFileName, setPassbookFileName] = useState<string | null>(null);
   const [contractFileName, setContractFileName] = useState<string | null>(null);
-
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-        useFocusEffect(
-          React.useCallback(() => {
-     console.log("focus effect third", isnewthirdstep)
-          if(isnewthirdstep===true){
-            setNicFrontImage(null)
-            setNicBackImage(null)
-            setPassbookImage(null)
-            setContractImage(null)
-            setNicFrontFileName(null)
-            setNicBackFileName(null)
-            setPassbookFileName(null)
-            setContractFileName(null)
-          }
-    
-          }, [isnewthirdstep])
-        );
+  useFocusEffect(
+    React.useCallback(() => {
+      if (isnewthirdstep === true) {
+        setNicFrontImage(null);
+        setNicBackImage(null);
+        setPassbookImage(null);
+        setContractImage(null);
+        setNicFrontFileName(null);
+        setNicBackFileName(null);
+        setPassbookFileName(null);
+        setContractFileName(null);
+      }
+    }, [isnewthirdstep]),
+  );
   const pickImage = async (type: string) => {
-    // Request permission
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
       Alert.alert(
         t("AddOfficer.PermissionRequired"),
         t("AddOfficer.PermissionRequiredMessage"),
-        [{ text: t("Main.ok") }]
+        [{ text: t("Main.ok") }],
       );
       return;
     }
 
-    // Launch image picker
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: false,
@@ -129,19 +120,14 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
   };
 
   const clearAllFormData = () => {
-    // Clear all image states
     setNicFrontImage(null);
     setNicBackImage(null);
     setPassbookImage(null);
     setContractImage(null);
-
-    // Clear all file names
     setNicFrontFileName(null);
     setNicBackFileName(null);
     setPassbookFileName(null);
     setContractFileName(null);
-
-    // Clear errors and loading state
     setErrors({});
     setLoading(false);
   };
@@ -158,22 +144,20 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
     if (!contractImage)
       newErrors.contract = t("Error.Contract image is required");
     setErrors(newErrors);
-  return newErrors;
+    return newErrors;
   };
 
   const convertImageToFormData = async (
     imageUri: string,
-    fieldName: string
+    fieldName: string,
   ) => {
     try {
-      // Extract file extension from URI or use default
       const fileExtension = imageUri.split(".").pop() || "jpg";
       const fileName = `${fieldName}_${Date.now()}.${fileExtension}`;
 
-      // For React Native FormData, we need to create a file-like object
       return {
         uri: imageUri,
-        type: "image/jpeg", // You can make this dynamic based on actual image type
+        type: "image/jpeg",
         name: fileName,
       };
     } catch (error) {
@@ -184,16 +168,14 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
 
   const handleSubmit = async () => {
     const validationErrors = validateStep3();
-  if (Object.keys(validationErrors).length > 0) {
-    const errorMessage = Object.values(validationErrors).join("\n• ");
+    if (Object.keys(validationErrors).length > 0) {
+      const errorMessage = Object.values(validationErrors).join("\n• ");
 
-       Alert.alert(
-      t("Error.Validation Error"),
-      `• ${errorMessage}`,
-      [{ text: t("Main.ok") }]
-    );
-    return;
-  }
+      Alert.alert(t("Error.Validation Error"), `• ${errorMessage}`, [
+        { text: t("Main.ok") },
+      ]);
+      return;
+    }
     try {
       setLoading(true);
 
@@ -202,47 +184,40 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
         Alert.alert(
           t("Error.Sorry"),
           t("Error.Your login session has expired"),
-          [{ text: t("Main.ok") }]
+          [{ text: t("Main.ok") }],
         );
         navigation.navigate("Login");
         return;
       }
 
-      // Prepare form data
       const submitFormData = new FormData();
 
-      // Add all form data from previous steps
       Object.keys(formData).forEach((key) => {
         if (key === "assignDistrict" && Array.isArray(formData[key])) {
-          // Convert array to string for form data
           submitFormData.append(key, JSON.stringify(formData[key]));
         } else if (key === "languages" && typeof formData[key] === "object") {
-          // Convert languages object to JSON string
           submitFormData.append(key, JSON.stringify(formData[key]));
         } else if (key === "profileImage") {
-          // Skip profileImage here, we'll handle it separately as a file
           return;
         } else {
           submitFormData.append(key, formData[key]?.toString() || "");
         }
       });
 
-      // Add profile image if exists
       if (formData.profileImage) {
         const profileFile = await convertImageToFormData(
           formData.profileImage,
-          "profile"
+          "profile",
         );
         if (profileFile) {
           submitFormData.append("profile", profileFile as any);
         }
       }
 
-      // Add other images
       if (nicFrontImage) {
         const nicFrontFile = await convertImageToFormData(
           nicFrontImage,
-          "frontNic"
+          "frontNic",
         );
         if (nicFrontFile) {
           submitFormData.append("frontNic", nicFrontFile as any);
@@ -252,7 +227,7 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
       if (nicBackImage) {
         const nicBackFile = await convertImageToFormData(
           nicBackImage,
-          "backNic"
+          "backNic",
         );
         if (nicBackFile) {
           submitFormData.append("backNic", nicBackFile as any);
@@ -262,7 +237,7 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
       if (passbookImage) {
         const passbookFile = await convertImageToFormData(
           passbookImage,
-          "backPassbook"
+          "backPassbook",
         );
         if (passbookFile) {
           submitFormData.append("backPassbook", passbookFile as any);
@@ -272,14 +247,13 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
       if (contractImage) {
         const contractFile = await convertImageToFormData(
           contractImage,
-          "contract"
+          "contract",
         );
         if (contractFile) {
           submitFormData.append("contract", contractFile as any);
         }
       }
 
-      // Submit to backend
       const response = await axios.post(
         `${environment.API_BASE_URL}api/officer/create-field-officer`,
         submitFormData,
@@ -288,15 +262,15 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
             Authorization: `Bearer ${token}`,
             "Content-Type": "multipart/form-data",
           },
-          timeout: 30000, // 30 seconds timeout
-        }
+          timeout: 30000,
+        },
       );
 
       if (response.data.status === "success" || response.data.id) {
         Alert.alert(
           t("AddOfficer.Success"),
           t("AddOfficer.OfficerAddedSuccess"),
-          [{ text: t("Main.ok") }]
+          [{ text: t("Main.ok") }],
         );
 
         clearAllFormData();
@@ -320,7 +294,9 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
         errorMessage = t("Error.RequestTimeout");
       }
 
-      Alert.alert(t("Error.Error"), t("Error.somethingWentWrong"),[{ text: t("Main.ok") }]);
+      Alert.alert(t("Error.Error"), t("Error.somethingWentWrong"), [
+        { text: t("Main.ok") },
+      ]);
     } finally {
       setLoading(false);
     }
@@ -353,24 +329,26 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
         </View>
       </TouchableOpacity>
 
-      {/* Show file name when uploaded */}
       {fileName && (
         <View className="mt-2 flex-row items-center">
           <Text className="text-sm text-black font-semibold mr-2">
             {t("AddOfficer.Attached")}:
           </Text>
-          <Text className="text-sm text-[#415CFF] font-medium w-[70%]">{fileName}</Text>
+          <Text className="text-sm text-[#415CFF] font-medium w-[70%]">
+            {fileName}
+          </Text>
         </View>
       )}
 
-      {/* Show error message */}
       {error && <Text className="text-red-500 text-sm mt-1 ml-2">{error}</Text>}
     </View>
   );
 
-  // Add back button functionality
   const handleGoBack = () => {
-    navigation.navigate("AddOfficerStep2", { formData, isnewsecondstep:false });
+    navigation.navigate("AddOfficerStep2", {
+      formData,
+      isnewsecondstep: false,
+    });
   };
 
   return (
@@ -379,7 +357,7 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
       style={{ flex: 1, backgroundColor: "white" }}
     >
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-       <CustomHeader
+      <CustomHeader
         title={t("AddOfficer.AddOfficer")}
         navigation={navigation}
         showBackButton={true}
@@ -391,8 +369,6 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-
-        {/* Document Upload Section */}
         <View className="p-4">
           <View className="mt-4">
             <UploadButton

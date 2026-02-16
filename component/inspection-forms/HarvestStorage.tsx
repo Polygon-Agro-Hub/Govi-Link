@@ -1,4 +1,3 @@
-// HarvestStorage.tsx - Fixed version with proper data handling
 import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
@@ -112,8 +111,6 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
   const route = useRoute<RouteProp<RootStackParamList, "HarvestStorage">>();
   const { requestNumber, requestId } = route.params;
   const { t } = useTranslation();
-
-  // Local state for form data
   const [formData, setFormData] = useState<HarvestStorageData>({
     hasOwnStorage: undefined,
     ifNotHasFacilityAccess: undefined,
@@ -135,7 +132,6 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
   const [isSaving, setIsSaving] = useState(false);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
 
-  // Load data from SQLite when component mounts
   useFocusEffect(
     useCallback(() => {
       const loadData = async () => {
@@ -146,12 +142,6 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
           const localData = await getHarvestStorageInfo(reqId);
 
           if (localData) {
-            console.log(
-              "✅ Loaded harvest storage info from SQLite:",
-              localData,
-            );
-
-            // Ensure proper data types
             const normalizedData: HarvestStorageData = {
               hasOwnStorage: localData.hasOwnStorage,
               ifNotHasFacilityAccess: localData.ifNotHasFacilityAccess,
@@ -164,7 +154,6 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
             setFormData(normalizedData);
             setIsExistingData(true);
           } else {
-            console.log("📝 No local harvest storage data - new entry");
             setIsExistingData(false);
           }
           setIsDataLoaded(true);
@@ -181,25 +170,22 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
     }, [requestId]),
   );
 
-  // Auto-save to SQLite whenever formData changes (debounced)
   useEffect(() => {
-    if (!isDataLoaded) return; // Don't auto-save during initial load
+    if (!isDataLoaded) return;
 
     const timer = setTimeout(async () => {
       if (requestId) {
         try {
           await saveHarvestStorageInfo(Number(requestId), formData);
-          console.log("💾 Auto-saved harvest storage info to SQLite");
         } catch (err) {
           console.error("Error auto-saving harvest storage info:", err);
         }
       }
-    }, 500); // 500ms debounce
+    }, 500);
 
     return () => clearTimeout(timer);
   }, [formData, requestId, isDataLoaded]);
 
-  // Validate form completion
   useEffect(() => {
     const hasOwnStorageValid =
       formData.hasOwnStorage === "Yes" || formData.hasOwnStorage === "No";
@@ -241,13 +227,11 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
     );
   }, [formData, errors]);
 
-  // Handle field changes
   const handleyesNOFieldChange = (key: string, value: "Yes" | "No") => {
     let updates: Partial<HarvestStorageData> = {
       [key]: value,
     };
 
-    // Clear conditional field when hasOwnStorage changes
     if (key === "hasOwnStorage" && value === "Yes") {
       updates.ifNotHasFacilityAccess = undefined;
     }
@@ -255,7 +239,6 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
     setFormData((prev) => ({ ...prev, ...updates }));
   };
 
-  // Save to backend
   const saveToBackend = async (
     reqId: number,
     tableName: string,
@@ -263,11 +246,6 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
     isUpdate: boolean,
   ): Promise<boolean> => {
     try {
-      console.log(
-        `💾 Saving to backend (${isUpdate ? "UPDATE" : "INSERT"}):`,
-        tableName,
-      );
-
       const yesNoToInt = (val: any) =>
         val === "Yes" ? "1" : val === "No" ? "0" : null;
 
@@ -280,7 +258,6 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
         transformedData.hasOwnStorage = yesNoToInt(data.hasOwnStorage);
       }
 
-      // Conditional field
       if (
         data.hasOwnStorage === "No" &&
         data.ifNotHasFacilityAccess !== undefined
@@ -324,27 +301,23 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
       );
 
       if (response.data.success) {
-        console.log(`✅ ${tableName} ${response.data.operation}d successfully`);
         return true;
       }
 
       return false;
     } catch (error: any) {
-      console.error(`❌ Error saving ${tableName}:`, error);
+      console.error(` Error saving ${tableName}:`, error);
       return false;
     }
   };
 
-  // Handle next button
   const handleNext = () => {
     const validationErrors: Record<string, string> = {};
 
-    // Validate required fields
     if (!formData.hasOwnStorage) {
       validationErrors.hasOwnStorage = t("Error.Own storage field is required");
     }
 
-    // Conditional validation
     if (formData.hasOwnStorage === "No" && !formData.ifNotHasFacilityAccess) {
       validationErrors.ifNotHasFacilityAccess = t(
         "Error.Facility access field is required",
@@ -389,7 +362,7 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
     setIsSaving(true);
 
     if (!requestId) {
-      console.error("❌ requestId is missing!");
+      console.error(" requestId is missing!");
       setErrorModalVisible(true);
       setIsSaving(false);
       return;
@@ -398,7 +371,7 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
     const reqId = Number(requestId);
 
     if (isNaN(reqId) || reqId <= 0) {
-      console.error("❌ Invalid requestId:", requestId);
+      console.error(" Invalid requestId:", requestId);
       setErrorModalVisible(true);
       setIsSaving(false);
       return;
@@ -415,11 +388,9 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
       setIsSaving(false);
 
       if (saved) {
-        console.log("✅ Harvest storage info saved successfully to backend");
         setIsExistingData(true);
         setSuccessModalVisible(true);
       } else {
-        console.log("⚠️ Backend save failed");
         setErrorModalVisible(true);
       }
     } catch (error) {
@@ -433,23 +404,16 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
     setSuccessModalVisible(false);
 
     try {
-      // Clear SQLite data for this request
-      console.log("🗑️ Clearing SQLite data for request:", requestId);
-
-      // You would need to call similar clear functions for other tables
       if (requestId) {
         await clearHarvestStorageInfo(Number(requestId));
-        // Add other clear functions for other tables here
-        console.log("✅ SQLite data cleared successfully");
       }
 
-      // Navigate to confirmation page
       navigation.navigate("ConfirmationCapitalRequest", {
         requestNumber: requestNumber,
         requestId: requestId,
       });
     } catch (error) {
-      console.error("❌ Error during cleanup:", error);
+      console.error(" Error during cleanup:", error);
       navigation.navigate("ConfirmationCapitalRequest", {
         requestNumber: requestNumber,
         requestId: requestId,
@@ -482,8 +446,8 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
               "Cultivation Info": "CultivationInfo",
               "Cropping Systems": "CroppingSystems",
               "Profit & Risk": "ProfitRisk",
-              "Economical": "Economical",
-              "Labour": "Labour",
+              Economical: "Economical",
+              Labour: "Labour",
             };
 
             const route = routesMap[key];
@@ -663,16 +627,6 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
         type="error"
         onClose={handleErrorClose}
       />
-
-      {isSaving && (
-        <View className="absolute inset-0 bg-black/50 justify-center items-center">
-          <View className="bg-white p-6 rounded-2xl">
-            <Text className="text-base text-black">
-              {t("InspectionForm.Saving...")}
-            </Text>
-          </View>
-        </View>
-      )}
     </KeyboardAvoidingView>
   );
 };

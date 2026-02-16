@@ -11,7 +11,6 @@ import {
   Pressable,
   Modal,
   BackHandler,
-  TouchableWithoutFeedback,
   Linking,
   Alert,
   Dimensions,
@@ -150,8 +149,6 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
   };
 
   const translateY = useRef(new Animated.Value(0)).current;
-  const currentTranslateY = useRef(0);
-  console.log(translateY);
 
   const panResponder = useRef(
     PanResponder.create({
@@ -164,20 +161,17 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
 
       onPanResponderRelease: (_, g) => {
         if (g.dy > 120) {
-          console.log("hit1");
           setShowPopup(false);
           Animated.timing(translateY, {
             toValue: 600,
             duration: 100,
             useNativeDriver: true,
           }).start(() => {
-            console.log("hit3");
             translateY.setValue(0);
             setShowPopup(false);
             setSelectedItem(null);
           });
         } else {
-          console.log("hit4");
           Animated.spring(translateY, {
             toValue: 0,
             useNativeDriver: true,
@@ -221,7 +215,7 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
       setCurrentDraftIndex(validIndex);
     } catch (error) {
       draftFlatListRef.current.scrollToOffset({
-        offset: validIndex * 320, // width of item
+        offset: validIndex * 320,
         animated: true,
       });
     }
@@ -268,20 +262,13 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
 
   useEffect(() => {
     fetchUserProfile();
-    // fetchVisits();
-    // fetchVisitsDraft()
     fetchAllVisits();
   }, []);
 
   const onRefresh = useCallback(async () => {
     try {
       setRefreshing(true);
-      await Promise.all([
-        fetchUserProfile(),
-        // fetchVisits(),
-        // fetchVisitsDraft(),
-        fetchAllVisits(),
-      ]);
+      await Promise.all([fetchUserProfile(), fetchAllVisits()]);
     } catch (error) {
       console.error("Refresh error:", error);
     } finally {
@@ -298,18 +285,6 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
         return `${profile.firstNameTamil}`;
       default:
         return `${profile.firstName}`;
-    }
-  };
-  const getProposeName = (item: VisitsData) => {
-    if (!item) return "";
-
-    switch (i18n.language) {
-      case "si":
-        return item.servicesinhalaName || item.propose || "";
-      case "ta":
-        return item.servicetamilName || item.propose || "";
-      default:
-        return item.serviceenglishName || item.propose || "";
     }
   };
 
@@ -339,10 +314,6 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
       };
     }
   };
-
-  useEffect(() => {
-    console.log("🎯 Loading States:", { loadingVisitsdrafts });
-  }, [loadingVisitsdrafts]);
 
   useEffect(() => {
     const backAction = () => {
@@ -382,7 +353,6 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
       );
 
       const { visits, draftVisits } = response.data.data;
-      console.log("Fetched visits:", visits, draftVisits);
 
       setVisitsData(visits || []);
       setDraftVisits(draftVisits || []);
@@ -452,7 +422,11 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
                 </Text>
               </Text>
               <TouchableOpacity
-                onPress={() => navigation.navigate("ViewAllVisits")}
+                onPress={() =>
+                  navigation.navigate("ViewAllVisits", {
+                    officerId: profile?.empId ?? "",
+                  })
+                }
               >
                 <Text className="text-pink-500 font-semibold">
                   {t("Dashboard.View All")}
@@ -461,7 +435,6 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
             </View>
           </View>
           {visitsData.length > 0 ? (
-            // <View className="flex-row items-center">
             <View
               className="flex-row"
               style={{
@@ -498,7 +471,6 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
                     className="border border-[#FF1D85] rounded-lg p-3 mr-4"
                     activeOpacity={0.8}
                     onPress={() => {
-                      //requested comes from govilinkjobs , individual comes from farmaudits
                       if (
                         item.propose === "Individual" ||
                         item.propose === "Requested"
@@ -512,9 +484,6 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
                           farmName: item.farmerName,
                           screenName: "Dashboard",
                         });
-                        {
-                          /*if cluster need send  clusterID , jobId    */
-                        }
                       }
                     }}
                   >
@@ -606,9 +575,7 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
           </View>
 
           <View className="">
-            {/* Drafts done for only individual audit */}
             {draftVisits.length > 0 ? (
-              // <View className="flex-row items-center">
               <View
                 className="flex-row"
                 style={{
@@ -617,7 +584,6 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
                   alignItems: "center",
                 }}
               >
-                {/* Left Arrow */}
                 <TouchableOpacity
                   disabled={currentDraftIndex <= 0}
                   onPress={() => scrollDraftToIndex(currentDraftIndex - 1)}
@@ -630,7 +596,6 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
                   />
                 </TouchableOpacity>
 
-                {/* Drafts FlatList */}
                 <FlatList
                   ref={draftFlatListRef}
                   horizontal
@@ -665,9 +630,6 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
                         }
                       }}
                     >
-                      {/* <View className="border border-[#FF1D85] rounded-lg p-3 mb-4 flex-row justify-between items-center mr-4"
-                         style={{ width: wp("77%") }}
-                         > */}
                       <View
                         style={{
                           marginHorizontal: 10,
@@ -737,7 +699,6 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
                   )}
                 />
 
-                {/* Right Arrow */}
                 <TouchableOpacity
                   disabled={currentDraftIndex >= draftVisits.length - 1}
                   onPress={() => scrollDraftToIndex(currentDraftIndex + 1)}
@@ -771,7 +732,11 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
       )}
       <View className="mt-8 mx-8">
         <TouchableOpacity
-          onPress={() => navigation.navigate("ViewAllVisits")}
+          onPress={() =>
+            navigation.navigate("ViewAllVisits", {
+              officerId: profile?.empId ?? "",
+            })
+          }
           className="bg-[#FFE5D6] rounded-lg p-3 h-28 mr-4 w-full flex-row justify-between items-center"
           style={{
             shadowColor: "#000",
@@ -999,7 +964,6 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
                       screenName: "Dashboard",
                     });
                   } else if (selectedItem?.propose === "Requested") {
-                    console.log("hitt Request");
                     navigation.navigate("QRScaneerRequstAudit", {
                       farmerId: selectedItem.farmerId,
                       govilinkjobid: selectedItem.id,

@@ -80,6 +80,7 @@
     "Unauthorized Access": "Unauthorized Access",
     "You are not authorized to access this system. Please use a valid Employee ID": "You are not authorized to access this system. Please use a valid Employee ID",
     "This EMP ID is not approved.": "This EMP ID is not approved.",
+    "This Employee ID is Rejected":"This Employee ID is Rejected",
     "Please Wait": "Please Wait",
     "Validating your information, please wait...": "Validating your information, please wait...",
     "firstName is required": "First name is required",
@@ -246,7 +247,7 @@
     "Failed to complete task, Please try again": "Failed to complete task, Please try again",
     "Are you sure you want to mark this task as incomplete?": "Are you sure you want to mark this task as incomplete?",
     "Are you sure you want to continue?": "Are you sure you want to continue?",
-    "You haven’t marked any tasks as completed.": "You haven’t marked any tasks as completed.",
+    "You haven’t marked any tasks as completed.": "You haven't marked any tasks as completed.",
     "Continue": "Continue"
   },
   "CertificateSuggestions": {
@@ -269,7 +270,7 @@
   },
   "Otpverification": {
     "Enter Verification Code": "Enter Verification Code",
-    "We have sent a Verification Code to Farmer’s mobile number": "We have sent a Verification Code to Farmer’s mobile number",
+    "We have sent a Verification Code to Farmer’s mobile number": "We have sent a Verification Code to Farmer's mobile number",
     "Verify": "Verify",
     "Resend in": "Resend in",
     "RESEND OTP": "RESEND OTP",
@@ -710,7 +711,7 @@
     "AssignSuccess": "Assigned to {name} successfully!",
     "NoOfficersAvailable": "No officers available for assignment",
     "HeaderOn": "Confirmation",
-    "UndoSuccess": "All inspection data deleted successfully",
+    "UndoSuccess": "The request completion process was cancelled. Your submitted data remains unchanged.",
     "UndoFailed": "Deleting inspection data failed."
   }
 }

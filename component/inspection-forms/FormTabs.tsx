@@ -36,7 +36,6 @@ const FormTabs: React.FC<FormTabsProps> = ({
 
   const activeIndex = tabs.indexOf(activeKey);
 
-  // Auto-scroll to active tab
   useEffect(() => {
     const x = positions[activeKey];
     if (x !== undefined) {
@@ -49,12 +48,17 @@ const FormTabs: React.FC<FormTabsProps> = ({
 
   return (
     <View className="mb-6">
-      {/* Header */}
       <View className="flex-row items-center justify-between px-4 py-3 bg-[#F6F6F6]">
-        {/* Back button */}
         <View style={{ width: wp(15) }}>
           <TouchableOpacity
-            onPress={() => navigation.goBack()}
+            onPress={() =>
+              navigation.navigate("Main", {
+                screen: "MainTabs",
+                params: {
+                  screen: "CapitalRequests",
+                },
+              })
+            }
             className="items-start"
           >
             <Entypo
@@ -70,18 +74,15 @@ const FormTabs: React.FC<FormTabsProps> = ({
           </TouchableOpacity>
         </View>
 
-        {/* Title */}
         <View className="flex-1 items-center">
           <Text className="text-xl font-semibold text-black text-center">
             {t("InspectionForm.Inspection Form")}
           </Text>
         </View>
 
-        {/* Right spacer (to keep title centered) */}
         <View style={{ width: wp(15) }} />
       </View>
 
-      {/* Tabs */}
       <View className="px-4 mt-4">
         <ScrollView
           ref={scrollRef}
@@ -111,10 +112,10 @@ const FormTabs: React.FC<FormTabsProps> = ({
                   <Text
                     className={`text-sm pb-1 ${
                       index < activeIndex
-                        ? "text-[#FA345A]" // completed
+                        ? "text-[#FA345A]"
                         : index === activeIndex
-                          ? "text-[#FA345A]" // current
-                          : "text-[#CACACA]" // future (disabled)
+                          ? "text-[#FA345A]"
+                          : "text-[#CACACA]"
                     }`}
                   >
                     {t(`InspectionForm.${key}`)}

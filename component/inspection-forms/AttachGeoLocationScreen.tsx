@@ -1,16 +1,26 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, TouchableOpacity, Alert, ActivityIndicator, Platform, StatusBar, Modal } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+  Platform,
+  StatusBar,
+  Modal,
+} from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp } from "@react-navigation/native";
 import { WebView } from "react-native-webview";
 import * as Location from "expo-location";
 import { AntDesign, Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 import { RootStackParamList } from "../types";
-import LottieView from "lottie-react-native";
 import { useTranslation } from "react-i18next";
 import { LinearGradient } from "expo-linear-gradient";
-
 
 type AttachGeoLocationScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -35,8 +45,6 @@ const AttachGeoLocationScreen: React.FC<AttachGeoLocationScreenProps> = ({
 
   const currentLatitude = route.params?.currentLatitude;
   const currentLongitude = route.params?.currentLongitude;
-//   const onLocationSelect = route.params?.onLocationSelect;
-
   const [markerPosition, setMarkerPosition] = useState({
     latitude: currentLatitude || 7.2008,
     longitude: currentLongitude || 79.8358,
@@ -44,8 +52,10 @@ const AttachGeoLocationScreen: React.FC<AttachGeoLocationScreenProps> = ({
 
   const [isLoading, setIsLoading] = useState(false);
   const [isAttaching, setIsAttaching] = useState(false);
-  const [locationName, setLocationName] = useState("Tap on the map to select a location");
-const {t} = useTranslation();
+  const [locationName, setLocationName] = useState(
+    "Tap on the map to select a location",
+  );
+  const { t } = useTranslation();
   useEffect(() => {
     if (!currentLatitude || !currentLongitude) {
       getCurrentLocation();
@@ -60,7 +70,7 @@ const {t} = useTranslation();
         Alert.alert(
           t("Error.Permission Denied"),
           t("Error.Location permission is required to use this feature."),
-              [{ text: t("Main.ok") }]
+          [{ text: t("Main.ok") }],
         );
         setIsLoading(false);
         return;
@@ -77,7 +87,6 @@ const {t} = useTranslation();
 
       setMarkerPosition(newPosition);
 
-      // Update map via WebView
       if (webViewRef.current) {
         webViewRef.current.injectJavaScript(`
           updateMarkerPosition(${newPosition.latitude}, ${newPosition.longitude});
@@ -87,11 +96,15 @@ const {t} = useTranslation();
 
       await getAddressFromCoordinates(
         location.coords.latitude,
-        location.coords.longitude
+        location.coords.longitude,
       );
     } catch (error) {
       console.error("Error getting location:", error);
-      Alert.alert(t("Error.Error"), t("Error.Unable to get your current location"),[{ text: t("Main.ok") }] );
+      Alert.alert(
+        t("Error.Error"),
+        t("Error.Unable to get your current location"),
+        [{ text: t("Main.ok") }],
+      );
     } finally {
       setIsLoading(false);
     }
@@ -124,16 +137,16 @@ const {t} = useTranslation();
 
   const handleConfirmLocation = async () => {
     setIsAttaching(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    await new Promise((resolve) => setTimeout(resolve, 1500));
 
     if (route.params?.onLocationSelect) {
       route.params.onLocationSelect(
         markerPosition.latitude,
         markerPosition.longitude,
-        locationName
+        locationName,
       );
     }
-    
+
     setIsAttaching(false);
     navigation.goBack();
   };
@@ -141,7 +154,7 @@ const {t} = useTranslation();
   const handleWebViewMessage = (event: any) => {
     try {
       const data = JSON.parse(event.nativeEvent.data);
-      if (data.type === 'mapClick') {
+      if (data.type === "mapClick") {
         const { lat, lng } = data;
         setMarkerPosition({ latitude: lat, longitude: lng });
         getAddressFromCoordinates(lat, lng);
@@ -151,7 +164,7 @@ const {t} = useTranslation();
     }
   };
 
- const leafletHTML = `
+  const leafletHTML = `
   <!DOCTYPE html>
   <html>
   <head>
@@ -230,52 +243,34 @@ const {t} = useTranslation();
   </html>
 `;
 
-
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
       {/* Header */}
-      {/* <View 
-        className="bg-white flex-row items-center shadow-lg px-3 py-4 mt-[-10%]"
-        style={{
-          paddingTop: Platform.OS === 'android' ? (StatusBar.currentHeight || 0) + 16 : 16,
-        }}
-      >
+      <View className="flex-row items-center justify-center py-4 mt-2">
         <TouchableOpacity
+          className="absolute left-4 bg-[#F3F3F3] rounded-full p-4"
           onPress={() => navigation.goBack()}
-          style={{ paddingHorizontal: wp(2), paddingVertical: hp(1) }}
         >
-          <View className="p-4 bg-[#F6F6F680] rounded-full justify-center items-center">
-            <AntDesign name="left" size={20} color="black" />
-          </View>
+          <AntDesign name="left" size={20} color="#000" />
         </TouchableOpacity>
-
-        <Text className="flex-1 text-center text-lg font-semibold text-black mr-9">
-          Attach Geo Location
+        <Text className="text-lg font-semibold text-black">
+          {t("InspectionForm.Attach Geo Location")}
         </Text>
-      </View> */}
-        <View className="flex-row items-center justify-center py-4 mt-2">
-          <TouchableOpacity
-            className="absolute left-4 bg-[#F3F3F3] rounded-full p-4"
-            onPress={() => navigation.goBack()}
-          >
-            <AntDesign name="left" size={20} color="#000" />
-          </TouchableOpacity>
-          <Text className="text-lg font-semibold text-black">
-            {t("InspectionForm.Attach Geo Location")}
-          </Text>
-        </View>
+      </View>
       <View className="items-center justify-center mt-[2%]">
-        <Text className="text-[#828282]">{t("InspectionForm.Tap on the map to select a location.")}</Text>
+        <Text className="text-[#828282]">
+          {t("InspectionForm.Tap on the map to select a location.")}
+        </Text>
       </View>
 
       {/* Map WebView */}
       <View style={{ flex: 1, marginTop: hp(2), marginHorizontal: wp(4) }}>
-        <View style={{ flex: 1, borderRadius: 12, overflow: 'hidden' }}>
+        <View style={{ flex: 1, borderRadius: 12, overflow: "hidden" }}>
           <WebView
             ref={webViewRef}
-            originWhitelist={['*']}
+            originWhitelist={["*"]}
             source={{ html: leafletHTML }}
             onMessage={handleWebViewMessage}
             javaScriptEnabled={true}
@@ -321,13 +316,14 @@ const {t} = useTranslation();
           disabled={isLoading || isAttaching}
           className="flex-1 mr-2"
         >
-          <View className={`bg-[#444444] rounded-full py-4 px-4 flex-row items-center justify-center`}>
+          <View
+            className={`bg-[#444444] rounded-full py-4 px-4 flex-row items-center justify-center`}
+          >
             {isLoading ? (
               <ActivityIndicator size="small" color="#fff" />
             ) : (
               <>
                 <Text className="text-white font-semibold ml-2 text-sm">
-                  
                   {t("InspectionForm.Use My Location")}
                 </Text>
               </>
@@ -340,30 +336,25 @@ const {t} = useTranslation();
           disabled={isAttaching}
           className="flex-1 "
         >
-          {/* <View className={`bg-[#874DDB] rounded-full py-3 px-4 flex-row items-center justify-center shadow-md ${isAttaching ? 'opacity-50' : ''}`}>
-            <Ionicons name="checkmark" size={20} color="white" />
-            <Text className="text-white font-bold ml-2 text-sm">
-              Confirm Now
+          <LinearGradient
+            colors={["#F35125", "#FF1D85"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            className=" rounded-full py-3 p-3 items-center flex-row gap-x-1"
+            style={{
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 3 },
+              shadowOpacity: 0.25,
+              shadowRadius: 5,
+              elevation: 6,
+            }}
+          >
+            <MaterialIcons name="done" size={24} color="#fff" />
+
+            <Text className="text-white text-base font-semibold">
+              {t("InspectionForm.Confirm Now")}
             </Text>
-          </View> */}
-
-                        <LinearGradient
-                                    colors={["#F35125", "#FF1D85"]}
-                                    start={{ x: 0, y: 0 }}
-                                    end={{ x: 1, y: 0 }}
-                                    className=" rounded-full py-3 p-3 items-center flex-row gap-x-1"
-                                    style={{
-                                      shadowColor: "#000",
-                                      shadowOffset: { width: 0, height: 3 },
-                                      shadowOpacity: 0.25,
-                                      shadowRadius: 5,
-                                      elevation: 6,
-                                    }}
-                                  >
-                                                    <MaterialIcons name="done" size={24} color="#fff" />
-
-                      <Text className="text-white text-base font-semibold">{t("InspectionForm.Confirm Now")}</Text>
-                      </LinearGradient>
+          </LinearGradient>
         </TouchableOpacity>
       </View>
 
@@ -374,20 +365,20 @@ const {t} = useTranslation();
         visible={isAttaching}
         onRequestClose={() => {}}
       >
-        <View 
+        <View
           style={{
             flex: 1,
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            justifyContent: 'center',
-            alignItems: 'center',
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            justifyContent: "center",
+            alignItems: "center",
           }}
         >
-          <View 
+          <View
             style={{
-              backgroundColor: 'white',
+              backgroundColor: "white",
               borderRadius: 16,
               padding: 32,
-              alignItems: 'center',
+              alignItems: "center",
               minWidth: wp(70),
               shadowColor: "#000",
               shadowOffset: { width: 0, height: 2 },
@@ -396,20 +387,13 @@ const {t} = useTranslation();
               elevation: 5,
             }}
           >
-            {/* <LottieView
-              source={require("../assets/images/loading.json")}
-              style={{ width: wp(20), height: hp(20) }}
-              autoPlay
-              loop
-            />
-             */}
-             <ActivityIndicator size="large" color="#FA345A" />
-            <Text 
+            <ActivityIndicator size="large" color="#FA345A" />
+            <Text
               style={{
                 fontSize: 14,
-                fontWeight: '600',
-                color: '#000',
-                textAlign: 'center',
+                fontWeight: "600",
+                color: "#000",
+                textAlign: "center",
               }}
               className="mt-4"
             >

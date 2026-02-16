@@ -1,4 +1,3 @@
-// Labour.tsx - Fixed version with proper data handling
 import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
@@ -111,7 +110,7 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
   const { requestNumber, requestId } = route.params;
   const { t } = useTranslation();
 
-  // Local state for form data
+
   const [formData, setFormData] = useState<LabourData>({
     isManageFamilyLabour: undefined,
     isFamilyHiredLabourEquipped: undefined,
@@ -129,7 +128,7 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
   const [isExistingData, setIsExistingData] = useState(false);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
 
-  // Load data from SQLite when component mounts
+ 
   useFocusEffect(
     useCallback(() => {
       const loadData = async () => {
@@ -140,9 +139,9 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
           const localData = await getLabourInfo(reqId);
 
           if (localData) {
-            console.log("✅ Loaded labour info from SQLite:", localData);
+            
 
-            // Ensure proper data types
+  
             const normalizedData: LabourData = {
               isManageFamilyLabour: localData.isManageFamilyLabour,
               isFamilyHiredLabourEquipped:
@@ -159,7 +158,7 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
             setFormData(normalizedData);
             setIsExistingData(true);
           } else {
-            console.log("📝 No local labour data - new entry");
+           
             setIsExistingData(false);
           }
           setIsDataLoaded(true);
@@ -173,25 +172,25 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
     }, [requestId]),
   );
 
-  // Auto-save to SQLite whenever formData changes (debounced)
+ 
   useEffect(() => {
-    if (!isDataLoaded) return; // Don't auto-save during initial load
+    if (!isDataLoaded) return; 
 
     const timer = setTimeout(async () => {
       if (requestId) {
         try {
           await saveLabourInfo(Number(requestId), formData);
-          console.log("💾 Auto-saved labour info to SQLite");
+          
         } catch (err) {
           console.error("Error auto-saving labour info:", err);
         }
       }
-    }, 500); // 500ms debounce
+    }, 500); 
 
     return () => clearTimeout(timer);
   }, [formData, requestId, isDataLoaded]);
 
-  // Validate form completion
+
   useEffect(() => {
     const hasBaseAnswer =
       formData.isManageFamilyLabour === "Yes" ||
@@ -240,18 +239,18 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
     );
   }, [formData, errors]);
 
-  // Update form data
+
   const updateFormData = (updates: Partial<LabourData>) => {
     setFormData((prev) => ({ ...prev, ...updates }));
   };
 
-  // Handle Yes/No field changes
+
   const handleyesNOFieldChange = (key: string, value: "Yes" | "No") => {
     let updates: Partial<LabourData> = {
       [key]: value,
     };
 
-    // Clear conditional fields when base answer changes
+    
     if (key === "isManageFamilyLabour") {
       updates = {
         ...updates,
@@ -263,7 +262,7 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
     updateFormData(updates);
   };
 
-  // Save to backend
+  
   const saveToBackend = async (
     reqId: number,
     tableName: string,
@@ -271,10 +270,7 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
     isUpdate: boolean,
   ): Promise<boolean> => {
     try {
-      console.log(
-        `💾 Saving to backend (${isUpdate ? "UPDATE" : "INSERT"}):`,
-        tableName,
-      );
+     
 
       const yesNoToInt = (val: any) =>
         val === "Yes" ? "1" : val === "No" ? "0" : null;
@@ -284,14 +280,14 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
         tableName,
       };
 
-      // Base question
+      
       if (data.isManageFamilyLabour !== undefined) {
         transformedData.isManageFamilyLabour = yesNoToInt(
           data.isManageFamilyLabour,
         );
       }
 
-      // Conditional fields based on isManageFamilyLabour
+  
       if (data.isManageFamilyLabour === "Yes") {
         if (data.isFamilyHiredLabourEquipped !== undefined) {
           transformedData.isFamilyHiredLabourEquipped = yesNoToInt(
@@ -308,7 +304,6 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
         transformedData.isFamilyHiredLabourEquipped = null;
       }
 
-      // Other fields
       if (data.areThereMechanizationOptions !== undefined) {
         transformedData.areThereMechanizationOptions = yesNoToInt(
           data.areThereMechanizationOptions,
@@ -341,29 +336,27 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
       );
 
       if (response.data.success) {
-        console.log(`✅ ${tableName} ${response.data.operation}d successfully`);
+      
         return true;
       }
 
       return false;
     } catch (error: any) {
-      console.error(`❌ Error saving ${tableName}:`, error);
+      console.error(` Error saving ${tableName}:`, error);
       return false;
     }
   };
 
-  // Handle next button
+ 
   const handleNext = async () => {
     const validationErrors: Record<string, string> = {};
 
-    // Validate required fields
     if (!formData.isManageFamilyLabour) {
       validationErrors.isManageFamilyLabour = t(
         "Error.Family labour field is required",
       );
     }
 
-    // Conditional validation
     if (
       formData.isManageFamilyLabour === "Yes" &&
       !formData.isFamilyHiredLabourEquipped
@@ -448,7 +441,7 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
       );
 
       if (saved) {
-        console.log("✅ Labour info saved successfully to backend");
+    
         setIsExistingData(true);
 
         Alert.alert(

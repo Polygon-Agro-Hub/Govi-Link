@@ -1,4 +1,3 @@
-// Economical.tsx - Fixed version with proper data handling
 import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
@@ -110,14 +109,11 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
   const route = useRoute<RouteProp<RootStackParamList, "Economical">>();
   const { requestNumber, requestId } = route.params;
   const { t } = useTranslation();
-
-  // Local state for form data
   const [formData, setFormData] = useState<EconomicalData>({
     isSuitaleSize: undefined,
     isFinanceResource: undefined,
     isAltRoutes: undefined,
   });
-
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [yesNoModalVisible, setYesNoModalVisible] = useState(false);
   const [activeYesNoField, setActiveYesNoField] = useState<string | null>(null);
@@ -125,7 +121,6 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
   const [isExistingData, setIsExistingData] = useState(false);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
 
-  // Load data from SQLite when component mounts
   useFocusEffect(
     useCallback(() => {
       const loadData = async () => {
@@ -136,9 +131,6 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
           const localData = await getEconomicalInfo(reqId);
 
           if (localData) {
-            console.log("✅ Loaded economical info from SQLite:", localData);
-
-            // Ensure proper data types
             const normalizedData: EconomicalData = {
               isSuitaleSize: localData.isSuitaleSize,
               isFinanceResource: localData.isFinanceResource,
@@ -148,7 +140,6 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
             setFormData(normalizedData);
             setIsExistingData(true);
           } else {
-            console.log("📝 No local economical data - new entry");
             setIsExistingData(false);
           }
           setIsDataLoaded(true);
@@ -162,25 +153,22 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
     }, [requestId]),
   );
 
-  // Auto-save to SQLite whenever formData changes (debounced)
   useEffect(() => {
-    if (!isDataLoaded) return; // Don't auto-save during initial load
+    if (!isDataLoaded) return;
 
     const timer = setTimeout(async () => {
       if (requestId) {
         try {
           await saveEconomicalInfo(Number(requestId), formData);
-          console.log("💾 Auto-saved economical info to SQLite");
         } catch (err) {
           console.error("Error auto-saving economical info:", err);
         }
       }
-    }, 500); // 500ms debounce
+    }, 500);
 
     return () => clearTimeout(timer);
   }, [formData, requestId, isDataLoaded]);
 
-  // Validate form completion
   useEffect(() => {
     const isSuitaleSizeValid =
       formData.isSuitaleSize === "Yes" || formData.isSuitaleSize === "No";
@@ -202,17 +190,14 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
     );
   }, [formData, errors]);
 
-  // Update form data
   const updateFormData = (updates: Partial<EconomicalData>) => {
     setFormData((prev) => ({ ...prev, ...updates }));
   };
 
-  // Handle Yes/No field changes
   const handleyesNOFieldChange = (key: string, value: "Yes" | "No") => {
     updateFormData({ [key]: value } as any);
   };
 
-  // Save to backend
   const saveToBackend = async (
     reqId: number,
     tableName: string,
@@ -220,12 +205,6 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
     isUpdate: boolean,
   ): Promise<boolean> => {
     try {
-      console.log(
-        `💾 Saving to backend (${isUpdate ? "UPDATE" : "INSERT"}):`,
-        tableName,
-      );
-
-      // Yes/No fields
       const yesNoToInt = (val: any) =>
         val === "Yes" ? "1" : val === "No" ? "0" : null;
 
@@ -244,8 +223,6 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
         transformedData.isAltRoutes = yesNoToInt(data.isAltRoutes);
       }
 
-      console.log(`📦 Transformed data:`, transformedData);
-
       const response = await axios.post(
         `${environment.API_BASE_URL}api/capital-request/inspection/save`,
         transformedData,
@@ -257,23 +234,20 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
       );
 
       if (response.data.success) {
-        console.log(`✅ ${tableName} ${response.data.operation}d successfully`);
         return true;
       } else {
-        console.error(`❌ ${tableName} save failed:`, response.data.message);
+        console.error(` ${tableName} save failed:`, response.data.message);
         return false;
       }
     } catch (error: any) {
-      console.error(`❌ Error saving ${tableName}:`, error);
+      console.error(` Error saving ${tableName}:`, error);
       return false;
     }
   };
 
-  // Handle next button
   const handleNext = async () => {
     const validationErrors: Record<string, string> = {};
 
-    // Validate required fields
     if (!formData.isSuitaleSize) {
       validationErrors.isSuitaleSize = t(
         "Error.Suitable size field is required",
@@ -299,9 +273,8 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
       return;
     }
 
-    // Validate requestId exists
     if (!requestId) {
-      console.error("❌ requestId is missing!");
+      console.error(" requestId is missing!");
       Alert.alert(
         t("Error.Error"),
         "Request ID is missing. Please go back and try again.",
@@ -313,7 +286,7 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
     const reqId = Number(requestId);
 
     if (isNaN(reqId) || reqId <= 0) {
-      console.error("❌ Invalid requestId:", requestId);
+      console.error(" Invalid requestId:", requestId);
       Alert.alert(
         t("Error.Error"),
         "Invalid request ID. Please go back and try again.",
@@ -321,8 +294,6 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
       );
       return;
     }
-
-    console.log("✅ Using requestId:", reqId);
 
     Alert.alert(
       t("InspectionForm.Saving"),
@@ -340,7 +311,6 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
       );
 
       if (saved) {
-        console.log("✅ Economical info saved successfully to backend");
         setIsExistingData(true);
 
         Alert.alert(
@@ -359,7 +329,6 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
           ],
         );
       } else {
-        console.log("⚠️ Backend save failed, but continuing with local data");
         Alert.alert(
           t("Main.Warning"),
           t("InspectionForm.Could not save to server. Data saved locally."),
@@ -404,7 +373,6 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
       <View className="flex-1 bg-[#F3F3F3] ">
         <StatusBar barStyle="dark-content" />
 
-        {/* Tabs */}
         <FormTabs
           activeKey="Economical"
           navigation={navigation}

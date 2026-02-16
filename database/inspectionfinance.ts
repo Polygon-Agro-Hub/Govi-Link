@@ -2,7 +2,6 @@ import * as SQLite from "expo-sqlite";
 
 const db = SQLite.openDatabaseSync("inspection.db");
 
-// Initialize finance table
 export const initFinanceTable = () => {
   try {
     db.execSync(
@@ -23,9 +22,9 @@ export const initFinanceTable = () => {
         updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
       );`,
     );
-    console.log("✅ Finance table created/verified");
+    console.log("Finance table created/verified");
   } catch (error) {
-    console.error("❌ Error initializing finance table:", error);
+    console.error("Error initializing finance table:", error);
     throw error;
   }
 };
@@ -45,19 +44,16 @@ export interface FinanceInfo {
   assetsFarmTool: string;
 }
 
-// Save or update finance info
 export const saveFinanceInfo = (
   requestId: number,
   data: Partial<FinanceInfo>,
 ): void => {
   try {
-    // Check if record exists
     const existing = db.getFirstSync<{ requestId: number }>(
       "SELECT requestId FROM inspectionfinance WHERE requestId = ?",
       [requestId],
     );
 
-    // Transform arrays to JSON strings
     const dbData: any = { ...data };
     if (data.assetsLand) dbData.assetsLand = JSON.stringify(data.assetsLand);
     if (data.assetsBuilding)
@@ -71,7 +67,6 @@ export const saveFinanceInfo = (
     delete dbData.confirmAccountNumber;
 
     if (existing) {
-      // UPDATE
       const fields = Object.keys(dbData)
         .map((key) => `${key} = ?`)
         .join(", ");
@@ -85,9 +80,8 @@ export const saveFinanceInfo = (
         `UPDATE inspectionfinance SET ${fields}, updatedAt = ? WHERE requestId = ?`,
         values as SQLite.SQLiteBindParams,
       );
-      console.log("✅ Finance info updated in SQLite");
+      console.log("Finance info updated in SQLite");
     } else {
-      // INSERT
       const fields = [
         "requestId",
         ...Object.keys(dbData),
@@ -108,15 +102,14 @@ export const saveFinanceInfo = (
         `INSERT INTO inspectionfinance (${fields}) VALUES (${placeholders})`,
         values as SQLite.SQLiteBindParams,
       );
-      console.log("✅ Finance info inserted into SQLite");
+      console.log("Finance info inserted into SQLite");
     }
   } catch (error) {
-    console.error("❌ Error saving finance info:", error);
+    console.error("Error saving finance info:", error);
     throw error;
   }
 };
 
-// Get finance info
 export const getFinanceInfo = (requestId: number): FinanceInfo | null => {
   try {
     const row = db.getFirstSync<any>(
@@ -125,9 +118,6 @@ export const getFinanceInfo = (requestId: number): FinanceInfo | null => {
     );
 
     if (row) {
-      console.log("✅ Finance info loaded from SQLite");
-
-      // Parse JSON strings back to arrays
       const parseJson = (field: string | null): string[] => {
         if (!field) return [];
         try {
@@ -153,28 +143,24 @@ export const getFinanceInfo = (requestId: number): FinanceInfo | null => {
       };
     }
 
-    console.log("📭 No finance info found in SQLite");
     return null;
   } catch (error) {
-    console.error("❌ Error fetching finance info:", error);
+    console.error("Error fetching finance info:", error);
     return null;
   }
 };
 
-// Clear finance info for a specific request
 export const clearFinanceInfo = (requestId: number): void => {
   try {
     db.runSync("DELETE FROM inspectionfinance WHERE requestId = ?", [
       requestId,
     ] as SQLite.SQLiteBindParams);
-    console.log("🗑️ Cleared finance info for request:", requestId);
   } catch (error) {
-    console.error("❌ Error clearing finance info:", error);
+    console.error(" Error clearing finance info:", error);
     throw error;
   }
 };
 
-// Get all finance records
 export const getAllFinanceInfo = () => {
   try {
     const rows = db.getAllSync<any>(
@@ -182,7 +168,7 @@ export const getAllFinanceInfo = () => {
     );
     return rows;
   } catch (error) {
-    console.error("❌ Error fetching all finance info:", error);
+    console.error(" Error fetching all finance info:", error);
     return [];
   }
 };

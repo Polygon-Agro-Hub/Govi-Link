@@ -14,7 +14,7 @@ export type RootStackParamList = {
   FieldOfficerDashboard: undefined;
   Profile: undefined;
   AddComplaint: undefined;
-  ViewAllVisits: undefined;
+  ViewAllVisits: { officerId: string };
   ComplainHistory: undefined;
   AssignJobs: undefined;
   CapitalRequests: undefined;
@@ -36,6 +36,11 @@ export type RootStackParamList = {
     jobId?: string;
     farmerMobile?: number;
     screenName: any;
+  };
+  CapitalRequstQRScanner: {
+    requestNumber: string;
+    requestId: number;
+    farmerId: number;
   };
   CertificateQuesanory: {
     jobId?: string;

@@ -3,7 +3,6 @@ import {
   View,
   Text,
   TouchableOpacity,
-  Platform,
   StatusBar,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";

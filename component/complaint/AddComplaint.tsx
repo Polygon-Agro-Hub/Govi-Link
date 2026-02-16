@@ -27,7 +27,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import CustomHeader from "../common/CustomHeader";
 import GlobalSearchModal from "../common/GlobalSearchModal";
 import { useModal } from "@/hooks/useModal";
-import { AntDesign, MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 
 type AddComplaintScreenNavigationProp = StackNavigationProp<
@@ -48,10 +48,8 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
   const [loading, setLoading] = useState(false);
   const { t } = useTranslation();
 
-  // Use modal hook for category selection
   const categoryModal = useModal();
 
-  // Clear form when screen comes into focus
   useFocusEffect(
     React.useCallback(() => {
       resetForm();
@@ -59,20 +57,17 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
     }, []),
   );
 
-  // Reset form function
   const resetForm = () => {
     setSelectedCategory("");
     setComplaintText("");
     categoryModal.hide();
   };
 
-  // Handle back button press
   const handleBackPress = () => {
     resetForm();
     navigation.goBack();
   };
 
-  // Fetch complaint categories from API
   useEffect(() => {
     const fetchComplainCategory = async () => {
       try {
@@ -100,7 +95,7 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
 
   const handleSubmit = async () => {
     Keyboard.dismiss();
-    // Check if both fields are empty
+
     if (!selectedCategory && !complaintText.trim()) {
       Alert.alert(
         t("Error.error"),
@@ -110,7 +105,6 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
       return;
     }
 
-    // Check if category is not selected but complaint is entered
     if (!selectedCategory && complaintText.trim()) {
       Alert.alert(
         t("Error.error"),
@@ -120,7 +114,6 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
       return;
     }
 
-    // Check if category is selected but complaint is empty
     if (selectedCategory && !complaintText.trim()) {
       Alert.alert(
         t("Error.error"),
@@ -185,14 +178,12 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
     }
   };
 
-  // Handle category selection from modal
   const handleCategorySelect = (selectedValues: string[]) => {
     if (selectedValues.length > 0) {
       setSelectedCategory(selectedValues[0]);
     }
   };
 
-  // Get selected category label
   const getSelectedLabel = () => {
     const selected = category.find((item) => item.value === selectedCategory);
     return selected
@@ -234,7 +225,6 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
             </Text>
           </View>
 
-          {/* Custom Dropdown Trigger using GlobalSearchModal */}
           <TouchableOpacity
             onPress={categoryModal.show}
             className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-full px-5 flex-row items-center justify-between"
@@ -312,7 +302,6 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
         </View>
       </ScrollView>
 
-      {/* GlobalSearchModal for Category Selection */}
       <GlobalSearchModal
         visible={categoryModal.isVisible}
         onClose={categoryModal.hide}

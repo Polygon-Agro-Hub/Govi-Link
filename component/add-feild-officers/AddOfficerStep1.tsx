@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -49,8 +49,6 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
   const route = useRoute<AddOfficerStep1RouteProp>();
   const { isnew } = route.params;
   const { t } = useTranslation();
-
-  // Modal hooks
   const districtModal = useModal();
   const countryCodeModal1 = useModal();
   const countryCodeModal2 = useModal();
@@ -74,24 +72,20 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
   const [email, setEmail] = useState("");
   const [profileImage, setProfileImage] = useState<string | null>(null);
 
-  // Validation states
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [isValidating, setIsValidating] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // District dropdown states - MULTI SELECT
   const [selectedDistricts, setSelectedDistricts] = useState<string[]>([]);
   const [cfoDistricts, setCfoDistricts] = useState<string[]>([]);
 
-  // Country code dropdown states
   const [selectedCountryCode1, setSelectedCountryCode1] = useState("+94");
   const [selectedCountryCode2, setSelectedCountryCode2] = useState("+94");
   const [currentCountryCodeModal, setCurrentCountryCodeModal] = useState<
     "phone1" | "phone2"
   >("phone1");
 
-  // Sri Lanka districts with translations
   const districts = [
     { en: "Ampara", si: "අම්පාර", ta: "அம்பாறை" },
     { en: "Anuradhapura", si: "අනුරාධපුර", ta: "அனுராதபுரம்" },
@@ -123,7 +117,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
   useFocusEffect(
     useCallback(() => {
       fetchCFOdistricts();
-      console.log("focus effect step 1", isnew);
+
       if (isnew === true) {
         setFirstNameEN("");
         setLastNameEN("");
@@ -182,7 +176,6 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     return districts.filter((d) => cfoDistricts.includes(d.en));
   };
 
-  // Prepare districts data for GlobalSearchModal
   const getDistrictsData = () => {
     const availableDistricts = getFilteredCFODistricts();
     return availableDistricts.map((district) => ({
@@ -192,7 +185,6 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     }));
   };
 
-  // Prepare country data for GlobalSearchModal
   const getCountryData = () => {
     return countryData.map((country) => ({
       label: getTranslatedCountry(country),
@@ -201,12 +193,10 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     }));
   };
 
-  // Mark field as touched
   const markFieldAsTouched = (fieldName: string) => {
     setTouched((prev) => ({ ...prev, [fieldName]: true }));
   };
 
-  // Clear specific field error
   const clearFieldError = (fieldName: string) => {
     setErrors((prev) => {
       const newErrors = { ...prev };
@@ -236,7 +226,6 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     return true;
   };
 
-  // Validation functions
   const validateEmail = (email: string): boolean => {
     const generalEmailRegex =
       /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -716,12 +705,10 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     }));
   };
 
-  // Get current language
   const getCurrentLanguage = () => {
     return i18n.language || "en";
   };
 
-  // Get translated district name
   const getTranslatedDistrict = (district: {
     en: string;
     si: string;
@@ -731,7 +718,6 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     return district[lang as keyof typeof district] || district.en;
   };
 
-  // Get translated country name
   const getTranslatedCountry = (country: {
     name: { en: string; si: string; ta: string };
   }) => {
@@ -739,12 +725,10 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     return country.name[lang as keyof typeof country.name] || country.name.en;
   };
 
-  // Handle district selection from modal
   const handleDistrictSelect = (selectedValues: string[]) => {
     setSelectedDistricts(selectedValues);
     districtModal.hide();
 
-    // Validate after selection
     markFieldAsTouched("districts");
     if (selectedValues.length === 0) {
       setErrors((prev) => ({
@@ -756,7 +740,6 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     }
   };
 
-  // Handle country code selection
   const handleCountryCodeSelect = (selectedValues: string[]) => {
     if (selectedValues.length > 0) {
       const selectedCode = selectedValues[0];
@@ -770,7 +753,6 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     }
   };
 
-  // Open country code modal
   const openCountryCodeModal = (phoneType: "phone1" | "phone2") => {
     setCurrentCountryCodeModal(phoneType);
     if (phoneType === "phone1") {
@@ -780,7 +762,6 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     }
   };
 
-  // Get display text for districts
   const getDistrictDisplayText = () => {
     if (selectedDistricts.length === 0) {
       return t("AddOfficer.AssignedDistrict");
@@ -812,7 +793,6 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     }
   };
 
-  // Custom render item for district selection with checkbox
   const renderDistrictItem = (item: any, isSelected: boolean) => (
     <TouchableOpacity
       className="px-4 py-3 border-b border-gray-200 flex-row justify-between items-center"
@@ -827,7 +807,6 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     </TouchableOpacity>
   );
 
-  // Custom render item for country code selection
   const renderCountryCodeItem = (item: any, isSelected: boolean) => (
     <TouchableOpacity
       className="px-4 py-3 border-b border-gray-200 flex-row items-center"
@@ -844,7 +823,6 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     </TouchableOpacity>
   );
 
-  // Validate all fields before proceeding
   const validateStep1 = () => {
     const newErrors: Record<string, string> = {};
 
@@ -883,7 +861,6 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     return newErrors;
   };
 
-  // Clear all form data function
   const clearFormData = () => {
     setType("Permanent");
     setLanguages({
@@ -909,7 +886,6 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     setTouched({});
   };
 
-  // Updated cancel button handler
   const handleCancel = () => {
     clearFormData();
     navigation.navigate("ManageOfficers");
@@ -1025,7 +1001,6 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        {/* Profile Picture */}
         <View className="items-center mt-6">
           <TouchableOpacity onPress={pickProfileImage}>
             <View className="relative">
@@ -1047,7 +1022,6 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
           </TouchableOpacity>
         </View>
 
-        {/* Type */}
         <View className="p-2">
           <View className="px-2 mt-6 items-center ">
             <View className="flex flex-row items-center space-x-2 justify-between">
@@ -1088,7 +1062,6 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
 
           <View className="border border-[#ADADAD] border-b-0 mt-4"></View>
 
-          {/* Preferred Languages */}
           <View className="px-6 mt-4">
             <Text className="text-base font-medium mb-4">
               {t("AddOfficer.PreferredLanguages")}:
@@ -1120,7 +1093,6 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
 
           {/* Form Fields */}
           <View className="px-2 mt-4 space-y-4">
-            {/* District Dropdown - MULTI SELECT */}
             <View>
               <TouchableOpacity
                 className={`bg-[#F4F4F4] rounded-2xl px-4 py-3 flex-row justify-between items-center ${
@@ -1288,7 +1260,6 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
             {/* Phone Numbers */}
             <View>
               <View className="flex-row space-x-2">
-                {/* Phone 1 Country Code */}
                 <TouchableOpacity
                   className="bg-[#F4F4F4] rounded-2xl px-4 py-4 w-20 flex-row justify-between items-center"
                   onPress={() => openCountryCodeModal("phone1")}
@@ -1327,7 +1298,6 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
 
             <View>
               <View className="flex-row space-x-2">
-                {/* Phone 2 Country Code */}
                 <TouchableOpacity
                   className="bg-[#F4F4F4] rounded-2xl px-4 py-4 w-20 flex-row justify-between items-center"
                   onPress={() => openCountryCodeModal("phone2")}
@@ -1429,7 +1399,6 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
         </View>
       </ScrollView>
 
-      {/* District Selection Modal using GlobalSearchModal */}
       <GlobalSearchModal
         visible={districtModal.isVisible}
         onClose={districtModal.hide}
@@ -1445,7 +1414,6 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
         searchKeys={["label", "en", "si", "ta"]}
       />
 
-      {/* Country Code Selection Modal 1 using GlobalSearchModal */}
       <GlobalSearchModal
         visible={countryCodeModal1.isVisible}
         onClose={countryCodeModal1.hide}
@@ -1461,7 +1429,6 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
         searchKeys={["label", "value", "name.en", "name.si", "name.ta"]}
       />
 
-      {/* Country Code Selection Modal 2 using GlobalSearchModal */}
       <GlobalSearchModal
         visible={countryCodeModal2.isVisible}
         onClose={countryCodeModal2.hide}

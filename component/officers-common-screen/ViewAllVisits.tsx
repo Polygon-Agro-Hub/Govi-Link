@@ -23,14 +23,18 @@ import axios from "axios";
 import { environment } from "@/environment/environment";
 import { Ionicons, FontAwesome6 } from "@expo/vector-icons";
 import LottieView from "lottie-react-native";
+import { RouteProp } from "@react-navigation/native";
 
 type ViewAllVisitsNavigationProps = StackNavigationProp<
   RootStackParamList,
   "ViewAllVisits"
 >;
 
+type ViewAllVisitsRouteProp = RouteProp<RootStackParamList, "ViewAllVisits">;
+
 interface ViewAllVisitsProps {
   navigation: ViewAllVisitsNavigationProps;
+  route: ViewAllVisitsRouteProp;
 }
 
 interface VisitItem {
@@ -59,15 +63,14 @@ interface VisitItem {
   totalClusterCount?: number;
 }
 
-const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation }) => {
+const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
   const { t, i18n } = useTranslation();
+  const officerId = route.params?.officerId ?? "";
 
   const today = dayjs();
-  const currentDay = today.date(); // 31
-  console.log("Today date:", currentDay);
+  const currentDay = today.date();
 
   const [selectedDate, setSelectedDate] = useState(dayjs());
-  // const [selectedMonth] = useState(today.format("MMMM, YYYY"));
   const monthNames: Record<string, string[]> = {
     en: [
       "January",
@@ -126,9 +129,9 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation }) => {
   const filteredVisits = visits.filter((v) => {
     const visitDate = dayjs(v.sheduleDate);
     if (isOverdueSelected) {
-      return visitDate.isBefore(today, "day"); // all overdue visits
+      return visitDate.isBefore(today, "day");
     } else {
-      return visitDate.isSame(selectedDate, "day"); // selected date visits
+      return visitDate.isSame(selectedDate, "day");
     }
   });
   const [showPopup, setShowPopup] = useState(false);
@@ -136,11 +139,7 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation }) => {
 
   const scrollRef = React.useRef<ScrollView>(null);
 
-  const ITEM_WIDTH = 0; // width + margin of each date item, adjust if neede
-
   const translateY = useRef(new Animated.Value(0)).current;
-  const currentTranslateY = useRef(0);
-  console.log(translateY);
 
   const panResponder = useRef(
     PanResponder.create({
@@ -153,20 +152,17 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation }) => {
 
       onPanResponderRelease: (_, g) => {
         if (g.dy > 120) {
-          console.log("hit1");
           setShowPopup(false);
           Animated.timing(translateY, {
             toValue: 600,
             duration: 100,
             useNativeDriver: true,
           }).start(() => {
-            console.log("hit3");
             translateY.setValue(0);
             setShowPopup(false);
             setSelectedItem(null);
           });
         } else {
-          console.log("hit4");
           Animated.spring(translateY, {
             toValue: 0,
             useNativeDriver: true,
@@ -184,12 +180,12 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation }) => {
 
   useFocusEffect(
     useCallback(() => {
-      setSelectedDate(today); // ensure current date is selected
+      setSelectedDate(today);
       setIsOverdueSelected(false);
       setTimeout(() => {
         if (scrollRef.current) {
           scrollRef.current.scrollTo({
-            x: 0, // today is first in array, so no offset needed
+            x: 0,
             animated: true,
           });
         }
@@ -201,12 +197,6 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation }) => {
   }, [selectedDate, isOverdueSelected]);
 
   const fetchVisits = async () => {
-    console.log(
-      "Fetching visits for date:",
-      selectedDate.format("YYYY-MM-DD"),
-      "Overdue:",
-      isOverdueSelected,
-    );
     setLoading(true);
     try {
       const token = await AsyncStorage.getItem("token");
@@ -219,7 +209,6 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation }) => {
           },
         );
         setVisits(response.data.data);
-        console.log("VISIT:", response.data.data);
       }
     } catch (error) {
       console.error("Failed to fetch officer visits:", error);
@@ -228,7 +217,6 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation }) => {
     }
   };
 
-  // Count pending and ongoing visits
   const pendingCount = filteredVisits.filter((item) => {
     if (item.propose === "Cluster" && item.totalClusterCount) {
       return (
@@ -260,38 +248,31 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation }) => {
     );
   };
 
-  const updateStatus = async (feildauditId: number, jobId: any) => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-
-      if (token) {
-        const response = await axios.post(
-          `${environment.API_BASE_URL}api/cluster-audit/status/onGoing/${feildauditId}`,
-          { jobId }, // Empty body
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
-        );
-        console.log("Status updated:", response.data);
-        // Optionally refresh the visits data after updating
-        await fetchVisits();
-      }
-    } catch (error) {
-      console.error("Failed to update status:", error);
-    }
-  };
+  const shouldShowBackButton =
+    officerId && officerId.toString().startsWith("FIO");
 
   return (
     <View className="flex-1 bg-[#F5F7FB] pt-4">
-      {/* Header */}
-      <Text className="text-lg font-semibold text-center m text-[#000]">
-        {selectedMonth}
-      </Text>
+      <View className="flex-row items-center justify-center px-4 mb-2">
+        {shouldShowBackButton && (
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            className="absolute left-4 bg-[#EAEAEA] rounded-full h-8 w-8 items-center justify-center"
+          >
+            <Ionicons name="chevron-back" size={24} color="#000" />
+          </TouchableOpacity>
+        )}
+        <View className="items-center">
+          <Text className="text-lg font-semibold text-[#000]">
+            {selectedMonth}
+          </Text>
+        </View>
+      </View>
       <View className="flex-row p-2 ml-4">
         <TouchableOpacity
           onPress={() => {
-            setIsOverdueSelected(true); // select overdue
-            setSelectedDate(dayjs()); // optional: reset date
+            setIsOverdueSelected(true);
+            setSelectedDate(dayjs());
           }}
         >
           <LinearGradient
@@ -323,7 +304,6 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation }) => {
           </LinearGradient>
         </TouchableOpacity>
 
-        {/* Horizontal Date Selector */}
         <ScrollView
           ref={scrollRef}
           horizontal
@@ -389,35 +369,42 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation }) => {
             [...filteredVisits]
               .sort((a, b) => {
                 const getStatusRank = (item: VisitItem) => {
-                  // ---------- CLUSTER LOGIC ----------
                   if (item.propose === "Cluster" && item.totalClusterCount) {
                     if (item.completedClusterCount === item.totalClusterCount) {
-                      return 4;
+                      return 5;
                     }
 
                     if (
                       item.completedClusterCount !== undefined &&
                       item.completedClusterCount > 0
                     ) {
-                      return item.completionPercentage < "20" ? 2 : 3;
+                      const completionPercentage = parseFloat(
+                        item.completionPercentage,
+                      );
+                      if (completionPercentage >= 10) {
+                        return 2;
+                      }
                     }
 
-                    return 1;
+                    return 3;
                   }
 
-                  // ---------- NON-CLUSTER LOGIC ----------
                   if (
                     item.status === "Completed" ||
                     item.status === "Finished"
                   ) {
-                    return 3; // bottom
+                    return 5;
                   }
 
-                  if (item.status === "Pending" || item.status === "Ongoing") {
-                    return 1; // top
+                  if (item.status === "Ongoing") {
+                    return 1;
                   }
 
-                  return 2; // middle
+                  if (item.status === "Pending") {
+                    return 3;
+                  }
+
+                  return 4;
                 };
 
                 return getStatusRank(a) - getStatusRank(b);
@@ -544,7 +531,7 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation }) => {
           ) : (
             <View className="flex-1 items-center justify-center mt-32">
               <LottieView
-                source={require("../assets/json/NoData.json")}
+                source={require("../../assets/json/NoData.json")}
                 style={{ width: 200, height: 200 }}
                 autoPlay
                 loop
@@ -711,7 +698,6 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation }) => {
                     selectedItem?.farmerId &&
                     selectedItem?.propose === "Individual"
                   ) {
-                    updateStatus(selectedItem.id, selectedItem.jobId);
                     navigation.navigate("QRScanner", {
                       farmerId: selectedItem.farmerId,
                       jobId: selectedItem.jobId,
@@ -725,8 +711,6 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation }) => {
                       screenName: "ViewAllVisits",
                     });
                   } else if (selectedItem?.propose === "Requested") {
-                    updateStatus(selectedItem.id, selectedItem.jobId);
-                    console.log("hitt Request");
                     navigation.navigate("QRScaneerRequstAudit", {
                       farmerId: selectedItem.farmerId,
                       govilinkjobid: selectedItem.id,

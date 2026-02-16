@@ -80,6 +80,7 @@
     "Unauthorized Access": "Unauthorized Access",
     "You are not authorized to access this system. Please use a valid Employee ID": "You are not authorized to access this system. Please use a valid Employee ID",
     "This EMP ID is not approved.": "This EMP ID is not approved.",
+    "This Employee ID is Rejected":"This Employee ID is Rejected",
     "Please Wait": "Please Wait",
     "Validating your information, please wait...": "Validating your information, please wait...",
     "firstName is required": "First name is required",

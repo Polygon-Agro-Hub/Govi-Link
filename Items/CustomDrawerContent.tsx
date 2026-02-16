@@ -21,7 +21,7 @@ import { useDispatch } from "react-redux";
 import { logoutUser } from "@/store/authSlice";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { DrawerNavigationProp } from "@react-navigation/drawer";
-import { useDrawerStatus } from '@react-navigation/drawer';
+import { useDrawerStatus } from "@react-navigation/drawer";
 
 import { RootStackParamList } from "@/component/types";
 interface ProfileData {
@@ -34,19 +34,20 @@ interface ProfileData {
   lastNameTamil: string;
   empId: string;
 }
-type CustomDrawerNavigationProp = NativeStackNavigationProp<RootStackParamList> & DrawerNavigationProp< RootStackParamList>;
-
+type CustomDrawerNavigationProp =
+  NativeStackNavigationProp<RootStackParamList> &
+    DrawerNavigationProp<RootStackParamList>;
 
 export default function CustomDrawerContent(props: any) {
   const { t } = useTranslation();
   const navigation = props.navigation;
-    const [profile, setProfile] = useState<ProfileData | null>(null);
+
   const [isLanguageDropdownOpen, setLanguageDropdownOpen] =
     useState<boolean>(false);
   const [selectedLanguage, setSelectedLanguage] = useState<string>("en");
-  console.log("se lng", selectedLanguage)
+
   const [selectedComplaint, setSelectedComplaint] = useState<string | null>(
-    null
+    null,
   );
   const [isComplaintDropdownOpen, setComplaintDropdownOpen] =
     useState<boolean>(false);
@@ -65,20 +66,18 @@ export default function CustomDrawerContent(props: any) {
         return `${userProfile.firstName} ${userProfile.lastName}`;
     }
   };
-  const isDrawerOpen = useDrawerStatus() === 'open';
-
-
+  const isDrawerOpen = useDrawerStatus() === "open";
 
   useEffect(() => {
     setLanguageDropdownOpen(false);
     setComplaintDropdownOpen(false);
   }, [isDrawerOpen]);
 
-     useFocusEffect(
+  useFocusEffect(
     React.useCallback(() => {
-            setComplaintDropdownOpen(false)
+      setComplaintDropdownOpen(false);
       setLanguageDropdownOpen(false);
-      console.log("Current language:", i18n.language);
+
       if (i18n.language === "en") {
         setSelectedLanguage("en");
       } else if (i18n.language === "si") {
@@ -86,7 +85,7 @@ export default function CustomDrawerContent(props: any) {
       } else if (i18n.language === "ta") {
         setSelectedLanguage("ta");
       }
-    }, [i18n.language]) 
+    }, [i18n.language]),
   );
 
   const getTextStyle = () => {
@@ -127,10 +126,11 @@ export default function CustomDrawerContent(props: any) {
   const handleLogout = async () => {
     try {
       await AsyncStorage.clear();
-    await new Promise((resolve) => {
-      dispatch(logoutUser());
-      setTimeout(resolve, 100); // small delay for Redux to finish
-    });      navigation.reset({
+      await new Promise((resolve) => {
+        dispatch(logoutUser());
+        setTimeout(resolve, 100);
+      });
+      navigation.reset({
         index: 0,
         routes: [{ name: "Login" }],
       });
@@ -180,7 +180,6 @@ export default function CustomDrawerContent(props: any) {
               />
             </TouchableOpacity>
 
-            {/* Then render dropdown AFTER the trigger */}
             {isLanguageDropdownOpen && (
               <View className="pl-8 bg-white  rounded-lg mt-2">
                 {["en", "si", "ta"].map((language) => {
@@ -188,10 +187,10 @@ export default function CustomDrawerContent(props: any) {
                     language === "si"
                       ? "සිංහල"
                       : language === "ta"
-                      ? "தமிழ்"
-                      : language === "en"
-                      ? "English"
-                      : language;
+                        ? "தமிழ்"
+                        : language === "en"
+                          ? "English"
+                          : language;
                   return (
                     <TouchableOpacity
                       key={language}
@@ -206,7 +205,7 @@ export default function CustomDrawerContent(props: any) {
                         className={`text-base ${
                           selectedLanguage === language
                             ? "text-black"
-                            : "text-[#434343]" // Fixed: Added "text-" prefix
+                            : "text-[#434343]"
                         }`}
                       >
                         {displayLanguage}
@@ -226,13 +225,14 @@ export default function CustomDrawerContent(props: any) {
               </View>
             )}
 
-            <TouchableOpacity className="flex-row items-center py-5"
-        onPress={() => {
-    navigation.navigate("MainTabs", { // the Drawer screen name
-  screen: "Profile",              // the Tab screen inside MainTabs
-});
-    navigation.closeDrawer(); // <-- closes the drawer after navigation
-  }}
+            <TouchableOpacity
+              className="flex-row items-center py-5"
+              onPress={() => {
+                navigation.navigate("MainTabs", {
+                  screen: "Profile",
+                });
+                navigation.closeDrawer();
+              }}
             >
               <View className="bg-[#F4F9FB] rounded-full p-1">
                 <FontAwesome6 name="user-large" size={18} color="#999999" />
@@ -249,7 +249,8 @@ export default function CustomDrawerContent(props: any) {
             <TouchableOpacity
               className="flex-row items-center py-5"
               onPress={() =>
-                navigation.navigate("ChangePassword", { passwordUpdate: 1 })}
+                navigation.navigate("ChangePassword", { passwordUpdate: 1 })
+              }
             >
               <View className="bg-[#F4F9FB] rounded-full p-1">
                 <Entypo name="lock" size={20} color="#999999" />
@@ -291,9 +292,9 @@ export default function CustomDrawerContent(props: any) {
                     }`}
                   >
                     <Text
-                    style={{
-                      fontSize:15
-                    }}
+                      style={{
+                        fontSize: 15,
+                      }}
                       className={` font-bold ${
                         selectedComplaint === complaint
                           ? "text-black"
@@ -319,9 +320,8 @@ export default function CustomDrawerContent(props: any) {
           className="flex-row items-center py-3"
           onPress={handleLogout}
         >
-                        <View className="bg-[#FFF2EE] rounded-full p-1">
-
-          <Ionicons name="log-out-outline" size={20} color="red" />
+          <View className="bg-[#FFF2EE] rounded-full p-1">
+            <Ionicons name="log-out-outline" size={20} color="red" />
           </View>
           <Text className="flex-1 text-lg ml-2 text-red-500">
             {t("Drawer.Logout")}

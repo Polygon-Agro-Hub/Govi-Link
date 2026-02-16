@@ -80,6 +80,7 @@
     "Unauthorized Access": "අනවසර ප්‍රවේශය",
     "You are not authorized to access this system. Please use a valid Employee ID": "ඔබ මෙම පද්ධතියට ප්‍රවේශ වීමට අවසර නොමැත. කරුණාකර වලංගු සේවක හැඳුනුම්පතක් භාවිතා කරන්න.",
     "This EMP ID is not approved.": "මෙම සේවක හැඳුනුම්පත අනුමත කර නොමැත.",
+    "This Employee ID is Rejected":"මෙම සේවක හැඳුනුම්පත ප්‍රතික්ෂේප කර ඇත.",
     "Please Wait": "කරුණාකර රැඳී සිටින්න",
     "Validating your information, please wait...": "ඔබගේ තොරතුරු තහවුරු කරන තෙක් රැඳී සිටින්න...",
     "firstName is required": "පළමු නම අවශ්‍යයි",

@@ -9,7 +9,6 @@ import {
   ImageBackground,
   KeyboardAvoidingView,
   Platform,
-  ActivityIndicator,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../types";
@@ -88,15 +87,15 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
     let lastName = formData.lastName || "";
 
     switch (i18n.language) {
-      case "si": // Sinhala
+      case "si":
         firstName = formData.firstNameSinhala || formData.firstName || "";
         lastName = formData.lastNameSinhala || formData.lastName || "";
         break;
-      case "ta": // Tamil
+      case "ta":
         firstName = formData.firstNameTamil || formData.firstName || "";
         lastName = formData.lastNameTamil || formData.lastName || "";
         break;
-      default: // English
+      default:
         firstName = formData.firstName || "";
         lastName = formData.lastName || "";
         break;
@@ -150,9 +149,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                 </TouchableOpacity>
               </View>
 
-              <View
-                className="bg-white rounded-t-3xl pt-4 mt-48"
-              >
+              <View className="bg-white rounded-t-3xl pt-4 mt-48">
                 <View className="items-center" style={{ marginTop: -hp(12) }}>
                   <TouchableOpacity className="relative">
                     {formData.image ? (
@@ -164,7 +161,10 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                           borderRadius: wp(35) / 2,
                         }}
                         onError={(e) =>
-                          console.log("Image load error:", e.nativeEvent.error)
+                          console.log(
+                            "Image load error Profile Screen:",
+                            e.nativeEvent.error,
+                          )
                         }
                         defaultSource={require("@/assets/images/auth/my-profile.webp")}
                       />
