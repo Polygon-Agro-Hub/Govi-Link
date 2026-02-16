@@ -110,7 +110,6 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
   const { requestNumber, requestId } = route.params;
   const { t } = useTranslation();
 
-
   const [formData, setFormData] = useState<LabourData>({
     isManageFamilyLabour: undefined,
     isFamilyHiredLabourEquipped: undefined,
@@ -128,7 +127,6 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
   const [isExistingData, setIsExistingData] = useState(false);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
 
- 
   useFocusEffect(
     useCallback(() => {
       const loadData = async () => {
@@ -139,9 +137,6 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
           const localData = await getLabourInfo(reqId);
 
           if (localData) {
-            
-
-  
             const normalizedData: LabourData = {
               isManageFamilyLabour: localData.isManageFamilyLabour,
               isFamilyHiredLabourEquipped:
@@ -158,7 +153,6 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
             setFormData(normalizedData);
             setIsExistingData(true);
           } else {
-           
             setIsExistingData(false);
           }
           setIsDataLoaded(true);
@@ -172,24 +166,21 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
     }, [requestId]),
   );
 
- 
   useEffect(() => {
-    if (!isDataLoaded) return; 
+    if (!isDataLoaded) return;
 
     const timer = setTimeout(async () => {
       if (requestId) {
         try {
           await saveLabourInfo(Number(requestId), formData);
-          
         } catch (err) {
           console.error("Error auto-saving labour info:", err);
         }
       }
-    }, 500); 
+    }, 500);
 
     return () => clearTimeout(timer);
   }, [formData, requestId, isDataLoaded]);
-
 
   useEffect(() => {
     const hasBaseAnswer =
@@ -239,18 +230,15 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
     );
   }, [formData, errors]);
 
-
   const updateFormData = (updates: Partial<LabourData>) => {
     setFormData((prev) => ({ ...prev, ...updates }));
   };
-
 
   const handleyesNOFieldChange = (key: string, value: "Yes" | "No") => {
     let updates: Partial<LabourData> = {
       [key]: value,
     };
 
-    
     if (key === "isManageFamilyLabour") {
       updates = {
         ...updates,
@@ -262,7 +250,6 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
     updateFormData(updates);
   };
 
-  
   const saveToBackend = async (
     reqId: number,
     tableName: string,
@@ -270,8 +257,6 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
     isUpdate: boolean,
   ): Promise<boolean> => {
     try {
-     
-
       const yesNoToInt = (val: any) =>
         val === "Yes" ? "1" : val === "No" ? "0" : null;
 
@@ -280,14 +265,12 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
         tableName,
       };
 
-      
       if (data.isManageFamilyLabour !== undefined) {
         transformedData.isManageFamilyLabour = yesNoToInt(
           data.isManageFamilyLabour,
         );
       }
 
-  
       if (data.isManageFamilyLabour === "Yes") {
         if (data.isFamilyHiredLabourEquipped !== undefined) {
           transformedData.isFamilyHiredLabourEquipped = yesNoToInt(
@@ -336,7 +319,6 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
       );
 
       if (response.data.success) {
-      
         return true;
       }
 
@@ -347,7 +329,6 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
     }
   };
 
- 
   const handleNext = async () => {
     const validationErrors: Record<string, string> = {};
 
@@ -441,7 +422,6 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
       );
 
       if (saved) {
-    
         setIsExistingData(true);
 
         Alert.alert(
@@ -496,6 +476,32 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
     }
   };
 
+  // Handle tab navigation
+  const handleTabPress = (tabKey: string) => {
+    // Map tab keys to navigation routes
+    const routeMap: Record<string, string> = {
+      "Personal Info": "PersonalInfo",
+      "ID Proof": "IDProof",
+      "Finance Info": "FinanceInfo",
+      "Land Info": "LandInfo",
+      "Investment Info": "InvestmentInfo",
+      "Cultivation Info": "CultivationInfo",
+      "Cropping Systems": "CroppingSystems",
+      "Profit & Risk": "ProfitRisk",
+      "Economical": "Economical",
+      "Labour": "Labour",
+      "Harvest Storage": "HarvestStorage",
+    };
+
+    const route = routeMap[tabKey];
+    if (route) {
+      navigation.navigate(route, {
+        requestId,
+        requestNumber,
+      });
+    }
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -507,27 +513,8 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
         <FormTabs
           activeKey="Labour"
           navigation={navigation}
-          onTabPress={(key) => {
-            const routesMap: Record<string, string> = {
-              "Personal Info": "PersonalInfo",
-              "ID Proof": "IDProof",
-              "Finance Info": "FinanceInfo",
-              "Land Info": "LandInfo",
-              "Investment Info": "InvestmentInfo",
-              "Cultivation Info": "CultivationInfo",
-              "Cropping Systems": "CroppingSystems",
-              "Profit & Risk": "ProfitRisk",
-              Economical: "Economical",
-            };
-
-            const route = routesMap[key];
-            if (route) {
-              navigation.navigate(route, {
-                requestId,
-                requestNumber,
-              });
-            }
-          }}
+          requestId={requestId}
+          onTabPress={handleTabPress}
         />
 
         <ScrollView

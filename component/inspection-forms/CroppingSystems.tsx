@@ -452,6 +452,32 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
     }
   };
 
+  // Handle tab navigation
+  const handleTabPress = (tabKey: string) => {
+    // Map tab keys to navigation routes
+    const routeMap: Record<string, string> = {
+      "Personal Info": "PersonalInfo",
+      "ID Proof": "IDProof",
+      "Finance Info": "FinanceInfo",
+      "Land Info": "LandInfo",
+      "Investment Info": "InvestmentInfo",
+      "Cultivation Info": "CultivationInfo",
+      "Cropping Systems": "CroppingSystems",
+      "Profit & Risk": "ProfitRisk",
+      "Economical": "Economical",
+      "Labour": "Labour",
+      "Harvest Storage": "HarvestStorage",
+    };
+
+    const route = routeMap[tabKey];
+    if (route) {
+      navigation.navigate(route, {
+        requestId,
+        requestNumber,
+      });
+    }
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -464,24 +490,8 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
         <FormTabs
           activeKey="Cropping Systems"
           navigation={navigation}
-          onTabPress={(key) => {
-            const routesMap: Record<string, string> = {
-              "Personal Info": "PersonalInfo",
-              "ID Proof": "IDProof",
-              "Finance Info": "FinanceInfo",
-              "Land Info": "LandInfo",
-              "Investment Info": "InvestmentInfo",
-              "Cultivation Info": "CultivationInfo",
-            };
-
-            const route = routesMap[key];
-            if (route) {
-              navigation.navigate(route, {
-                requestId,
-                requestNumber,
-              });
-            }
-          }}
+          requestId={requestId}
+          onTabPress={handleTabPress}
         />
 
         <ScrollView

@@ -720,6 +720,32 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
     });
   };
 
+  // Handle tab navigation
+  const handleTabPress = (tabKey: string) => {
+    // Map tab keys to navigation routes
+    const routeMap: Record<string, string> = {
+      "Personal Info": "PersonalInfo",
+      "ID Proof": "IDProof",
+      "Finance Info": "FinanceInfo",
+      "Land Info": "LandInfo",
+      "Investment Info": "InvestmentInfo",
+      "Cultivation Info": "CultivationInfo",
+      "Cropping Systems": "CroppingSystems",
+      "Profit & Risk": "ProfitRisk",
+      "Economical": "Economical",
+      "Labour": "Labour",
+      "Harvest Storage": "HarvestStorage",
+    };
+
+    const route = routeMap[tabKey];
+    if (route) {
+      navigation.navigate(route, {
+        requestId,
+        requestNumber,
+      });
+    }
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -727,7 +753,12 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
     >
       <View className="flex-1 bg-[#F3F3F3]">
         <StatusBar barStyle="dark-content" />
-        <FormTabs activeKey="Personal Info" navigation={navigation} />
+        <FormTabs
+          activeKey="Personal Info"
+          navigation={navigation}
+          requestId={requestId}
+          onTabPress={handleTabPress}
+        />
 
         <ScrollView
           className="flex-1 px-6 bg-white rounded-t-3xl"

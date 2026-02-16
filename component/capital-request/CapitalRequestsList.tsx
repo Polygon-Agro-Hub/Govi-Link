@@ -108,6 +108,7 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
       );
 
       const apiRequests = response.data.requests;
+
       setRequests(apiRequests);
     } catch (error: any) {
       console.error("Failed to fetch capital requests:", error);
@@ -185,7 +186,7 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 20 }}
+        contentContainerStyle={{ paddingBottom: 70 }}
       >
         <View className="px-6 py-4 space-y-5">
           {requests.length === 0 ? (
