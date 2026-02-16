@@ -920,7 +920,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
           <View className="mt-2">
             <Text className="text-sm text-[#070707] mb-2">
               {t("InspectionForm.Overall soil fertility")}{" "}
-              <Text className="text-red-500">*</Text>
+              <Text className="text-black-500">*</Text>
             </Text>
 
             <TouchableOpacity
@@ -949,7 +949,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
           <View className="mt-2">
             <Text className="text-sm text-[#070707] mb-4">
               {t("InspectionForm.Water sources")}{" "}
-              <Text className="text-red-500">*</Text>
+              <Text className="text-black-500">*</Text>
             </Text>
 
             {["Tanks", "Wells", "River", "Dams", "Other"].map((option) => {
@@ -989,7 +989,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
           <View className="mb-2 mt-4">
             <Text className="text-sm text-[#070707] mb-2">
               {t("InspectionForm.Images of the water source")}{" "}
-              <Text className="text-red-500">*</Text>
+              <Text className="text-black-500">*</Text>
             </Text>
             <TouchableOpacity
               className="bg-[#1A1A1A] rounded-3xl px-6 py-4 flex-row justify-center items-center"

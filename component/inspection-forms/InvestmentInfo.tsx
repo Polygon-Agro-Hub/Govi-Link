@@ -47,9 +47,8 @@ const Input = ({
       {required && <Text className="text-black">*</Text>}
     </Text>
     <View
-      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
-        error ? "border border-red-500" : ""
-      }`}
+      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${error ? "border border-red-500" : ""
+        }`}
     >
       <TextInput
         placeholder={placeholder}
@@ -483,8 +482,8 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
             label={t(
               "InspectionForm.Expected repayment period as per the farmer in months",
             )}
-            placeholder="----"
-            value={formData.repaymentMonth?.toString() || ""}
+            placeholder="--"
+            value={formData.repaymentMonth && formData.repaymentMonth !== 0 ? formData.repaymentMonth.toString() : ""}
             onChangeText={(text) =>
               handleFieldChange("repaymentMonth", text, {
                 required: true,

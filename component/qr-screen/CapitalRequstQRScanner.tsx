@@ -18,6 +18,11 @@ import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { useRoute, RouteProp } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect } from "@react-navigation/native";
+import * as SQLite from "expo-sqlite";
+const db = SQLite.openDatabaseSync("inspection.db");
+
+
+
 
 type CapitalRequstQRScannerNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -32,13 +37,55 @@ interface CapitalRequstQRScannerProps {
   navigation: CapitalRequstQRScannerNavigationProp;
 }
 
+const tabs = [
+  "Personal Info",
+  "ID Proof",
+  "Finance Info",
+  "Land Info",
+  "Investment Info",
+  "Cultivation Info",
+  "Cropping Systems",
+  "Profit & Risk",
+  "Economical",
+  "Labour",
+  "Harvest Storage",
+];
+
+const tableNames = [
+  "inspectionpersonal",
+  "inspectionidproof",
+  "inspectionfinance",
+  "inspectionland",
+  "inspectioncultivation",
+  "inspectioninvestment",
+  "inspectioncropping",
+  "inspectionprofit",
+  "inspectioneconomical",
+  "inspectionlabour",
+  "inspectionharveststorage",
+];
+
+const screenNames = [
+  "PersonalInfo",
+  "IDProof",
+  "FinanceInfo",
+  "LandInfo",
+  "InvestmentInfo",
+  "CultivationInfo",
+  "CroppingSystems",
+  "ProfitRisk",
+  "Economical",
+  "Labour",
+  "HarvestStorage",
+];
+
 const { width } = Dimensions.get("window");
 const scanningAreaSize = width * 0.8;
 const CapitalRequstQRScanner: React.FC<CapitalRequstQRScannerProps> = ({
   navigation,
 }) => {
   const route = useRoute<CapitalRequstQRScannerRouteProp>();
-  const { farmerId, requestId,requestNumber } =
+  const { farmerId, requestId, requestNumber } =
     route.params;
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanned, setScanned] = useState<boolean>(false);
@@ -70,8 +117,43 @@ const CapitalRequstQRScanner: React.FC<CapitalRequstQRScannerProps> = ({
     return unsubscribe;
   }, [navigation]);
 
+  const getLastCompletedFormScreen = (reqId: number): string => {
+    try {
+      let lastCompletedIndex = -1;
+
+      for (let i = 0; i < tableNames.length; i++) {
+        const tableName = tableNames[i];
+
+        const result = db.getFirstSync<{ requestId: number }>(
+          `SELECT requestId FROM ${tableName} WHERE requestId = ?`,
+          [reqId]
+        );
+
+        if (result) {
+          lastCompletedIndex = i;
+        } else {
+
+          break;
+        }
+      }
+
+      const targetIndex = lastCompletedIndex + 1;
+
+      if (targetIndex >= screenNames.length) {
+        return screenNames[screenNames.length - 1];
+      }
+
+      return screenNames[targetIndex];
+
+    } catch (error) {
+      console.error("Error checking completed forms:", error);
+      return screenNames[0];
+    }
+  };
 
 
+
+  // Replace the handleBarCodeScanned function
   const handleBarCodeScanned = async ({
     data,
   }: {
@@ -92,11 +174,14 @@ const CapitalRequstQRScanner: React.FC<CapitalRequstQRScannerProps> = ({
         throw new Error(t("QRScanner.Wrong QR code"));
       }
       if (userId == farmerId) {
-       
+        // Get the last completed form screen
+        const targetScreen = getLastCompletedFormScreen(requestId);
 
-        navigation.navigate("PersonalInfo", {
-         requestNumber,
-                requestId
+        console.log("Navigating to screen:", targetScreen, "with requestId:", requestId);
+
+        navigation.navigate(targetScreen as any, {
+          requestNumber,
+          requestId
         });
       }
     } catch (error) {

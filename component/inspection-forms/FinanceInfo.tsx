@@ -221,6 +221,24 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     );
   }, [formData, errors]);
 
+  useEffect(() => {
+  if (formData.confirmAccountNumber && formData.accountNumber) {
+    if (formData.confirmAccountNumber !== formData.accountNumber) {
+      setErrors(prev => ({
+        ...prev,
+        confirmAccountNumber: t("Error.Account numbers do not match")
+      }));
+    } else {
+      // Clear the error if they match
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors.confirmAccountNumber;
+        return newErrors;
+      });
+    }
+  }
+}, [formData.confirmAccountNumber, formData.accountNumber, t]);
+
   const updateFormData = (updates: Partial<FinanceInfoData>) => {
     setFormData((prev) => ({
       ...prev,

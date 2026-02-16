@@ -63,9 +63,8 @@ const Input = ({
       {label} {required && <Text className="text-black">*</Text>}
     </Text>
     <View
-      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
-        error ? "border border-red-500" : ""
-      }`}
+      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${error ? "border border-red-500" : ""
+        }`}
     >
       {isMobile ? (
         <View className="flex-row flex-1 items-center">
@@ -172,7 +171,7 @@ const validateAndFormat = (
         const isDuplicate = rules.uniqueWith.some(
           (key) =>
             formData[key]?.toLowerCase().trim() ===
-              value.toLowerCase().trim() && key !== currentKey,
+            value.toLowerCase().trim() && key !== currentKey,
         );
         if (isDuplicate) error = t("Error.Email addresses cannot be the same");
       }
@@ -196,7 +195,7 @@ const validateAndFormat = (
       const isDuplicate = rules.uniqueWith.some(
         (key) =>
           formData[key]?.replace(/[^0-9]/g, "").replace(/^0+/, "") ===
-            numbersOnly && key !== currentKey,
+          numbersOnly && key !== currentKey,
       );
       if (isDuplicate) error = t("Error.Phone numbers cannot be the same");
     }
@@ -213,7 +212,7 @@ const validateAndFormat = (
       const isDuplicate = rules.uniqueWith.some(
         (key) =>
           formData[key]?.replace(/[^0-9]/g, "").replace(/^0+/, "") ===
-            numbersOnly && key !== currentKey,
+          numbersOnly && key !== currentKey,
       );
       if (isDuplicate) error = t("Error.Phone numbers cannot be the same");
     }
@@ -304,8 +303,8 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             setDisplayProvince(
               provinceObj
                 ? provinceObj.name[
-                    i18n.language as keyof typeof provinceObj.name
-                  ] || provinceObj.name.en
+                i18n.language as keyof typeof provinceObj.name
+                ] || provinceObj.name.en
                 : "",
             );
 
@@ -315,8 +314,8 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             setDisplayCountry(
               countryObj
                 ? countryObj.name[
-                    i18n.language as keyof typeof countryObj.name
-                  ] || countryObj.name.en
+                i18n.language as keyof typeof countryObj.name
+                ] || countryObj.name.en
                 : localData.country || "Sri Lanka",
             );
           } else {
@@ -599,7 +598,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
 
     const displayProv = province
       ? province.name[i18n.language as keyof typeof province.name] ||
-        province.name.en
+      province.name.en
       : "";
 
     setSelectedProvince(province?.name.en || null);
@@ -931,7 +930,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             onChangeText={(text) =>
               handleFieldChange("house", text, {
                 required: true,
-                type: "house",
+                type: "text", // Changed from "house" to "text" to allow special characters
               })
             }
             required
