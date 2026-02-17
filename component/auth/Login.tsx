@@ -84,7 +84,6 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
   const handleLogin = async () => {
     Keyboard.dismiss();
 
-    // Clear any existing errors
     setEmpIdError("");
 
     if (!empid && !password) {
@@ -148,7 +147,6 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
       );
 
       const data = await response.json();
-      console.log("response", data);
 
       if (!response.ok || !data.success) {
         setLoading(false);
@@ -163,7 +161,6 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
         } else if (message.includes("user not found")) {
           Alert.alert(t("Error.error"), t("Login.Invalid EMP ID & Password"));
         } else if (message.includes("user not approved")) {
-          // Not approved
           Alert.alert(
             t("Error.error"),
             t("Error.This EMP ID is not approved."),
@@ -182,7 +179,6 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
 
       const { token, passwordUpdate, role, empId } = data.data;
 
-      // Continue with normal login flow
       await AsyncStorage.setItem("token", token);
       await AsyncStorage.setItem("jobRole", role);
       await AsyncStorage.setItem("empid", empId.toString());
@@ -207,7 +203,6 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
             passwordUpdate: passwordUpdate,
           });
         } else {
-          // Fixed: Check for both Distribution roles individually
           if (role === "Chief Field Officer") {
             navigation.navigate("Main", { screen: "Dashboard" });
           } else if (role === "Field Officer") {
@@ -268,7 +263,6 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
           resizeMode="contain"
         />
 
-        {/* Welcome Text */}
         <Text className="font-semibold text-2xl pt-[7%]">
           {t("Login.Welcome")}
         </Text>

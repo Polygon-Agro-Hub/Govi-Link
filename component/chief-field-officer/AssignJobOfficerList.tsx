@@ -66,20 +66,16 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [countdown, setCountdown] = useState(30);
   const [userInfo, setUserInfo] = useState<any>(null);
-
-  // Animated values for smooth progress
   const progressAnim = useRef(new Animated.Value(100)).current;
   const countdownAnim = useRef(new Animated.Value(30)).current;
 
   const timerRef = useRef<number | null>(null);
   const animationRef = useRef<Animated.CompositeAnimation | null>(null);
 
-  // Get the single jobId (not array)
   const singleJobId = Array.isArray(selectedJobIds)
     ? selectedJobIds[0]
     : selectedJobIds;
 
-  // Load user info on component mount
   useEffect(() => {
     const loadUserInfo = async () => {
       try {
@@ -94,7 +90,6 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
     loadUserInfo();
   }, []);
 
-  // Get officer name based on current language
   const getOfficerName = (officer: Officer) => {
     const currentLanguage = i18n.language;
 
@@ -112,36 +107,23 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
     }
   };
 
-  // Format date to "On October 12" format
-  // const formatDate = (dateString: string) => {
-  //   const date = new Date(dateString);
-  //   const options: Intl.DateTimeFormatOptions = {
-  //     month: "long",
-  //     day: "numeric",
-  //   };
-  //   return `On ${date.toLocaleDateString("en-US", options)}`;
-  // };
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
 
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
+    const options: Intl.DateTimeFormatOptions = {
+      month: "long",
+      day: "numeric",
+    };
 
-  const options: Intl.DateTimeFormatOptions = {
-    month: "long",
-    day: "numeric",
+    if (i18n.language === "si") {
+      return `${date.toLocaleDateString("si-LK", options)}`;
+    } else if (i18n.language === "ta") {
+      return `${date.toLocaleDateString("ta-LK", options)}`;
+    } else {
+      return `On ${date.toLocaleDateString("en-US", options)}`;
+    }
   };
 
-  if( i18n.language === "si"){
-    return `${date.toLocaleDateString("si-LK", options)}`;
-  }
-  else if( i18n.language === "ta"){
-    return `${date.toLocaleDateString("ta-LK", options)}`;
-  }else{
-    return `On ${date.toLocaleDateString("en-US", options)}`;
-  }
-};
-
-
-  // Start smooth countdown animation
   const startCountdownAnimation = () => {
     progressAnim.setValue(100);
     countdownAnim.setValue(30);
@@ -172,7 +154,6 @@ const formatDate = (dateString: string) => {
     });
   };
 
-  // Countdown timer effect
   useEffect(() => {
     if (showConfirmationModal) {
       startCountdownAnimation();
@@ -189,7 +170,6 @@ const formatDate = (dateString: string) => {
     };
   }, [showConfirmationModal]);
 
-  // Update countdown value based on animation
   useEffect(() => {
     const countdownListener = countdownAnim.addListener(({ value }) => {
       const roundedValue = Math.ceil(value);
@@ -206,11 +186,12 @@ const formatDate = (dateString: string) => {
     try {
       const token = await AsyncStorage.getItem("token");
       if (!token) {
-        Alert.alert(t("Error.Error"), t("Error.AuthTokenNotFound"), [{ text: t("Main.ok") }]);
+        Alert.alert(t("Error.Error"), t("Error.AuthTokenNotFound"), [
+          { text: t("Main.ok") },
+        ]);
         return;
       }
 
-      // Use the single jobId instead of array
       if (!singleJobId) {
         Alert.alert(t("Error.Error"), t("AssignJobOfficerList.NoJobIdFound"));
         return;
@@ -220,10 +201,8 @@ const formatDate = (dateString: string) => {
         `${environment.API_BASE_URL}api/assign-jobs/get-assign-officer-list/${singleJobId}/${selectedDate}`,
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
-
-      console.log("IRM Users API Response:", response.data);
 
       if (response.data.status === "success") {
         setOfficers(response.data.data);
@@ -231,7 +210,7 @@ const formatDate = (dateString: string) => {
         Alert.alert(
           t("Error.Error"),
           t("AssignJobOfficerList.FailedToFetchOfficers"),
-          [{ text: t("Main.ok") }]
+          [{ text: t("Main.ok") }],
         );
       }
     } catch (error) {
@@ -239,7 +218,7 @@ const formatDate = (dateString: string) => {
       Alert.alert(
         t("Error.Error"),
         t("AssignJobOfficerList.FailedToLoadOfficers"),
-        [{ text: t("Main.ok") }]
+        [{ text: t("Main.ok") }],
       );
     } finally {
       setLoading(false);
@@ -249,7 +228,7 @@ const formatDate = (dateString: string) => {
   useFocusEffect(
     React.useCallback(() => {
       fetchOfficers();
-    }, [])
+    }, []),
   );
 
   const handleAssignToOfficer = (officer: Officer) => {
@@ -280,21 +259,12 @@ const formatDate = (dateString: string) => {
     try {
       const token = await AsyncStorage.getItem("token");
       if (!token) {
-        Alert.alert(t("Error.Error"), t("Error.AuthTokenNotFound"), [{ text: t("Main.ok") }]);
+        Alert.alert(t("Error.Error"), t("Error.AuthTokenNotFound"), [
+          { text: t("Main.ok") },
+        ]);
         return;
       }
 
-      console.log("Sending assignment request with:", {
-        officerId: selectedOfficer.id,
-        date: selectedDate,
-        propose: propose,
-        fieldAuditIds: fieldAuditIds || [],
-        govilinkJobIds: govilinkJobIds || [],
-        auditType: auditType,
-      });
-
-      // IMPORTANT: Use the correct endpoint URL based on your backend
-      // The endpoint should match what's defined in your backend routes
       const response = await axios.post(
         `${environment.API_BASE_URL}api/assign-jobs/assign-officer-to-field-audits`,
         {
@@ -304,17 +274,14 @@ const formatDate = (dateString: string) => {
           fieldAuditIds: fieldAuditIds || [],
           govilinkJobIds: govilinkJobIds || [],
           auditType: auditType,
-          // The backend should get assignedBy from req.user.id automatically
         },
         {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-        }
+        },
       );
-
-      console.log("Assignment API Response:", response.data);
 
       if (response.data.status === "success") {
         Alert.alert(
@@ -324,16 +291,16 @@ const formatDate = (dateString: string) => {
           }),
           [
             {
-               text: t("Main.ok") ,
+              text: t("Main.ok"),
               onPress: () => navigation.navigate("AssignJobs"),
             },
-          ]
+          ],
         );
       } else {
         Alert.alert(
           t("Main.Error"),
-           t("AssignJobOfficerList.FailedToAssignJobs"),
-           [{ text: t("Main.ok") }]
+          t("AssignJobOfficerList.FailedToAssignJobs"),
+          [{ text: t("Main.ok") }],
         );
       }
     } catch (error: any) {
@@ -342,8 +309,6 @@ const formatDate = (dateString: string) => {
       let errorMessage = t("AssignJobOfficerList.FailedToAssignJobs");
 
       if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
         console.error("Error response data:", error.response.data);
         console.error("Error response status:", error.response.status);
         console.error("Error response headers:", error.response.headers);
@@ -352,22 +317,20 @@ const formatDate = (dateString: string) => {
           error.response.data?.message ||
           `Server Error: ${error.response.status}`;
       } else if (error.request) {
-        // The request was made but no response was received
         console.error("Error request:", error.request);
         errorMessage =
           "No response from server. Please check your internet connection.";
       } else {
-        // Something happened in setting up the request that triggered an Error
         console.error("Error message:", error.message);
         errorMessage = error.message || "An unexpected error occurred";
       }
 
-Alert.alert(
-          t("Main.Error"),
-           t("AssignJobOfficerList.FailedToAssignJobs"),
-           [{ text: t("Main.ok") }]
-        );
-          } finally {
+      Alert.alert(
+        t("Main.Error"),
+        t("AssignJobOfficerList.FailedToAssignJobs"),
+        [{ text: t("Main.ok") }],
+      );
+    } finally {
       setAssigning(false);
     }
   };
@@ -387,11 +350,9 @@ Alert.alert(
       .padStart(2, "0")}`;
   };
 
-  // Circle parameters
   const radius = 65;
   const circumference = 2 * Math.PI * radius;
 
-  // Determine which IDs to display based on auditType
   const getAssignedJobInfo = () => {
     if (
       auditType === "feildaudits" &&
@@ -413,7 +374,6 @@ Alert.alert(
 
   return (
     <View className="flex-1 bg-white">
-      {/* Single Header - Always visible */}
       <View className="flex-row items-center px-4 py-3 border-b border-gray-200">
         <TouchableOpacity
           onPress={() => {
@@ -447,7 +407,6 @@ Alert.alert(
         <View style={{ width: 55 }} />
       </View>
 
-      {/* Main Content */}
       {!showConfirmationModal ? (
         loading ? (
           <View className="flex-1 justify-center items-center">
@@ -470,7 +429,6 @@ Alert.alert(
                 >
                   <View className="flex-row justify-between items-start">
                     <View className="flex-1">
-                      {/* Officer Name - Language Specific */}
                       <Text className="text-md font-bold text-[#212121]">
                         {getOfficerName(officer)}
                       </Text>
@@ -485,7 +443,6 @@ Alert.alert(
                       </Text>
                     </View>
 
-                    {/* Assign Button */}
                     <TouchableOpacity
                       onPress={() => handleAssignToOfficer(officer)}
                       disabled={assigning}
@@ -514,11 +471,8 @@ Alert.alert(
           </View>
         )
       ) : (
-        /* Confirmation Modal Content */
         <View className="flex-1 bg-white">
-          {/* Countdown Section */}
           <View className="flex justify-center items-center px-6 mt-6">
-            {/* Circular Countdown */}
             <View className="items-center mb-8">
               <Svg width={150} height={150}>
                 <G rotation="-90" origin="75, 75">
@@ -558,7 +512,6 @@ Alert.alert(
               </Svg>
             </View>
 
-            {/* Instruction Text */}
             <Text className="text-md text-center text-[#4E6393] mb-1 leading-6">
               {t("AssignJobOfficerList.CountdownInstruction1")}{" "}
               <Text className="underline font-semibold text-black">
@@ -570,7 +523,6 @@ Alert.alert(
               {t("AssignJobOfficerList.CountdownInstruction3")}
             </Text>
 
-            {/* Selected Officer Card */}
             {selectedOfficer && (
               <View className="w-full border border-[#9DB2CE] bg-white p-4 rounded-lg mb-8">
                 <View className="flex-row justify-between items-start">
@@ -587,7 +539,6 @@ Alert.alert(
                     </Text>
                   </View>
 
-                  {/* Undo Button */}
                   <TouchableOpacity
                     onPress={handleUndo}
                     disabled={assigning}
@@ -608,7 +559,6 @@ Alert.alert(
             )}
           </View>
 
-          {/* Confirm & Leave Button */}
           <View className="px-12 pb-8 mt-auto mb-14">
             <TouchableOpacity
               onPress={handleConfirmAndLeave}
@@ -639,7 +589,6 @@ Alert.alert(
   );
 };
 
-// Animated Circle component
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 export default AssignJobOfficerList;

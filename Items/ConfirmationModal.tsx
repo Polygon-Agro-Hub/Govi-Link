@@ -32,12 +32,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             <MaterialIcons name="info-outline" size={32} color="white" />
           </View>
         );
-      case "success":
-        return (
-          <View className="w-16 h-16 bg-green-500 rounded-full items-center justify-center mb-6">
-            <MaterialIcons name="check" size={32} color="white" />
-          </View>
-        );
+   
       case "error":
         return (
           <View className="w-16 h-16 bg-red-500 rounded-full items-center justify-center mb-6">

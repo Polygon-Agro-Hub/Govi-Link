@@ -19,8 +19,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 import { useDispatch } from "react-redux";
-import { clearAllInspectionSlices } from "@/store/clearAllSlices";
-import { hasDraft, initPersonalTable } from "@/database/inspectionpersonal"; // Import the function to check drafts
+import { hasDraft, initPersonalTable } from "@/database/inspectionpersonal";
 
 type CapitalRequestsNavigationProps = StackNavigationProp<
   RootStackParamList,
@@ -44,63 +43,49 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [requests, setRequests] = useState<Request[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [draftRequestIds, setDraftRequestIds] = useState<number[]>([]); // Track draft IDs
+  const [draftRequestIds, setDraftRequestIds] = useState<number[]>([]);
 
-  // ✅ Prevent infinite refetches
   const isFetchingRef = useRef(false);
 
-  // ✅ Initialize database on component mount
   useEffect(() => {
-    console.log("🗄️ Initializing database tables...");
     try {
       initPersonalTable();
-      console.log("✅ Database initialized successfully");
     } catch (error) {
-      console.error("❌ Failed to initialize database:", error);
+      console.error("Failed to initialize database:", error);
     }
   }, []);
 
-  // ✅ Check SQLite for draft records
   const checkForDrafts = (requests: Request[]) => {
-    console.log("🔍 Starting draft check for", requests.length, "requests");
     try {
       const drafts: number[] = [];
 
       for (const request of requests) {
-        console.log(`🔎 Checking request ID: ${request.id} (jobId: ${request.jobId})`);
         const isDraft = hasDraft(request.id);
-        console.log(`   → hasDraft returned: ${isDraft}`);
-        
+
         if (isDraft) {
           drafts.push(request.id);
-          console.log(`   ✅ Added ${request.id} to drafts`);
         }
       }
 
-      console.log("📊 Total drafts found:", drafts.length);
-      console.log("📋 Draft request IDs:", drafts);
       setDraftRequestIds(drafts);
     } catch (error) {
-      console.error("❌ Failed to check for drafts:", error);
+      console.error(
+        "Failed to check for drafts (Capital RequestsList Screen):",
+        error,
+      );
     }
   };
 
-  // ✅ Call checkForDrafts after fetching requests
   useEffect(() => {
-    console.log("🔄 useEffect triggered - requests.length:", requests.length);
     if (requests.length > 0) {
-      console.log("✅ Calling checkForDrafts...");
       checkForDrafts(requests);
     } else {
-      console.log("⚠️ No requests, clearing draft IDs");
       setDraftRequestIds([]);
     }
   }, [requests]);
 
   const fetchCapitalRequests = async (search: string = "") => {
-    // ✅ Prevent concurrent fetches
     if (isFetchingRef.current) {
-      console.log("⏭️ Already fetching, skipping");
       return;
     }
 
@@ -119,11 +104,11 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
         `${environment.API_BASE_URL}api/capital-request/requests`,
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
-      console.log("Requests", response.data.requests);
 
       const apiRequests = response.data.requests;
+
       setRequests(apiRequests);
     } catch (error: any) {
       console.error("Failed to fetch capital requests:", error);
@@ -142,22 +127,20 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
     fetchCapitalRequests(searchQuery);
   }, [searchQuery]);
 
-  // ✅ Only fetch on initial focus, not on every focus
   useFocusEffect(
     useCallback(() => {
-      console.log("📱 CapitalRequests screen focused");
       fetchCapitalRequests(searchQuery);
 
       return () => {
-        console.log("👋 CapitalRequests screen blurred");
+        console.log("CapitalRequests screen blurred");
       };
-    }, [searchQuery])
+    }, [searchQuery]),
   );
 
-  // ✅ Handle navigation to RequestDetails (starting a new inspection)
-  const handleNavigateToRequestDetails = (requestId: number, requestNumber: string) => {
-    console.log(`🚀 Starting new inspection for request ${requestNumber}`);
-    
+  const handleNavigateToRequestDetails = (
+    requestId: number,
+    requestNumber: string,
+  ) => {
     navigation.navigate("RequestDetails", {
       requestId: requestId,
       requestNumber: requestNumber,
@@ -179,10 +162,9 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
     <View className="flex-1 bg-white">
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
-      {/* Header */}
       <View className="flex-row items-center px-4 py-3">
         <TouchableOpacity
-          onPress={() => navigation.navigate("Dashboard")}
+          onPress={() => navigation.goBack()}
           className="bg-[#F6F6F680] rounded-full py-4 px-3"
         >
           <MaterialIcons
@@ -204,7 +186,7 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 20 }}
+        contentContainerStyle={{ paddingBottom: 70 }}
       >
         <View className="px-6 py-4 space-y-5">
           {requests.length === 0 ? (
@@ -223,12 +205,14 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
           ) : (
             requests.map((request, index) => {
               const isDraft = draftRequestIds.includes(request.id);
-              
+
               return (
                 <TouchableOpacity
                   key={`${request.id}-${index}`}
                   className=""
-                  onPress={() => handleNavigateToRequestDetails(request.id, request.jobId)}
+                  onPress={() =>
+                    handleNavigateToRequestDetails(request.id, request.jobId)
+                  }
                 >
                   <View
                     className="bg-[#ADADAD1A] rounded-3xl p-4 flex-row items-center justify-between"
@@ -237,7 +221,6 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
                       borderColor: isDraft ? "#FA4064" : "transparent",
                     }}
                   >
-                    {/* Left side content */}
                     <View className="flex-1">
                       <View className="flex-row space-x-2 items-baseline">
                         <Text className="text-[#000000] text-base">
@@ -259,7 +242,6 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
                       </Text>
                     </View>
 
-                    {/* Right side arrow button */}
                     <MaterialIcons
                       name="keyboard-arrow-right"
                       size={40}

@@ -131,8 +131,6 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
   const route = useRoute<RouteProp<RootStackParamList, "FinanceInfo">>();
   const { requestNumber, requestId } = route.params;
   const { t } = useTranslation();
-
-  // Local state for form data
   const [formData, setFormData] = useState<FinanceInfoData>({
     accHolder: "",
     accountNumber: "",
@@ -170,13 +168,11 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     name: bank.name,
   }));
 
-  // Auto-save to SQLite whenever formData changes (debounced)
   useEffect(() => {
     const timer = setTimeout(async () => {
       if (requestId) {
         try {
           await saveFinanceInfo(Number(requestId), formData);
-          console.log("💾 Auto-saved finance info to SQLite");
         } catch (err) {
           console.error("Error auto-saving finance info:", err);
         }
@@ -186,7 +182,6 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     return () => clearTimeout(timer);
   }, [formData, requestId]);
 
-  // Validate form completion
   useEffect(() => {
     const requiredFields = [
       "accHolder",
@@ -201,14 +196,11 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
       );
     });
 
-    // Check if account numbers match
     const accountNumbersMatch =
       formData.accountNumber === formData.confirmAccountNumber;
 
-    // Check if at least one valid asset is selected
     const hasAssets = hasValidAssetSelection();
 
-    // Check if bank and branch are selected
     const hasBankInfo = !!(
       formData.bank &&
       formData.bank.trim() !== "" &&
@@ -229,7 +221,24 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     );
   }, [formData, errors]);
 
-  // Update form data
+  useEffect(() => {
+  if (formData.confirmAccountNumber && formData.accountNumber) {
+    if (formData.confirmAccountNumber !== formData.accountNumber) {
+      setErrors(prev => ({
+        ...prev,
+        confirmAccountNumber: t("Error.Account numbers do not match")
+      }));
+    } else {
+      // Clear the error if they match
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors.confirmAccountNumber;
+        return newErrors;
+      });
+    }
+  }
+}, [formData.confirmAccountNumber, formData.accountNumber, t]);
+
   const updateFormData = (updates: Partial<FinanceInfoData>) => {
     setFormData((prev) => ({
       ...prev,
@@ -239,7 +248,6 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     }));
   };
 
-  // Transform data for backend
   const transformFinanceInfoForBackend = (data: FinanceInfoData) => {
     return {
       accHolder: data.accHolder,
@@ -273,7 +281,6 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     };
   };
 
-  // Save to backend
   const saveToBackend = async (
     reqId: number,
     tableName: string,
@@ -281,16 +288,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     isUpdate: boolean,
   ): Promise<boolean> => {
     try {
-      console.log(
-        `💾 Saving to backend (${isUpdate ? "UPDATE" : "INSERT"}):`,
-        tableName,
-      );
-      console.log(`📝 reqId being sent:`, reqId);
-
       const transformedData = transformFinanceInfoForBackend(data);
-
-      console.log(`📦 Original data:`, data);
-      console.log(`📦 Transformed data:`, transformedData);
 
       const response = await axios.post(
         `${environment.API_BASE_URL}api/capital-request/inspection/save`,
@@ -307,14 +305,13 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
       );
 
       if (response.data.success) {
-        console.log(`✅ ${tableName} ${response.data.operation}d successfully`);
         return true;
       } else {
-        console.error(`❌ ${tableName} save failed:`, response.data.message);
+        console.error(` ${tableName} save failed:`, response.data.message);
         return false;
       }
     } catch (error: any) {
-      console.error(`❌ Error saving ${tableName}:`, error);
+      console.error(` Error saving ${tableName}:`, error);
       if (error.response) {
         console.error("Response data:", error.response.data);
         console.error("Response status:", error.response.status);
@@ -323,13 +320,10 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     }
   };
 
-  // Fetch from backend
   const fetchInspectionData = async (
     reqId: number,
   ): Promise<FinanceInfoData | null> => {
     try {
-      console.log(`🔍 Fetching inspection data for reqId: ${reqId}`);
-
       const response = await axios.get(
         `${environment.API_BASE_URL}api/capital-request/inspection/get`,
         {
@@ -340,11 +334,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
         },
       );
 
-      console.log("📦 Raw response:", response.data);
-
       if (response.data.success && response.data.data) {
-        console.log(`✅ Fetched existing data:`, response.data.data);
-
         const data = response.data.data;
 
         const safeJsonParse = (field: any): string[] => {
@@ -381,14 +371,12 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
         };
       }
 
-      console.log(`📭 No existing data found for reqId: ${reqId}`);
       return null;
     } catch (error: any) {
-      console.error(`❌ Error fetching inspection data:`, error);
+      console.error(` Error fetching inspection data:`, error);
       console.error("Error details:", error.response?.data);
 
       if (error.response?.status === 404) {
-        console.log(`📝 No existing record - will create new`);
         return null;
       }
       return null;
@@ -399,7 +387,6 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     useCallback(() => {
       const loadFormData = async () => {
         if (isDataLoadedRef.current) {
-          console.log("⏭️ Data already loaded, skipping...");
           return;
         }
 
@@ -407,15 +394,12 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
           if (requestId) {
             const reqId = Number(requestId);
             if (!isNaN(reqId) && reqId > 0) {
-              // First try SQLite
               const localData = await getFinanceInfo(reqId);
 
               if (localData) {
-                console.log(`✅ Loaded data from SQLite`);
                 setFormData(localData);
                 setIsExistingData(true);
 
-                // Update checkedAssets based on loaded data
                 const newCheckedAssets: Record<string, boolean> = {};
                 if (localData.assetsLand && localData.assetsLand.length > 0) {
                   newCheckedAssets.assetsLand = true;
@@ -464,18 +448,12 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
                 return;
               }
 
-              // If no SQLite data, try backend
-              console.log(
-                `🔄 Attempting to fetch data from backend for reqId: ${reqId}`,
-              );
               const backendData = await fetchInspectionData(reqId);
 
               if (backendData) {
-                console.log(`✅ Loaded data from backend`);
                 setFormData(backendData);
                 setIsExistingData(true);
 
-                // Update checkedAssets based on loaded backend data
                 const newCheckedAssets: Record<string, boolean> = {};
                 if (
                   backendData.assetsLand &&
@@ -532,7 +510,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
           }
 
           setIsExistingData(false);
-          console.log("📝 No existing data - new entry");
+
           isDataLoadedRef.current = true;
         } catch (e) {
           console.error("Failed to load form data", e);
@@ -549,7 +527,6 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     }, [requestId]),
   );
 
-  // Handle field change
   const handleFieldChange = (
     key: keyof FinanceInfoData,
     text: string,
@@ -567,7 +544,6 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     setErrors((prev) => ({ ...prev, [key]: error || "" }));
   };
 
-  // Handle next button
   const handleNext = async () => {
     const validationErrors: Record<string, string> = {};
 
@@ -591,7 +567,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
         "Error.Account numbers do not match",
       );
     }
-    // Validate at least one valid asset selection
+
     if (!hasValidAssetSelection()) {
       validationErrors.assets = t(
         "Error.At least one option must be selected.",
@@ -638,7 +614,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     }
 
     if (!requestId) {
-      console.error("❌ requestId is missing!");
+      console.error(" requestId is missing!");
       Alert.alert(
         t("Error.Error"),
         "Request ID is missing. Please go back and try again.",
@@ -650,7 +626,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     const reqId = Number(requestId);
 
     if (isNaN(reqId) || reqId <= 0) {
-      console.error("❌ Invalid requestId:", requestId);
+      console.error(" Invalid requestId:", requestId);
       Alert.alert(
         t("Error.Error"),
         "Invalid request ID. Please go back and try again.",
@@ -658,8 +634,6 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
       );
       return;
     }
-
-    console.log("✅ Using requestId:", reqId);
 
     Alert.alert(
       t("InspectionForm.Saving"),
@@ -669,10 +643,6 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     );
 
     try {
-      console.log(
-        `🚀 Saving to backend (${isExistingData ? "UPDATE" : "INSERT"})`,
-      );
-
       const saved = await saveToBackend(
         reqId,
         "inspectionfinance",
@@ -681,7 +651,6 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
       );
 
       if (saved) {
-        console.log("✅ Finance info saved successfully to backend");
         setIsExistingData(true);
 
         Alert.alert(
@@ -700,7 +669,6 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
           ],
         );
       } else {
-        console.log("⚠️ Backend save failed, but continuing with local data");
         Alert.alert(
           t("Main.Warning"),
           t("InspectionForm.Could not save to server. Data saved locally."),
@@ -737,7 +705,6 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     }
   };
 
-  // Modal handlers
   const handleModalClose = (modalType: string) => {
     switch (modalType) {
       case "bank":
@@ -773,7 +740,6 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     });
   };
 
-  // Sorting functions
   const sortBanksAlphabetically = (
     banks: Array<{ id: number; name: string }>,
   ) => {
@@ -812,7 +778,6 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     );
   };
 
-  // Render functions
   const renderBankItem = ({ item }: { item: { id: number; name: string } }) => (
     <TouchableOpacity
       className="px-4 py-3 border-b border-gray-200 rounded-2xl"
@@ -859,7 +824,6 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     </View>
   );
 
-  // Asset categories
   const assetCategories: AssetCategory[] = [
     {
       key: "assetsLand",
@@ -915,12 +879,10 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
   ];
 
   const hasValidAssetSelection = (): boolean => {
-    // Check if Special Farm Tool has text
     if (formData.assetsFarmTool && formData.assetsFarmTool.trim() !== "") {
       return true;
     }
 
-    // Check if any category with sub-items has at least one sub-item selected
     const categoryKeys: (keyof FinanceInfoData)[] = [
       "assetsLand",
       "assetsBuilding",
@@ -934,6 +896,32 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     });
   };
 
+  // Handle tab navigation
+  const handleTabPress = (tabKey: string) => {
+    // Map tab keys to navigation routes
+    const routeMap: Record<string, string> = {
+      "Personal Info": "PersonalInfo",
+      "ID Proof": "IDProof",
+      "Finance Info": "FinanceInfo",
+      "Land Info": "LandInfo",
+      "Investment Info": "InvestmentInfo",
+      "Cultivation Info": "CultivationInfo",
+      "Cropping Systems": "CroppingSystems",
+      "Profit & Risk": "ProfitRisk",
+      Economical: "Economical",
+      Labour: "Labour",
+      "Harvest Storage": "HarvestStorage",
+    };
+
+    const route = routeMap[tabKey];
+    if (route) {
+      navigation.navigate(route, {
+        requestId,
+        requestNumber,
+      });
+    }
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -944,20 +932,8 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
         <FormTabs
           activeKey="Finance Info"
           navigation={navigation}
-          onTabPress={(key) => {
-            const routesMap: Record<string, string> = {
-              "Personal Info": "PersonalInfo",
-              "ID Proof": "IDProof",
-            };
-
-            const route = routesMap[key];
-            if (route) {
-              navigation.navigate(route, {
-                requestId,
-                requestNumber,
-              });
-            }
-          }}
+          requestId={requestId}
+          onTabPress={handleTabPress}
         />
 
         <ScrollView
@@ -1103,7 +1079,6 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
                     debtsOfFarmer: formattedText,
                   });
 
-                  // Validation
                   const error =
                     formattedText.trim() === ""
                       ? t("Error.debtsOfFarmer is required")
@@ -1125,7 +1100,6 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
             )}
           </View>
 
-          {/* No of Dependents */}
           <View className="mt-4">
             <Input
               label={t("InspectionForm.No of Dependents")}
@@ -1154,7 +1128,6 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
 
               return (
                 <View key={category.key} className="mb-4 ml-4">
-                  {/* MAIN CATEGORY */}
                   <View className="flex-row items-center mb-2">
                     <Checkbox
                       value={isChecked}
@@ -1164,7 +1137,6 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
                           [category.key]: newValue,
                         }));
 
-                        // Clear data ONLY when unchecked
                         if (!newValue) {
                           updateFormData({
                             [category.key]:
@@ -1179,7 +1151,6 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
                     <Text className="ml-2 text-black">{category.label}</Text>
                   </View>
 
-                  {/* SUB CATEGORIES */}
                   {isChecked && category.subCategories && (
                     <View className="ml-6 mt-2">
                       {category.subCategories.map((sub) => {
@@ -1225,7 +1196,6 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
                     </View>
                   )}
 
-                  {/* FARM TOOL TEXTAREA */}
                   {category.key === "assetsFarmTool" && isChecked && (
                     <View className="mt-2 bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ml-[-5%]">
                       <TextInput

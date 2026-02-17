@@ -4,7 +4,6 @@ import {
   BackHandler,
   Text,
   View,
-  Dimensions,
   TextInput,
   ActivityIndicator,
 } from "react-native";
@@ -28,35 +27,35 @@ import { navigationRef } from "../navigationRef";
 import { LanguageProvider } from "@/context/LanguageContext";
 import NavigationBar from "@/Items/NavigationBar";
 import Splash from "@/component/auth/Splash";
-import Lanuage from "@/component/Lanuage";
+import Lanuage from "@/component/officers-common-screen/Lanuage";
 import Login from "@/component/auth/Login";
-import Dashboard from "@/component/ChiefFieldOfficer/Dashboard";
+import Dashboard from "@/component/chief-field-officer/Dashboard";
 import { NativeWindStyleSheet } from "nativewind";
 import CustomDrawerContent from "@/Items/CustomDrawerContent";
-import FieldOfficerDashboard from "@/component/FeildOfficer/FieldOfficerDashboard";
+import FieldOfficerDashboard from "@/component/feild-officers/FieldOfficerDashboard";
 import ProfileScreen from "@/component/auth/Profile";
 import AddComplaintScreen from "@/component/complaint/AddComplaint";
-import ViewAllVisits from "@/component/ViewAllVisits";
-import QRScanner from "@/component/QRScanner";
-import CertificateQuesanory from "@/component/CertificateQuesanory";
-import CertificateSuggestions from "@/component/CertificateSuggestions";
-import Otpverification from "@/component/Otpverification";
-import OtpverificationSuccess from "@/component/OtpverificationSuccess";
-import ViewFarmsCluster from "@/component/ViewFarmsCluster";
-import QRScaneerRequstAudit from "@/component/QRScaneerRequstAudit";
-import RequestSuggestions from "@/component/RequestSuggestions";
-import RequestProblem from "@/component/RequestProblem";
-import ManageOfficers from "@/component/feild-officers/ManageOfficers";
-import AddOfficerStep1 from "@/component/feild-officers/AddOfficerStep1";
-import AddOfficerStep2 from "@/component/feild-officers/AddOfficerStep2";
-import AddOfficerStep3 from "@/component/feild-officers/AddOfficerStep3";
-import OtpverificationRequestAudit from "@/component/OtpverificationRequestAudit";
+import ViewAllVisits from "@/component/officers-common-screen/ViewAllVisits";
+import QRScanner from "@/component/qr-screen/QRScanner";
+import CertificateQuesanory from "@/component/officers-common-screen/CertificateQuesanory";
+import CertificateSuggestions from "@/component/officers-common-screen/CertificateSuggestions";
+import Otpverification from "@/component/otp-screen/Otpverification";
+import OtpverificationSuccess from "@/component/otp-screen/OtpverificationSuccess";
+import ViewFarmsCluster from "@/component/officers-common-screen/ViewFarmsCluster";
+import QRScaneerRequstAudit from "@/component/qr-screen/QRScaneerRequstAudit";
+import RequestSuggestions from "@/component/officers-common-screen/RequestSuggestions";
+import RequestProblem from "@/component/officers-common-screen/RequestProblem";
+import ManageOfficers from "@/component/add-feild-officers/ManageOfficers";
+import AddOfficerStep1 from "@/component/add-feild-officers/AddOfficerStep1";
+import AddOfficerStep2 from "@/component/add-feild-officers/AddOfficerStep2";
+import AddOfficerStep3 from "@/component/add-feild-officers/AddOfficerStep3";
+import OtpverificationRequestAudit from "@/component/otp-screen/OtpverificationRequestAudit";
 import ChangePassword from "@/component/auth/ChangePassword";
 import ComplainHistory from "@/component/complaint/ComplainHistory";
-import AssignJobs from "@/component/AssignJobs";
+import AssignJobs from "@/component/chief-field-officer/AssignJobs";
 import CapitalRequests from "@/component/capital-request/CapitalRequestsList";
 import RequestDetails from "@/component/capital-request/RequestLetter";
-import AssignJobOfficerList from "@/component/AssignJobOfficerList";
+import AssignJobOfficerList from "@/component/chief-field-officer/AssignJobOfficerList";
 import PersonalInfo from "@/component/inspection-forms/PersonalInfo";
 import IDProof from "@/component/inspection-forms/IDProof";
 import FinanceInfo from "@/component/inspection-forms/FinanceInfo";
@@ -71,8 +70,8 @@ import Economical from "@/component/inspection-forms/Economical";
 import Labour from "@/component/inspection-forms/Labour";
 import HarvestStorage from "@/component/inspection-forms/HarvestStorage";
 import ConfirmationCapitalRequest from "@/component/inspection-forms/ConfirmationCapitalRequest";
+import CapitalRequstQRScanner from "@/component/qr-screen/CapitalRequstQRScanner";
 
-// Import from our new database index
 import { initDatabase } from "@/database/index";
 
 LogBox.ignoreAllLogs(true);
@@ -104,7 +103,7 @@ function MainTabs() {
   }, [jobRole]);
 
   if (!initialTab) {
-    return null; // or <ActivityIndicator />
+    return null;
   }
 
   return (
@@ -121,7 +120,7 @@ function MainTabs() {
         <>
           <Tab.Screen name="Dashboard" component={Dashboard} />
           <Tab.Screen name="Profile" component={ProfileScreen} />
-          <Tab.Screen name="ViewAllVisits" component={ViewAllVisits} />
+          <Tab.Screen name="ViewAllVisits" component={ViewAllVisits as any} />
 
           <Tab.Screen name="ManageOfficers" component={ManageOfficers} />
           <Tab.Screen name="AddOfficerStep1" component={AddOfficerStep1} />
@@ -141,7 +140,7 @@ function MainTabs() {
             component={FieldOfficerDashboard}
           />
           <Tab.Screen name="Profile" component={ProfileScreen} />
-          <Tab.Screen name="ViewAllVisits" component={ViewAllVisits} />
+          <Tab.Screen name="ViewAllVisits" component={ViewAllVisits as any} />
           <Tab.Screen name="CapitalRequests" component={CapitalRequests} />
         </>
       )}
@@ -173,7 +172,7 @@ function MainDrawer() {
       />
       <Drawer.Screen
         name="ViewAllVisits"
-        component={ViewAllVisits}
+        component={ViewAllVisits as any}
         options={{ drawerItemStyle: { display: "none" } }}
       />
     </Drawer.Navigator>
@@ -185,7 +184,6 @@ function AppContent() {
   const { t } = useTranslation();
   const [isOfflineAlertShown, setIsOfflineAlertShown] = useState(false);
 
-  // Internet Check
   useEffect(() => {
     const unsubscribeNetInfo = NetInfo.addEventListener((state) => {
       if (!state.isConnected && !isOfflineAlertShown) {
@@ -198,14 +196,13 @@ function AppContent() {
               text: "OK",
               onPress: () => setIsOfflineAlertShown(false),
             },
-          ]
+          ],
         );
       }
     });
     return () => unsubscribeNetInfo();
   }, [isOfflineAlertShown]);
 
-  // Back Button Handler
   useEffect(() => {
     const backAction = () => {
       if (!navigationRef.isReady()) return false;
@@ -221,7 +218,7 @@ function AppContent() {
     };
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
-      backAction
+      backAction,
     );
     return () => backHandler.remove();
   }, []);
@@ -297,6 +294,7 @@ function AppContent() {
             <Stack.Screen name="Economical" component={Economical} />
             <Stack.Screen name="Labour" component={Labour} />
             <Stack.Screen name="HarvestStorage" component={HarvestStorage} />
+            <Stack.Screen name="CapitalRequstQRScanner" component={CapitalRequstQRScanner} />
             <Stack.Screen
               name="ConfirmationCapitalRequest"
               component={ConfirmationCapitalRequest}
@@ -309,20 +307,17 @@ function AppContent() {
 }
 
 export default function App() {
-  // ✅ SQLite Database Initialization State
   const [dbReady, setDbReady] = useState(false);
 
-  // ✅ Initialize SQLite Database on App Start
   useEffect(() => {
     const initializeDatabase = () => {
       try {
-        initDatabase(); // This now initializes ALL tables
-        console.log("✅ SQLite Database initialized successfully");
+        initDatabase();
+        console.log("SQLite Database initialized successfully");
         setDbReady(true);
       } catch (error) {
-        console.error("❌ SQLite Database initialization failed:", error);
-        // Still set dbReady to true to allow app to continue
-        // You can show an alert here if needed
+        console.error(" SQLite Database initialization failed:", error);
+
         setDbReady(true);
       }
     };
@@ -330,7 +325,6 @@ export default function App() {
     initializeDatabase();
   }, []);
 
-  // ✅ Show loading screen while database initializes
   if (!dbReady) {
     return (
       <SafeAreaProvider>
@@ -358,7 +352,6 @@ export default function App() {
     );
   }
 
-  // ✅ Normal App Rendering after DB is ready
   return (
     <SafeAreaProvider>
       <Provider store={store}>

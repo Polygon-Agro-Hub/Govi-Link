@@ -2,7 +2,6 @@ import * as SQLite from "expo-sqlite";
 
 const db = SQLite.openDatabaseSync("inspection.db");
 
-// Initialize cultivation table
 export const initCultivationTable = () => {
   try {
     db.execSync(
@@ -31,9 +30,9 @@ export const initCultivationTable = () => {
         updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
       );`,
     );
-    console.log("✅ Cultivation table created/verified");
+    console.log("Cultivation table created/verified");
   } catch (error) {
-    console.error("❌ Error initializing cultivation table:", error);
+    console.error(" Error initializing cultivation table:", error);
     throw error;
   }
 };
@@ -72,22 +71,13 @@ export const saveCultivationInfo = (
   data: Partial<CultivationInfo>,
 ): void => {
   try {
-    console.log("💾 ======= START SAVE CULTIVATION INFO =======");
-    console.log("💾 Request ID:", requestId);
-    console.log("💾 Full data to save:", JSON.stringify(data, null, 2));
-
-    // Check if record exists
     const existing = db.getFirstSync<{ requestId: number }>(
       "SELECT requestId FROM inspectioncultivation WHERE requestId = ?",
       [requestId],
     );
 
-    console.log("💾 Existing record found?", !!existing);
-
-    // Transform data for database
     const dbData: any = {};
 
-    // Convert "yes"/"no" to 1/0 for climate parameters
     const yesNoToBool = (val: any): number | null => {
       if (val === "yes") return 1;
       if (val === "no") return 0;
@@ -151,29 +141,19 @@ export const saveCultivationInfo = (
       dbData.otherWaterSource = data.otherWaterSource;
     }
 
-    // Water sources (JSON array)
     if (data.waterSources && Array.isArray(data.waterSources)) {
       dbData.waterSources = JSON.stringify(data.waterSources);
-      console.log("💧 Saving water sources count:", data.waterSources.length);
     }
 
-    // Water images (JSON array) - UPDATED FOR MULTIPLE IMAGES
     if (data.waterImages && Array.isArray(data.waterImages)) {
       dbData.waterImage = JSON.stringify(data.waterImages);
-      console.log("📸 Saving water images count:", data.waterImages.length);
     }
 
-    console.log("💾 Database values to save:", dbData);
-
-    // Check if there's actually data to save
     if (Object.keys(dbData).length === 0) {
-      console.log("⚠️ No data to save, skipping database operation");
-      console.log("💾 ======= END SAVE CULTIVATION INFO =======");
       return;
     }
 
     if (existing) {
-      // UPDATE
       const fields = Object.keys(dbData)
         .map((key) => `${key} = ?`)
         .join(", ");
@@ -183,17 +163,13 @@ export const saveCultivationInfo = (
         requestId,
       ];
 
-      console.log("🔄 UPDATE query values:", values);
-
       const result = db.runSync(
         `UPDATE inspectioncultivation SET ${fields}, updatedAt = ? WHERE requestId = ?`,
         values as SQLite.SQLiteBindParams,
       );
 
-      console.log("🔄 Update rows affected:", result?.changes || 0);
-      console.log("✅ Cultivation info updated in SQLite");
+      console.log("Cultivation info updated in SQLite");
     } else {
-      // INSERT
       const fields = [
         "requestId",
         ...Object.keys(dbData),
@@ -210,67 +186,50 @@ export const saveCultivationInfo = (
         new Date().toISOString(),
       ];
 
-      console.log("📝 INSERT query values:", values);
-
       const result = db.runSync(
         `INSERT INTO inspectioncultivation (${fields}) VALUES (${placeholders})`,
         values as SQLite.SQLiteBindParams,
       );
 
-      console.log("📝 Insert result:", result);
-      console.log("✅ Cultivation info inserted into SQLite");
+      console.log(" Cultivation info inserted into SQLite");
     }
-
-    console.log("💾 ======= END SAVE CULTIVATION INFO =======");
   } catch (error) {
-    console.error("❌ Error saving cultivation info:", error);
+    console.error(" Error saving cultivation info:", error);
     throw error;
   }
 };
 
-// Get cultivation info
 export const getCultivationInfo = (
   requestId: number,
 ): CultivationInfo | null => {
   try {
-    console.log("🔍 ======= START FETCH CULTIVATION INFO =======");
-    console.log("🔍 Fetching cultivation info for requestId:", requestId);
-
     const row = db.getFirstSync<any>(
       "SELECT * FROM inspectioncultivation WHERE requestId = ?",
       [requestId],
     );
 
     if (row) {
-      console.log("🔍 Raw row from SQLite:", row);
-
-      // Parse water sources
       let waterSources: string[] = [];
       if (row.waterSources) {
         try {
           waterSources = JSON.parse(row.waterSources);
-          console.log("💧 Parsed water sources:", waterSources.length);
         } catch (e) {
-          console.error("❌ Failed to parse water sources:", e);
           waterSources = [];
         }
       }
 
-      // Parse water images - UPDATED FOR MULTIPLE IMAGES
       let waterImages: WaterImage[] = [];
       if (row.waterImage) {
         try {
           const images = JSON.parse(row.waterImage);
           if (Array.isArray(images)) {
             waterImages = images;
-            console.log("📸 Parsed water images count:", waterImages.length);
           }
         } catch (e) {
-          console.error("❌ Failed to parse water images:", e);
+          console.error("Failed to parse water images:", e);
         }
       }
 
-      // Convert 1/0 to "yes"/"no" for climate parameters
       const boolToYesNo = (val: any): "yes" | "no" | null => {
         if (val === 1) return "yes";
         if (val === 0) return "no";
@@ -308,41 +267,28 @@ export const getCultivationInfo = (
         ispumpOrirrigation: row.ispumpOrirrigation as "Yes" | "No" | undefined,
       };
 
-      console.log(
-        "✅ Returning cultivation info:",
-        JSON.stringify(result, null, 2),
-      );
-      console.log("🔍 ======= END FETCH CULTIVATION INFO =======");
       return result;
     }
 
-    console.log(
-      "📭 No cultivation info found in SQLite for requestId:",
-      requestId,
-    );
-    console.log("🔍 ======= END FETCH CULTIVATION INFO =======");
     return null;
   } catch (error) {
     console.error("❌ Error fetching cultivation info:", error);
-    console.log("🔍 ======= END FETCH CULTIVATION INFO =======");
+
     return null;
   }
 };
 
-// Clear cultivation info for a specific request
 export const clearCultivationInfo = (requestId: number): void => {
   try {
     db.runSync("DELETE FROM inspectioncultivation WHERE requestId = ?", [
       requestId,
     ]);
-    console.log("🗑️ Cleared cultivation info for request:", requestId);
   } catch (error) {
-    console.error("❌ Error clearing cultivation info:", error);
+    console.error("Error clearing cultivation info:", error);
     throw error;
   }
 };
 
-// Get all cultivation records
 export const getAllCultivationInfo = () => {
   try {
     const rows = db.getAllSync<any>(
@@ -350,7 +296,7 @@ export const getAllCultivationInfo = () => {
     );
     return rows;
   } catch (error) {
-    console.error("❌ Error fetching all cultivation info:", error);
+    console.error("Error fetching all cultivation info:", error);
     return [];
   }
 };

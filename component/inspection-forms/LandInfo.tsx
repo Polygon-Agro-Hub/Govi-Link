@@ -1,4 +1,3 @@
-// LandInfo.tsx - Land Info with SQLite
 import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
@@ -44,7 +43,6 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
   const { requestNumber, requestId } = route.params;
   const { t } = useTranslation();
 
-  // Local state for form data
   const [formData, setFormData] = useState<LandInfoData>({
     landDiscription: "",
     isOwnByFarmer: undefined,
@@ -69,7 +67,6 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
     "Permit land – long term from the government",
   ];
 
-  // Sample geo coordinates for testing
   const SAMPLE_LOCATIONS = [
     {
       name: "Colombo, Sri Lanka",
@@ -103,14 +100,9 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
     },
   ];
 
-  // Auto-save to SQLite whenever formData changes (debounced)
   useEffect(() => {
-    console.log("🔄 FormData changed, checking for auto-save...");
-    console.log("📍 Current GeoLocation:", formData.geoLocation);
-    console.log("📍 GeoLocation type:", typeof formData.geoLocation);
-
     if (formData.geoLocation) {
-      console.log("📍 GeoLocation details:", {
+      console.log(" GeoLocation details:", {
         latitude: formData.geoLocation.latitude,
         longitude: formData.geoLocation.longitude,
         locationName: formData.geoLocation.locationName,
@@ -120,19 +112,16 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
     const timer = setTimeout(async () => {
       if (requestId) {
         try {
-          console.log("💾 Auto-saving land info to SQLite...");
           await saveLandInfo(Number(requestId), formData);
-          console.log("💾 Auto-saved land info to SQLite");
         } catch (err) {
           console.error("Error auto-saving land info:", err);
         }
       }
-    }, 1000); // Increased to 1000ms for better debugging
+    }, 1000);
 
     return () => clearTimeout(timer);
   }, [formData, requestId]);
 
-  // Load data from SQLite when component mounts
   useFocusEffect(
     useCallback(() => {
       const loadData = async () => {
@@ -140,19 +129,13 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
 
         try {
           const reqId = Number(requestId);
-          console.log("🔄 Loading land info for requestId:", reqId);
 
           const localData = await getLandInfo(reqId);
 
           if (localData) {
-            console.log("✅ Loaded land info from SQLite:", localData);
-            console.log("📍 GeoLocation exists?", !!localData.geoLocation);
-            console.log("📍 GeoLocation data:", localData.geoLocation);
-
             setFormData(localData);
             setIsExistingData(true);
           } else {
-            console.log("📝 No local land info - new entry");
             setIsExistingData(false);
           }
         } catch (error) {
@@ -164,7 +147,6 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
     }, [requestId]),
   );
 
-  // Validate form completion
   useEffect(() => {
     const allFilled =
       formData.landDiscription.trim() !== "" &&
@@ -176,31 +158,10 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
     setIsNextEnabled(allFilled);
   }, [formData]);
 
-  // Update form data
   const updateFormData = (updates: Partial<LandInfoData>) => {
     setFormData((prev) => ({ ...prev, ...updates }));
   };
 
-  // Set sample geo coordinates
-  const setSampleCoordinates = (location: (typeof SAMPLE_LOCATIONS)[0]) => {
-    const geoLocation: GeoLocation = {
-      latitude: location.latitude,
-      longitude: location.longitude,
-      locationName: location.locationName,
-    };
-
-    console.log("📍 Setting sample coordinates:", geoLocation);
-    updateFormData({ geoLocation });
-    // setShowSampleOptions(false);
-
-    Alert.alert(
-      "Sample Location Set",
-      `Successfully set location to: ${location.name}`,
-      [{ text: "OK" }],
-    );
-  };
-
-  // Handle camera close
   const handleCameraClose = (uri: string | null) => {
     setShowCamera(false);
 
@@ -215,13 +176,11 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
     updateFormData({ images: [...formData.images, fileObj] });
   };
 
-  // Handle image removal
   const handleRemoveImage = (index: number) => {
     const newImages = formData.images.filter((_, i) => i !== index);
     updateFormData({ images: newImages });
   };
 
-  // Save to backend (only called on Next button)
   const saveToBackend = async (
     reqId: number,
     tableName: string,
@@ -229,11 +188,6 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
     isUpdate: boolean,
   ): Promise<boolean> => {
     try {
-      console.log(
-        `💾 Saving to backend (${isUpdate ? "UPDATE" : "INSERT"}):`,
-        tableName,
-      );
-
       const apiFormData = new FormData();
       apiFormData.append("reqId", reqId.toString());
       apiFormData.append("tableName", tableName);
@@ -244,27 +198,19 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
       apiFormData.append("ownershipStatus", data.ownershipStatus || "");
       apiFormData.append("landDiscription", data.landDiscription || "");
 
-      // Add geo location - ONLY send latitude and longitude
       if (data.geoLocation) {
         apiFormData.append("latitude", data.geoLocation.latitude.toString());
         apiFormData.append("longitude", data.geoLocation.longitude.toString());
-        // ⚠️ REMOVE THIS LINE - Don't send locationName to backend
-        // apiFormData.append("locationName", data.geoLocation.locationName);
       }
 
-      // Handle images - differentiate between S3 URLs and local files
       if (data.images && data.images.length > 0) {
         let existingUrlIndex = 0;
 
         data.images.forEach((img: LandImage, index: number) => {
-          // Check if it's an S3 URL (already uploaded)
           if (img.uri.startsWith("http://") || img.uri.startsWith("https://")) {
             apiFormData.append(`imagesUrl_${existingUrlIndex}`, img.uri);
             existingUrlIndex++;
-            console.log(`🔗 Keeping existing image URL: ${img.uri}`);
-          }
-          // Local file - need to upload
-          else if (
+          } else if (
             img.uri.startsWith("file://") ||
             img.uri.startsWith("content://")
           ) {
@@ -273,7 +219,6 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
               name: img.name || `land_${Date.now()}_${index}.jpg`,
               type: img.type || "image/jpeg",
             } as any);
-            console.log(`📤 Uploading new image: ${img.name}`);
           }
         });
       }
@@ -289,9 +234,6 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
       );
 
       if (response.data.success) {
-        console.log(`✅ Land info saved successfully`);
-
-        // Update local state with S3 URLs from backend
         if (response.data.data.images) {
           let imageUrls = response.data.data.images;
           if (typeof imageUrls === "string") {
@@ -321,12 +263,11 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
 
       return false;
     } catch (error: any) {
-      console.error(`❌ Error saving land info:`, error);
+      console.error(`Error saving land info:`, error);
       return false;
     }
   };
 
-  // Handle next button
   const handleNext = async () => {
     const validationErrors: Record<string, string> = {};
 
@@ -393,7 +334,6 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
       );
 
       if (saved) {
-        console.log("✅ Land info saved successfully to backend");
         setIsExistingData(true);
 
         Alert.alert(
@@ -448,6 +388,32 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
     }
   };
 
+  // Handle tab navigation
+  const handleTabPress = (tabKey: string) => {
+    // Map tab keys to navigation routes
+    const routeMap: Record<string, string> = {
+      "Personal Info": "PersonalInfo",
+      "ID Proof": "IDProof",
+      "Finance Info": "FinanceInfo",
+      "Land Info": "LandInfo",
+      "Investment Info": "InvestmentInfo",
+      "Cultivation Info": "CultivationInfo",
+      "Cropping Systems": "CroppingSystems",
+      "Profit & Risk": "ProfitRisk",
+      "Economical": "Economical",
+      "Labour": "Labour",
+      "Harvest Storage": "HarvestStorage",
+    };
+
+    const route = routeMap[tabKey];
+    if (route) {
+      navigation.navigate(route, {
+        requestId,
+        requestNumber,
+      });
+    }
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -458,21 +424,8 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
         <FormTabs
           activeKey="Land Info"
           navigation={navigation}
-          onTabPress={(key) => {
-            const routesMap: Record<string, string> = {
-              "Personal Info": "PersonalInfo",
-              "ID Proof": "IDProof",
-              "Finance Info": "FinanceInfo",
-            };
-
-            const route = routesMap[key];
-            if (route) {
-              navigation.navigate(route, {
-                requestId,
-                requestNumber,
-              });
-            }
-          }}
+          requestId={requestId}
+          onTabPress={handleTabPress}
         />
 
         <ScrollView
@@ -482,7 +435,6 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
         >
           <View className="h-6" />
 
-          {/* Is the land own by farmer */}
           <View className="mt-4">
             <Text className="text-sm text-[#070707] mb-2">
               {t("InspectionForm.Is the land own by farmer")} *
@@ -532,7 +484,6 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
             </TouchableOpacity>
           </View>
 
-          {/* Land description */}
           <View className="mt-4">
             <Text className="text-sm text-[#070707] mb-2">
               {t(
@@ -541,17 +492,16 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
               *
             </Text>
             <View
-              className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${errors.landDiscription ? "border border-red-500" : ""
-                }`}
+              className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${
+                errors.landDiscription ? "border border-red-500" : ""
+              }`}
             >
               <TextInput
                 placeholder={t("InspectionForm.Type here...")}
                 value={formData.landDiscription}
                 onChangeText={(text) => {
-                  // Remove leading whitespace only, preserve line breaks
                   let formattedText = text.replace(/^\s+/, "");
-                  if (formattedText.length > 0 && !text.startsWith('\n')) {
-                    // Only capitalize if not starting with a line break
+                  if (formattedText.length > 0 && !text.startsWith("\n")) {
                     formattedText =
                       formattedText.charAt(0).toUpperCase() +
                       formattedText.slice(1);
@@ -570,20 +520,15 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
             )}
           </View>
 
-          {/* Geo coordinates section */}
           <View className="mt-6">
             <Text className="text-sm text-[#070707] mb-2">
               {t("InspectionForm.Tag the geo coordinates of the land")} *
             </Text>
 
             <View className="flex-row space-x-2 mb-2">
-              {/* Main GPS button */}
               <TouchableOpacity
                 className="flex-1 bg-[#FA345A] rounded-full px-4 py-4 flex-row items-center justify-center gap-x-2"
                 onPress={() => {
-                  console.log("📍 Navigating to AttachGeoLocationScreen");
-                  console.log("📍 Current geoLocation:", formData.geoLocation);
-
                   navigation.navigate("AttachGeoLocationScreen", {
                     currentLatitude: formData.geoLocation?.latitude,
                     currentLongitude: formData.geoLocation?.longitude,
@@ -592,30 +537,17 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
                       longitude: number,
                       locationName: string,
                     ) => {
-                      console.log("📍 Location selected callback received:", {
-                        latitude,
-                        longitude,
-                        locationName,
-                      });
-
                       const geoLocation: GeoLocation = {
                         latitude,
                         longitude,
                         locationName: locationName || "Selected Location",
                       };
 
-                      console.log("📍 Updating formData with:", geoLocation);
-
-                      // Update state
                       updateFormData({ geoLocation });
 
-                      // ⭐ SAVE IMMEDIATELY - Don't wait for debounced auto-save
                       if (requestId) {
                         const updatedData = { ...formData, geoLocation };
                         saveLandInfo(Number(requestId), updatedData);
-                        console.log(
-                          "💾 Geo location saved immediately to SQLite",
-                        );
                       }
                     },
                   });
@@ -632,7 +564,6 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
               </TouchableOpacity>
             </View>
 
-            {/* Current location display */}
             {formData.geoLocation && (
               <View className="  ">
                 <View className="flex-row space-x-2 mt-3">
@@ -659,7 +590,6 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
               </View>
             )}
 
-            {/* Error message */}
             {errors.geoLocation && !formData.geoLocation && (
               <Text className="text-red-500 text-sm mt-2 ml-2">
                 {errors.geoLocation}
@@ -667,7 +597,6 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
             )}
           </View>
 
-          {/* Images */}
           <View className="mt-6">
             <Text className="text-sm text-[#070707] mb-2">
               {t(
@@ -686,7 +615,6 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
             </TouchableOpacity>
           </View>
 
-          {/* Image gallery */}
           {formData.images && formData.images.length > 0 && (
             <View className="mt-4">
               <Text className="text-sm text-gray-600 mb-2">
@@ -694,11 +622,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
               </Text>
               <View className="mt-4 flex-row flex-wrap">
                 {formData.images.map((img: LandImage, index: number) => (
-                  <View
-                    key={index}
-                    //  className="w-40 h-40 m-1 rounded-xl overflow-hidden relative"
-                    className="w-1/2 p-1 relative"
-                  >
+                  <View key={index} className="w-1/2 p-1 relative">
                     <Image
                       source={{ uri: img.uri }}
                       className="w-full h-40 rounded-2xl"

@@ -6,14 +6,14 @@ import {
   TouchableOpacity,
   ScrollView,
   Modal,
-  TouchableWithoutFeedback,
   Linking,
   ActivityIndicator,
   Alert,
   BackHandler,
-    Animated, PanResponder,
-    Pressable,
-    Image
+  Animated,
+  PanResponder,
+  Pressable,
+  Image,
 } from "react-native";
 import { RootStackParamList } from "@/component/types";
 import { useTranslation } from "react-i18next";
@@ -22,8 +22,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { environment } from "@/environment/environment";
-import { AntDesign, Ionicons, Feather, FontAwesome6 } from "@expo/vector-icons";
-import LottieView from "lottie-react-native";
+import { AntDesign, Ionicons, FontAwesome6 } from "@expo/vector-icons";
 
 type AssignJobsNavigationProps = StackNavigationProp<
   RootStackParamList,
@@ -79,43 +78,38 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
   const [selectedItem, setSelectedItem] = useState<VisitItem | null>(null);
 
   const translateY = useRef(new Animated.Value(0)).current;
-  const currentTranslateY = useRef(0);
-  console.log(translateY)
-  
+
   const panResponder = useRef(
     PanResponder.create({
       onMoveShouldSetPanResponderCapture: (_, g) => g.dy > 5,
       onStartShouldSetPanResponder: () => true,
-  
+
       onPanResponderMove: (_, g) => {
         if (g.dy > 0) translateY.setValue(g.dy);
       },
-  
+
       onPanResponderRelease: (_, g) => {
         if (g.dy > 120) {
-          console.log("hit1");
-                    setShowPopup(false);
+          setShowPopup(false);
           Animated.timing(translateY, {
             toValue: 600,
             duration: 100,
             useNativeDriver: true,
           }).start(() => {
-            console.log("hit3");
             translateY.setValue(0);
             setShowPopup(false);
             setSelectedItem(null);
           });
         } else {
-          console.log("hit4");
           Animated.spring(translateY, {
             toValue: 0,
             useNativeDriver: true,
           }).start();
         }
       },
-    })
+    }),
   ).current;
-  
+
   useEffect(() => {
     if (showPopup) {
       translateY.setValue(0);
@@ -128,7 +122,6 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
   }, []);
 
   const fetchVisits = async () => {
-    console.log("Fetching visits for date:", "Overdue:", isOverdueSelected);
     setLoading(true);
     try {
       const token = await AsyncStorage.getItem("token");
@@ -138,9 +131,9 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
           {
             params: { isOverdueSelected: isOverdueSelected },
             headers: { Authorization: `Bearer ${token}` },
-          }
+          },
         );
-        console.log("VISIT:", response.data.data);
+
         setVisits(response.data.data);
       }
     } catch (error) {
@@ -154,10 +147,9 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
     useCallback(() => {
       fetchVisits();
       setSelectedJobs([]);
-    }, [selectedDate, isOverdueSelected])
+    }, [selectedDate, isOverdueSelected]),
   );
 
-  // Handle back button when modal is open
   useFocusEffect(
     React.useCallback(() => {
       const backAction = () => {
@@ -171,11 +163,11 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
 
       const backHandler = BackHandler.addEventListener(
         "hardwareBackPress",
-        backAction
+        backAction,
       );
 
       return () => backHandler.remove();
-    }, [showPopup])
+    }, [showPopup]),
   );
 
   const toggleJobSelection = (jobId: string) => {
@@ -183,14 +175,12 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
       if (prev.includes(jobId)) {
         return prev.filter((id) => id !== jobId);
       } else {
-        // Only allow one job to be selected at a time
         return [jobId];
       }
     });
   };
 
   const handleCardPress = (item: VisitItem) => {
-    // Only select the job, don't show modal or navigate immediately
     toggleJobSelection(item.jobId);
   };
 
@@ -198,25 +188,23 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
     if (selectedJobs.length === 0) {
       Alert.alert(
         "No Job Selected",
-        "Please select at least one job to start."
+        "Please select at least one job to start.",
       );
       return;
     }
 
-    // Get the selected job details
     const selectedJob = visits.find((item) =>
-      selectedJobs.includes(item.jobId)
+      selectedJobs.includes(item.jobId),
     );
 
     if (!selectedJob) {
       Alert.alert(
         "Error",
-        "Could not find selected job details. Please try again."
+        "Could not find selected job details. Please try again.",
       );
       return;
     }
 
-    // If propose is Individual or Requested, show modal
     if (
       selectedJob.propose === "Individual" ||
       selectedJob.propose === "Requested"
@@ -224,7 +212,6 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
       setSelectedItem(selectedJob);
       setShowPopup(true);
     } else {
-      // For other propose types (like Cluster), navigate directly
       navigation.navigate("ViewFarmsCluster", {
         jobId: selectedJob.jobId,
         feildauditId: selectedJob.id,
@@ -237,9 +224,7 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
   const handleStartJobFromModal = () => {
     if (!selectedItem) return;
 
-    // Handle navigation based on propose type when Start is pressed in modal
     if (selectedItem.propose === "Individual") {
-      console.log("hit assign jobs");
       navigation.navigate("QRScanner", {
         farmerId: selectedItem.farmerId,
         jobId: selectedItem.jobId,
@@ -263,54 +248,46 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
 
     setShowPopup(false);
     setSelectedItem(null);
-    setSelectedJobs([]); // Clear selection after starting
+    setSelectedJobs([]);
   };
 
   const handleAssignJobs = () => {
     if (selectedJobs.length === 0) {
       Alert.alert(
         "No Jobs Selected",
-        "Please select at least one job to assign."
+        "Please select at least one job to assign.",
       );
       return;
     }
 
     const firstSelectedJob = visits.find((item) =>
-      selectedJobs.includes(item.jobId)
+      selectedJobs.includes(item.jobId),
     );
 
     if (firstSelectedJob) {
-      // Prepare the IDs based on auditType
       const fieldAuditIds: number[] = [];
       const govilinkJobIds: number[] = [];
 
-      // Get all selected jobs
       const selectedJobItems = visits.filter((item) =>
-        selectedJobs.includes(item.jobId)
+        selectedJobs.includes(item.jobId),
       );
 
-      // Separate IDs based on auditType
       selectedJobItems.forEach((job) => {
         if (job.auditType === "feildaudits") {
-          // For feildaudits, use the id as fieldAuditId
           fieldAuditIds.push(job.id);
         } else if (job.auditType === "govilinkjobs") {
-          // For govilinkjobs, use the id as govilinkJobId
           govilinkJobIds.push(job.id);
         }
       });
 
-      // Only one type of jobs should be selected at a time
-      // (as per your single selection logic)
       if (fieldAuditIds.length > 0 && govilinkJobIds.length > 0) {
         Alert.alert(
           "Mixed Job Types",
-          "Cannot assign mixed job types at once. Please select jobs of the same type."
+          "Cannot assign mixed job types at once. Please select jobs of the same type.",
         );
         return;
       }
 
-      // Determine which ID to send based on the first selected job
       let paramsToSend;
 
       if (firstSelectedJob.auditType === "feildaudits") {
@@ -323,7 +300,6 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
           auditType: firstSelectedJob.auditType,
         };
       } else {
-        // For govilinkjobs type
         paramsToSend = {
           selectedJobIds: selectedJobs,
           selectedDate: selectedDate,
@@ -334,12 +310,11 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
         };
       }
 
-      console.log("Navigating with params:", paramsToSend);
       navigation.navigate("AssignJobOfficerList", paramsToSend);
     } else {
       Alert.alert(
         "Error",
-        "Could not find selected job details. Please try again."
+        "Could not find selected job details. Please try again.",
       );
       return;
     }
@@ -348,7 +323,7 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
   const handleDial = (farmerMobile: number) => {
     const phoneUrl = `tel:${farmerMobile}`;
     Linking.openURL(phoneUrl).catch((err) =>
-      console.error("Failed to open dial pad:", err)
+      console.error("Failed to open dial pad:", err),
     );
   };
 
@@ -383,7 +358,6 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
     }
   };
 
-  // Calculate counts based on visits data with leading zeros
   const getOverdueCount = () => {
     if (!isOverdueSelected) return "00";
     return visits.length.toString().padStart(2, "0");
@@ -420,7 +394,7 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
                   isOverdueSelected ? "text-white" : "text-[#F83B4F]"
                 }`}
               >
-                 {t("Visits.Over Due")}
+                {t("Visits.Over Due")}
               </Text>
               {isOverdueSelected && (
                 <View className="bg-white rounded-full w-6 h-6 items-center justify-center">
@@ -470,7 +444,6 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      {/* Action Buttons - Only show when at least one job is selected */}
       {selectedJobs.length > 0 && (
         <View className="flex-row p-4 justify-between items-center space-x-6">
           <View className="flex-1"></View>
@@ -480,9 +453,13 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
                 colors={["#F2561D", "#FF1D85"]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
-className="flex-row p-3 rounded-full items-center justify-center min-w-[120px]"
+                className="flex-row p-3 rounded-full items-center justify-center min-w-[120px]"
               >
-                <Text className={`text-white  font-bold ${i18n.language==="si"? "text-base": i18n.language === "ta"? "text-base": "text-lg"}`}>{t("AssignJobOfficerList.Start")}</Text>
+                <Text
+                  className={`text-white  font-bold ${i18n.language === "si" ? "text-base" : i18n.language === "ta" ? "text-base" : "text-lg"}`}
+                >
+                  {t("AssignJobOfficerList.Start")}
+                </Text>
               </LinearGradient>
             </TouchableOpacity>
           </View>
@@ -491,7 +468,11 @@ className="flex-row p-3 rounded-full items-center justify-center min-w-[120px]"
               onPress={handleAssignJobs}
               className=" bg-black px-auto p-3 min-w-[120px] rounded-3xl items-center justify-center"
             >
-              <Text className={`text-white  font-bold ${i18n.language==="si"? "text-base": i18n.language === "ta"? "text-base": "text-lg"}`}>{t("AssignJobOfficerList.AssignButton")}</Text>
+              <Text
+                className={`text-white  font-bold ${i18n.language === "si" ? "text-base" : i18n.language === "ta" ? "text-base" : "text-lg"}`}
+              >
+                {t("AssignJobOfficerList.AssignButton")}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -518,7 +499,6 @@ className="flex-row p-3 rounded-full items-center justify-center min-w-[120px]"
                 }}
               >
                 <View className="flex-row justify-between items-start">
-                  {/* Checkbox on Left Side */}
                   <TouchableOpacity
                     onPress={(e) => {
                       e.stopPropagation();
@@ -535,7 +515,6 @@ className="flex-row p-3 rounded-full items-center justify-center min-w-[120px]"
                     )}
                   </TouchableOpacity>
 
-                  {/* Card Content */}
                   <View className="flex-1">
                     <Text className="text-sm font-medium">#{item.jobId}</Text>
                     <Text className="text-[16px] font-bold text-[#000] mt-1">
@@ -553,27 +532,21 @@ className="flex-row p-3 rounded-full items-center justify-center min-w-[120px]"
         </ScrollView>
       ) : (
         <View className=" items-center justify-center mt-[60%]">
-          {/* <LottieView
-            source={require("../assets/json/NoData.json")}
-            style={{ width: 200, height: 200 }}
-            autoPlay
-            loop
-          /> */}
-           <Image
-                       source={require("../assets/NoData.webp")}
-                       style={{
-                         width: 100,
-                         height: 100
-                       }}
-                       resizeMode="contain"
-                     />
+          <Image
+            source={require("../../assets/NoData.webp")}
+            style={{
+              width: 100,
+              height: 100,
+            }}
+            resizeMode="contain"
+          />
           <Text className="text-center text-gray-600 mt-1 italic">
             {t("Visits.No Jobs Available")}
           </Text>
         </View>
       )}
 
-         <Modal
+      <Modal
         transparent
         visible={showPopup}
         animationType="none"
@@ -582,163 +555,154 @@ className="flex-row p-3 rounded-full items-center justify-center min-w-[120px]"
           setSelectedItem(null);
         }}
       >
-                  <View
-                    style={{
-                      flex: 1,
-                      backgroundColor: "rgba(0,0,0,0.3)",
-                    }}
-                  >
-                        <Pressable
-              style={{ flex: 1 }}
-              onPress={() => {
-                setShowPopup(false);
-                setSelectedItem(null);
-              }}
-            />
-                      <Animated.View
-          {...panResponder.panHandlers}
+        <View
           style={{
-            position: "absolute",
-            bottom: 0,
-            width: "100%",
-            transform: [{ translateY }],
+            flex: 1,
+            backgroundColor: "rgba(0,0,0,0.3)",
           }}
-          className="bg-white rounded-t-3xl p-5 w-full"
-        > 
-        
-                <View className="items-center mt-4">
-                  <TouchableOpacity
-                    className="z-50 justify-center items-center"
-                    onPress={() => {
-                      setShowPopup(false);
-                      setSelectedItem(null);
-                    }}
-                  >
-                    <View className="bg-[#D9D9D9] w-20 py-0.5 rounded-full -mt-6" />
-                    <View className="bg-[#D9D9D9] w-8 py-0.5 rounded-full mt-1 mb-6" />
-                  </TouchableOpacity>
+        >
+          <Pressable
+            style={{ flex: 1 }}
+            onPress={() => {
+              setShowPopup(false);
+              setSelectedItem(null);
+            }}
+          />
+          <Animated.View
+            {...panResponder.panHandlers}
+            style={{
+              position: "absolute",
+              bottom: 0,
+              width: "100%",
+              transform: [{ translateY }],
+            }}
+            className="bg-white rounded-t-3xl p-5 w-full"
+          >
+            <View className="items-center mt-4">
+              <TouchableOpacity
+                className="z-50 justify-center items-center"
+                onPress={() => {
+                  setShowPopup(false);
+                  setSelectedItem(null);
+                }}
+              >
+                <View className="bg-[#D9D9D9] w-20 py-0.5 rounded-full -mt-6" />
+                <View className="bg-[#D9D9D9] w-8 py-0.5 rounded-full mt-1 mb-6" />
+              </TouchableOpacity>
 
-                  {selectedItem && (
-                    <>
-                      <Text className="text-base font-semibold text-[#747474]">
-                        #{selectedItem.jobId || "N/A"}
-                      </Text>
-                      <Text className="text-lg font-bold mt-2">
-                        {selectedItem.farmerName || "N/A"}
-                      </Text>
-                      <Text className="text-base font-semibold mt-1">
-                        {getServiceName(selectedItem)}
-                      </Text>
+              {selectedItem && (
+                <>
+                  <Text className="text-base font-semibold text-[#747474]">
+                    #{selectedItem.jobId || "N/A"}
+                  </Text>
+                  <Text className="text-lg font-bold mt-2">
+                    {selectedItem.farmerName || "N/A"}
+                  </Text>
+                  <Text className="text-base font-semibold mt-1">
+                    {getServiceName(selectedItem)}
+                  </Text>
 
-                      <Text className="text-sm font-medium text-[#4E6393] mt-1">
-                        {t(`Districts.${selectedItem.district}`)}{" "}
-                        {t("VisitPopup.District")}
-                      </Text>
+                  <Text className="text-sm font-medium text-[#4E6393] mt-1">
+                    {t(`Districts.${selectedItem.district}`)}{" "}
+                    {t("VisitPopup.District")}
+                  </Text>
 
-                      <View className="flex flex-row justify-center gap-x-2 mb-4 mt-6 px-4">
-                        <TouchableOpacity
-                          className="flex-1"
-                          disabled={
-                            !selectedItem?.latitude || !selectedItem?.longitude
-                          }
-                          onPress={() => {
-                            if (
-                              selectedItem?.latitude &&
-                              selectedItem?.longitude
-                            ) {
-                              const lat = selectedItem.latitude;
-                              const lon = selectedItem.longitude;
-                              const url = `https://www.google.com/maps?q=${lat},${lon}`;
-                              Linking.openURL(url);
-                            }
-                          }}
-                        >
-                          <View
-                            className={`flex flex-row items-center justify-center rounded-full py-2 border ${
-                              selectedItem?.latitude && selectedItem?.longitude
-                                ? "border-[#F83B4F]"
-                                : "border-[#9DB2CE]"
-                            }`}
-                          >
-                            <FontAwesome6
-                              name="location-dot"
-                              size={20}
-                              color={
-                                selectedItem?.latitude &&
-                                selectedItem?.longitude
-                                  ? "#F83B4F"
-                                  : "#9DB2CE"
-                              }
-                            />
-                            <Text
-                              className={`text-base font-semibold ml-2 ${
-                                selectedItem?.latitude &&
-                                selectedItem?.longitude
-                                  ? "text-[#000000]"
-                                  : "text-[#9DB2CE]"
-                              }`}
-                            >
-                              {t("VisitPopup.Location")}
-                            </Text>
-                          </View>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                          className="flex"
-                          onPress={() => handleDial(selectedItem.farmerMobile)}
-                        >
-                          <View className="flex-row items-center justify-center border border-[#F83B4F] rounded-full px-6 py-2">
-                            <Ionicons name="call" size={20} color="#F83B4F" />
-                            <Text className="text-base font-semibold ml-2">
-                              {t("VisitPopup.Get Call")}
-                            </Text>
-                          </View>
-                        </TouchableOpacity>
-                      </View>
-
-                      {(selectedItem.city ||
-                        selectedItem.plotNo ||
-                        selectedItem.street) && (
-                        <View className="flex text-center justify-center items-center">
-                          <Text className="text-sm font-semibold text-[#4E6393] mb-2">
-                            {t("VisitPopup.Address")}
-                          </Text>
-                          <Text className="text-base font-medium text-[#434343]">
-                            {selectedItem.plotNo}, {selectedItem.street},
-                          </Text>
-                          <Text className="text-base font-medium text-[#434343]">
-                            {selectedItem.city}
-                          </Text>
-                        </View>
-                      )}
-                    </>
-                  )}
-
-                  <View className="flex-row justify-between w-full mt-6 px-4 gap-x-4">
+                  <View className="flex flex-row justify-center gap-x-2 mb-4 mt-6 px-4">
                     <TouchableOpacity
                       className="flex-1"
-                      onPress={handleStartJobFromModal}
+                      disabled={
+                        !selectedItem?.latitude || !selectedItem?.longitude
+                      }
+                      onPress={() => {
+                        if (selectedItem?.latitude && selectedItem?.longitude) {
+                          const lat = selectedItem.latitude;
+                          const lon = selectedItem.longitude;
+                          const url = `https://www.google.com/maps?q=${lat},${lon}`;
+                          Linking.openURL(url);
+                        }
+                      }}
                     >
-                      <LinearGradient
-                        colors={["#F2561D", "#FF1D85"]}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 0 }}
-                        className="py-3 items-center justify-center rounded-full"
+                      <View
+                        className={`flex flex-row items-center justify-center rounded-full py-2 border ${
+                          selectedItem?.latitude && selectedItem?.longitude
+                            ? "border-[#F83B4F]"
+                            : "border-[#9DB2CE]"
+                        }`}
                       >
-                        {/* <Text className="text-white text-lg font-semibold">
-                          {t("VisitPopup.Start")}
-                        </Text> */}
-                                              <Text className={`text-white  font-semibold ${i18n.language==="si"? "text-base": i18n.language === "ta"? "text-base": "text-lg"}`}>
-                                                {t("VisitPopup.Start")}
-                                              </Text>
-                      </LinearGradient>
+                        <FontAwesome6
+                          name="location-dot"
+                          size={20}
+                          color={
+                            selectedItem?.latitude && selectedItem?.longitude
+                              ? "#F83B4F"
+                              : "#9DB2CE"
+                          }
+                        />
+                        <Text
+                          className={`text-base font-semibold ml-2 ${
+                            selectedItem?.latitude && selectedItem?.longitude
+                              ? "text-[#000000]"
+                              : "text-[#9DB2CE]"
+                          }`}
+                        >
+                          {t("VisitPopup.Location")}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      className="flex"
+                      onPress={() => handleDial(selectedItem.farmerMobile)}
+                    >
+                      <View className="flex-row items-center justify-center border border-[#F83B4F] rounded-full px-6 py-2">
+                        <Ionicons name="call" size={20} color="#F83B4F" />
+                        <Text className="text-base font-semibold ml-2">
+                          {t("VisitPopup.Get Call")}
+                        </Text>
+                      </View>
                     </TouchableOpacity>
                   </View>
-                </View>
-                              </Animated.View>
-                
-              </View>
 
+                  {(selectedItem.city ||
+                    selectedItem.plotNo ||
+                    selectedItem.street) && (
+                    <View className="flex text-center justify-center items-center">
+                      <Text className="text-sm font-semibold text-[#4E6393] mb-2">
+                        {t("VisitPopup.Address")}
+                      </Text>
+                      <Text className="text-base font-medium text-[#434343]">
+                        {selectedItem.plotNo}, {selectedItem.street},
+                      </Text>
+                      <Text className="text-base font-medium text-[#434343]">
+                        {selectedItem.city}
+                      </Text>
+                    </View>
+                  )}
+                </>
+              )}
+
+              <View className="flex-row justify-between w-full mt-6 px-4 gap-x-4">
+                <TouchableOpacity
+                  className="flex-1"
+                  onPress={handleStartJobFromModal}
+                >
+                  <LinearGradient
+                    colors={["#F2561D", "#FF1D85"]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    className="py-3 items-center justify-center rounded-full"
+                  >
+                    <Text
+                      className={`text-white  font-semibold ${i18n.language === "si" ? "text-base" : i18n.language === "ta" ? "text-base" : "text-lg"}`}
+                    >
+                      {t("VisitPopup.Start")}
+                    </Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Animated.View>
+        </View>
       </Modal>
     </View>
   );

@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp, useRoute, useFocusEffect } from "@react-navigation/native";
-import { RootStackParamList } from "./types";
+import { RootStackParamList } from "../types";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
@@ -20,7 +20,7 @@ import { environment } from "@/environment/environment";
 import { useTranslation } from "react-i18next";
 import { LinearGradient } from "expo-linear-gradient";
 import { CameraScreen } from "@/Items/CameraScreen";
-import ContentLoader, { Rect, Circle } from "react-content-loader/native";
+import ContentLoader, { Rect } from "react-content-loader/native";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -167,13 +167,6 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
   );
   const [loaingCertificate, setloaingCertificate] = useState(true);
 
-  // Calculate allChecked and noneChecked
-  const allChecked =
-    questions.length > 0 &&
-    questions.every(
-      (q) => q.officerTickResult === 1 || q.officerUploadImage != null,
-    );
-
   const noneChecked =
     questions.length > 0 &&
     questions.every(
@@ -185,12 +178,11 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(
     null,
   );
-  const [showCameraScreen, setShowCameraScreen] = useState(false);
+
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [countdown, setCountdown] = useState(3);
   const [isButtonEnabled, setIsButtonEnabled] = useState(false);
 
-  // New state for the confirmation modal
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 
   useEffect(() => {
@@ -211,12 +203,6 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
   }, [capturedImage]);
 
   useEffect(() => {
-    console.log(
-      "Farmer ID from QR:",
-      certificationpaymentId,
-      farmId,
-      clusterId,
-    );
     const fetchQuestions = async () => {
       try {
         const token = await AsyncStorage.getItem("token");
@@ -257,8 +243,6 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
   };
 
   const handleCheck = async (q: Question) => {
-    console.log("Toggle check for question:", q.id);
-
     try {
       const token = await AsyncStorage.getItem("token");
       if (!token) {
@@ -337,7 +321,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
 
       await updateTickResult(q, newTickResult, token);
     } catch (err) {
-      console.error("❌ Error updating tickResult:", err);
+      console.error(" Error updating tickResult:", err);
       Alert.alert(
         t("Error.error"),
         t("CertificateQuesanory.Something went wrong while updating question."),
@@ -376,7 +360,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
         }
       }
     } catch (err) {
-      console.error("❌ Error updating tickResult:", err);
+      console.error(" Error updating tickResult:", err);
       Alert.alert(
         t("Error.error"),
         t("CertificateQuesanory.Something went wrong while updating question."),
@@ -388,7 +372,6 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
   };
 
   const handleSubmitPhoto = async (q: Question) => {
-    console.log("image upload", q);
     if (!capturedImage || !selectedQuestion) return;
 
     try {
@@ -461,7 +444,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
         );
       }
     } catch (err) {
-      console.error("❌ Upload photo failed:", err);
+      console.error("Upload photo failed:", err);
       Alert.alert(
         t("Error.error"),
         t("CertificateQuesanory.Failed to complete task, Please try again"),
@@ -475,18 +458,15 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
   const handleCameraClose = (imageUri: string | null) => {
     setShowCamera(false);
     if (imageUri) {
-      console.log("Captured Image URI:", imageUri);
       setCapturedImage(imageUri);
       setShowCameraModal(true);
     }
   };
 
   const handleNextButtonPress = () => {
-    // If no tasks are completed, show confirmation modal
     if (noneChecked) {
       setShowConfirmationModal(true);
     } else {
-      // Proceed to next page
       navigateToNextPage();
     }
   };
@@ -555,7 +535,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
               <View className="w-full items-center mb-8">
                 <View className="flex-row items-center justify-center max-w-[240px]">
                   <Image
-                    source={require("../assets/staraward.png")}
+                    source={require("../../assets/staraward.png")}
                     style={{ width: 40, height: 100 }}
                     resizeMode="contain"
                   />
@@ -626,7 +606,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
                     )}
                   </TouchableOpacity>
 
-                  <View className="flex-row justify-between items-center mr-4">
+                  <View className="flex-row justify-between items-center mr-5">
                     <Text className="flex-1  ">{getLocalizedQuestion(q)}</Text>
                   </View>
                 </View>
@@ -636,20 +616,24 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
         </>
       )}
 
-      <View className="flex-row justify-between p-4 border-t border-gray-200">
+      <View className="flex-row justify-between p-4 border-t border-gray-200 px-6">
         <TouchableOpacity
-          className="flex-row items-center bg-[#444444] px-12 py-3 rounded-full"
+          className="flex-row items-center bg-[#444444] px-9 py-3 rounded-full"
           onPress={() => {
-            navigation.navigate("Main", { screen: screenName });
+            navigation.navigate("Main", {
+              screen: "MainTabs",
+              params: {
+                screen: "ViewAllVisits",
+              },
+            });
           }}
         >
           <AntDesign name="arrow-left" size={20} color="#fff" />
-          <Text className="ml-4 text-white font-semibold text-base">
+          <Text className="ml-4 text-white font-semibold text-base ">
             {t("CertificateQuesanory.Exit")}
           </Text>
         </TouchableOpacity>
 
-        {/* Next Button - Always enabled */}
         <TouchableOpacity
           onPress={handleNextButtonPress}
           className="rounded-full overflow-hidden"
@@ -658,7 +642,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
             colors={["#F35125", "#FF1D85"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
-            className="flex-row items-center px-12 py-3 rounded-full"
+            className="flex-row items-center px-9 py-3 rounded-full"
           >
             <Text className="mr-4 text-white font-semibold text-base">
               {t("CertificateQuesanory.Next")}
@@ -668,7 +652,6 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
         </TouchableOpacity>
       </View>
 
-      {/* Confirmation Modal for None Checked */}
       <Modal
         visible={showConfirmationModal}
         animationType="fade"
@@ -695,7 +678,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
             <View className="flex-row justify-between w-full space-x-4">
               <TouchableOpacity
                 onPress={() => setShowConfirmationModal(false)}
-                className="flex-row items-center px-8 py-3 rounded-full bg-[#444444]"
+                className="flex-row items-center px-8 py-3 rounded-full bg-[#444444]  "
               >
                 <Text className="text-white font-semibold text-base">
                   {t("CertificateQuesanory.Cancel")}
@@ -712,7 +695,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
                   colors={["#F35125", "#FF1D85"]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
-                  className="flex-row items-center px-7 mr-6 py-3 rounded-full"
+                  className="flex-row items-center px-7  py-3 rounded-full mr-2 "
                 >
                   <Text className="text-white font-semibold text-base">
                     {t("CertificateQuesanory.Continue")}
@@ -813,7 +796,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
               }}
               className="mt-4"
             >
-              <Text className="text-gray-400 text-sm">
+              <Text className="text-[#434343] underline text-sm">
                 {t("CertificateQuesanory.Cancel")}
               </Text>
             </TouchableOpacity>

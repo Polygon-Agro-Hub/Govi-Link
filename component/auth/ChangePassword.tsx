@@ -50,7 +50,6 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ navigation }) => {
   const { t } = useTranslation();
 
   const validatePassword = () => {
-    // Check if all fields are filled
     if (!currentPassword || !newPassword || !confirmPassword) {
       Alert.alert(t("Error.error"), t("Error.All fields are required"), [
         { text: t("Main.ok") },
@@ -58,7 +57,6 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ navigation }) => {
       return false;
     }
 
-    // Check if new password meets format requirements
     if (newPassword.length < 8) {
       Alert.alert(t("Error.error"), t("Error.Your password must contain"), [
         { text: t("Main.ok") },
@@ -66,7 +64,6 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ navigation }) => {
       return false;
     }
 
-    // Check for at least 1 uppercase letter
     if (!/[A-Z]/.test(newPassword)) {
       Alert.alert(
         t("Error.error"),
@@ -76,7 +73,6 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ navigation }) => {
       return false;
     }
 
-    // Check for at least 1 number
     if (!/[0-9]/.test(newPassword)) {
       Alert.alert(t("Error.error"), t("Error.Your password must contain"), [
         { text: t("Main.ok") },
@@ -84,7 +80,6 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ navigation }) => {
       return false;
     }
 
-    // Check for at least 1 special character
     if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(newPassword)) {
       Alert.alert(
         t("Error.error"),
@@ -94,7 +89,6 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ navigation }) => {
       return false;
     }
 
-    // Check if new password and confirm password match
     if (newPassword !== confirmPassword) {
       Alert.alert(
         t("Error.error"),
@@ -165,12 +159,10 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ navigation }) => {
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
-        // If passwordUpdate is 0, prevent back navigation
         if (passwordUpdate === 0) {
-          console.log("hitt");
-          return true; // Prevent back navigation
+          return true;
         }
-        // If passwordUpdate is 1, allow back navigation
+
         return false;
       };
 
@@ -179,7 +171,7 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ navigation }) => {
         onBackPress,
       );
       return () => subscription.remove();
-    }, [passwordUpdate]), // Added passwordUpdate as dependency
+    }, [passwordUpdate]),
   );
 
   return (
@@ -198,7 +190,7 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ navigation }) => {
       <ScrollView
         className="flex-1 bg-white"
         keyboardShouldPersistTaps="handled"
-        style={{ paddingHorizontal: wp(4)}}
+        style={{ paddingHorizontal: wp(4) }}
       >
         <View
           className={`flex-row items-center justify-center space-x-[-30%] ml-[5%]`}
