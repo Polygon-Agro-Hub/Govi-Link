@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import countryData from "@/assets/json/countryflag.json";
 import banksData from "@/assets/json/banks.json";
 import branchesData from "@/assets/json/branches.json";

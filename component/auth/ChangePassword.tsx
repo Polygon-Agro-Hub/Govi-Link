@@ -13,7 +13,7 @@ import {
 import React, { useCallback, useState } from "react";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp, useRoute } from "@react-navigation/native";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import axios from "axios";
 import { ScrollView } from "react-native-gesture-handler";
 import { environment } from "@/environment/environment";

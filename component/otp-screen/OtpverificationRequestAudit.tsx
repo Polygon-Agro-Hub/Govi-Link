@@ -16,7 +16,6 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { environment } from "@/environment/environment";
 import { useTranslation } from "react-i18next";
-import { Dimensions } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { ScrollView } from "react-native-gesture-handler";
 import NetInfo from "@react-native-community/netinfo";
@@ -366,15 +365,10 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
         </View>
       </View>
 
-      <View className="flex justify-center items-center mt-0">
-        <Text className="text-black" style={{ fontSize: wp(8) }}>
-          {/* {t("OtpVerification.OTPVerification")} */}
-        </Text>
-      </View>
 
-      <View className="flex justify-center items-center">
+      <View className="flex justify-center items-center mt-3">
         <Image
-          source={require("../../assets/otpverify.webp")}
+          source={require("../../assets/images/otp/otpverify.webp")}
           style={{
             width: 500,
             height: 150,

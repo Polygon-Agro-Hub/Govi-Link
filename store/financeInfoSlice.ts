@@ -28,25 +28,24 @@ type FinanceInfoState = {
   data: {
     [jobId: string]: FormData;
   };
-  currentRequestId: number | null; // ✅ Added
+  currentRequestId: number | null; 
 };
 
 const initialState: FinanceInfoState = {
   data: {},
-  currentRequestId: null, // ✅ Added
+  currentRequestId: null, 
 };
 
 const financeInfoSlice = createSlice({
   name: 'financeInfo',
   initialState,
   reducers: {
-    // ✅ NEW: Initialize action with auto-clear
+   
     initializeFinanceInfo: (state, action: PayloadAction<{ requestId: number }>) => {
-      const { requestId } = action.payload;
+      const { requestId } = action.payload;     
       
-      // ✅ Auto-clear when switching requests
       if (state.currentRequestId !== null && state.currentRequestId !== requestId) {
-        console.log(`🗑️ [FinanceInfo] Clearing data for old request ${state.currentRequestId}`);
+        
         delete state.data[state.currentRequestId];
       }
       
@@ -98,17 +97,17 @@ const financeInfoSlice = createSlice({
 
     clearAllFinanceInfo: (state) => {
       state.data = {};
-      state.currentRequestId = null; // ✅ Added
+      state.currentRequestId = null; 
     },
   },
 });
 
 export const { 
-  initializeFinanceInfo, // ✅ Export new action
+  initializeFinanceInfo, 
   setFinanceInfo, 
   updateFinanceInfo, 
   clearFinanceInfo,
-  clearAllFinanceInfo, // ✅ Export new action
+  clearAllFinanceInfo, 
 } = financeInfoSlice.actions;
 
 export default financeInfoSlice.reducer;

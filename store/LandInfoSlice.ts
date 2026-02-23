@@ -24,26 +24,26 @@ export type LandInfoData = {
 type LandInfoState = {
   data: Record<string, LandInfoData>;
   isExisting: Record<string, boolean>;
-  currentRequestId: number | null; // ✅ Added
+  currentRequestId: number | null; 
 };
 
 const initialState: LandInfoState = {
   data: {},
   isExisting: {},
-  currentRequestId: null, // ✅ Added
+  currentRequestId: null, 
 };
 
 const landInfoSlice = createSlice({
   name: 'inspectionland',
   initialState,
   reducers: {
-    // ✅ UPDATED with auto-clear
+    
     initializeLandInfo: (state, action: PayloadAction<{ requestId: number }>) => {
       const { requestId } = action.payload;
       
-      // ✅ Auto-clear when switching requests
+      
       if (state.currentRequestId !== null && state.currentRequestId !== requestId) {
-        console.log(`🗑️ [LandInfo] Clearing data for old request ${state.currentRequestId}`);
+       
         delete state.data[state.currentRequestId];
         delete state.isExisting[state.currentRequestId];
       }
@@ -180,7 +180,7 @@ const landInfoSlice = createSlice({
     clearAllLandInfo: (state) => {
       state.data = {};
       state.isExisting = {};
-      state.currentRequestId = null; // ✅ Added
+      state.currentRequestId = null; 
     },
   },
 });
@@ -210,7 +210,7 @@ export const saveLandInfoToStorage = async (
       `landinfo_${requestId}`,
       JSON.stringify(data)
     );
-    console.log(`💾 Saved land info to AsyncStorage for requestId: ${requestId}`);
+    
   } catch (error) {
     console.error('Failed to save land info to AsyncStorage:', error);
   }
@@ -222,7 +222,6 @@ export const loadLandInfoFromStorageAsync = async (
   try {
     const stored = await AsyncStorage.getItem(`landinfo_${requestId}`);
     if (stored) {
-      console.log(`📂 Loaded land info from AsyncStorage for requestId: ${requestId}`);
       return JSON.parse(stored);
     }
     return null;

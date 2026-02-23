@@ -31,7 +31,7 @@ const appReducer = combineReducers({
 
 const rootReducer = (state: any, action: any) => {
   if (action.type === 'auth/logoutUser') {
-    state = undefined; // clears all slices
+    state = undefined; 
   }
   return appReducer(state, action);
 };

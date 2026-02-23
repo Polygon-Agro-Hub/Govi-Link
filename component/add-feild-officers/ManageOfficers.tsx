@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
@@ -213,7 +213,9 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
           </Text>
 
           {officers.length === 0 ? (
+            <View className="flex-1 items-center justify-center">
             <NoDataComponent message={t("ManageOfficers.NoOfficers")} />
+            </View>
           ) : (
             officers.map((officer, index) => (
               <View

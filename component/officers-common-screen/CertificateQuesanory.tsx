@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp, useRoute, useFocusEffect } from "@react-navigation/native";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
@@ -535,7 +535,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
               <View className="w-full items-center mb-8">
                 <View className="flex-row items-center justify-center max-w-[240px]">
                   <Image
-                    source={require("../../assets/staraward.png")}
+                    source={require("../../assets/images/public/staraward.webp")}
                     style={{ width: 40, height: 100 }}
                     resizeMode="contain"
                   />

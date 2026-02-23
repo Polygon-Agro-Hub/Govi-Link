@@ -18,7 +18,7 @@ import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import { CameraScreen } from "@/Items/CameraScreen";
 import FormFooterButton from "./FormFooterButton";
 import {
@@ -83,7 +83,6 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
     frontImg: null,
     backImg: null,
   });
-
   const [isNextEnabled, setIsNextEnabled] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showCamera, setShowCamera] = useState(false);
@@ -413,9 +412,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
     }
   };
 
-  // Handle tab navigation
   const handleTabPress = (tabKey: string) => {
-    // Map tab keys to navigation routes
     const routeMap: Record<string, string> = {
       "Personal Info": "PersonalInfo",
       "ID Proof": "IDProof",
@@ -425,8 +422,8 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
       "Cultivation Info": "CultivationInfo",
       "Cropping Systems": "CroppingSystems",
       "Profit & Risk": "ProfitRisk",
-      "Economical": "Economical",
-      "Labour": "Labour",
+      Economical: "Economical",
+      Labour: "Labour",
       "Harvest Storage": "HarvestStorage",
     };
 

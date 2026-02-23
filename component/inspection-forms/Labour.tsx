@@ -14,7 +14,7 @@ import { AntDesign } from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
 import { useTranslation } from "react-i18next";
 import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 import FormFooterButton from "./FormFooterButton";
@@ -109,7 +109,6 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
   const route = useRoute<RouteProp<RootStackParamList, "Labour">>();
   const { requestNumber, requestId } = route.params;
   const { t } = useTranslation();
-
   const [formData, setFormData] = useState<LabourData>({
     isManageFamilyLabour: undefined,
     isFamilyHiredLabourEquipped: undefined,
@@ -119,7 +118,6 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
     isMachineryAffordable: undefined,
     isMachineryCostEffective: undefined,
   });
-
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [yesNoModalVisible, setYesNoModalVisible] = useState(false);
   const [activeYesNoField, setActiveYesNoField] = useState<string | null>(null);
@@ -476,9 +474,7 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
     }
   };
 
-  // Handle tab navigation
   const handleTabPress = (tabKey: string) => {
-    // Map tab keys to navigation routes
     const routeMap: Record<string, string> = {
       "Personal Info": "PersonalInfo",
       "ID Proof": "IDProof",
@@ -488,8 +484,8 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
       "Cultivation Info": "CultivationInfo",
       "Cropping Systems": "CroppingSystems",
       "Profit & Risk": "ProfitRisk",
-      "Economical": "Economical",
-      "Labour": "Labour",
+      Economical: "Economical",
+      Labour: "Labour",
       "Harvest Storage": "HarvestStorage",
     };
 

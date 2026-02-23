@@ -21,7 +21,7 @@ import countryData from "@/assets/json/countryflag.json";
 import sriLankaData from "@/assets/json/provinceDistrict.json";
 import districtData from "@/assets/json/Districts.json";
 import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import FormFooterButton from "./FormFooterButton";
 import {
   savePersonalInfo,
@@ -63,8 +63,9 @@ const Input = ({
       {label} {required && <Text className="text-black">*</Text>}
     </Text>
     <View
-      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${error ? "border border-red-500" : ""
-        }`}
+      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
+        error ? "border border-red-500" : ""
+      }`}
     >
       {isMobile ? (
         <View className="flex-row flex-1 items-center">
@@ -171,7 +172,7 @@ const validateAndFormat = (
         const isDuplicate = rules.uniqueWith.some(
           (key) =>
             formData[key]?.toLowerCase().trim() ===
-            value.toLowerCase().trim() && key !== currentKey,
+              value.toLowerCase().trim() && key !== currentKey,
         );
         if (isDuplicate) error = t("Error.Email addresses cannot be the same");
       }
@@ -195,7 +196,7 @@ const validateAndFormat = (
       const isDuplicate = rules.uniqueWith.some(
         (key) =>
           formData[key]?.replace(/[^0-9]/g, "").replace(/^0+/, "") ===
-          numbersOnly && key !== currentKey,
+            numbersOnly && key !== currentKey,
       );
       if (isDuplicate) error = t("Error.Phone numbers cannot be the same");
     }
@@ -212,7 +213,7 @@ const validateAndFormat = (
       const isDuplicate = rules.uniqueWith.some(
         (key) =>
           formData[key]?.replace(/[^0-9]/g, "").replace(/^0+/, "") ===
-          numbersOnly && key !== currentKey,
+            numbersOnly && key !== currentKey,
       );
       if (isDuplicate) error = t("Error.Phone numbers cannot be the same");
     }
@@ -229,7 +230,6 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
   const route = useRoute<RouteProp<RootStackParamList, "PersonalInfo">>();
   const { requestNumber, requestId } = route.params;
   const { t, i18n } = useTranslation();
-
   const [formData, setFormData] = useState<PersonalInfo>({
     firstName: "",
     lastName: "",
@@ -264,7 +264,6 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
   const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
   const [isNextEnabled, setIsNextEnabled] = useState(false);
   const [isExistingData, setIsExistingData] = useState(false);
-
   const districts: DistrictsMap = districtData;
 
   useEffect(() => {
@@ -303,8 +302,8 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             setDisplayProvince(
               provinceObj
                 ? provinceObj.name[
-                i18n.language as keyof typeof provinceObj.name
-                ] || provinceObj.name.en
+                    i18n.language as keyof typeof provinceObj.name
+                  ] || provinceObj.name.en
                 : "",
             );
 
@@ -314,8 +313,8 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             setDisplayCountry(
               countryObj
                 ? countryObj.name[
-                i18n.language as keyof typeof countryObj.name
-                ] || countryObj.name.en
+                    i18n.language as keyof typeof countryObj.name
+                  ] || countryObj.name.en
                 : localData.country || "Sri Lanka",
             );
           } else {
@@ -527,7 +526,6 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
       { cancelable: false },
     );
 
-    // Save to backend
     const saved = await saveToBackend(
       reqId,
       "inspectionpersonal",
@@ -598,7 +596,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
 
     const displayProv = province
       ? province.name[i18n.language as keyof typeof province.name] ||
-      province.name.en
+        province.name.en
       : "";
 
     setSelectedProvince(province?.name.en || null);
@@ -719,9 +717,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
     });
   };
 
-  // Handle tab navigation
   const handleTabPress = (tabKey: string) => {
-    // Map tab keys to navigation routes
     const routeMap: Record<string, string> = {
       "Personal Info": "PersonalInfo",
       "ID Proof": "IDProof",
@@ -731,8 +727,8 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
       "Cultivation Info": "CultivationInfo",
       "Cropping Systems": "CroppingSystems",
       "Profit & Risk": "ProfitRisk",
-      "Economical": "Economical",
-      "Labour": "Labour",
+      Economical: "Economical",
+      Labour: "Labour",
       "Harvest Storage": "HarvestStorage",
     };
 
@@ -930,7 +926,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             onChangeText={(text) =>
               handleFieldChange("house", text, {
                 required: true,
-                type: "text", // Changed from "house" to "text" to allow special characters
+                type: "text",
               })
             }
             required

@@ -27,7 +27,7 @@ interface PersonalInfoState {
   isExisting: {
     [requestId: string]: boolean;
   };
-  currentRequestId: number | null; // ✅ Added
+  currentRequestId: number | null; 
 }
 
 const initialPersonalInfo: PersonalInfo = {
@@ -53,20 +53,18 @@ const initialPersonalInfo: PersonalInfo = {
 const initialState: PersonalInfoState = {
   data: {},
   isExisting: {},
-  currentRequestId: null, // ✅ Added
+  currentRequestId: null, 
 };
 
 const personalInfoSlice = createSlice({
   name: 'personalInfo',
   initialState,
   reducers: {
-    // ✅ UPDATED with auto-clear
     initializePersonalInfo: (state, action: PayloadAction<{ requestId: number }>) => {
       const { requestId } = action.payload;
       
-      // ✅ Auto-clear when switching requests
       if (state.currentRequestId !== null && state.currentRequestId !== requestId) {
-        console.log(`🗑️ [PersonalInfo] Clearing data for old request ${state.currentRequestId}`);
+        
         delete state.data[state.currentRequestId];
         delete state.isExisting[state.currentRequestId];
       }
@@ -129,7 +127,7 @@ const personalInfoSlice = createSlice({
     clearAllPersonalInfo: (state) => {
       state.data = {};
       state.isExisting = {};
-      state.currentRequestId = null; // ✅ Added
+      state.currentRequestId = null; 
     },
   },
 });

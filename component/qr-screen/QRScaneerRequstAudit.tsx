@@ -11,7 +11,7 @@ import {
   Pressable,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import { CameraView, Camera } from "expo-camera";
 import { useTranslation } from "react-i18next";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
@@ -49,10 +49,8 @@ const QRScaneerRequstAudit: React.FC<QRScaneerRequstAuditProps> = ({
     useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { t } = useTranslation();
-
   const [isUnsuccessfulModalVisible, setIsUnsuccessfulModalVisible] =
     useState<boolean>(false);
-
   const [unsuccessfulLoadingBarWidth, setUnsuccessfulLoadingBarWidth] =
     useState(new Animated.Value(100));
 
@@ -330,7 +328,7 @@ const QRScaneerRequstAudit: React.FC<QRScaneerRequstAuditProps> = ({
               </Text>
               <View className="mb-4">
                 <Image
-                  source={require("../../assets/error.png")}
+                  source={require("../../assets/images/public/error.webp")}
                   className="w-32 h-32"
                   resizeMode="contain"
                 />

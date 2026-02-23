@@ -18,7 +18,7 @@ export const initProfitTable = () => {
         updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
       );`,
     );
-    console.log(" Profit/risk table created/verified");
+    
   } catch (error) {
     console.error(" Error initializing profit/risk table:", error);
     throw error;
@@ -87,7 +87,6 @@ export const saveProfitInfo = (
       );
       console.log("Profit/risk info updated in SQLite");
     } else {
-      // INSERT new record
       const fields = [
         "requestId",
         ...Object.keys(storageData),

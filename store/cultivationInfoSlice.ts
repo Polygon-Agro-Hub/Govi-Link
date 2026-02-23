@@ -32,7 +32,7 @@ interface CultivationInfoState {
   isExisting: {
     [requestId: number]: boolean;
   };
-  currentRequestId: number | null; // ✅ Added
+  currentRequestId: number | null; 
 }
 
 const initialCultivationInfo: CultivationInfoData = {
@@ -60,20 +60,19 @@ const initialCultivationInfo: CultivationInfoData = {
 const initialState: CultivationInfoState = {
   data: {},
   isExisting: {},
-  currentRequestId: null, // ✅ Added
+  currentRequestId: null, 
 };
 
 const cultivationInfoSlice = createSlice({
   name: 'cultivationInfo',
   initialState,
   reducers: {
-    // ✅ UPDATED with auto-clear
+    
     initializeCultivationInfo: (state, action: PayloadAction<{ requestId: number }>) => {
       const { requestId } = action.payload;
-      
-      // ✅ Auto-clear when switching requests
+           
       if (state.currentRequestId !== null && state.currentRequestId !== requestId) {
-        console.log(`🗑️ [CultivationInfo] Clearing data for old request ${state.currentRequestId}`);
+        
         delete state.data[state.currentRequestId];
         delete state.isExisting[state.currentRequestId];
       }
@@ -136,7 +135,7 @@ const cultivationInfoSlice = createSlice({
     clearAllCultivationInfo: (state) => {
       state.data = {};
       state.isExisting = {};
-      state.currentRequestId = null; // ✅ Added
+      state.currentRequestId = null; 
     },
   },
 });

@@ -23,7 +23,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { DrawerNavigationProp } from "@react-navigation/drawer";
 import { useDrawerStatus } from "@react-navigation/drawer";
 
-import { RootStackParamList } from "@/component/types";
+import { RootStackParamList } from "@/component/types/types";
 interface ProfileData {
   firstName: string;
   lastName: string;

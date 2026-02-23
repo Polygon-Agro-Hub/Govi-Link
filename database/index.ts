@@ -24,7 +24,6 @@ export const initDatabase = () => {
     initLabourTable();
     initHarvestStorageTable();
 
-    console.log(" All database tables initialized successfully");
   } catch (error) {
     console.error(" Error initializing database:", error);
     throw error;

@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export type CroppingSystemsData = {
   opportunity?: string[];
@@ -15,51 +15,54 @@ type CroppingSystemsState = {
   isExisting: {
     [requestId: number]: boolean;
   };
-  currentRequestId: number | null; // ✅ Added
+  currentRequestId: number | null;
 };
 
 const initialState: CroppingSystemsState = {
   data: {},
   isExisting: {},
-  currentRequestId: null, // ✅ Added
+  currentRequestId: null,
 };
 
 const croppingSystemsSlice = createSlice({
-  name: 'croppingSystems',
+  name: "croppingSystems",
   initialState,
   reducers: {
-    // ✅ UPDATED with auto-clear
-    initializeCroppingSystems: (state, action: PayloadAction<{ requestId: number }>) => {
+    initializeCroppingSystems: (
+      state,
+      action: PayloadAction<{ requestId: number }>,
+    ) => {
       const { requestId } = action.payload;
-      
-      // ✅ Auto-clear when switching requests
-      if (state.currentRequestId !== null && state.currentRequestId !== requestId) {
-        console.log(`🗑️ [CroppingSystems] Clearing data for old request ${state.currentRequestId}`);
+
+      if (
+        state.currentRequestId !== null &&
+        state.currentRequestId !== requestId
+      ) {
         delete state.data[state.currentRequestId];
         delete state.isExisting[state.currentRequestId];
       }
-      
+
       state.currentRequestId = requestId;
-      
+
       if (!state.data[requestId]) {
         state.data[requestId] = {
           opportunity: [],
-          otherOpportunity: '',
+          otherOpportunity: "",
           hasKnowlage: undefined,
-          prevExperince: '',
-          opinion: '',
+          prevExperince: "",
+          opinion: "",
         };
         state.isExisting[requestId] = false;
       }
     },
-    
+
     setCroppingSystems: (
       state,
       action: PayloadAction<{
         requestId: number;
         data: CroppingSystemsData;
         isExisting?: boolean;
-      }>
+      }>,
     ) => {
       const { requestId, data, isExisting } = action.payload;
       state.data[requestId] = { ...data };
@@ -67,13 +70,13 @@ const croppingSystemsSlice = createSlice({
         state.isExisting[requestId] = isExisting;
       }
     },
-    
+
     updateCroppingSystems: (
       state,
       action: PayloadAction<{
         requestId: number;
         updates: Partial<CroppingSystemsData>;
-      }>
+      }>,
     ) => {
       const { requestId, updates } = action.payload;
       if (state.data[requestId]) {
@@ -83,28 +86,34 @@ const croppingSystemsSlice = createSlice({
         };
       }
     },
-    
-    markCroppingAsExisting: (state, action: PayloadAction<{ requestId: number }>) => {
+
+    markCroppingAsExisting: (
+      state,
+      action: PayloadAction<{ requestId: number }>,
+    ) => {
       const { requestId } = action.payload;
       state.isExisting[requestId] = true;
     },
-    
-    clearCroppingSystems: (state, action: PayloadAction<{ requestId: number }>) => {
+
+    clearCroppingSystems: (
+      state,
+      action: PayloadAction<{ requestId: number }>,
+    ) => {
       const { requestId } = action.payload;
       state.data[requestId] = {
         opportunity: [],
-        otherOpportunity: '',
+        otherOpportunity: "",
         hasKnowlage: undefined,
-        prevExperince: '',
-        opinion: '',
+        prevExperince: "",
+        opinion: "",
       };
       state.isExisting[requestId] = false;
     },
-    
+
     clearAllCroppingSystems: (state) => {
       state.data = {};
       state.isExisting = {};
-      state.currentRequestId = null; // ✅ Added
+      state.currentRequestId = null;
     },
   },
 });

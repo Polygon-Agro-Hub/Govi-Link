@@ -15,13 +15,14 @@ import {
   Pressable,
   Image,
 } from "react-native";
-import { RootStackParamList } from "@/component/types";
+import { RootStackParamList } from "@/component/types/types";
 import { useTranslation } from "react-i18next";
 import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { environment } from "@/environment/environment";
+import NoDataComponent from "@/component/common/NoDataComponent";
 import { AntDesign, Ionicons, FontAwesome6 } from "@expo/vector-icons";
 
 type AssignJobsNavigationProps = StackNavigationProp<
@@ -68,7 +69,6 @@ interface VisitItem {
 
 const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
   const { t, i18n } = useTranslation();
-
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [isOverdueSelected, setIsOverdueSelected] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -76,7 +76,6 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
   const [visits, setVisits] = useState<VisitItem[]>([]);
   const [showPopup, setShowPopup] = useState(false);
   const [selectedItem, setSelectedItem] = useState<VisitItem | null>(null);
-
   const translateY = useRef(new Animated.Value(0)).current;
 
   const panResponder = useRef(
@@ -531,19 +530,7 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
           ))}
         </ScrollView>
       ) : (
-        <View className=" items-center justify-center mt-[60%]">
-          <Image
-            source={require("../../assets/NoData.webp")}
-            style={{
-              width: 100,
-              height: 100,
-            }}
-            resizeMode="contain"
-          />
-          <Text className="text-center text-gray-600 mt-1 italic">
-            {t("Visits.No Jobs Available")}
-          </Text>
-        </View>
+        <NoDataComponent message={t("Visits.No Jobs Available")} />
       )}
 
       <Modal

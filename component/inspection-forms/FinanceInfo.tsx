@@ -17,7 +17,7 @@ import FormTabs from "./FormTabs";
 import { useTranslation } from "react-i18next";
 import Checkbox from "expo-checkbox";
 import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import banksData from "@/assets/json/banks.json";
 import branchesData from "@/assets/json/branches.json";
 import axios from "axios";
@@ -229,7 +229,6 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
         confirmAccountNumber: t("Error.Account numbers do not match")
       }));
     } else {
-      // Clear the error if they match
       setErrors(prev => {
         const newErrors = { ...prev };
         delete newErrors.confirmAccountNumber;
@@ -896,9 +895,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     });
   };
 
-  // Handle tab navigation
   const handleTabPress = (tabKey: string) => {
-    // Map tab keys to navigation routes
     const routeMap: Record<string, string> = {
       "Personal Info": "PersonalInfo",
       "ID Proof": "IDProof",

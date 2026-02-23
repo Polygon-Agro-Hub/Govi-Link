@@ -13,7 +13,7 @@ import {
   Keyboard,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,

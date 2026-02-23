@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
-  Platform,
   StatusBar,
   Modal,
 } from "react-native";
@@ -18,7 +17,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import { useTranslation } from "react-i18next";
 import { LinearGradient } from "expo-linear-gradient";
 

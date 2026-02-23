@@ -17,7 +17,7 @@ import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { RadioButton } from "react-native-paper";
 import Checkbox from "expo-checkbox";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import countryData from "@/assets/json/countryflag.json";
 import { useTranslation } from "react-i18next";
 import i18n from "@/i18n/i18n";

@@ -17,7 +17,7 @@ export const initHarvestStorageTable = () => {
         updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
       );`,
     );
-    console.log(" Harvest Storage table created/verified");
+    
   } catch (error) {
     console.error("Error initializing harvest storage table:", error);
     throw error;

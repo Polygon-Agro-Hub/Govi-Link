@@ -12,13 +12,12 @@ import {
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { environment } from "@/environment/environment";
-import { useDispatch } from "react-redux";
 import { hasDraft, initPersonalTable } from "@/database/inspectionpersonal";
 
 type CapitalRequestsNavigationProps = StackNavigationProp<
@@ -38,7 +37,6 @@ interface Request {
 
 const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
   const { t } = useTranslation();
-  const dispatch = useDispatch();
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [requests, setRequests] = useState<Request[]>([]);
@@ -131,9 +129,6 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
     useCallback(() => {
       fetchCapitalRequests(searchQuery);
 
-      return () => {
-        console.log("CapitalRequests screen blurred");
-      };
     }, [searchQuery]),
   );
 
@@ -192,7 +187,7 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
           {requests.length === 0 ? (
             <View className="flex justify-center items-center mt-40">
               <Image
-                source={require("../../assets/no tasks.webp")}
+                source={require("../../assets/images/dashboard/no tasks.webp")}
                 style={{ width: 120, height: 90 }}
                 resizeMode="contain"
               />

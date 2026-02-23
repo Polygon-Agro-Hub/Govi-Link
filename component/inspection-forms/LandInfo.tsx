@@ -21,7 +21,7 @@ import {
 import FormTabs from "./FormTabs";
 import { useTranslation } from "react-i18next";
 import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import { CameraScreen } from "@/Items/CameraScreen";
 import axios from "axios";
 import { environment } from "@/environment/environment";
@@ -42,7 +42,6 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
   const route = useRoute<RouteProp<RootStackParamList, "LandInfo">>();
   const { requestNumber, requestId } = route.params;
   const { t } = useTranslation();
-
   const [formData, setFormData] = useState<LandInfoData>({
     landDiscription: "",
     isOwnByFarmer: undefined,
@@ -50,7 +49,6 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
     images: [],
     geoLocation: undefined,
   });
-
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [landownModal, setlandownNoModal] = useState(false);
   const [legalStatusModal, setLegalStatusModal] = useState(false);
@@ -67,48 +65,8 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
     "Permit land – long term from the government",
   ];
 
-  const SAMPLE_LOCATIONS = [
-    {
-      name: "Colombo, Sri Lanka",
-      latitude: 6.9271,
-      longitude: 79.8612,
-      locationName: "Colombo City Center",
-    },
-    {
-      name: "Kandy, Sri Lanka",
-      latitude: 7.2906,
-      longitude: 80.6337,
-      locationName: "Kandy Temple",
-    },
-    {
-      name: "Galle, Sri Lanka",
-      latitude: 6.0535,
-      longitude: 80.221,
-      locationName: "Galle Fort",
-    },
-    {
-      name: "Jaffna, Sri Lanka",
-      latitude: 9.6615,
-      longitude: 80.0255,
-      locationName: "Jaffna Town",
-    },
-    {
-      name: "Anuradhapura, Sri Lanka",
-      latitude: 8.3114,
-      longitude: 80.4037,
-      locationName: "Sacred City",
-    },
-  ];
 
   useEffect(() => {
-    if (formData.geoLocation) {
-      console.log(" GeoLocation details:", {
-        latitude: formData.geoLocation.latitude,
-        longitude: formData.geoLocation.longitude,
-        locationName: formData.geoLocation.locationName,
-      });
-    }
-
     const timer = setTimeout(async () => {
       if (requestId) {
         try {
@@ -388,9 +346,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
     }
   };
 
-  // Handle tab navigation
   const handleTabPress = (tabKey: string) => {
-    // Map tab keys to navigation routes
     const routeMap: Record<string, string> = {
       "Personal Info": "PersonalInfo",
       "ID Proof": "IDProof",
@@ -400,8 +356,8 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
       "Cultivation Info": "CultivationInfo",
       "Cropping Systems": "CroppingSystems",
       "Profit & Risk": "ProfitRisk",
-      "Economical": "Economical",
-      "Labour": "Labour",
+      Economical: "Economical",
+      Labour: "Labour",
       "Harvest Storage": "HarvestStorage",
     };
 

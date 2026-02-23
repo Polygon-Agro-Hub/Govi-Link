@@ -13,7 +13,7 @@ interface InvestmentInfoState {
   isExisting: {
     [requestId: number]: boolean;
   };
-  currentRequestId: number | null; // ✅ Added
+  currentRequestId: number | null; 
 }
 
 const initialInvestmentInfo: InvestmentInfoData = {
@@ -25,20 +25,19 @@ const initialInvestmentInfo: InvestmentInfoData = {
 const initialState: InvestmentInfoState = {
   data: {},
   isExisting: {},
-  currentRequestId: null, // ✅ Added
+  currentRequestId: null, 
 };
 
 const investmentInfoSlice = createSlice({
   name: 'investmentInfo',
   initialState,
   reducers: {
-    // ✅ UPDATED with auto-clear
+   
     initializeInvestmentInfo: (state, action: PayloadAction<{ requestId: number }>) => {
-      const { requestId } = action.payload;
+      const { requestId } = action.payload;    
       
-      // ✅ Auto-clear when switching requests
       if (state.currentRequestId !== null && state.currentRequestId !== requestId) {
-        console.log(`🗑️ [InvestmentInfo] Clearing data for old request ${state.currentRequestId}`);
+       
         delete state.data[state.currentRequestId];
         delete state.isExisting[state.currentRequestId];
       }
@@ -101,7 +100,7 @@ const investmentInfoSlice = createSlice({
     clearAllInvestmentInfo: (state) => {
       state.data = {};
       state.isExisting = {};
-      state.currentRequestId = null; // ✅ Added
+      state.currentRequestId = null; 
     },
   },
 });

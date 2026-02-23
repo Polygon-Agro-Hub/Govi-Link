@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp, useRoute } from "@react-navigation/native";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import { AntDesign, Entypo, FontAwesome5 } from "@expo/vector-icons";
 import axios from "axios";
 import { environment } from "@/environment/environment";

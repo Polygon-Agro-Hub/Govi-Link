@@ -1,5 +1,3 @@
-// Create a new file: @/store/clearAllSlices.ts
-
 import { AppDispatch } from '@/services/store';
 import { clearAllIDProof } from '@/store/IDproofSlice';
 import { clearAllPersonalInfo } from '@/store/personalInfoSlice';
@@ -14,11 +12,8 @@ import { clearAllCultivationInfo } from '@/store/cultivationInfoSlice';
 import { clearAllProfitRisk } from '@/store/profitRiskSlice';
 
 /**
- * Clears all Redux slices for a specific request
- * This should be called after successful form submission and navigation
- * 
- * @param dispatch - Redux dispatch function
- * @param requestId - The request ID to clear data for
+ * @param dispatch 
+ * @param requestId 
  */
 
 
@@ -27,7 +22,7 @@ export const clearAllInspectionSlices = (
   requestId: number
 ) => {
   try {
-    console.log(`🗑️ Clearing all Redux slices for requestId: ${requestId}...`);
+    
 
     dispatch(clearAllIDProof());
     dispatch(clearAllPersonalInfo());
@@ -41,7 +36,6 @@ export const clearAllInspectionSlices = (
     dispatch(clearAllCultivationInfo());
     dispatch(clearAllProfitRisk());
 
-    console.log('✅ All Redux slices cleared successfully');
   } catch (error) {
     console.error('❌ Error clearing Redux slices:', error);
     throw error;

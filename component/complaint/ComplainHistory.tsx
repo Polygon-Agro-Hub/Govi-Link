@@ -12,7 +12,7 @@ import axios from "axios";
 import { StatusBar, Platform } from "react-native";
 import { useTranslation } from "react-i18next";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { environment } from "@/environment/environment";
 import {
@@ -20,13 +20,13 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { AntDesign } from "@expo/vector-icons";
-import LottieView from "lottie-react-native";
 import { useSelector } from "react-redux";
 import { selectUserPersonal } from "@/store/authSlice";
 import { useFocusEffect } from "@react-navigation/native";
 import { t } from "i18next";
 import CustomHeader from "../common/CustomHeader";
 import LoadingPage from "../common/LoadingPage";
+import NoDataComponent from "../common/NoDataComponent";
 
 interface complainItem {
   id: number;
@@ -138,14 +138,12 @@ const ComplainHistory: React.FC<ComplainHistoryProps> = ({ navigation }) => {
 
   const formatDateTime = (isoDate: string) => {
     const date = new Date(isoDate);
-
     const hours = date.getHours();
     const minutes = date.getMinutes();
     const ampm = hours >= 12 ? "PM" : "AM";
     const hour12 = hours % 12 || 12;
     const minuteStr = minutes.toString().padStart(2, "0");
     const timeStr = `${hour12}.${minuteStr}${ampm}`;
-
     const day = date.getDate();
     const month = date.toLocaleString("en-US", { month: "short" });
     const year = date.getFullYear();
@@ -194,16 +192,8 @@ const ComplainHistory: React.FC<ComplainHistoryProps> = ({ navigation }) => {
             fullScreen={true}
           />
         ) : complains.length === 0 ? (
-          <View className="flex-1 items-center justify-center -mt-[70%]">
-            <LottieView
-              source={require("@/assets/json/NoData.json")}
-              style={{ width: wp(50), height: hp(50) }}
-              autoPlay
-              loop
-            />
-            <Text className="text-center text-gray-600 -mt-[30%]">
-              {t("ComplainHistory.No Data")}
-            </Text>
+          <View className="flex-1 items-center justify-center -mt-[10%]">
+             <NoDataComponent message={t("ComplainHistory.No Data")} />
           </View>
         ) : (
           <ScrollView

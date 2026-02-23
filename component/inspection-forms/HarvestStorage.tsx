@@ -14,7 +14,7 @@ import { AntDesign } from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
 import { useTranslation } from "react-i18next";
 import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 import ConfirmationModal from "@/Items/ConfirmationModal";
@@ -119,7 +119,6 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
     hasValueAddedMarketLinkage: undefined,
     awareOfQualityStandards: undefined,
   });
-
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [yesNoModalVisible, setYesNoModalVisible] = useState(false);
   const [activeYesNoField, setActiveYesNoField] = useState<string | null>(null);
@@ -425,9 +424,7 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
     setErrorModalVisible(false);
   };
 
-  // Handle tab navigation
   const handleTabPress = (tabKey: string) => {
-    // Map tab keys to navigation routes
     const routeMap: Record<string, string> = {
       "Personal Info": "PersonalInfo",
       "ID Proof": "IDProof",

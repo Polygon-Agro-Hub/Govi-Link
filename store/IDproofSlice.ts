@@ -14,7 +14,7 @@ interface IDProofState {
   isExisting: {
     [requestId: string]: boolean;
   };
-  currentRequestId: number | null; // ✅ Added
+  currentRequestId: number | null; 
 }
 
 const initialIDProofInfo: IDProofInfo = {
@@ -27,20 +27,18 @@ const initialIDProofInfo: IDProofInfo = {
 const initialState: IDProofState = {
   data: {},
   isExisting: {},
-  currentRequestId: null, // ✅ Added
+  currentRequestId: null, 
 };
 
 const idProofSlice = createSlice({
   name: 'idProof',
   initialState,
   reducers: {
-    // ✅ UPDATED with auto-clear
+    
     initializeIDProof: (state, action: PayloadAction<{ requestId: number }>) => {
       const { requestId } = action.payload;
       
-      // ✅ Auto-clear when switching requests
       if (state.currentRequestId !== null && state.currentRequestId !== requestId) {
-        console.log(`🗑️ [IDProof] Clearing data for old request ${state.currentRequestId}`);
         delete state.data[state.currentRequestId];
         delete state.isExisting[state.currentRequestId];
       }
@@ -103,7 +101,7 @@ const idProofSlice = createSlice({
     clearAllIDProof: (state) => {
       state.data = {};
       state.isExisting = {};
-      state.currentRequestId = null; // ✅ Added
+      state.currentRequestId = null; 
     },
 
     loadIDProofFromStorage: (

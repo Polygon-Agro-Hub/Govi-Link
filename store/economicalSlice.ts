@@ -9,26 +9,25 @@ export type EconomicalData = {
 type EconomicalState = {
   data: Record<number, EconomicalData>;
   isExisting: Record<number, boolean>;
-  currentRequestId: number | null; // ✅ Added
+  currentRequestId: number | null; 
 };
 
 const initialState: EconomicalState = {
   data: {},
   isExisting: {},
-  currentRequestId: null, // ✅ Added
+  currentRequestId: null, 
 };
 
 const economicalSlice = createSlice({
   name: 'economical',
   initialState,
   reducers: {
-    // ✅ UPDATED with auto-clear
+    
     initializeEconomical: (state, action: PayloadAction<{ requestId: number }>) => {
-      const { requestId } = action.payload;
+      const { requestId } = action.payload;    
       
-      // ✅ Auto-clear when switching requests
       if (state.currentRequestId !== null && state.currentRequestId !== requestId) {
-        console.log(`🗑️ [Economical] Clearing data for old request ${state.currentRequestId}`);
+        
         delete state.data[state.currentRequestId];
         delete state.isExisting[state.currentRequestId];
       }
@@ -83,7 +82,7 @@ const economicalSlice = createSlice({
     clearAllEconomical: (state) => {
       state.data = {};
       state.isExisting = {};
-      state.currentRequestId = null; // ✅ Added
+      state.currentRequestId = null; 
     },
   },
 });

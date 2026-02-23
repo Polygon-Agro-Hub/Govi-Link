@@ -15,7 +15,7 @@ export const initIDProofTable = () => {
         updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
       );`,
     );
-    console.log("ID proof table created/verified");
+    
   } catch (error) {
     console.error(" Error initializing ID proof table:", error);
     throw error;
