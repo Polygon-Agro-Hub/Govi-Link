@@ -352,7 +352,6 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
         </View>
 
         {/* Start Button */}
-        {/* Start Button */}
         <TouchableOpacity
           onPress={async () => {
             try {

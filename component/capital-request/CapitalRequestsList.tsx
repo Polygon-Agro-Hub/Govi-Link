@@ -19,6 +19,7 @@ import axios from "axios";
 import { environment } from "@/environment/environment";
 import { hasDraft, initPersonalTable } from "@/database/inspectionpersonal";
 import LoadingPage from "../common/LoadingPage";
+import CustomHeader from "../common/CustomHeader";
 
 type CapitalRequestsNavigationProps = StackNavigationProp<
   RootStackParamList,
@@ -152,23 +153,12 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
 
   return (
     <View className="flex-1 bg-white">
-      <View className="flex-row items-center px-4 py-3">
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          className="bg-[#F6F6F680] rounded-full py-4 px-3"
-        >
-          <MaterialIcons
-            name="arrow-back-ios"
-            size={24}
-            color="black"
-            style={{ marginLeft: 10 }}
-          />
-        </TouchableOpacity>
-        <Text className="text-lg font-bold text-black text-center flex-1">
-          {t("CapitalRequests.CapitalRequests")}
-        </Text>
-        <View style={{ width: 55 }} />
-      </View>
+      <CustomHeader
+        title={t("CapitalRequests.CapitalRequests")}
+        navigation={navigation}
+        showBackButton={true}
+        onBackPress={() => navigation.goBack()}
+      />
 
       <ScrollView
         className="flex-1 bg-white"

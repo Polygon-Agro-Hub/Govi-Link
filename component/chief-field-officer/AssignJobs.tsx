@@ -383,7 +383,7 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
             }
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
-            className={`flex-row items-center px-4 h-10 rounded-full mr-2 border ${
+            className={`flex-row items-center px-2 pl-3 h-10 rounded-full mr-2 border ${
               isOverdueSelected ? "border-transparent" : "border-[#F83B4F]"
             }`}
           >
@@ -419,7 +419,7 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
             }
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
-            className={`flex-row items-center px-4 h-10 rounded-full mr-2 border ${
+            className={`flex-row items-center px-2 pl-3 h-10 rounded-full mr-2 border ${
               !isOverdueSelected ? "border-transparent" : "border-[#F83B4F]"
             }`}
           >
@@ -596,7 +596,7 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
 
                   <View className="flex flex-row justify-center gap-x-2 mb-4 mt-6 px-4">
                     <TouchableOpacity
-                      className="flex-1"
+                      className="flex w-1/2"
                       disabled={
                         !selectedItem?.latitude || !selectedItem?.longitude
                       }
@@ -638,7 +638,7 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
                     </TouchableOpacity>
 
                     <TouchableOpacity
-                      className="flex"
+                      className="flex w-1/2"
                       onPress={() => handleDial(selectedItem.farmerMobile)}
                     >
                       <View className="flex-row items-center justify-center border border-[#F83B4F] rounded-full px-6 py-2">

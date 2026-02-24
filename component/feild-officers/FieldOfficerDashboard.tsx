@@ -871,7 +871,7 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
                   </Text>
                   <View className="flex flex-row justify-center gap-x-2 mb-4 mt-6 px-4">
                     <TouchableOpacity
-                      className="flex-1"
+                      className="flex w-1/2"
                       disabled={
                         !selectedItem?.latitude || !selectedItem?.longitude
                       }
@@ -913,7 +913,7 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
                     </TouchableOpacity>
 
                     <TouchableOpacity
-                      className="flex "
+                      className="flex w-1/2"
                       onPress={() => handleDial(selectedItem.farmerMobile)}
                     >
                       <View className="flex-row items-center justify-center border border-[#F83B4F] rounded-full px-6 py-2">
