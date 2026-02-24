@@ -4,7 +4,6 @@ import {
   Text,
   TouchableOpacity,
   ScrollView,
-  StatusBar,
   Alert,
   KeyboardAvoidingView,
   Platform,
@@ -64,6 +63,8 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
       }
     }, [isnewthirdstep]),
   );
+  
+  // FIXED: Updated to use new MediaType syntax
   const pickImage = async (type: string) => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
@@ -76,7 +77,7 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
     }
 
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ['images'],
       allowsEditing: false,
       aspect: [4, 3],
       quality: 1,
@@ -356,12 +357,10 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1, backgroundColor: "white" }}
     >
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <CustomHeader
         title={t("AddOfficer.AddOfficer")}
         navigation={navigation}
         showBackButton={true}
-        showLanguageSelector={false}
         onBackPress={handleGoBack}
       />
       <ScrollView

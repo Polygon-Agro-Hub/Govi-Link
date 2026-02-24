@@ -184,13 +184,12 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ navigation }) => {
         title={""}
         navigation={navigation}
         showBackButton={true}
-        showLanguageSelector={false}
         onBackPress={() => navigation.goBack()}
       />
       <ScrollView
         className="flex-1 bg-white"
         keyboardShouldPersistTaps="handled"
-        style={{ paddingHorizontal: wp(4) }}
+        style={{ paddingHorizontal: wp(6) }}
       >
         <View
           className={`flex-row items-center justify-center space-x-[-30%] ml-[5%]`}

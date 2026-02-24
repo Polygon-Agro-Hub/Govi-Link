@@ -669,7 +669,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
             ) : (
               <View className="justify-center items-center mt-4">
                 <Image
-                  source={require("../../assets/images/dashboard/no tasks.webp")}
+                  source={require("../../assets/images/dashboard/no-tasks.webp")}
                   style={{
                     width: 140,
                     height: 100,
@@ -833,7 +833,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
               ) : (
                 <View className="items-center justify-center mt-2">
                   <Image
-                    source={require("../../assets/images/dashboard/no drafts.webp")}
+                    source={require("../../assets/images/dashboard/no-drafts.webp")}
                     style={{ width: 110, height: 80 }}
                     resizeMode="contain"
                   />

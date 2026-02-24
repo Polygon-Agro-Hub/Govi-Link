@@ -4,12 +4,6 @@ import { useTranslation } from "react-i18next";
 import { MaterialIcons, Entypo, FontAwesome6 } from "@expo/vector-icons";
 import { useSelector } from "react-redux";
 import type { RootState } from "../services/store";
-interface UserData {
-  farmCount: number;
-  membership: string;
-  paymentActiveStatus: string | null;
-  role: string;
-}
 
 const NavigationBar = ({
   navigation,

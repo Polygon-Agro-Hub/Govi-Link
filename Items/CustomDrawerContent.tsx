@@ -19,24 +19,7 @@ import { RootState } from "@/services/store";
 import { LanguageContext } from "@/context/LanguageContext";
 import { useDispatch } from "react-redux";
 import { logoutUser } from "@/store/authSlice";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { DrawerNavigationProp } from "@react-navigation/drawer";
 import { useDrawerStatus } from "@react-navigation/drawer";
-
-import { RootStackParamList } from "@/component/types/types";
-interface ProfileData {
-  firstName: string;
-  lastName: string;
-  profileImg: string;
-  firstNameSinhala: string;
-  lastNameSinhala: string;
-  firstNameTamil: string;
-  lastNameTamil: string;
-  empId: string;
-}
-type CustomDrawerNavigationProp =
-  NativeStackNavigationProp<RootStackParamList> &
-    DrawerNavigationProp<RootStackParamList>;
 
 export default function CustomDrawerContent(props: any) {
   const { t } = useTranslation();

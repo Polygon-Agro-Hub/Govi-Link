@@ -555,7 +555,7 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
           ) : (
             <View className=" justify-center items-center mt-4">
               <Image
-                source={require("../../assets/images/dashboard/no tasks.webp")}
+                source={require("../../assets/images/dashboard/no-tasks.webp")}
                 style={{
                   width: 140,
                   height: 100,
@@ -718,7 +718,7 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
             ) : (
               <View className="items-center justify-center mt-2">
                 <Image
-                  source={require("../../assets/images/dashboard/no drafts.webp")}
+                  source={require("../../assets/images/dashboard/no-drafts.webp")}
                   style={{ width: 110, height: 80 }}
                   resizeMode="contain"
                 />
@@ -750,7 +750,7 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
             {t("Dashboard.Assigned Target")}
           </Text>
           <Image
-            source={require("../../assets/images/dashboard/AssignedTarget.webp")}
+            source={require("../../assets/images/dashboard/assigned-target.webp")}
             style={{
               width: 100,
               height: 100,

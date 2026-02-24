@@ -9,7 +9,7 @@ import {
   KeyboardAvoidingView,
 } from "react-native";
 import axios from "axios";
-import { StatusBar, Platform } from "react-native";
+import { Platform } from "react-native";
 import { useTranslation } from "react-i18next";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../types/types";
@@ -177,12 +177,10 @@ const ComplainHistory: React.FC<ComplainHistoryProps> = ({ navigation }) => {
       enabled
       style={{ flex: 1, backgroundColor: "#F9F9FA" }}
     >
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <CustomHeader
         title={t("ComplainHistory.Complaint History")}
         navigation={navigation}
         showBackButton={true}
-        showLanguageSelector={false}
         onBackPress={() => navigation.goBack()}
       />
       <View className="flex-1 bg-white">
@@ -254,10 +252,6 @@ const ComplainHistory: React.FC<ComplainHistoryProps> = ({ navigation }) => {
         >
           <View
             className="flex-1 items-center bg-white bg-opacity-50"
-            style={{
-              paddingTop:
-                Platform.OS === "android" ? StatusBar.currentHeight || 0 : 0,
-            }}
           >
             <ScrollView
               className="bg-white rounded-lg shadow-lg w-full"

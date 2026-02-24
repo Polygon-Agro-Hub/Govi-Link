@@ -21,11 +21,6 @@ interface LanuageProps {
   navigation: LanuageScreenNavigationProp;
 }
 
-interface NewsItem {
-  title: string;
-  description: string;
-}
-
 const Lanuage: React.FC<LanuageProps> = ({ navigation }) => {
   const { changeLanguage } = useContext(LanguageContext);
   const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);

@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   ScrollView,
   RefreshControl,
-  StatusBar,
   Image,
   Alert,
   ActivityIndicator,
@@ -19,6 +18,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 import { hasDraft, initPersonalTable } from "@/database/inspectionpersonal";
+import LoadingPage from "../common/LoadingPage";
 
 type CapitalRequestsNavigationProps = StackNavigationProp<
   RootStackParamList,
@@ -128,7 +128,6 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
   useFocusEffect(
     useCallback(() => {
       fetchCapitalRequests(searchQuery);
-
     }, [searchQuery]),
   );
 
@@ -144,19 +143,15 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
 
   if (loading && !refreshing) {
     return (
-      <View className="flex-1 bg-white justify-center items-center">
-        <ActivityIndicator size="large" color="#21202B" />
-        <Text className="mt-4 text-[#565559]">
-          {t("CapitalRequests.LoadingRequests")}
-        </Text>
-      </View>
+      <LoadingPage
+        message={t("CapitalRequests.LoadingRequests")}
+        fullScreen={true}
+      />
     );
   }
 
   return (
     <View className="flex-1 bg-white">
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-
       <View className="flex-row items-center px-4 py-3">
         <TouchableOpacity
           onPress={() => navigation.goBack()}
@@ -187,7 +182,7 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
           {requests.length === 0 ? (
             <View className="flex justify-center items-center mt-40">
               <Image
-                source={require("../../assets/images/dashboard/no tasks.webp")}
+                source={require("../../assets/images/dashboard/no-tasks.webp")}
                 style={{ width: 120, height: 90 }}
                 resizeMode="contain"
               />
