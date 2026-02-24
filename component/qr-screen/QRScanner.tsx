@@ -81,7 +81,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
 
       if (token) {
         const response = await axios.post(
-          `${environment.API_BASE_URL}api/cluster-audit/status/onGoing/${feildauditId}`,
+          `${environment.API_BASE_URL}api/cluster-audit/status/on-going/${feildauditId}`,
           { jobId },
           {
             headers: { Authorization: `Bearer ${token}` },

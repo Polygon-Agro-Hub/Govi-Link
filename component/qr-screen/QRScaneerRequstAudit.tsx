@@ -77,7 +77,7 @@ const QRScaneerRequstAudit: React.FC<QRScaneerRequstAuditProps> = ({
 
       if (token) {
         const response = await axios.post(
-          `${environment.API_BASE_URL}api/cluster-audit/status/onGoing/${feildauditId}`,
+          `${environment.API_BASE_URL}api/cluster-audit/status/on-going/${feildauditId}`,
           { jobId, govilinkjobid },
           {
             headers: { Authorization: `Bearer ${token}` },
