@@ -274,20 +274,20 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
             }
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
-            className={`flex-row items-center px-4 h-10 rounded-full mr-2 border ${
+            className={`flex-row items-center px-2 h-10 rounded-full mr-2 border ${
               isOverdueSelected ? "border-transparent" : "border-[#F83B4F]"
             }`}
           >
             <View className="flex-row items-center">
               <Text
-                className={`font-semibold mr-2 ${
+                className={`font-semibold ${
                   isOverdueSelected ? "text-white" : "text-[#F83B4F]"
                 }`}
               >
                 {t("Visits.Over Due")}
               </Text>
               {isOverdueSelected && (
-                <View className="bg-white rounded-full w-6 h-6 items-center justify-center">
+                <View className="bg-white rounded-full w-6 h-6 items-center justify-center ml-2">
                   <Text className="text-[#F83B4F] font-bold text-xs">
                     {pendingCount}
                   </Text>
@@ -326,7 +326,7 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
                       <Text className="font-semibold text-white">
                         {dayNumber}
                       </Text>
-                      <View className="bg-white rounded-full w-6 h-6 items-center justify-center">
+                      <View className="bg-white rounded-full w-6 h-6 items-center justify-center mr-2">
                         <Text className="text-[#F83B4F] font-bold text-xs">
                           {filteredVisits.length}
                         </Text>

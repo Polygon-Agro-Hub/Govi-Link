@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { View, Text, TouchableOpacity, BackHandler } from "react-native";
-import { StatusBar } from "expo-status-bar";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -34,8 +33,6 @@ const OtpverificationSuccess: React.FC = ({ navigation }: any) => {
 
   return (
     <View className="flex-1 bg-white">
-      <StatusBar style="light" />
-
       <View className="flex-1 justify-center items-center">
         <LottieView
           source={require("../../assets/json/verify.json")}

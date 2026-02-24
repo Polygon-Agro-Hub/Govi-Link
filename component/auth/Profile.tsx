@@ -20,9 +20,10 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { LinearGradient } from "expo-linear-gradient";
-import { Entypo } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import i18n from "@/i18n/i18n";
+import { StatusBar } from "expo-status-bar";
+import CustomHeader from "../common/CustomHeader";
 
 type ProfileScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -106,6 +107,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 
   return (
     <View className="flex-1 bg-white">
+      <StatusBar style="light" backgroundColor="#F2561D" />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         enabled
@@ -131,23 +133,12 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                   }}
                 />
               </View>
-              <View className="ml-3">
-                <TouchableOpacity
-                  onPress={() => navigation.goBack()}
-                  style={{ position: "absolute", top: hp(2) }}
-                >
-                  <Entypo
-                    name="chevron-left"
-                    size={25}
-                    color={"black"}
-                    style={{
-                      backgroundColor: "#F6F6F680",
-                      borderRadius: 50,
-                      padding: wp(2.5),
-                    }}
-                  />
-                </TouchableOpacity>
-              </View>
+              <CustomHeader
+                title=""
+                showBackButton={true}
+                navigation={navigation}
+                transparent
+              />
 
               <View className="bg-white rounded-t-3xl pt-4 mt-48">
                 <View className="items-center" style={{ marginTop: -hp(12) }}>
@@ -195,7 +186,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
               </View>
 
               <View className="bg-white">
-                <View className="px-4 mb-8">
+                <View className="px-6 mb-8">
                   <View className="mb-4">
                     <Text className="text-black mb-1">
                       {t("Profile.Employee ID")}

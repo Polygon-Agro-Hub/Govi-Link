@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
-  StatusBar,
   Modal,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -244,8 +243,6 @@ const AttachGeoLocationScreen: React.FC<AttachGeoLocationScreenProps> = ({
 
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-
       {/* Header */}
       <View className="flex-row items-center justify-center py-4 mt-2">
         <TouchableOpacity

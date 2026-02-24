@@ -5,7 +5,6 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  StatusBar,
   KeyboardAvoidingView,
   Platform,
   Alert,
@@ -15,9 +14,9 @@ import {
 import { MaterialIcons } from "@expo/vector-icons";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../types/types";
-import countryData from "@/assets/json/countryflag.json";
-import banksData from "@/assets/json/banks.json";
-import branchesData from "@/assets/json/branches.json";
+import countryData from "@/assets/json/country-flag.json";
+import banksData from "@/assets/json/bank-names.json";
+import branchesData from "@/assets/json/bank-branches.json";
 import { useTranslation } from "react-i18next";
 import i18n from "@/i18n/i18n";
 import { RouteProp, useRoute, useFocusEffect } from "@react-navigation/native";
@@ -698,13 +697,10 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1, backgroundColor: "white" }}
     >
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-
       <CustomHeader
         title={t("AddOfficer.AddOfficer")}
         navigation={navigation}
         showBackButton={true}
-        showLanguageSelector={false}
         onBackPress={() =>
           navigation.navigate("AddOfficerStep1", { isnew: false })
         }

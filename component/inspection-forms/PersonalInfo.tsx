@@ -5,7 +5,6 @@ import {
   TextInput,
   ScrollView,
   TouchableOpacity,
-  StatusBar,
   Alert,
   KeyboardAvoidingView,
   Platform,
@@ -17,9 +16,9 @@ import FormTabs from "./FormTabs";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { environment } from "@/environment/environment";
-import countryData from "@/assets/json/countryflag.json";
-import sriLankaData from "@/assets/json/provinceDistrict.json";
-import districtData from "@/assets/json/Districts.json";
+import countryData from "@/assets/json/country-flag.json";
+import sriLankaData from "@/assets/json/country-province.json";
+import districtData from "@/assets/json/country-districts.json";
 import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../types/types";
 import FormFooterButton from "./FormFooterButton";
@@ -747,7 +746,6 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
       style={{ flex: 1, backgroundColor: "white" }}
     >
       <View className="flex-1 bg-[#F3F3F3]">
-        <StatusBar barStyle="dark-content" />
         <FormTabs
           activeKey="Personal Info"
           navigation={navigation}

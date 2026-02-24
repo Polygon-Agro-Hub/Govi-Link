@@ -5,7 +5,6 @@ import {
   TextInput,
   ScrollView,
   TouchableOpacity,
-  StatusBar,
   Alert,
   KeyboardAvoidingView,
   Platform,
@@ -18,8 +17,8 @@ import { useTranslation } from "react-i18next";
 import Checkbox from "expo-checkbox";
 import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../types/types";
-import banksData from "@/assets/json/banks.json";
-import branchesData from "@/assets/json/branches.json";
+import banksData from "@/assets/json/bank-names.json";
+import branchesData from "@/assets/json/bank-branches.json";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 import FormFooterButton from "./FormFooterButton";
@@ -925,7 +924,6 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
       style={{ flex: 1, backgroundColor: "white" }}
     >
       <View className="flex-1 bg-[#F3F3F3]">
-        <StatusBar barStyle="dark-content" />
         <FormTabs
           activeKey="Finance Info"
           navigation={navigation}

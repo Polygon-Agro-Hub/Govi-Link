@@ -245,7 +245,6 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
         title={""}
         navigation={navigation}
         showBackButton={true}
-        showLanguageSelector={false}
         onBackPress={() => handleNavBack()}
       />
       <ScrollView
@@ -253,7 +252,7 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
           flexGrow: 1,
           justifyContent: "center",
           alignItems: "center",
-          paddingHorizontal: wp(4),
+          paddingHorizontal: wp(6),
         }}
         keyboardShouldPersistTaps="handled"
       >

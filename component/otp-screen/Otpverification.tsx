@@ -379,7 +379,7 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
 
       <View className="flex justify-center items-center mt-3">
         <Image
-          source={require("../../assets/images/otp/otpverify.webp")}
+          source={require("../../assets/images/otp/otp-verify.webp")}
           style={{
             width: 500,
             height: 150,

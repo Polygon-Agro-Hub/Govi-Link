@@ -4,7 +4,6 @@ import {
   Text,
   TouchableOpacity,
   ScrollView,
-  StatusBar,
   Alert,
   ActivityIndicator,
   Image,
@@ -20,6 +19,7 @@ import axios from "axios";
 import { environment } from "@/environment/environment";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CustomHeader from "../common/CustomHeader";
+import LoadingPage from "../common/LoadingPage";
 
 type RequestDetailsNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -115,13 +115,10 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
 
   if (loading) {
     return (
-      <View className="flex-1 bg-white justify-center items-center">
-        <ActivityIndicator size="large" color="#21202B" />
-        <Text className="mt-4 text-[#565559]">
-          {" "}
-          {t("CapitalRequests.LoadingRequests")}
-        </Text>
-      </View>
+      <LoadingPage
+        message={t("CapitalRequests.LoadingRequests")}
+        fullScreen={true}
+      />
     );
   }
 
@@ -140,13 +137,10 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
 
   return (
     <View className="flex-1 bg-white">
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-
       <CustomHeader
         title={t("RequestLetter.Request Letter")}
         navigation={navigation}
         showBackButton={true}
-        showLanguageSelector={false}
         onBackPress={() => navigation.goBack()}
       />
 

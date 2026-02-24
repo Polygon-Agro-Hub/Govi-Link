@@ -12,8 +12,6 @@ import economicalReducer from '@/store/economicalSlice';
 import labourReducer from '@/store/labourSlice';
 import harvestStorageReducer from '@/store/HarvestStorageSlice';
 
-
-
 const appReducer = combineReducers({
   auth: authReducer,
   inspectionpersonal: personalInfoReducer,
