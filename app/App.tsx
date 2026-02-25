@@ -6,6 +6,7 @@ import {
   View,
   TextInput,
   ActivityIndicator,
+  StatusBar,
 } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -233,6 +234,7 @@ function AppContent() {
         }}
         edges={["top", "right", "left"]}
       >
+        <StatusBar backgroundColor="#ffffff" barStyle="dark-content" />
         <NavigationContainer ref={navigationRef}>
           <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name="Splash" component={Splash} />
@@ -294,7 +296,10 @@ function AppContent() {
             <Stack.Screen name="Economical" component={Economical} />
             <Stack.Screen name="Labour" component={Labour} />
             <Stack.Screen name="HarvestStorage" component={HarvestStorage} />
-            <Stack.Screen name="CapitalRequstQRScanner" component={CapitalRequstQRScanner} />
+            <Stack.Screen
+              name="CapitalRequstQRScanner"
+              component={CapitalRequstQRScanner}
+            />
             <Stack.Screen
               name="ConfirmationCapitalRequest"
               component={ConfirmationCapitalRequest}

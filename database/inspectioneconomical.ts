@@ -14,7 +14,6 @@ export const initEconomicalTable = () => {
         updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
       );`,
     );
-    console.log(" Economical table created/verified");
   } catch (error) {
     console.error(" Error initializing economical table:", error);
     throw error;
@@ -121,7 +120,6 @@ export const getEconomicalInfo = (requestId: number): EconomicalData | null => {
         isAltRoutes: toYesNo(row.isAltRoutes),
       };
 
-      console.log("Parsed economical info:", result);
       return result;
     }
 

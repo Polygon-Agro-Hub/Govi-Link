@@ -16,13 +16,10 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { environment } from "@/environment/environment";
 import { useTranslation } from "react-i18next";
-import { Dimensions } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { ScrollView } from "react-native-gesture-handler";
 import NetInfo from "@react-native-community/netinfo";
 import { LinearGradient } from "expo-linear-gradient";
-
-const { width: screenWidth } = Dimensions.get("window");
 
 type RootStackParamList = {
   OtpVerification: undefined;
@@ -49,9 +46,7 @@ interface SuccessModalProps {
 
 const Otpverification: React.FC = ({ navigation, route }: any) => {
   const { farmerMobile, jobId, isClusterAudit, farmId, auditId } = route.params;
-
   const [otpCode, setOtpCode] = useState<string>("");
-
   const [referenceId, setReferenceId] = useState<string | null>(null);
   const [timer, setTimer] = useState<number>(240);
   const [isVerified, setIsVerified] = useState<boolean>(false);
@@ -59,7 +54,6 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
   const { t, i18n } = useTranslation();
   const [language, setLanguage] = useState("en");
   const [isOtpValid, setIsOtpValid] = useState<boolean>(false);
-
   const [verificationAttempts, setVerificationAttempts] = useState<number>(0);
   const [isOtpExpired, setIsOtpExpired] = useState<boolean>(false);
 
@@ -367,8 +361,6 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
     return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
   };
 
-  
-
   return (
     <ScrollView className="flex-1 bg-white">
       <View className="flex-row items-center px-4 py-4 bg-white shadow-sm border-b border-[#E5E5E5]">
@@ -384,15 +376,10 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
         </View>
       </View>
 
-      <View className="flex justify-center items-center mt-0">
-        <Text className="text-black" style={{ fontSize: wp(8) }}>
-          {/* {t("OtpVerification.OTPVerification")} */}
-        </Text>
-      </View>
 
-      <View className="flex justify-center items-center">
+      <View className="flex justify-center items-center mt-3">
         <Image
-          source={require("../../assets/otpverify.webp")}
+          source={require("../../assets/images/otp/otp-verify.webp")}
           style={{
             width: 500,
             height: 150,

@@ -9,10 +9,10 @@ import {
   KeyboardAvoidingView,
 } from "react-native";
 import axios from "axios";
-import { StatusBar, Platform } from "react-native";
+import { Platform } from "react-native";
 import { useTranslation } from "react-i18next";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { environment } from "@/environment/environment";
 import {
@@ -20,13 +20,13 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { AntDesign } from "@expo/vector-icons";
-import LottieView from "lottie-react-native";
 import { useSelector } from "react-redux";
 import { selectUserPersonal } from "@/store/authSlice";
 import { useFocusEffect } from "@react-navigation/native";
 import { t } from "i18next";
 import CustomHeader from "../common/CustomHeader";
 import LoadingPage from "../common/LoadingPage";
+import NoDataComponent from "../common/NoDataComponent";
 
 interface complainItem {
   id: number;
@@ -138,14 +138,12 @@ const ComplainHistory: React.FC<ComplainHistoryProps> = ({ navigation }) => {
 
   const formatDateTime = (isoDate: string) => {
     const date = new Date(isoDate);
-
     const hours = date.getHours();
     const minutes = date.getMinutes();
     const ampm = hours >= 12 ? "PM" : "AM";
     const hour12 = hours % 12 || 12;
     const minuteStr = minutes.toString().padStart(2, "0");
     const timeStr = `${hour12}.${minuteStr}${ampm}`;
-
     const day = date.getDate();
     const month = date.toLocaleString("en-US", { month: "short" });
     const year = date.getFullYear();
@@ -179,12 +177,10 @@ const ComplainHistory: React.FC<ComplainHistoryProps> = ({ navigation }) => {
       enabled
       style={{ flex: 1, backgroundColor: "#F9F9FA" }}
     >
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <CustomHeader
         title={t("ComplainHistory.Complaint History")}
         navigation={navigation}
         showBackButton={true}
-        showLanguageSelector={false}
         onBackPress={() => navigation.goBack()}
       />
       <View className="flex-1 bg-white">
@@ -194,16 +190,8 @@ const ComplainHistory: React.FC<ComplainHistoryProps> = ({ navigation }) => {
             fullScreen={true}
           />
         ) : complains.length === 0 ? (
-          <View className="flex-1 items-center justify-center -mt-[70%]">
-            <LottieView
-              source={require("@/assets/json/NoData.json")}
-              style={{ width: wp(50), height: hp(50) }}
-              autoPlay
-              loop
-            />
-            <Text className="text-center text-gray-600 -mt-[30%]">
-              {t("ComplainHistory.No Data")}
-            </Text>
+          <View className="flex-1 items-center justify-center -mt-[10%]">
+             <NoDataComponent message={t("ComplainHistory.No Data")} />
           </View>
         ) : (
           <ScrollView
@@ -264,10 +252,6 @@ const ComplainHistory: React.FC<ComplainHistoryProps> = ({ navigation }) => {
         >
           <View
             className="flex-1 items-center bg-white bg-opacity-50"
-            style={{
-              paddingTop:
-                Platform.OS === "android" ? StatusBar.currentHeight || 0 : 0,
-            }}
           >
             <ScrollView
               className="bg-white rounded-lg shadow-lg w-full"

@@ -18,7 +18,7 @@ export const initLandTable = () => {
         updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
       );`,
     );
-    console.log("Land table created/verified");
+    
   } catch (error) {
     console.error("Error initializing land table:", error);
     throw error;

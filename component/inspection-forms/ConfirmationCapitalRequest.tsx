@@ -9,12 +9,12 @@ import {
   Animated,
   Easing,
 } from "react-native";
-import { RootStackParamList } from "@/component/types";
+import { RootStackParamList } from "@/component/types/types";
 import { useTranslation } from "react-i18next";
 import { LinearGradient } from "expo-linear-gradient";
 import { MaterialIcons } from "@expo/vector-icons";
 import Svg, { Circle, G, Text as SvgText } from "react-native-svg";
-import { RouteProp, useRoute, useFocusEffect } from "@react-navigation/native";
+import { RouteProp, useRoute } from "@react-navigation/native";
 import { environment } from "@/environment/environment";
 import axios from "axios";
 import { deleteAllInspectionData } from "@/database/deleteInspectionData";
@@ -34,15 +34,12 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
   const route =
     useRoute<RouteProp<RootStackParamList, "ConfirmationCapitalRequest">>();
   const { formData, requestNumber, requestId } = route.params;
-
   const { t } = useTranslation();
   const [assigning, setAssigning] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(true);
   const [countdown, setCountdown] = useState(20);
-
   const progressAnim = useRef(new Animated.Value(100)).current;
   const countdownAnim = useRef(new Animated.Value(20)).current;
-
   const animationRef = useRef<Animated.CompositeAnimation | null>(null);
   const hasNavigatedRef = useRef(false);
   const isAnimationStartedRef = useRef(false);
@@ -146,15 +143,6 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
     };
   }, [countdownAnim]);
 
-  useFocusEffect(
-    useCallback(() => {
-      console.log("ConfirmationCapitalRequest focused");
-
-      return () => {
-        console.log("ConfirmationCapitalRequest blurred");
-      };
-    }, []),
-  );
 
   const handleUndo = async () => {
     if (hasNavigatedRef.current) {

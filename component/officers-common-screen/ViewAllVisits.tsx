@@ -13,7 +13,7 @@ import {
   PanResponder,
   Pressable,
 } from "react-native";
-import { RootStackParamList } from "@/component/types";
+import { RootStackParamList } from "@/component/types/types";
 import { useTranslation } from "react-i18next";
 import { LinearGradient } from "expo-linear-gradient";
 import dayjs from "dayjs";
@@ -22,8 +22,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 import { Ionicons, FontAwesome6 } from "@expo/vector-icons";
-import LottieView from "lottie-react-native";
 import { RouteProp } from "@react-navigation/native";
+import NoDataComponent from "../common/NoDataComponent";
 
 type ViewAllVisitsNavigationProps = StackNavigationProp<
   RootStackParamList,
@@ -66,10 +66,7 @@ interface VisitItem {
 const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
   const { t, i18n } = useTranslation();
   const officerId = route.params?.officerId ?? "";
-
   const today = dayjs();
-  const currentDay = today.date();
-
   const [selectedDate, setSelectedDate] = useState(dayjs());
   const monthNames: Record<string, string[]> = {
     en: [
@@ -119,10 +116,8 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
   const month =
     monthNames[lang]?.[today.month()] || monthNames["en"][today.month()];
   const selectedMonth = `${month}, ${today.year()}`;
-
   const [isOverdueSelected, setIsOverdueSelected] = useState(false);
   const [loading, setLoading] = useState(false);
-
   const dates = Array.from({ length: 14 }, (_, i) => today.add(i, "day"));
   const [visits, setVisits] = useState<VisitItem[]>([]);
 
@@ -136,9 +131,7 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
   });
   const [showPopup, setShowPopup] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
-
   const scrollRef = React.useRef<ScrollView>(null);
-
   const translateY = useRef(new Animated.Value(0)).current;
 
   const panResponder = useRef(
@@ -281,20 +274,20 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
             }
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
-            className={`flex-row items-center px-4 h-10 rounded-full mr-2 border ${
+            className={`flex-row items-center px-2 h-10 rounded-full mr-2 border ${
               isOverdueSelected ? "border-transparent" : "border-[#F83B4F]"
             }`}
           >
             <View className="flex-row items-center">
               <Text
-                className={`font-semibold mr-2 ${
+                className={`font-semibold ${
                   isOverdueSelected ? "text-white" : "text-[#F83B4F]"
                 }`}
               >
                 {t("Visits.Over Due")}
               </Text>
               {isOverdueSelected && (
-                <View className="bg-white rounded-full w-6 h-6 items-center justify-center">
+                <View className="bg-white rounded-full w-6 h-6 items-center justify-center ml-2">
                   <Text className="text-[#F83B4F] font-bold text-xs">
                     {pendingCount}
                   </Text>
@@ -333,7 +326,7 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
                       <Text className="font-semibold text-white">
                         {dayNumber}
                       </Text>
-                      <View className="bg-white rounded-full w-6 h-6 items-center justify-center">
+                      <View className="bg-white rounded-full w-6 h-6 items-center justify-center mr-2">
                         <Text className="text-[#F83B4F] font-bold text-xs">
                           {filteredVisits.length}
                         </Text>
@@ -529,16 +522,8 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
                 );
               })
           ) : (
-            <View className="flex-1 items-center justify-center mt-32">
-              <LottieView
-                source={require("../../assets/json/NoData.json")}
-                style={{ width: 200, height: 200 }}
-                autoPlay
-                loop
-              />
-              <Text className="text-center text-gray-600 mt-2 italic">
-                {t("Visits.No Jobs Available")}
-              </Text>
+            <View className="flex-1 items-center justify-center mt-[75%]">
+              <NoDataComponent message={t("Visits.No Jobs Available")} />
             </View>
           )}
         </ScrollView>
@@ -618,7 +603,7 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
                   </Text>
                   <View className="flex flex-row justify-center gap-x-2 mb-4 mt-6 px-4">
                     <TouchableOpacity
-                      className="flex-1"
+                      className="flex w-1/2"
                       disabled={
                         !selectedItem?.latitude || !selectedItem?.longitude
                       }
@@ -660,7 +645,7 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
                     </TouchableOpacity>
 
                     <TouchableOpacity
-                      className="flex "
+                      className="flex w-1/2"
                       onPress={() => handleDial(selectedItem.farmerMobile)}
                     >
                       <View className="flex-row items-center justify-center border border-[#F83B4F] rounded-full px-6 py-2">

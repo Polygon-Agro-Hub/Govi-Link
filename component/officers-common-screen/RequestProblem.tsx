@@ -8,14 +8,13 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
-  Image,
   Modal,
   BackHandler,
   ActivityIndicator,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp, useRoute, useFocusEffect } from "@react-navigation/native";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import { AntDesign, FontAwesome6 } from "@expo/vector-icons";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -38,17 +37,13 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
   const route = useRoute<RequestProblemRouteProp>();
   const { govilinkjobid, jobId, farmerId, farmerMobile, screenName } =
     route.params;
-
   const { t } = useTranslation();
-
   const [farmerFeedback, setFarmerFeedback] = useState("");
   const [advice, setAdvice] = useState("");
-
   const [loading, setLoading] = useState(false);
   const [showCameraModal, setShowCameraModal] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
-
   const [countdown, setCountdown] = useState(3);
   const [isButtonEnabled, setIsButtonEnabled] = useState(false);
   const [existingProblem, setExistingProblem] = useState<{

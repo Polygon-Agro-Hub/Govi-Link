@@ -4,11 +4,11 @@
     "slug": "GoViLink",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/favicon-icon.png",
+    "icon": "./assets/images/public/favicon-icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/favicon-icon.png",
+      "image": "./assets/images/public/favicon-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -17,7 +17,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/favicon-icon.png",
+        "foregroundImage": "./assets/images/public/favicon-icon.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
@@ -47,14 +47,14 @@
       ]
     },
     "web": {
-      "favicon": "./assets/favicon-icon.png"
+      "favicon": "./assets/images/public/favicon-icon.png"
     },
     "plugins": [
       "expo-router",
       [
         "expo-notifications",
         {
-          "icon": "./assets/favicon-icon.png",
+          "icon": "./assets/images/public/favicon-icon.png",
           "color": "#ffffff",
           "defaultChannel": "default",
           "enableBackgroundRemoteNotifications": false
@@ -71,14 +71,12 @@
           }
         }
       ],
-      "expo-sqlite"
+      "expo-sqlite",
+      "expo-web-browser"
     ],
     "extra": {
       "router": {
         "origin": false
-      },
-      "eas": {
-        "projectId": "71090bfc-087a-4a7b-8b7d-439ef415de1f"
       }
     },
     "expo-camera": {

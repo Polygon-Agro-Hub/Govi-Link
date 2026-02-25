@@ -11,7 +11,7 @@ import {
   Pressable,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import { CameraView, Camera } from "expo-camera";
 import { useTranslation } from "react-i18next";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
@@ -20,9 +20,6 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect } from "@react-navigation/native";
 import * as SQLite from "expo-sqlite";
 const db = SQLite.openDatabaseSync("inspection.db");
-
-
-
 
 type CapitalRequstQRScannerNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -36,20 +33,6 @@ type CapitalRequstQRScannerRouteProp = RouteProp<
 interface CapitalRequstQRScannerProps {
   navigation: CapitalRequstQRScannerNavigationProp;
 }
-
-const tabs = [
-  "Personal Info",
-  "ID Proof",
-  "Finance Info",
-  "Land Info",
-  "Investment Info",
-  "Cultivation Info",
-  "Cropping Systems",
-  "Profit & Risk",
-  "Economical",
-  "Labour",
-  "Harvest Storage",
-];
 
 const tableNames = [
   "inspectionpersonal",
@@ -85,18 +68,15 @@ const CapitalRequstQRScanner: React.FC<CapitalRequstQRScannerProps> = ({
   navigation,
 }) => {
   const route = useRoute<CapitalRequstQRScannerRouteProp>();
-  const { farmerId, requestId, requestNumber } =
-    route.params;
+  const { farmerId, requestId, requestNumber } = route.params;
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanned, setScanned] = useState<boolean>(false);
   const [showPermissionModal, setShowPermissionModal] =
     useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { t } = useTranslation();
-
   const [isUnsuccessfulModalVisible, setIsUnsuccessfulModalVisible] =
     useState<boolean>(false);
-
   const [unsuccessfulLoadingBarWidth, setUnsuccessfulLoadingBarWidth] =
     useState(new Animated.Value(100));
 
@@ -126,13 +106,12 @@ const CapitalRequstQRScanner: React.FC<CapitalRequstQRScannerProps> = ({
 
         const result = db.getFirstSync<{ requestId: number }>(
           `SELECT requestId FROM ${tableName} WHERE requestId = ?`,
-          [reqId]
+          [reqId],
         );
 
         if (result) {
           lastCompletedIndex = i;
         } else {
-
           break;
         }
       }
@@ -144,16 +123,12 @@ const CapitalRequstQRScanner: React.FC<CapitalRequstQRScannerProps> = ({
       }
 
       return screenNames[targetIndex];
-
     } catch (error) {
       console.error("Error checking completed forms:", error);
       return screenNames[0];
     }
   };
 
-
-
-  // Replace the handleBarCodeScanned function
   const handleBarCodeScanned = async ({
     data,
   }: {
@@ -174,14 +149,11 @@ const CapitalRequstQRScanner: React.FC<CapitalRequstQRScannerProps> = ({
         throw new Error(t("QRScanner.Wrong QR code"));
       }
       if (userId == farmerId) {
-        // Get the last completed form screen
         const targetScreen = getLastCompletedFormScreen(requestId);
-
-        console.log("Navigating to screen:", targetScreen, "with requestId:", requestId);
 
         navigation.navigate(targetScreen as any, {
           requestNumber,
-          requestId
+          requestId,
         });
       }
     } catch (error) {
@@ -295,9 +267,7 @@ const CapitalRequstQRScanner: React.FC<CapitalRequstQRScannerProps> = ({
       <View className="flex-row items-center px-4 py-4 bg-white shadow-sm">
         <TouchableOpacity
           className="bg-[#F6F6F680] rounded-full p-2 justify-center w-10 z-20 "
-          onPress={() =>
-            navigation.goBack()
-          }
+          onPress={() => navigation.goBack()}
         >
           <AntDesign name="left" size={22} color="#000" />
         </TouchableOpacity>
@@ -381,7 +351,7 @@ const CapitalRequstQRScanner: React.FC<CapitalRequstQRScannerProps> = ({
               </Text>
               <View className="mb-4">
                 <Image
-                  source={require("../../assets/error.png")}
+                  source={require("../../assets/images/public/error.webp")}
                   className="w-32 h-32"
                   resizeMode="contain"
                 />

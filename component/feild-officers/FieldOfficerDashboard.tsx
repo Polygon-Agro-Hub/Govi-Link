@@ -21,16 +21,16 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 import { useFocusEffect } from "@react-navigation/native";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import { useTranslation } from "react-i18next";
 import { DrawerActions } from "@react-navigation/native";
 import i18n from "@/i18n/i18n";
 import { useDispatch } from "react-redux";
 import { setUserProfile } from "@/store/authSlice";
 import { LinearGradient } from "expo-linear-gradient";
-import { AntDesign, Ionicons, Feather, FontAwesome6 } from "@expo/vector-icons";
+import { AntDesign, Ionicons,  FontAwesome6 } from "@expo/vector-icons";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
-import ContentLoader, { Rect, Circle } from "react-content-loader/native";
+import ContentLoader, { Rect } from "react-content-loader/native";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -555,7 +555,7 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
           ) : (
             <View className=" justify-center items-center mt-4">
               <Image
-                source={require("../../assets/no tasks.webp")}
+                source={require("../../assets/images/dashboard/no-tasks.webp")}
                 style={{
                   width: 140,
                   height: 100,
@@ -718,7 +718,7 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
             ) : (
               <View className="items-center justify-center mt-2">
                 <Image
-                  source={require("../../assets/no drafts.webp")}
+                  source={require("../../assets/images/dashboard/no-drafts.webp")}
                   style={{ width: 110, height: 80 }}
                   resizeMode="contain"
                 />
@@ -750,7 +750,7 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
             {t("Dashboard.Assigned Target")}
           </Text>
           <Image
-            source={require("../../assets/AssignedTarget.webp")}
+            source={require("../../assets/images/dashboard/assigned-target.webp")}
             style={{
               width: 100,
               height: 100,
@@ -785,7 +785,7 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
             {t("Dashboard.Capital Requests")}
           </Text>
           <Image
-            source={require("../../assets/request.png")}
+            source={require("../../assets/images/dashboard/request.webp")}
             style={{
               width: 100,
               height: 100,
@@ -871,7 +871,7 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
                   </Text>
                   <View className="flex flex-row justify-center gap-x-2 mb-4 mt-6 px-4">
                     <TouchableOpacity
-                      className="flex-1"
+                      className="flex w-1/2"
                       disabled={
                         !selectedItem?.latitude || !selectedItem?.longitude
                       }
@@ -913,7 +913,7 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
                     </TouchableOpacity>
 
                     <TouchableOpacity
-                      className="flex "
+                      className="flex w-1/2"
                       onPress={() => handleDial(selectedItem.farmerMobile)}
                     >
                       <View className="flex-row items-center justify-center border border-[#F83B4F] rounded-full px-6 py-2">

@@ -4,7 +4,6 @@ import {
   Text,
   TextInput,
   ScrollView,
-  StatusBar,
   Alert,
   KeyboardAvoidingView,
   Platform,
@@ -12,7 +11,7 @@ import {
 import FormTabs from "./FormTabs";
 import { useTranslation } from "react-i18next";
 import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 import FormFooterButton from "./FormFooterButton";
@@ -47,8 +46,9 @@ const Input = ({
       {required && <Text className="text-black">*</Text>}
     </Text>
     <View
-      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${error ? "border border-red-500" : ""
-        }`}
+      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
+        error ? "border border-red-500" : ""
+      }`}
     >
       <TextInput
         placeholder={placeholder}
@@ -133,7 +133,6 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
     purpose: "",
     repaymentMonth: 0,
   });
-
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isNextEnabled, setIsNextEnabled] = useState(false);
   const [isExistingData, setIsExistingData] = useState(false);
@@ -393,9 +392,7 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
     return numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   };
 
-  // Handle tab navigation
   const handleTabPress = (tabKey: string) => {
-    // Map tab keys to navigation routes
     const routeMap: Record<string, string> = {
       "Personal Info": "PersonalInfo",
       "ID Proof": "IDProof",
@@ -405,8 +402,8 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
       "Cultivation Info": "CultivationInfo",
       "Cropping Systems": "CroppingSystems",
       "Profit & Risk": "ProfitRisk",
-      "Economical": "Economical",
-      "Labour": "Labour",
+      Economical: "Economical",
+      Labour: "Labour",
       "Harvest Storage": "HarvestStorage",
     };
 
@@ -425,7 +422,6 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
       style={{ flex: 1, backgroundColor: "white" }}
     >
       <View className="flex-1 bg-[#F3F3F3] ">
-        <StatusBar barStyle="dark-content" />
         <FormTabs
           activeKey="Investment Info"
           navigation={navigation}
@@ -449,7 +445,6 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
                 : ""
             }
             onChangeText={(text) => {
-              // Remove commas before processing
               const numericValue = text.replace(/,/g, "");
               handleFieldChange("expected", numericValue, {
                 required: true,
@@ -483,7 +478,11 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
               "InspectionForm.Expected repayment period as per the farmer in months",
             )}
             placeholder="--"
-            value={formData.repaymentMonth && formData.repaymentMonth !== 0 ? formData.repaymentMonth.toString() : ""}
+            value={
+              formData.repaymentMonth && formData.repaymentMonth !== 0
+                ? formData.repaymentMonth.toString()
+                : ""
+            }
             onChangeText={(text) =>
               handleFieldChange("repaymentMonth", text, {
                 required: true,

@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import React, { useCallback, useState } from "react";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import { ScrollView } from "react-native-gesture-handler";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { environment } from "@/environment/environment";
@@ -245,7 +245,6 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
         title={""}
         navigation={navigation}
         showBackButton={true}
-        showLanguageSelector={false}
         onBackPress={() => handleNavBack()}
       />
       <ScrollView
@@ -253,7 +252,7 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
           flexGrow: 1,
           justifyContent: "center",
           alignItems: "center",
-          paddingHorizontal: wp(4),
+          paddingHorizontal: wp(6),
         }}
         keyboardShouldPersistTaps="handled"
       >

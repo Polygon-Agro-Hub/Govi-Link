@@ -21,7 +21,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 import { useFocusEffect } from "@react-navigation/native";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import { useTranslation } from "react-i18next";
 import { DrawerActions } from "@react-navigation/native";
 import i18n from "@/i18n/i18n";
@@ -94,7 +94,6 @@ const LoadingSkeleton = () => {
   const rectWidth = wp("38%");
   const gapBetweenRects = wp("8%");
   const totalWidth = 2 * rectWidth + gapBetweenRects;
-  const startX = (wp("100%") - totalWidth) / 2;
 
   return (
     <View
@@ -670,7 +669,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
             ) : (
               <View className="justify-center items-center mt-4">
                 <Image
-                  source={require("../../assets/no tasks.webp")}
+                  source={require("../../assets/images/dashboard/no-tasks.webp")}
                   style={{
                     width: 140,
                     height: 100,
@@ -834,7 +833,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
               ) : (
                 <View className="items-center justify-center mt-2">
                   <Image
-                    source={require("../../assets/no drafts.webp")}
+                    source={require("../../assets/images/dashboard/no-drafts.webp")}
                     style={{ width: 110, height: 80 }}
                     resizeMode="contain"
                   />
@@ -862,7 +861,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
               {t("Dashboard.Capital Requests")}
             </Text>
             <Image
-              source={require("../../assets/request.png")}
+              source={require("../../assets/images/dashboard/request.webp")}
               style={{
                 width: 100,
                 height: 100,
@@ -948,7 +947,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                     </Text>
                     <View className="flex flex-row justify-center gap-x-2 mb-4 mt-6 px-4">
                       <TouchableOpacity
-                        className="flex-1"
+                        className="flex w-1/2"
                         disabled={
                           !selectedItem?.latitude || !selectedItem?.longitude
                         }
@@ -993,7 +992,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                       </TouchableOpacity>
 
                       <TouchableOpacity
-                        className="flex "
+                        className="flex w-1/2"
                         onPress={() => handleDial(selectedItem.farmerMobile)}
                       >
                         <View className="flex-row items-center justify-center border border-[#F83B4F] rounded-full px-6 py-2">

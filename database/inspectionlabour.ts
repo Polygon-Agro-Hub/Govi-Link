@@ -18,7 +18,7 @@ export const initLabourTable = () => {
         updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
       );`,
     );
-    console.log(" Labour table created/verified");
+    
   } catch (error) {
     console.error("Error initializing labour table:", error);
     throw error;
@@ -102,7 +102,6 @@ export const saveLabourInfo = (
       );
       console.log("Labour info updated in SQLite");
     } else {
-      // INSERT new record
       const fields = [
         "requestId",
         ...Object.keys(storageData),

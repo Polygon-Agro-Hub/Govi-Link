@@ -4,7 +4,6 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
-  StatusBar,
   Alert,
   KeyboardAvoidingView,
   Platform,
@@ -14,7 +13,7 @@ import { AntDesign } from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
 import { useTranslation } from "react-i18next";
 import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 import FormFooterButton from "./FormFooterButton";
@@ -365,9 +364,7 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
     }
   };
 
-  // Handle tab navigation
   const handleTabPress = (tabKey: string) => {
-    // Map tab keys to navigation routes
     const routeMap: Record<string, string> = {
       "Personal Info": "PersonalInfo",
       "ID Proof": "IDProof",
@@ -397,8 +394,6 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
       style={{ flex: 1, backgroundColor: "white" }}
     >
       <View className="flex-1 bg-[#F3F3F3] ">
-        <StatusBar barStyle="dark-content" />
-
         <FormTabs
           activeKey="Economical"
           navigation={navigation}

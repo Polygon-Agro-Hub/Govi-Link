@@ -19,24 +19,7 @@ import { RootState } from "@/services/store";
 import { LanguageContext } from "@/context/LanguageContext";
 import { useDispatch } from "react-redux";
 import { logoutUser } from "@/store/authSlice";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { DrawerNavigationProp } from "@react-navigation/drawer";
 import { useDrawerStatus } from "@react-navigation/drawer";
-
-import { RootStackParamList } from "@/component/types";
-interface ProfileData {
-  firstName: string;
-  lastName: string;
-  profileImg: string;
-  firstNameSinhala: string;
-  lastNameSinhala: string;
-  firstNameTamil: string;
-  lastNameTamil: string;
-  empId: string;
-}
-type CustomDrawerNavigationProp =
-  NativeStackNavigationProp<RootStackParamList> &
-    DrawerNavigationProp<RootStackParamList>;
 
 export default function CustomDrawerContent(props: any) {
   const { t } = useTranslation();
@@ -245,21 +228,6 @@ export default function CustomDrawerContent(props: any) {
               />
             </TouchableOpacity>
 
-            {/* Change Password */}
-            <TouchableOpacity
-              className="flex-row items-center py-5"
-              onPress={() =>
-                navigation.navigate("ChangePassword", { passwordUpdate: 1 })
-              }
-            >
-              <View className="bg-[#F4F9FB] rounded-full p-1">
-                <Entypo name="lock" size={20} color="#999999" />
-              </View>
-              <Text className="flex-1 text-lg ml-2">
-                {t("Drawer.Change Password")}
-              </Text>
-            </TouchableOpacity>
-
             <TouchableOpacity
               onPress={() => setComplaintDropdownOpen(!isComplaintDropdownOpen)}
               className="flex-row items-center py-5"
@@ -312,6 +280,25 @@ export default function CustomDrawerContent(props: any) {
                 ))}
               </View>
             )}
+            {/* Change Password */}
+            <TouchableOpacity
+              className="flex-row items-center py-5"
+              onPress={() =>
+                navigation.navigate("ChangePassword", { passwordUpdate: 1 })
+              }
+            >
+              <View className="bg-[#F4F9FB] rounded-full p-1">
+                <Entypo name="lock" size={20} color="#999999" />
+              </View>
+              <Text className="flex-1 text-lg ml-2">
+                {t("Drawer.Change Password")}
+              </Text>
+              <Ionicons
+                name={"chevron-forward-sharp"}
+                size={20}
+                color="#999999"
+              />
+            </TouchableOpacity>
           </View>
         </View>
       </DrawerContentScrollView>

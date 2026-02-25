@@ -30,7 +30,7 @@ export const initCultivationTable = () => {
         updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
       );`,
     );
-    console.log("Cultivation table created/verified");
+    
   } catch (error) {
     console.error(" Error initializing cultivation table:", error);
     throw error;

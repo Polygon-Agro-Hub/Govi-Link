@@ -5,13 +5,12 @@ import {
   TouchableOpacity,
   ScrollView,
   RefreshControl,
-  StatusBar,
   Image,
   Alert,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
@@ -184,13 +183,11 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
   };
 
   return (
-    <View className="flex-1 bg-white">
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+    <View className="flex-1">
       <CustomHeader
         title={t("ManageOfficers.Officers")}
         navigation={navigation}
         showBackButton={false}
-        showLanguageSelector={false}
         showBottomBorder={true}
       />
 
@@ -202,7 +199,7 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 100, flexGrow: 1 }}
       >
-        <View className="px-4 py-4 space-y-3 flex-1">
+        <View className="px-6 py-4 space-y-3 flex-1">
           <Text className="mt-2 text-[#21202B] text-base">
             <Text className="font-bold">
               {t("ManageOfficers.OfficersList")}{" "}
@@ -213,7 +210,9 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
           </Text>
 
           {officers.length === 0 ? (
+            <View className="flex-1 items-center justify-center">
             <NoDataComponent message={t("ManageOfficers.NoOfficers")} />
+            </View>
           ) : (
             officers.map((officer, index) => (
               <View
@@ -277,7 +276,7 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
       </ScrollView>
 
       <TouchableOpacity
-        className="absolute bottom-20 right-4 items-center justify-center"
+        className="absolute bottom-20 right-6 items-center justify-center"
         style={{
           width: 70,
           height: 70,

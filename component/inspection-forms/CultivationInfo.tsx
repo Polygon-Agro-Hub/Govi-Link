@@ -5,7 +5,6 @@ import {
   TextInput,
   ScrollView,
   TouchableOpacity,
-  StatusBar,
   Alert,
   KeyboardAvoidingView,
   Platform,
@@ -17,7 +16,7 @@ import FormTabs from "./FormTabs";
 import { useTranslation } from "react-i18next";
 import Checkbox from "expo-checkbox";
 import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import { CameraScreen } from "@/Items/CameraScreen";
 import axios from "axios";
 import { environment } from "@/environment/environment";
@@ -207,7 +206,6 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
   const route = useRoute<RouteProp<RootStackParamList, "CultivationInfo">>();
   const { requestNumber, requestId } = route.params;
   const { t } = useTranslation();
-
   const [formData, setFormData] = useState<CultivationInfoExtended>({
     temperature: null,
     rainfall: null,
@@ -229,7 +227,6 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
     isElectrocityAvailable: undefined,
     ispumpOrirrigation: undefined,
   });
-
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isNextEnabled, setIsNextEnabled] = useState(false);
   const [yesNoModalVisible, setYesNoModalVisible] = useState(false);
@@ -239,7 +236,6 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
   const [showCamera, setShowCamera] = useState(false);
   const [error, setError] = useState<string>("");
   const [isExistingData, setIsExistingData] = useState(false);
-
   const [selections, setSelections] = useState<Record<string, Selection>>(() =>
     climateParameters.reduce(
       (acc, item) => {
@@ -754,9 +750,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
     }
   };
 
-  // Handle tab navigation
   const handleTabPress = (tabKey: string) => {
-    // Map tab keys to navigation routes
     const routeMap: Record<string, string> = {
       "Personal Info": "PersonalInfo",
       "ID Proof": "IDProof",
@@ -788,7 +782,6 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
       style={{ flex: 1, backgroundColor: "white" }}
     >
       <View className="flex-1 bg-[#F3F3F3]">
-        <StatusBar barStyle="dark-content" />
         <FormTabs
           activeKey="Cultivation Info"
           navigation={navigation}
@@ -865,8 +858,6 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
               </View>
             ) : null}
           </View>
-
-          {/* Fixed after this line */}
 
           <YesNoSelect
             label={t(
@@ -1014,7 +1005,6 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
                       resizeMode="cover"
                     />
 
-                    {/* Remove button */}
                     <TouchableOpacity
                       onPress={() => onClearImage(index)}
                       className="absolute top-[-8] right-[-8] bg-[#f21d1d] p-2 rounded-full"

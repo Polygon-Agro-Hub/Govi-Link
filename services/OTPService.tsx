@@ -1,4 +1,3 @@
-// OTPService.tsx
 import axios from "axios";
 import { Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -26,24 +25,10 @@ export const sendOTP = async (
       destination: formattedPhonenumber,
     };
 
-    console.log("this is the body from OTPService..", body);
-    console.log("this is the apiUrl..", apiUrl);
-
     const response = await axios.post(apiUrl, body, { headers });
 
-    console.log(
-      "this is response from shoutout.............:\n\n",
-      response.data
-    );
-    console.log(
-      "this is referenceId from shoutout.............:\n\n",
-      response.data.referenceId
-    );
-
-    // Store referenceId in AsyncStorage
     await AsyncStorage.setItem("referenceId", response.data.referenceId);
 
-    // Navigate to the OTPE screen with the mobile number
     navigation.navigate("OTPEOLDUSER", {
       mobileNumber: formattedPhonenumber,
     });

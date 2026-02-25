@@ -1,10 +1,5 @@
 import React, { useRef } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StatusBar,
-} from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp } from "@react-navigation/native";
 import { WebView } from "react-native-webview";
@@ -13,7 +8,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import { useTranslation } from "react-i18next";
 
 type ViewLocationScreenNavigationProp = StackNavigationProp<
@@ -96,8 +91,6 @@ const ViewLocationScreen: React.FC<ViewLocationScreenProps> = ({
 
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-
       <View className="flex-row items-center justify-center py-4 mt-2">
         <TouchableOpacity
           className="absolute left-4 bg-[#F3F3F3] rounded-full p-4"

@@ -14,7 +14,7 @@ interface NoDataComponentProps {
 
 const NoDataComponent: React.FC<NoDataComponentProps> = ({
   message,
-  animationSource = require("@/assets/json/NoData.json"),
+  animationSource = require("@/assets/json/no-data.json"),
 }) => {
   const { t } = useTranslation();
 

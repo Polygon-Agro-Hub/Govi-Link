@@ -13,7 +13,7 @@ import {
 import React, { useCallback, useState } from "react";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp, useRoute } from "@react-navigation/native";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import axios from "axios";
 import { ScrollView } from "react-native-gesture-handler";
 import { environment } from "@/environment/environment";
@@ -184,13 +184,12 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ navigation }) => {
         title={""}
         navigation={navigation}
         showBackButton={true}
-        showLanguageSelector={false}
         onBackPress={() => navigation.goBack()}
       />
       <ScrollView
         className="flex-1 bg-white"
         keyboardShouldPersistTaps="handled"
-        style={{ paddingHorizontal: wp(4) }}
+        style={{ paddingHorizontal: wp(6) }}
       >
         <View
           className={`flex-row items-center justify-center space-x-[-30%] ml-[5%]`}

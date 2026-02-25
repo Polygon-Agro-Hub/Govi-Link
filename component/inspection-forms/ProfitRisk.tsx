@@ -5,7 +5,6 @@ import {
   TextInput,
   ScrollView,
   TouchableOpacity,
-  StatusBar,
   Alert,
   KeyboardAvoidingView,
   Platform,
@@ -15,7 +14,7 @@ import { AntDesign } from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
 import { useTranslation } from "react-i18next";
 import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 import FormFooterButton from "./FormFooterButton";
@@ -186,7 +185,6 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
   const route = useRoute<RouteProp<RootStackParamList, "ProfitRisk">>();
   const { requestNumber, requestId } = route.params;
   const { t } = useTranslation();
-
   const [formData, setFormData] = useState<ProfitRiskData>({
     profit: "",
     isProfitable: undefined,
@@ -196,7 +194,6 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
     manageRisk: undefined,
     worthToTakeRisk: "",
   });
-
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [yesNoModalVisible, setYesNoModalVisible] = useState(false);
   const [activeYesNoField, setActiveYesNoField] = useState<string | null>(null);
@@ -553,9 +550,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
     }
   };
 
-  // Handle tab navigation
   const handleTabPress = (tabKey: string) => {
-    // Map tab keys to navigation routes
     const routeMap: Record<string, string> = {
       "Personal Info": "PersonalInfo",
       "ID Proof": "IDProof",
@@ -565,8 +560,8 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
       "Cultivation Info": "CultivationInfo",
       "Cropping Systems": "CroppingSystems",
       "Profit & Risk": "ProfitRisk",
-      "Economical": "Economical",
-      "Labour": "Labour",
+      Economical: "Economical",
+      Labour: "Labour",
       "Harvest Storage": "HarvestStorage",
     };
 
@@ -585,8 +580,6 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
       style={{ flex: 1, backgroundColor: "white" }}
     >
       <View className="flex-1 bg-[#F3F3F3] ">
-        <StatusBar barStyle="dark-content" />
-
         {/* Tabs */}
         <FormTabs
           activeKey="Profit & Risk"

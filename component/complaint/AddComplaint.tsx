@@ -13,7 +13,7 @@ import {
   Keyboard,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -28,7 +28,6 @@ import CustomHeader from "../common/CustomHeader";
 import GlobalSearchModal from "../common/GlobalSearchModal";
 import { useModal } from "@/hooks/useModal";
 import { MaterialIcons } from "@expo/vector-icons";
-import { StatusBar } from "expo-status-bar";
 
 type AddComplaintScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -197,12 +196,10 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
       keyboardVerticalOffset={Platform.select({ ios: 60, android: 0 })}
       style={{ flex: 1, backgroundColor: "white" }}
     >
-      <StatusBar style="dark" backgroundColor="#fff" />
       <CustomHeader
         title={""}
         navigation={navigation}
         showBackButton={true}
-        showLanguageSelector={false}
         onBackPress={handleBackPress}
       />
       <ScrollView

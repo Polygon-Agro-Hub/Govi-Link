@@ -5,7 +5,6 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  StatusBar,
   KeyboardAvoidingView,
   Platform,
   Alert,
@@ -17,8 +16,8 @@ import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { RadioButton } from "react-native-paper";
 import Checkbox from "expo-checkbox";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../types";
-import countryData from "@/assets/json/countryflag.json";
+import { RootStackParamList } from "../types/types";
+import countryData from "@/assets/json/country-flag.json";
 import { useTranslation } from "react-i18next";
 import i18n from "@/i18n/i18n";
 import axios from "axios";
@@ -587,7 +586,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
       }
 
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ['images'], 
         allowsEditing: true,
         aspect: [1, 1],
         quality: 0.8,
@@ -988,12 +987,10 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1, backgroundColor: "white" }}
     >
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <CustomHeader
         title={t("AddOfficer.AddOfficer")}
         navigation={navigation}
         showBackButton={true}
-        showLanguageSelector={false}
         onBackPress={() => navigation.navigate("ManageOfficers")}
       />
       <ScrollView
@@ -1022,7 +1019,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
           </TouchableOpacity>
         </View>
 
-        <View className="p-2">
+        <View className="p-2 px-4">
           <View className="px-2 mt-6 items-center ">
             <View className="flex flex-row items-center space-x-2 justify-between">
               <Text className="text-base font-medium">

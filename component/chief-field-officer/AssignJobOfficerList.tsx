@@ -10,7 +10,7 @@ import {
   Animated,
   Easing,
 } from "react-native";
-import { RootStackParamList } from "@/component/types";
+import { RootStackParamList } from "@/component/types/types";
 import { useTranslation } from "react-i18next";
 import { LinearGradient } from "expo-linear-gradient";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -68,8 +68,6 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
   const [userInfo, setUserInfo] = useState<any>(null);
   const progressAnim = useRef(new Animated.Value(100)).current;
   const countdownAnim = useRef(new Animated.Value(30)).current;
-
-  const timerRef = useRef<number | null>(null);
   const animationRef = useRef<Animated.CompositeAnimation | null>(null);
 
   const singleJobId = Array.isArray(selectedJobIds)

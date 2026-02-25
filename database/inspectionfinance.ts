@@ -22,7 +22,7 @@ export const initFinanceTable = () => {
         updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
       );`,
     );
-    console.log("Finance table created/verified");
+   
   } catch (error) {
     console.error("Error initializing finance table:", error);
     throw error;

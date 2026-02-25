@@ -5,22 +5,21 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
-  Platform,
-  StatusBar,
   Modal,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp } from "@react-navigation/native";
 import { WebView } from "react-native-webview";
 import * as Location from "expo-location";
-import { AntDesign, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { AntDesign, Entypo, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import { useTranslation } from "react-i18next";
 import { LinearGradient } from "expo-linear-gradient";
+import CustomHeader from "../common/CustomHeader";
 
 type AttachGeoLocationScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -245,20 +244,13 @@ const AttachGeoLocationScreen: React.FC<AttachGeoLocationScreenProps> = ({
 
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-
       {/* Header */}
-      <View className="flex-row items-center justify-center py-4 mt-2">
-        <TouchableOpacity
-          className="absolute left-4 bg-[#F3F3F3] rounded-full p-4"
-          onPress={() => navigation.goBack()}
-        >
-          <AntDesign name="left" size={20} color="#000" />
-        </TouchableOpacity>
-        <Text className="text-lg font-semibold text-black">
-          {t("InspectionForm.Attach Geo Location")}
-        </Text>
-      </View>
+      <CustomHeader
+        title={t("InspectionForm.Attach Geo Location")}
+        navigation={navigation}
+        showBackButton={true}
+        onBackPress={() => navigation.goBack()}
+      />
       <View className="items-center justify-center mt-[2%]">
         <Text className="text-[#828282]">
           {t("InspectionForm.Tap on the map to select a location.")}
@@ -340,7 +332,7 @@ const AttachGeoLocationScreen: React.FC<AttachGeoLocationScreenProps> = ({
             colors={["#F35125", "#FF1D85"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
-            className=" rounded-full py-3 p-3 items-center flex-row gap-x-1"
+            className="rounded-full py-4 flex-row justify-center items-center"
             style={{
               shadowColor: "#000",
               shadowOffset: { width: 0, height: 3 },
@@ -350,8 +342,7 @@ const AttachGeoLocationScreen: React.FC<AttachGeoLocationScreenProps> = ({
             }}
           >
             <MaterialIcons name="done" size={24} color="#fff" />
-
-            <Text className="text-white text-base font-semibold">
+            <Text className="text-white text-base font-semibold ml-2">
               {t("InspectionForm.Confirm Now")}
             </Text>
           </LinearGradient>
