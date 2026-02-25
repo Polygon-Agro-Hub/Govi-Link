@@ -34,20 +34,6 @@ interface CapitalRequstQRScannerProps {
   navigation: CapitalRequstQRScannerNavigationProp;
 }
 
-const tabs = [
-  "Personal Info",
-  "ID Proof",
-  "Finance Info",
-  "Land Info",
-  "Investment Info",
-  "Cultivation Info",
-  "Cropping Systems",
-  "Profit & Risk",
-  "Economical",
-  "Labour",
-  "Harvest Storage",
-];
-
 const tableNames = [
   "inspectionpersonal",
   "inspectionidproof",
