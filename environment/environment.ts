@@ -1,10 +1,10 @@
 export const environment = {
   production: true,
   // LOCAL --------------------
-  // API_BASE_URL: "http://192.168.1.24:3000/govilink/",
+   API_BASE_URL: "http://192.168.8.180:3000/govilink/",
 
   // DEV --------------------
-  API_BASE_URL: "https://govi-link-back-dev-api.vercel.app/govilink/",
+ // API_BASE_URL: "https://govi-link-back-dev-api.vercel.app/govilink/",
 
   // PROD --------------------
   // API_BASE_URL: "https://govi-link-back-prod-api.vercel.app/govilink/",
