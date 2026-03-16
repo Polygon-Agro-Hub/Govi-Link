@@ -438,7 +438,7 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
 
           <Input
             label={t("InspectionForm.Expected investment by the farmer")}
-            placeholder=""
+            placeholder="0.00"
             value={
               formData.expected
                 ? formatWithCommas(formData.expected.toString())

@@ -362,42 +362,38 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
             [...filteredVisits]
               .sort((a, b) => {
                 const getStatusRank = (item: VisitItem) => {
-                  if (item.propose === "Cluster" && item.totalClusterCount) {
-                    if (item.completedClusterCount === item.totalClusterCount) {
-                      return 5;
-                    }
-
-                    if (
-                      item.completedClusterCount !== undefined &&
-                      item.completedClusterCount > 0
-                    ) {
-                      const completionPercentage = parseFloat(
-                        item.completionPercentage,
-                      );
-                      if (completionPercentage >= 10) {
-                        return 2;
-                      }
-                    }
-
-                    return 3;
-                  }
+                  if (item.status === "Ongoing") return 1;
 
                   if (
-                    item.status === "Completed" ||
-                    item.status === "Finished"
+                    item.propose === "Cluster" &&
+                    item.totalClusterCount &&
+                    item.completedClusterCount !== undefined &&
+                    item.completedClusterCount > 0 &&
+                    item.completedClusterCount < item.totalClusterCount
                   ) {
-                    return 5;
+                    return 2;
                   }
 
-                  if (item.status === "Ongoing") {
-                    return 1;
-                  }
-
-                  if (item.status === "Pending") {
+                  if (item.status === "Pending") return 3;
+                  if (
+                    item.propose === "Cluster" &&
+                    item.totalClusterCount &&
+                    (!item.completedClusterCount ||
+                      item.completedClusterCount === 0)
+                  ) {
                     return 3;
                   }
 
-                  return 4;
+                  if (item.status === "Completed" || item.status === "Finished")
+                    return 4;
+                  if (
+                    item.propose === "Cluster" &&
+                    item.completedClusterCount === item.totalClusterCount
+                  ) {
+                    return 4;
+                  }
+
+                  return 3;
                 };
 
                 return getStatusRank(a) - getStatusRank(b);

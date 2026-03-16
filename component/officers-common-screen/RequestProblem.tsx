@@ -354,7 +354,14 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
       <View className="flex-row justify-between p-4 border-t border-gray-200 px-6">
         <TouchableOpacity
           className="flex-row items-center bg-[#444444] px-9 py-3 rounded-full "
-          onPress={() => navigation.navigate("Main", { screen: screenName })}
+          onPress={() =>
+            navigation.navigate("Main", {
+              screen: "MainTabs",
+              params: {
+                screen: screenName,
+              },
+            })
+          }
         >
           <AntDesign name="arrow-left" size={20} color="#fff" />
           <Text className="ml-4 text-white font-semibold text-base">

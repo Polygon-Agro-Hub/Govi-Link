@@ -17,7 +17,6 @@ import Svg, { Circle, G, Text as SvgText } from "react-native-svg";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { environment } from "@/environment/environment";
 import axios from "axios";
-import { deleteAllInspectionData } from "@/database/deleteInspectionData";
 
 type ConfirmationCapitalRequestNavigationProps = StackNavigationProp<
   RootStackParamList,
@@ -143,7 +142,6 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
     };
   }, [countdownAnim]);
 
-
   const handleUndo = async () => {
     if (hasNavigatedRef.current) {
       return;
@@ -155,41 +153,19 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
 
     setAssigning(true);
 
-    try {
-      const response = await axios.delete(
-        `${environment.API_BASE_URL}api/capital-request/inspection/delete/${requestId}`,
-      );
+    setAssigning(false);
+    setShowConfirmationModal(false);
 
-      if (response.data.success) {
-        await deleteAllInspectionData(requestId.toString());
-
-        setAssigning(false);
-        setShowConfirmationModal(false);
-
-        Alert.alert(
-          t("Main.Success"),
-          t("ConfirmationCapitalRequest.UndoSuccess"),
-          [
-            {
-              text: t("Main.ok"),
-              onPress: navigateToCapitalRequests,
-            },
-          ],
-        );
-      } else {
-        throw new Error(response.data.message || "Delete failed");
-      }
-    } catch (error: any) {
-      console.error("Error deleting inspection data:", error);
-      setAssigning(false);
-
-      Alert.alert(
-        t("Main.Error"),
-        error.response?.data?.message ||
-          t("ConfirmationCapitalRequest.UndoFailed"),
-        [{ text: t("Main.ok") }],
-      );
-    }
+    Alert.alert(
+      t("Main.Success"),
+      t("ConfirmationCapitalRequest.UndoSuccess"),
+      [
+        {
+          text: t("Main.ok"),
+          onPress: navigateToCapitalRequests,
+        },
+      ],
+    );
   };
 
   const handleConfirmAndLeave = async () => {
