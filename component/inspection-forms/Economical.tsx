@@ -22,6 +22,7 @@ import {
   getEconomicalInfo,
   EconomicalData,
 } from "@/database/inspectioneconomical";
+import { updateLastScreen } from "@/database/inspectionprogress";
 
 type EconomicalProps = {
   navigation: any;
@@ -122,6 +123,12 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
 
   useFocusEffect(
     useCallback(() => {
+      updateLastScreen(requestId, "Economical");
+    }, [requestId])
+  );
+
+  useFocusEffect(
+    useCallback(() => {
       const loadData = async () => {
         if (!requestId) return;
 
@@ -183,9 +190,9 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
 
     setIsNextEnabled(
       isSuitaleSizeValid &&
-        isFinanceResourceValid &&
-        isAltRoutesValid &&
-        !hasErrors,
+      isFinanceResourceValid &&
+      isAltRoutesValid &&
+      !hasErrors,
     );
   }, [formData, errors]);
 

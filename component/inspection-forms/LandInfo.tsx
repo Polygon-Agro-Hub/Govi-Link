@@ -32,6 +32,7 @@ import {
   LandImage,
   GeoLocation,
 } from "@/database/inspectionland";
+import { updateLastScreen } from "@/database/inspectionprogress";
 
 type LandInfoProps = {
   navigation: any;
@@ -63,6 +64,12 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
     "Permit land – short term from the government",
     "Permit land – long term from the government",
   ];
+
+  useFocusEffect(
+    useCallback(() => {
+      updateLastScreen(requestId, "LandInfo");
+    }, [requestId])
+  );
 
 
   useEffect(() => {
@@ -446,9 +453,8 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
               *
             </Text>
             <View
-              className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${
-                errors.landDiscription ? "border border-red-500" : ""
-              }`}
+              className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${errors.landDiscription ? "border border-red-500" : ""
+                }`}
             >
               <TextInput
                 placeholder={t("InspectionForm.Type here...")}

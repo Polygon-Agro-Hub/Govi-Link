@@ -24,6 +24,7 @@ import {
   getCroppingInfo,
   CroppingSystemsData,
 } from "@/database/inspectioncropping";
+import { updateLastScreen } from "@/database/inspectionprogress";
 
 const YesNoSelect = ({
   label,
@@ -126,6 +127,13 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
     useState(false);
   const [isExistingData, setIsExistingData] = useState(false);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      updateLastScreen(requestId, "CroppingSystems");
+    }, [requestId])
+  );
+
 
   useFocusEffect(
     useCallback(() => {

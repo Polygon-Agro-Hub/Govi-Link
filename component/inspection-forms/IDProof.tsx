@@ -25,6 +25,7 @@ import {
   getIDProof,
   IDProofInfo,
 } from "@/database/inspectionidproof";
+import { updateLastScreen } from "@/database/inspectionprogress";
 
 type IDProofProps = {
   navigation: any;
@@ -94,6 +95,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
     { key: "Driving License ID", label: "Driving License" },
   ];
 
+
   useEffect(() => {
     const timer = setTimeout(async () => {
       if (requestId) {
@@ -107,6 +109,12 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
 
     return () => clearTimeout(timer);
   }, [formData, requestId]);
+
+  useFocusEffect(
+    useCallback(() => {
+      updateLastScreen(requestId, "IDProof");
+    }, [requestId])
+  );
 
   useFocusEffect(
     useCallback(() => {
@@ -487,9 +495,8 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
                 </Text>
               </Text>
               <View
-                className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
-                  errors.nic ? "border border-red-500" : ""
-                }`}
+                className={`bg-[#F6F6F6] rounded-full flex-row items-center ${errors.nic ? "border border-red-500" : ""
+                  }`}
               >
                 <TextInput
                   placeholder="----"

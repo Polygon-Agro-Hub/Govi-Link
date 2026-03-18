@@ -27,6 +27,7 @@ import {
   getFinanceInfo,
   FinanceInfo as FinanceInfoData,
 } from "@/database/inspectionfinance";
+import { updateLastScreen } from "@/database/inspectionprogress";
 
 type AssetCategory = {
   key: string;
@@ -56,9 +57,8 @@ const Input = ({
       {label} {required && <Text className="text-black">*</Text>}
     </Text>
     <View
-      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
-        error ? "border border-red-500" : ""
-      }`}
+      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${error ? "border border-red-500" : ""
+        }`}
     >
       <TextInput
         placeholder={placeholder}
@@ -166,6 +166,12 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     name: bank.name,
   }));
 
+  useFocusEffect(
+    useCallback(() => {
+      updateLastScreen(requestId, "FinanceInfo");
+    }, [requestId])
+  );
+
   const updateFormData = useCallback((updates: Partial<FinanceInfoData>) => {
     setFormData((prev) => ({ ...prev, ...updates }));
   }, []);
@@ -210,10 +216,10 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
 
     setIsNextEnabled(
       allFilled &&
-        accountNumbersMatch &&
-        hasAssets &&
-        hasBankInfo &&
-        !hasErrors,
+      accountNumbersMatch &&
+      hasAssets &&
+      hasBankInfo &&
+      !hasErrors,
     );
   }, [formData, errors]);
 
@@ -847,9 +853,8 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               {t("InspectionForm.Bank Name")} *
             </Text>
             <TouchableOpacity
-              className={`bg-[#F4F4F4] rounded-full px-4 py-4 flex-row justify-between items-center ${
-                errors.bank ? "border border-red-500" : ""
-              }`}
+              className={`bg-[#F4F4F4] rounded-full px-4 py-4 flex-row justify-between items-center ${errors.bank ? "border border-red-500" : ""
+                }`}
               onPress={() => setShowBankDropdown(true)}
             >
               <Text
@@ -871,9 +876,8 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               {t("InspectionForm.Branch Name")} *
             </Text>
             <TouchableOpacity
-              className={`bg-[#F4F4F4] rounded-full px-4 py-4 flex-row justify-between items-center ${
-                errors.branch ? "border border-red-500" : ""
-              }`}
+              className={`bg-[#F4F4F4] rounded-full px-4 py-4 flex-row justify-between items-center ${errors.branch ? "border border-red-500" : ""
+                }`}
               onPress={() => setShowBranchDropdown(true)}
               disabled={availableBranches.length === 0}
             >
@@ -898,9 +902,8 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               {t("InspectionForm.Existing debts of the farmer")} *
             </Text>
             <View
-              className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${
-                errors.debtsOfFarmer ? "border border-red-500" : ""
-              }`}
+              className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${errors.debtsOfFarmer ? "border border-red-500" : ""
+                }`}
             >
               <TextInput
                 placeholder={t("InspectionForm.Type here...")}

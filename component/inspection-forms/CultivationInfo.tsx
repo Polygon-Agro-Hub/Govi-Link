@@ -27,6 +27,7 @@ import {
   CultivationInfo as CultivationInfoData,
   WaterImage,
 } from "@/database/inspectioncultivation";
+import { updateLastScreen } from "@/database/inspectionprogress";
 
 interface CultivationInfoExtended extends CultivationInfoData {
   [key: string]: any;
@@ -143,9 +144,8 @@ const Input = ({
       {required && <Text className="text-black">*</Text>}
     </Text>
     <View
-      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
-        error ? "border border-red-500" : ""
-      }`}
+      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${error ? "border border-red-500" : ""
+        }`}
     >
       <TextInput
         placeholder={placeholder}
@@ -246,6 +246,12 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
     ),
   );
 
+  useFocusEffect(
+    useCallback(() => {
+      updateLastScreen(requestId, "CultivationInfo");
+    }, [requestId])
+  );
+
   useEffect(() => {
     const timer = setTimeout(async () => {
       if (requestId) {
@@ -327,13 +333,13 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
 
     setIsNextEnabled(
       allClimateSelected &&
-        isPHValid &&
-        isSoilTypeValid &&
-        isWaterSourceValid &&
-        isOverallSoilFertilityValid &&
-        allYesNoSelected &&
-        isImageValid &&
-        !hasErrors,
+      isPHValid &&
+      isSoilTypeValid &&
+      isWaterSourceValid &&
+      isOverallSoilFertilityValid &&
+      allYesNoSelected &&
+      isImageValid &&
+      !hasErrors,
     );
   }, [formData, selections, errors]);
 
