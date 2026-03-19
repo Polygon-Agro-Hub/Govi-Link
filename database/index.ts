@@ -9,6 +9,7 @@ import { initProfitTable } from "./inspectionprofit";
 import { initEconomicalTable } from "./inspectioneconomical";
 import { initLabourTable } from "./inspectionlabour";
 import { initHarvestStorageTable } from "./inspectionharvest";
+import { initProgressTable } from "./inspectionprogress";
 
 export const initDatabase = () => {
   try {
@@ -23,6 +24,7 @@ export const initDatabase = () => {
     initEconomicalTable();
     initLabourTable();
     initHarvestStorageTable();
+    initProgressTable();
 
   } catch (error) {
     console.error(" Error initializing database:", error);
@@ -41,3 +43,15 @@ export * from "./inspectionprofit";
 export * from "./inspectioneconomical";
 export * from "./inspectionlabour";
 export * from "./inspectionharvest";
+export * from "./inspectionpersonal";
+export * from "./inspectionidproof";
+export * from "./inspectionfinance";
+export * from "./inspectionland";
+export * from "./inspectioncultivation";
+export * from "./inspectioninvestment";
+export * from "./inspectioncropping";
+export * from "./inspectionprofit";
+export * from "./inspectioneconomical";
+export * from "./inspectionlabour";
+export * from "./inspectionharvest";
+export * from "./inspectionprogress";

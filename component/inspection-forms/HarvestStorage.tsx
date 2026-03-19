@@ -24,6 +24,7 @@ import {
   clearHarvestStorageInfo,
   HarvestStorageData,
 } from "@/database/inspectionharvest";
+import { updateLastScreen } from "@/database/inspectionprogress";
 
 type HarvestStorageProps = {
   navigation: any;
@@ -80,7 +81,6 @@ const YesNoSelect = ({
         </TouchableOpacity>
       </Modal>
 
-      {/* Field */}
       <View className="mt-4">
         <Text className="text-sm text-[#070707] mb-2">
           {label} {required && <Text className="text-black">*</Text>}
@@ -130,10 +130,18 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
   const [isSaving, setIsSaving] = useState(false);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
 
+    useFocusEffect(
+      useCallback(() => {
+        updateLastScreen(requestId, "HarvestStorage");
+      }, [requestId])
+    );
+
   useFocusEffect(
     useCallback(() => {
       const loadData = async () => {
         if (!requestId) return;
+
+        setIsDataLoaded(false);
 
         try {
           const reqId = Number(requestId);
@@ -148,18 +156,25 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
               hasValueAddedMarketLinkage: localData.hasValueAddedMarketLinkage,
               awareOfQualityStandards: localData.awareOfQualityStandards,
             };
-
             setFormData(normalizedData);
             setIsExistingData(true);
           } else {
+            setFormData({
+              hasOwnStorage: undefined,
+              ifNotHasFacilityAccess: undefined,
+              hasPrimaryProcessingAccess: undefined,
+              knowsValueAdditionTech: undefined,
+              hasValueAddedMarketLinkage: undefined,
+              awareOfQualityStandards: undefined,
+            });
             setIsExistingData(false);
           }
-          setIsDataLoaded(true);
         } catch (error) {
           console.error(
             "Failed to load harvest storage info from SQLite:",
             error,
           );
+        } finally {
           setIsDataLoaded(true);
         }
       };
@@ -298,13 +313,9 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
         },
       );
 
-      if (response.data.success) {
-        return true;
-      }
-
-      return false;
+      return response.data.success === true;
     } catch (error: any) {
-      console.error(` Error saving ${tableName}:`, error);
+      console.error(`Error saving ${tableName}:`, error);
       return false;
     }
   };
@@ -360,7 +371,7 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
     setIsSaving(true);
 
     if (!requestId) {
-      console.error(" requestId is missing!");
+      console.error("requestId is missing!");
       setErrorModalVisible(true);
       setIsSaving(false);
       return;
@@ -369,7 +380,7 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
     const reqId = Number(requestId);
 
     if (isNaN(reqId) || reqId <= 0) {
-      console.error(" Invalid requestId:", requestId);
+      console.error("Invalid requestId:", requestId);
       setErrorModalVisible(true);
       setIsSaving(false);
       return;
@@ -411,7 +422,7 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
         requestId: requestId,
       });
     } catch (error) {
-      console.error(" Error during cleanup:", error);
+      console.error("Error during cleanup:", error);
       navigation.navigate("ConfirmationCapitalRequest", {
         requestNumber: requestNumber,
         requestId: requestId,
@@ -433,8 +444,8 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
       "Cultivation Info": "CultivationInfo",
       "Cropping Systems": "CroppingSystems",
       "Profit & Risk": "ProfitRisk",
-      "Economical": "Economical",
-      "Labour": "Labour",
+      Economical: "Economical",
+      Labour: "Labour",
       "Harvest Storage": "HarvestStorage",
     };
 
@@ -452,7 +463,7 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1, backgroundColor: "white" }}
     >
-      <View className="flex-1 bg-[#F3F3F3] ">
+      <View className="flex-1 bg-[#F3F3F3]">
         <FormTabs
           activeKey="Harvest Storage"
           navigation={navigation}

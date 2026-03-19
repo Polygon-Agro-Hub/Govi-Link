@@ -17,7 +17,6 @@ export const initHarvestStorageTable = () => {
         updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
       );`,
     );
-    
   } catch (error) {
     console.error("Error initializing harvest storage table:", error);
     throw error;
@@ -47,17 +46,17 @@ const toYesNo = (val: any): "Yes" | "No" | undefined => {
   return undefined;
 };
 
-export const saveHarvestStorageInfo = (
+export const saveHarvestStorageInfo = async (
   requestId: number,
   data: Partial<HarvestStorageData>,
-): void => {
+): Promise<void> => {
   try {
     const existing = db.getFirstSync<{ requestId: number }>(
       "SELECT requestId FROM inspectionharveststorage WHERE requestId = ?",
       [requestId],
     );
 
-    const storageData: any = { ...data };
+    const storageData: any = {};
 
     if (data.hasOwnStorage !== undefined) {
       storageData.hasOwnStorage = data.hasOwnStorage;
@@ -92,7 +91,6 @@ export const saveHarvestStorageInfo = (
         `UPDATE inspectionharveststorage SET ${fields}, updatedAt = ? WHERE requestId = ?`,
         values as SQLite.SQLiteBindParams,
       );
-      console.log(" Harvest Storage info updated in SQLite");
     } else {
       const fields = [
         "requestId",
@@ -114,7 +112,6 @@ export const saveHarvestStorageInfo = (
         `INSERT INTO inspectionharveststorage (${fields}) VALUES (${placeholders})`,
         values as SQLite.SQLiteBindParams,
       );
-      console.log("Harvest Storage info inserted into SQLite");
     }
   } catch (error) {
     console.error("Error saving harvest storage info:", error);
@@ -122,9 +119,9 @@ export const saveHarvestStorageInfo = (
   }
 };
 
-export const getHarvestStorageInfo = (
+export const getHarvestStorageInfo = async (
   requestId: number,
-): HarvestStorageData | null => {
+): Promise<HarvestStorageData | null> => {
   try {
     const row = db.getFirstSync<any>(
       "SELECT * FROM inspectionharveststorage WHERE requestId = ?",
@@ -132,7 +129,7 @@ export const getHarvestStorageInfo = (
     );
 
     if (row) {
-      const result = {
+      return {
         hasOwnStorage: toYesNo(row.hasOwnStorage),
         ifNotHasFacilityAccess: toYesNo(row.ifNotHasFacilityAccess),
         hasPrimaryProcessingAccess: toYesNo(row.hasPrimaryProcessingAccess),
@@ -140,8 +137,6 @@ export const getHarvestStorageInfo = (
         hasValueAddedMarketLinkage: toYesNo(row.hasValueAddedMarketLinkage),
         awareOfQualityStandards: toYesNo(row.awareOfQualityStandards),
       };
-
-      return result;
     }
 
     return null;
@@ -151,13 +146,15 @@ export const getHarvestStorageInfo = (
   }
 };
 
-export const clearHarvestStorageInfo = (requestId: number): void => {
+export const clearHarvestStorageInfo = async (
+  requestId: number,
+): Promise<void> => {
   try {
     db.runSync("DELETE FROM inspectionharveststorage WHERE requestId = ?", [
       requestId,
     ]);
   } catch (error) {
-    console.error(" Error clearing harvest storage info:", error);
+    console.error("Error clearing harvest storage info:", error);
     throw error;
   }
 };
@@ -177,7 +174,7 @@ export const getAllHarvestStorageInfo = () => {
       awareOfQualityStandards: toYesNo(row.awareOfQualityStandards),
     }));
   } catch (error) {
-    console.error(" Error fetching all harvest storage info:", error);
+    console.error("Error fetching all harvest storage info:", error);
     return [];
   }
 };

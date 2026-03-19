@@ -20,6 +20,7 @@ import {
   getInvestmentInfo,
   InvestmentInfoData,
 } from "@/database/inspectioninvestment";
+import { updateLastScreen } from "@/database/inspectionprogress";
 
 const Input = ({
   label,
@@ -46,9 +47,8 @@ const Input = ({
       {required && <Text className="text-black">*</Text>}
     </Text>
     <View
-      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
-        error ? "border border-red-500" : ""
-      }`}
+      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${error ? "border border-red-500" : ""
+        }`}
     >
       <TextInput
         placeholder={placeholder}
@@ -136,6 +136,12 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isNextEnabled, setIsNextEnabled] = useState(false);
   const [isExistingData, setIsExistingData] = useState(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      updateLastScreen(requestId, "InvestmentInfo");
+    }, [requestId])
+  );
 
   useEffect(() => {
     const timer = setTimeout(async () => {
@@ -438,7 +444,7 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
 
           <Input
             label={t("InspectionForm.Expected investment by the farmer")}
-            placeholder=""
+            placeholder="0.00"
             value={
               formData.expected
                 ? formatWithCommas(formData.expected.toString())
