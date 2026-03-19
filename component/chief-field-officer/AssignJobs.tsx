@@ -22,7 +22,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { environment } from "@/environment/environment";
-import NoDataComponent from "@/component/common/NoDataComponent";
+import NoDataComponent from "@/component/commons/NoDataComponent";
 import { AntDesign, Ionicons, FontAwesome6 } from "@expo/vector-icons";
 
 type AssignJobsNavigationProps = StackNavigationProp<

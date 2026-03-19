@@ -25,8 +25,8 @@ import { environment } from "@/environment/environment";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
 import { useFocusEffect, RouteProp, useRoute } from "@react-navigation/native";
-import CustomHeader from "../common/CustomHeader";
-import GlobalSearchModal from "@/component/common/GlobalSearchModal";
+import CustomHeader from "../commons/CustomHeader";
+import GlobalSearchModal from "@/component/commons/GlobalSearchModal";
 import { useModal } from "@/hooks/useModal";
 
 type AddOfficerStep1NavigationProp = StackNavigationProp<

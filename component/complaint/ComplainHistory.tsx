@@ -24,9 +24,9 @@ import { useSelector } from "react-redux";
 import { selectUserPersonal } from "@/store/authSlice";
 import { useFocusEffect } from "@react-navigation/native";
 import { t } from "i18next";
-import CustomHeader from "../common/CustomHeader";
-import LoadingPage from "../common/LoadingPage";
-import NoDataComponent from "../common/NoDataComponent";
+import CustomHeader from "../commons/CustomHeader";
+import LoadingPage from "../commons/LoadingPage";
+import NoDataComponent from "../commons/NoDataComponent";
 
 interface complainItem {
   id: number;

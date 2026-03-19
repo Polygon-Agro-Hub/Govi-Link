@@ -18,8 +18,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 import { hasDraft, initPersonalTable } from "@/database/inspectionpersonal";
-import LoadingPage from "../common/LoadingPage";
-import CustomHeader from "../common/CustomHeader";
+import LoadingPage from "../commons/LoadingPage";
+import CustomHeader from "../commons/CustomHeader";
 
 type CapitalRequestsNavigationProps = StackNavigationProp<
   RootStackParamList,

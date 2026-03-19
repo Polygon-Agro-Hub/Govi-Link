@@ -20,9 +20,9 @@ import branchesData from "@/assets/json/bank-branches.json";
 import { useTranslation } from "react-i18next";
 import i18n from "@/i18n/i18n";
 import { RouteProp, useRoute, useFocusEffect } from "@react-navigation/native";
-import GlobalSearchModal from "@/component/common/GlobalSearchModal";
+import GlobalSearchModal from "@/component/commons/GlobalSearchModal";
 import { useModal } from "@/hooks/useModal";
-import CustomHeader from "@/component/common/CustomHeader";
+import CustomHeader from "@/component/commons/CustomHeader";
 
 type AddOfficerStep2NavigationProps = StackNavigationProp<
   RootStackParamList,
