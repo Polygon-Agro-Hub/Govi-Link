@@ -23,7 +23,7 @@ import axios from "axios";
 import { environment } from "@/environment/environment";
 import { Ionicons, FontAwesome6 } from "@expo/vector-icons";
 import { RouteProp } from "@react-navigation/native";
-import NoDataComponent from "../common/NoDataComponent";
+import NoDataComponent from "../commons/NoDataComponent";
 
 type ViewAllVisitsNavigationProps = StackNavigationProp<
   RootStackParamList,

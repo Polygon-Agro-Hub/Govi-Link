@@ -17,9 +17,9 @@ import axios from "axios";
 import { environment } from "@/environment/environment";
 import { useFocusEffect } from "@react-navigation/native";
 import i18n from "@/i18n/i18n";
-import NoDataComponent from "@/component/common/NoDataComponent";
-import LoadingPage from "../common/LoadingPage";
-import CustomHeader from "../common/CustomHeader";
+import NoDataComponent from "@/component/commons/NoDataComponent";
+import LoadingPage from "../commons/LoadingPage";
+import CustomHeader from "../commons/CustomHeader";
 
 const UserProfileImage = require("@/assets/images/feild-officers/user-profile.webp");
 

@@ -19,7 +19,7 @@ import {
 import { RootStackParamList } from "../types/types";
 import { useTranslation } from "react-i18next";
 import { LinearGradient } from "expo-linear-gradient";
-import CustomHeader from "../common/CustomHeader";
+import CustomHeader from "../commons/CustomHeader";
 
 type AttachGeoLocationScreenNavigationProp = StackNavigationProp<
   RootStackParamList,

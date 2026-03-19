@@ -18,7 +18,7 @@ import axios from "axios";
 import { environment } from "@/environment/environment";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { RouteProp, useRoute, useFocusEffect } from "@react-navigation/native";
-import CustomHeader from "../common/CustomHeader";
+import CustomHeader from "../commons/CustomHeader";
 
 type AddOfficerStep3NavigationProp = StackNavigationProp<
   RootStackParamList,

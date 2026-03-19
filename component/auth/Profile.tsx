@@ -23,7 +23,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useTranslation } from "react-i18next";
 import i18n from "@/i18n/i18n";
 import { StatusBar } from "expo-status-bar";
-import CustomHeader from "../common/CustomHeader";
+import CustomHeader from "../commons/CustomHeader";
 
 type ProfileScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
