@@ -195,23 +195,23 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
         ]);
       }
 
-      setTimeout(() => {
-        setLoading(false);
+     setTimeout(() => {
+  setLoading(false);
 
-        if (passwordUpdate === 0) {
-          navigation.navigate("ChangePassword", {
-            passwordUpdate: passwordUpdate,
-          });
-        } else {
-          if (role === "Chief Field Officer") {
-            navigation.navigate("Main", { screen: "Dashboard" });
-          } else if (role === "Field Officer") {
-            navigation.navigate("Main", {
-              screen: "FieldOfficerDashboard",
-            });
-          }
-        }
-      }, 4000);
+  if (passwordUpdate === 0) {
+    navigation.navigate("ChangePassword", {
+      passwordUpdate: passwordUpdate,
+    });
+  } else {
+    navigation.navigate("Otpverification", {
+      farmerMobile: 1234567890, // replace later with real value
+      jobId: undefined,
+      isClusterAudit: false,
+      farmId: 0,
+      auditId: 0,
+    });
+  }
+}, 4000);
     } catch (error) {
       setLoading(false);
       console.error("Login error:", error);
