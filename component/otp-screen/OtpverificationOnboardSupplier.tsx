@@ -21,36 +21,71 @@ import NetInfo from "@react-native-community/netinfo";
 import { LinearGradient } from "expo-linear-gradient";
 import CustomHeader from "../commons/CustomHeader";
 
-const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
-  const { farmerMobile, jobId, govilinkjobid } = route.params;
+const OtpverificationOnboardSupplier: React.FC = ({
+  navigation,
+  route,
+}: any) => {
+  const { supplierName, contact, email, nic } = route.params;
   const [otpCode, setOtpCode] = useState<string>("");
   const [referenceId, setReferenceId] = useState<string | null>(null);
   const [timer, setTimer] = useState<number>(240);
   const [isVerified, setIsVerified] = useState<boolean>(false);
   const [disabledResend, setDisabledResend] = useState<boolean>(true);
   const { t, i18n } = useTranslation();
-  const [language, setLanguage] = useState("en");
   const [isOtpValid, setIsOtpValid] = useState<boolean>(false);
   const [verificationAttempts, setVerificationAttempts] = useState<number>(0);
   const [isOtpExpired, setIsOtpExpired] = useState<boolean>(false);
 
   const inputRefs = useRef<Array<TextInput | null>>([]);
 
-  useEffect(() => {
-    const selectedLanguage = t("Otpverification.LNG");
-    setLanguage(selectedLanguage);
-    const fetchReferenceId = async () => {
-      try {
-        const refId = await AsyncStorage.getItem("referenceId");
-        if (refId) {
-          setReferenceId(refId);
-        }
-      } catch (error) {
-        console.error("Failed to load referenceId:", error);
-      }
+  const sendOTP = async (): Promise<boolean> => {
+    await AsyncStorage.removeItem("referenceId");
+
+    const apiUrl = "https://api.getshoutout.com/otpservice/send";
+    const headers = {
+      Authorization: `Apikey ${environment.SHOUTOUT_API_KEY}`,
+      "Content-Type": "application/json",
     };
 
-    fetchReferenceId();
+    const otpMessages: Record<string, string> = {
+      en: `Greetings from GoViShop! Your OTP is {{code}}`,
+      si: `GoViShop වෙතින් සුභ පැතුම්! ඔබගේ OTP කේතය {{code}} වේ.`,
+      ta: `GoViShop இலிருந்து வாழ்த்துகள்! உங்கள் OTP குறியீடு {{code}}.`,
+    };
+    const otpMessage = otpMessages[i18n.language] ?? otpMessages["en"];
+
+    const formattedContact = contact.startsWith("0")
+      ? "+94" + contact.substring(1)
+      : contact;
+
+    const body = {
+      source: "PolygonAgro",
+      transport: "sms",
+      content: { sms: otpMessage },
+      destination: formattedContact,
+    };
+
+    try {
+      const response = await axios.post(apiUrl, body, { headers });
+      console.log("OTP send response:", response.data);
+
+      if (response.data.referenceId) {
+        await AsyncStorage.setItem("referenceId", response.data.referenceId);
+        setReferenceId(response.data.referenceId);
+        setIsOtpExpired(false);
+        setTimer(240);
+        setDisabledResend(true);
+        return true;
+      }
+      return false;
+    } catch (error: any) {
+      console.error("OTP send error:", error?.response?.data ?? error.message);
+      return false;
+    }
+  };
+
+  useEffect(() => {
+    sendOTP();
   }, []);
 
   useEffect(() => {
@@ -58,9 +93,7 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
       const interval = setInterval(() => {
         setTimer((prevTimer) => prevTimer - 1);
       }, 1000);
-
       setDisabledResend(true);
-
       return () => clearInterval(interval);
     } else if (timer === 0 && !isVerified) {
       setDisabledResend(false);
@@ -71,15 +104,95 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
   const handleOtpChange = (text: string, index: number) => {
     const updatedOtpCode = otpCode.split("");
     updatedOtpCode[index] = text;
-    setOtpCode(updatedOtpCode.join(""));
+    const newOtp = updatedOtpCode.join("");
+    setOtpCode(newOtp);
 
-    setIsOtpValid(updatedOtpCode.length === 5 && !updatedOtpCode.includes(""));
+    const allFilled =
+      updatedOtpCode.length === 5 &&
+      updatedOtpCode.every((char) => char !== "" && char !== undefined);
+    setIsOtpValid(allFilled);
 
     if (text && inputRefs.current[index + 1]) {
       inputRefs.current[index + 1]?.focus();
     }
-    if (updatedOtpCode.length === 5) {
+    if (allFilled) {
       Keyboard.dismiss();
+    }
+  };
+
+  const handleKeyPress = (e: any, index: number) => {
+    if (e.nativeEvent.key === "Backspace") {
+      const updatedOtpCode = otpCode.split("");
+
+      if (updatedOtpCode[index]) {
+        updatedOtpCode[index] = "";
+        setOtpCode(updatedOtpCode.join(""));
+        setIsOtpValid(false);
+      } else if (index > 0) {
+        updatedOtpCode[index - 1] = "";
+        setOtpCode(updatedOtpCode.join(""));
+        setIsOtpValid(false);
+        inputRefs.current[index - 1]?.focus();
+      }
+    }
+  };
+
+  const handleResendOTP = async () => {
+    const success = await sendOTP();
+
+    if (success) {
+      Alert.alert(
+        t("Otpverification.Success"),
+        t("Otpverification.A new OTP has been sent to your mobile number."),
+        [{ text: t("Main.ok") }],
+      );
+    } else {
+      Alert.alert(
+        t("Error.Sorry"),
+        t("Otpverification.We couldn't send the OTP. Please try again later."),
+        [{ text: t("Main.ok") }],
+      );
+    }
+  };
+
+  const handleComplete = async (): Promise<boolean> => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      if (!token) {
+        Alert.alert(
+          t("Error.Sorry"),
+          t(
+            "Error.Your login session has expired. Please log in again to continue.",
+          ),
+          [{ text: t("Main.ok") }],
+        );
+        return false;
+      }
+
+      const response = await axios.post(
+        `${environment.API_BASE_URL}api/onboard-supplier/add-supplier`,
+        { supplierName, contact, email, nic },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      console.log("handleComplete response:", response.data);
+
+      if (response.status === 201 && response.data?.success) {
+        return true;
+      } else {
+        console.warn("Supplier save failed:", response.data);
+        return false;
+      }
+    } catch (err: any) {
+      console.error(
+        "Error saving supplier:",
+        err?.response?.data ?? err.message,
+      );
+      return false;
     }
   };
 
@@ -102,15 +215,23 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
         t("Otpverification.Your OTP is invalid or expired."),
         [
           { text: t("Otpverification.Resend OTP"), onPress: handleResendOTP },
-          { text: t("Otpverification.Cancel", "Cancel"), style: "cancel" },
+          { text: t("Otpverification.Cancel"), style: "cancel" },
         ],
       );
       return;
     }
 
-    try {
-      const refId = referenceId;
+    const netState = await NetInfo.fetch();
+    if (!netState.isConnected) {
+      Alert.alert(
+        t("Main.No Internet Connection"),
+        t("Main.Please turn on Mobile Data or Wi-Fi to continue."),
+        [{ text: t("Main.ok") }],
+      );
+      return;
+    }
 
+    try {
       const url = "https://api.getshoutout.com/otpservice/verify";
       const headers = {
         Authorization: `Apikey ${environment.SHOUTOUT_API_KEY}`,
@@ -119,21 +240,12 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
 
       const body = {
         code: code,
-        referenceId: refId,
+        referenceId: referenceId,
       };
 
       const response = await axios.post(url, body, { headers });
-      const { statusCode, message } = response.data;
-
-      const netState = await NetInfo.fetch();
-      if (!netState.isConnected) {
-        Alert.alert(
-          t("Main.No Internet Connection"),
-          t("Main.Please turn on Mobile Data or Wi-Fi to continue."),
-          [{ text: t("Main.ok") }],
-        );
-        return;
-      }
+      const { statusCode } = response.data;
+      console.log("OTP verify response:", response.data);
 
       switch (statusCode) {
         case "1000":
@@ -141,7 +253,7 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
           const completeSuccess = await handleComplete();
 
           if (completeSuccess) {
-            navigation.navigate("OtpverificationSuccess");
+            navigation.navigate("Main");
           } else {
             Alert.alert(
               t("Error.Sorry"),
@@ -183,6 +295,7 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
             );
           }
           break;
+
         case "1002":
           setIsOtpExpired(true);
           Alert.alert(
@@ -203,19 +316,26 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
           ]);
       }
     } catch (error: any) {
-      console.error("OTP Verification Error:", error);
+      console.error(
+        "OTP Verification Error:",
+        error?.response?.data ?? error.message,
+      );
 
-      if (error.response?.data?.statusCode === "1002") {
+      const errCode = error.response?.data?.statusCode;
+
+      if (errCode === "1002") {
         setIsOtpExpired(true);
         Alert.alert(
           t("Error.Sorry"),
           t("Otpverification.Your OTP is invalid or expired."),
           [{ text: t("Otpverification.Resend OTP"), onPress: handleResendOTP }],
         );
-      } else if (error.response?.data?.statusCode === "1001") {
+      } else if (errCode === "1001") {
         Alert.alert(
           t("Error.Sorry"),
-          t("Otpverification.Your OTP is invalid or expired."),
+          t(
+            "Otpverification.The OTP you entered is incorrect. Please try again.",
+          ),
           [{ text: t("Main.ok") }],
         );
       } else {
@@ -225,97 +345,6 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
       }
     }
   };
-  const handleResendOTP = async () => {
-    await AsyncStorage.removeItem("referenceId");
-
-    try {
-      const apiUrl = "https://api.getshoutout.com/otpservice/send";
-      const headers = {
-        Authorization: `Apikey ${environment.SHOUTOUT_API_KEY}`,
-        "Content-Type": "application/json",
-      };
-
-      let otpMessage = "";
-      if (i18n.language === "en") {
-        otpMessage = `Your GoviLink OTP is {{code}}`;
-      } else if (i18n.language === "si") {
-        otpMessage = `ඔබේ GoviLink OTP මුරපදය {{code}} වේ.`;
-      } else if (i18n.language === "ta") {
-        otpMessage = `உங்கள் GoviLink OTP {{code}} ஆகும்.`;
-      }
-      const body = {
-        source: "PolygonAgro",
-        transport: "sms",
-        content: {
-          sms: otpMessage,
-        },
-        destination: farmerMobile,
-      };
-
-      const response = await axios.post(apiUrl, body, { headers });
-
-      if (response.data.referenceId) {
-        await AsyncStorage.setItem("referenceId", response.data.referenceId);
-        setReferenceId(response.data.referenceId);
-        setIsOtpExpired(false);
-        Alert.alert(
-          t("Otpverification.Success"),
-          t("Otpverification.A new OTP has been sent to your mobile number."),
-          [{ text: t("Main.ok") }],
-        );
-        setTimer(240);
-        setDisabledResend(true);
-      } else {
-        Alert.alert(
-          t("Error.Sorry"),
-          t(
-            "Otpverification.We couldn’t send the OTP. Please try again later.",
-          ),
-          [{ text: t("Main.ok") }],
-        );
-      }
-    } catch (error) {
-      Alert.alert(t("Error.Sorry"), t("Main.somethingWentWrong"), [
-        { text: t("Main.ok") },
-      ]);
-    }
-  };
-
-  const handleComplete = async (): Promise<boolean> => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-      if (!token) {
-        Alert.alert(
-          t("Error.Sorry"),
-          t(
-            "Error.Your login session has expired. Please log in again to continue.",
-          ),
-          [{ text: t("Main.ok") }],
-        );
-        return false;
-      }
-
-      const response = await axios.put(
-        `${environment.API_BASE_URL}api/request-audit/complete/${govilinkjobid}`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-
-      if (response.status === 200 && response.data?.success) {
-        return true;
-      } else {
-        console.warn(" Audit completion failed:", response.data);
-        return false;
-      }
-    } catch (err) {
-      console.error(" Error updating audit completion:", err);
-      return false;
-    }
-  };
 
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60);
@@ -323,54 +352,35 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
     return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
   };
 
-  const handleKeyPress = (e: any, index: number) => {
-    if (e.nativeEvent.key === "Backspace") {
-      const updatedOtpCode = otpCode.split("");
-
-      if (updatedOtpCode[index]) {
-        updatedOtpCode[index] = "";
-        setOtpCode(updatedOtpCode.join(""));
-        setIsOtpValid(false);
-      } else if (index > 0) {
-        updatedOtpCode[index - 1] = "";
-        setOtpCode(updatedOtpCode.join(""));
-        setIsOtpValid(false);
-        inputRefs.current[index - 1]?.focus();
-      }
-    }
-  };
-
   return (
     <ScrollView className="flex-1 bg-white">
       <CustomHeader
-        title={`#${jobId}`}
+        title={t("OnboardSupplier.OTP Verification")}
         navigation={navigation}
         showBackButton={true}
-        titleColor="black"
         onBackPress={() => navigation.goBack()}
+        titleColor="black"
       />
 
       <View className="flex justify-center items-center mt-3">
         <Image
           source={require("../../assets/images/otp/otp-verify.webp")}
-          style={{
-            width: 500,
-            height: 150,
-          }}
+          style={{ width: 500, height: 150 }}
           resizeMode="contain"
         />
 
-        <View className="">
+        <View>
           <Text className="mt-8 text-lg text-black text-center font-semibold">
             {t("Otpverification.Enter Verification Code")}
           </Text>
-          <Text className=" text-base text-[#808080] text-center p-4">
+          <Text className="text-base text-[#808080] text-center p-4">
             {t(
-              "Otpverification.We have sent a Verification Code to Farmer’s mobile number",
+              "OnboardSupplier.We have sent a Verification Code to the given mobile number",
             )}
           </Text>
         </View>
 
+        {/* OTP Input Boxes */}
         <View className="flex-row justify-center gap-3 mt-4 px-4">
           {Array.from({ length: 5 }).map((_, index) => (
             <TextInput
@@ -392,16 +402,20 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
             />
           ))}
         </View>
+
+        {/* Timer */}
         <View className="mt-6">
-          <Text className="text-base ">{formatTime(timer)}</Text>
+          <Text className="text-base">{formatTime(timer)}</Text>
         </View>
+
+        {/* Resend OTP */}
         <View className="mt-4 mb-10 flex-row justify-center items-center">
-          <Text className="text-md text-[#707070] ">
-            {t("Otpverification.Didn’t receive the OTP ?")}
+          <Text className="text-md text-[#707070]">
+            {t("OnboardSupplier.Didn't receive the OTP")}
           </Text>
           <View className="ml-2">
             <Text
-              className=" text-md font-semibold text-black text-center underline"
+              className="text-md font-semibold text-center underline"
               onPress={disabledResend ? undefined : handleResendOTP}
               style={{ color: disabledResend ? "gray" : "black" }}
             >
@@ -409,30 +423,38 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
             </Text>
           </View>
         </View>
-        <View>
+
+        {/* Buttons */}
+        <View style={{ width: wp(75) }}>
+          {/* Back Button */}
           <TouchableOpacity
-            className="bg-[#444444]  py-4 justify-center rounded-3xl mb-4"
+            className="bg-[#D9D9D9] py-3 justify-center rounded-3xl mb-4"
             onPress={() => navigation.goBack()}
           >
-            <Text className="text-white text-xl text-center font-semibold">
-              {t("Otpverification.Go Back")}
+            <Text className="text-[#686868] text-lg text-center">
+              {t("OnboardSupplier.Back")}
             </Text>
           </TouchableOpacity>
+
+          {/* Submit Button */}
           <TouchableOpacity
-            style={{ height: hp(10), width: wp(75) }}
             onPress={handleVerify}
             disabled={!isOtpValid || isVerified}
+            activeOpacity={0.8}
+            className="justify-center rounded-full mb-4"
           >
             <LinearGradient
-              colors={["#F35125", "#FF1D85"]}
+              colors={
+                !isOtpValid || isVerified
+                  ? ["#C4C4C4", "#C4C4C4"]
+                  : ["#F35125", "#FF1D85"]
+              }
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
-              className={`flex items-center py-3 justify-center rounded-3xl ${
-                !isOtpValid || isVerified ? "bg-gray-400" : "bg-[#000000]"
-              }`}
+              className="flex-1 items-center justify-center rounded-3xl py-3"
             >
-              <Text className="text-white text-xl font-semibold">
-                {t("Otpverification.Verify")}
+              <Text className="text-white text-lg font-semibold">
+                {t("OnboardSupplier.Submit")}
               </Text>
             </LinearGradient>
           </TouchableOpacity>
@@ -442,4 +464,4 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
   );
 };
 
-export default OtpverificationRequestAudit;
+export default OtpverificationOnboardSupplier;

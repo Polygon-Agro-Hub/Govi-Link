@@ -845,9 +845,9 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
             </View>
           </>
         )}
-        <View className="p-8 mt-4">
+        <View className="px-8 mt-8">
           <TouchableOpacity
-            className="bg-[#FEE5E6] rounded-lg p-3 h-28 mr-4 w-full flex-row justify-between items-center"
+            className="bg-[#FEE5E6] rounded-lg p-3 h-20 mr-4 w-full flex-row justify-between items-center"
             style={{
               shadowColor: "#000",
               shadowOffset: { width: 1, height: 1 },
@@ -864,10 +864,38 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
               source={require("../../assets/images/dashboard/request.webp")}
               style={{
                 width: 100,
-                height: 100,
+                height: 70,
                 position: "absolute",
                 bottom: 0,
                 right: 10,
+              }}
+              resizeMode="contain"
+            />
+          </TouchableOpacity>
+        </View>
+         <View className="px-8 mt-4 mb-[15%]">
+          <TouchableOpacity
+            className="bg-[#FFF5BE] rounded-lg p-3 h-20 mr-4 w-full flex-row justify-between items-center"
+            style={{
+              shadowColor: "#000",
+              shadowOffset: { width: 1, height: 1 },
+              shadowOpacity: 0.3,
+              shadowRadius: 6,
+              elevation: 2,
+            }}
+            onPress={() => navigation.navigate("AddOnboardSupplier")}
+          >
+            <Text className="text-base font-bold text-[#434343] ml-2">
+              {t("Dashboard.Onboard Suppliers")}
+            </Text>
+            <Image
+              source={require("../../assets/images/dashboard/onboard-suppliers.webp")}
+              style={{
+                width: 100,
+                height: 70,
+                position: "absolute",
+                bottom: 0,
+                right: -5,
               }}
               resizeMode="contain"
             />

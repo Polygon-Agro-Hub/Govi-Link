@@ -72,6 +72,8 @@ import Labour from "@/component/inspection-forms/Labour";
 import HarvestStorage from "@/component/inspection-forms/HarvestStorage";
 import ConfirmationCapitalRequest from "@/component/inspection-forms/ConfirmationCapitalRequest";
 import CapitalRequstQRScanner from "@/component/qr-screen/CapitalRequstQRScanner";
+import AddOnboardSupplier from "@/component/onboard-supplier/AddOnboardSupplier";
+import OtpverificationOnboardSupplier from "@/component/otp-screen/OtpverificationOnboardSupplier";
 
 import { initDatabase } from "@/database/index";
 
@@ -304,6 +306,8 @@ function AppContent() {
               name="ConfirmationCapitalRequest"
               component={ConfirmationCapitalRequest}
             />
+            <Stack.Screen name="AddOnboardSupplier" component={AddOnboardSupplier} />
+            <Stack.Screen name="OtpverificationOnboardSupplier" component={OtpverificationOnboardSupplier} />
           </Stack.Navigator>
         </NavigationContainer>
       </SafeAreaView>

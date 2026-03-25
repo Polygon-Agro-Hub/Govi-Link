@@ -28,7 +28,7 @@ import i18n from "@/i18n/i18n";
 import { useDispatch } from "react-redux";
 import { setUserProfile } from "@/store/authSlice";
 import { LinearGradient } from "expo-linear-gradient";
-import { AntDesign, Ionicons,  FontAwesome6 } from "@expo/vector-icons";
+import { AntDesign, Ionicons, FontAwesome6 } from "@expo/vector-icons";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
 import ContentLoader, { Rect } from "react-content-loader/native";
 import {
@@ -737,7 +737,7 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
               officerId: profile?.empId ?? "",
             })
           }
-          className="bg-[#FFE5D6] rounded-lg p-3 h-28 mr-4 w-full flex-row justify-between items-center"
+          className="bg-[#FFE5D6] rounded-lg p-3 h-20 mr-4 w-full flex-row justify-between items-center"
           style={{
             shadowColor: "#000",
             shadowOffset: { width: 1, height: 1 },
@@ -753,7 +753,7 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
             source={require("../../assets/images/dashboard/assigned-target.webp")}
             style={{
               width: 100,
-              height: 100,
+              height: 70,
               position: "absolute",
               bottom: 0,
               right: 10,
@@ -764,7 +764,7 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
       </View>
       <View className="p-8">
         <TouchableOpacity
-          className="bg-[#FEE5E6] rounded-lg p-3 h-28 mr-4 w-full flex-row justify-between items-center"
+          className="bg-[#FEE5E6] rounded-lg p-3 h-20 mr-4 w-full flex-row justify-between items-center"
           style={{
             shadowColor: "#000",
             shadowOffset: { width: 1, height: 1 },
@@ -788,10 +788,38 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
             source={require("../../assets/images/dashboard/request.webp")}
             style={{
               width: 100,
-              height: 100,
+              height: 70,
               position: "absolute",
               bottom: 0,
               right: 10,
+            }}
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
+      </View>
+      <View className="px-8  mb-[15%]">
+        <TouchableOpacity
+          className="bg-[#FFF5BE] rounded-lg p-3 h-20 mr-4 w-full flex-row justify-between items-center"
+          style={{
+            shadowColor: "#000",
+            shadowOffset: { width: 1, height: 1 },
+            shadowOpacity: 0.3,
+            shadowRadius: 6,
+            elevation: 2,
+          }}
+          onPress={() => navigation.navigate("AddOnboardSupplier")}
+        >
+          <Text className="text-base font-bold text-[#434343] ml-2">
+            {t("Dashboard.Onboard Suppliers")}
+          </Text>
+          <Image
+            source={require("../../assets/images/dashboard/onboard-suppliers.webp")}
+            style={{
+              width: 100,
+              height: 70,
+              position: "absolute",
+              bottom: 0,
+              right: -5,
             }}
             resizeMode="contain"
           />
@@ -989,9 +1017,6 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
                     marginBottom: 30,
                   }}
                 >
-                  {/* <Text className="text-white text-lg font-semibold">
-                        {t("VisitPopup.Start")}
-                      </Text> */}
                   <Text
                     className={`text-white  font-semibold ${i18n.language === "si" ? "text-base" : i18n.language === "ta" ? "text-base" : "text-lg"}`}
                   >

@@ -128,7 +128,11 @@
     "Is it worth to take the risks for anticipated profits is required": "Is it worth to take the risks for anticipated profits is required",
     "Land number must be 9 digits long": "Land number must be 9 digits long",
     "Land number must start with 0": "Land number must start with 0",
-    "Invalid land number format": "Invalid land number format"
+    "Invalid land number format": "Invalid land number format",
+    "Phone number must be 10 digits":"Phone number must be 10 digits",
+    "This phone number is already registered":"This phone number is already registered",
+    "This email is already registered":"This email is already registered",
+    "This NIC is already registered":"This NIC is already registered"
   },
   "Login": {
     "Welcome": "Welcome!",
@@ -152,7 +156,8 @@
     "Assigned Target": "Assigned Target",
     "No Jobs for Today": "No Jobs for Today",
     "No Saved Drafts for Today": "No Saved Drafts for Today",
-    "Capital Requests": "Capital Requests"
+    "Capital Requests": "Capital Requests",
+    "Onboard Suppliers":"Onboard Suppliers"
   },
   "Drawer": {
     "Language": "Language",
@@ -713,5 +718,20 @@
     "HeaderOn": "Confirmation",
     "UndoSuccess": "The request completion process was cancelled. Your submitted data remains unchanged.",
     "UndoFailed": "Deleting inspection data failed."
+  },
+  "OnboardSupplier":{
+    "Onboard Supplier":"Onboard Supplier",
+    "Supplier Full Name":"--Supplier Full Name--",
+    "Contact":"--Contact (e.g. 07XXXXXXXX)--",
+    "Email Address":"--Email Address--",
+    "NIC Number":"--NIC Number--",
+    "Cancel":"Cancel",
+    "Next":"Next",
+    "Supplier Full Name is required":"Supplier Full Name is required",
+    "OTP Verification":"OTP Verification",
+    "We have sent a Verification Code to the given mobile number":"We have sent a Verification Code to the given mobile number",
+    "Submit":"Submit",
+    "Back":"Back",
+    "Didn't receive the OTP":"Didn't receive the OTP ?"
   }
 }
