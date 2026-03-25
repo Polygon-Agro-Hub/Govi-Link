@@ -21,16 +21,6 @@ import { ScrollView } from "react-native-gesture-handler";
 import NetInfo from "@react-native-community/netinfo";
 import { LinearGradient } from "expo-linear-gradient";
 
-type RootStackParamList = {
-  OtpVerification: undefined;
-  NextScreen: undefined;
-};
-
-interface SuccessModalProps {
-  visible: boolean;
-  onClose: () => void;
-}
-
 const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
   const { farmerMobile, jobId, govilinkjobid } = route.params;
   const [otpCode, setOtpCode] = useState<string>("");

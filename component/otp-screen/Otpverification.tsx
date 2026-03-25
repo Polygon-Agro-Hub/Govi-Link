@@ -20,29 +20,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { ScrollView } from "react-native-gesture-handler";
 import NetInfo from "@react-native-community/netinfo";
 import { LinearGradient } from "expo-linear-gradient";
-
-type RootStackParamList = {
-  OtpVerification: undefined;
-  NextScreen: undefined;
-};
-
-interface userItem {
-  firstName: string;
-  lastName: string;
-  phoneNumber: number;
-  NICnumber: string;
-  district: string;
-  accNumber: string;
-  accHolderName: string;
-  bankName: string;
-  branchName: string;
-  PreferdLanguage: string;
-}
-
-interface SuccessModalProps {
-  visible: boolean;
-  onClose: () => void;
-}
+import CustomHeader from "../commons/CustomHeader";
 
 const Otpverification: React.FC = ({ navigation, route }: any) => {
   const { farmerMobile, jobId, isClusterAudit, farmId, auditId } = route.params;
@@ -363,21 +341,16 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
 
   return (
     <ScrollView className="flex-1 bg-white">
-      <View className="flex-row items-center px-4 py-4 bg-white shadow-sm border-b border-[#E5E5E5]">
-        <TouchableOpacity
-          className="bg-[#F6F6F680] rounded-full p-2 justify-center w-10 z-20"
-          onPress={() => navigation.goBack()}
-        >
-          <AntDesign name="left" size={22} color="#000" />
-        </TouchableOpacity>
+      <CustomHeader
+        title={`#${jobId}`}
+        navigation={navigation}
+        showBackButton={true}
+        titleColor="black"
+        onBackPress={() => navigation.goBack()}
+      />
+      <View className="border-b border-[#E5E5E5]" />
 
-        <View className="flex-1">
-          <Text className="text-base font-semibold text-center">#{jobId}</Text>
-        </View>
-      </View>
-
-
-      <View className="flex justify-center items-center mt-3">
+      <View className="flex justify-center items-center mt-10">
         <Image
           source={require("../../assets/images/otp/otp-verify.webp")}
           style={{

@@ -22,6 +22,7 @@ import {
   getLabourInfo,
   LabourData,
 } from "@/database/inspectionlabour";
+import { updateLastScreen } from "@/database/inspectionprogress";
 
 type LabourProps = {
   navigation: any;
@@ -123,6 +124,12 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
   const [isNextEnabled, setIsNextEnabled] = useState(false);
   const [isExistingData, setIsExistingData] = useState(false);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
+
+    useFocusEffect(
+      useCallback(() => {
+        updateLastScreen(requestId, "Labour");
+      }, [requestId])
+    );
 
   useFocusEffect(
     useCallback(() => {

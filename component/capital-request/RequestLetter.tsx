@@ -18,8 +18,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import CustomHeader from "../common/CustomHeader";
-import LoadingPage from "../common/LoadingPage";
+import CustomHeader from "../commons/CustomHeader";
+import LoadingPage from "../commons/LoadingPage";
 
 type RequestDetailsNavigationProp = StackNavigationProp<
   RootStackParamList,

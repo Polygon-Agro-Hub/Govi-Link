@@ -24,6 +24,7 @@ import {
   clearHarvestStorageInfo,
   HarvestStorageData,
 } from "@/database/inspectionharvest";
+import { updateLastScreen } from "@/database/inspectionprogress";
 
 type HarvestStorageProps = {
   navigation: any;
@@ -128,6 +129,12 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
   const [errorModalVisible, setErrorModalVisible] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
+
+    useFocusEffect(
+      useCallback(() => {
+        updateLastScreen(requestId, "HarvestStorage");
+      }, [requestId])
+    );
 
   useFocusEffect(
     useCallback(() => {

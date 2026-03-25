@@ -23,6 +23,7 @@ import {
   getProfitInfo,
   ProfitRiskData,
 } from "@/database/inspectionprofit";
+import { updateLastScreen } from "@/database/inspectionprogress";
 
 const Input = ({
   label,
@@ -200,6 +201,12 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
   const [isNextEnabled, setIsNextEnabled] = useState(false);
   const [isExistingData, setIsExistingData] = useState(false);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
+
+    useFocusEffect(
+      useCallback(() => {
+        updateLastScreen(requestId, "ProfitRisk");
+      }, [requestId])
+    );
 
   useFocusEffect(
     useCallback(() => {
