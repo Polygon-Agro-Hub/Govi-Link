@@ -128,7 +128,11 @@
     "Is it worth to take the risks for anticipated profits is required": "Is it worth to take the risks for anticipated profits is required",
     "Land number must be 9 digits long": "நில எண்ணில் 9 இலக்கங்கள் இருக்க வேண்டும்",
     "Land number must start with 0": "நில எண் 0-இல் தொடங்க வேண்டும்",
-    "Invalid land number format": "தவறான நில எண் வடிவம்"
+    "Invalid land number format": "தவறான நில எண் வடிவம்",
+    "Phone number must be 10 digits": "தொலைபேசி எண் 10 இலக்கங்களைக் கொண்டிருக்க வேண்டும்.",
+    "This phone number is already registered": "இந்த தொலைபேசி எண் ஏற்கனவே பதிவு செய்யப்பட்டுள்ளது",
+    "This email is already registered": "இந்த மின்னஞ்சல் ஏற்கனவே பதிவு செய்யப்பட்டுள்ளது",
+    "This NIC is already registered": "இந்த NIC ஏற்கனவே பதிவு செய்யப்பட்டுள்ளது"
   },
   "Login": {
     "Welcome": "வரவேற்கிறோம்",
@@ -152,7 +156,8 @@
     "Assigned Target": "ஒதுக்கப்பட்ட இலக்கு",
     "No Jobs for Today": "No Jobs for Today",
     "No Saved Drafts for Today": "No Saved Drafts for Today",
-    "Capital Requests": "Capital Requests"
+    "Capital Requests": "Capital Requests",
+    "Onboard Suppliers": "புதிய சப்ளையர்கள்"
   },
   "Drawer": {
     "Language": "மொழி மாற்றம்",
@@ -713,5 +718,20 @@
     "HeaderOn": "உறுதிப்படுத்தல்",
     "UndoSuccess": "அனைத்து ஆய்வுத் தரவும் வெற்றிகரமாக நீக்கப்பட்டது.",
     "UndoFailed": "ஆய்வுத் தரவை நீக்க முடியவில்லை."
+  },
+  "OnboardSupplier": {
+    "Onboard Supplier": "புதிய சப்ளையர்கள்",
+    "Supplier Full Name": "--வழங்குநரின் முழுப் பெயர்--",
+    "Contact": "--தொடர்புக்கு (எ.கா. 07XXXXXXXX)--",
+    "Email Address": "--மின்னஞ்சல் முகவரி--",
+    "NIC Number": "--என்ஐசி எண்--",
+    "Cancel": "ரத்து செய்",
+    "Next": "அடுத்து",
+    "Supplier Full Name is required": "வழங்குநரின் முழுப் பெயர் தேவை.",
+    "OTP Verification": "OTP சரிபார்ப்பு",
+    "We have sent a Verification Code to the given mobile number": "கொடுக்கப்பட்ட கைபேசி எண்ணுக்கு நாங்கள் ஒரு சரிபார்ப்புக் குறியீட்டை அனுப்பியுள்ளோம்.",
+    "Submit": "சமர்ப்பிக்கவும்",
+    "Back": "பின்னால்",
+    "Didn't receive the OTP": "OTP வரவில்லையா?"
   }
 }

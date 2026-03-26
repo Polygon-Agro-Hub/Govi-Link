@@ -128,7 +128,11 @@
     "Is it worth to take the risks for anticipated profits is required": "අපේක්ෂිත ලාභ සඳහා අවදානම් ගැනීම වටී ද යන්න අවශ්‍යයි.",
     "Land number must be 9 digits long": "භූමි දුරකථන අංකය අංක 9ක් විය යුතුය",
     "Land number number must start with 0": "භූමි දුරකථන අංකය 0 න් ආරම්භ විය යුතුය",
-    "Invalid land number format": "භූමි දුරකථන අංකය වැරදියි"
+    "Invalid land number format": "භූමි දුරකථන අංකය වැරදියි",
+    "Phone number must be 10 digits": "දුරකථන අංකය ඉලක්කම් 10ක් විය යුතුය.",
+    "This phone number is already registered": "මෙම දුරකථන අංකය දැනටමත් ලියාපදිංචි කර ඇත.",
+    "This email is already registered": "මෙම ඊතැපෑල දැනටමත් ලියාපදිංචි කර ඇත",
+    "This NIC is already registered": "මෙම ජාතික හැඳුනුම්පත දැනටමත් ලියාපදිංචි කර ඇත."
   },
   "Login": {
     "Welcome": "සාදරයෙන් පිළිගනිමු!",
@@ -152,7 +156,8 @@
     "Assigned Target": "පවරන ලද ඉලක්ක",
     "No Jobs for Today": "අදට ඉලක්කය නැත",
     "No Saved Drafts for Today": "අදට සුරැකූ කෙටුම්පත් නොමැත",
-    "Capital Requests": "මුල්ධන ඉල්ලීම්"
+    "Capital Requests": "මුල්ධන ඉල්ලීම්",
+    "Onboard Suppliers": "නව සැපයුම්කරුවන්"
   },
   "Drawer": {
     "Language": "භාෂාව",
@@ -713,5 +718,20 @@
     "HeaderOn": "තහවුරු කිරීම",
     "UndoSuccess": "සියලුම පරීක්ෂණ දත්ත සාර්ථකව මකා දමන ලදී.",
     "UndoFailed": "පරීක්ෂණ දත්ත මැකීම අසාර්ථක විය."
+  },
+  "OnboardSupplier": {
+    "Onboard Supplier": "නව සැපයුම්කරුවන්",
+    "Supplier Full Name": "--සැපයුම්කරුගේ සම්පූර්ණ නම--",
+    "Contact": "--සම්බන්ධතාව (උදා: 07XXXXXXXX)--",
+    "Email Address": "--ඊතැපැල් ලිපිනය--",
+    "NIC Number": "--ජාතික හැඳුනුම්පත් අංකය--",
+    "Cancel": "අවලංගු කරන්න",
+    "Next": "ඊළඟ",
+    "Supplier Full Name is required": "සැපයුම්කරුගේ සම්පූර්ණ නම අවශ්‍යයි.",
+    "OTP Verification": "OTP සත්‍යාපනය",
+    "We have sent a Verification Code to the given mobile number": "අපි ලබා දී ඇති ජංගම දුරකථන අංකයට සත්‍යාපන කේතයක් යවා ඇත.",
+    "Submit": "තහවුරු කරන්න",
+    "Back": "ආපසු",
+    "Didn't receive the OTP": "OTP එක ලැබුනේ නැද්ද?"
   }
 }
