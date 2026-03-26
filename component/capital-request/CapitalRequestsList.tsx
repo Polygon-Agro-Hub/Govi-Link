@@ -59,7 +59,6 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
 
       for (const request of requests) {
         const isDraft = hasDraft(request.id);
-
         if (isDraft) {
           drafts.push(request.id);
         }
@@ -83,9 +82,7 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
   }, [requests]);
 
   const fetchCapitalRequests = async (search: string = "") => {
-    if (isFetchingRef.current) {
-      return;
-    }
+    if (isFetchingRef.current) return;
 
     isFetchingRef.current = true;
 
@@ -100,14 +97,10 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
 
       const response = await axios.get(
         `${environment.API_BASE_URL}api/capital-request/requests`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
-      const apiRequests = response.data.requests;
-
-      setRequests(apiRequests);
+      setRequests(response.data.requests);
     } catch (error: any) {
       console.error("Failed to fetch capital requests:", error);
       Alert.alert(t("Error.Error"), t("Error.FailedToLoadRequests"), [
@@ -136,8 +129,8 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
     requestNumber: string,
   ) => {
     navigation.navigate("RequestDetails", {
-      requestId: requestId,
-      requestNumber: requestNumber,
+      requestId,
+      requestNumber,
     });
   };
 
@@ -149,6 +142,12 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
       />
     );
   }
+
+  const sortedRequests = [...requests].sort((a, b) => {
+    const aIsDraft = draftRequestIds.includes(a.id) ? 0 : 1;
+    const bIsDraft = draftRequestIds.includes(b.id) ? 0 : 1;
+    return aIsDraft - bIsDraft;
+  });
 
   return (
     <View className="flex-1 bg-white">
@@ -168,7 +167,7 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
         contentContainerStyle={{ paddingBottom: 70 }}
       >
         <View className="px-6 py-4 space-y-5">
-          {requests.length === 0 ? (
+          {sortedRequests.length === 0 ? (
             <View className="flex justify-center items-center mt-[70%]">
               <Image
                 source={require("../../assets/images/dashboard/no-tasks.webp")}
@@ -182,7 +181,7 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
               </Text>
             </View>
           ) : (
-            requests.map((request, index) => {
+            sortedRequests.map((request, index) => {
               const isDraft = draftRequestIds.includes(request.id);
 
               return (
