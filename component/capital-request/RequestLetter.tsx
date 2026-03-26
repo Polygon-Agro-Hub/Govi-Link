@@ -223,7 +223,7 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
                 label={t("RequestLetter.Expected Investment")}
                 value={
                   <>
-                    <Text>{t("RequestLetter.Rs")} </Text>
+                    <Text>{t("RequestLetter.Rs")}. </Text>
                     <Text className="font-bold">
                       {formatNumber(requestData.investment)}
                     </Text>
@@ -253,7 +253,7 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
           </View>
 
           <Text className="text-base mb-4 text-black leading-6">
-            {t("RequestLetter.This loan is essential for covering the costst")}
+            {t("RequestLetter.This investment is essential for covering the costst")}
           </Text>
 
           <Text className="text-base mb-4 text-black leading-6">
