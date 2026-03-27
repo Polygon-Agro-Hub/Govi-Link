@@ -12,7 +12,12 @@ import {
   Image,
   BackHandler,
 } from "react-native";
-import { Feather, FontAwesome6, AntDesign } from "@expo/vector-icons";
+import {
+  Feather,
+  FontAwesome6,
+  AntDesign,
+  FontAwesome,
+} from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
@@ -125,7 +130,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
       );
     }
     if (pType === "Driving License ID" && !validateDrivingLicense(pNumber)) {
-      return t("Error.Invalid Driving License number");
+      return t("Error.Please enter a valid License ID number");
     }
     return "";
   };
@@ -206,7 +211,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
     /^[0-9]{9}V$|^[0-9]{12}$/.test(input);
 
   const validateDrivingLicense = (input: string) =>
-    /^(?:[A-Z]{1,2}[0-9]{8,9}|[0-9]{10})$/.test(input);
+    /^(?:[A-Z][0-9]{7}|[0-9]{10,12})$/.test(input);
 
   const handleIdNumberChange = (input: string) => {
     if (!formData.pType) return;
@@ -226,7 +231,13 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
         value = value.slice(0, vIndex + 1);
       }
     } else {
-      value = value.replace(/[^A-Z0-9]/g, "");
+      const hasLetter = /^[A-Z]/.test(value);
+      if (hasLetter) {
+        value = value.replace(/[^A-Z0-9]/g, "");
+        value = value[0] + value.slice(1).replace(/[A-Z]/g, "");
+      } else {
+        value = value.replace(/[^0-9]/g, "");
+      }
     }
 
     let error = "";
@@ -241,7 +252,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
       formData.pType === "Driving License ID" &&
       !validateDrivingLicense(value)
     ) {
-      error = t("Error.Invalid Driving License number");
+      error = t("Error.Please enter a valid License ID number");
     }
 
     setErrors((prev) => ({ ...prev, nic: error }));
@@ -521,37 +532,46 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
               </View>
             </TouchableOpacity>
 
-            <View className="mt-4">
-              <Text className="text-sm text-[#070707] mb-2">
-                <Text className="text-black">
-                  {formData.pType === "NIC Number"
-                    ? t("InspectionForm.NIC Number")
-                    : t("InspectionForm.Driving License ID")}{" "}
-                  *
+            {formData.pType && (
+              <View className="mt-4">
+                <Text className="text-sm text-[#070707] mb-2">
+                  <Text className="text-black">
+                    {formData.pType === "NIC Number"
+                      ? t("InspectionForm.NIC Number")
+                      : t("InspectionForm.Driving License ID")}{" "}
+                    *
+                  </Text>
                 </Text>
-              </Text>
-              <View
-                className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
-                  errors.nic ? "border border-red-500" : ""
-                }`}
-              >
-                <TextInput
-                  placeholder="----"
-                  placeholderTextColor="#7D7D7D"
-                  className="flex-1 px-2 py-4 text-base text-black ml-4"
-                  value={formData.pNumber}
-                  onChangeText={handleIdNumberChange}
-                  underlineColorAndroid="transparent"
-                  maxLength={formData.pType === "NIC Number" ? 12 : 10}
-                  autoCapitalize="characters"
-                />
+                <View
+                  className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
+                    errors.nic ? "border border-red-500" : ""
+                  }`}
+                >
+                  <TextInput
+                    placeholder="----"
+                    placeholderTextColor="#7D7D7D"
+                    className="flex-1 px-2 py-4 text-base text-black ml-4"
+                    value={formData.pNumber}
+                    onChangeText={handleIdNumberChange}
+                    underlineColorAndroid="transparent"
+                    maxLength={formData.pType === "NIC Number" ? 12 : 13}
+                    autoCapitalize="characters"
+                  />
+                </View>
+                {errors.nic && (
+                  <View className="flex-row items-center mt-1 ml-2">
+                    <FontAwesome
+                      name="exclamation-triangle"
+                      size={14}
+                      color="#EF4444"
+                    />
+                    <Text className="text-red-500 text-sm ml-1 flex-1">
+                      {errors.nic}
+                    </Text>
+                  </View>
+                )}
               </View>
-              {errors.nic && (
-                <Text className="text-red-500 text-sm mt-1 ml-2">
-                  {errors.nic}
-                </Text>
-              )}
-            </View>
+            )}
           </View>
 
           {formData.pType && (
@@ -585,7 +605,12 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
           exitText={t("InspectionForm.Back")}
           nextText={t("InspectionForm.Next")}
           isNextEnabled={isNextEnabled}
-          onExit={() => navigation.goBack()}
+          onExit={() =>
+            navigation.navigate("PersonalInfo", {
+              requestNumber,
+              requestId,
+            })
+          }
           onNext={handleNext}
         />
       </View>
@@ -604,7 +629,6 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
                 onPress={() => {
                   setShowIdProofDropdown(false);
                   setErrors({});
-
                   setFormData({
                     pType: option.key,
                     pNumber: "",

@@ -132,7 +132,8 @@
     "Phone number must be 10 digits": "தொலைபேசி எண் 10 இலக்கங்களைக் கொண்டிருக்க வேண்டும்.",
     "This phone number is already registered": "இந்த தொலைபேசி எண் ஏற்கனவே பதிவு செய்யப்பட்டுள்ளது",
     "This email is already registered": "இந்த மின்னஞ்சல் ஏற்கனவே பதிவு செய்யப்பட்டுள்ளது",
-    "This NIC is already registered": "இந்த NIC ஏற்கனவே பதிவு செய்யப்பட்டுள்ளது"
+    "This NIC is already registered": "இந்த NIC ஏற்கனவே பதிவு செய்யப்பட்டுள்ளது",
+    "Please enter a valid License ID number":"சரியான உரிம அடையாள எண்ணை (1 பெரிய எழுத்து + 7 இலக்கங்கள் அல்லது 10–12 இலக்கங்கள்) உள்ளிடவும்."
   },
   "Login": {
     "Welcome": "வரவேற்கிறோம்",

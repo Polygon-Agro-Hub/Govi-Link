@@ -10,6 +10,7 @@ import {
   Platform,
   Modal,
   FlatList,
+  BackHandler,
 } from "react-native";
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
@@ -57,8 +58,9 @@ const Input = ({
       {label} {required && <Text className="text-black">*</Text>}
     </Text>
     <View
-      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${error ? "border border-red-500" : ""
-        }`}
+      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
+        error ? "border border-red-500" : ""
+      }`}
     >
       <TextInput
         placeholder={placeholder}
@@ -169,7 +171,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
   useFocusEffect(
     useCallback(() => {
       updateLastScreen(requestId, "FinanceInfo");
-    }, [requestId])
+    }, [requestId]),
   );
 
   const updateFormData = useCallback((updates: Partial<FinanceInfoData>) => {
@@ -216,10 +218,10 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
 
     setIsNextEnabled(
       allFilled &&
-      accountNumbersMatch &&
-      hasAssets &&
-      hasBankInfo &&
-      !hasErrors,
+        accountNumbersMatch &&
+        hasAssets &&
+        hasBankInfo &&
+        !hasErrors,
     );
   }, [formData, errors]);
 
@@ -239,6 +241,29 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
       }
     }
   }, [formData.confirmAccountNumber, formData.accountNumber, t]);
+
+  useEffect(() => {
+    const valid = hasValidAssetSelection();
+    if (!valid && Object.values(checkedAssets).some(Boolean)) {
+      setErrors((prev) => ({
+        ...prev,
+        assets: t("Error.At least one option must be selected."),
+      }));
+    } else {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors.assets;
+        return newErrors;
+      });
+    }
+  }, [
+    checkedAssets,
+    formData.assetsLand,
+    formData.assetsBuilding,
+    formData.assetsVehicle,
+    formData.assetsMachinery,
+    formData.assetsFarmTool,
+  ]);
 
   const transformFinanceInfoForBackend = (data: FinanceInfoData) => {
     return {
@@ -381,6 +406,65 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     if (data.branch) setSelectedBranch(data.branch);
   };
 
+  const validateAllFinanceFields = (
+    data: FinanceInfoData,
+    checked: Record<string, boolean>,
+  ): Record<string, string> => {
+    const errs: Record<string, string> = {};
+
+    if (!data.accHolder || data.accHolder.trim() === "") {
+      errs.accHolder = t("Error.accHolder is required");
+    }
+    if (!data.accountNumber || data.accountNumber.toString().trim() === "") {
+      errs.accountNumber = t("Error.accountNumber is required");
+    }
+    if (
+      !data.confirmAccountNumber ||
+      data.confirmAccountNumber.toString().trim() === ""
+    ) {
+      errs.confirmAccountNumber = t("Error.Confirm account number is required");
+    } else if (data.confirmAccountNumber !== data.accountNumber) {
+      errs.confirmAccountNumber = t("Error.Account numbers do not match");
+    }
+    if (!data.bank || data.bank.trim() === "") {
+      errs.bank = t("Error.Bank is required");
+    }
+    if (!data.branch || data.branch.trim() === "") {
+      errs.branch = t("Error.Branch is required");
+    }
+
+    if (!data.debtsOfFarmer || data.debtsOfFarmer.trim() === "") {
+      errs.debtsOfFarmer = t("Error.debtsOfFarmer is required");
+    }
+
+    if (!data.noOfDependents || data.noOfDependents.toString().trim() === "") {
+      errs.noOfDependents = t("Error.noOfDependents is required");
+    }
+
+    const anyChecked = Object.values(checked).some(Boolean);
+    if (!anyChecked) {
+      errs.assets = t("Error.At least one option must be selected.");
+    } else {
+      const assetInvalid = assetCategories.some((category) => {
+        const isChecked = !!checked[category.key];
+        if (!isChecked) return false;
+        if (category.key === "assetsFarmTool") {
+          return !(data.assetsFarmTool && data.assetsFarmTool.trim() !== "");
+        }
+        if (category.subCategories && category.subCategories.length > 0) {
+          const value = data[category.key as keyof FinanceInfoData];
+          return !(Array.isArray(value) && value.length > 0);
+        }
+        return false;
+      });
+      if (assetInvalid) {
+        errs.assets = t("Error.At least one option must be selected.");
+      }
+    }
+
+    return errs;
+  };
+
   useFocusEffect(
     useCallback(() => {
       const loadFormData = async () => {
@@ -393,10 +477,17 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               const localData = await getFinanceInfo(reqId);
 
               if (localData) {
+                const builtChecked = buildCheckedAssets(localData);
                 setFormData(localData);
                 setIsExistingData(true);
-                setCheckedAssets(buildCheckedAssets(localData));
+                setCheckedAssets(builtChecked);
                 applyBankData(localData);
+
+                const draftErrors = validateAllFinanceFields(
+                  localData,
+                  builtChecked,
+                );
+                setErrors(draftErrors);
                 isDataLoadedRef.current = true;
                 return;
               }
@@ -404,10 +495,17 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               const backendData = await fetchInspectionData(reqId);
 
               if (backendData) {
+                const builtChecked = buildCheckedAssets(backendData);
                 setFormData(backendData);
                 setIsExistingData(true);
-                setCheckedAssets(buildCheckedAssets(backendData));
+                setCheckedAssets(builtChecked);
                 applyBankData(backendData);
+
+                const draftErrors = validateAllFinanceFields(
+                  backendData,
+                  builtChecked,
+                );
+                setErrors(draftErrors);
                 isDataLoadedRef.current = true;
                 return;
               }
@@ -645,6 +743,23 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     </TouchableOpacity>
   );
 
+  useEffect(() => {
+    const handleBackPress = () => {
+      navigation.navigate("Main", {
+        screen: "MainTabs",
+        params: { screen: "CapitalRequests" },
+      });
+      return true;
+    };
+
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      handleBackPress,
+    );
+
+    return () => subscription.remove();
+  }, [navigation]);
+
   const renderBranchItem = ({
     item,
   }: {
@@ -750,8 +865,12 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
         );
       }
 
-      const value = formData[category.key as keyof FinanceInfoData];
-      return Array.isArray(value) && value.length > 0;
+      if (category.subCategories && category.subCategories.length > 0) {
+        const value = formData[category.key as keyof FinanceInfoData];
+        return Array.isArray(value) && value.length > 0;
+      }
+
+      return true;
     });
   };
 
@@ -814,6 +933,10 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
             onChangeText={(text) => {
               const numericValue = text.replace(/[^0-9]/g, "");
               setFormData((prev) => ({ ...prev, accountNumber: numericValue }));
+              const error = !numericValue.trim()
+                ? t("Error.accountNumber is required")
+                : "";
+              setErrors((prev) => ({ ...prev, accountNumber: error }));
             }}
             error={errors.accountNumber}
             keyboardType="number-pad"
@@ -849,8 +972,9 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               {t("InspectionForm.Bank Name")} *
             </Text>
             <TouchableOpacity
-              className={`bg-[#F4F4F4] rounded-full px-4 py-4 flex-row justify-between items-center ${errors.bank ? "border border-red-500" : ""
-                }`}
+              className={`bg-[#F4F4F4] rounded-full px-4 py-4 flex-row justify-between items-center ${
+                errors.bank ? "border border-red-500" : ""
+              }`}
               onPress={() => setShowBankDropdown(true)}
             >
               <Text
@@ -872,8 +996,9 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               {t("InspectionForm.Branch Name")} *
             </Text>
             <TouchableOpacity
-              className={`bg-[#F4F4F4] rounded-full px-4 py-4 flex-row justify-between items-center ${errors.branch ? "border border-red-500" : ""
-                }`}
+              className={`bg-[#F4F4F4] rounded-full px-4 py-4 flex-row justify-between items-center ${
+                errors.branch ? "border border-red-500" : ""
+              }`}
               onPress={() => setShowBranchDropdown(true)}
               disabled={availableBranches.length === 0}
             >
@@ -898,8 +1023,9 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               {t("InspectionForm.Existing debts of the farmer")} *
             </Text>
             <View
-              className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${errors.debtsOfFarmer ? "border border-red-500" : ""
-                }`}
+              className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${
+                errors.debtsOfFarmer ? "border border-red-500" : ""
+              }`}
             >
               <TextInput
                 placeholder={t("InspectionForm.Type here...")}
@@ -927,9 +1053,16 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               />
             </View>
             {errors.debtsOfFarmer && (
-              <Text className="text-red-500 text-sm mt-1 ml-2">
-                {errors.debtsOfFarmer}
-              </Text>
+              <View className="flex-row items-center mt-1 ml-2">
+                <FontAwesome
+                  name="exclamation-triangle"
+                  size={14}
+                  color="#EF4444"
+                />
+                <Text className="text-red-500 text-sm ml-1 flex-1">
+                  {errors.debtsOfFarmer}
+                </Text>
+              </View>
             )}
           </View>
 
@@ -1120,7 +1253,13 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
           exitText={t("InspectionForm.Back")}
           nextText={t("InspectionForm.Next")}
           isNextEnabled={isNextEnabled}
-          onExit={() => navigation.goBack()}
+          onExit={() =>
+            navigation.navigate("IDProof", {
+              formData: { inspectionpersonal: formData },
+              requestNumber,
+              requestId,
+            })
+          }
           onNext={handleNext}
         />
       </View>
