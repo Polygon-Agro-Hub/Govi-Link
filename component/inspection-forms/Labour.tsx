@@ -449,13 +449,7 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
           t("InspectionForm.Could not save to server. Data saved locally."),
           [
             {
-              text: t("Main.Continue"),
-              onPress: () => {
-                navigation.navigate("HarvestStorage", {
-                  requestNumber,
-                  requestId,
-                });
-              },
+              text: t("Main.ok"),
             },
           ],
         );
@@ -467,13 +461,7 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
         t("InspectionForm.Could not save to server. Data saved locally."),
         [
           {
-            text: t("Main.Continue"),
-            onPress: () => {
-              navigation.navigate("HarvestStorage", {
-                requestNumber,
-                requestId,
-              });
-            },
+            text: t("Main.ok"),
           },
         ],
       );

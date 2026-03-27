@@ -526,13 +526,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
           t("InspectionForm.Could not save to server. Data saved locally."),
           [
             {
-              text: t("Main.Continue"),
-              onPress: () => {
-                navigation.navigate("Economical", {
-                  requestNumber,
-                  requestId,
-                });
-              },
+              text: t("Main.ok"),
             },
           ],
         );
@@ -544,13 +538,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
         t("InspectionForm.Could not save to server. Data saved locally."),
         [
           {
-            text: t("Main.Continue"),
-            onPress: () => {
-              navigation.navigate("Economical", {
-                requestNumber,
-                requestId,
-              });
-            },
+            text: t("Main.ok"),
           },
         ],
       );

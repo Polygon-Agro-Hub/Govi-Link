@@ -657,14 +657,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
         t("InspectionForm.Could not save to server. Data saved locally."),
         [
           {
-            text: t("Main.Continue"),
-            onPress: () => {
-              navigation.navigate("IDProof", {
-                formData: { inspectionpersonal: formData },
-                requestNumber,
-                requestId,
-              });
-            },
+            text: t("Main.ok"),
           },
         ],
       );

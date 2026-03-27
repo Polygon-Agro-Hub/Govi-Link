@@ -447,13 +447,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
         t("InspectionForm.Could not save to server. Data saved locally."),
         [
           {
-            text: t("Main.Continue"),
-            onPress: () => {
-              navigation.navigate("FinanceInfo", {
-                requestNumber,
-                requestId,
-              });
-            },
+            text: t("Main.ok"),
           },
         ],
       );

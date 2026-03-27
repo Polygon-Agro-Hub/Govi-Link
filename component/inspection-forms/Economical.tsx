@@ -340,13 +340,7 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
           t("InspectionForm.Could not save to server. Data saved locally."),
           [
             {
-              text: t("Main.Continue"),
-              onPress: () => {
-                navigation.navigate("Labour", {
-                  requestNumber,
-                  requestId,
-                });
-              },
+              text: t("Main.ok"),
             },
           ],
         );
@@ -358,13 +352,7 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
         t("InspectionForm.Could not save to server. Data saved locally."),
         [
           {
-            text: t("Main.Continue"),
-            onPress: () => {
-              navigation.navigate("Labour", {
-                requestNumber,
-                requestId,
-              });
-            },
+            text: t("Main.ok"),
           },
         ],
       );
