@@ -7,7 +7,6 @@ import {
   RefreshControl,
   Image,
   Alert,
-  ActivityIndicator,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -60,7 +59,6 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
 
       for (const request of requests) {
         const isDraft = hasDraft(request.id);
-
         if (isDraft) {
           drafts.push(request.id);
         }
@@ -84,9 +82,7 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
   }, [requests]);
 
   const fetchCapitalRequests = async (search: string = "") => {
-    if (isFetchingRef.current) {
-      return;
-    }
+    if (isFetchingRef.current) return;
 
     isFetchingRef.current = true;
 
@@ -101,14 +97,10 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
 
       const response = await axios.get(
         `${environment.API_BASE_URL}api/capital-request/requests`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
-      const apiRequests = response.data.requests;
-
-      setRequests(apiRequests);
+      setRequests(response.data.requests);
     } catch (error: any) {
       console.error("Failed to fetch capital requests:", error);
       Alert.alert(t("Error.Error"), t("Error.FailedToLoadRequests"), [
@@ -137,8 +129,8 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
     requestNumber: string,
   ) => {
     navigation.navigate("RequestDetails", {
-      requestId: requestId,
-      requestNumber: requestNumber,
+      requestId,
+      requestNumber,
     });
   };
 
@@ -150,6 +142,12 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
       />
     );
   }
+
+  const sortedRequests = [...requests].sort((a, b) => {
+    const aIsDraft = draftRequestIds.includes(a.id) ? 0 : 1;
+    const bIsDraft = draftRequestIds.includes(b.id) ? 0 : 1;
+    return aIsDraft - bIsDraft;
+  });
 
   return (
     <View className="flex-1 bg-white">
@@ -169,8 +167,8 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
         contentContainerStyle={{ paddingBottom: 70 }}
       >
         <View className="px-6 py-4 space-y-5">
-          {requests.length === 0 ? (
-            <View className="flex justify-center items-center mt-40">
+          {sortedRequests.length === 0 ? (
+            <View className="flex justify-center items-center mt-[70%]">
               <Image
                 source={require("../../assets/images/dashboard/no-tasks.webp")}
                 style={{ width: 120, height: 90 }}
@@ -183,20 +181,28 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
               </Text>
             </View>
           ) : (
-            requests.map((request, index) => {
+            sortedRequests.map((request, index) => {
               const isDraft = draftRequestIds.includes(request.id);
 
               return (
                 <TouchableOpacity
                   key={`${request.id}-${index}`}
-                  className=""
                   onPress={() =>
                     handleNavigateToRequestDetails(request.id, request.jobId)
                   }
+                  style={{
+                    borderRadius: 24,
+                    shadowColor: "#000000",
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.08,
+                    shadowRadius: 3,
+                    elevation: 2,
+                  }}
                 >
                   <View
-                    className="bg-[#ADADAD1A] rounded-3xl p-4 flex-row items-center justify-between"
+                    className="rounded-3xl p-4 flex-row items-center justify-between"
                     style={{
+                      backgroundColor: "#F7F7F7",
                       borderWidth: isDraft ? 1 : 0,
                       borderColor: isDraft ? "#FA4064" : "transparent",
                     }}

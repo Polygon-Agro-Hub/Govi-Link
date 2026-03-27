@@ -389,6 +389,13 @@ const AddOnboardSupplier: React.FC<AddOnboardSupplierProps> = ({
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               className="rounded-full"
+              style={{
+                shadowColor: "#000000",
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.25,
+                shadowRadius: 10,
+                elevation: 6,
+              }}
             >
               <TouchableOpacity
                 className="py-4 items-center"
@@ -404,6 +411,13 @@ const AddOnboardSupplier: React.FC<AddOnboardSupplierProps> = ({
               className="bg-[#C4C4C4] rounded-full py-4 items-center"
               activeOpacity={0.5}
               onPress={handleNext}
+              style={{
+                shadowColor: "#000000",
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.25,
+                shadowRadius: 4,
+                elevation: 4,
+              }}
             >
               <Text className="text-[15px] text-[#FFFFFF] font-semibold">
                 {t("OnboardSupplier.Next")}

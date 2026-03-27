@@ -6,6 +6,7 @@ import {
   Text,
   ViewStyle,
   TextStyle,
+  Platform,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 
@@ -49,14 +50,27 @@ const FormFooterButton: React.FC<FormFooterButtonProps> = ({
   return (
     <View
       className="flex-row px-6 py-3 gap-4 bg-white border-t border-gray-200"
-      style={containerStyle}
+      style={[
+        containerStyle,
+        {
+          paddingBottom: Platform.OS === "android" ? 8 : 12,
+        },
+      ]}
     >
-      {/* Exit/Back Button */}
       <TouchableOpacity
         className="flex-1 bg-[#444444] rounded-full py-4 flex-row items-center justify-center"
         onPress={onExit}
         activeOpacity={0.8}
-        style={exitButtonStyle}
+        style={[
+          {
+            shadowColor: "#000000",
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.25,
+            shadowRadius: 10,
+            elevation: 6,
+          },
+          exitButtonStyle,
+        ]}
       >
         <Ionicons name="arrow-back" size={25} color="#fff" />
         <Text
@@ -67,7 +81,6 @@ const FormFooterButton: React.FC<FormFooterButtonProps> = ({
         </Text>
       </TouchableOpacity>
 
-      {/* Next Button */}
       {isNextEnabled ? (
         <View className="flex-1">
           <TouchableOpacity
@@ -102,7 +115,16 @@ const FormFooterButton: React.FC<FormFooterButtonProps> = ({
       ) : (
         <View
           className="flex-1 bg-gray-300 rounded-full py-4 flex-row items-center justify-center"
-          style={disabledButtonStyle}
+          style={[
+            {
+              shadowColor: "#000000",
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.25,
+              shadowRadius: 10,
+              elevation: 6,
+            },
+            disabledButtonStyle,
+          ]}
         >
           <Text
             className="text-white text-base font-semibold mr-2"

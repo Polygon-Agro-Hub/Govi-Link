@@ -10,6 +10,7 @@ import {
   Platform,
   Modal,
   Image,
+  BackHandler,
 } from "react-native";
 import { Feather, FontAwesome6, AntDesign } from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
@@ -95,7 +96,6 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
     { key: "Driving License ID", label: "Driving License" },
   ];
 
-
   useEffect(() => {
     const timer = setTimeout(async () => {
       if (requestId) {
@@ -113,14 +113,27 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
   useFocusEffect(
     useCallback(() => {
       updateLastScreen(requestId, "IDProof");
-    }, [requestId])
+    }, [requestId]),
   );
+
+  const validateIdNumber = (pType: string, pNumber: string): string => {
+    if (!pType) return "";
+    if (!pNumber.trim()) return t(`Error.${pType} is required`);
+    if (pType === "NIC Number" && !validateNicNumber(pNumber)) {
+      return t(
+        "Error.NIC Number must be 9 digits followed by 'V' or 12 digits.",
+      );
+    }
+    if (pType === "Driving License ID" && !validateDrivingLicense(pNumber)) {
+      return t("Error.Invalid Driving License number");
+    }
+    return "";
+  };
 
   useFocusEffect(
     useCallback(() => {
       const loadData = async () => {
         if (!requestId) return;
-
         try {
           const reqId = Number(requestId);
           const localData = await getIDProof(reqId);
@@ -128,6 +141,12 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
           if (localData) {
             setFormData(localData);
             setIsExistingData(true);
+
+            const nicError = validateIdNumber(
+              localData.pType,
+              localData.pNumber,
+            );
+            setErrors(nicError ? { nic: nicError } : {});
           } else {
             setIsExistingData(false);
           }
@@ -201,6 +220,11 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
 
     if (formData.pType === "NIC Number") {
       value = value.replace(/[^0-9V]/g, "");
+
+      const vIndex = value.indexOf("V");
+      if (vIndex !== -1) {
+        value = value.slice(0, vIndex + 1);
+      }
     } else {
       value = value.replace(/[^A-Z0-9]/g, "");
     }
@@ -223,6 +247,23 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
     setErrors((prev) => ({ ...prev, nic: error }));
     updateFormData({ pNumber: value });
   };
+
+  useEffect(() => {
+    const handleBackPress = () => {
+      navigation.navigate("Main", {
+        screen: "MainTabs",
+        params: { screen: "CapitalRequests" },
+      });
+      return true;
+    };
+
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      handleBackPress,
+    );
+
+    return () => subscription.remove();
+  }, [navigation]);
 
   const saveToBackend = async (
     reqId: number,
@@ -447,6 +488,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1, backgroundColor: "white" }}
+      keyboardVerticalOffset={Platform.OS === "android" ? -200 : 0}
     >
       <View className="flex-1 bg-[#F3F3F3]">
         <FormTabs
@@ -495,8 +537,9 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
                 </Text>
               </Text>
               <View
-                className={`bg-[#F6F6F6] rounded-full flex-row items-center ${errors.nic ? "border border-red-500" : ""
-                  }`}
+                className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
+                  errors.nic ? "border border-red-500" : ""
+                }`}
               >
                 <TextInput
                   placeholder="----"
@@ -560,10 +603,10 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
           onPress={() => setShowIdProofDropdown(false)}
         >
           <View className="bg-white rounded-2xl p-4">
-            {idProofOptions.map((option) => (
+            {idProofOptions.map((option, index) => (
               <TouchableOpacity
                 key={option.key}
-                className="py-4 border-b border-gray-200"
+                className={`py-4 ${index < idProofOptions.length - 1 ? "border-b border-gray-200" : ""}`}
                 onPress={() => {
                   setShowIdProofDropdown(false);
                   setErrors({});
