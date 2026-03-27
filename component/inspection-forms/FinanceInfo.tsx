@@ -558,9 +558,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
           t("InspectionForm.Could not save to server. Data saved locally."),
           [
             {
-              text: t("Main.Continue"),
-              onPress: () =>
-                navigation.navigate("LandInfo", { requestNumber, requestId }),
+              text: t("Main.ok"),
             },
           ],
         );
@@ -572,9 +570,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
         t("InspectionForm.Could not save to server. Data saved locally."),
         [
           {
-            text: t("Main.Continue"),
-            onPress: () =>
-              navigation.navigate("LandInfo", { requestNumber, requestId }),
+            text: t("Main.ok"),
           },
         ],
       );
