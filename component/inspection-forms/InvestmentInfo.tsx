@@ -7,6 +7,7 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  BackHandler,
 } from "react-native";
 import FormTabs from "./FormTabs";
 import { useTranslation } from "react-i18next";
@@ -21,6 +22,7 @@ import {
   InvestmentInfoData,
 } from "@/database/inspectioninvestment";
 import { updateLastScreen } from "@/database/inspectionprogress";
+import { FontAwesome } from "@expo/vector-icons";
 
 const Input = ({
   label,
@@ -43,12 +45,14 @@ const Input = ({
 }) => (
   <View className="mb-4">
     <Text className="text-sm text-[#070707] mb-2">
-      {label} {extra && <Text className="text-black font-bold">{extra} </Text>}
-      {required && <Text className="text-black">*</Text>}
+      {label}
+      {extra && <Text className="text-black font-bold"> {extra}</Text>}
+      {required && <Text className="text-black">{"\u00A0"}*</Text>}
     </Text>
     <View
-      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${error ? "border border-red-500" : ""
-        }`}
+      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
+        error ? "border border-red-500" : ""
+      }`}
     >
       <TextInput
         placeholder={placeholder}
@@ -60,7 +64,12 @@ const Input = ({
       />
     </View>
 
-    {error && <Text className="text-red-500 text-sm mt-1 ml-4">{error}</Text>}
+    {error && (
+      <View className="flex-row items-center mt-1 ml-4 gap-1">
+        <FontAwesome name="exclamation-triangle" size={14} color="#EF4444" />
+        <Text className="text-red-500 text-sm">{error}</Text>
+      </View>
+    )}
   </View>
 );
 
@@ -99,7 +108,7 @@ const validateAndFormat = (text: string, rules: ValidationRule, t: any) => {
       value = value.slice(1);
     }
     if (rules.required && value.length === 0) {
-      error = t(`Error.${rules.type} is required`);
+      error = t(`Error.repaymentMonth is required`);
     }
   }
 
@@ -113,7 +122,7 @@ const validateAndFormat = (text: string, rules: ValidationRule, t: any) => {
       }
     }
     if (rules.required && value.trim().length === 0) {
-      error = t(`Error.${rules.type} is required`);
+      error = t(`Error.purpose is required`);
     }
   }
 
@@ -136,11 +145,16 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isNextEnabled, setIsNextEnabled] = useState(false);
   const [isExistingData, setIsExistingData] = useState(false);
+  const [hasAttemptedNext, setHasAttemptedNext] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
       updateLastScreen(requestId, "InvestmentInfo");
-    }, [requestId])
+
+      return () => {
+        setHasAttemptedNext(false);
+      };
+    }, [requestId]),
   );
 
   useEffect(() => {
@@ -169,6 +183,22 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
           if (localData) {
             setFormData(localData);
             setIsExistingData(true);
+
+            const draftErrors: Record<string, string> = {};
+
+            if (!localData.expected || localData.expected === 0) {
+              draftErrors.expected = t("Error.expected is required");
+            }
+            if (!localData.purpose || localData.purpose.trim() === "") {
+              draftErrors.purpose = t("Error.purpose is required");
+            }
+            if (!localData.repaymentMonth || localData.repaymentMonth === 0) {
+              draftErrors.repaymentMonth = t(
+                "Error.repaymentMonth is required",
+              );
+            }
+
+            setErrors(draftErrors);
           } else {
             setIsExistingData(false);
           }
@@ -269,6 +299,8 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
   };
 
   const handleNext = async () => {
+    setHasAttemptedNext(true);
+
     const validationErrors: Record<string, string> = {};
 
     if (
@@ -380,9 +412,7 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
 
   const formatWithCommas = (value: string): string => {
     if (!value) return "";
-
     const numericValue = value.replace(/,/g, "");
-
     return numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   };
 
@@ -410,12 +440,30 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
     }
   };
 
+  useEffect(() => {
+    const handleBackPress = () => {
+      navigation.navigate("Main", {
+        screen: "MainTabs",
+        params: { screen: "CapitalRequests" },
+      });
+      return true;
+    };
+
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      handleBackPress,
+    );
+
+    return () => subscription.remove();
+  }, [navigation]);
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1, backgroundColor: "white" }}
+      keyboardVerticalOffset={Platform.OS === "android" ? -200 : 0}
     >
-      <View className="flex-1 bg-[#F3F3F3] ">
+      <View className="flex-1 bg-[#F3F3F3]">
         <FormTabs
           activeKey="Investment Info"
           navigation={navigation}
@@ -448,7 +496,7 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
             required
             extra={t("InspectionForm.Rs")}
             keyboardType={"phone-pad"}
-            error={errors.expected}
+            error={hasAttemptedNext ? errors.expected : undefined}
           />
 
           <Input
@@ -464,7 +512,7 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
               })
             }
             required
-            error={errors.purpose}
+            error={hasAttemptedNext ? errors.purpose : undefined}
           />
 
           <Input
@@ -485,7 +533,7 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
             }
             required
             keyboardType={"phone-pad"}
-            error={errors.repaymentMonth}
+            error={hasAttemptedNext ? errors.repaymentMonth : undefined}
           />
         </ScrollView>
 
@@ -493,7 +541,9 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
           exitText={t("InspectionForm.Back")}
           nextText={t("InspectionForm.Next")}
           isNextEnabled={isNextEnabled}
-          onExit={() => navigation.goBack()}
+          onExit={() =>
+            navigation.navigate("LandInfo", { requestNumber, requestId })
+          }
           onNext={handleNext}
         />
       </View>

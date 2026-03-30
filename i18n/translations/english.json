@@ -132,7 +132,8 @@
     "Phone number must be 10 digits":"Phone number must be 10 digits",
     "This phone number is already registered":"This phone number is already registered",
     "This email is already registered":"This email is already registered",
-    "This NIC is already registered":"This NIC is already registered"
+    "This NIC is already registered":"This NIC is already registered",
+    "Please enter a valid License ID number":"Please enter a valid License ID number (1 capital letter + 7 digits or 10–12 digits)"
   },
   "Login": {
     "Welcome": "Welcome!",

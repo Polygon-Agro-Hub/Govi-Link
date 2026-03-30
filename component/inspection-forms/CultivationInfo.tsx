@@ -10,6 +10,7 @@ import {
   Platform,
   Modal,
   Image,
+  BackHandler,
 } from "react-native";
 import { AntDesign, FontAwesome6, MaterialIcons } from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
@@ -144,8 +145,9 @@ const Input = ({
       {required && <Text className="text-black">*</Text>}
     </Text>
     <View
-      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${error ? "border border-red-500" : ""
-        }`}
+      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
+        error ? "border border-red-500" : ""
+      }`}
     >
       <TextInput
         placeholder={placeholder}
@@ -249,8 +251,25 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
   useFocusEffect(
     useCallback(() => {
       updateLastScreen(requestId, "CultivationInfo");
-    }, [requestId])
+    }, [requestId]),
   );
+
+  useEffect(() => {
+    const handleBackPress = () => {
+      navigation.navigate("Main", {
+        screen: "MainTabs",
+        params: { screen: "CapitalRequests" },
+      });
+      return true;
+    };
+
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      handleBackPress,
+    );
+
+    return () => subscription.remove();
+  }, [navigation]);
 
   useEffect(() => {
     const timer = setTimeout(async () => {
@@ -333,13 +352,13 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
 
     setIsNextEnabled(
       allClimateSelected &&
-      isPHValid &&
-      isSoilTypeValid &&
-      isWaterSourceValid &&
-      isOverallSoilFertilityValid &&
-      allYesNoSelected &&
-      isImageValid &&
-      !hasErrors,
+        isPHValid &&
+        isSoilTypeValid &&
+        isWaterSourceValid &&
+        isOverallSoilFertilityValid &&
+        allYesNoSelected &&
+        isImageValid &&
+        !hasErrors,
     );
   }, [formData, selections, errors]);
 
@@ -1131,7 +1150,9 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
           exitText={t("InspectionForm.Back")}
           nextText={t("InspectionForm.Next")}
           isNextEnabled={isNextEnabled}
-          onExit={() => navigation.goBack()}
+          onExit={() =>
+            navigation.navigate("InvestmentInfo", { requestNumber, requestId })
+          }
           onNext={handleNext}
         />
       </View>

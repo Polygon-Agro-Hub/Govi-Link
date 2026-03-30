@@ -12,7 +12,7 @@ import {
   FlatList,
   BackHandler,
 } from "react-native";
-import { MaterialIcons, AntDesign } from "@expo/vector-icons";
+import { MaterialIcons, AntDesign, FontAwesome } from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
@@ -81,7 +81,12 @@ const Input = ({
         autoCorrect={!isEmail}
       />
     </View>
-    {error && <Text className="text-red-500 text-sm mt-1 ml-4">{error}</Text>}
+    {error && (
+      <View className="flex-row items-center mt-1 ml-4">
+        <FontAwesome name="exclamation-triangle" size={14} color="#EF4444" />
+        <Text className="text-red-500 text-sm ml-1 flex-1">{error}</Text>
+      </View>
+    )}
   </View>
 );
 
@@ -804,10 +809,10 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
   );
 
   const handleExit = () => {
-    navigation.navigate("Main", {
-      screen: "MainTabs",
-      params: { screen: "CapitalRequests" },
-    });
+  navigation.navigate("RequestDetails", {
+      requestId,
+      requestNumber,
+    })
   };
 
   const handleTabPress = (tabKey: string) => {
@@ -1098,9 +1103,16 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
                   </View>
                 </TouchableOpacity>
                 {errors.district && (
-                  <Text className="text-red-500 text-sm mt-1 ml-4">
-                    {errors.district}
-                  </Text>
+                  <View className="flex-row items-center mt-1 ml-4">
+                    <FontAwesome
+                      name="exclamation-triangle"
+                      size={14}
+                      color="#EF4444"
+                    />
+                    <Text className="text-red-500 text-sm ml-1 flex-1">
+                      {errors.district}
+                    </Text>
+                  </View>
                 )}
               </View>
               <View className="relative mb-4">

@@ -132,7 +132,8 @@
     "Phone number must be 10 digits": "දුරකථන අංකය ඉලක්කම් 10ක් විය යුතුය.",
     "This phone number is already registered": "මෙම දුරකථන අංකය දැනටමත් ලියාපදිංචි කර ඇත.",
     "This email is already registered": "මෙම ඊතැපෑල දැනටමත් ලියාපදිංචි කර ඇත",
-    "This NIC is already registered": "මෙම ජාතික හැඳුනුම්පත දැනටමත් ලියාපදිංචි කර ඇත."
+    "This NIC is already registered": "මෙම ජාතික හැඳුනුම්පත දැනටමත් ලියාපදිංචි කර ඇත.",
+    "Please enter a valid License ID number":"වලංගු බලපත්‍ර හැඳුනුම්පත් අංකයක් (1 ලොකු අකුර + ඉලක්කම් 7 හෝ ඉලක්කම් 10–12) ඇතුළත් කරන්න."
   },
   "Login": {
     "Welcome": "සාදරයෙන් පිළිගනිමු!",
