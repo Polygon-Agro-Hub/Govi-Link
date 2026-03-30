@@ -30,6 +30,31 @@ type HarvestStorageProps = {
   navigation: any;
 };
 
+const FormLabel = ({
+  label,
+  required = false,
+}: {
+  label: string;
+  required?: boolean;
+}) => {
+  const words = label.trim().split(" ");
+  const lastWord = words.pop() ?? "";
+  const leadingText = words.join(" ");
+
+  return (
+    <View className="flex-row flex-wrap mb-2">
+      {leadingText.length > 0 && (
+        <Text className="text-sm text-[#070707]">{leadingText} </Text>
+      )}
+
+      <Text className="text-sm text-[#070707]">
+        {lastWord}
+        {required ? <Text className="text-black"> *</Text> : null}
+      </Text>
+    </View>
+  );
+};
+
 const YesNoSelect = ({
   label,
   value,
@@ -57,7 +82,7 @@ const YesNoSelect = ({
           activeOpacity={1}
           onPress={onClose}
         >
-          <View className="bg-white w-80 rounded-2xl overflow-hidden">
+          <View className="bg-white w-64 rounded-2xl overflow-hidden">
             {["Yes", "No"].map((item, index, arr) => (
               <View key={item}>
                 <TouchableOpacity
@@ -82,9 +107,7 @@ const YesNoSelect = ({
       </Modal>
 
       <View className="mt-4">
-        <Text className="text-sm text-[#070707] mb-2">
-          {label} {required && <Text className="text-black">*</Text>}
-        </Text>
+        <FormLabel label={label} required={required} />
 
         <TouchableOpacity
           className="bg-[#F6F6F6] rounded-full px-4 py-4 flex-row items-center justify-between"
@@ -99,7 +122,7 @@ const YesNoSelect = ({
             </Text>
           )}
 
-          {!value && <AntDesign name="down" size={20} color="#838B8C" />}
+          <AntDesign name="down" size={20} color="#838B8C" />
         </TouchableOpacity>
       </View>
     </>
@@ -125,16 +148,16 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
   const [isExistingData, setIsExistingData] = useState(false);
   const [confirmationModalVisible, setConfirmationModalVisible] =
     useState(false);
-  const [successModalVisible, setSuccessModalVisible] = useState(false);
+
   const [errorModalVisible, setErrorModalVisible] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
 
-    useFocusEffect(
-      useCallback(() => {
-        updateLastScreen(requestId, "HarvestStorage");
-      }, [requestId])
-    );
+  useFocusEffect(
+    useCallback(() => {
+      updateLastScreen(requestId, "HarvestStorage");
+    }, [requestId]),
+  );
 
   useFocusEffect(
     useCallback(() => {
@@ -371,7 +394,6 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
     setIsSaving(true);
 
     if (!requestId) {
-      console.error("requestId is missing!");
       setErrorModalVisible(true);
       setIsSaving(false);
       return;
@@ -380,7 +402,6 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
     const reqId = Number(requestId);
 
     if (isNaN(reqId) || reqId <= 0) {
-      console.error("Invalid requestId:", requestId);
       setErrorModalVisible(true);
       setIsSaving(false);
       return;
@@ -398,7 +419,12 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
 
       if (saved) {
         setIsExistingData(true);
-        setSuccessModalVisible(true);
+        setTimeout(() => {
+          navigation.navigate("ConfirmationCapitalRequest", {
+            requestNumber: requestNumber,
+            requestId: requestId,
+          });
+        }, 300);
       } else {
         setErrorModalVisible(true);
       }
@@ -410,13 +436,7 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
   };
 
   const handleSuccessClose = async () => {
-    setSuccessModalVisible(false);
-
     try {
-      if (requestId) {
-        await clearHarvestStorageInfo(Number(requestId));
-      }
-
       navigation.navigate("ConfirmationCapitalRequest", {
         requestNumber: requestNumber,
         requestId: requestId,
@@ -615,7 +635,12 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
           exitText={t("InspectionForm.Back")}
           nextText={t("InspectionForm.Next")}
           isNextEnabled={isNextEnabled}
-          onExit={() => navigation.goBack()}
+          onExit={() =>
+            navigation.navigate("Labour", {
+              requestNumber,
+              requestId,
+            })
+          }
           onNext={handleNext}
         />
       </View>
@@ -625,12 +650,6 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
         type="confirmation"
         onClose={() => setConfirmationModalVisible(false)}
         onConfirm={handleConfirmSubmit}
-      />
-
-      <ConfirmationModal
-        visible={successModalVisible}
-        type="success"
-        onClose={handleSuccessClose}
       />
 
       <ConfirmationModal

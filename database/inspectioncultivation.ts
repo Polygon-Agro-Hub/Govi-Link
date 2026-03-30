@@ -19,7 +19,7 @@ export const initCultivationTable = () => {
         soilType TEXT,
         soilfertility TEXT,
         waterSources TEXT,
-        otherWaterSource TEXT,
+        otherWaterSources TEXT,
         waterImage TEXT,
         isRecevieRainFall TEXT,
         isRainFallSuitableCrop TEXT,
@@ -30,6 +30,8 @@ export const initCultivationTable = () => {
         updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
       );`,
     );
+
+    
     
   } catch (error) {
     console.error(" Error initializing cultivation table:", error);
@@ -56,7 +58,7 @@ export interface CultivationInfo {
   soilType: string;
   soilfertility: string;
   waterSources: string[];
-  otherWaterSource: string;
+  otherWaterSources: string;
   waterImages: WaterImage[];
   isRecevieRainFall: "Yes" | "No" | undefined;
   isRainFallSuitableCrop: "Yes" | "No" | undefined;
@@ -137,8 +139,8 @@ export const saveCultivationInfo = (
     if (data.soilfertility !== undefined) {
       dbData.soilfertility = data.soilfertility;
     }
-    if (data.otherWaterSource !== undefined) {
-      dbData.otherWaterSource = data.otherWaterSource;
+    if (data.otherWaterSources !== undefined) {
+      dbData.otherWaterSources = data.otherWaterSources;
     }
 
     if (data.waterSources && Array.isArray(data.waterSources)) {
@@ -249,7 +251,7 @@ export const getCultivationInfo = (
         soilType: row.soilType || "",
         soilfertility: row.soilfertility || "",
         waterSources,
-        otherWaterSource: row.otherWaterSource || "",
+        otherWaterSources: row.otherWaterSources || "",
         waterImages,
         isRecevieRainFall: row.isRecevieRainFall as "Yes" | "No" | undefined,
         isRainFallSuitableCrop: row.isRainFallSuitableCrop as

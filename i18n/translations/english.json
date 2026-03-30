@@ -133,7 +133,9 @@
     "This phone number is already registered":"This phone number is already registered",
     "This email is already registered":"This email is already registered",
     "This NIC is already registered":"This NIC is already registered",
-    "Please enter a valid License ID number":"Please enter a valid License ID number (1 capital letter + 7 digits or 10–12 digits)"
+    "Please enter a valid License ID number":"Please enter a valid License ID number (1 capital letter + 7 digits or 10–12 digits)",
+    "At least one image of the water source is required":"At least one image of the water source is required",
+    "pH is required":"pH is required"
   },
   "Login": {
     "Welcome": "Welcome!",
