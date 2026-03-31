@@ -1075,7 +1075,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
               <Text className="text-black-500">*</Text>
             </Text>
             <TouchableOpacity
-              className="bg-[#1A1A1A] rounded-3xl px-6 py-4 flex-row justify-center items-center"
+              className="bg-[#1A1A1A] rounded-3xl px-6 py-4 flex-row justify-center items-center mb-1"
               onPress={() => {
                 setShowCamera(true);
               }}

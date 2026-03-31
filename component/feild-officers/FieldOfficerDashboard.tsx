@@ -807,7 +807,7 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
             shadowRadius: 6,
             elevation: 2,
           }}
-          onPress={() => navigation.navigate("AddOnboardSupplier")}
+          onPress={() => navigation.navigate("AddOnboardSupplierOfficer")}
         >
           <Text className="text-base font-bold text-[#434343] ml-2">
             {t("Dashboard.Onboard Suppliers")}

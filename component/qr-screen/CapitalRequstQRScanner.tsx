@@ -19,6 +19,9 @@ import { useRoute, RouteProp } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect } from "@react-navigation/native";
 import { getLastScreen } from "@/database/inspectionprogress";
+import { environment } from "@/environment/environment";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 
 type CapitalRequstQRScannerNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -36,7 +39,6 @@ interface CapitalRequstQRScannerProps {
 const { width } = Dimensions.get("window");
 const scanningAreaSize = width * 0.8;
 
-
 const FIRST_SCREEN = "PersonalInfo";
 
 const CapitalRequstQRScanner: React.FC<CapitalRequstQRScannerProps> = ({
@@ -46,7 +48,8 @@ const CapitalRequstQRScanner: React.FC<CapitalRequstQRScannerProps> = ({
   const { farmerId, requestId, requestNumber } = route.params;
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanned, setScanned] = useState<boolean>(false);
-  const [showPermissionModal, setShowPermissionModal] = useState<boolean>(false);
+  const [showPermissionModal, setShowPermissionModal] =
+    useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { t } = useTranslation();
   const [isUnsuccessfulModalVisible, setIsUnsuccessfulModalVisible] =
@@ -94,6 +97,22 @@ const CapitalRequstQRScanner: React.FC<CapitalRequstQRScannerProps> = ({
         throw new Error(t("QRScanner.Wrong QR code"));
       }
 
+      const token = await AsyncStorage.getItem("token");
+
+      const response = await axios.put(
+        `${environment.API_BASE_URL}api/capital-request/update-officer-status/${requestId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (response.status !== 200) {
+        throw new Error(t("QRScanner.Failed to update officer status"));
+      }
+
       const targetScreen = resolveTargetScreen(requestId);
 
       navigation.navigate(targetScreen as any, {
@@ -119,6 +138,7 @@ const CapitalRequstQRScanner: React.FC<CapitalRequstQRScannerProps> = ({
       setTimeout(() => {
         setIsUnsuccessfulModalVisible(false);
         setErrorMessage(null);
+        setScanned(false);
       }, 5000);
     }
   };
@@ -172,7 +192,9 @@ const CapitalRequstQRScanner: React.FC<CapitalRequstQRScannerProps> = ({
               width: "80%",
             }}
           >
-            <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}>
+            <Text
+              style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}
+            >
               {t("QRScanner.CameraRequired")}
             </Text>
             <Text style={{ color: "#555", marginBottom: 0 }}>
@@ -189,7 +211,9 @@ const CapitalRequstQRScanner: React.FC<CapitalRequstQRScannerProps> = ({
                 navigation.navigate("Dashboard");
               }}
             >
-              <Text style={{ color: "white", textAlign: "center", fontSize: 16 }}>
+              <Text
+                style={{ color: "white", textAlign: "center", fontSize: 16 }}
+              >
                 {t("QRScanner.Close")}
               </Text>
             </TouchableOpacity>
@@ -246,7 +270,9 @@ const CapitalRequstQRScanner: React.FC<CapitalRequstQRScannerProps> = ({
       </View>
 
       {scanned && (
-        <View style={{ position: "absolute", bottom: 100, alignSelf: "center" }}>
+        <View
+          style={{ position: "absolute", bottom: 100, alignSelf: "center" }}
+        >
           <TouchableOpacity onPress={() => setScanned(false)}>
             <LinearGradient
               colors={["#F2561D", "#FF1D85"]}

@@ -195,6 +195,7 @@ export type RootStackParamList = {
     requestId: number;
   };
   AddOnboardSupplier: undefined;
+  AddOnboardSupplierOfficer:undefined
   OtpverificationOnboardSupplier: {
     supplierName: string;
     contact: string;

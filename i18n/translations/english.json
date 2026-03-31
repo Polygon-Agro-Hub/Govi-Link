@@ -735,6 +735,7 @@
     "We have sent a Verification Code to the given mobile number":"We have sent a Verification Code to the given mobile number",
     "Submit":"Submit",
     "Back":"Back",
-    "Didn't receive the OTP":"Didn't receive the OTP ?"
+    "Didn't receive the OTP":"Didn't receive the OTP ?",
+    "Account created successfully": "Account created successfully"
   }
 }

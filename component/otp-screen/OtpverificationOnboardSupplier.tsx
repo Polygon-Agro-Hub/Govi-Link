@@ -28,7 +28,7 @@ const OtpverificationOnboardSupplier: React.FC = ({
   const { supplierName, contact, email, nic } = route.params;
   const [otpCode, setOtpCode] = useState<string>("");
   const [referenceId, setReferenceId] = useState<string | null>(null);
-  const [timer, setTimer] = useState<number>(240);
+  const [timer, setTimer] = useState<number>(300);
   const [isVerified, setIsVerified] = useState<boolean>(false);
   const [disabledResend, setDisabledResend] = useState<boolean>(true);
   const { t, i18n } = useTranslation();
@@ -73,7 +73,7 @@ const OtpverificationOnboardSupplier: React.FC = ({
         await AsyncStorage.setItem("referenceId", response.data.referenceId);
         setReferenceId(response.data.referenceId);
         setIsOtpExpired(false);
-        setTimer(240);
+        setTimer(300);
         setDisabledResend(true);
         return true;
       }
@@ -102,8 +102,9 @@ const OtpverificationOnboardSupplier: React.FC = ({
   }, [timer, isVerified]);
 
   const handleOtpChange = (text: string, index: number) => {
+    const numeric = text.replace(/[^0-9]/g, "");
     const updatedOtpCode = otpCode.split("");
-    updatedOtpCode[index] = text;
+    updatedOtpCode[index] = numeric;
     const newOtp = updatedOtpCode.join("");
     setOtpCode(newOtp);
 
@@ -253,14 +254,18 @@ const OtpverificationOnboardSupplier: React.FC = ({
           const completeSuccess = await handleComplete();
 
           if (completeSuccess) {
-            navigation.navigate("Main");
-          } else {
             Alert.alert(
-              t("Error.Sorry"),
-              t("Otpverification.Audit completion failed. Please try again."),
-              [{ text: t("Main.ok") }],
+              t("Otpverification.Success"),
+              t("OnboardSupplier.Account created successfully"),
+              [
+                {
+                  text: t("Main.ok"),
+                  onPress: () => navigation.navigate("Main"),
+                },
+              ],
             );
           }
+
           break;
 
         case "1001":

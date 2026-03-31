@@ -735,6 +735,7 @@
     "We have sent a Verification Code to the given mobile number": "අපි ලබා දී ඇති ජංගම දුරකථන අංකයට සත්‍යාපන කේතයක් යවා ඇත.",
     "Submit": "තහවුරු කරන්න",
     "Back": "ආපසු",
-    "Didn't receive the OTP": "OTP එක ලැබුනේ නැද්ද?"
+    "Didn't receive the OTP": "OTP එක ලැබුනේ නැද්ද?",
+    "Account created successfully": "ගිණුම සාර්ථකව නිර්මාණය කරන ලදී."
   }
 }

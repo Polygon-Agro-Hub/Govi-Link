@@ -735,6 +735,7 @@
     "We have sent a Verification Code to the given mobile number": "கொடுக்கப்பட்ட கைபேசி எண்ணுக்கு நாங்கள் ஒரு சரிபார்ப்புக் குறியீட்டை அனுப்பியுள்ளோம்.",
     "Submit": "சமர்ப்பிக்கவும்",
     "Back": "பின்னால்",
-    "Didn't receive the OTP": "OTP வரவில்லையா?"
+    "Didn't receive the OTP": "OTP வரவில்லையா?",
+    "Account created successfully": "கணக்கு வெற்றிகரமாக உருவாக்கப்பட்டது"
   }
 }
