@@ -21,6 +21,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { environment } from "@/environment/environment";
+import CustomHeader from "../commons/CustomHeader";
 
 type QRScaneerRequstAuditNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -234,27 +235,19 @@ const QRScaneerRequstAudit: React.FC<QRScaneerRequstAuditProps> = ({
 
   return (
     <View style={{ flex: 1, position: "relative" }}>
-      <View className="flex-row items-center px-4 py-4 bg-white shadow-sm">
-        <TouchableOpacity
-          className="bg-[#F6F6F680] rounded-full p-2 justify-center w-10 z-20 "
-          onPress={() =>
-            navigation.navigate("Main", {
-              screen: "MainTabs",
-              params: {
-                screen: screenName,
-              },
-            })
-          }
-        >
-          <AntDesign name="left" size={22} color="#000" />
-        </TouchableOpacity>
-
-        <View className="flex-1 ">
-          <Text className="text-lg font-bold text-center -ml-8">
-            {t("QRScanner.Scan the QR")}
-          </Text>
-        </View>
-      </View>
+      <CustomHeader
+        title={t("QRScanner.Scan the QR")}
+        navigation={navigation}
+        showBackButton={true}
+        onBackPress={() =>
+          navigation.navigate("Main", {
+            screen: "MainTabs",
+            params: {
+              screen: screenName,
+            },
+          })
+        }
+      />
       <CameraView
         className="flex-1 "
         onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
