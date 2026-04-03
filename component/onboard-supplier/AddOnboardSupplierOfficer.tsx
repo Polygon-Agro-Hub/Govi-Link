@@ -18,16 +18,16 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 
-type AddOnboardSupplierNavigationProp = StackNavigationProp<
+type AddOnboardSupplierOfficerNavigationProp = StackNavigationProp<
   RootStackParamList,
-  "AddOnboardSupplier"
+  "AddOnboardSupplierOfficer"
 >;
 
-interface AddOnboardSupplierProps {
-  navigation: AddOnboardSupplierNavigationProp;
+interface AddOnboardSupplierOfficerProps {
+  navigation: AddOnboardSupplierOfficerNavigationProp;
 }
 
-const AddOnboardSupplier: React.FC<AddOnboardSupplierProps> = ({
+const AddOnboardSupplierOfficer: React.FC<AddOnboardSupplierOfficerProps> = ({
   navigation,
 }) => {
   const [supplierName, setSupplierName] = useState("");
@@ -280,6 +280,7 @@ const AddOnboardSupplier: React.FC<AddOnboardSupplierProps> = ({
         className="flex-1 px-5 pt-5"
         contentContainerStyle={{
           flexGrow: 1,
+          justifyContent: "space-between",
           paddingBottom: 32,
         }}
         keyboardShouldPersistTaps="handled"
@@ -374,9 +375,9 @@ const AddOnboardSupplier: React.FC<AddOnboardSupplierProps> = ({
           </View>
         </View>
 
-        <View className="gap-y-3 mt-[30%]">
+        <View className="mt-10 gap-y-3">
           <TouchableOpacity
-            className="bg-[#D9D9D9] rounded-3xl px-6 py-4 w-full items-center "
+            className="bg-[#D9D9D9] rounded-3xl px-6 py-4 w-full items-center"
             onPress={() => navigation.goBack()}
             activeOpacity={0.7}
             style={{
@@ -439,4 +440,4 @@ const AddOnboardSupplier: React.FC<AddOnboardSupplierProps> = ({
   );
 };
 
-export default AddOnboardSupplier;
+export default AddOnboardSupplierOfficer;

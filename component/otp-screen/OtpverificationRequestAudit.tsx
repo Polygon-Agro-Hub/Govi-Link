@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Alert,
   Keyboard,
+  AppState,
 } from "react-native";
 import {
   widthPercentageToDP as wp,
@@ -33,8 +34,28 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
   const [isOtpValid, setIsOtpValid] = useState<boolean>(false);
   const [verificationAttempts, setVerificationAttempts] = useState<number>(0);
   const [isOtpExpired, setIsOtpExpired] = useState<boolean>(false);
+  const [isActive, setIsActive] = useState<boolean>(true);
 
   const inputRefs = useRef<Array<TextInput | null>>([]);
+  const backgroundTime = useRef<number | null>(null);
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (nextAppState) => {
+      if (nextAppState === "active") {
+        if (backgroundTime.current) {
+          const elapsed = Math.floor((Date.now() - backgroundTime.current) / 1000);
+          setTimer((prev) => Math.max(0, prev - elapsed));
+          backgroundTime.current = null;
+        }
+        setIsActive(true);
+      } else if (nextAppState.match(/inactive|background/)) {
+        backgroundTime.current = Date.now();
+        setIsActive(false);
+      }
+    });
+
+    return () => subscription.remove();
+  }, []);
 
   useEffect(() => {
     const selectedLanguage = t("Otpverification.LNG");
@@ -54,19 +75,24 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
   }, []);
 
   useEffect(() => {
-    if (timer > 0 && !isVerified) {
-      const interval = setInterval(() => {
+    let interval: ReturnType<typeof setInterval> | undefined;
+
+    if (timer > 0 && !isVerified && isActive) {
+      interval = setInterval(() => {
         setTimer((prevTimer) => prevTimer - 1);
       }, 1000);
 
       setDisabledResend(true);
-
-      return () => clearInterval(interval);
-    } else if (timer === 0 && !isVerified) {
+    } else if (timer <= 0 && !isVerified) {
+      setTimer(0);
       setDisabledResend(false);
       setIsOtpExpired(true);
     }
-  }, [timer, isVerified]);
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [timer, isVerified, isActive]);
 
   const handleOtpChange = (text: string, index: number) => {
     const updatedOtpCode = otpCode.split("");

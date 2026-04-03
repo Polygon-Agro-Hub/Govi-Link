@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Alert,
   Keyboard,
+  AppState,
 } from "react-native";
 import {
   widthPercentageToDP as wp,
@@ -28,15 +29,35 @@ const OtpverificationOnboardSupplier: React.FC = ({
   const { supplierName, contact, email, nic } = route.params;
   const [otpCode, setOtpCode] = useState<string>("");
   const [referenceId, setReferenceId] = useState<string | null>(null);
-  const [timer, setTimer] = useState<number>(240);
+  const [timer, setTimer] = useState<number>(300);
   const [isVerified, setIsVerified] = useState<boolean>(false);
   const [disabledResend, setDisabledResend] = useState<boolean>(true);
   const { t, i18n } = useTranslation();
   const [isOtpValid, setIsOtpValid] = useState<boolean>(false);
   const [verificationAttempts, setVerificationAttempts] = useState<number>(0);
   const [isOtpExpired, setIsOtpExpired] = useState<boolean>(false);
+  const [isActive, setIsActive] = useState<boolean>(true);
 
   const inputRefs = useRef<Array<TextInput | null>>([]);
+  const backgroundTime = useRef<number | null>(null);
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (nextAppState) => {
+      if (nextAppState === "active") {
+        if (backgroundTime.current) {
+          const elapsed = Math.floor((Date.now() - backgroundTime.current) / 1000);
+          setTimer((prev) => Math.max(0, prev - elapsed));
+          backgroundTime.current = null;
+        }
+        setIsActive(true);
+      } else if (nextAppState.match(/inactive|background/)) {
+        backgroundTime.current = Date.now();
+        setIsActive(false);
+      }
+    });
+
+    return () => subscription.remove();
+  }, []);
 
   const sendOTP = async (): Promise<boolean> => {
     await AsyncStorage.removeItem("referenceId");
@@ -73,7 +94,7 @@ const OtpverificationOnboardSupplier: React.FC = ({
         await AsyncStorage.setItem("referenceId", response.data.referenceId);
         setReferenceId(response.data.referenceId);
         setIsOtpExpired(false);
-        setTimer(240);
+        setTimer(300);
         setDisabledResend(true);
         return true;
       }
@@ -89,21 +110,29 @@ const OtpverificationOnboardSupplier: React.FC = ({
   }, []);
 
   useEffect(() => {
-    if (timer > 0 && !isVerified) {
-      const interval = setInterval(() => {
+    let interval: ReturnType<typeof setInterval> | undefined;
+
+    if (timer > 0 && !isVerified && isActive) {
+      interval = setInterval(() => {
         setTimer((prevTimer) => prevTimer - 1);
       }, 1000);
+
       setDisabledResend(true);
-      return () => clearInterval(interval);
-    } else if (timer === 0 && !isVerified) {
+    } else if (timer <= 0 && !isVerified) {
+      setTimer(0);
       setDisabledResend(false);
       setIsOtpExpired(true);
     }
-  }, [timer, isVerified]);
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [timer, isVerified, isActive]);
 
   const handleOtpChange = (text: string, index: number) => {
+    const numeric = text.replace(/[^0-9]/g, "");
     const updatedOtpCode = otpCode.split("");
-    updatedOtpCode[index] = text;
+    updatedOtpCode[index] = numeric;
     const newOtp = updatedOtpCode.join("");
     setOtpCode(newOtp);
 
@@ -253,14 +282,18 @@ const OtpverificationOnboardSupplier: React.FC = ({
           const completeSuccess = await handleComplete();
 
           if (completeSuccess) {
-            navigation.navigate("Main");
-          } else {
             Alert.alert(
-              t("Error.Sorry"),
-              t("Otpverification.Audit completion failed. Please try again."),
-              [{ text: t("Main.ok") }],
+              t("Otpverification.Success"),
+              t("OnboardSupplier.Account created successfully"),
+              [
+                {
+                  text: t("Main.ok"),
+                  onPress: () => navigation.navigate("Main"),
+                },
+              ],
             );
           }
+
           break;
 
         case "1001":

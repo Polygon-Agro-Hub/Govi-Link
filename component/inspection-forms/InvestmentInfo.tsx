@@ -33,6 +33,7 @@ const Input = ({
   error,
   extra,
   keyboardType = "default",
+  maxLength,
 }: {
   label: string;
   placeholder: string;
@@ -42,6 +43,7 @@ const Input = ({
   error?: string;
   keyboardType?: any;
   extra?: any;
+  maxLength?: number;
 }) => (
   <View className="mb-4">
     <Text className="text-sm text-[#070707] mb-2">
@@ -61,6 +63,7 @@ const Input = ({
         value={value}
         onChangeText={onChangeText}
         keyboardType={keyboardType}
+        maxLength={maxLength}
       />
     </View>
 
@@ -121,8 +124,14 @@ const validateAndFormat = (text: string, rules: ValidationRule, t: any) => {
         value = value.charAt(0).toUpperCase() + value.slice(1);
       }
     }
+
+    if (value.length > 50) {
+      value = value.slice(0, 50);
+      error = t("Error.purpose max 50 characters");
+    }
+
     if (rules.required && value.trim().length === 0) {
-      error = t(`Error.purpose is required`);
+      error = t("Error.purpose is required");
     }
   }
 
@@ -312,6 +321,9 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
     }
     if (!formData?.purpose || formData.purpose.trim() === "") {
       validationErrors.purpose = t("Error.purpose is required");
+    }
+    if (formData?.purpose && formData.purpose.length > 50) {
+      validationErrors.purpose = t("Error.purpose max 50 characters");
     }
     if (
       !formData?.repaymentMonth ||
@@ -512,6 +524,7 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
               })
             }
             required
+            maxLength={50}
             error={hasAttemptedNext ? errors.purpose : undefined}
           />
 

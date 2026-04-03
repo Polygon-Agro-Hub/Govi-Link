@@ -74,6 +74,7 @@ import ConfirmationCapitalRequest from "@/component/inspection-forms/Confirmatio
 import CapitalRequstQRScanner from "@/component/qr-screen/CapitalRequstQRScanner";
 import AddOnboardSupplier from "@/component/onboard-supplier/AddOnboardSupplier";
 import OtpverificationOnboardSupplier from "@/component/otp-screen/OtpverificationOnboardSupplier";
+import AddOnboardSupplierOfficer from "@/component/onboard-supplier/AddOnboardSupplierOfficer";
 
 import { initDatabase } from "@/database/index";
 
@@ -130,6 +131,10 @@ function MainTabs() {
           <Tab.Screen name="AddOfficerStep2" component={AddOfficerStep2} />
           <Tab.Screen name="AddOfficerStep3" component={AddOfficerStep3} />
           <Tab.Screen name="AssignJobs" component={AssignJobs} />
+          <Tab.Screen
+            name="AddOnboardSupplier"
+            component={AddOnboardSupplier}
+          />
           <Tab.Screen name="CapitalRequests" component={CapitalRequests} />
           <Tab.Screen
             name="AssignJobOfficerList"
@@ -306,8 +311,15 @@ function AppContent() {
               name="ConfirmationCapitalRequest"
               component={ConfirmationCapitalRequest}
             />
-            <Stack.Screen name="AddOnboardSupplier" component={AddOnboardSupplier} />
-            <Stack.Screen name="OtpverificationOnboardSupplier" component={OtpverificationOnboardSupplier} />
+
+            <Stack.Screen
+              name="AddOnboardSupplierOfficer"
+              component={AddOnboardSupplierOfficer}
+            />
+            <Stack.Screen
+              name="OtpverificationOnboardSupplier"
+              component={OtpverificationOnboardSupplier}
+            />
           </Stack.Navigator>
         </NavigationContainer>
       </SafeAreaView>

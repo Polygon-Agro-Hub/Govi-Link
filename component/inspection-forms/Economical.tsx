@@ -8,6 +8,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Modal,
+  BackHandler,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
@@ -55,7 +56,7 @@ const YesNoSelect = ({
           activeOpacity={1}
           onPress={onClose}
         >
-          <View className="bg-white w-80 rounded-2xl overflow-hidden">
+          <View className="bg-white w-64 rounded-2xl overflow-hidden">
             {["Yes", "No"].map((item, index, arr) => (
               <View key={item}>
                 <TouchableOpacity
@@ -98,7 +99,7 @@ const YesNoSelect = ({
             </Text>
           )}
 
-          {!value && <AntDesign name="down" size={20} color="#838B8C" />}
+          <AntDesign name="down" size={20} color="#838B8C" />
         </TouchableOpacity>
       </View>
     </>
@@ -124,7 +125,7 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
   useFocusEffect(
     useCallback(() => {
       updateLastScreen(requestId, "Economical");
-    }, [requestId])
+    }, [requestId]),
   );
 
   useFocusEffect(
@@ -190,9 +191,9 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
 
     setIsNextEnabled(
       isSuitaleSizeValid &&
-      isFinanceResourceValid &&
-      isAltRoutesValid &&
-      !hasErrors,
+        isFinanceResourceValid &&
+        isAltRoutesValid &&
+        !hasErrors,
     );
   }, [formData, errors]);
 
@@ -369,8 +370,8 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
       "Cultivation Info": "CultivationInfo",
       "Cropping Systems": "CroppingSystems",
       "Profit & Risk": "ProfitRisk",
-      "Economical": "Economical",
-      "Labour": "Labour",
+      Economical: "Economical",
+      Labour: "Labour",
       "Harvest Storage": "HarvestStorage",
     };
 
@@ -382,6 +383,23 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
       });
     }
   };
+
+  useEffect(() => {
+    const handleBackPress = () => {
+      navigation.navigate("Main", {
+        screen: "MainTabs",
+        params: { screen: "CapitalRequests" },
+      });
+      return true;
+    };
+
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      handleBackPress,
+    );
+
+    return () => subscription.remove();
+  }, [navigation]);
 
   return (
     <KeyboardAvoidingView
@@ -466,7 +484,12 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
           exitText={t("InspectionForm.Back")}
           nextText={t("InspectionForm.Next")}
           isNextEnabled={isNextEnabled}
-          onExit={() => navigation.goBack()}
+          onExit={() =>
+            navigation.navigate("ProfitRisk", {
+              requestNumber,
+              requestId,
+            })
+          }
           onNext={handleNext}
         />
       </View>

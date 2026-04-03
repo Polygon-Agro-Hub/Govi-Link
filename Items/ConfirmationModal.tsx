@@ -32,7 +32,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             <MaterialIcons name="info-outline" size={32} color="white" />
           </View>
         );
-   
+
       case "error":
         return (
           <View className="w-16 h-16 bg-red-500 rounded-full items-center justify-center mb-6">
@@ -59,7 +59,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     switch (type) {
       case "confirmation":
         return t(
-          "InspectionForm.You have filled out all the forms. If you need to make any changes, you can go back. Otherwise, continuing will take you to the confirmation step."
+          "InspectionForm.You have filled out all the forms. If you need to make any changes, you can go back. Otherwise, continuing will take you to the confirmation step.",
         );
       case "success":
         return t("InspectionForm.Inspection form completed successfully!");
@@ -86,9 +86,16 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             {type === "confirmation" && (
               <>
                 <TouchableOpacity
-                  className="bg-white border-2 border-gray-300 rounded-full py-4 items-center"
+                  className="bg-white border border-[#000000] rounded-full py-4 items-center"
                   onPress={onClose}
                   activeOpacity={0.7}
+                  style={{
+                    shadowColor: "#000",
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.2,
+                    shadowRadius: 3,
+                    elevation: 4,
+                  }}
                 >
                   <Text className="text-black text-base font-semibold">
                     {t("Main.Go Back")}
@@ -99,6 +106,13 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                   className="bg-[#1A1A1A] rounded-full py-4 items-center mt-6"
                   onPress={onConfirm}
                   activeOpacity={0.7}
+                  style={{
+                    shadowColor: "#000",
+                    shadowOffset: { width: 0, height: 3 },
+                    shadowOpacity: 0.25,
+                    shadowRadius: 5,
+                    elevation: 6,
+                  }}
                 >
                   <Text className="text-white text-base font-semibold">
                     {t("Main.Continue")}

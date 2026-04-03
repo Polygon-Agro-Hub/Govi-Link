@@ -12,7 +12,12 @@ import {
   Image,
   BackHandler,
 } from "react-native";
-import { AntDesign, FontAwesome6, MaterialIcons } from "@expo/vector-icons";
+import {
+  AntDesign,
+  FontAwesome,
+  FontAwesome6,
+  MaterialIcons,
+} from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
 import { useTranslation } from "react-i18next";
 import Checkbox from "expo-checkbox";
@@ -46,6 +51,13 @@ const climateParameters = [
 
 type Selection = "yes" | "no" | null;
 
+const ErrorMessage = ({ message }: { message: string }) => (
+  <View className="flex-row items-center mt-1 ml-1 gap-1">
+    <FontAwesome name="exclamation-triangle" size={14} color="#EF4444" />
+    <Text className="text-red-500 text-sm ml-1">{message}</Text>
+  </View>
+);
+
 const YesNoSelect = ({
   label,
   value,
@@ -73,11 +85,11 @@ const YesNoSelect = ({
           activeOpacity={1}
           onPress={onClose}
         >
-          <View className="bg-white w-80 rounded-2xl overflow-hidden">
+          <View className="bg-white w-64 rounded-2xl overflow-hidden">
             {["Yes", "No"].map((item, index, arr) => (
               <View key={item}>
                 <TouchableOpacity
-                  className="py-4"
+                  className="py-3"
                   onPress={() => {
                     onSelect(item as "Yes" | "No");
                     onClose();
@@ -113,7 +125,7 @@ const YesNoSelect = ({
               {t("InspectionForm.--Select From Here--")}
             </Text>
           )}
-          {!value && <AntDesign name="down" size={20} color="#838B8C" />}
+          <AntDesign name="down" size={20} color="#838B8C" />
         </TouchableOpacity>
       </View>
     </>
@@ -158,7 +170,7 @@ const Input = ({
         keyboardType={keyboardType}
       />
     </View>
-    {error && <Text className="text-red-500 text-sm mt-1 ml-4">{error}</Text>}
+    {error && <ErrorMessage message={error} />}
   </View>
 );
 
@@ -221,7 +233,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
     soilType: "",
     soilfertility: "",
     waterSources: [],
-    otherWaterSource: "",
+    otherWaterSources: "",
     waterImages: [],
     isRecevieRainFall: undefined,
     isRainFallSuitableCrop: undefined,
@@ -305,6 +317,62 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
               savedSelections[key] = extendedLocalData[key] ?? null;
             });
             setSelections(savedSelections);
+
+            const restoredErrors: Record<string, string> = {};
+
+            if (!localData.ph) {
+              restoredErrors.ph = t("Error.pH is required");
+            }
+
+            if (!localData.soilType?.trim()) {
+              restoredErrors.soilType = t("Error.soilType is required");
+            }
+
+            if (!localData.soilfertility) {
+              restoredErrors.soilfertility = t(
+                "Error.Overall soil fertility is required",
+              );
+            }
+
+            const waterSources = localData.waterSources || [];
+
+            const hasValidSource = waterSources.some((source) => {
+              if (source === "Other") {
+                return localData.otherWaterSources?.trim().length > 0;
+              }
+              return true;
+            });
+
+            if (waterSources.length === 0) {
+              restoredErrors.waterSources = t(
+                "Error.Please select at least one water source",
+              );
+            } else if (!hasValidSource) {
+              restoredErrors.waterSources = t(
+                "Error.Please specify the other water source",
+              );
+            }
+
+            if (!localData.waterImages || localData.waterImages.length === 0) {
+              restoredErrors.waterImages = t(
+                "Error.At least one image of the water source is required",
+              );
+            }
+
+            setErrors(restoredErrors);
+
+            const nextMissing = climateParameters.find(
+              (p) => !savedSelections[p.key],
+            );
+            if (nextMissing) {
+              setError(
+                t("Error.Please select Yes or No for", {
+                  Missing: t(`InspectionForm.${nextMissing.label}`),
+                }),
+              );
+            } else {
+              setError("");
+            }
           } else {
             setIsExistingData(false);
           }
@@ -323,13 +391,17 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
         selections[param.key] === "yes" || selections[param.key] === "no",
     );
 
-    const isPHValid = !!formData.ph && !errors.ph;
-    const isSoilTypeValid = !!formData.soilType && !errors.soilType;
+    const isPHValid = !!formData.ph;
+    const isSoilTypeValid = !!formData.soilType?.trim();
 
     const waterSources = formData.waterSources || [];
-    const isWaterSourceValid =
-      waterSources.length > 0 &&
-      (!waterSources.includes("Other") || !!formData.otherWaterSource?.trim());
+
+    const isWaterSourceValid = waterSources.some((source) => {
+      if (source === "Other") {
+        return formData.otherWaterSources?.trim().length > 0;
+      }
+      return true;
+    });
 
     const isOverallSoilFertilityValid = !!formData.soilfertility;
 
@@ -346,7 +418,6 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
       (key) => formData[key] === "Yes" || formData[key] === "No",
     );
 
-    const hasErrors = Object.values(errors).some(Boolean);
     const isImageValid =
       formData.waterImages && formData.waterImages.length > 0;
 
@@ -357,10 +428,9 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
         isWaterSourceValid &&
         isOverallSoilFertilityValid &&
         allYesNoSelected &&
-        isImageValid &&
-        !hasErrors,
+        !!isImageValid,
     );
-  }, [formData, selections, errors]);
+  }, [formData, selections]);
 
   const updateFormData = (updates: Partial<CultivationInfoData>) => {
     setFormData((prev) => ({ ...prev, ...updates }));
@@ -459,22 +529,23 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
     };
 
     if (option === "Other" && !updatedOptions.includes("Other")) {
-      updates.otherWaterSource = "";
+      updates.otherWaterSources = "";
     }
 
     updateFormData(updates);
 
     let errorMsg = "";
-    const validWaterSources = updatedOptions.filter(
-      (source: string) => source !== "Other",
-    );
 
-    if (validWaterSources.length === 0) {
+    const hasValidSource = updatedOptions.some((source) => {
+      if (source === "Other") {
+        return formData.otherWaterSources?.trim().length > 0;
+      }
+      return true;
+    });
+
+    if (updatedOptions.length === 0) {
       errorMsg = t("Error.Please select at least one water source");
-    } else if (
-      updatedOptions.includes("Other") &&
-      !formData.otherWaterSource?.trim()
-    ) {
+    } else if (!hasValidSource) {
       errorMsg = t("Error.Please specify the other water source");
     }
 
@@ -482,17 +553,23 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
   };
 
   const handleOtherWaterSourceChange = (text: string) => {
-    updateFormData({ otherWaterSource: text });
+    const trimmedText = text.replace(/^\s+/, "");
+
+    updateFormData({ otherWaterSources: trimmedText });
 
     let errorMsg = "";
     const waterSources = formData.waterSources || [];
-    const validWaterSources = waterSources.filter(
-      (source: string) => source !== "Other",
-    );
 
-    if (validWaterSources.length === 0) {
+    const hasValidSource = waterSources.some((source) => {
+      if (source === "Other") {
+        return trimmedText.trim().length > 0;
+      }
+      return true;
+    });
+
+    if (waterSources.length === 0) {
       errorMsg = t("Error.Please select at least one water source");
-    } else if (waterSources.includes("Other") && !text.trim()) {
+    } else if (!hasValidSource) {
       errorMsg = t("Error.Please specify the other water source");
     }
 
@@ -562,8 +639,8 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
         apiFormData.append("waterSources", JSON.stringify(data.waterSources));
       }
 
-      if (data.otherWaterSource) {
-        apiFormData.append("otherWaterSource", data.otherWaterSource);
+      if (data.otherWaterSources) {
+        apiFormData.append("otherWaterSources", data.otherWaterSources);
       }
 
       if (data.waterImages && data.waterImages.length > 0) {
@@ -793,6 +870,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1, backgroundColor: "white" }}
+      keyboardVerticalOffset={Platform.OS === "android" ? -200 : 0}
     >
       <View className="flex-1 bg-[#F3F3F3]">
         <FormTabs
@@ -863,11 +941,10 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
               </View>
             ))}
 
+            {/* Climate table error */}
             {error ? (
               <View className="mt-2">
-                <Text className="text-red-500 text-sm whitespace-pre-line">
-                  {error}
-                </Text>
+                <ErrorMessage message={error} />
               </View>
             ) : null}
           </View>
@@ -943,10 +1020,13 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
                   : t("InspectionForm.--Select From Here--")}
               </Text>
 
-              {!formData?.soilfertility && (
-                <AntDesign name="down" size={20} color="#838B8C" />
-              )}
+              <AntDesign name="down" size={20} color="#838B8C" />
             </TouchableOpacity>
+
+            {/* Soil fertility error */}
+            {errors.soilfertility ? (
+              <ErrorMessage message={errors.soilfertility} />
+            ) : null}
           </View>
 
           {/* Water Sources */}
@@ -978,15 +1058,14 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
                 placeholder={t("InspectionForm.--Mention Other--")}
                 placeholderTextColor="#838B8C"
                 className="bg-[#F6F6F6] px-4 py-4 rounded-full text-black mb-2"
-                value={formData.otherWaterSource || ""}
+                value={formData.otherWaterSources || ""}
                 onChangeText={handleOtherWaterSourceChange}
               />
             )}
 
+            {/* Water sources error */}
             {errors.waterSources ? (
-              <Text className="text-red-500 text-sm mt-1">
-                {errors.waterSources}
-              </Text>
+              <ErrorMessage message={errors.waterSources} />
             ) : null}
           </View>
 
@@ -996,7 +1075,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
               <Text className="text-black-500">*</Text>
             </Text>
             <TouchableOpacity
-              className="bg-[#1A1A1A] rounded-3xl px-6 py-4 flex-row justify-center items-center"
+              className="bg-[#1A1A1A] rounded-3xl px-6 py-4 flex-row justify-center items-center mb-1"
               onPress={() => {
                 setShowCamera(true);
               }}
@@ -1029,10 +1108,9 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
               </View>
             )}
 
+            {/* Water images error */}
             {errors.waterImages ? (
-              <Text className="text-red-500 text-sm mt-2">
-                {errors.waterImages}
-              </Text>
+              <ErrorMessage message={errors.waterImages} />
             ) : null}
           </View>
 

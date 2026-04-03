@@ -133,7 +133,9 @@
     "This phone number is already registered": "இந்த தொலைபேசி எண் ஏற்கனவே பதிவு செய்யப்பட்டுள்ளது",
     "This email is already registered": "இந்த மின்னஞ்சல் ஏற்கனவே பதிவு செய்யப்பட்டுள்ளது",
     "This NIC is already registered": "இந்த NIC ஏற்கனவே பதிவு செய்யப்பட்டுள்ளது",
-    "Please enter a valid License ID number":"சரியான உரிம அடையாள எண்ணை (1 பெரிய எழுத்து + 7 இலக்கங்கள் அல்லது 10–12 இலக்கங்கள்) உள்ளிடவும்."
+    "Please enter a valid License ID number":"சரியான உரிம அடையாள எண்ணை (1 பெரிய எழுத்து + 7 இலக்கங்கள் அல்லது 10–12 இலக்கங்கள்) உள்ளிடவும்.",
+    "At least one image of the water source is required":"நீர் ஆதாரத்தின் குறைந்தபட்சம் ஒரு புகைப்படம் தேவைப்படுகிறது.",
+    "pH is required":"pH தேவைப்படுகிறது"
   },
   "Login": {
     "Welcome": "வரவேற்கிறோம்",
@@ -733,6 +735,7 @@
     "We have sent a Verification Code to the given mobile number": "கொடுக்கப்பட்ட கைபேசி எண்ணுக்கு நாங்கள் ஒரு சரிபார்ப்புக் குறியீட்டை அனுப்பியுள்ளோம்.",
     "Submit": "சமர்ப்பிக்கவும்",
     "Back": "பின்னால்",
-    "Didn't receive the OTP": "OTP வரவில்லையா?"
+    "Didn't receive the OTP": "OTP வரவில்லையா?",
+    "Account created successfully": "கணக்கு வெற்றிகரமாக உருவாக்கப்பட்டது"
   }
 }
