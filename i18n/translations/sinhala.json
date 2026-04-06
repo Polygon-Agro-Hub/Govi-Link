@@ -135,7 +135,8 @@
     "This NIC is already registered": "මෙම ජාතික හැඳුනුම්පත දැනටමත් ලියාපදිංචි කර ඇත.",
     "Please enter a valid License ID number":"වලංගු බලපත්‍ර හැඳුනුම්පත් අංකයක් (1 ලොකු අකුර + ඉලක්කම් 7 හෝ ඉලක්කම් 10–12) ඇතුළත් කරන්න.",
     "At least one image of the water source is required":"ජල මූලාශ්‍රයේ අවම වශයෙන් එක් රූපයක්වත් අවශ්‍ය වේ.",
-    "pH is required":"pH අගය අවශ්‍යයි"
+    "pH is required":"pH අගය අවශ්‍යයි",
+    "Overall soil fertility is required":"සමස්ත පසේ සාරවත් බව අවශ්‍ය වේ."
   },
   "Login": {
     "Welcome": "සාදරයෙන් පිළිගනිමු!",

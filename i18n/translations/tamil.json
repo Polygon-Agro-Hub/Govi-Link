@@ -135,7 +135,8 @@
     "This NIC is already registered": "இந்த NIC ஏற்கனவே பதிவு செய்யப்பட்டுள்ளது",
     "Please enter a valid License ID number":"சரியான உரிம அடையாள எண்ணை (1 பெரிய எழுத்து + 7 இலக்கங்கள் அல்லது 10–12 இலக்கங்கள்) உள்ளிடவும்.",
     "At least one image of the water source is required":"நீர் ஆதாரத்தின் குறைந்தபட்சம் ஒரு புகைப்படம் தேவைப்படுகிறது.",
-    "pH is required":"pH தேவைப்படுகிறது"
+    "pH is required":"pH தேவைப்படுகிறது",
+    "Overall soil fertility is required":"ஒட்டுமொத்த மண் வளம் தேவைப்படுகிறது"
   },
   "Login": {
     "Welcome": "வரவேற்கிறோம்",

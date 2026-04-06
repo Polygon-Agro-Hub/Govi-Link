@@ -310,6 +310,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
   const route = useRoute<RouteProp<RootStackParamList, "PersonalInfo">>();
   const { requestNumber, requestId } = route.params;
   const { t, i18n } = useTranslation();
+  const [isLoaded, setIsLoaded] = useState(false);
   const [formData, setFormData] = useState<PersonalInfo>({
     firstName: "",
     lastName: "",
@@ -347,6 +348,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
   const districts: DistrictsMap = districtData;
 
   useEffect(() => {
+    if (!isLoaded) return;
     const timer = setTimeout(() => {
       if (requestId) {
         try {
@@ -358,7 +360,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [formData, requestId]);
+  }, [formData, requestId, isLoaded]);
 
   useFocusEffect(
     useCallback(() => {
@@ -368,8 +370,13 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
 
   useFocusEffect(
     useCallback(() => {
+      setIsLoaded(false);
+
       const loadData = async () => {
-        if (!requestId) return;
+        if (!requestId) {
+          setIsLoaded(true);
+          return;
+        }
 
         try {
           const reqId = Number(requestId);
@@ -411,6 +418,8 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           }
         } catch (error) {
           console.error("Failed to load from SQLite:", error);
+        } finally {
+          setIsLoaded(true);
         }
       };
 
@@ -419,6 +428,8 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
   );
 
   useEffect(() => {
+    if (!isLoaded) return;
+
     const requiredFields: (keyof PersonalInfo)[] = [
       "firstName",
       "lastName",
@@ -444,7 +455,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
 
     const hasErrors = Object.keys(errors).length > 0;
     setIsNextEnabled(allFilled && !hasErrors);
-  }, [formData, errors]);
+  }, [formData, errors, isLoaded]);
 
   const updateFormData = (updates: Partial<PersonalInfo>) => {
     setFormData((prev) => ({ ...prev, ...updates }));
@@ -809,10 +820,10 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
   );
 
   const handleExit = () => {
-  navigation.navigate("RequestDetails", {
+    navigation.navigate("RequestDetails", {
       requestId,
       requestNumber,
-    })
+    });
   };
 
   const handleTabPress = (tabKey: string) => {
