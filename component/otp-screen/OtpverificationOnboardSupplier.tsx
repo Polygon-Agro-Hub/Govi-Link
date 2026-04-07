@@ -458,10 +458,10 @@ const OtpverificationOnboardSupplier: React.FC = ({
         </View>
 
         {/* Buttons */}
-        <View style={{ width: wp(75) }}>
+        <View className="w-2/3">
           {/* Back Button */}
           <TouchableOpacity
-            className="bg-[#D9D9D9] py-3 justify-center rounded-3xl mb-4"
+            className="bg-[#D9D9D9] h-[50px]  justify-center rounded-3xl mb-4"
             onPress={() => navigation.goBack()}
           >
             <Text className="text-[#686868] text-lg text-center">
@@ -484,7 +484,7 @@ const OtpverificationOnboardSupplier: React.FC = ({
               }
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
-              className="flex-1 items-center justify-center rounded-3xl py-3"
+              className="flex-1 items-center justify-center rounded-3xl h-[50px]"
             >
               <Text className="text-white text-lg font-semibold">
                 {t("OnboardSupplier.Submit")}

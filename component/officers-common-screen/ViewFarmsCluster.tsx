@@ -25,6 +25,7 @@ import {
 } from "react-native-responsive-screen";
 import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesome6 } from "@expo/vector-icons";
+import CustomHeader from "../commons/CustomHeader";
 
 type ViewFarmsClusterNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -205,18 +206,13 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
 
   return (
     <View className="flex-1 bg-white">
-      <View className="flex-row items-center px-4 py-4 bg-white shadow-sm border-b border-[#E5E5E5]">
-        <TouchableOpacity
-          className="bg-[#F6F6F680] rounded-full p-2 justify-center w-10 z-20"
-          onPress={() => navigation.goBack()}
-        >
-          <AntDesign name="left" size={22} color="#000" />
-        </TouchableOpacity>
-
-        <View className="flex-1">
-          <Text className="text-base font-semibold text-center">#{jobId}</Text>
-        </View>
-      </View>
+      <CustomHeader
+        title={`#${jobId}`}
+        navigation={navigation}
+        showBackButton={true}
+        onBackPress={() => navigation.goBack()}
+      />
+      <View className="shadow-sm border-b border-[#E5E5E5]" />
 
       <View className="mt-4">
         <Text className="text-xl font-semibold text-center">{farmName}</Text>

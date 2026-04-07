@@ -23,6 +23,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import CustomHeader from "../commons/CustomHeader";
 type CertificateSuggestionsNavigationProp = StackNavigationProp<
   RootStackParamList,
   "CertificateSuggestions"
@@ -349,18 +350,13 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
       className="flex-1 bg-white"
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <View className="flex-row items-center px-4 py-4 bg-white shadow-sm border-b border-[#E5E5E5]">
-        <TouchableOpacity
-          className="bg-[#F6F6F680] rounded-full p-2 justify-center w-10 z-20"
-          onPress={() => navigation.goBack()}
-        >
-          <AntDesign name="left" size={22} color="#000" />
-        </TouchableOpacity>
-
-        <View className="flex-1">
-          <Text className="text-base font-semibold text-center">#{jobId}</Text>
-        </View>
-      </View>
+      <CustomHeader
+        title={`#${jobId}`}
+        navigation={navigation}
+        showBackButton={true}
+        onBackPress={() => navigation.goBack()}
+      />
+      <View className="shadow-sm border-b border-[#E5E5E5]" />
 
       <View className="px-6 mt-6">
         <Text className="text-center text-[#3B424C]">
@@ -459,7 +455,7 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
           ))}
           <View className="items-center mt-2">
             <TouchableOpacity
-              className={`bg-[#1A1A1A] p-4 flex-row rounded-3xl flex justify-center items-center ${
+              className={`bg-[#1A1A1A] h-[50px] w-2/3 flex-row rounded-3xl flex justify-center items-center ${
                 editingId !== null || problems.some((p) => !p.saved)
                   ? "opacity-50"
                   : ""
@@ -467,9 +463,9 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
               onPress={handleAddProblem}
               disabled={editingId !== null || problems.some((p) => !p.saved)}
             >
-              <Entypo name="plus" size={30} color="white" />
+              <Entypo name="plus" size={25} color="white" />
 
-              <Text className="text-white text-center font-semibold text-base">
+              <Text className="text-white text-center font-semibold text-lg">
                 {t("CertificateSuggestions.Add more")}
               </Text>
             </TouchableOpacity>
@@ -478,17 +474,17 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
       )}
       <View className="flex-row justify-between p-4 border-t border-gray-200 px-6">
         <TouchableOpacity
-          className="flex-row items-center bg-[#444444] px-9 py-3 rounded-full "
+          className="flex-row items-center bg-[#444444] px-10 h-[50px] rounded-3xl "
           onPress={() => navigation.goBack()}
         >
           <AntDesign name="arrow-left" size={20} color="#fff" />
-          <Text className="ml-4 text-white font-semibold text-base">
+          <Text className="ml-3 text-white font-semibold text-lg">
             {t("CertificateQuesanory.Back")}
           </Text>
         </TouchableOpacity>
         {loading || editingId !== null ? (
-          <View className="flex-row items-center px-9 py-3 rounded-full bg-[#C4C4C4] ">
-            <Text className="mr-2 text-white font-semibold text-base">
+          <View className="flex-row items-center px-11 h-[50px] rounded-3xl bg-[#C4C4C4] ">
+            <Text className="mr-2 text-white font-semibold text-lg">
               {t("CertificateQuesanory.Next")}
             </Text>
             <AntDesign name="arrow-right" size={20} color="#fff" />
@@ -531,9 +527,9 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
                 colors={["#F35125", "#FF1D85"]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
-                className="flex-row items-center px-9 py-3 rounded-full"
+                className="flex-row items-center px-10 h-[50px] rounded-3xl"
               >
-                <Text className="mr-4 text-white font-semibold text-base">
+                <Text className="mr-4 text-white font-semibold text-lg">
                   {t("CertificateQuesanory.Next")}
                 </Text>
                 <AntDesign name="arrow-right" size={20} color="#fff" />

@@ -23,6 +23,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import CustomHeader from "../commons/CustomHeader";
 type RequestSuggestionsNavigationProp = StackNavigationProp<
   RootStackParamList,
   "RequestSuggestions"
@@ -342,18 +343,13 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
       className="flex-1 bg-white"
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <View className="flex-row items-center px-4 py-4 bg-white shadow-sm border-b border-[#E5E5E5]">
-        <TouchableOpacity
-          className="bg-[#F6F6F680] rounded-full p-2 justify-center w-10 z-20"
-          onPress={() => navigation.goBack()}
-        >
-          <AntDesign name="left" size={22} color="#000" />
-        </TouchableOpacity>
-
-        <View className="flex-1">
-          <Text className="text-base font-semibold text-center">#{jobId}</Text>
-        </View>
-      </View>
+      <CustomHeader
+        title={`#${jobId}`}
+        navigation={navigation}
+        showBackButton={true}
+        onBackPress={() => navigation.goBack()}
+      />
+      <View className="shadow-sm border-b border-[#E5E5E5]" />
 
       <View className="px-6 mt-6">
         <Text className="text-center text-[#3B424C]">
@@ -428,20 +424,20 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
                     />
 
                     <TouchableOpacity
-                      className="bg-[#1A1A1A] p-4 rounded-3xl w-full flex justify-center items-center mb-1"
+                      className="bg-[#1A1A1A] rounded-3xl w-full h-[50px] flex justify-center items-center mb-1"
                       onPress={() => handleSaveProblem(item)}
                     >
-                      <Text className="text-white text-center font-semibold text-base">
+                      <Text className="text-white text-center font-semibold text-lg">
                         {item.saved
                           ? t("CertificateSuggestions.Update")
                           : t("CertificateSuggestions.Save Problem")}
                       </Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                      className="bg-[#C4C4C4] p-4 rounded-3xl w-full flex-1 justify-center items-center mt-2"
+                      className="bg-[#C4C4C4]  rounded-3xl w-full h-[50px] flex-1 justify-center items-center mt-2"
                       onPress={() => handleCancelEdit(item.id)}
                     >
-                      <Text className="text-white text-center font-semibold text-base">
+                      <Text className="text-white text-center font-semibold text-lg">
                         {t("CertificateQuesanory.Cancel")}
                       </Text>
                     </TouchableOpacity>
@@ -452,7 +448,7 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
           ))}
           <View className="items-center mt-2">
             <TouchableOpacity
-              className={`bg-[#1A1A1A] p-4 rounded-3xl flex justify-center items-center flex-row ${
+              className={`bg-[#1A1A1A] w-2/3 h-[50px] rounded-3xl flex justify-center items-center flex-row ${
                 editingId !== null || problems.some((p) => !p.saved)
                   ? "opacity-50"
                   : ""
@@ -470,17 +466,17 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
       )}
       <View className="flex-row justify-between p-4 border-t border-gray-200 px-6">
         <TouchableOpacity
-          className="flex-row items-center bg-[#444444] px-9 py-3 rounded-full "
+          className="flex-row items-center bg-[#444444] px-9 h-[50px] rounded-3xl "
           onPress={() => navigation.goBack()}
         >
           <AntDesign name="arrow-left" size={20} color="#fff" />
-          <Text className="ml-4 text-white font-semibold text-base">
+          <Text className="ml-4 text-white font-semibold text-lg">
             {t("CertificateQuesanory.Back")}
           </Text>
         </TouchableOpacity>
         {loading || editingId !== null ? (
-          <View className="flex-row items-center bg-[#444444] px-9 py-3 rounded-full ">
-            <Text className="mr-2 text-white font-semibold text-base">
+          <View className="flex-row items-center bg-[#444444] px-9 h-[50px] rounded-3xl ">
+            <Text className="mr-2 text-white font-semibold text-lg">
               {t("CertificateQuesanory.Next")}
             </Text>
             <AntDesign name="arrow-right" size={20} color="#fff" />
@@ -523,9 +519,9 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
                 colors={["#F35125", "#FF1D85"]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
-                className="flex-row items-center px-9 py-3 rounded-full"
+                className="flex-row items-center px-9 h-[50px] rounded-3xl"
               >
-                <Text className="mr-4 text-white font-semibold text-base">
+                <Text className="mr-4 text-white font-semibold text-lg">
                   {t("CertificateQuesanory.Next")}
                 </Text>
                 <AntDesign name="arrow-right" size={20} color="#fff" />

@@ -260,7 +260,7 @@ const AddOnboardSupplier: React.FC<AddOnboardSupplierProps> = ({
     !hasErrors;
 
   const inputCls = (field: string) =>
-    `bg-[#F4F4F4] rounded-2xl px-4 py-4 text-[15px] text-[#1A1A1A]${
+    `bg-[#F4F4F4] rounded-3xl px-4 h-[50px] text-[15px] text-[#1A1A1A]${
       errors[field] && touched[field] ? " border border-red-500" : ""
     }`;
 
@@ -367,7 +367,7 @@ const AddOnboardSupplier: React.FC<AddOnboardSupplierProps> = ({
             )}
           </View>
 
-          <View className="bg-[#F4F4F4] rounded-2xl px-4 py-4 flex-row items-center justify-between">
+          <View className="bg-[#F4F4F4] rounded-3xl px-4 h-[50px] flex-row items-center justify-between">
             <Text className="text-[15px] text-[#1A1A1A] font-medium">
               Standard Plan
             </Text>
@@ -376,7 +376,7 @@ const AddOnboardSupplier: React.FC<AddOnboardSupplierProps> = ({
 
         <View className="gap-y-3 mt-[30%]">
           <TouchableOpacity
-            className="bg-[#D9D9D9] rounded-3xl px-6 py-4 w-full items-center "
+            className="bg-[#D9D9D9] rounded-3xl  h-[50px] w-full items-center justify-center"
             onPress={() => navigation.goBack()}
             activeOpacity={0.7}
             style={{
@@ -387,7 +387,7 @@ const AddOnboardSupplier: React.FC<AddOnboardSupplierProps> = ({
               elevation: 6,
             }}
           >
-            <Text className="text-[15px] text-[#888888] font-medium">
+            <Text className="text-[#888888] font-medium text-lg">
               {t("OnboardSupplier.Cancel")}
             </Text>
           </TouchableOpacity>
@@ -397,7 +397,7 @@ const AddOnboardSupplier: React.FC<AddOnboardSupplierProps> = ({
               colors={["#F35125", "#FF1D85"]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
-              className="rounded-full"
+              className="rounded-3xl"
               style={{
                 shadowColor: "#000000",
                 shadowOffset: { width: 0, height: 4 },
@@ -407,17 +407,17 @@ const AddOnboardSupplier: React.FC<AddOnboardSupplierProps> = ({
               }}
             >
               <TouchableOpacity
-                className="py-4 items-center"
+                className="h-[50px] items-center justify-center"
                 onPress={handleNext}
               >
-                <Text className="text-[15px] text-white font-bold tracking-wide">
+                <Text className="text-lg text-white font-bold tracking-wide">
                   {t("OnboardSupplier.Next")}
                 </Text>
               </TouchableOpacity>
             </LinearGradient>
           ) : (
             <TouchableOpacity
-              className="bg-[#C4C4C4] rounded-full py-4 items-center"
+              className="bg-[#C4C4C4] rounded-3xl h-[50px] items-center justify-center"
               activeOpacity={0.5}
               onPress={handleNext}
               style={{
@@ -428,7 +428,7 @@ const AddOnboardSupplier: React.FC<AddOnboardSupplierProps> = ({
                 elevation: 4,
               }}
             >
-              <Text className="text-[15px] text-[#FFFFFF] font-semibold">
+              <Text className="text-lg text-[#FFFFFF] font-semibold">
                 {t("OnboardSupplier.Next")}
               </Text>
             </TouchableOpacity>

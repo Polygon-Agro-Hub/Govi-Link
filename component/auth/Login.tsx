@@ -279,13 +279,13 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
               {t("Login.Employee ID")}
             </Text>
             <View
-              className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[53px] mb-2 px-3 ${
+              className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] mb-2 px-3 ${
                 empIdError ? "border-red-500" : "border-[#F4F4F4]"
               }`}
             >
               <FontAwesome name="user-o" size={20} color="#353535" />
               <TextInput
-                className="flex-1 h-[40px] text-base pl-2"
+                className="flex-1 h-[50px] text-base pl-2"
                 autoCapitalize="characters"
                 value={empid}
                 onChangeText={handleEmpIdChange}
@@ -300,7 +300,7 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
             <Text className="text-base pb-[2%] font-light">
               {t("Login.Password")}
             </Text>
-            <View className="flex-row items-center bg-[#F4F4F4] border border-[#F4F4F4] rounded-3xl h-[53px] mb-8 px-3">
+            <View className="flex-row items-center bg-[#F4F4F4] border border-[#F4F4F4] rounded-3xl h-[50px] mb-8 px-3">
               <SimpleLineIcons name="lock" size={22} color="#353535" />{" "}
               <TextInput
                 className="flex-1 h-[40px] text-base pl-2"
@@ -320,8 +320,7 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
             </View>
 
             <TouchableOpacity
-              className="rounded-3xl mb-5 overflow-hidden"
-              style={{ width: "100%" }}
+              className="rounded-3xl mb-5 overflow-hidden h-[50px] w-full self-center"
               disabled={loading}
               onPress={handleLogin}
             >
@@ -329,12 +328,12 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
                 colors={["#F2561D", "#FF1D85"]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
-                className="py-4 items-center justify-center"
+                className="flex-1 items-center justify-center"
               >
                 {loading ? (
                   <ActivityIndicator color="white" size="small" />
                 ) : (
-                  <Text className="text-white text-lg font-semibold tracking-wide">
+                  <Text className="text-white text-lg font-semibold tracking-wide text-center">
                     {t("Login.Sign in")}
                   </Text>
                 )}
