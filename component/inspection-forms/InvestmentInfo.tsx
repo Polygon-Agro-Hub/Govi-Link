@@ -52,14 +52,14 @@ const Input = ({
       {required && <Text className="text-black">{"\u00A0"}*</Text>}
     </Text>
     <View
-      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
+      className={`bg-[#F6F6F6] rounded-3xl flex-row items-center ${
         error ? "border border-red-500" : ""
       }`}
     >
       <TextInput
         placeholder={placeholder}
         placeholderTextColor="#838B8C"
-        className="px-5 py-4 text-base text-black flex-1"
+        className="px-5 h-[50px] text-base text-black flex-1"
         value={value}
         onChangeText={onChangeText}
         keyboardType={keyboardType}

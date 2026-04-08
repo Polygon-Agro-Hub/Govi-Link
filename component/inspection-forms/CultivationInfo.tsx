@@ -157,14 +157,14 @@ const Input = ({
       {required && <Text className="text-black">*</Text>}
     </Text>
     <View
-      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
+      className={`bg-[#F6F6F6] rounded-3xl flex-row items-center ${
         error ? "border border-red-500" : ""
       }`}
     >
       <TextInput
         placeholder={placeholder}
         placeholderTextColor="#838B8C"
-        className="px-5 py-4 text-base text-black flex-1"
+        className="px-5 h-[50px] text-base text-black flex-1"
         value={value}
         onChangeText={onChangeText}
         keyboardType={keyboardType}
@@ -591,6 +591,8 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
   const handleSoilFertilitySelect = (item: string) => {
     updateFormData({ soilfertility: item });
     setOverallSoilFertilityVisible(false);
+
+    setErrors((prev) => ({ ...prev, soilfertility: "" }));
   };
 
   const saveToBackend = async (
@@ -1059,7 +1061,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
               <TextInput
                 placeholder={t("InspectionForm.--Mention Other--")}
                 placeholderTextColor="#838B8C"
-                className="bg-[#F6F6F6] px-4 py-4 rounded-full text-black mb-2"
+                className="bg-[#F6F6F6] px-4 h-[50px] rounded-3xl text-black mb-2"
                 value={formData.otherWaterSources || ""}
                 onChangeText={handleOtherWaterSourceChange}
               />
@@ -1076,13 +1078,13 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
               <Text className="text-black-500">*</Text>
             </Text>
             <TouchableOpacity
-              className="bg-[#1A1A1A] rounded-3xl px-6 py-4 flex-row justify-center items-center mb-1"
+              className="bg-[#1A1A1A] rounded-3xl px-6 h-[50px] flex-row justify-center items-center mb-1"
               onPress={() => {
                 setShowCamera(true);
               }}
             >
               <FontAwesome6 name="camera" size={22} color="#fff" />
-              <Text className="text-base text-white ml-3">
+              <Text className="text-lg text-white ml-3">
                 {t("InspectionForm.Capture Photos")}
               </Text>
             </TouchableOpacity>

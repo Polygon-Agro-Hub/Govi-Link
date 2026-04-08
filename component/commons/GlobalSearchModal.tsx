@@ -109,7 +109,7 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
 
   const renderSearchInput = () => (
     <View className="px-4 py-2 border-b border-gray-200">
-      <View className="bg-gray-100 rounded-lg px-3 flex-row items-center">
+      <View className="bg-gray-100 rounded-3xl px-3 h-[50px] flex-row items-center">
         <MaterialIcons name="search" size={20} color="#666" />
         <TextInput
           placeholder={searchPlaceholder}
@@ -179,10 +179,10 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
           {multiSelect && (
             <View className="px-4 py-3 border-t border-gray-200">
               <TouchableOpacity
-                className="bg-[#21202B] rounded-xl py-3 items-center"
+                className="bg-[#21202B] rounded-3xl h-[50px] items-center justify-center"
                 onPress={handleDone}
               >
-                <Text className="text-white font-semibold text-base">
+                <Text className="text-white font-semibold text-lg">
                   {doneButtonText}
                 </Text>
               </TouchableOpacity>

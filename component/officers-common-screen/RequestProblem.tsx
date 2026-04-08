@@ -309,7 +309,7 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
           {t("RequestProblem.FarmerSay")}
         </Text>
         <TextInput
-          className="border border-[#9DB2CE] rounded-md p-2 mb-4"
+          className="border border-[#9DB2CE] rounded-3xl p-2 mb-4"
           multiline
           placeholder={t("CertificateSuggestions.Type here...")}
           textAlignVertical="top"
@@ -323,7 +323,7 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
         </Text>
 
         <TextInput
-          className="border border-[#9DB2CE] rounded-md p-2 mb-6"
+          className="border border-[#9DB2CE] rounded-3xl p-2 mb-6"
           multiline
           placeholder={t("CertificateSuggestions.Type here...")}
           textAlignVertical="top"

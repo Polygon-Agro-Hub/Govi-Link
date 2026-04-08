@@ -285,7 +285,7 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
             >
               <FontAwesome name="user-o" size={20} color="#353535" />
               <TextInput
-                className="flex-1 h-[50px] text-base pl-2"
+                className="flex-1  text-base pl-2"
                 autoCapitalize="characters"
                 value={empid}
                 onChangeText={handleEmpIdChange}
@@ -303,7 +303,7 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
             <View className="flex-row items-center bg-[#F4F4F4] border border-[#F4F4F4] rounded-3xl h-[50px] mb-8 px-3">
               <SimpleLineIcons name="lock" size={22} color="#353535" />{" "}
               <TextInput
-                className="flex-1 h-[40px] text-base pl-2"
+                className="flex-1  text-base pl-2"
                 secureTextEntry={secureTextEntry}
                 value={password}
                 onChangeText={handlePasswordChange}

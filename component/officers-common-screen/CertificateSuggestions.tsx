@@ -404,7 +404,7 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
                       {t("CertificateSuggestions.Identified Problem")}
                     </Text>
                     <TextInput
-                      className="border border-[#9DB2CE] rounded-md p-2 mb-4"
+                      className="border border-[#9DB2CE] rounded-3xl p-2 mb-4"
                       multiline
                       placeholder={t("CertificateSuggestions.Type here...")}
                       textAlignVertical="top"
@@ -419,7 +419,7 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
                       {t("CertificateSuggestions.Suggested Solution")}
                     </Text>
                     <TextInput
-                      className="border border-[#9DB2CE] rounded-md p-2 mb-4"
+                      className="border border-[#9DB2CE] rounded-3xl p-2 mb-4"
                       multiline
                       placeholder={t("CertificateSuggestions.Type here...")}
                       textAlignVertical="top"

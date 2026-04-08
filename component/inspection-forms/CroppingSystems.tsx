@@ -667,7 +667,7 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
               <TextInput
                 placeholder={t("InspectionForm.--Mention Other--")}
                 placeholderTextColor="#838B8C"
-                className="bg-[#F6F6F6] px-4 py-4 rounded-full text-black mb-2"
+                className="bg-[#F6F6F6] px-4 h-[50px] rounded-3xl text-black mb-2"
                 value={formData.otherOpportunity || ""}
                 onChangeText={handleOtherOpportunityChange}
               />

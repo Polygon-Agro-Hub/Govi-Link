@@ -86,7 +86,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             {type === "confirmation" && (
               <>
                 <TouchableOpacity
-                  className="bg-white border border-[#000000] rounded-full py-4 items-center"
+                  className="bg-white border border-[#000000] rounded-3xl h-[50px] items-center justify-center"
                   onPress={onClose}
                   activeOpacity={0.7}
                   style={{
@@ -97,13 +97,13 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                     elevation: 4,
                   }}
                 >
-                  <Text className="text-black text-base font-semibold">
+                  <Text className="text-black text-lg font-semibold">
                     {t("Main.Go Back")}
                   </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  className="bg-[#1A1A1A] rounded-full py-4 items-center mt-6"
+                  className="bg-[#1A1A1A] rounded-3xl h-[50px] items-center justify-center mt-6"
                   onPress={onConfirm}
                   activeOpacity={0.7}
                   style={{
@@ -114,7 +114,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                     elevation: 6,
                   }}
                 >
-                  <Text className="text-white text-base font-semibold">
+                  <Text className="text-white text-lg font-semibold">
                     {t("Main.Continue")}
                   </Text>
                 </TouchableOpacity>

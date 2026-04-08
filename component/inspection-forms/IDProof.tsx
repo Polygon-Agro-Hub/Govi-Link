@@ -50,7 +50,7 @@ const UploadButton = ({
 }) => (
   <View className="mb-8">
     <TouchableOpacity
-      className="bg-[#1A1A1A] rounded-3xl px-6 py-4 flex-row justify-center items-center"
+      className="bg-[#1A1A1A] rounded-3xl px-6 h-[50px] flex-row justify-center items-center"
       onPress={onPress}
     >
       {image ? (
@@ -58,7 +58,7 @@ const UploadButton = ({
       ) : (
         <FontAwesome6 name="camera" size={22} color="#fff" />
       )}
-      <Text className="text-base text-white ml-3">{title}</Text>
+      <Text className="text-lg text-white ml-3">{title}</Text>
     </TouchableOpacity>
 
     {image && (
@@ -520,7 +520,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
               onPress={() => setShowIdProofDropdown(true)}
               activeOpacity={0.8}
             >
-              <View className="bg-[#F6F6F6] rounded-full px-5 py-4 flex-row items-center justify-between">
+              <View className="bg-[#F6F6F6] rounded-3xl px-5 h-[50px] flex-row items-center justify-between">
                 <Text
                   className={`text-base ${formData.pType ? "text-black" : "text-[#838B8C]"}`}
                 >
@@ -543,14 +543,14 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
                   </Text>
                 </Text>
                 <View
-                  className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
+                  className={`bg-[#F6F6F6] rounded-3xl flex-row items-center ${
                     errors.nic ? "border border-red-500" : ""
                   }`}
                 >
                   <TextInput
                     placeholder="----"
                     placeholderTextColor="#7D7D7D"
-                    className="flex-1 px-2 py-4 text-base text-black ml-4"
+                    className="flex-1 px-2 h-[50px] text-base text-black ml-4"
                     value={formData.pNumber}
                     onChangeText={handleIdNumberChange}
                     underlineColorAndroid="transparent"

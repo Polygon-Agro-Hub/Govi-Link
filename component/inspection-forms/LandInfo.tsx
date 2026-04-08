@@ -89,55 +89,63 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
     return () => clearTimeout(timer);
   }, [formData, requestId]);
 
- useFocusEffect(
-  useCallback(() => {
-    const loadData = async () => {
-      if (!requestId) return;
-      try {
-        const reqId = Number(requestId);
-        const localData = await getLandInfo(reqId);
-        if (localData) {
-          setFormData(localData);
-          setIsExistingData(true);
+  useFocusEffect(
+    useCallback(() => {
+      const loadData = async () => {
+        if (!requestId) return;
+        try {
+          const reqId = Number(requestId);
+          const localData = await getLandInfo(reqId);
+          if (localData) {
+            setFormData(localData);
+            setIsExistingData(true);
 
-          // 👇 Re-evaluate errors for loaded draft data
-          const validationErrors: Record<string, string> = {};
-          if (!localData.landDiscription?.trim())
-            validationErrors.landDiscription = t("Error.landDiscription is required");
-          if (!localData.isOwnByFarmer)
-            validationErrors.isOwnByFarmer = t("Error.Land ownership is required");
-          if (!localData.ownershipStatus)
-            validationErrors.ownershipStatus = t("Error.Ownership status is required");
-          if (!localData.geoLocation)
-            validationErrors.geoLocation = t("Error.Geo location is required");
-          if (!localData.images?.length)
-            validationErrors.images = t("Error.At least one image is required");
+            // 👇 Re-evaluate errors for loaded draft data
+            const validationErrors: Record<string, string> = {};
+            if (!localData.landDiscription?.trim())
+              validationErrors.landDiscription = t(
+                "Error.landDiscription is required",
+              );
+            if (!localData.isOwnByFarmer)
+              validationErrors.isOwnByFarmer = t(
+                "Error.Land ownership is required",
+              );
+            if (!localData.ownershipStatus)
+              validationErrors.ownershipStatus = t(
+                "Error.Ownership status is required",
+              );
+            if (!localData.geoLocation)
+              validationErrors.geoLocation = t(
+                "Error.Geo location is required",
+              );
+            if (!localData.images?.length)
+              validationErrors.images = t(
+                "Error.At least one image is required",
+              );
 
-          setErrors(validationErrors);
-          // Don't set touched here — errors are silent until user interacts
-        } else {
-          setIsExistingData(false);
+            setErrors(validationErrors);
+            // Don't set touched here — errors are silent until user interacts
+          } else {
+            setIsExistingData(false);
+          }
+        } catch (error) {
+          console.error("Failed to load land info from SQLite:", error);
         }
-      } catch (error) {
-        console.error("Failed to load land info from SQLite:", error);
-      }
-    };
-    loadData();
-  }, [requestId]),
-);
+      };
+      loadData();
+    }, [requestId]),
+  );
 
   useEffect(() => {
-  const allFilled =
-    formData.landDiscription.trim() !== "" &&
-    formData.isOwnByFarmer !== undefined &&
-    formData.ownershipStatus !== undefined &&
-    formData.geoLocation !== undefined &&
-    formData.images.length > 0;
+    const allFilled =
+      formData.landDiscription.trim() !== "" &&
+      formData.isOwnByFarmer !== undefined &&
+      formData.ownershipStatus !== undefined &&
+      formData.geoLocation !== undefined &&
+      formData.images.length > 0;
 
-  // Only enable Next if fields are filled AND no active validation errors
-  const hasErrors = Object.values(errors).some((e) => e && e.trim() !== "");
-  setIsNextEnabled(allFilled && !hasErrors);
-}, [formData, errors]);
+    setIsNextEnabled(allFilled);
+  }, [formData]);
 
   useEffect(() => {
     const handleBackPress = () => {
@@ -163,7 +171,9 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
     const validationErrors: Record<string, string> = { ...errors };
     if (field === "landDiscription") {
       if (!formData.landDiscription || formData.landDiscription.trim() === "") {
-        validationErrors.landDiscription = t("Error.landDiscription is required");
+        validationErrors.landDiscription = t(
+          "Error.landDiscription is required",
+        );
       } else {
         validationErrors.landDiscription = "";
       }
@@ -197,7 +207,10 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
       const apiFormData = new FormData();
       apiFormData.append("reqId", reqId.toString());
       apiFormData.append("tableName", tableName);
-      apiFormData.append("isOwnByFarmer", data.isOwnByFarmer === "Yes" ? "1" : "0");
+      apiFormData.append(
+        "isOwnByFarmer",
+        data.isOwnByFarmer === "Yes" ? "1" : "0",
+      );
       apiFormData.append("ownershipStatus", data.ownershipStatus || "");
       apiFormData.append("landDiscription", data.landDiscription || "");
 
@@ -268,7 +281,9 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
       validationErrors.isOwnByFarmer = t("Error.Land ownership is required");
     }
     if (!formData.ownershipStatus) {
-      validationErrors.ownershipStatus = t("Error.Ownership status is required");
+      validationErrors.ownershipStatus = t(
+        "Error.Ownership status is required",
+      );
     }
     if (!formData.geoLocation) {
       validationErrors.geoLocation = t("Error.Geo location is required");
@@ -321,7 +336,12 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
     );
 
     try {
-      const saved = await saveToBackend(reqId, "inspectionland", formData, isExistingData);
+      const saved = await saveToBackend(
+        reqId,
+        "inspectionland",
+        formData,
+        isExistingData,
+      );
 
       if (saved) {
         setIsExistingData(true);
@@ -332,7 +352,10 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
             {
               text: t("Main.ok"),
               onPress: () => {
-                navigation.navigate("InvestmentInfo", { requestNumber, requestId });
+                navigation.navigate("InvestmentInfo", {
+                  requestNumber,
+                  requestId,
+                });
               },
             },
           ],
@@ -407,7 +430,11 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
             >
               <View style={{ flex: 1, marginRight: 8 }}>
                 {formData.isOwnByFarmer ? (
-                  <Text numberOfLines={1} ellipsizeMode="tail" className="text-black">
+                  <Text
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                    className="text-black"
+                  >
                     {t(`InspectionForm.${formData.isOwnByFarmer}`)}
                   </Text>
                 ) : (
@@ -418,14 +445,20 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
               </View>
               <AntDesign name="down" size={20} color="#838B8C" />
             </TouchableOpacity>
-            {touched.isOwnByFarmer && errors.isOwnByFarmer && !formData.isOwnByFarmer && (
-              <View className="flex-row items-center mt-1 ml-2">
-                <FontAwesome name="exclamation-triangle" size={14} color="#EF4444" />
-                <Text className="text-red-500 text-sm ml-1 flex-1">
-                  {errors.isOwnByFarmer}
-                </Text>
-              </View>
-            )}
+            {touched.isOwnByFarmer &&
+              errors.isOwnByFarmer &&
+              !formData.isOwnByFarmer && (
+                <View className="flex-row items-center mt-1 ml-2">
+                  <FontAwesome
+                    name="exclamation-triangle"
+                    size={14}
+                    color="#EF4444"
+                  />
+                  <Text className="text-red-500 text-sm ml-1 flex-1">
+                    {errors.isOwnByFarmer}
+                  </Text>
+                </View>
+              )}
           </View>
 
           {/* Legal status */}
@@ -440,7 +473,11 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
             >
               <View style={{ flex: 1, marginRight: 8 }}>
                 {formData.ownershipStatus ? (
-                  <Text numberOfLines={1} ellipsizeMode="tail" className="text-black">
+                  <Text
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                    className="text-black"
+                  >
                     {t(`InspectionForm.${formData.ownershipStatus}`)}
                   </Text>
                 ) : (
@@ -451,20 +488,29 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
               </View>
               <AntDesign name="down" size={20} color="#838B8C" />
             </TouchableOpacity>
-            {touched.ownershipStatus && errors.ownershipStatus && !formData.ownershipStatus && (
-              <View className="flex-row items-center mt-1 ml-2">
-                <FontAwesome name="exclamation-triangle" size={14} color="#EF4444" />
-                <Text className="text-red-500 text-sm ml-1 flex-1">
-                  {errors.ownershipStatus}
-                </Text>
-              </View>
-            )}
+            {touched.ownershipStatus &&
+              errors.ownershipStatus &&
+              !formData.ownershipStatus && (
+                <View className="flex-row items-center mt-1 ml-2">
+                  <FontAwesome
+                    name="exclamation-triangle"
+                    size={14}
+                    color="#EF4444"
+                  />
+                  <Text className="text-red-500 text-sm ml-1 flex-1">
+                    {errors.ownershipStatus}
+                  </Text>
+                </View>
+              )}
           </View>
 
           {/* Land description */}
           <View className="mt-4">
             <Text className="text-sm text-[#070707] mb-2">
-              {t("InspectionForm.Provide brief description to reach the cultivation land")} *
+              {t(
+                "InspectionForm.Provide brief description to reach the cultivation land",
+              )}{" "}
+              *
             </Text>
             <View
               className="bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2"
@@ -496,7 +542,11 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
             </View>
             {touched.landDiscription && errors.landDiscription && (
               <View className="flex-row items-center mt-1 ml-2">
-                <FontAwesome name="exclamation-triangle" size={14} color="#EF4444" />
+                <FontAwesome
+                  name="exclamation-triangle"
+                  size={14}
+                  color="#EF4444"
+                />
                 <Text className="text-red-500 text-sm ml-1 flex-1">
                   {errors.landDiscription}
                 </Text>
@@ -511,7 +561,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
             </Text>
             <View className="flex-row space-x-2 mb-2">
               <TouchableOpacity
-                className="flex-1 bg-[#FA345A] rounded-full px-4 py-4 flex-row items-center justify-center gap-x-2"
+                className="flex-1 bg-[#FA345A] rounded-3xl px-4 h-[50px] flex-row items-center justify-center gap-x-2"
                 onPress={() => {
                   navigation.navigate("AttachGeoLocationScreen", {
                     currentLatitude: formData.geoLocation?.latitude,
@@ -538,11 +588,11 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
                 }}
               >
                 {formData.geoLocation ? (
-                  <Feather name="rotate-ccw" size={22} color="#fff" />
+                  <Feather name="rotate-ccw" size={24} color="#fff" />
                 ) : (
-                  <MaterialIcons name="gps-fixed" size={22} color="#fff" />
+                  <MaterialIcons name="gps-fixed" size={24} color="#fff" />
                 )}
-                <Text className="text-white font-semibold">
+                <Text className="text-white font-semibold text-lg">
                   {t("InspectionForm.Tag Geo Coordinate")}
                 </Text>
               </TouchableOpacity>
@@ -561,7 +611,11 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
                       })
                     }
                   >
-                    <MaterialIcons name="location-pin" size={18} color="#FF0000" />
+                    <MaterialIcons
+                      name="location-pin"
+                      size={18}
+                      color="#FF0000"
+                    />
                     <Text className="ml-1 text-[#FF0000] underline">
                       {t("InspectionForm.View Here")}
                     </Text>
@@ -570,38 +624,53 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
               </View>
             )}
 
-            {touched.geoLocation && errors.geoLocation && !formData.geoLocation && (
-              <View className="flex-row items-center mt-2 ml-2">
-                <FontAwesome name="exclamation-triangle" size={14} color="#EF4444" />
-                <Text className="text-red-500 text-sm ml-1 flex-1">
-                  {errors.geoLocation}
-                </Text>
-              </View>
-            )}
+            {touched.geoLocation &&
+              errors.geoLocation &&
+              !formData.geoLocation && (
+                <View className="flex-row items-center mt-2 ml-2">
+                  <FontAwesome
+                    name="exclamation-triangle"
+                    size={14}
+                    color="#EF4444"
+                  />
+                  <Text className="text-red-500 text-sm ml-1 flex-1">
+                    {errors.geoLocation}
+                  </Text>
+                </View>
+              )}
           </View>
 
           {/* Images */}
           <View className="mt-6">
             <Text className="text-sm text-[#070707] mb-2">
-              {t("InspectionForm.Images of the deed / lease / permit / any other formal document to prove the ownership of the land by the farmer")} *
+              {t(
+                "InspectionForm.Images of the deed / lease / permit / any other formal document to prove the ownership of the land by the farmer",
+              )}{" "}
+              *
             </Text>
             <TouchableOpacity
-              className="bg-[#1A1A1A] rounded-full px-4 py-4 flex-row items-center justify-center gap-x-2"
+              className="bg-[#1A1A1A] rounded-3xl px-4 h-[50px] flex-row items-center justify-center gap-x-2"
               onPress={() => setShowCamera(true)}
             >
               <FontAwesome6 name="camera" size={22} color="#fff" />
-              <Text className="text-white font-semibold">
+              <Text className="text-white font-semibold text-lg">
                 {t("InspectionForm.Capture Photos")}
               </Text>
             </TouchableOpacity>
-            {touched.images && errors.images && formData.images.length === 0 && (
-              <View className="flex-row items-center mt-2 ml-2">
-                <FontAwesome name="exclamation-triangle" size={14} color="#EF4444" />
-                <Text className="text-red-500 text-sm ml-1 flex-1">
-                  {errors.images}
-                </Text>
-              </View>
-            )}
+            {touched.images &&
+              errors.images &&
+              formData.images.length === 0 && (
+                <View className="flex-row items-center mt-2 ml-2">
+                  <FontAwesome
+                    name="exclamation-triangle"
+                    size={14}
+                    color="#EF4444"
+                  />
+                  <Text className="text-red-500 text-sm ml-1 flex-1">
+                    {errors.images}
+                  </Text>
+                </View>
+              )}
           </View>
 
           {formData.images && formData.images.length > 0 && (
