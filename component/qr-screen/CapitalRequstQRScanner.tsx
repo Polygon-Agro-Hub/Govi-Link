@@ -9,12 +9,14 @@ import {
   Dimensions,
   BackHandler,
   Pressable,
+  Alert,
+  Linking,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../types/types";
 import { CameraView, Camera } from "expo-camera";
 import { useTranslation } from "react-i18next";
-import { AntDesign, Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { useRoute, RouteProp } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect } from "@react-navigation/native";
@@ -23,6 +25,7 @@ import { environment } from "@/environment/environment";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import CustomHeader from "../commons/CustomHeader";
+import CameraAccess from "../permission/CameraAccess";
 
 type CapitalRequstQRScannerNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -51,6 +54,7 @@ const CapitalRequstQRScanner: React.FC<CapitalRequstQRScannerProps> = ({
   const [scanned, setScanned] = useState<boolean>(false);
   const [showPermissionModal, setShowPermissionModal] =
     useState<boolean>(false);
+  const [showCameraAccess, setShowCameraAccess] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { t } = useTranslation();
   const [isUnsuccessfulModalVisible, setIsUnsuccessfulModalVisible] =
@@ -58,21 +62,46 @@ const CapitalRequstQRScanner: React.FC<CapitalRequstQRScannerProps> = ({
   const [unsuccessfulLoadingBarWidth] = useState(new Animated.Value(100));
 
   useEffect(() => {
-    const getCameraPermissions = async () => {
-      const { status } = await Camera.requestCameraPermissionsAsync();
-      setHasPermission(status === "granted");
-    };
+    checkCameraPermissions();
+  }, []);
 
-    getCameraPermissions();
+  const checkCameraPermissions = async () => {
+    const { status } = await Camera.getCameraPermissionsAsync();
+    if (status === "granted") {
+      setHasPermission(true);
+      setShowCameraAccess(false);
+    } else {
+      setHasPermission(false);
+      setShowCameraAccess(true);
+    }
+  };
 
-    const unsubscribe = navigation.addListener("focus", () => {
-      setScanned(false);
-      setErrorMessage(null);
-      setIsUnsuccessfulModalVisible(false);
-    });
+  const requestCameraPermission = async () => {
+    const { status } = await Camera.requestCameraPermissionsAsync();
+    if (status === "granted") {
+      setHasPermission(true);
+      setShowCameraAccess(false);
+    } else {
+      setHasPermission(false);
+      Alert.alert(
+        t("Permission.permissionDenied") || "Permission Denied",
+        t("Permission.enableCameraManually") ||
+          "Camera access is required to scan QR codes. Please enable it in settings.",
+        [
+          { text: t("PublicForum.Cancel") || "Cancel", style: "cancel" },
+          {
+            text: t("Permission.openSettings") || "Open Settings",
+            onPress: () => Linking.openSettings(),
+          },
+        ],
+      );
+    }
+  };
 
-    return unsubscribe;
-  }, [navigation]);
+  const handleCameraPermissionGranted = () => {
+    setShowCameraAccess(false);
+    setHasPermission(true);
+  };
 
   const resolveTargetScreen = (reqId: number): string => {
     const lastScreen = getLastScreen(reqId);
@@ -158,6 +187,16 @@ const CapitalRequstQRScanner: React.FC<CapitalRequstQRScannerProps> = ({
     }, []),
   );
 
+  if (showCameraAccess) {
+    return (
+      <CameraAccess
+        navigation={navigation as any}
+        onPermissionGranted={handleCameraPermissionGranted}
+        returnScreen="CapitalRequstQRScanner"
+      />
+    );
+  }
+
   if (hasPermission === null) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -170,64 +209,30 @@ const CapitalRequstQRScanner: React.FC<CapitalRequstQRScannerProps> = ({
 
   if (hasPermission === false) {
     return (
-      <Modal
-        visible={showPermissionModal}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setShowPermissionModal(false)}
-      >
-        <View
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text style={{ fontSize: 18, color: "#333" }}>
+          {t("QRScanner.Camera permission denied")}
+        </Text>
+        <TouchableOpacity
           style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-            backgroundColor: "rgba(0,0,0,0.7)",
+            backgroundColor: "#34D399",
+            padding: 10,
+            borderRadius: 8,
+            marginTop: 20,
           }}
+          onPress={checkCameraPermissions}
         >
-          <View
-            style={{
-              backgroundColor: "white",
-              padding: 20,
-              borderRadius: 10,
-              shadowColor: "black",
-              width: "80%",
-            }}
-          >
-            <Text
-              style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}
-            >
-              {t("QRScanner.CameraRequired")}
-            </Text>
-            <Text style={{ color: "#555", marginBottom: 0 }}>
-              {t("QRScanner.WeneedCamera")}
-            </Text>
-            <TouchableOpacity
-              style={{
-                backgroundColor: "#34D399",
-                padding: 10,
-                borderRadius: 8,
-              }}
-              onPress={() => {
-                setShowPermissionModal(false);
-                navigation.navigate("Dashboard");
-              }}
-            >
-              <Text
-                style={{ color: "white", textAlign: "center", fontSize: 16 }}
-              >
-                {t("QRScanner.Close")}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+          <Text style={{ color: "white", textAlign: "center", fontSize: 16 }}>
+            {t("QRScanner.Try Again")}
+          </Text>
+        </TouchableOpacity>
+      </View>
     );
   }
 
   return (
     <View style={{ flex: 1, position: "relative" }}>
-    
-       <CustomHeader
+      <CustomHeader
         title={t("QRScanner.Scan the QR")}
         navigation={navigation}
         showBackButton={true}

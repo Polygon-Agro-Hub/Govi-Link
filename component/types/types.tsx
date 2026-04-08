@@ -202,4 +202,6 @@ export type RootStackParamList = {
     email: string;
     nic: string;
   };
+  LocationAccess:undefined;
+  CameraAccess:undefined;
 };

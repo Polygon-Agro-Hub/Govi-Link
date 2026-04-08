@@ -738,5 +738,21 @@
     "Back": "பின்னால்",
     "Didn't receive the OTP": "OTP வரவில்லையா?",
     "Account created successfully": "கணக்கு வெற்றிகரமாக உருவாக்கப்பட்டது"
+  },
+  "Permission":{
+   "locationAccess": "Location Access",
+    "enableLocationMessage": "Enable location access to access location information.",
+    "allow": "Allow",
+    "requesting": "Requesting...",
+    "success": "Success",
+    "locationEnabled": "Location access enabled successfully!",
+    "permissionDenied": "Permission Denied",
+    "enableLocationManually": "Location access is required. Please enable it in settings.",
+    "openSettings": "Open Settings",
+    "permissionError": "Unable to request location permission. Please try again.",
+    "skipLocation": "Skip Location?",
+    "skipMessage": "Some features may not work properly without location access. Are you sure?",
+    "skip": "Skip",
+    "skipForNow": "Skip for now"
   }
 }

@@ -35,6 +35,10 @@ import {
   GeoLocation,
 } from "@/database/inspectionland";
 import { updateLastScreen } from "@/database/inspectionprogress";
+import * as Location from "expo-location";
+import * as ImagePicker from "expo-image-picker";
+import CameraAccess from "../permission/CameraAccess";
+import LocationAccess from "../permission/LocationAccess";
 
 type LandInfoProps = {
   navigation: any;
@@ -60,6 +64,12 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
   const [showCamera, setShowCamera] = useState(false);
   const [isNextEnabled, setIsNextEnabled] = useState(false);
   const [isExistingData, setIsExistingData] = useState(false);
+  
+  const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
+  const [showCameraAccess, setShowCameraAccess] = useState(false);
+  const [hasLocationPermission, setHasLocationPermission] = useState<boolean | null>(null);
+  const [showLocationAccess, setShowLocationAccess] = useState(false);
+  const [pendingGeoLocationAction, setPendingGeoLocationAction] = useState(false);
 
   const LEGAL_STATUS_OPTIONS = [
     "Own land – Single owner",
@@ -89,6 +99,92 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
     return () => clearTimeout(timer);
   }, [formData, requestId]);
 
+  
+  useEffect(() => {
+    checkPermissions();
+  }, []);
+
+  const checkPermissions = async () => {
+    
+    const { status: cameraStatus } = await ImagePicker.getCameraPermissionsAsync();
+    if (cameraStatus === "granted") {
+      setHasCameraPermission(true);
+    } else {
+      setHasCameraPermission(false);
+    }
+
+   
+    const { status: locationStatus } = await Location.getForegroundPermissionsAsync();
+    if (locationStatus === "granted") {
+      setHasLocationPermission(true);
+    } else {
+      setHasLocationPermission(false);
+    }
+  };
+
+  const handleCameraPermissionGranted = () => {
+    setShowCameraAccess(false);
+    setHasCameraPermission(true);
+    setShowCamera(true);
+  };
+
+  const handleLocationPermissionGranted = async () => {
+    setShowLocationAccess(false);
+    setHasLocationPermission(true);
+    setPendingGeoLocationAction(false);
+    navigateToGeoLocation();
+  };
+
+  const navigateToGeoLocation = () => {
+    navigation.navigate("AttachGeoLocationScreen", {
+      currentLatitude: formData.geoLocation?.latitude,
+      currentLongitude: formData.geoLocation?.longitude,
+      onLocationSelect: (
+        latitude: number,
+        longitude: number,
+        locationName: string,
+      ) => {
+        const geoLocation: GeoLocation = {
+          latitude,
+          longitude,
+          locationName: locationName || "Selected Location",
+        };
+        updateFormData({ geoLocation });
+        setTouched((prev) => ({ ...prev, geoLocation: true }));
+        setErrors((prev) => ({ ...prev, geoLocation: "" }));
+        if (requestId) {
+          const updatedData = { ...formData, geoLocation };
+          saveLandInfo(Number(requestId), updatedData);
+        }
+      },
+    });
+  };
+
+  const handleOpenCamera = async () => {
+    if (hasCameraPermission === null) {
+      await checkPermissions();
+    }
+    
+    if (hasCameraPermission === false) {
+      setShowCameraAccess(true);
+    } else {
+      setShowCamera(true);
+    }
+  };
+
+  const handleOpenGeoLocation = async () => {
+    if (hasLocationPermission === null) {
+      await checkPermissions();
+    }
+    
+    if (hasLocationPermission === false) {
+      setPendingGeoLocationAction(true);
+      setShowLocationAccess(true);
+    } else {
+      navigateToGeoLocation();
+    }
+  };
+
   useFocusEffect(
     useCallback(() => {
       const loadData = async () => {
@@ -100,7 +196,6 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
             setFormData(localData);
             setIsExistingData(true);
 
-            // 👇 Re-evaluate errors for loaded draft data
             const validationErrors: Record<string, string> = {};
             if (!localData.landDiscription?.trim())
               validationErrors.landDiscription = t(
@@ -124,7 +219,6 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
               );
 
             setErrors(validationErrors);
-            // Don't set touched here — errors are silent until user interacts
           } else {
             setIsExistingData(false);
           }
@@ -294,7 +388,6 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-      // Mark all fields as touched so errors show
       setTouched({
         isOwnByFarmer: true,
         ownershipStatus: true,
@@ -396,6 +489,28 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
       navigation.navigate(route, { requestId, requestNumber });
     }
   };
+
+  
+  if (showCameraAccess) {
+    return (
+      <CameraAccess
+        navigation={navigation}
+        onPermissionGranted={handleCameraPermissionGranted}
+        returnScreen="LandInfo"
+      />
+    );
+  }
+
+  
+  if (showLocationAccess) {
+    return (
+      <LocationAccess
+        navigation={navigation}
+        onPermissionGranted={handleLocationPermissionGranted}
+        returnScreen="LandInfo"
+      />
+    );
+  }
 
   return (
     <KeyboardAvoidingView
@@ -562,30 +677,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
             <View className="flex-row space-x-2 mb-2">
               <TouchableOpacity
                 className="flex-1 bg-[#FA345A] rounded-3xl px-4 h-[50px] flex-row items-center justify-center gap-x-2"
-                onPress={() => {
-                  navigation.navigate("AttachGeoLocationScreen", {
-                    currentLatitude: formData.geoLocation?.latitude,
-                    currentLongitude: formData.geoLocation?.longitude,
-                    onLocationSelect: (
-                      latitude: number,
-                      longitude: number,
-                      locationName: string,
-                    ) => {
-                      const geoLocation: GeoLocation = {
-                        latitude,
-                        longitude,
-                        locationName: locationName || "Selected Location",
-                      };
-                      updateFormData({ geoLocation });
-                      setTouched((prev) => ({ ...prev, geoLocation: true }));
-                      setErrors((prev) => ({ ...prev, geoLocation: "" }));
-                      if (requestId) {
-                        const updatedData = { ...formData, geoLocation };
-                        saveLandInfo(Number(requestId), updatedData);
-                      }
-                    },
-                  });
-                }}
+                onPress={handleOpenGeoLocation}
               >
                 {formData.geoLocation ? (
                   <Feather name="rotate-ccw" size={24} color="#fff" />
@@ -650,7 +742,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
             </Text>
             <TouchableOpacity
               className="bg-[#1A1A1A] rounded-3xl px-4 h-[50px] flex-row items-center justify-center gap-x-2"
-              onPress={() => setShowCamera(true)}
+              onPress={handleOpenCamera}
             >
               <FontAwesome6 name="camera" size={22} color="#fff" />
               <Text className="text-white font-semibold text-lg">

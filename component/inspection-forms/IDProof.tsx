@@ -32,6 +32,8 @@ import {
   IDProofInfo,
 } from "@/database/inspectionidproof";
 import { updateLastScreen } from "@/database/inspectionprogress";
+import { Camera } from "expo-camera";
+import CameraAccess from "../permission/CameraAccess";
 
 type IDProofProps = {
   navigation: any;
@@ -95,6 +97,10 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
   const [cameraSide, setCameraSide] = useState<"front" | "back" | null>(null);
   const [showIdProofDropdown, setShowIdProofDropdown] = useState(false);
   const [isExistingData, setIsExistingData] = useState(false);
+  const [showCameraAccess, setShowCameraAccess] = useState(false);
+  const [pendingCameraSide, setPendingCameraSide] = useState<
+    "front" | "back" | null
+  >(null);
 
   const idProofOptions = [
     { key: "NIC Number", label: "NIC Number" },
@@ -146,7 +152,6 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
           if (localData) {
             setFormData(localData);
             setIsExistingData(true);
-
             const nicError = validateIdNumber(
               localData.pType,
               localData.pNumber,
@@ -181,30 +186,39 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
     setFormData((prev) => ({ ...prev, ...updates }));
   };
 
-  const openCamera = (side: "front" | "back") => {
-    setCameraSide(side);
-    setShowCamera(true);
+  const openCamera = async (side: "front" | "back") => {
+    const { status } = await Camera.getCameraPermissionsAsync();
+    if (status === "granted") {
+      setCameraSide(side);
+      setShowCamera(true);
+    } else {
+      setPendingCameraSide(side);
+      setShowCameraAccess(true);
+    }
+  };
+
+  const handleCameraPermissionGranted = () => {
+    setShowCameraAccess(false);
+    if (pendingCameraSide) {
+      setCameraSide(pendingCameraSide);
+      setShowCamera(true);
+      setPendingCameraSide(null);
+    }
   };
 
   const handleCameraClose = (uri: string | null) => {
     setShowCamera(false);
-
     if (!uri || !cameraSide) return;
-
-    const updates = {
+    updateFormData({
       [cameraSide === "front" ? "frontImg" : "backImg"]: uri,
-    };
-
-    updateFormData(updates);
-
+    });
     setCameraSide(null);
   };
 
   const handleClearImage = (side: "front" | "back") => {
-    const updates = {
+    updateFormData({
       [side === "front" ? "frontImg" : "backImg"]: null,
-    };
-    updateFormData(updates);
+    });
   };
 
   const validateNicNumber = (input: string) =>
@@ -225,7 +239,6 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
 
     if (formData.pType === "NIC Number") {
       value = value.replace(/[^0-9V]/g, "");
-
       const vIndex = value.indexOf("V");
       if (vIndex !== -1) {
         value = value.slice(0, vIndex + 1);
@@ -241,7 +254,6 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
     }
 
     let error = "";
-
     if (rules.required && value.trim().length === 0) {
       error = t(`Error.${rules.type} is required`);
     } else if (formData.pType === "NIC Number" && !validateNicNumber(value)) {
@@ -272,7 +284,6 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
       "hardwareBackPress",
       handleBackPress,
     );
-
     return () => subscription.remove();
   }, [navigation]);
 
@@ -331,11 +342,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
       const response = await axios.post(
         `${environment.API_BASE_URL}api/capital-request/inspection/save`,
         formDataPayload,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        },
+        { headers: { "Content-Type": "multipart/form-data" } },
       );
 
       if (response.data.success) {
@@ -345,13 +352,10 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
             updates.frontImg = response.data.data.frontImg;
           if (response.data.data.backImg)
             updates.backImg = response.data.data.backImg;
-
           updateFormData(updates);
         }
-
         return true;
       }
-
       return false;
     } catch (error: any) {
       console.error(`Error saving ID proof:`, error);
@@ -410,7 +414,6 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
     }
 
     const reqId = Number(requestId);
-
     if (isNaN(reqId) || reqId <= 0) {
       Alert.alert(
         t("Error.Error"),
@@ -424,7 +427,9 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
       t("InspectionForm.Saving"),
       t("InspectionForm.Please wait..."),
       [],
-      { cancelable: false },
+      {
+        cancelable: false,
+      },
     );
 
     const saved = await saveToBackend(
@@ -436,7 +441,6 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
 
     if (saved) {
       setIsExistingData(true);
-
       Alert.alert(
         t("Main.Success"),
         t("InspectionForm.Data saved successfully"),
@@ -444,10 +448,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
           {
             text: t("Main.ok"),
             onPress: () => {
-              navigation.navigate("FinanceInfo", {
-                requestNumber,
-                requestId,
-              });
+              navigation.navigate("FinanceInfo", { requestNumber, requestId });
             },
           },
         ],
@@ -456,11 +457,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
       Alert.alert(
         t("Main.Warning"),
         t("InspectionForm.Could not save to server. Data saved locally."),
-        [
-          {
-            text: t("Main.ok"),
-          },
-        ],
+        [{ text: t("Main.ok") }],
       );
     }
   };
@@ -482,12 +479,19 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
 
     const route = routeMap[tabKey];
     if (route) {
-      navigation.navigate(route, {
-        requestId,
-        requestNumber,
-      });
+      navigation.navigate(route, { requestId, requestNumber });
     }
   };
+
+  if (showCameraAccess) {
+    return (
+      <CameraAccess
+        navigation={navigation}
+        onPermissionGranted={handleCameraPermissionGranted}
+        returnScreen="IDProof"
+      />
+    );
+  }
 
   return (
     <KeyboardAvoidingView
@@ -586,7 +590,6 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
                 image={formData.frontImg}
                 onClear={() => handleClearImage("front")}
               />
-
               <UploadButton
                 title={
                   formData.pType === "NIC Number"
@@ -606,10 +609,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
           nextText={t("InspectionForm.Next")}
           isNextEnabled={isNextEnabled}
           onExit={() =>
-            navigation.navigate("PersonalInfo", {
-              requestNumber,
-              requestId,
-            })
+            navigation.navigate("PersonalInfo", { requestNumber, requestId })
           }
           onNext={handleNext}
         />

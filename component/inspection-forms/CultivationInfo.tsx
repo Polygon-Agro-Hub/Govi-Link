@@ -34,6 +34,8 @@ import {
   WaterImage,
 } from "@/database/inspectioncultivation";
 import { updateLastScreen } from "@/database/inspectionprogress";
+import { Camera } from "expo-camera";
+import CameraAccess from "../permission/CameraAccess";
 
 interface CultivationInfoExtended extends CultivationInfoData {
   [key: string]: any;
@@ -252,6 +254,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
   const [showCamera, setShowCamera] = useState(false);
   const [error, setError] = useState<string>("");
   const [isExistingData, setIsExistingData] = useState(false);
+  const [showCameraAccess, setShowCameraAccess] = useState(false);
 
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -511,6 +514,11 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
     const updatedImages = [...(formData?.waterImages || []), fileObj];
     updateFormData({ waterImages: updatedImages });
     setErrors((prev) => ({ ...prev, waterImages: "" }));
+  };
+
+  const handleCameraPermissionGranted = () => {
+    setShowCameraAccess(false);
+    setShowCamera(true);
   };
 
   const onClearImage = (index: number) => {
@@ -872,6 +880,16 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
 
   const images = formData?.waterImages || [];
 
+  if (showCameraAccess) {
+    return (
+      <CameraAccess
+        navigation={navigation}
+        onPermissionGranted={handleCameraPermissionGranted}
+        returnScreen="CultivationInfo"
+      />
+    );
+  }
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -1079,8 +1097,13 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
             </Text>
             <TouchableOpacity
               className="bg-[#1A1A1A] rounded-3xl px-6 h-[50px] flex-row justify-center items-center mb-1"
-              onPress={() => {
-                setShowCamera(true);
+              onPress={async () => {
+                const { status } = await Camera.getCameraPermissionsAsync();
+                if (status === "granted") {
+                  setShowCamera(true);
+                } else {
+                  setShowCameraAccess(true);
+                }
               }}
             >
               <FontAwesome6 name="camera" size={22} color="#fff" />

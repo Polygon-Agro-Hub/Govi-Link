@@ -738,5 +738,23 @@
     "Back":"Back",
     "Didn't receive the OTP":"Didn't receive the OTP ?",
     "Account created successfully": "Account created successfully"
+  },
+  "Permission":{
+   "locationAccess": "Location Access",
+   "CameraAccess":"Camera Access",
+    "enableLocationMessage": "Enable location access to access location information.",
+    "enableCameraMessage":"Enable access to the camera to take photos.",
+    "allow": "Allow",
+    "requesting": "Requesting...",
+    "success": "Success",
+    "locationEnabled": "Location access enabled successfully!",
+    "permissionDenied": "Permission Denied",
+    "enableLocationManually": "Location access is required. Please enable it in settings.",
+    "openSettings": "Open Settings",
+    "permissionError": "Unable to request location permission. Please try again.",
+    "skipLocation": "Skip Location?",
+    "skipMessage": "Some features may not work properly without location access. Are you sure?",
+    "skip": "Skip",
+    "skipForNow": "Skip for now"
   }
 }

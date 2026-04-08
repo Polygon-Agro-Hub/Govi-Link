@@ -309,13 +309,13 @@ const AttachGeoLocationScreen: React.FC<AttachGeoLocationScreenProps> = ({
           className="flex-1 mr-2"
         >
           <View
-            className={`bg-[#444444] rounded-full py-4 px-4 flex-row items-center justify-center`}
+            className={`bg-[#444444] rounded-3xl h-[50px] px-4 flex-row items-center justify-center`}
           >
             {isLoading ? (
               <ActivityIndicator size="small" color="#fff" />
             ) : (
               <>
-                <Text className="text-white font-semibold ml-2 text-sm">
+                <Text className="text-white font-semibold ml-2 text-base">
                   {t("InspectionForm.Use My Location")}
                 </Text>
               </>
@@ -332,7 +332,7 @@ const AttachGeoLocationScreen: React.FC<AttachGeoLocationScreenProps> = ({
             colors={["#F35125", "#FF1D85"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
-            className="rounded-full py-4 flex-row justify-center items-center"
+            className="rounded-3xl h-[50px] flex-row justify-center items-center"
             style={{
               shadowColor: "#000",
               shadowOffset: { width: 0, height: 3 },
