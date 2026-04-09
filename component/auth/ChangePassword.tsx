@@ -277,16 +277,16 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ navigation }) => {
 
         <View className="items-center justify-center pt-7 gap-y-5 mb-20">
           <TouchableOpacity
-            className="w-full rounded-full items-center justify-center"
+            className="w-full  items-center justify-center h-[50px]"
             onPress={handleChangePassword}
           >
             <LinearGradient
               colors={["#F2561D", "#FF1D85"]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
-              className="w-full p-3 rounded-full items-center justify-center"
+              className="w-full p-3 rounded-3xl items-center justify-center h-[50px]"
             >
-              <Text className="text-xl font-semibold text-white">
+              <Text className="text-lg font-semibold text-white">
                 {t("ChangePassword.Next")}
               </Text>
             </LinearGradient>

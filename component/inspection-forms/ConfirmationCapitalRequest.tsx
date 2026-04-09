@@ -377,7 +377,7 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
               }
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
-              className="rounded-3xl px-6 py-4 items-center"
+              className="rounded-3xl px-6 h-[50px] items-center justify-center"
               style={{
                 shadowColor: "#000",
                 shadowOffset: { width: 0, height: 3 },

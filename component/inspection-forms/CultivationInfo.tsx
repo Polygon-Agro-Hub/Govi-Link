@@ -34,6 +34,8 @@ import {
   WaterImage,
 } from "@/database/inspectioncultivation";
 import { updateLastScreen } from "@/database/inspectionprogress";
+import { Camera } from "expo-camera";
+import CameraAccess from "../permission/CameraAccess";
 
 interface CultivationInfoExtended extends CultivationInfoData {
   [key: string]: any;
@@ -157,14 +159,14 @@ const Input = ({
       {required && <Text className="text-black">*</Text>}
     </Text>
     <View
-      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
+      className={`bg-[#F6F6F6] rounded-3xl flex-row items-center ${
         error ? "border border-red-500" : ""
       }`}
     >
       <TextInput
         placeholder={placeholder}
         placeholderTextColor="#838B8C"
-        className="px-5 py-4 text-base text-black flex-1"
+        className="px-5 h-[50px] text-base text-black flex-1"
         value={value}
         onChangeText={onChangeText}
         keyboardType={keyboardType}
@@ -220,6 +222,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
   const route = useRoute<RouteProp<RootStackParamList, "CultivationInfo">>();
   const { requestNumber, requestId } = route.params;
   const { t } = useTranslation();
+
   const [formData, setFormData] = useState<CultivationInfoExtended>({
     temperature: null,
     rainfall: null,
@@ -241,6 +244,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
     isElectrocityAvailable: undefined,
     ispumpOrirrigation: undefined,
   });
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isNextEnabled, setIsNextEnabled] = useState(false);
   const [yesNoModalVisible, setYesNoModalVisible] = useState(false);
@@ -250,6 +254,10 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
   const [showCamera, setShowCamera] = useState(false);
   const [error, setError] = useState<string>("");
   const [isExistingData, setIsExistingData] = useState(false);
+  const [showCameraAccess, setShowCameraAccess] = useState(false);
+
+  const [isLoaded, setIsLoaded] = useState(false);
+
   const [selections, setSelections] = useState<Record<string, Selection>>(() =>
     climateParameters.reduce(
       (acc, item) => {
@@ -284,6 +292,8 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
   }, [navigation]);
 
   useEffect(() => {
+    if (!isLoaded) return;
+
     const timer = setTimeout(async () => {
       if (requestId) {
         try {
@@ -295,16 +305,20 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [formData, requestId]);
+  }, [formData, requestId, isLoaded]);
 
   useFocusEffect(
     useCallback(() => {
+      setIsLoaded(false);
+
       const loadData = async () => {
-        if (!requestId) return;
+        if (!requestId) {
+          setIsLoaded(true);
+          return;
+        }
 
         try {
           const reqId = Number(requestId);
-
           const localData = await getCultivationInfo(reqId);
 
           if (localData) {
@@ -320,7 +334,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
 
             const restoredErrors: Record<string, string> = {};
 
-            if (!localData.ph) {
+            if (!localData.ph || localData.ph <= 0) {
               restoredErrors.ph = t("Error.pH is required");
             }
 
@@ -335,7 +349,6 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
             }
 
             const waterSources = localData.waterSources || [];
-
             const hasValidSource = waterSources.some((source) => {
               if (source === "Other") {
                 return localData.otherWaterSources?.trim().length > 0;
@@ -378,6 +391,8 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
           }
         } catch (error) {
           console.error("Failed to load cultivation info from SQLite:", error);
+        } finally {
+          setIsLoaded(true);
         }
       };
 
@@ -391,11 +406,11 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
         selections[param.key] === "yes" || selections[param.key] === "no",
     );
 
-    const isPHValid = !!formData.ph;
+    const isPHValid =
+      formData.ph !== null && formData.ph !== undefined && formData.ph > 0;
     const isSoilTypeValid = !!formData.soilType?.trim();
 
     const waterSources = formData.waterSources || [];
-
     const isWaterSourceValid = waterSources.some((source) => {
       if (source === "Other") {
         return formData.otherWaterSources?.trim().length > 0;
@@ -501,6 +516,11 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
     setErrors((prev) => ({ ...prev, waterImages: "" }));
   };
 
+  const handleCameraPermissionGranted = () => {
+    setShowCameraAccess(false);
+    setShowCamera(true);
+  };
+
   const onClearImage = (index: number) => {
     const updatedImages = formData.waterImages.filter((_, i) => i !== index);
     updateFormData({ waterImages: updatedImages });
@@ -579,6 +599,8 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
   const handleSoilFertilitySelect = (item: string) => {
     updateFormData({ soilfertility: item });
     setOverallSoilFertilityVisible(false);
+
+    setErrors((prev) => ({ ...prev, soilfertility: "" }));
   };
 
   const saveToBackend = async (
@@ -721,7 +743,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
       );
     }
 
-    if (!formData?.ph) {
+    if (!formData?.ph || formData.ph <= 0) {
       validationErrors.ph = t("Error.pH is required");
     }
     if (!formData?.soilType || formData.soilType.trim() === "") {
@@ -819,11 +841,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
         Alert.alert(
           t("Main.Warning"),
           t("InspectionForm.Could not save to server. Data saved locally."),
-          [
-            {
-              text: t("Main.ok"),
-            },
-          ],
+          [{ text: t("Main.ok") }],
         );
       }
     } catch (error) {
@@ -831,11 +849,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
       Alert.alert(
         t("Main.Warning"),
         t("InspectionForm.Could not save to server. Data saved locally."),
-        [
-          {
-            text: t("Main.ok"),
-          },
-        ],
+        [{ text: t("Main.ok") }],
       );
     }
   };
@@ -865,6 +879,16 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
   };
 
   const images = formData?.waterImages || [];
+
+  if (showCameraAccess) {
+    return (
+      <CameraAccess
+        navigation={navigation}
+        onPermissionGranted={handleCameraPermissionGranted}
+        returnScreen="CultivationInfo"
+      />
+    );
+  }
 
   return (
     <KeyboardAvoidingView
@@ -941,7 +965,6 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
               </View>
             ))}
 
-            {/* Climate table error */}
             {error ? (
               <View className="mt-2">
                 <ErrorMessage message={error} />
@@ -972,7 +995,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
           <Input
             label={t("InspectionForm.pH")}
             placeholder="----"
-            value={formData?.ph?.toString()}
+            value={formData?.ph > 0 ? formData.ph.toString() : ""}
             onChangeText={(text) =>
               handleFieldChange("ph", text, {
                 required: true,
@@ -1023,7 +1046,6 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
               <AntDesign name="down" size={20} color="#838B8C" />
             </TouchableOpacity>
 
-            {/* Soil fertility error */}
             {errors.soilfertility ? (
               <ErrorMessage message={errors.soilfertility} />
             ) : null}
@@ -1057,13 +1079,12 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
               <TextInput
                 placeholder={t("InspectionForm.--Mention Other--")}
                 placeholderTextColor="#838B8C"
-                className="bg-[#F6F6F6] px-4 py-4 rounded-full text-black mb-2"
+                className="bg-[#F6F6F6] px-4 h-[50px] rounded-3xl text-black mb-2"
                 value={formData.otherWaterSources || ""}
                 onChangeText={handleOtherWaterSourceChange}
               />
             )}
 
-            {/* Water sources error */}
             {errors.waterSources ? (
               <ErrorMessage message={errors.waterSources} />
             ) : null}
@@ -1075,18 +1096,22 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
               <Text className="text-black-500">*</Text>
             </Text>
             <TouchableOpacity
-              className="bg-[#1A1A1A] rounded-3xl px-6 py-4 flex-row justify-center items-center mb-1"
-              onPress={() => {
-                setShowCamera(true);
+              className="bg-[#1A1A1A] rounded-3xl px-6 h-[50px] flex-row justify-center items-center mb-1"
+              onPress={async () => {
+                const { status } = await Camera.getCameraPermissionsAsync();
+                if (status === "granted") {
+                  setShowCamera(true);
+                } else {
+                  setShowCameraAccess(true);
+                }
               }}
             >
               <FontAwesome6 name="camera" size={22} color="#fff" />
-              <Text className="text-base text-white ml-3">
+              <Text className="text-lg text-white ml-3">
                 {t("InspectionForm.Capture Photos")}
               </Text>
             </TouchableOpacity>
 
-            {/* Display all images */}
             {images.length > 0 && (
               <View className="mt-4 flex-row flex-wrap">
                 {images.map((image, index) => (
@@ -1108,7 +1133,6 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
               </View>
             )}
 
-            {/* Water images error */}
             {errors.waterImages ? (
               <ErrorMessage message={errors.waterImages} />
             ) : null}

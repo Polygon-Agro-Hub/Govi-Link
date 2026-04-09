@@ -224,11 +224,8 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
 
           <TouchableOpacity
             onPress={categoryModal.show}
-            className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-full px-5 flex-row items-center justify-between"
-            style={{
-              height: 55,
-              borderRadius: 25,
-            }}
+            className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-5 flex-row items-center justify-between h-[50px]"
+            
           >
             <Text
               className={`text-base ${selectedCategory ? "text-black" : "text-[#434343]"}`}
@@ -280,7 +277,7 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
               colors={["#F2561D", "#FF1D85"]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
-              className="py-3 rounded-full flex-row items-center justify-center"
+              className="py-3 rounded-3xl flex-row items-center justify-center h-[50px]"
             >
               {loading ? (
                 <>

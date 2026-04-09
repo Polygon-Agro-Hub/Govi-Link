@@ -571,7 +571,6 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     }
   };
 
-  // Profile image picker
   const pickProfileImage = async () => {
     try {
       const { status } =
@@ -586,7 +585,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
       }
 
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ['images'], 
+        mediaTypes: ["images"],
         allowsEditing: true,
         aspect: [1, 1],
         quality: 0.8,
@@ -1020,7 +1019,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
         </View>
 
         <View className="p-2 px-4">
-          <View className="px-2 mt-6 items-center ">
+          <View className="px-2 mt-6 items-center">
             <View className="flex flex-row items-center space-x-2 justify-between">
               <Text className="text-base font-medium">
                 {t("AddOfficer.Type")}:
@@ -1057,7 +1056,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
             </View>
           </View>
 
-          <View className="border border-[#ADADAD] border-b-0 mt-4"></View>
+          <View className="border border-[#ADADAD] border-b-0 mt-4" />
 
           <View className="px-6 mt-4">
             <Text className="text-base font-medium mb-4">
@@ -1086,21 +1085,22 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
             )}
           </View>
 
-          <View className="border border-[#ADADAD] border-b-0 mt-4"></View>
+          <View className="border border-[#ADADAD] border-b-0 mt-4" />
 
           {/* Form Fields */}
           <View className="px-2 mt-4 space-y-4">
+            {/* District */}
             <View>
               <TouchableOpacity
-                className={`bg-[#F4F4F4] rounded-2xl px-4 py-3 flex-row justify-between items-center ${
+                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${
                   errors.districts && touched.districts
-                    ? "border border-red-500"
-                    : ""
+                    ? "border-red-500"
+                    : "border-[#F4F4F4]"
                 }`}
                 onPress={districtModal.show}
               >
                 <Text
-                  className={`${
+                  className={`flex-1 text-base ${
                     selectedDistricts.length > 0
                       ? "text-black"
                       : "text-[#7D7D7D]"
@@ -1117,20 +1117,27 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
               )}
             </View>
 
+            {/* First Name English */}
             <View>
-              <TextInput
-                placeholder={t("AddOfficer.FirstNameEnglish")}
-                placeholderTextColor="#7D7D7D"
-                className={`bg-[#F4F4F4] rounded-2xl px-4 py-4 ${
+              <View
+                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${
                   errors.firstNameEN && touched.firstNameEN
-                    ? "border border-red-500"
-                    : ""
+                    ? "border-red-500"
+                    : "border-[#F4F4F4]"
                 }`}
-                value={firstNameEN}
-                onChangeText={(text) => handleNameENChange(text, "firstNameEN")}
-                onBlur={handleFirstNameENBlur}
-                underlineColorAndroid="transparent"
-              />
+              >
+                <TextInput
+                  placeholder={t("AddOfficer.FirstNameEnglish")}
+                  placeholderTextColor="#7D7D7D"
+                  className="flex-1 h-[50px] text-base pl-2"
+                  value={firstNameEN}
+                  onChangeText={(text) =>
+                    handleNameENChange(text, "firstNameEN")
+                  }
+                  onBlur={handleFirstNameENBlur}
+                  underlineColorAndroid="transparent"
+                />
+              </View>
               {errors.firstNameEN && touched.firstNameEN && (
                 <Text className="text-red-500 text-sm mt-1 ml-2">
                   {errors.firstNameEN}
@@ -1138,20 +1145,27 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
               )}
             </View>
 
+            {/* Last Name English */}
             <View>
-              <TextInput
-                placeholder={t("AddOfficer.LastNameEnglish")}
-                placeholderTextColor="#7D7D7D"
-                className={`bg-[#F4F4F4] rounded-2xl px-4 py-4 ${
+              <View
+                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${
                   errors.lastNameEN && touched.lastNameEN
-                    ? "border border-red-500"
-                    : ""
+                    ? "border-red-500"
+                    : "border-[#F4F4F4]"
                 }`}
-                value={lastNameEN}
-                onChangeText={(text) => handleNameENChange(text, "lastNameEN")}
-                onBlur={handleLastNameENBlur}
-                underlineColorAndroid="transparent"
-              />
+              >
+                <TextInput
+                  placeholder={t("AddOfficer.LastNameEnglish")}
+                  placeholderTextColor="#7D7D7D"
+                  className="flex-1 h-[50px] text-base pl-2"
+                  value={lastNameEN}
+                  onChangeText={(text) =>
+                    handleNameENChange(text, "lastNameEN")
+                  }
+                  onBlur={handleLastNameENBlur}
+                  underlineColorAndroid="transparent"
+                />
+              </View>
               {errors.lastNameEN && touched.lastNameEN && (
                 <Text className="text-red-500 text-sm mt-1 ml-2">
                   {errors.lastNameEN}
@@ -1159,22 +1173,27 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
               )}
             </View>
 
+            {/* First Name Sinhala */}
             <View>
-              <TextInput
-                placeholder={t("AddOfficer.FirstNameSinhala")}
-                placeholderTextColor="#7D7D7D"
-                className={`bg-[#F4F4F4] rounded-2xl px-4 py-4 ${
+              <View
+                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${
                   errors.firstNameSI && touched.firstNameSI
-                    ? "border border-red-500"
-                    : ""
+                    ? "border-red-500"
+                    : "border-[#F4F4F4]"
                 }`}
-                value={firstNameSI}
-                onChangeText={(text) =>
-                  handleUnicodeNameChange(text, "firstNameSI")
-                }
-                onBlur={handleFirstNameSIBlur}
-                underlineColorAndroid="transparent"
-              />
+              >
+                <TextInput
+                  placeholder={t("AddOfficer.FirstNameSinhala")}
+                  placeholderTextColor="#7D7D7D"
+                  className="flex-1 h-[50px] text-base pl-2"
+                  value={firstNameSI}
+                  onChangeText={(text) =>
+                    handleUnicodeNameChange(text, "firstNameSI")
+                  }
+                  onBlur={handleFirstNameSIBlur}
+                  underlineColorAndroid="transparent"
+                />
+              </View>
               {errors.firstNameSI && touched.firstNameSI && (
                 <Text className="text-red-500 text-sm mt-1 ml-2">
                   {errors.firstNameSI}
@@ -1182,22 +1201,27 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
               )}
             </View>
 
+            {/* Last Name Sinhala */}
             <View>
-              <TextInput
-                placeholder={t("AddOfficer.LastNameSinhala")}
-                placeholderTextColor="#7D7D7D"
-                className={`bg-[#F4F4F4] rounded-2xl px-4 py-4 ${
+              <View
+                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${
                   errors.lastNameSI && touched.lastNameSI
-                    ? "border border-red-500"
-                    : ""
+                    ? "border-red-500"
+                    : "border-[#F4F4F4]"
                 }`}
-                value={lastNameSI}
-                onChangeText={(text) =>
-                  handleUnicodeNameChange(text, "lastNameSI")
-                }
-                onBlur={handleLastNameSIBlur}
-                underlineColorAndroid="transparent"
-              />
+              >
+                <TextInput
+                  placeholder={t("AddOfficer.LastNameSinhala")}
+                  placeholderTextColor="#7D7D7D"
+                  className="flex-1 h-[50px] text-base pl-2"
+                  value={lastNameSI}
+                  onChangeText={(text) =>
+                    handleUnicodeNameChange(text, "lastNameSI")
+                  }
+                  onBlur={handleLastNameSIBlur}
+                  underlineColorAndroid="transparent"
+                />
+              </View>
               {errors.lastNameSI && touched.lastNameSI && (
                 <Text className="text-red-500 text-sm mt-1 ml-2">
                   {errors.lastNameSI}
@@ -1205,22 +1229,27 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
               )}
             </View>
 
+            {/* First Name Tamil */}
             <View>
-              <TextInput
-                placeholder={t("AddOfficer.FirstNameTamil")}
-                placeholderTextColor="#7D7D7D"
-                className={`bg-[#F4F4F4] rounded-2xl px-4 py-4 ${
+              <View
+                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${
                   errors.firstNameTA && touched.firstNameTA
-                    ? "border border-red-500"
-                    : ""
+                    ? "border-red-500"
+                    : "border-[#F4F4F4]"
                 }`}
-                value={firstNameTA}
-                onChangeText={(text) =>
-                  handleUnicodeNameChange(text, "firstNameTA")
-                }
-                onBlur={handleFirstNameTABlur}
-                underlineColorAndroid="transparent"
-              />
+              >
+                <TextInput
+                  placeholder={t("AddOfficer.FirstNameTamil")}
+                  placeholderTextColor="#7D7D7D"
+                  className="flex-1 h-[50px] text-base pl-2"
+                  value={firstNameTA}
+                  onChangeText={(text) =>
+                    handleUnicodeNameChange(text, "firstNameTA")
+                  }
+                  onBlur={handleFirstNameTABlur}
+                  underlineColorAndroid="transparent"
+                />
+              </View>
               {errors.firstNameTA && touched.firstNameTA && (
                 <Text className="text-red-500 text-sm mt-1 ml-2">
                   {errors.firstNameTA}
@@ -1228,22 +1257,27 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
               )}
             </View>
 
+            {/* Last Name Tamil */}
             <View>
-              <TextInput
-                placeholder={t("AddOfficer.LastNameTamil")}
-                placeholderTextColor="#7D7D7D"
-                className={`bg-[#F4F4F4] rounded-2xl px-4 py-4 ${
+              <View
+                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${
                   errors.lastNameTA && touched.lastNameTA
-                    ? "border border-red-500"
-                    : ""
+                    ? "border-red-500"
+                    : "border-[#F4F4F4]"
                 }`}
-                value={lastNameTA}
-                onChangeText={(text) =>
-                  handleUnicodeNameChange(text, "lastNameTA")
-                }
-                onBlur={handleLastNameTABlur}
-                underlineColorAndroid="transparent"
-              />
+              >
+                <TextInput
+                  placeholder={t("AddOfficer.LastNameTamil")}
+                  placeholderTextColor="#7D7D7D"
+                  className="flex-1 h-[50px] text-base pl-2"
+                  value={lastNameTA}
+                  onChangeText={(text) =>
+                    handleUnicodeNameChange(text, "lastNameTA")
+                  }
+                  onBlur={handleLastNameTABlur}
+                  underlineColorAndroid="transparent"
+                />
+              </View>
               {errors.lastNameTA && touched.lastNameTA && (
                 <Text className="text-red-500 text-sm mt-1 ml-2">
                   {errors.lastNameTA}
@@ -1251,14 +1285,15 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
               )}
             </View>
           </View>
-          <View className="border border-[#ADADAD] border-b-0 mt-4"></View>
+
+          <View className="border border-[#ADADAD] border-b-0 mt-4" />
 
           <View className="px-2 mt-4 space-y-4">
-            {/* Phone Numbers */}
+            {/* Phone 1 */}
             <View>
               <View className="flex-row space-x-2">
                 <TouchableOpacity
-                  className="bg-[#F4F4F4] rounded-2xl px-4 py-4 w-20 flex-row justify-between items-center"
+                  className="bg-[#F4F4F4] border border-[#F4F4F4] rounded-3xl px-3 h-[50px] w-20 flex-row justify-between items-center"
                   onPress={() => openCountryCodeModal("phone1")}
                 >
                   <Text className="text-black">{selectedCountryCode1}</Text>
@@ -1269,15 +1304,17 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
                   />
                 </TouchableOpacity>
 
-                <View className="flex-1">
+                <View
+                  className={`flex-1 flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${
+                    errors.phone1 && touched.phone1
+                      ? "border-red-500"
+                      : "border-[#F4F4F4]"
+                  }`}
+                >
                   <TextInput
                     placeholder="7XXXXXXXX"
                     placeholderTextColor="#7D7D7D"
-                    className={`bg-[#F4F4F4] rounded-2xl px-4 py-4 flex-1 ${
-                      errors.phone1 && touched.phone1
-                        ? "border border-red-500"
-                        : ""
-                    }`}
+                    className="flex-1 h-[50px] text-base pl-2"
                     value={phone1}
                     onChangeText={handlePhone1Change}
                     keyboardType="phone-pad"
@@ -1293,10 +1330,11 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
               )}
             </View>
 
+            {/* Phone 2 */}
             <View>
               <View className="flex-row space-x-2">
                 <TouchableOpacity
-                  className="bg-[#F4F4F4] rounded-2xl px-4 py-4 w-20 flex-row justify-between items-center"
+                  className="bg-[#F4F4F4] border border-[#F4F4F4] rounded-3xl px-3 h-[50px] w-20 flex-row justify-between items-center"
                   onPress={() => openCountryCodeModal("phone2")}
                 >
                   <Text className="text-black">{selectedCountryCode2}</Text>
@@ -1307,15 +1345,17 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
                   />
                 </TouchableOpacity>
 
-                <View className="flex-1">
+                <View
+                  className={`flex-1 flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${
+                    errors.phone2 && touched.phone2
+                      ? "border-red-500"
+                      : "border-[#F4F4F4]"
+                  }`}
+                >
                   <TextInput
                     placeholder="7XXXXXXXX"
                     placeholderTextColor="#7D7D7D"
-                    className={`bg-[#F4F4F4] rounded-2xl px-4 py-4 flex-1 ${
-                      errors.phone2 && touched.phone2
-                        ? "border border-red-500"
-                        : ""
-                    }`}
+                    className="flex-1 h-[50px] text-base pl-2"
                     value={phone2}
                     onChangeText={handlePhone2Change}
                     keyboardType="phone-pad"
@@ -1331,19 +1371,26 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
               )}
             </View>
 
+            {/* NIC */}
             <View>
-              <TextInput
-                placeholder={t("AddOfficer.NICNumber")}
-                placeholderTextColor="#7D7D7D"
-                className={`bg-[#F4F4F4] rounded-2xl px-4 py-4 ${
-                  errors.nic && touched.nic ? "border border-red-500" : ""
+              <View
+                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${
+                  errors.nic && touched.nic
+                    ? "border-red-500"
+                    : "border-[#F4F4F4]"
                 }`}
-                value={nic}
-                onChangeText={handleNICChange}
-                underlineColorAndroid="transparent"
-                maxLength={12}
-                autoCapitalize="characters"
-              />
+              >
+                <TextInput
+                  placeholder={t("AddOfficer.NICNumber")}
+                  placeholderTextColor="#7D7D7D"
+                  className="flex-1 h-[50px] text-base pl-2"
+                  value={nic}
+                  onChangeText={handleNICChange}
+                  underlineColorAndroid="transparent"
+                  maxLength={12}
+                  autoCapitalize="characters"
+                />
+              </View>
               {errors.nic && touched.nic && (
                 <Text className="text-red-500 text-sm mt-1 ml-2">
                   {errors.nic}
@@ -1351,19 +1398,26 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
               )}
             </View>
 
+            {/* Email */}
             <View>
-              <TextInput
-                placeholder={t("AddOfficer.EmailAddress")}
-                placeholderTextColor="#7D7D7D"
-                className={`bg-[#F4F4F4] rounded-2xl px-4 py-4 ${
-                  errors.email && touched.email ? "border border-red-500" : ""
+              <View
+                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${
+                  errors.email && touched.email
+                    ? "border-red-500"
+                    : "border-[#F4F4F4]"
                 }`}
-                value={email}
-                onChangeText={handleEmailChange}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                underlineColorAndroid="transparent"
-              />
+              >
+                <TextInput
+                  placeholder={t("AddOfficer.EmailAddress")}
+                  placeholderTextColor="#7D7D7D"
+                  className="flex-1 h-[50px] text-base pl-2"
+                  value={email}
+                  onChangeText={handleEmailChange}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  underlineColorAndroid="transparent"
+                />
+              </View>
               {errors.email && touched.email && (
                 <Text className="text-red-500 text-sm mt-1 ml-2">
                   {errors.email}
@@ -1375,21 +1429,25 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
           {/* Buttons */}
           <View className="px-2 flex-col w-full gap-4 mt-4">
             <TouchableOpacity
-              className="bg-[#D9D9D9] rounded-3xl px-6 py-4 w-full items-center"
+              className="bg-[#D9D9D9] rounded-3xl h-[50px] w-full items-center justify-center"
               onPress={handleCancel}
             >
-              <Text className="text-[#686868]">{t("AddOfficer.Cancel")}</Text>
+              <Text className="text-[#686868] text-lg">
+                {t("AddOfficer.Cancel")}
+              </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              className="bg-black rounded-3xl px-6 py-4 w-full items-center"
+              className="bg-black rounded-3xl h-[50px] w-full items-center justify-center"
               onPress={handleNext}
               disabled={loading}
             >
               {loading ? (
                 <ActivityIndicator color="white" size="small" />
               ) : (
-                <Text className="text-white">{t("AddOfficer.Next")}</Text>
+                <Text className="text-white text-lg">
+                  {t("AddOfficer.Next")}
+                </Text>
               )}
             </TouchableOpacity>
           </View>

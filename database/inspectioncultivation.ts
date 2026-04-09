@@ -30,11 +30,8 @@ export const initCultivationTable = () => {
         updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
       );`,
     );
-
-    
-    
   } catch (error) {
-    console.error(" Error initializing cultivation table:", error);
+    console.error("Error initializing cultivation table:", error);
     throw error;
   }
 };
@@ -67,7 +64,6 @@ export interface CultivationInfo {
   ispumpOrirrigation: "Yes" | "No" | undefined;
 }
 
-// Save or update cultivation info
 export const saveCultivationInfo = (
   requestId: number,
   data: Partial<CultivationInfo>,
@@ -86,7 +82,6 @@ export const saveCultivationInfo = (
       return null;
     };
 
-    // Climate parameters
     if (data.temperature !== undefined) {
       dbData.temperature = yesNoToBool(data.temperature);
     }
@@ -109,7 +104,6 @@ export const saveCultivationInfo = (
       dbData.zone = yesNoToBool(data.zone);
     }
 
-    // Yes/No fields
     if (data.isCropSuitale !== undefined) {
       dbData.isCropSuitale = data.isCropSuitale;
     }
@@ -129,8 +123,7 @@ export const saveCultivationInfo = (
       dbData.ispumpOrirrigation = data.ispumpOrirrigation;
     }
 
-    // Other fields
-    if (data.ph !== undefined) {
+    if (data.ph !== undefined && data.ph !== null) {
       dbData.ph = data.ph;
     }
     if (data.soilType !== undefined) {
@@ -165,7 +158,7 @@ export const saveCultivationInfo = (
         requestId,
       ];
 
-      const result = db.runSync(
+      db.runSync(
         `UPDATE inspectioncultivation SET ${fields}, updatedAt = ? WHERE requestId = ?`,
         values as SQLite.SQLiteBindParams,
       );
@@ -188,15 +181,15 @@ export const saveCultivationInfo = (
         new Date().toISOString(),
       ];
 
-      const result = db.runSync(
+      db.runSync(
         `INSERT INTO inspectioncultivation (${fields}) VALUES (${placeholders})`,
         values as SQLite.SQLiteBindParams,
       );
 
-      console.log(" Cultivation info inserted into SQLite");
+      console.log("Cultivation info inserted into SQLite");
     }
   } catch (error) {
-    console.error(" Error saving cultivation info:", error);
+    console.error("Error saving cultivation info:", error);
     throw error;
   }
 };
@@ -247,7 +240,8 @@ export const getCultivationInfo = (
         windDirection: boolToYesNo(row.windDirection),
         zone: boolToYesNo(row.zone),
         isCropSuitale: row.isCropSuitale as "Yes" | "No" | undefined,
-        ph: row.ph ? parseFloat(row.ph) : 0,
+
+        ph: row.ph !== null && row.ph !== undefined ? parseFloat(row.ph) : 0,
         soilType: row.soilType || "",
         soilfertility: row.soilfertility || "",
         waterSources,
@@ -274,8 +268,7 @@ export const getCultivationInfo = (
 
     return null;
   } catch (error) {
-    console.error("❌ Error fetching cultivation info:", error);
-
+    console.error("Error fetching cultivation info:", error);
     return null;
   }
 };

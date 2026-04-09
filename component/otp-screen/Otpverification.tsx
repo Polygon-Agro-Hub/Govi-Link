@@ -9,15 +9,10 @@ import {
   Keyboard,
   AppState,
 } from "react-native";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { environment } from "@/environment/environment";
 import { useTranslation } from "react-i18next";
-import { AntDesign } from "@expo/vector-icons";
 import { ScrollView } from "react-native-gesture-handler";
 import NetInfo from "@react-native-community/netinfo";
 import { LinearGradient } from "expo-linear-gradient";
@@ -44,7 +39,9 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
     const subscription = AppState.addEventListener("change", (nextAppState) => {
       if (nextAppState === "active") {
         if (backgroundTime.current) {
-          const elapsed = Math.floor((Date.now() - backgroundTime.current) / 1000);
+          const elapsed = Math.floor(
+            (Date.now() - backgroundTime.current) / 1000,
+          );
           setTimer((prev) => Math.max(0, prev - elapsed));
           backgroundTime.current = null;
         }
@@ -390,9 +387,9 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
           <Text className="mt-8 text-lg text-black text-center font-semibold">
             {t("Otpverification.Enter Verification Code")}
           </Text>
-          <Text className=" text-base text-[#808080] text-center p-4">
+          <Text className="text-base text-[#808080] text-center p-4">
             {t(
-              "Otpverification.We have sent a Verification Code to Farmer’s mobile number",
+              "Otpverification.We have sent a Verification Code to Farmer's mobile number",
             )}
           </Text>
         </View>
@@ -418,16 +415,18 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
             />
           ))}
         </View>
+
         <View className="mt-6">
-          <Text className="text-base ">{formatTime(timer)}</Text>
+          <Text className="text-base">{formatTime(timer)}</Text>
         </View>
+
         <View className="mt-4 mb-10 flex-row justify-center items-center">
-          <Text className="text-md text-[#707070] ">
+          <Text className="text-md text-[#707070]">
             {t("Otpverification.Didn’t receive the OTP ?")}
           </Text>
           <View className="ml-2">
             <Text
-              className=" text-md font-semibold text-black text-center underline"
+              className="text-md font-semibold text-black text-center underline"
               onPress={disabledResend ? undefined : handleResendOTP}
               style={{ color: disabledResend ? "gray" : "black" }}
             >
@@ -435,17 +434,19 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
             </Text>
           </View>
         </View>
-        <View>
+
+        <View className="w-full items-center mb-10 gap-4">
           <TouchableOpacity
-            className="bg-[#444444]  py-4 justify-center rounded-3xl mb-4"
+            className="w-2/3 h-[50px] bg-[#444444] justify-center items-center rounded-full"
             onPress={() => navigation.goBack()}
           >
-            <Text className="text-white text-xl text-center font-semibold">
+            <Text className="text-white text-lg text-center font-semibold">
               {t("Otpverification.Go Back")}
             </Text>
           </TouchableOpacity>
+
           <TouchableOpacity
-            style={{ height: hp(10), width: wp(75) }}
+            className="w-2/3 h-[50px] rounded-full overflow-hidden"
             onPress={handleVerify}
             disabled={!isOtpValid || isVerified}
           >
@@ -453,11 +454,9 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
               colors={["#F35125", "#FF1D85"]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
-              className={`flex items-center py-3 justify-center rounded-3xl ${
-                !isOtpValid || isVerified ? "bg-gray-400" : "bg-[#000000]"
-              }`}
+              className={`flex-1 items-center justify-center `}
             >
-              <Text className="text-white text-xl font-semibold">
+              <Text className="text-white text-lg font-semibold">
                 {t("Otpverification.Verify")}
               </Text>
             </LinearGradient>

@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
-import { View, TouchableOpacity, Text } from "react-native";
+import { View, TouchableOpacity, Text, Linking, Alert } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { Ionicons } from "@expo/vector-icons";
+import CameraAccess from "../component/permission/CameraAccess";
 
 export function CameraScreen({
   onClose,
@@ -12,32 +13,19 @@ export function CameraScreen({
   const [permission, requestPermission] = useCameraPermissions();
   const [isReady, setIsReady] = useState(false);
 
-  useEffect(() => {
-    (async () => {
-      if (!permission?.granted) {
-        await requestPermission();
-      }
-    })();
-  }, []);
-
   const takePhoto = async () => {
     if (cameraRef.current) {
       const photo = await cameraRef.current.takePictureAsync({ quality: 0.6 });
-      onClose(photo.uri);
+      onClose(photo?.uri ?? null);
     }
   };
 
   if (!permission?.granted) {
     return (
-      <View className="flex-1 justify-center items-center bg-black">
-        <Text className="text-white mb-4">Camera permission is required</Text>
-        <TouchableOpacity
-          className="bg-white px-4 py-2 rounded-lg"
-          onPress={requestPermission}
-        >
-          <Text>Grant Permission</Text>
-        </TouchableOpacity>
-      </View>
+      <CameraAccess
+        navigation={null as any}
+        onPermissionGranted={requestPermission}
+      />
     );
   }
 
@@ -49,7 +37,6 @@ export function CameraScreen({
         onCameraReady={() => setIsReady(true)}
       />
 
-      {/* Bottom controls */}
       <View className="absolute bottom-12 w-full flex-row justify-center items-center">
         <TouchableOpacity
           className="bg-white/70 p-4 rounded-full mx-5"

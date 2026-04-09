@@ -58,14 +58,14 @@ const Input = ({
       {label} {required && <Text className="text-black">*</Text>}
     </Text>
     <View
-      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
+      className={`bg-[#F6F6F6] rounded-3xl flex-row items-center ${
         error ? "border border-red-500" : ""
       }`}
     >
       <TextInput
         placeholder={placeholder}
         placeholderTextColor="#838B8C"
-        className="px-5 py-4 text-base text-black flex-1"
+        className="px-5 h-[50px] text-base text-black flex-1"
         value={value}
         onChangeText={onChangeText}
         keyboardType={keyboardType}
@@ -779,7 +779,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     placeholder: string,
   ) => (
     <View className="px-4 py-2 border-b border-gray-200">
-      <View className="bg-gray-100 rounded-lg px-3 flex-row items-center">
+      <View className="bg-gray-100 rounded-3xl h-[50px] px-3 flex-row items-center">
         <MaterialIcons name="search" size={20} color="#666" />
         <TextInput
           placeholder={placeholder}

@@ -135,7 +135,8 @@
     "This NIC is already registered":"This NIC is already registered",
     "Please enter a valid License ID number":"Please enter a valid License ID number (1 capital letter + 7 digits or 10–12 digits)",
     "At least one image of the water source is required":"At least one image of the water source is required",
-    "pH is required":"pH is required"
+    "pH is required":"pH is required",
+    "Overall soil fertility is required":"Overall soil fertility is required"
   },
   "Login": {
     "Welcome": "Welcome!",
@@ -737,5 +738,23 @@
     "Back":"Back",
     "Didn't receive the OTP":"Didn't receive the OTP ?",
     "Account created successfully": "Account created successfully"
+  },
+  "Permission":{
+   "locationAccess": "Location Access",
+   "CameraAccess":"Camera Access",
+    "enableLocationMessage": "Enable location access to access location information.",
+    "enableCameraMessage":"Enable access to the camera to take photos.",
+    "allow": "Allow",
+    "requesting": "Requesting...",
+    "success": "Success",
+    "locationEnabled": "Location access enabled successfully!",
+    "permissionDenied": "Permission Denied",
+    "enableLocationManually": "Location access is required. Please enable it in settings.",
+    "openSettings": "Open Settings",
+    "permissionError": "Unable to request location permission. Please try again.",
+    "skipLocation": "Skip Location?",
+    "skipMessage": "Some features may not work properly without location access. Are you sure?",
+    "skip": "Skip",
+    "skipForNow": "Skip for now"
   }
 }

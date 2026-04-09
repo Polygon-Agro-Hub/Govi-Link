@@ -43,7 +43,9 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
     const subscription = AppState.addEventListener("change", (nextAppState) => {
       if (nextAppState === "active") {
         if (backgroundTime.current) {
-          const elapsed = Math.floor((Date.now() - backgroundTime.current) / 1000);
+          const elapsed = Math.floor(
+            (Date.now() - backgroundTime.current) / 1000,
+          );
           setTimer((prev) => Math.max(0, prev - elapsed));
           backgroundTime.current = null;
         }
@@ -437,10 +439,10 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
         </View>
         <View>
           <TouchableOpacity
-            className="bg-[#444444]  py-4 justify-center rounded-3xl mb-4"
+            className="bg-[#444444]  h-[50px] justify-center rounded-3xl mb-4"
             onPress={() => navigation.goBack()}
           >
-            <Text className="text-white text-xl text-center font-semibold">
+            <Text className="text-white text-lg text-center font-semibold">
               {t("Otpverification.Go Back")}
             </Text>
           </TouchableOpacity>
@@ -453,11 +455,11 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
               colors={["#F35125", "#FF1D85"]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
-              className={`flex items-center py-3 justify-center rounded-3xl ${
+              className={`flex items-center h-[50px] justify-center rounded-3xl ${
                 !isOtpValid || isVerified ? "bg-gray-400" : "bg-[#000000]"
               }`}
             >
-              <Text className="text-white text-xl font-semibold">
+              <Text className="text-white text-lg font-semibold">
                 {t("Otpverification.Verify")}
               </Text>
             </LinearGradient>

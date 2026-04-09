@@ -75,6 +75,8 @@ import CapitalRequstQRScanner from "@/component/qr-screen/CapitalRequstQRScanner
 import AddOnboardSupplier from "@/component/onboard-supplier/AddOnboardSupplier";
 import OtpverificationOnboardSupplier from "@/component/otp-screen/OtpverificationOnboardSupplier";
 import AddOnboardSupplierOfficer from "@/component/onboard-supplier/AddOnboardSupplierOfficer";
+import LocationAccess from "@/component/permission/LocationAccess";
+import CameraAccess from "@/component/permission/CameraAccess";
 
 import { initDatabase } from "@/database/index";
 
@@ -303,6 +305,8 @@ function AppContent() {
             <Stack.Screen name="Economical" component={Economical} />
             <Stack.Screen name="Labour" component={Labour} />
             <Stack.Screen name="HarvestStorage" component={HarvestStorage} />
+            <Stack.Screen name="LocationAccess" component={LocationAccess} />
+            <Stack.Screen name="CameraAccess" component={CameraAccess} />
             <Stack.Screen
               name="CapitalRequstQRScanner"
               component={CapitalRequstQRScanner}

@@ -135,7 +135,8 @@
     "This NIC is already registered": "මෙම ජාතික හැඳුනුම්පත දැනටමත් ලියාපදිංචි කර ඇත.",
     "Please enter a valid License ID number":"වලංගු බලපත්‍ර හැඳුනුම්පත් අංකයක් (1 ලොකු අකුර + ඉලක්කම් 7 හෝ ඉලක්කම් 10–12) ඇතුළත් කරන්න.",
     "At least one image of the water source is required":"ජල මූලාශ්‍රයේ අවම වශයෙන් එක් රූපයක්වත් අවශ්‍ය වේ.",
-    "pH is required":"pH අගය අවශ්‍යයි"
+    "pH is required":"pH අගය අවශ්‍යයි",
+    "Overall soil fertility is required":"සමස්ත පසේ සාරවත් බව අවශ්‍ය වේ."
   },
   "Login": {
     "Welcome": "සාදරයෙන් පිළිගනිමු!",
@@ -737,5 +738,21 @@
     "Back": "ආපසු",
     "Didn't receive the OTP": "OTP එක ලැබුනේ නැද්ද?",
     "Account created successfully": "ගිණුම සාර්ථකව නිර්මාණය කරන ලදී."
+  },
+  "Permission":{
+   "locationAccess": "Location Access",
+    "enableLocationMessage": "Enable location access to access location information.",
+    "allow": "Allow",
+    "requesting": "Requesting...",
+    "success": "Success",
+    "locationEnabled": "Location access enabled successfully!",
+    "permissionDenied": "Permission Denied",
+    "enableLocationManually": "Location access is required. Please enable it in settings.",
+    "openSettings": "Open Settings",
+    "permissionError": "Unable to request location permission. Please try again.",
+    "skipLocation": "Skip Location?",
+    "skipMessage": "Some features may not work properly without location access. Are you sure?",
+    "skip": "Skip",
+    "skipForNow": "Skip for now"
   }
 }

@@ -89,14 +89,14 @@ const Input = ({
   <View className="mb-4">
     <FormLabel label={label} required={required} extra={extra} />
     <View
-      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
+      className={`bg-[#F6F6F6] rounded-3xl flex-row items-center ${
         error ? "border border-red-500" : ""
       }`}
     >
       <TextInput
         placeholder={placeholder}
         placeholderTextColor="#838B8C"
-        className="px-5 py-4 text-base text-black flex-1"
+        className="px-5 h-[50px] text-base text-black flex-1"
         value={value}
         onChangeText={onChangeText}
         keyboardType={keyboardType}

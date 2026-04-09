@@ -135,7 +135,8 @@
     "This NIC is already registered": "இந்த NIC ஏற்கனவே பதிவு செய்யப்பட்டுள்ளது",
     "Please enter a valid License ID number":"சரியான உரிம அடையாள எண்ணை (1 பெரிய எழுத்து + 7 இலக்கங்கள் அல்லது 10–12 இலக்கங்கள்) உள்ளிடவும்.",
     "At least one image of the water source is required":"நீர் ஆதாரத்தின் குறைந்தபட்சம் ஒரு புகைப்படம் தேவைப்படுகிறது.",
-    "pH is required":"pH தேவைப்படுகிறது"
+    "pH is required":"pH தேவைப்படுகிறது",
+    "Overall soil fertility is required":"ஒட்டுமொத்த மண் வளம் தேவைப்படுகிறது"
   },
   "Login": {
     "Welcome": "வரவேற்கிறோம்",
@@ -737,5 +738,21 @@
     "Back": "பின்னால்",
     "Didn't receive the OTP": "OTP வரவில்லையா?",
     "Account created successfully": "கணக்கு வெற்றிகரமாக உருவாக்கப்பட்டது"
+  },
+  "Permission":{
+   "locationAccess": "Location Access",
+    "enableLocationMessage": "Enable location access to access location information.",
+    "allow": "Allow",
+    "requesting": "Requesting...",
+    "success": "Success",
+    "locationEnabled": "Location access enabled successfully!",
+    "permissionDenied": "Permission Denied",
+    "enableLocationManually": "Location access is required. Please enable it in settings.",
+    "openSettings": "Open Settings",
+    "permissionError": "Unable to request location permission. Please try again.",
+    "skipLocation": "Skip Location?",
+    "skipMessage": "Some features may not work properly without location access. Are you sure?",
+    "skip": "Skip",
+    "skipForNow": "Skip for now"
   }
 }

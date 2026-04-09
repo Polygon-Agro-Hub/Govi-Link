@@ -390,12 +390,9 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
           </View>
 
           <TouchableOpacity onPress={() => handleDial(requestData.phoneNumber)}>
-            <View
-              className="flex-row self-center items-center justify-center border border-[#F83B4F] rounded-full py-2.5"
-              style={{ width: "55%" }}
-            >
-              <FontAwesome6 name="phone-volume" size={16} color="#F83B4F" />
-              <Text className="text-sm font-semibold ml-2 text-[#070707]">
+            <View className="flex-row self-center w-2/3 h-[50px] items-center justify-center border border-[#F83B4F] rounded-full py-2.5">
+              <FontAwesome6 name="phone-volume" size={18} color="#F83B4F" />
+              <Text className="text-lg font-semibold ml-3 text-[#070707]">
                 {t("VisitPopup.Get Call")}
               </Text>
             </View>
@@ -436,11 +433,10 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
           >
             <LinearGradient
               colors={["#F35125", "#FF1D85"]}
+              className="h-[50px] rounded-3xl item-center justify-center"
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={{
-                borderRadius: 50,
-                paddingVertical: 14,
                 alignItems: "center",
                 shadowColor: "#000",
                 shadowOffset: { width: 0, height: 3 },
@@ -449,7 +445,7 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
                 elevation: 6,
               }}
             >
-              <Text className="text-white text-base font-semibold">
+              <Text className="text-white text-lg font-semibold">
                 {t("RequestLetter.Start")}
               </Text>
             </LinearGradient>

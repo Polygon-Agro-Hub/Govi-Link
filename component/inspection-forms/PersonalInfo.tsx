@@ -66,14 +66,14 @@ const Input = ({
       {label} {required && <Text className="text-black">*</Text>}
     </Text>
     <View
-      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
+      className={`bg-[#F6F6F6] rounded-3xl h-[50px] flex-row items-center ${
         error ? "border border-red-500" : ""
       }`}
     >
       <TextInput
         placeholder={placeholder}
         placeholderTextColor="#838B8C"
-        className="px-5 py-4 text-base text-black flex-1"
+        className="px-5  text-base text-black flex-1"
         value={value}
         onChangeText={onChangeText}
         keyboardType={keyboardType}
@@ -310,6 +310,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
   const route = useRoute<RouteProp<RootStackParamList, "PersonalInfo">>();
   const { requestNumber, requestId } = route.params;
   const { t, i18n } = useTranslation();
+  const [isLoaded, setIsLoaded] = useState(false);
   const [formData, setFormData] = useState<PersonalInfo>({
     firstName: "",
     lastName: "",
@@ -347,6 +348,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
   const districts: DistrictsMap = districtData;
 
   useEffect(() => {
+    if (!isLoaded) return;
     const timer = setTimeout(() => {
       if (requestId) {
         try {
@@ -358,7 +360,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [formData, requestId]);
+  }, [formData, requestId, isLoaded]);
 
   useFocusEffect(
     useCallback(() => {
@@ -368,8 +370,13 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
 
   useFocusEffect(
     useCallback(() => {
+      setIsLoaded(false);
+
       const loadData = async () => {
-        if (!requestId) return;
+        if (!requestId) {
+          setIsLoaded(true);
+          return;
+        }
 
         try {
           const reqId = Number(requestId);
@@ -411,6 +418,8 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           }
         } catch (error) {
           console.error("Failed to load from SQLite:", error);
+        } finally {
+          setIsLoaded(true);
         }
       };
 
@@ -419,6 +428,8 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
   );
 
   useEffect(() => {
+    if (!isLoaded) return;
+
     const requiredFields: (keyof PersonalInfo)[] = [
       "firstName",
       "lastName",
@@ -431,7 +442,6 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
       "street",
       "cityName",
       "district",
-      "province",
       "country",
     ];
 
@@ -442,9 +452,24 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
       );
     });
 
-    const hasErrors = Object.keys(errors).length > 0;
-    setIsNextEnabled(allFilled && !hasErrors);
-  }, [formData, errors]);
+    const requiredErrorKeys: (keyof PersonalInfo)[] = [
+      "firstName",
+      "lastName",
+      "otherName",
+      "callName",
+      "phone1",
+      "familyPhone",
+      "email1",
+      "house",
+      "street",
+      "cityName",
+      "district",
+    ];
+
+    const hasRequiredErrors = requiredErrorKeys.some((key) => errors[key]);
+
+    setIsNextEnabled(allFilled && !hasRequiredErrors);
+  }, [formData, errors, isLoaded]);
 
   const updateFormData = (updates: Partial<PersonalInfo>) => {
     setFormData((prev) => ({ ...prev, ...updates }));
@@ -749,7 +774,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
 
   const renderDistrictSearchInput = () => (
     <View className="px-4 py-2 border-b border-gray-200">
-      <View className="bg-gray-100 rounded-lg px-3 flex-row items-center">
+      <View className="bg-gray-100 h-[50px] rounded-3xl px-3 flex-row items-center">
         <MaterialIcons name="search" size={20} color="#666" />
         <TextInput
           placeholder={t("AddOfficer.SearchDistrict") || "Search district..."}
@@ -790,7 +815,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
     placeholder: string,
   ) => (
     <View className="px-4 py-2 border-b border-gray-200">
-      <View className="bg-gray-100 rounded-lg px-3 flex-row items-center">
+      <View className="bg-gray-100 h-[50px] rounded-3xl px-3 flex-row items-center">
         <MaterialIcons name="search" size={20} color="#666" />
         <TextInput
           placeholder={placeholder}
@@ -809,10 +834,10 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
   );
 
   const handleExit = () => {
-  navigation.navigate("RequestDetails", {
+    navigation.navigate("RequestDetails", {
       requestId,
       requestNumber,
-    })
+    });
   };
 
   const handleTabPress = (tabKey: string) => {
