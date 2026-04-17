@@ -102,7 +102,6 @@
     "noOfDependents is required": "Number of dependents is required",
     "debtsOfFarmer is required": "Existing debts of the farmer is required",
     "ID Proof Type is required": "ID proof type is required",
-    "At least one option must be selected.": "At least one option must be selected. (without Special Farm Tools)",
     "At least one": "At least one {{category}} option must be selected",
     "Please specify any special farm tools utilized by the farmer.": "Please specify any special farm tools utilized by the farmer.",
     "Permission Denied": "Permission Denied",
@@ -136,7 +135,11 @@
     "Please enter a valid License ID number":"Please enter a valid License ID number (1 capital letter + 7 digits or 10–12 digits)",
     "At least one image of the water source is required":"At least one image of the water source is required",
     "pH is required":"pH is required",
-    "Overall soil fertility is required":"Overall soil fertility is required"
+    "Overall soil fertility is required":"Overall soil fertility is required",
+    "Land ownership is required":"Land ownership is required",
+    "Ownership status is required":"Ownership status is required",
+    "Knowledge field is required":"Knowledge field is required",
+    "Previous experience is required":"Previous experience is required"
   },
   "Login": {
     "Welcome": "Welcome!",
@@ -145,7 +148,7 @@
     "Password": "Password",
     "Sign in": "Sign in",
     "Please enter Employee ID in uppercase letters": "Please enter Employee ID in uppercase letters",
-    "Password & Employee ID are not allowed to be empty": "Password & Employee ID are not allowed to be empty",
+    "Password and Employee ID are required": "Password and Employee ID are required",
     "Password is not allowed to be empty": "Password is not allowed to be empty",
     "Employee ID is not allowed to be empty": "Employee ID is not allowed to be empty",
     "Invalid EMP ID & Password": "Invalid EMP ID & Password",
@@ -555,7 +558,7 @@
     "Next": "Next",
     "Exit": "Exit",
     "ID Proof Type": "ID Proof Type",
-    "-- Select ID Proof --": "-- Select ID Proof --",
+    "Select Proof Type": "-- Select Proof Type --",
     "NIC Number": "NIC Number",
     "Driving License": "Driving License",
     "Driving License ID": "Driving License ID",

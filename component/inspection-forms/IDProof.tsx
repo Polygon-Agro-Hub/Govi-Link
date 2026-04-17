@@ -530,7 +530,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
                 >
                   {formData.pType
                     ? t(`InspectionForm.${formData.pType}`)
-                    : t("InspectionForm.-- Select ID Proof --")}
+                    : t("InspectionForm.Select Proof Type")}
                 </Text>
                 <AntDesign name="down" size={20} color="#838B8C" />
               </View>

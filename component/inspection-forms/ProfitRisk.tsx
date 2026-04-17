@@ -48,18 +48,11 @@ const FormLabel = ({
   className?: string;
 }) => {
   const baseStyle = "text-sm text-[#070707]";
-  const words = label.trim().split(" ");
-  const lastWord = words.pop() ?? "";
-  const leadingText = words.join(" ");
 
   return (
-    <View className="flex-row flex-wrap mb-2">
-      {leadingText.length > 0 && (
-        <Text className={`${baseStyle} ${extraClass}`}>{leadingText} </Text>
-      )}
-
+    <View className="mb-2">
       <Text className={`${baseStyle} ${extraClass}`}>
-        {lastWord}
+        {label}
         {extra ? <Text className="text-black font-bold"> {extra}</Text> : null}
         {required ? <Text className="text-black"> *</Text> : null}
       </Text>
@@ -138,7 +131,7 @@ const YesNoSelect = ({
             {["Yes", "No"].map((item, index, arr) => (
               <View key={item}>
                 <TouchableOpacity
-                  className="py-4"
+                  className="py-3"
                   onPress={() => {
                     onSelect(item as "Yes" | "No");
                     onClose();
@@ -158,8 +151,11 @@ const YesNoSelect = ({
         </TouchableOpacity>
       </Modal>
 
+      {/* Field */}
       <View className="mt-4">
-        <FormLabel label={label} required={required} />
+        <Text className="text-sm text-[#070707] mb-2">
+          {label} {required && <Text className="text-black">*</Text>}
+        </Text>
 
         <TouchableOpacity
           className="bg-[#F6F6F6] rounded-full px-4 py-4 flex-row items-center justify-between"
@@ -173,7 +169,6 @@ const YesNoSelect = ({
               {t("InspectionForm.--Select From Here--")}
             </Text>
           )}
-
           <AntDesign name="down" size={20} color="#838B8C" />
         </TouchableOpacity>
       </View>

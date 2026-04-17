@@ -118,10 +118,9 @@ const isOpportunitySelectionValid = (
   opportunity: string[],
   otherOpportunity: string,
 ): boolean => {
-  const nonOtherSelected = opportunity.filter((o) => o !== "Other").length > 0;
-  const otherFilledIn =
-    opportunity.includes("Other") && !!otherOpportunity?.trim();
-  return nonOtherSelected || otherFilledIn;
+  if (opportunity.length === 0) return false;
+  if (opportunity.includes("Other") && !otherOpportunity?.trim()) return false;
+  return true;
 };
 
 const getOpportunityError = (
@@ -134,10 +133,6 @@ const getOpportunityError = (
   }
   if (opportunity.includes("Other") && !otherOpportunity?.trim()) {
     return t("Error.Please specify the other opportunity to go for");
-  }
-  const nonOtherSelected = opportunity.filter((o) => o !== "Other").length > 0;
-  if (!nonOtherSelected && !opportunity.includes("Other")) {
-    return t("Error.Please select at least one opportunity to go for");
   }
   return "";
 };
@@ -711,17 +706,21 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
                 setExperienceModalVisible(true);
               }}
             >
-              <Text
-                className={
-                  formData.prevExperince ? "text-black" : "text-[#A3A3A3]"
-                }
-              >
-                {formData.prevExperince
-                  ? t(`InspectionForm.${formData.prevExperince}`)
-                  : t("InspectionForm.--Select From Here--")}
-              </Text>
+              <View className="flex-1 mr-2">
+                <Text
+                  className={
+                    formData.prevExperince ? "text-black" : "text-[#A3A3A3]"
+                  }
+                  numberOfLines={2}
+                >
+                  {formData.prevExperince
+                    ? t(`InspectionForm.${formData.prevExperince}`)
+                    : t("InspectionForm.--Select From Here--")}
+                </Text>
+              </View>
               <AntDesign name="down" size={20} color="#838B8C" />
             </TouchableOpacity>
+
             {errors.prevExperince && (
               <ErrorMessage message={errors.prevExperince} />
             )}

@@ -30,31 +30,6 @@ type HarvestStorageProps = {
   navigation: any;
 };
 
-const FormLabel = ({
-  label,
-  required = false,
-}: {
-  label: string;
-  required?: boolean;
-}) => {
-  const words = label.trim().split(" ");
-  const lastWord = words.pop() ?? "";
-  const leadingText = words.join(" ");
-
-  return (
-    <View className="flex-row flex-wrap mb-2">
-      {leadingText.length > 0 && (
-        <Text className="text-sm text-[#070707]">{leadingText} </Text>
-      )}
-
-      <Text className="text-sm text-[#070707]">
-        {lastWord}
-        {required ? <Text className="text-black"> *</Text> : null}
-      </Text>
-    </View>
-  );
-};
-
 const YesNoSelect = ({
   label,
   value,
@@ -86,7 +61,7 @@ const YesNoSelect = ({
             {["Yes", "No"].map((item, index, arr) => (
               <View key={item}>
                 <TouchableOpacity
-                  className="py-4"
+                  className="py-3"
                   onPress={() => {
                     onSelect(item as "Yes" | "No");
                     onClose();
@@ -96,7 +71,6 @@ const YesNoSelect = ({
                     {t(`InspectionForm.${item}`)}
                   </Text>
                 </TouchableOpacity>
-
                 {index !== arr.length - 1 && (
                   <View className="h-px bg-gray-300 mx-4" />
                 )}
@@ -106,8 +80,13 @@ const YesNoSelect = ({
         </TouchableOpacity>
       </Modal>
 
+      {/* Field */}
       <View className="mt-4">
-        <FormLabel label={label} required={required} />
+        {/* Single Text block — asterisk stays inline, never orphaned */}
+        <Text className="text-sm text-[#070707] mb-2 leading-5">
+          {label.trim()}
+          {required ? <Text className="text-black">{"\u00A0*"}</Text> : null}
+        </Text>
 
         <TouchableOpacity
           className="bg-[#F6F6F6] rounded-full px-4 py-4 flex-row items-center justify-between"
@@ -121,7 +100,6 @@ const YesNoSelect = ({
               {t("InspectionForm.--Select From Here--")}
             </Text>
           )}
-
           <AntDesign name="down" size={20} color="#838B8C" />
         </TouchableOpacity>
       </View>
