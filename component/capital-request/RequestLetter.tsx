@@ -365,7 +365,7 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
           shadowOpacity: 0.15,
           shadowRadius: 8,
           elevation: 10,
-          overflow: "hidden",
+          //  overflow: "hidden",
           position: "absolute",
           bottom: 0,
           left: 0,
@@ -430,22 +430,15 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
                 console.log("Error navigating to QR Scanner:", e);
               }
             }}
+            className="rounded-3xl overflow-hidden h-[50px] w-[300px] self-center "
           >
             <LinearGradient
-              colors={["#F35125", "#FF1D85"]}
-              className="h-[50px] rounded-3xl item-center justify-center"
+              colors={["#F2561D", "#FF1D85"]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
-              style={{
-                alignItems: "center",
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 3 },
-                shadowOpacity: 0.25,
-                shadowRadius: 5,
-                elevation: 6,
-              }}
+              className="flex-1 items-center justify-center"
             >
-              <Text className="text-white text-lg font-semibold">
+              <Text style={{ color: "white", fontSize: 18, fontWeight: "600" }}>
                 {t("RequestLetter.Start")}
               </Text>
             </LinearGradient>

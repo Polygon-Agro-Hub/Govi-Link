@@ -345,19 +345,33 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
               <TouchableOpacity
                 onPress={handleUndo}
                 disabled={assigning || hasNavigatedRef.current}
-                className={`px-10 py-3 rounded-3xl items-center ml-3 mt-auto ${
-                  assigning || hasNavigatedRef.current
-                    ? "bg-gray-400"
-                    : "bg-black"
-                }`}
+                className="ml-3 mt-auto"
               >
-                {assigning ? (
-                  <ActivityIndicator size="small" color="white" />
-                ) : (
-                  <Text className="text-white text-md font-semibold">
-                    {t("ConfirmationCapitalRequest.UndoButton")}
-                  </Text>
-                )}
+                <LinearGradient
+                  colors={
+                    assigning || hasNavigatedRef.current
+                      ? ["#CCCCCC", "#CCCCCC"]
+                      : ["#2C2C2C", "#000000"]
+                  }
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  className="px-10 py-3 rounded-3xl items-center"
+                  style={{
+                    shadowColor: "#000000",
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: 0.25,
+                    shadowRadius: 10,
+                    elevation: 6,
+                  }}
+                >
+                  {assigning ? (
+                    <ActivityIndicator size="small" color="white" />
+                  ) : (
+                    <Text className="text-white text-md font-semibold">
+                      {t("ConfirmationCapitalRequest.UndoButton")}
+                    </Text>
+                  )}
+                </LinearGradient>
               </TouchableOpacity>
             </View>
           </View>

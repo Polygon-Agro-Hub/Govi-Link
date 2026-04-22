@@ -102,7 +102,6 @@
     "noOfDependents is required": "Number of dependents is required",
     "debtsOfFarmer is required": "Existing debts of the farmer is required",
     "ID Proof Type is required": "ID proof type is required",
-    "At least one option must be selected.": "At least one option must be selected. (without Special Farm Tools)",
     "At least one": "At least one {{category}} option must be selected",
     "Please specify any special farm tools utilized by the farmer.": "Please specify any special farm tools utilized by the farmer.",
     "Permission Denied": "Permission Denied",
@@ -136,7 +135,11 @@
     "Please enter a valid License ID number":"சரியான உரிம அடையாள எண்ணை (1 பெரிய எழுத்து + 7 இலக்கங்கள் அல்லது 10–12 இலக்கங்கள்) உள்ளிடவும்.",
     "At least one image of the water source is required":"நீர் ஆதாரத்தின் குறைந்தபட்சம் ஒரு புகைப்படம் தேவைப்படுகிறது.",
     "pH is required":"pH தேவைப்படுகிறது",
-    "Overall soil fertility is required":"ஒட்டுமொத்த மண் வளம் தேவைப்படுகிறது"
+    "Overall soil fertility is required":"ஒட்டுமொத்த மண் வளம் தேவைப்படுகிறது",
+    "Land ownership is required":"நில உரிமை தேவைப்படுகிறது",
+    "Ownership status is required":"உரிமை நிலை தேவைப்படுகிறது",
+    "Knowledge field is required":"துறை சார்ந்த அறிவு தேவைப்படுகிறது",
+    "Previous experience is required":"முன் அனுபவம் தேவை"
   },
   "Login": {
     "Welcome": "வரவேற்கிறோம்",
@@ -145,7 +148,7 @@
     "Password": "கடவுச்சொல்",
     "Sign in": "உள்நுழை",
     "Please enter Employee ID in uppercase letters": "பணியாளர் ஐடியை பெரிய எழுத்துக்களில் உள்ளிடவும்.",
-    "Password & Employee ID are not allowed to be empty": "கடவுச்சொல் மற்றும் பணியாளர் எண் வெறுமையாக இருக்க அனுமதிக்கப்படவில்லை.",
+    "Password and Employee ID are required": "கடவுச்சொல் மற்றும் பணியாளர் அடையாள எண் தேவை.",
     "Password is not allowed to be empty": "கடவுச்சொல் வெறுமையாக இருக்க அனுமதி இல்லை.",
     "Employee ID is not allowed to be empty": "பணியாளர் எண் காலியாக இருக்க அனுமதி இல்லை.",
     "Invalid EMP ID & Password": "தவறான பணியாளர் எண் மற்றும் கடவுச்சொல்",

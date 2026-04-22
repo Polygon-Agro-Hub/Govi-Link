@@ -411,12 +411,10 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
     const isSoilTypeValid = !!formData.soilType?.trim();
 
     const waterSources = formData.waterSources || [];
-    const isWaterSourceValid = waterSources.some((source) => {
-      if (source === "Other") {
-        return formData.otherWaterSources?.trim().length > 0;
-      }
-      return true;
-    });
+    const hasOther = waterSources.includes("Other");
+    const isWaterSourceValid =
+      waterSources.length > 0 &&
+      (!hasOther || (formData.otherWaterSources?.trim().length ?? 0) > 0);
 
     const isOverallSoilFertilityValid = !!formData.soilfertility;
 
@@ -556,22 +554,17 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
 
     let errorMsg = "";
 
-    const hasValidSource = updatedOptions.some((source) => {
-      if (source === "Other") {
-        return formData.otherWaterSources?.trim().length > 0;
-      }
-      return true;
-    });
+    const hasOther = updatedOptions.includes("Other");
+    const otherFilled = (formData.otherWaterSources?.trim().length ?? 0) > 0;
 
     if (updatedOptions.length === 0) {
       errorMsg = t("Error.Please select at least one water source");
-    } else if (!hasValidSource) {
+    } else if (hasOther && !otherFilled) {
       errorMsg = t("Error.Please specify the other water source");
     }
 
     setErrors((prev) => ({ ...prev, waterSources: errorMsg }));
   };
-
   const handleOtherWaterSourceChange = (text: string) => {
     const trimmedText = text.replace(/^\s+/, "");
 
@@ -579,17 +572,11 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
 
     let errorMsg = "";
     const waterSources = formData.waterSources || [];
-
-    const hasValidSource = waterSources.some((source) => {
-      if (source === "Other") {
-        return trimmedText.trim().length > 0;
-      }
-      return true;
-    });
+    const hasOther = waterSources.includes("Other");
 
     if (waterSources.length === 0) {
       errorMsg = t("Error.Please select at least one water source");
-    } else if (!hasValidSource) {
+    } else if (hasOther && trimmedText.trim().length === 0) {
       errorMsg = t("Error.Please specify the other water source");
     }
 

@@ -102,7 +102,6 @@
     "noOfDependents is required": "යැපෙන්නන් සංඛ්‍යාව අවශ්‍ය වේ",
     "debtsOfFarmer is required": "ගොවියාගේ පවතින ණය ගෙවීම අවශ්‍ය වේ",
     "ID Proof Type is required": "හැඳුනුම්පත් සාක්ෂි වර්ගය අවශ්‍යයි",
-    "At least one option must be selected.": "අවම වශයෙන් එක් විකල්පයක්වත් තෝරා ගත යුතුය. (විශේෂ ගොවිපල මෙවලම් නොමැතිව)",
     "At least one": "අවම වශයෙන් එක් {{category}} විකල්පයක්වත් තෝරා ගත යුතුය.",
     "Please specify any special farm tools utilized by the farmer.": "ගොවියා විසින් භාවිතා කරන විශේෂ ගොවිපල මෙවලම් තිබේ නම් කරුණාකර සඳහන් කරන්න.",
     "Permission Denied": "අවසරය ප්රතික්ෂේප කෙරිණි",
@@ -136,7 +135,11 @@
     "Please enter a valid License ID number":"වලංගු බලපත්‍ර හැඳුනුම්පත් අංකයක් (1 ලොකු අකුර + ඉලක්කම් 7 හෝ ඉලක්කම් 10–12) ඇතුළත් කරන්න.",
     "At least one image of the water source is required":"ජල මූලාශ්‍රයේ අවම වශයෙන් එක් රූපයක්වත් අවශ්‍ය වේ.",
     "pH is required":"pH අගය අවශ්‍යයි",
-    "Overall soil fertility is required":"සමස්ත පසේ සාරවත් බව අවශ්‍ය වේ."
+    "Overall soil fertility is required":"සමස්ත පසේ සාරවත් බව අවශ්‍ය වේ.",
+    "Land ownership is required":"ඉඩම් හිමිකම අවශ්‍යයි",
+    "Ownership status is required":"හිමිකාරිත්ව තත්ත්වය අවශ්‍යයි",
+    "Knowledge field is required":"දැනුම ක්ෂේත්‍රය අවශ්‍යයි",
+    "Previous experience is required":"පෙර අත්දැකීම් අවශ්‍යයි"
   },
   "Login": {
     "Welcome": "සාදරයෙන් පිළිගනිමු!",
@@ -145,7 +148,7 @@
     "Password": "මුරපදය",
     "Sign in": "පුරන්න",
     "Please enter Employee ID in uppercase letters": "කරුණාකර සේවක හැඳුනුම්පත මහකුරුවලින් ඇතුළත් කරන්න.",
-    "Password & Employee ID are not allowed to be empty": "මුරපදය සහ සේවක පරිශීලක අංකය හිස්ව තැබිය නොහැක.",
+    "Password and Employee ID are required": "මුරපදය සහ සේවක හැඳුනුම්පත අවශ්‍ය වේ.",
     "Password is not allowed to be empty": "මුරපදය හිස්ව තැබිය නොහැක.",
     "Employee ID is not allowed to be empty": "මුරපදය සහ සේවක පරිශීලක අංකය හිස්ව තැබිය නොහැක.",
     "Invalid EMP ID & Password": "වැරදි සේවක අංකයක් සහ මුරපදයකි",
