@@ -540,17 +540,33 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
                   <TouchableOpacity
                     onPress={handleUndo}
                     disabled={assigning}
-                    className={`px-5 py-3 rounded-3xl items-center ml-3 mt-auto ${
-                      assigning ? "bg-gray-400" : "bg-black"
-                    }`}
+                    className="ml-3 mt-auto"
                   >
-                    {assigning ? (
-                      <ActivityIndicator size="small" color="white" />
-                    ) : (
-                      <Text className="text-white text-md font-semibold">
-                        {t("AssignJobOfficerList.UndoButton")}
-                      </Text>
-                    )}
+                    <LinearGradient
+                      colors={
+                        assigning
+                          ? ["#CCCCCC", "#CCCCCC"]
+                          : ["#2C2C2C", "#000000"]
+                      }
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 0 }}
+                      className="px-10 py-3 rounded-3xl items-center"
+                      style={{
+                        shadowColor: "#000",
+                        shadowOffset: { width: 0, height: 3 },
+                        shadowOpacity: 0.25,
+                        shadowRadius: 5,
+                        elevation: 6,
+                      }}
+                    >
+                      {assigning ? (
+                        <ActivityIndicator size="small" color="white" />
+                      ) : (
+                        <Text className="text-white text-md font-semibold">
+                          {t("AssignJobOfficerList.UndoButton")}
+                        </Text>
+                      )}
+                    </LinearGradient>
                   </TouchableOpacity>
                 </View>
               </View>

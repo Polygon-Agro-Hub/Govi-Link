@@ -89,7 +89,7 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
     if (!empid && !password) {
       Alert.alert(
         t("Error.error"),
-        t("Login.Password & Employee ID are not allowed to be empty"),
+        t("Login.Password and Employee ID are required"),
       );
       return false;
     }

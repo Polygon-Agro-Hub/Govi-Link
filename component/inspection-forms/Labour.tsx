@@ -60,7 +60,7 @@ const YesNoSelect = ({
             {["Yes", "No"].map((item, index, arr) => (
               <View key={item}>
                 <TouchableOpacity
-                  className="py-4"
+                  className="py-3"
                   onPress={() => {
                     onSelect(item as "Yes" | "No");
                     onClose();
@@ -98,7 +98,6 @@ const YesNoSelect = ({
               {t("InspectionForm.--Select From Here--")}
             </Text>
           )}
-
           <AntDesign name="down" size={20} color="#838B8C" />
         </TouchableOpacity>
       </View>

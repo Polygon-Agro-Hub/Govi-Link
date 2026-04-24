@@ -247,7 +247,9 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     if (!valid && Object.values(checkedAssets).some(Boolean)) {
       setErrors((prev) => ({
         ...prev,
-        assets: t("Error.At least one option must be selected."),
+        assets: t(
+          "Error.Please specify any special farm tools utilized by the farmer.",
+        ),
       }));
     } else {
       setErrors((prev) => {
@@ -694,12 +696,15 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     setShowBankDropdown(false);
 
     updateFormData({ bank: bank.name, branch: "" });
+    setErrors((prev) => ({ ...prev, bank: "", branch: "" }));
   };
 
   const handleBranchSelect = (branch: { ID: number; name: string }) => {
     setSelectedBranch(branch.name);
     handleModalClose("branch");
     updateFormData({ branch: branch.name });
+
+    setErrors((prev) => ({ ...prev, branch: "" }));
   };
 
   const sortBanksAlphabetically = (
@@ -985,9 +990,16 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
             </TouchableOpacity>
             {errors.bank && (
-              <Text className="text-red-500 text-sm mt-1 ml-2">
-                {errors.bank}
-              </Text>
+              <View className="flex-row items-center mt-1 ml-4">
+                <FontAwesome
+                  name="exclamation-triangle"
+                  size={16}
+                  color="#EF4444"
+                />
+                <Text className="text-red-500 text-sm ml-1 flex-1">
+                  {errors.bank}
+                </Text>
+              </View>
             )}
           </View>
 
@@ -1010,9 +1022,16 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
             </TouchableOpacity>
             {errors.branch && (
-              <Text className="text-red-500 text-sm mt-1 ml-2">
-                {errors.branch}
-              </Text>
+              <View className="flex-row items-center mt-1 ml-4">
+                <FontAwesome
+                  name="exclamation-triangle"
+                  size={16}
+                  color="#EF4444"
+                />
+                <Text className="text-red-500 text-sm ml-1 flex-1">
+                  {errors.branch}
+                </Text>
+              </View>
             )}
           </View>
 
@@ -1053,10 +1072,10 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               />
             </View>
             {errors.debtsOfFarmer && (
-              <View className="flex-row items-center mt-1 ml-2">
+              <View className="flex-row items-center mt-1 ml-4">
                 <FontAwesome
                   name="exclamation-triangle"
-                  size={14}
+                  size={16}
                   color="#EF4444"
                 />
                 <Text className="text-red-500 text-sm ml-1 flex-1">
@@ -1178,9 +1197,16 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
             })}
 
             {errors.assets && (
-              <Text className="text-red-500 text-sm mt-1 ml-2">
-                {errors.assets}
-              </Text>
+              <View className="flex-row  ml-4 justify-center">
+                <FontAwesome
+                  name="exclamation-triangle"
+                  size={16}
+                  color="#EF4444"
+                />
+                <Text className="text-red-500 text-sm  ml-2">
+                  {errors.assets}
+                </Text>
+              </View>
             )}
           </View>
         </ScrollView>
