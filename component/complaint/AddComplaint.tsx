@@ -13,7 +13,7 @@ import {
   Keyboard,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -24,11 +24,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
 import { useTranslation } from "react-i18next";
 import { useFocusEffect } from "@react-navigation/native";
-import CustomHeader from "../common/CustomHeader";
-import GlobalSearchModal from "../common/GlobalSearchModal";
+import CustomHeader from "../commons/CustomHeader";
+import GlobalSearchModal from "../commons/GlobalSearchModal";
 import { useModal } from "@/hooks/useModal";
 import { MaterialIcons } from "@expo/vector-icons";
-import { StatusBar } from "expo-status-bar";
 
 type AddComplaintScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -197,12 +196,10 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
       keyboardVerticalOffset={Platform.select({ ios: 60, android: 0 })}
       style={{ flex: 1, backgroundColor: "white" }}
     >
-      <StatusBar style="dark" backgroundColor="#fff" />
       <CustomHeader
         title={""}
         navigation={navigation}
         showBackButton={true}
-        showLanguageSelector={false}
         onBackPress={handleBackPress}
       />
       <ScrollView
@@ -227,11 +224,8 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
 
           <TouchableOpacity
             onPress={categoryModal.show}
-            className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-full px-5 flex-row items-center justify-between"
-            style={{
-              height: 55,
-              borderRadius: 25,
-            }}
+            className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-5 flex-row items-center justify-between h-[50px]"
+            
           >
             <Text
               className={`text-base ${selectedCategory ? "text-black" : "text-[#434343]"}`}
@@ -283,7 +277,7 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
               colors={["#F2561D", "#FF1D85"]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
-              className="py-3 rounded-full flex-row items-center justify-center"
+              className="py-3 rounded-3xl flex-row items-center justify-center h-[50px]"
             >
               {loading ? (
                 <>

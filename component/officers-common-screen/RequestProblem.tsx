@@ -8,14 +8,13 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
-  Image,
   Modal,
   BackHandler,
   ActivityIndicator,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp, useRoute, useFocusEffect } from "@react-navigation/native";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import { AntDesign, FontAwesome6 } from "@expo/vector-icons";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -23,6 +22,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useTranslation } from "react-i18next";
 import { environment } from "@/environment/environment";
 import { CameraScreen } from "@/Items/CameraScreen";
+import CustomHeader from "../commons/CustomHeader";
 
 type RequestProblemNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -38,17 +38,13 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
   const route = useRoute<RequestProblemRouteProp>();
   const { govilinkjobid, jobId, farmerId, farmerMobile, screenName } =
     route.params;
-
   const { t } = useTranslation();
-
   const [farmerFeedback, setFarmerFeedback] = useState("");
   const [advice, setAdvice] = useState("");
-
   const [loading, setLoading] = useState(false);
   const [showCameraModal, setShowCameraModal] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
-
   const [countdown, setCountdown] = useState(3);
   const [isButtonEnabled, setIsButtonEnabled] = useState(false);
   const [existingProblem, setExistingProblem] = useState<{
@@ -281,10 +277,12 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
       className="flex-1 bg-white"
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <View className="flex-row items-center px-4 py-4 bg-white shadow-sm border-b border-[#E5E5E5]">
-        <TouchableOpacity
-          className="bg-[#F6F6F680] rounded-full p-2 justify-center w-10 z-20"
-          onPress={() =>
+     
+      <CustomHeader
+        title={`#${jobId}`}
+        navigation={navigation}
+        showBackButton={true}
+        onBackPress={() =>
             navigation.navigate("Main", {
               screen: "MainTabs",
               params: {
@@ -292,14 +290,7 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
               },
             })
           }
-        >
-          <AntDesign name="left" size={22} color="#000" />
-        </TouchableOpacity>
-
-        <View className="flex-1">
-          <Text className="text-base font-semibold text-center">#{jobId}</Text>
-        </View>
-      </View>
+      />
 
       <View className="px-6 mt-6">
         <Text className="text-center text-[#3B424C]">
@@ -318,7 +309,7 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
           {t("RequestProblem.FarmerSay")}
         </Text>
         <TextInput
-          className="border border-[#9DB2CE] rounded-md p-2 mb-4"
+          className="border border-[#9DB2CE] rounded-3xl p-2 mb-4"
           multiline
           placeholder={t("CertificateSuggestions.Type here...")}
           textAlignVertical="top"
@@ -332,7 +323,7 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
         </Text>
 
         <TextInput
-          className="border border-[#9DB2CE] rounded-md p-2 mb-6"
+          className="border border-[#9DB2CE] rounded-3xl p-2 mb-6"
           multiline
           placeholder={t("CertificateSuggestions.Type here...")}
           textAlignVertical="top"
@@ -342,7 +333,7 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
         />
         <TouchableOpacity
           onPress={() => setShowCamera(true)}
-          className="bg-black rounded-3xl w-[50%] self-center py-3 items-center justify-center flex-row space-x-4"
+          className="bg-black rounded-3xl w-2/3 self-center h-[50px] items-center justify-center flex-row space-x-4"
         >
           <FontAwesome6 name="camera" size={24} color="white" />
           <Text className="text-white font-semibold text-sm">
@@ -358,11 +349,18 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
 
       <View className="flex-row justify-between p-4 border-t border-gray-200 px-6">
         <TouchableOpacity
-          className="flex-row items-center bg-[#444444] px-9 py-3 rounded-full "
-          onPress={() => navigation.navigate("Main", { screen: screenName })}
+          className="flex-row items-center bg-[#444444] px-11 h-[50px] rounded-3xl "
+          onPress={() =>
+            navigation.navigate("Main", {
+              screen: "MainTabs",
+              params: {
+                screen: screenName,
+              },
+            })
+          }
         >
           <AntDesign name="arrow-left" size={20} color="#fff" />
-          <Text className="ml-4 text-white font-semibold text-base">
+          <Text className="ml-4 text-white font-semibold text-lg">
             {t("CertificateQuesanory.Exit")}
           </Text>
         </TouchableOpacity>
@@ -376,7 +374,7 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
             colors={["#F35125", "#FF1D85"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
-            className="flex-row items-center px-9 py-3 rounded-full"
+            className="flex-row items-center px-10 h-[50px] rounded-3xl"
           >
             {loading ? (
               <ActivityIndicator
@@ -385,7 +383,7 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
                 style={{ marginRight: 8 }}
               />
             ) : (
-              <Text className="mr-4 text-white font-semibold text-base">
+              <Text className="mr-4 text-white font-semibold text-lg">
                 {t("CertificateQuesanory.Next")}
               </Text>
             )}

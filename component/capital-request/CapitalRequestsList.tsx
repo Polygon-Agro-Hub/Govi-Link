@@ -5,21 +5,20 @@ import {
   TouchableOpacity,
   ScrollView,
   RefreshControl,
-  StatusBar,
   Image,
   Alert,
-  ActivityIndicator,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { environment } from "@/environment/environment";
-import { useDispatch } from "react-redux";
 import { hasDraft, initPersonalTable } from "@/database/inspectionpersonal";
+import LoadingPage from "../commons/LoadingPage";
+import CustomHeader from "../commons/CustomHeader";
 
 type CapitalRequestsNavigationProps = StackNavigationProp<
   RootStackParamList,
@@ -38,7 +37,6 @@ interface Request {
 
 const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
   const { t } = useTranslation();
-  const dispatch = useDispatch();
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [requests, setRequests] = useState<Request[]>([]);
@@ -61,7 +59,6 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
 
       for (const request of requests) {
         const isDraft = hasDraft(request.id);
-
         if (isDraft) {
           drafts.push(request.id);
         }
@@ -85,9 +82,7 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
   }, [requests]);
 
   const fetchCapitalRequests = async (search: string = "") => {
-    if (isFetchingRef.current) {
-      return;
-    }
+    if (isFetchingRef.current) return;
 
     isFetchingRef.current = true;
 
@@ -102,14 +97,10 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
 
       const response = await axios.get(
         `${environment.API_BASE_URL}api/capital-request/requests`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
-      const apiRequests = response.data.requests;
-
-      setRequests(apiRequests);
+      setRequests(response.data.requests);
     } catch (error: any) {
       console.error("Failed to fetch capital requests:", error);
       Alert.alert(t("Error.Error"), t("Error.FailedToLoadRequests"), [
@@ -130,10 +121,6 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
   useFocusEffect(
     useCallback(() => {
       fetchCapitalRequests(searchQuery);
-
-      return () => {
-        console.log("CapitalRequests screen blurred");
-      };
     }, [searchQuery]),
   );
 
@@ -142,43 +129,34 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
     requestNumber: string,
   ) => {
     navigation.navigate("RequestDetails", {
-      requestId: requestId,
-      requestNumber: requestNumber,
+      requestId,
+      requestNumber,
     });
   };
 
   if (loading && !refreshing) {
     return (
-      <View className="flex-1 bg-white justify-center items-center">
-        <ActivityIndicator size="large" color="#21202B" />
-        <Text className="mt-4 text-[#565559]">
-          {t("CapitalRequests.LoadingRequests")}
-        </Text>
-      </View>
+      <LoadingPage
+        message={t("CapitalRequests.LoadingRequests")}
+        fullScreen={true}
+      />
     );
   }
 
+  const sortedRequests = [...requests].sort((a, b) => {
+    const aIsDraft = draftRequestIds.includes(a.id) ? 0 : 1;
+    const bIsDraft = draftRequestIds.includes(b.id) ? 0 : 1;
+    return aIsDraft - bIsDraft;
+  });
+
   return (
     <View className="flex-1 bg-white">
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-
-      <View className="flex-row items-center px-4 py-3">
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          className="bg-[#F6F6F680] rounded-full py-4 px-3"
-        >
-          <MaterialIcons
-            name="arrow-back-ios"
-            size={24}
-            color="black"
-            style={{ marginLeft: 10 }}
-          />
-        </TouchableOpacity>
-        <Text className="text-lg font-bold text-black text-center flex-1">
-          {t("CapitalRequests.CapitalRequests")}
-        </Text>
-        <View style={{ width: 55 }} />
-      </View>
+      <CustomHeader
+        title={t("CapitalRequests.CapitalRequests")}
+        navigation={navigation}
+        showBackButton={true}
+        onBackPress={() => navigation.goBack()}
+      />
 
       <ScrollView
         className="flex-1 bg-white"
@@ -189,10 +167,10 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
         contentContainerStyle={{ paddingBottom: 70 }}
       >
         <View className="px-6 py-4 space-y-5">
-          {requests.length === 0 ? (
-            <View className="flex justify-center items-center mt-40">
+          {sortedRequests.length === 0 ? (
+            <View className="flex justify-center items-center mt-[70%]">
               <Image
-                source={require("../../assets/no tasks.webp")}
+                source={require("../../assets/images/dashboard/no-tasks.webp")}
                 style={{ width: 120, height: 90 }}
                 resizeMode="contain"
               />
@@ -203,20 +181,28 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
               </Text>
             </View>
           ) : (
-            requests.map((request, index) => {
+            sortedRequests.map((request, index) => {
               const isDraft = draftRequestIds.includes(request.id);
 
               return (
                 <TouchableOpacity
                   key={`${request.id}-${index}`}
-                  className=""
                   onPress={() =>
                     handleNavigateToRequestDetails(request.id, request.jobId)
                   }
+                  style={{
+                    borderRadius: 24,
+                    shadowColor: "#000000",
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.08,
+                    shadowRadius: 3,
+                    elevation: 2,
+                  }}
                 >
                   <View
-                    className="bg-[#ADADAD1A] rounded-3xl p-4 flex-row items-center justify-between"
+                    className="rounded-3xl p-4 flex-row items-center justify-between"
                     style={{
+                      backgroundColor: "#F7F7F7",
                       borderWidth: isDraft ? 1 : 0,
                       borderColor: isDraft ? "#FA4064" : "transparent",
                     }}

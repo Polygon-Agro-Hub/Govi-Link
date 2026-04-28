@@ -9,15 +9,23 @@ import {
   Dimensions,
   BackHandler,
   Pressable,
+  Alert,
+  Linking,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import { CameraView, Camera } from "expo-camera";
 import { useTranslation } from "react-i18next";
-import { AntDesign, Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { useRoute, RouteProp } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect } from "@react-navigation/native";
+import { getLastScreen } from "@/database/inspectionprogress";
+import { environment } from "@/environment/environment";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import CustomHeader from "../commons/CustomHeader";
+import CameraAccess from "../permission/CameraAccess";
 
 type CapitalRequstQRScannerNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -34,43 +42,71 @@ interface CapitalRequstQRScannerProps {
 
 const { width } = Dimensions.get("window");
 const scanningAreaSize = width * 0.8;
+
+const FIRST_SCREEN = "PersonalInfo";
+
 const CapitalRequstQRScanner: React.FC<CapitalRequstQRScannerProps> = ({
   navigation,
 }) => {
   const route = useRoute<CapitalRequstQRScannerRouteProp>();
-  const { farmerId, requestId,requestNumber } =
-    route.params;
+  const { farmerId, requestId, requestNumber } = route.params;
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanned, setScanned] = useState<boolean>(false);
   const [showPermissionModal, setShowPermissionModal] =
     useState<boolean>(false);
+  const [showCameraAccess, setShowCameraAccess] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { t } = useTranslation();
-
   const [isUnsuccessfulModalVisible, setIsUnsuccessfulModalVisible] =
     useState<boolean>(false);
-
-  const [unsuccessfulLoadingBarWidth, setUnsuccessfulLoadingBarWidth] =
-    useState(new Animated.Value(100));
+  const [unsuccessfulLoadingBarWidth] = useState(new Animated.Value(100));
 
   useEffect(() => {
-    const getCameraPermissions = async () => {
-      const { status } = await Camera.requestCameraPermissionsAsync();
-      setHasPermission(status === "granted");
-    };
+    checkCameraPermissions();
+  }, []);
 
-    getCameraPermissions();
+  const checkCameraPermissions = async () => {
+    const { status } = await Camera.getCameraPermissionsAsync();
+    if (status === "granted") {
+      setHasPermission(true);
+      setShowCameraAccess(false);
+    } else {
+      setHasPermission(false);
+      setShowCameraAccess(true);
+    }
+  };
 
-    const unsubscribe = navigation.addListener("focus", () => {
-      setScanned(false);
-      setErrorMessage(null);
-      setIsUnsuccessfulModalVisible(false);
-    });
+  const requestCameraPermission = async () => {
+    const { status } = await Camera.requestCameraPermissionsAsync();
+    if (status === "granted") {
+      setHasPermission(true);
+      setShowCameraAccess(false);
+    } else {
+      setHasPermission(false);
+      Alert.alert(
+        t("Permission.permissionDenied") || "Permission Denied",
+        t("Permission.enableCameraManually") ||
+          "Camera access is required to scan QR codes. Please enable it in settings.",
+        [
+          { text: t("PublicForum.Cancel") || "Cancel", style: "cancel" },
+          {
+            text: t("Permission.openSettings") || "Open Settings",
+            onPress: () => Linking.openSettings(),
+          },
+        ],
+      );
+    }
+  };
 
-    return unsubscribe;
-  }, [navigation]);
+  const handleCameraPermissionGranted = () => {
+    setShowCameraAccess(false);
+    setHasPermission(true);
+  };
 
-
+  const resolveTargetScreen = (reqId: number): string => {
+    const lastScreen = getLastScreen(reqId);
+    return lastScreen ?? FIRST_SCREEN;
+  };
 
   const handleBarCodeScanned = async ({
     data,
@@ -82,7 +118,6 @@ const CapitalRequstQRScanner: React.FC<CapitalRequstQRScannerProps> = ({
 
     try {
       const qrData = JSON.parse(data);
-
       const userId = qrData.userInfo?.id;
 
       if (!userId) {
@@ -91,14 +126,29 @@ const CapitalRequstQRScanner: React.FC<CapitalRequstQRScannerProps> = ({
       if (userId !== farmerId) {
         throw new Error(t("QRScanner.Wrong QR code"));
       }
-      if (userId == farmerId) {
-       
 
-        navigation.navigate("PersonalInfo", {
-         requestNumber,
-                requestId
-        });
+      const token = await AsyncStorage.getItem("token");
+
+      const response = await axios.put(
+        `${environment.API_BASE_URL}api/capital-request/update-officer-status/${requestId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (response.status !== 200) {
+        throw new Error(t("QRScanner.Failed to update officer status"));
       }
+
+      const targetScreen = resolveTargetScreen(requestId);
+
+      navigation.navigate(targetScreen as any, {
+        requestNumber,
+        requestId,
+      });
     } catch (error) {
       console.error("QR Parsing Error:", error);
       setErrorMessage(
@@ -118,6 +168,7 @@ const CapitalRequstQRScanner: React.FC<CapitalRequstQRScannerProps> = ({
       setTimeout(() => {
         setIsUnsuccessfulModalVisible(false);
         setErrorMessage(null);
+        setScanned(false);
       }, 5000);
     }
   };
@@ -128,15 +179,23 @@ const CapitalRequstQRScanner: React.FC<CapitalRequstQRScannerProps> = ({
         navigation.goBack();
         return true;
       };
-
       const subscription = BackHandler.addEventListener(
         "hardwareBackPress",
         onBackPress,
       );
-
       return () => subscription.remove();
     }, []),
   );
+
+  if (showCameraAccess) {
+    return (
+      <CameraAccess
+        navigation={navigation as any}
+        onPermissionGranted={handleCameraPermissionGranted}
+        returnScreen="CapitalRequstQRScanner"
+      />
+    );
+  }
 
   if (hasPermission === null) {
     return (
@@ -150,88 +209,44 @@ const CapitalRequstQRScanner: React.FC<CapitalRequstQRScannerProps> = ({
 
   if (hasPermission === false) {
     return (
-      <Modal
-        visible={showPermissionModal}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setShowPermissionModal(false)}
-      >
-        <View
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text style={{ fontSize: 18, color: "#333" }}>
+          {t("QRScanner.Camera permission denied")}
+        </Text>
+        <TouchableOpacity
           style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-            backgroundColor: "rgba(0,0,0,0.7)",
+            backgroundColor: "#34D399",
+            padding: 10,
+            borderRadius: 8,
+            marginTop: 20,
           }}
+          onPress={checkCameraPermissions}
         >
-          <View
-            style={{
-              backgroundColor: "white",
-              padding: 20,
-              borderRadius: 10,
-              shadowColor: "black",
-              width: "80%",
-            }}
-          >
-            <Text
-              style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}
-            >
-              {t("QRScanner.CameraRequired")}
-            </Text>
-            <Text style={{ color: "#555", marginBottom: 0 }}>
-              {t("QRScanner.WeneedCamera")}
-            </Text>
-            <TouchableOpacity
-              style={{
-                backgroundColor: "#34D399",
-                padding: 10,
-                borderRadius: 8,
-              }}
-              onPress={() => {
-                setShowPermissionModal(false);
-                navigation.navigate("Dashboard");
-              }}
-            >
-              <Text
-                style={{ color: "white", textAlign: "center", fontSize: 16 }}
-              >
-                {" "}
-                {t("QRScanner.Close")}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+          <Text style={{ color: "white", textAlign: "center", fontSize: 16 }}>
+            {t("QRScanner.Try Again")}
+          </Text>
+        </TouchableOpacity>
+      </View>
     );
   }
 
   return (
     <View style={{ flex: 1, position: "relative" }}>
-      <View className="flex-row items-center px-4 py-4 bg-white shadow-sm">
-        <TouchableOpacity
-          className="bg-[#F6F6F680] rounded-full p-2 justify-center w-10 z-20 "
-          onPress={() =>
-            navigation.goBack()
-          }
-        >
-          <AntDesign name="left" size={22} color="#000" />
-        </TouchableOpacity>
+      <CustomHeader
+        title={t("QRScanner.Scan the QR")}
+        navigation={navigation}
+        showBackButton={true}
+        onBackPress={() => navigation.goBack()}
+      />
 
-        <View className="flex-1 ">
-          <Text className="text-lg font-bold text-center -ml-8">
-            {t("QRScanner.Scan the QR")}
-          </Text>
-        </View>
-      </View>
       <CameraView
-        className="flex-1 "
+        className="flex-1"
         onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
-        barcodeScannerSettings={{
-          barcodeTypes: ["qr", "pdf417"],
-        }}
+        barcodeScannerSettings={{ barcodeTypes: ["qr", "pdf417"] }}
         style={{ flex: 1 }}
       />
 
+      {/* Scanning overlay */}
       <View
         style={{
           position: "absolute",
@@ -258,16 +273,12 @@ const CapitalRequstQRScanner: React.FC<CapitalRequstQRScannerProps> = ({
         <View
           style={{ position: "absolute", bottom: 100, alignSelf: "center" }}
         >
-          <TouchableOpacity
-            onPress={() => {
-              setScanned(false);
-            }}
-          >
+          <TouchableOpacity onPress={() => setScanned(false)}>
             <LinearGradient
               colors={["#F2561D", "#FF1D85"]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
-              className={`items-center justify-center rounded-full mt-4 p-4 px-12`}
+              className="items-center justify-center rounded-full mt-4 p-4 px-12"
             >
               <Text style={{ color: "#fff", fontSize: 16 }}>
                 {t("QRScanner.Scan Again")}
@@ -277,6 +288,7 @@ const CapitalRequstQRScanner: React.FC<CapitalRequstQRScannerProps> = ({
         </View>
       )}
 
+      {/* Error modal */}
       <Modal
         transparent={true}
         visible={isUnsuccessfulModalVisible}
@@ -296,7 +308,7 @@ const CapitalRequstQRScanner: React.FC<CapitalRequstQRScannerProps> = ({
               </Text>
               <View className="mb-4">
                 <Image
-                  source={require("../../assets/error.png")}
+                  source={require("../../assets/images/public/error.webp")}
                   className="w-32 h-32"
                   resizeMode="contain"
                 />
@@ -305,7 +317,6 @@ const CapitalRequstQRScanner: React.FC<CapitalRequstQRScannerProps> = ({
                 {t("QRScanner.Wrong QR code")}
               </Text>
             </View>
-
             <View className="absolute bottom-0 left-0 w-full h-2 bg-gray-300">
               <Animated.View
                 className="h-full bg-red-500"

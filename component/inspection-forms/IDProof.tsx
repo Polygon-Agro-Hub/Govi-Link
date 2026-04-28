@@ -5,20 +5,25 @@ import {
   TextInput,
   ScrollView,
   TouchableOpacity,
-  StatusBar,
   Alert,
   KeyboardAvoidingView,
   Platform,
   Modal,
   Image,
+  BackHandler,
 } from "react-native";
-import { Feather, FontAwesome6, AntDesign } from "@expo/vector-icons";
+import {
+  Feather,
+  FontAwesome6,
+  AntDesign,
+  FontAwesome,
+} from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import { CameraScreen } from "@/Items/CameraScreen";
 import FormFooterButton from "./FormFooterButton";
 import {
@@ -26,6 +31,9 @@ import {
   getIDProof,
   IDProofInfo,
 } from "@/database/inspectionidproof";
+import { updateLastScreen } from "@/database/inspectionprogress";
+import { Camera } from "expo-camera";
+import CameraAccess from "../permission/CameraAccess";
 
 type IDProofProps = {
   navigation: any;
@@ -44,7 +52,7 @@ const UploadButton = ({
 }) => (
   <View className="mb-8">
     <TouchableOpacity
-      className="bg-[#1A1A1A] rounded-3xl px-6 py-4 flex-row justify-center items-center"
+      className="bg-[#1A1A1A] rounded-3xl px-6 h-[50px] flex-row justify-center items-center"
       onPress={onPress}
     >
       {image ? (
@@ -52,7 +60,7 @@ const UploadButton = ({
       ) : (
         <FontAwesome6 name="camera" size={22} color="#fff" />
       )}
-      <Text className="text-base text-white ml-3">{title}</Text>
+      <Text className="text-lg text-white ml-3">{title}</Text>
     </TouchableOpacity>
 
     {image && (
@@ -83,13 +91,16 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
     frontImg: null,
     backImg: null,
   });
-
   const [isNextEnabled, setIsNextEnabled] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showCamera, setShowCamera] = useState(false);
   const [cameraSide, setCameraSide] = useState<"front" | "back" | null>(null);
   const [showIdProofDropdown, setShowIdProofDropdown] = useState(false);
   const [isExistingData, setIsExistingData] = useState(false);
+  const [showCameraAccess, setShowCameraAccess] = useState(false);
+  const [pendingCameraSide, setPendingCameraSide] = useState<
+    "front" | "back" | null
+  >(null);
 
   const idProofOptions = [
     { key: "NIC Number", label: "NIC Number" },
@@ -112,9 +123,28 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
 
   useFocusEffect(
     useCallback(() => {
+      updateLastScreen(requestId, "IDProof");
+    }, [requestId]),
+  );
+
+  const validateIdNumber = (pType: string, pNumber: string): string => {
+    if (!pType) return "";
+    if (!pNumber.trim()) return t(`Error.${pType} is required`);
+    if (pType === "NIC Number" && !validateNicNumber(pNumber)) {
+      return t(
+        "Error.NIC Number must be 9 digits followed by 'V' or 12 digits.",
+      );
+    }
+    if (pType === "Driving License ID" && !validateDrivingLicense(pNumber)) {
+      return t("Error.Please enter a valid License ID number");
+    }
+    return "";
+  };
+
+  useFocusEffect(
+    useCallback(() => {
       const loadData = async () => {
         if (!requestId) return;
-
         try {
           const reqId = Number(requestId);
           const localData = await getIDProof(reqId);
@@ -122,6 +152,11 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
           if (localData) {
             setFormData(localData);
             setIsExistingData(true);
+            const nicError = validateIdNumber(
+              localData.pType,
+              localData.pNumber,
+            );
+            setErrors(nicError ? { nic: nicError } : {});
           } else {
             setIsExistingData(false);
           }
@@ -151,37 +186,46 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
     setFormData((prev) => ({ ...prev, ...updates }));
   };
 
-  const openCamera = (side: "front" | "back") => {
-    setCameraSide(side);
-    setShowCamera(true);
+  const openCamera = async (side: "front" | "back") => {
+    const { status } = await Camera.getCameraPermissionsAsync();
+    if (status === "granted") {
+      setCameraSide(side);
+      setShowCamera(true);
+    } else {
+      setPendingCameraSide(side);
+      setShowCameraAccess(true);
+    }
+  };
+
+  const handleCameraPermissionGranted = () => {
+    setShowCameraAccess(false);
+    if (pendingCameraSide) {
+      setCameraSide(pendingCameraSide);
+      setShowCamera(true);
+      setPendingCameraSide(null);
+    }
   };
 
   const handleCameraClose = (uri: string | null) => {
     setShowCamera(false);
-
     if (!uri || !cameraSide) return;
-
-    const updates = {
+    updateFormData({
       [cameraSide === "front" ? "frontImg" : "backImg"]: uri,
-    };
-
-    updateFormData(updates);
-
+    });
     setCameraSide(null);
   };
 
   const handleClearImage = (side: "front" | "back") => {
-    const updates = {
+    updateFormData({
       [side === "front" ? "frontImg" : "backImg"]: null,
-    };
-    updateFormData(updates);
+    });
   };
 
   const validateNicNumber = (input: string) =>
     /^[0-9]{9}V$|^[0-9]{12}$/.test(input);
 
   const validateDrivingLicense = (input: string) =>
-    /^(?:[A-Z]{1,2}[0-9]{8,9}|[0-9]{10})$/.test(input);
+    /^(?:[A-Z][0-9]{7}|[0-9]{10,12})$/.test(input);
 
   const handleIdNumberChange = (input: string) => {
     if (!formData.pType) return;
@@ -195,12 +239,21 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
 
     if (formData.pType === "NIC Number") {
       value = value.replace(/[^0-9V]/g, "");
+      const vIndex = value.indexOf("V");
+      if (vIndex !== -1) {
+        value = value.slice(0, vIndex + 1);
+      }
     } else {
-      value = value.replace(/[^A-Z0-9]/g, "");
+      const hasLetter = /^[A-Z]/.test(value);
+      if (hasLetter) {
+        value = value.replace(/[^A-Z0-9]/g, "");
+        value = value[0] + value.slice(1).replace(/[A-Z]/g, "");
+      } else {
+        value = value.replace(/[^0-9]/g, "");
+      }
     }
 
     let error = "";
-
     if (rules.required && value.trim().length === 0) {
       error = t(`Error.${rules.type} is required`);
     } else if (formData.pType === "NIC Number" && !validateNicNumber(value)) {
@@ -211,12 +264,28 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
       formData.pType === "Driving License ID" &&
       !validateDrivingLicense(value)
     ) {
-      error = t("Error.Invalid Driving License number");
+      error = t("Error.Please enter a valid License ID number");
     }
 
     setErrors((prev) => ({ ...prev, nic: error }));
     updateFormData({ pNumber: value });
   };
+
+  useEffect(() => {
+    const handleBackPress = () => {
+      navigation.navigate("Main", {
+        screen: "MainTabs",
+        params: { screen: "CapitalRequests" },
+      });
+      return true;
+    };
+
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      handleBackPress,
+    );
+    return () => subscription.remove();
+  }, [navigation]);
 
   const saveToBackend = async (
     reqId: number,
@@ -273,11 +342,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
       const response = await axios.post(
         `${environment.API_BASE_URL}api/capital-request/inspection/save`,
         formDataPayload,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        },
+        { headers: { "Content-Type": "multipart/form-data" } },
       );
 
       if (response.data.success) {
@@ -287,13 +352,10 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
             updates.frontImg = response.data.data.frontImg;
           if (response.data.data.backImg)
             updates.backImg = response.data.data.backImg;
-
           updateFormData(updates);
         }
-
         return true;
       }
-
       return false;
     } catch (error: any) {
       console.error(`Error saving ID proof:`, error);
@@ -352,7 +414,6 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
     }
 
     const reqId = Number(requestId);
-
     if (isNaN(reqId) || reqId <= 0) {
       Alert.alert(
         t("Error.Error"),
@@ -366,7 +427,9 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
       t("InspectionForm.Saving"),
       t("InspectionForm.Please wait..."),
       [],
-      { cancelable: false },
+      {
+        cancelable: false,
+      },
     );
 
     const saved = await saveToBackend(
@@ -378,7 +441,6 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
 
     if (saved) {
       setIsExistingData(true);
-
       Alert.alert(
         t("Main.Success"),
         t("InspectionForm.Data saved successfully"),
@@ -386,10 +448,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
           {
             text: t("Main.ok"),
             onPress: () => {
-              navigation.navigate("FinanceInfo", {
-                requestNumber,
-                requestId,
-              });
+              navigation.navigate("FinanceInfo", { requestNumber, requestId });
             },
           },
         ],
@@ -398,24 +457,12 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
       Alert.alert(
         t("Main.Warning"),
         t("InspectionForm.Could not save to server. Data saved locally."),
-        [
-          {
-            text: t("Main.Continue"),
-            onPress: () => {
-              navigation.navigate("FinanceInfo", {
-                requestNumber,
-                requestId,
-              });
-            },
-          },
-        ],
+        [{ text: t("Main.ok") }],
       );
     }
   };
 
-  // Handle tab navigation
   const handleTabPress = (tabKey: string) => {
-    // Map tab keys to navigation routes
     const routeMap: Record<string, string> = {
       "Personal Info": "PersonalInfo",
       "ID Proof": "IDProof",
@@ -425,27 +472,34 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
       "Cultivation Info": "CultivationInfo",
       "Cropping Systems": "CroppingSystems",
       "Profit & Risk": "ProfitRisk",
-      "Economical": "Economical",
-      "Labour": "Labour",
+      Economical: "Economical",
+      Labour: "Labour",
       "Harvest Storage": "HarvestStorage",
     };
 
     const route = routeMap[tabKey];
     if (route) {
-      navigation.navigate(route, {
-        requestId,
-        requestNumber,
-      });
+      navigation.navigate(route, { requestId, requestNumber });
     }
   };
+
+  if (showCameraAccess) {
+    return (
+      <CameraAccess
+        navigation={navigation}
+        onPermissionGranted={handleCameraPermissionGranted}
+        returnScreen="IDProof"
+      />
+    );
+  }
 
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1, backgroundColor: "white" }}
+      keyboardVerticalOffset={Platform.OS === "android" ? -200 : 0}
     >
       <View className="flex-1 bg-[#F3F3F3]">
-        <StatusBar barStyle="dark-content" />
         <FormTabs
           activeKey="ID Proof"
           navigation={navigation}
@@ -470,49 +524,58 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
               onPress={() => setShowIdProofDropdown(true)}
               activeOpacity={0.8}
             >
-              <View className="bg-[#F6F6F6] rounded-full px-5 py-4 flex-row items-center justify-between">
+              <View className="bg-[#F6F6F6] rounded-3xl px-5 h-[50px] flex-row items-center justify-between">
                 <Text
                   className={`text-base ${formData.pType ? "text-black" : "text-[#838B8C]"}`}
                 >
                   {formData.pType
                     ? t(`InspectionForm.${formData.pType}`)
-                    : t("InspectionForm.-- Select ID Proof --")}
+                    : t("InspectionForm.Select Proof Type")}
                 </Text>
                 <AntDesign name="down" size={20} color="#838B8C" />
               </View>
             </TouchableOpacity>
 
-            <View className="mt-4">
-              <Text className="text-sm text-[#070707] mb-2">
-                <Text className="text-black">
-                  {formData.pType === "NIC Number"
-                    ? t("InspectionForm.NIC Number")
-                    : t("InspectionForm.Driving License ID")}{" "}
-                  *
+            {formData.pType && (
+              <View className="mt-4">
+                <Text className="text-sm text-[#070707] mb-2">
+                  <Text className="text-black">
+                    {formData.pType === "NIC Number"
+                      ? t("InspectionForm.NIC Number")
+                      : t("InspectionForm.Driving License ID")}{" "}
+                    *
+                  </Text>
                 </Text>
-              </Text>
-              <View
-                className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
-                  errors.nic ? "border border-red-500" : ""
-                }`}
-              >
-                <TextInput
-                  placeholder="----"
-                  placeholderTextColor="#7D7D7D"
-                  className="flex-1 px-2 py-4 text-base text-black ml-4"
-                  value={formData.pNumber}
-                  onChangeText={handleIdNumberChange}
-                  underlineColorAndroid="transparent"
-                  maxLength={formData.pType === "NIC Number" ? 12 : 10}
-                  autoCapitalize="characters"
-                />
+                <View
+                  className={`bg-[#F6F6F6] rounded-3xl flex-row items-center ${
+                    errors.nic ? "border border-red-500" : ""
+                  }`}
+                >
+                  <TextInput
+                    placeholder="----"
+                    placeholderTextColor="#7D7D7D"
+                    className="flex-1 px-2 h-[50px] text-base text-black ml-4"
+                    value={formData.pNumber}
+                    onChangeText={handleIdNumberChange}
+                    underlineColorAndroid="transparent"
+                    maxLength={formData.pType === "NIC Number" ? 12 : 13}
+                    autoCapitalize="characters"
+                  />
+                </View>
+                {errors.nic && (
+                  <View className="flex-row items-center mt-1 ml-2">
+                    <FontAwesome
+                      name="exclamation-triangle"
+                      size={14}
+                      color="#EF4444"
+                    />
+                    <Text className="text-red-500 text-sm ml-1 flex-1">
+                      {errors.nic}
+                    </Text>
+                  </View>
+                )}
               </View>
-              {errors.nic && (
-                <Text className="text-red-500 text-sm mt-1 ml-2">
-                  {errors.nic}
-                </Text>
-              )}
-            </View>
+            )}
           </View>
 
           {formData.pType && (
@@ -527,7 +590,6 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
                 image={formData.frontImg}
                 onClear={() => handleClearImage("front")}
               />
-
               <UploadButton
                 title={
                   formData.pType === "NIC Number"
@@ -546,7 +608,9 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
           exitText={t("InspectionForm.Back")}
           nextText={t("InspectionForm.Next")}
           isNextEnabled={isNextEnabled}
-          onExit={() => navigation.goBack()}
+          onExit={() =>
+            navigation.navigate("PersonalInfo", { requestNumber, requestId })
+          }
           onNext={handleNext}
         />
       </View>
@@ -558,14 +622,13 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
           onPress={() => setShowIdProofDropdown(false)}
         >
           <View className="bg-white rounded-2xl p-4">
-            {idProofOptions.map((option) => (
+            {idProofOptions.map((option, index) => (
               <TouchableOpacity
                 key={option.key}
-                className="py-4 border-b border-gray-200"
+                className={`py-4 ${index < idProofOptions.length - 1 ? "border-b border-gray-200" : ""}`}
                 onPress={() => {
                   setShowIdProofDropdown(false);
                   setErrors({});
-
                   setFormData({
                     pType: option.key,
                     pNumber: "",

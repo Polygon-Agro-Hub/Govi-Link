@@ -14,7 +14,7 @@ export const initInvestmentTable = () => {
         updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
       );`,
     );
-    console.log("Investment info table created/verified");
+    
   } catch (error) {
     console.error("Error initializing investment info table:", error);
     throw error;

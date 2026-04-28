@@ -6,6 +6,7 @@ import {
   View,
   TextInput,
   ActivityIndicator,
+  StatusBar,
 } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -71,6 +72,11 @@ import Labour from "@/component/inspection-forms/Labour";
 import HarvestStorage from "@/component/inspection-forms/HarvestStorage";
 import ConfirmationCapitalRequest from "@/component/inspection-forms/ConfirmationCapitalRequest";
 import CapitalRequstQRScanner from "@/component/qr-screen/CapitalRequstQRScanner";
+import AddOnboardSupplier from "@/component/onboard-supplier/AddOnboardSupplier";
+import OtpverificationOnboardSupplier from "@/component/otp-screen/OtpverificationOnboardSupplier";
+import AddOnboardSupplierOfficer from "@/component/onboard-supplier/AddOnboardSupplierOfficer";
+import LocationAccess from "@/component/permission/LocationAccess";
+import CameraAccess from "@/component/permission/CameraAccess";
 
 import { initDatabase } from "@/database/index";
 
@@ -127,6 +133,10 @@ function MainTabs() {
           <Tab.Screen name="AddOfficerStep2" component={AddOfficerStep2} />
           <Tab.Screen name="AddOfficerStep3" component={AddOfficerStep3} />
           <Tab.Screen name="AssignJobs" component={AssignJobs} />
+          <Tab.Screen
+            name="AddOnboardSupplier"
+            component={AddOnboardSupplier}
+          />
           <Tab.Screen name="CapitalRequests" component={CapitalRequests} />
           <Tab.Screen
             name="AssignJobOfficerList"
@@ -233,6 +243,7 @@ function AppContent() {
         }}
         edges={["top", "right", "left"]}
       >
+        <StatusBar backgroundColor="#ffffff" barStyle="dark-content" />
         <NavigationContainer ref={navigationRef}>
           <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name="Splash" component={Splash} />
@@ -294,10 +305,24 @@ function AppContent() {
             <Stack.Screen name="Economical" component={Economical} />
             <Stack.Screen name="Labour" component={Labour} />
             <Stack.Screen name="HarvestStorage" component={HarvestStorage} />
-            <Stack.Screen name="CapitalRequstQRScanner" component={CapitalRequstQRScanner} />
+            <Stack.Screen name="LocationAccess" component={LocationAccess} />
+            <Stack.Screen name="CameraAccess" component={CameraAccess} />
+            <Stack.Screen
+              name="CapitalRequstQRScanner"
+              component={CapitalRequstQRScanner}
+            />
             <Stack.Screen
               name="ConfirmationCapitalRequest"
               component={ConfirmationCapitalRequest}
+            />
+
+            <Stack.Screen
+              name="AddOnboardSupplierOfficer"
+              component={AddOnboardSupplierOfficer}
+            />
+            <Stack.Screen
+              name="OtpverificationOnboardSupplier"
+              component={OtpverificationOnboardSupplier}
             />
           </Stack.Navigator>
         </NavigationContainer>

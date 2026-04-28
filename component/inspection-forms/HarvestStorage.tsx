@@ -4,7 +4,6 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
-  StatusBar,
   Alert,
   KeyboardAvoidingView,
   Platform,
@@ -14,7 +13,7 @@ import { AntDesign } from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
 import { useTranslation } from "react-i18next";
 import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 import ConfirmationModal from "@/Items/ConfirmationModal";
@@ -25,6 +24,7 @@ import {
   clearHarvestStorageInfo,
   HarvestStorageData,
 } from "@/database/inspectionharvest";
+import { updateLastScreen } from "@/database/inspectionprogress";
 
 type HarvestStorageProps = {
   navigation: any;
@@ -57,11 +57,11 @@ const YesNoSelect = ({
           activeOpacity={1}
           onPress={onClose}
         >
-          <View className="bg-white w-80 rounded-2xl overflow-hidden">
+          <View className="bg-white w-64 rounded-2xl overflow-hidden">
             {["Yes", "No"].map((item, index, arr) => (
               <View key={item}>
                 <TouchableOpacity
-                  className="py-4"
+                  className="py-3"
                   onPress={() => {
                     onSelect(item as "Yes" | "No");
                     onClose();
@@ -71,7 +71,6 @@ const YesNoSelect = ({
                     {t(`InspectionForm.${item}`)}
                   </Text>
                 </TouchableOpacity>
-
                 {index !== arr.length - 1 && (
                   <View className="h-px bg-gray-300 mx-4" />
                 )}
@@ -83,8 +82,10 @@ const YesNoSelect = ({
 
       {/* Field */}
       <View className="mt-4">
-        <Text className="text-sm text-[#070707] mb-2">
-          {label} {required && <Text className="text-black">*</Text>}
+        {/* Single Text block — asterisk stays inline, never orphaned */}
+        <Text className="text-sm text-[#070707] mb-2 leading-5">
+          {label.trim()}
+          {required ? <Text className="text-black">{"\u00A0*"}</Text> : null}
         </Text>
 
         <TouchableOpacity
@@ -99,8 +100,7 @@ const YesNoSelect = ({
               {t("InspectionForm.--Select From Here--")}
             </Text>
           )}
-
-          {!value && <AntDesign name="down" size={20} color="#838B8C" />}
+          <AntDesign name="down" size={20} color="#838B8C" />
         </TouchableOpacity>
       </View>
     </>
@@ -119,7 +119,6 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
     hasValueAddedMarketLinkage: undefined,
     awareOfQualityStandards: undefined,
   });
-
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [yesNoModalVisible, setYesNoModalVisible] = useState(false);
   const [activeYesNoField, setActiveYesNoField] = useState<string | null>(null);
@@ -127,15 +126,23 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
   const [isExistingData, setIsExistingData] = useState(false);
   const [confirmationModalVisible, setConfirmationModalVisible] =
     useState(false);
-  const [successModalVisible, setSuccessModalVisible] = useState(false);
+
   const [errorModalVisible, setErrorModalVisible] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
+      updateLastScreen(requestId, "HarvestStorage");
+    }, [requestId]),
+  );
+
+  useFocusEffect(
+    useCallback(() => {
       const loadData = async () => {
         if (!requestId) return;
+
+        setIsDataLoaded(false);
 
         try {
           const reqId = Number(requestId);
@@ -150,18 +157,25 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
               hasValueAddedMarketLinkage: localData.hasValueAddedMarketLinkage,
               awareOfQualityStandards: localData.awareOfQualityStandards,
             };
-
             setFormData(normalizedData);
             setIsExistingData(true);
           } else {
+            setFormData({
+              hasOwnStorage: undefined,
+              ifNotHasFacilityAccess: undefined,
+              hasPrimaryProcessingAccess: undefined,
+              knowsValueAdditionTech: undefined,
+              hasValueAddedMarketLinkage: undefined,
+              awareOfQualityStandards: undefined,
+            });
             setIsExistingData(false);
           }
-          setIsDataLoaded(true);
         } catch (error) {
           console.error(
             "Failed to load harvest storage info from SQLite:",
             error,
           );
+        } finally {
           setIsDataLoaded(true);
         }
       };
@@ -300,13 +314,9 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
         },
       );
 
-      if (response.data.success) {
-        return true;
-      }
-
-      return false;
+      return response.data.success === true;
     } catch (error: any) {
-      console.error(` Error saving ${tableName}:`, error);
+      console.error(`Error saving ${tableName}:`, error);
       return false;
     }
   };
@@ -362,7 +372,6 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
     setIsSaving(true);
 
     if (!requestId) {
-      console.error(" requestId is missing!");
       setErrorModalVisible(true);
       setIsSaving(false);
       return;
@@ -371,7 +380,6 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
     const reqId = Number(requestId);
 
     if (isNaN(reqId) || reqId <= 0) {
-      console.error(" Invalid requestId:", requestId);
       setErrorModalVisible(true);
       setIsSaving(false);
       return;
@@ -389,7 +397,12 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
 
       if (saved) {
         setIsExistingData(true);
-        setSuccessModalVisible(true);
+        setTimeout(() => {
+          navigation.navigate("ConfirmationCapitalRequest", {
+            requestNumber: requestNumber,
+            requestId: requestId,
+          });
+        }, 300);
       } else {
         setErrorModalVisible(true);
       }
@@ -401,19 +414,13 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
   };
 
   const handleSuccessClose = async () => {
-    setSuccessModalVisible(false);
-
     try {
-      if (requestId) {
-        await clearHarvestStorageInfo(Number(requestId));
-      }
-
       navigation.navigate("ConfirmationCapitalRequest", {
         requestNumber: requestNumber,
         requestId: requestId,
       });
     } catch (error) {
-      console.error(" Error during cleanup:", error);
+      console.error("Error during cleanup:", error);
       navigation.navigate("ConfirmationCapitalRequest", {
         requestNumber: requestNumber,
         requestId: requestId,
@@ -425,9 +432,7 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
     setErrorModalVisible(false);
   };
 
-  // Handle tab navigation
   const handleTabPress = (tabKey: string) => {
-    // Map tab keys to navigation routes
     const routeMap: Record<string, string> = {
       "Personal Info": "PersonalInfo",
       "ID Proof": "IDProof",
@@ -437,8 +442,8 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
       "Cultivation Info": "CultivationInfo",
       "Cropping Systems": "CroppingSystems",
       "Profit & Risk": "ProfitRisk",
-      "Economical": "Economical",
-      "Labour": "Labour",
+      Economical: "Economical",
+      Labour: "Labour",
       "Harvest Storage": "HarvestStorage",
     };
 
@@ -456,9 +461,7 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1, backgroundColor: "white" }}
     >
-      <View className="flex-1 bg-[#F3F3F3] ">
-        <StatusBar barStyle="dark-content" />
-
+      <View className="flex-1 bg-[#F3F3F3]">
         <FormTabs
           activeKey="Harvest Storage"
           navigation={navigation}
@@ -610,7 +613,12 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
           exitText={t("InspectionForm.Back")}
           nextText={t("InspectionForm.Next")}
           isNextEnabled={isNextEnabled}
-          onExit={() => navigation.goBack()}
+          onExit={() =>
+            navigation.navigate("Labour", {
+              requestNumber,
+              requestId,
+            })
+          }
           onNext={handleNext}
         />
       </View>
@@ -620,12 +628,6 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
         type="confirmation"
         onClose={() => setConfirmationModalVisible(false)}
         onConfirm={handleConfirmSubmit}
-      />
-
-      <ConfirmationModal
-        visible={successModalVisible}
-        type="success"
-        onClose={handleSuccessClose}
       />
 
       <ConfirmationModal

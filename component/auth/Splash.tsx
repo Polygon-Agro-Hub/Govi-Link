@@ -3,7 +3,7 @@ import { View, Image, Text, Animated } from "react-native";
 import * as Progress from "react-native-progress";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { environment } from "@/environment/environment";
 import axios from "axios";
@@ -85,7 +85,6 @@ const Splash: React.FC = () => {
 
       if (response.data.status === "success") {
         const user = response.data.data;
-        // Dispatch user data to the store
         dispatch(
           setUser({ token, role: user.role, empId: user.empId.toString() }),
         );

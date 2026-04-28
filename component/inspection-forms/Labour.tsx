@@ -4,17 +4,17 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
-  StatusBar,
   Alert,
   KeyboardAvoidingView,
   Platform,
   Modal,
+  BackHandler,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
 import { useTranslation } from "react-i18next";
 import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 import FormFooterButton from "./FormFooterButton";
@@ -23,6 +23,7 @@ import {
   getLabourInfo,
   LabourData,
 } from "@/database/inspectionlabour";
+import { updateLastScreen } from "@/database/inspectionprogress";
 
 type LabourProps = {
   navigation: any;
@@ -55,11 +56,11 @@ const YesNoSelect = ({
           activeOpacity={1}
           onPress={onClose}
         >
-          <View className="bg-white w-80 rounded-2xl overflow-hidden">
+          <View className="bg-white w-64 rounded-2xl overflow-hidden">
             {["Yes", "No"].map((item, index, arr) => (
               <View key={item}>
                 <TouchableOpacity
-                  className="py-4"
+                  className="py-3"
                   onPress={() => {
                     onSelect(item as "Yes" | "No");
                     onClose();
@@ -97,8 +98,7 @@ const YesNoSelect = ({
               {t("InspectionForm.--Select From Here--")}
             </Text>
           )}
-
-          {!value && <AntDesign name="down" size={20} color="#838B8C" />}
+          <AntDesign name="down" size={20} color="#838B8C" />
         </TouchableOpacity>
       </View>
     </>
@@ -109,7 +109,6 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
   const route = useRoute<RouteProp<RootStackParamList, "Labour">>();
   const { requestNumber, requestId } = route.params;
   const { t } = useTranslation();
-
   const [formData, setFormData] = useState<LabourData>({
     isManageFamilyLabour: undefined,
     isFamilyHiredLabourEquipped: undefined,
@@ -119,13 +118,18 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
     isMachineryAffordable: undefined,
     isMachineryCostEffective: undefined,
   });
-
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [yesNoModalVisible, setYesNoModalVisible] = useState(false);
   const [activeYesNoField, setActiveYesNoField] = useState<string | null>(null);
   const [isNextEnabled, setIsNextEnabled] = useState(false);
   const [isExistingData, setIsExistingData] = useState(false);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      updateLastScreen(requestId, "Labour");
+    }, [requestId]),
+  );
 
   useFocusEffect(
     useCallback(() => {
@@ -445,13 +449,7 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
           t("InspectionForm.Could not save to server. Data saved locally."),
           [
             {
-              text: t("Main.Continue"),
-              onPress: () => {
-                navigation.navigate("HarvestStorage", {
-                  requestNumber,
-                  requestId,
-                });
-              },
+              text: t("Main.ok"),
             },
           ],
         );
@@ -463,22 +461,31 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
         t("InspectionForm.Could not save to server. Data saved locally."),
         [
           {
-            text: t("Main.Continue"),
-            onPress: () => {
-              navigation.navigate("HarvestStorage", {
-                requestNumber,
-                requestId,
-              });
-            },
+            text: t("Main.ok"),
           },
         ],
       );
     }
   };
 
-  // Handle tab navigation
+  useEffect(() => {
+    const handleBackPress = () => {
+      navigation.navigate("Main", {
+        screen: "MainTabs",
+        params: { screen: "CapitalRequests" },
+      });
+      return true;
+    };
+
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      handleBackPress,
+    );
+
+    return () => subscription.remove();
+  }, [navigation]);
+
   const handleTabPress = (tabKey: string) => {
-    // Map tab keys to navigation routes
     const routeMap: Record<string, string> = {
       "Personal Info": "PersonalInfo",
       "ID Proof": "IDProof",
@@ -488,8 +495,8 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
       "Cultivation Info": "CultivationInfo",
       "Cropping Systems": "CroppingSystems",
       "Profit & Risk": "ProfitRisk",
-      "Economical": "Economical",
-      "Labour": "Labour",
+      Economical: "Economical",
+      Labour: "Labour",
       "Harvest Storage": "HarvestStorage",
     };
 
@@ -508,8 +515,6 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
       style={{ flex: 1, backgroundColor: "white" }}
     >
       <View className="flex-1 bg-[#F3F3F3] ">
-        <StatusBar barStyle="dark-content" />
-
         <FormTabs
           activeKey="Labour"
           navigation={navigation}
@@ -685,7 +690,12 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
           exitText={t("InspectionForm.Back")}
           nextText={t("InspectionForm.Next")}
           isNextEnabled={isNextEnabled}
-          onExit={() => navigation.goBack()}
+          onExit={() =>
+            navigation.navigate("Economical", {
+              requestNumber,
+              requestId,
+            })
+          }
           onNext={handleNext}
         />
       </View>

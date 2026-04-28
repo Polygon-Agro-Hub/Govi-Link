@@ -5,29 +5,30 @@ import {
   TextInput,
   ScrollView,
   TouchableOpacity,
-  StatusBar,
   Alert,
   KeyboardAvoidingView,
   Platform,
   Modal,
   FlatList,
+  BackHandler,
 } from "react-native";
-import { MaterialIcons, AntDesign } from "@expo/vector-icons";
+import { MaterialIcons, AntDesign, FontAwesome } from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { environment } from "@/environment/environment";
-import countryData from "@/assets/json/countryflag.json";
-import sriLankaData from "@/assets/json/provinceDistrict.json";
-import districtData from "@/assets/json/Districts.json";
+import countryData from "@/assets/json/country-flag.json";
+import sriLankaData from "@/assets/json/country-province.json";
+import districtData from "@/assets/json/country-districts.json";
 import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import FormFooterButton from "./FormFooterButton";
 import {
   savePersonalInfo,
   getPersonalInfo,
   PersonalInfo,
 } from "@/database/inspectionpersonal";
+import { updateLastScreen } from "@/database/inspectionprogress";
 
 interface District {
   en: string;
@@ -48,6 +49,7 @@ const Input = ({
   error,
   keyboardType = "default",
   isMobile = false,
+  isEmail = false,
 }: {
   label: string;
   placeholder: string;
@@ -57,41 +59,34 @@ const Input = ({
   error?: string;
   keyboardType?: any;
   isMobile?: boolean;
+  isEmail?: boolean;
 }) => (
   <View className="mb-4">
     <Text className="text-sm text-[#070707] mb-1">
       {label} {required && <Text className="text-black">*</Text>}
     </Text>
     <View
-      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
+      className={`bg-[#F6F6F6] rounded-3xl h-[50px] flex-row items-center ${
         error ? "border border-red-500" : ""
       }`}
     >
-      {isMobile ? (
-        <View className="flex-row flex-1 items-center">
-          <Text className="px-5 text-base text-black">+94</Text>
-          <TextInput
-            placeholder={placeholder}
-            placeholderTextColor="#838B8C"
-            className="flex-1 px-2 py-4 text-base text-black"
-            value={value}
-            onChangeText={onChangeText}
-            keyboardType="phone-pad"
-            maxLength={9}
-          />
-        </View>
-      ) : (
-        <TextInput
-          placeholder={placeholder}
-          placeholderTextColor="#838B8C"
-          className="px-5 py-4 text-base text-black flex-1"
-          value={value}
-          onChangeText={onChangeText}
-          keyboardType={keyboardType}
-        />
-      )}
+      <TextInput
+        placeholder={placeholder}
+        placeholderTextColor="#838B8C"
+        className="px-5  text-base text-black flex-1"
+        value={value}
+        onChangeText={onChangeText}
+        keyboardType={keyboardType}
+        autoCapitalize={isEmail ? "none" : "sentences"}
+        autoCorrect={!isEmail}
+      />
     </View>
-    {error && <Text className="text-red-500 text-sm mt-1 ml-4">{error}</Text>}
+    {error && (
+      <View className="flex-row items-center mt-1 ml-4">
+        <FontAwesome name="exclamation-triangle" size={14} color="#EF4444" />
+        <Text className="text-red-500 text-sm ml-1 flex-1">{error}</Text>
+      </View>
+    )}
   </View>
 );
 
@@ -110,11 +105,11 @@ const validateEmail = (email: string): boolean => {
   const [localPart, domain] = emailLower.split("@");
 
   if (domain === "gmail.com" || domain === "googlemail.com") {
-    const validCharsRegex = /^[a-zA-Z0-9.+]+$/;
-    if (!validCharsRegex.test(localPart)) return false;
+    if (!/^[a-zA-Z0-9.+]+$/.test(localPart)) return false;
     if (localPart.startsWith(".") || localPart.endsWith(".")) return false;
     if (localPart.includes("..")) return false;
-    return localPart.length > 0;
+    if (localPart.length === 0) return false;
+    return true;
   }
 
   const allowedTLDs = [".com", ".gov", ".lk"];
@@ -132,14 +127,9 @@ const validateAndFormat = (
   let error = "";
 
   if (
-    [
-      "firstName",
-      "lastName",
-      "otherName",
-      "callName",
-      "cityName",
-      "street",
-    ].includes(rules.type || "")
+    ["firstName", "lastName", "otherName", "callName"].includes(
+      rules.type || "",
+    )
   ) {
     value = value.replace(/^\s+/, "").replace(/[^a-zA-Z\s]/g, "");
     if (value.length > 0) {
@@ -202,6 +192,16 @@ const validateAndFormat = (
     }
   }
 
+  if (["street", "cityName"].includes(rules.type || "")) {
+    value = value.replace(/^\s+/, "").replace(/[^a-zA-Z0-9\s.,'/-]/g, "");
+    if (value.length > 0) {
+      value = value.charAt(0).toUpperCase() + value.slice(1);
+    }
+    if (rules.required && value.trim().length === 0) {
+      error = t(`Error.${rules.type} is required`);
+    }
+  }
+
   if (rules.type === "landHome" || rules.type === "landWork") {
     let numbersOnly = value.replace(/[^0-9]/g, "").replace(/^0+/, "");
     if (numbersOnly.length > 9) numbersOnly = numbersOnly.slice(0, 9);
@@ -222,6 +222,86 @@ const validateAndFormat = (
   return { value, error };
 };
 
+const validateAllFields = (
+  data: PersonalInfo,
+  t: any,
+): Record<string, string> => {
+  const fieldRules: Array<{
+    key: keyof PersonalInfo;
+    rules: ValidationRule;
+  }> = [
+    { key: "firstName", rules: { required: true, type: "firstName" } },
+    { key: "lastName", rules: { required: true, type: "lastName" } },
+    { key: "otherName", rules: { required: true, type: "otherName" } },
+    { key: "callName", rules: { required: true, type: "callName" } },
+    {
+      key: "phone1",
+      rules: {
+        required: true,
+        type: "phone1",
+        uniqueWith: ["phone2", "familyPhone", "landWork", "landHome"],
+      },
+    },
+    {
+      key: "phone2",
+      rules: {
+        type: "phone2",
+        uniqueWith: ["phone1", "familyPhone", "landWork", "landHome"],
+      },
+    },
+    {
+      key: "familyPhone",
+      rules: {
+        required: true,
+        type: "familyPhone",
+        uniqueWith: ["phone1", "phone2", "landWork", "landHome"],
+      },
+    },
+    {
+      key: "landHome",
+      rules: {
+        type: "landHome",
+        uniqueWith: ["phone1", "phone2", "familyPhone", "landWork"],
+      },
+    },
+    {
+      key: "landWork",
+      rules: {
+        type: "landWork",
+        uniqueWith: ["phone1", "phone2", "familyPhone", "landHome"],
+      },
+    },
+    {
+      key: "email1",
+      rules: { required: true, type: "email1", uniqueWith: ["email2"] },
+    },
+    {
+      key: "email2",
+      rules: { type: "email2", uniqueWith: ["email1"] },
+    },
+    { key: "house", rules: { required: true, type: "house" } },
+    { key: "street", rules: { required: true, type: "street" } },
+    { key: "cityName", rules: { required: true, type: "cityName" } },
+  ];
+
+  const errors: Record<string, string> = {};
+
+  for (const { key, rules } of fieldRules) {
+    const raw = (data[key] as string | null | undefined) ?? "";
+    const { error } = validateAndFormat(raw, rules, t, data, key);
+    if (error) errors[key] = error;
+  }
+
+  if (!data.district) {
+    errors.district = t("Error.District is required");
+  }
+  if (!data.province) {
+    errors.province = t("Error.Province is required");
+  }
+
+  return errors;
+};
+
 type InspectionForm1Props = {
   navigation: any;
 };
@@ -230,7 +310,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
   const route = useRoute<RouteProp<RootStackParamList, "PersonalInfo">>();
   const { requestNumber, requestId } = route.params;
   const { t, i18n } = useTranslation();
-
+  const [isLoaded, setIsLoaded] = useState(false);
   const [formData, setFormData] = useState<PersonalInfo>({
     firstName: "",
     lastName: "",
@@ -265,10 +345,10 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
   const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
   const [isNextEnabled, setIsNextEnabled] = useState(false);
   const [isExistingData, setIsExistingData] = useState(false);
-
   const districts: DistrictsMap = districtData;
 
   useEffect(() => {
+    if (!isLoaded) return;
     const timer = setTimeout(() => {
       if (requestId) {
         try {
@@ -280,12 +360,23 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [formData, requestId]);
+  }, [formData, requestId, isLoaded]);
 
   useFocusEffect(
     useCallback(() => {
+      updateLastScreen(requestId, "PersonalInfo");
+    }, [requestId]),
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      setIsLoaded(false);
+
       const loadData = async () => {
-        if (!requestId) return;
+        if (!requestId) {
+          setIsLoaded(true);
+          return;
+        }
 
         try {
           const reqId = Number(requestId);
@@ -319,11 +410,16 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
                   ] || countryObj.name.en
                 : localData.country || "Sri Lanka",
             );
+
+            const draftErrors = validateAllFields(localData, t);
+            setErrors(draftErrors);
           } else {
             setIsExistingData(false);
           }
         } catch (error) {
           console.error("Failed to load from SQLite:", error);
+        } finally {
+          setIsLoaded(true);
         }
       };
 
@@ -332,6 +428,8 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
   );
 
   useEffect(() => {
+    if (!isLoaded) return;
+
     const requiredFields: (keyof PersonalInfo)[] = [
       "firstName",
       "lastName",
@@ -344,7 +442,6 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
       "street",
       "cityName",
       "district",
-      "province",
       "country",
     ];
 
@@ -355,9 +452,24 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
       );
     });
 
-    const hasErrors = Object.keys(errors).length > 0;
-    setIsNextEnabled(allFilled && !hasErrors);
-  }, [formData, errors]);
+    const requiredErrorKeys: (keyof PersonalInfo)[] = [
+      "firstName",
+      "lastName",
+      "otherName",
+      "callName",
+      "phone1",
+      "familyPhone",
+      "email1",
+      "house",
+      "street",
+      "cityName",
+      "district",
+    ];
+
+    const hasRequiredErrors = requiredErrorKeys.some((key) => errors[key]);
+
+    setIsNextEnabled(allFilled && !hasRequiredErrors);
+  }, [formData, errors, isLoaded]);
 
   const updateFormData = (updates: Partial<PersonalInfo>) => {
     setFormData((prev) => ({ ...prev, ...updates }));
@@ -377,7 +489,6 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
       if (error) newErrors[key] = error;
       else delete newErrors[key];
 
-      // Revalidate related fields
       if (rules.uniqueWith) {
         rules.uniqueWith.forEach((relatedKey) => {
           const relatedValue = formData[relatedKey];
@@ -402,6 +513,23 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
       return newErrors;
     });
   };
+
+  useEffect(() => {
+    const handleBackPress = () => {
+      navigation.navigate("Main", {
+        screen: "MainTabs",
+        params: { screen: "CapitalRequests" },
+      });
+      return true;
+    };
+
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      handleBackPress,
+    );
+
+    return () => subscription.remove();
+  }, [navigation]);
 
   const transformForBackend = (data: PersonalInfo) => ({
     firstName: data.firstName,
@@ -528,7 +656,6 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
       { cancelable: false },
     );
 
-    // Save to backend
     const saved = await saveToBackend(
       reqId,
       "inspectionpersonal",
@@ -560,14 +687,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
         t("InspectionForm.Could not save to server. Data saved locally."),
         [
           {
-            text: t("Main.Continue"),
-            onPress: () => {
-              navigation.navigate("IDProof", {
-                formData: { inspectionpersonal: formData },
-                requestNumber,
-                requestId,
-              });
-            },
+            text: t("Main.ok"),
           },
         ],
       );
@@ -643,7 +763,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
     item: { en: string; si: string; ta: string };
   }) => (
     <TouchableOpacity
-      className="px-4 py-3 border-b border-gray-200"
+      className="px-4 py-3"
       onPress={() => selectDistrict(item)}
     >
       <Text className="text-base text-gray-800">
@@ -654,7 +774,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
 
   const renderDistrictSearchInput = () => (
     <View className="px-4 py-2 border-b border-gray-200">
-      <View className="bg-gray-100 rounded-lg px-3 flex-row items-center">
+      <View className="bg-gray-100 h-[50px] rounded-3xl px-3 flex-row items-center">
         <MaterialIcons name="search" size={20} color="#666" />
         <TextInput
           placeholder={t("AddOfficer.SearchDistrict") || "Search district..."}
@@ -695,7 +815,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
     placeholder: string,
   ) => (
     <View className="px-4 py-2 border-b border-gray-200">
-      <View className="bg-gray-100 rounded-lg px-3 flex-row items-center">
+      <View className="bg-gray-100 h-[50px] rounded-3xl px-3 flex-row items-center">
         <MaterialIcons name="search" size={20} color="#666" />
         <TextInput
           placeholder={placeholder}
@@ -714,15 +834,13 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
   );
 
   const handleExit = () => {
-    navigation.navigate("Main", {
-      screen: "MainTabs",
-      params: { screen: "CapitalRequests" },
+    navigation.navigate("RequestDetails", {
+      requestId,
+      requestNumber,
     });
   };
 
-  // Handle tab navigation
   const handleTabPress = (tabKey: string) => {
-    // Map tab keys to navigation routes
     const routeMap: Record<string, string> = {
       "Personal Info": "PersonalInfo",
       "ID Proof": "IDProof",
@@ -732,8 +850,8 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
       "Cultivation Info": "CultivationInfo",
       "Cropping Systems": "CroppingSystems",
       "Profit & Risk": "ProfitRisk",
-      "Economical": "Economical",
-      "Labour": "Labour",
+      Economical: "Economical",
+      Labour: "Labour",
       "Harvest Storage": "HarvestStorage",
     };
 
@@ -748,11 +866,11 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      behavior="padding"
       style={{ flex: 1, backgroundColor: "white" }}
+      keyboardVerticalOffset={Platform.OS === "android" ? -200 : 0}
     >
       <View className="flex-1 bg-[#F3F3F3]">
-        <StatusBar barStyle="dark-content" />
         <FormTabs
           activeKey="Personal Info"
           navigation={navigation}
@@ -852,7 +970,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             isMobile
           />
           <Input
-            label={t("InspectionForm.Phone Number of a family member")}
+            label={t("InspectionForm.Mobile Number of a family member")}
             placeholder="7XXXXXXXX"
             value={formData.familyPhone}
             keyboardType="phone-pad"
@@ -907,6 +1025,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
               })
             }
             required
+            isEmail
             error={errors.email1}
           />
           <Input
@@ -919,9 +1038,9 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
                 uniqueWith: ["email1"],
               })
             }
+            isEmail
             error={errors.email2}
           />
-
           <View className="border-t border-[#CACACA] my-4 mb-8" />
 
           <Input
@@ -1009,9 +1128,16 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
                   </View>
                 </TouchableOpacity>
                 {errors.district && (
-                  <Text className="text-red-500 text-sm mt-1 ml-4">
-                    {errors.district}
-                  </Text>
+                  <View className="flex-row items-center mt-1 ml-4">
+                    <FontAwesome
+                      name="exclamation-triangle"
+                      size={14}
+                      color="#EF4444"
+                    />
+                    <Text className="text-red-500 text-sm ml-1 flex-1">
+                      {errors.district}
+                    </Text>
+                  </View>
                 )}
               </View>
               <View className="relative mb-4">
@@ -1033,14 +1159,6 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             </>
           )}
         </ScrollView>
-
-        <FormFooterButton
-          exitText={t("InspectionForm.Exit")}
-          nextText={t("InspectionForm.Next")}
-          isNextEnabled={isNextEnabled}
-          onExit={handleExit}
-          onNext={handleNext}
-        />
       </View>
 
       <Modal
@@ -1107,7 +1225,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
               data={getFilteredCountries()}
               renderItem={({ item }) => (
                 <TouchableOpacity
-                  className="px-4 py-3 border-b border-gray-200 flex-row items-center"
+                  className="px-4 py-3 flex-row items-center"
                   onPress={() => handleCountrySelect(item)}
                 >
                   <Text className="text-2xl mr-3">{item.emoji}</Text>
@@ -1129,6 +1247,13 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           </View>
         </View>
       </Modal>
+      <FormFooterButton
+        exitText={t("InspectionForm.Exit")}
+        nextText={t("InspectionForm.Next")}
+        isNextEnabled={isNextEnabled}
+        onExit={handleExit}
+        onNext={handleNext}
+      />
     </KeyboardAvoidingView>
   );
 };

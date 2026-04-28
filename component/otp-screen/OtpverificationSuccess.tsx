@@ -1,10 +1,5 @@
 import React, { useEffect } from "react";
 import { View, Text, TouchableOpacity, BackHandler } from "react-native";
-import { StatusBar } from "expo-status-bar";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
 import i18n from "@/i18n/i18n";
 import LottieView from "lottie-react-native";
 
@@ -34,8 +29,6 @@ const OtpverificationSuccess: React.FC = ({ navigation }: any) => {
 
   return (
     <View className="flex-1 bg-white">
-      <StatusBar style="light" />
-
       <View className="flex-1 justify-center items-center">
         <LottieView
           source={require("../../assets/json/verify.json")}
@@ -70,8 +63,7 @@ const OtpverificationSuccess: React.FC = ({ navigation }: any) => {
         </Text>
 
         <TouchableOpacity
-          style={{ height: hp(8), width: wp(80) }}
-          className="bg-[#353535] flex items-center justify-center mx-auto rounded-full mt-24"
+          className="bg-[#353535] h-[50px] w-2/3 flex items-center justify-center mx-auto rounded-3xl mt-24"
           onPress={() => navigation.navigate("Main")}
         >
           <Text

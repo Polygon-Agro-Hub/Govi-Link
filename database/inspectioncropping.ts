@@ -16,7 +16,7 @@ export const initCroppingTable = () => {
         updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
       );`,
     );
-    console.log(" Cropping systems table created/verified");
+    
   } catch (error) {
     console.error("Error initializing cropping systems table:", error);
     throw error;

@@ -13,7 +13,7 @@ import {
 import React, { useCallback, useState } from "react";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp, useRoute } from "@react-navigation/native";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import axios from "axios";
 import { ScrollView } from "react-native-gesture-handler";
 import { environment } from "@/environment/environment";
@@ -27,7 +27,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import NetInfo from "@react-native-community/netinfo";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
-import CustomHeader from "../common/CustomHeader";
+import CustomHeader from "../commons/CustomHeader";
 
 type ChangePasswordNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -184,13 +184,12 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ navigation }) => {
         title={""}
         navigation={navigation}
         showBackButton={true}
-        showLanguageSelector={false}
         onBackPress={() => navigation.goBack()}
       />
       <ScrollView
         className="flex-1 bg-white"
         keyboardShouldPersistTaps="handled"
-        style={{ paddingHorizontal: wp(4) }}
+        style={{ paddingHorizontal: wp(6) }}
       >
         <View
           className={`flex-row items-center justify-center space-x-[-30%] ml-[5%]`}
@@ -278,16 +277,16 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ navigation }) => {
 
         <View className="items-center justify-center pt-7 gap-y-5 mb-20">
           <TouchableOpacity
-            className="w-full rounded-full items-center justify-center"
+            className="w-full  items-center justify-center h-[50px]"
             onPress={handleChangePassword}
           >
             <LinearGradient
               colors={["#F2561D", "#FF1D85"]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
-              className="w-full p-3 rounded-full items-center justify-center"
+              className="w-full p-3 rounded-3xl items-center justify-center h-[50px]"
             >
-              <Text className="text-xl font-semibold text-white">
+              <Text className="text-lg font-semibold text-white">
                 {t("ChangePassword.Next")}
               </Text>
             </LinearGradient>

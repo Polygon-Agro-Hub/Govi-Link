@@ -80,7 +80,7 @@
     "Unauthorized Access": "අනවසර ප්‍රවේශය",
     "You are not authorized to access this system. Please use a valid Employee ID": "ඔබ මෙම පද්ධතියට ප්‍රවේශ වීමට අවසර නොමැත. කරුණාකර වලංගු සේවක හැඳුනුම්පතක් භාවිතා කරන්න.",
     "This EMP ID is not approved.": "මෙම සේවක හැඳුනුම්පත අනුමත කර නොමැත.",
-    "This Employee ID is Rejected":"මෙම සේවක හැඳුනුම්පත ප්‍රතික්ෂේප කර ඇත.",
+    "This Employee ID is Rejected": "මෙම සේවක හැඳුනුම්පත ප්‍රතික්ෂේප කර ඇත.",
     "Please Wait": "කරුණාකර රැඳී සිටින්න",
     "Validating your information, please wait...": "ඔබගේ තොරතුරු තහවුරු කරන තෙක් රැඳී සිටින්න...",
     "firstName is required": "පළමු නම අවශ්‍යයි",
@@ -102,7 +102,6 @@
     "noOfDependents is required": "යැපෙන්නන් සංඛ්‍යාව අවශ්‍ය වේ",
     "debtsOfFarmer is required": "ගොවියාගේ පවතින ණය ගෙවීම අවශ්‍ය වේ",
     "ID Proof Type is required": "හැඳුනුම්පත් සාක්ෂි වර්ගය අවශ්‍යයි",
-    "At least one option must be selected.": "අවම වශයෙන් එක් විකල්පයක්වත් තෝරා ගත යුතුය. (විශේෂ ගොවිපල මෙවලම් නොමැතිව)",
     "At least one": "අවම වශයෙන් එක් {{category}} විකල්පයක්වත් තෝරා ගත යුතුය.",
     "Please specify any special farm tools utilized by the farmer.": "ගොවියා විසින් භාවිතා කරන විශේෂ ගොවිපල මෙවලම් තිබේ නම් කරුණාකර සඳහන් කරන්න.",
     "Permission Denied": "අවසරය ප්රතික්ෂේප කෙරිණි",
@@ -128,7 +127,19 @@
     "Is it worth to take the risks for anticipated profits is required": "අපේක්ෂිත ලාභ සඳහා අවදානම් ගැනීම වටී ද යන්න අවශ්‍යයි.",
     "Land number must be 9 digits long": "භූමි දුරකථන අංකය අංක 9ක් විය යුතුය",
     "Land number number must start with 0": "භූමි දුරකථන අංකය 0 න් ආරම්භ විය යුතුය",
-    "Invalid land number format": "භූමි දුරකථන අංකය වැරදියි"
+    "Invalid land number format": "භූමි දුරකථන අංකය වැරදියි",
+    "Phone number must be 10 digits": "දුරකථන අංකය ඉලක්කම් 10ක් විය යුතුය.",
+    "This phone number is already registered": "මෙම දුරකථන අංකය දැනටමත් ලියාපදිංචි කර ඇත.",
+    "This email is already registered": "මෙම ඊතැපෑල දැනටමත් ලියාපදිංචි කර ඇත",
+    "This NIC is already registered": "මෙම ජාතික හැඳුනුම්පත දැනටමත් ලියාපදිංචි කර ඇත.",
+    "Please enter a valid License ID number":"වලංගු බලපත්‍ර හැඳුනුම්පත් අංකයක් (1 ලොකු අකුර + ඉලක්කම් 7 හෝ ඉලක්කම් 10–12) ඇතුළත් කරන්න.",
+    "At least one image of the water source is required":"ජල මූලාශ්‍රයේ අවම වශයෙන් එක් රූපයක්වත් අවශ්‍ය වේ.",
+    "pH is required":"pH අගය අවශ්‍යයි",
+    "Overall soil fertility is required":"සමස්ත පසේ සාරවත් බව අවශ්‍ය වේ.",
+    "Land ownership is required":"ඉඩම් හිමිකම අවශ්‍යයි",
+    "Ownership status is required":"හිමිකාරිත්ව තත්ත්වය අවශ්‍යයි",
+    "Knowledge field is required":"දැනුම ක්ෂේත්‍රය අවශ්‍යයි",
+    "Previous experience is required":"පෙර අත්දැකීම් අවශ්‍යයි"
   },
   "Login": {
     "Welcome": "සාදරයෙන් පිළිගනිමු!",
@@ -137,7 +148,7 @@
     "Password": "මුරපදය",
     "Sign in": "පුරන්න",
     "Please enter Employee ID in uppercase letters": "කරුණාකර සේවක හැඳුනුම්පත මහකුරුවලින් ඇතුළත් කරන්න.",
-    "Password & Employee ID are not allowed to be empty": "මුරපදය සහ සේවක පරිශීලක අංකය හිස්ව තැබිය නොහැක.",
+    "Password and Employee ID are required": "මුරපදය සහ සේවක හැඳුනුම්පත අවශ්‍ය වේ.",
     "Password is not allowed to be empty": "මුරපදය හිස්ව තැබිය නොහැක.",
     "Employee ID is not allowed to be empty": "මුරපදය සහ සේවක පරිශීලක අංකය හිස්ව තැබිය නොහැක.",
     "Invalid EMP ID & Password": "වැරදි සේවක අංකයක් සහ මුරපදයකි",
@@ -152,7 +163,8 @@
     "Assigned Target": "පවරන ලද ඉලක්ක",
     "No Jobs for Today": "අදට ඉලක්කය නැත",
     "No Saved Drafts for Today": "අදට සුරැකූ කෙටුම්පත් නොමැත",
-    "Capital Requests": "මුල්ධන ඉල්ලීම්"
+    "Capital Requests": "මුල්ධන ඉල්ලීම්",
+    "Onboard Suppliers": "නව සැපයුම්කරුවන්"
   },
   "Drawer": {
     "Language": "භාෂාව",
@@ -713,5 +725,37 @@
     "HeaderOn": "තහවුරු කිරීම",
     "UndoSuccess": "සියලුම පරීක්ෂණ දත්ත සාර්ථකව මකා දමන ලදී.",
     "UndoFailed": "පරීක්ෂණ දත්ත මැකීම අසාර්ථක විය."
+  },
+  "OnboardSupplier": {
+    "Onboard Supplier": "නව සැපයුම්කරුවන්",
+    "Supplier Full Name": "--සැපයුම්කරුගේ සම්පූර්ණ නම--",
+    "Contact": "--සම්බන්ධතාව (උදා: 07XXXXXXXX)--",
+    "Email Address": "--ඊතැපැල් ලිපිනය--",
+    "NIC Number": "--ජාතික හැඳුනුම්පත් අංකය--",
+    "Cancel": "අවලංගු කරන්න",
+    "Next": "ඊළඟ",
+    "Supplier Full Name is required": "සැපයුම්කරුගේ සම්පූර්ණ නම අවශ්‍යයි.",
+    "OTP Verification": "OTP සත්‍යාපනය",
+    "We have sent a Verification Code to the given mobile number": "අපි ලබා දී ඇති ජංගම දුරකථන අංකයට සත්‍යාපන කේතයක් යවා ඇත.",
+    "Submit": "තහවුරු කරන්න",
+    "Back": "ආපසු",
+    "Didn't receive the OTP": "OTP එක ලැබුනේ නැද්ද?",
+    "Account created successfully": "ගිණුම සාර්ථකව නිර්මාණය කරන ලදී."
+  },
+  "Permission":{
+   "locationAccess": "Location Access",
+    "enableLocationMessage": "Enable location access to access location information.",
+    "allow": "Allow",
+    "requesting": "Requesting...",
+    "success": "Success",
+    "locationEnabled": "Location access enabled successfully!",
+    "permissionDenied": "Permission Denied",
+    "enableLocationManually": "Location access is required. Please enable it in settings.",
+    "openSettings": "Open Settings",
+    "permissionError": "Unable to request location permission. Please try again.",
+    "skipLocation": "Skip Location?",
+    "skipMessage": "Some features may not work properly without location access. Are you sure?",
+    "skip": "Skip",
+    "skipForNow": "Skip for now"
   }
 }

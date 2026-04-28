@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Alert,
   Keyboard,
+  AppState,
 } from "react-native";
 import {
   widthPercentageToDP as wp,
@@ -16,21 +17,10 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { environment } from "@/environment/environment";
 import { useTranslation } from "react-i18next";
-import { Dimensions } from "react-native";
-import { AntDesign } from "@expo/vector-icons";
 import { ScrollView } from "react-native-gesture-handler";
 import NetInfo from "@react-native-community/netinfo";
 import { LinearGradient } from "expo-linear-gradient";
-
-type RootStackParamList = {
-  OtpVerification: undefined;
-  NextScreen: undefined;
-};
-
-interface SuccessModalProps {
-  visible: boolean;
-  onClose: () => void;
-}
+import CustomHeader from "../commons/CustomHeader";
 
 const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
   const { farmerMobile, jobId, govilinkjobid } = route.params;
@@ -44,8 +34,30 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
   const [isOtpValid, setIsOtpValid] = useState<boolean>(false);
   const [verificationAttempts, setVerificationAttempts] = useState<number>(0);
   const [isOtpExpired, setIsOtpExpired] = useState<boolean>(false);
+  const [isActive, setIsActive] = useState<boolean>(true);
 
   const inputRefs = useRef<Array<TextInput | null>>([]);
+  const backgroundTime = useRef<number | null>(null);
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (nextAppState) => {
+      if (nextAppState === "active") {
+        if (backgroundTime.current) {
+          const elapsed = Math.floor(
+            (Date.now() - backgroundTime.current) / 1000,
+          );
+          setTimer((prev) => Math.max(0, prev - elapsed));
+          backgroundTime.current = null;
+        }
+        setIsActive(true);
+      } else if (nextAppState.match(/inactive|background/)) {
+        backgroundTime.current = Date.now();
+        setIsActive(false);
+      }
+    });
+
+    return () => subscription.remove();
+  }, []);
 
   useEffect(() => {
     const selectedLanguage = t("Otpverification.LNG");
@@ -65,19 +77,24 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
   }, []);
 
   useEffect(() => {
-    if (timer > 0 && !isVerified) {
-      const interval = setInterval(() => {
+    let interval: ReturnType<typeof setInterval> | undefined;
+
+    if (timer > 0 && !isVerified && isActive) {
+      interval = setInterval(() => {
         setTimer((prevTimer) => prevTimer - 1);
       }, 1000);
 
       setDisabledResend(true);
-
-      return () => clearInterval(interval);
-    } else if (timer === 0 && !isVerified) {
+    } else if (timer <= 0 && !isVerified) {
+      setTimer(0);
       setDisabledResend(false);
       setIsOtpExpired(true);
     }
-  }, [timer, isVerified]);
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [timer, isVerified, isActive]);
 
   const handleOtpChange = (text: string, index: number) => {
     const updatedOtpCode = otpCode.split("");
@@ -353,28 +370,17 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
 
   return (
     <ScrollView className="flex-1 bg-white">
-      <View className="flex-row items-center px-4 py-4 bg-white shadow-sm border-b border-[#E5E5E5]">
-        <TouchableOpacity
-          className="bg-[#F6F6F680] rounded-full p-2 justify-center w-10 z-20"
-          onPress={() => navigation.goBack()}
-        >
-          <AntDesign name="left" size={22} color="#000" />
-        </TouchableOpacity>
+      <CustomHeader
+        title={`#${jobId}`}
+        navigation={navigation}
+        showBackButton={true}
+        titleColor="black"
+        onBackPress={() => navigation.goBack()}
+      />
 
-        <View className="flex-1">
-          <Text className="text-base font-semibold text-center">#{jobId}</Text>
-        </View>
-      </View>
-
-      <View className="flex justify-center items-center mt-0">
-        <Text className="text-black" style={{ fontSize: wp(8) }}>
-          {/* {t("OtpVerification.OTPVerification")} */}
-        </Text>
-      </View>
-
-      <View className="flex justify-center items-center">
+      <View className="flex justify-center items-center mt-3">
         <Image
-          source={require("../../assets/otpverify.webp")}
+          source={require("../../assets/images/otp/otp-verify.webp")}
           style={{
             width: 500,
             height: 150,
@@ -433,10 +439,10 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
         </View>
         <View>
           <TouchableOpacity
-            className="bg-[#444444]  py-4 justify-center rounded-3xl mb-4"
+            className="bg-[#444444]  h-[50px] justify-center rounded-3xl mb-4"
             onPress={() => navigation.goBack()}
           >
-            <Text className="text-white text-xl text-center font-semibold">
+            <Text className="text-white text-lg text-center font-semibold">
               {t("Otpverification.Go Back")}
             </Text>
           </TouchableOpacity>
@@ -449,11 +455,11 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
               colors={["#F35125", "#FF1D85"]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
-              className={`flex items-center py-3 justify-center rounded-3xl ${
+              className={`flex items-center h-[50px] justify-center rounded-3xl ${
                 !isOtpValid || isVerified ? "bg-gray-400" : "bg-[#000000]"
               }`}
             >
-              <Text className="text-white text-xl font-semibold">
+              <Text className="text-white text-lg font-semibold">
                 {t("Otpverification.Verify")}
               </Text>
             </LinearGradient>

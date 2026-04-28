@@ -80,7 +80,7 @@
     "Unauthorized Access": "Unauthorized Access",
     "You are not authorized to access this system. Please use a valid Employee ID": "You are not authorized to access this system. Please use a valid Employee ID",
     "This EMP ID is not approved.": "This EMP ID is not approved.",
-    "This Employee ID is Rejected":"This Employee ID is Rejected",
+    "This Employee ID is Rejected": "This Employee ID is Rejected",
     "Please Wait": "Please Wait",
     "Validating your information, please wait...": "Validating your information, please wait...",
     "firstName is required": "First name is required",
@@ -102,7 +102,6 @@
     "noOfDependents is required": "Number of dependents is required",
     "debtsOfFarmer is required": "Existing debts of the farmer is required",
     "ID Proof Type is required": "ID proof type is required",
-    "At least one option must be selected.": "At least one option must be selected. (without Special Farm Tools)",
     "At least one": "At least one {{category}} option must be selected",
     "Please specify any special farm tools utilized by the farmer.": "Please specify any special farm tools utilized by the farmer.",
     "Permission Denied": "Permission Denied",
@@ -128,7 +127,19 @@
     "Is it worth to take the risks for anticipated profits is required": "Is it worth to take the risks for anticipated profits is required",
     "Land number must be 9 digits long": "நில எண்ணில் 9 இலக்கங்கள் இருக்க வேண்டும்",
     "Land number must start with 0": "நில எண் 0-இல் தொடங்க வேண்டும்",
-    "Invalid land number format": "தவறான நில எண் வடிவம்"
+    "Invalid land number format": "தவறான நில எண் வடிவம்",
+    "Phone number must be 10 digits": "தொலைபேசி எண் 10 இலக்கங்களைக் கொண்டிருக்க வேண்டும்.",
+    "This phone number is already registered": "இந்த தொலைபேசி எண் ஏற்கனவே பதிவு செய்யப்பட்டுள்ளது",
+    "This email is already registered": "இந்த மின்னஞ்சல் ஏற்கனவே பதிவு செய்யப்பட்டுள்ளது",
+    "This NIC is already registered": "இந்த NIC ஏற்கனவே பதிவு செய்யப்பட்டுள்ளது",
+    "Please enter a valid License ID number":"சரியான உரிம அடையாள எண்ணை (1 பெரிய எழுத்து + 7 இலக்கங்கள் அல்லது 10–12 இலக்கங்கள்) உள்ளிடவும்.",
+    "At least one image of the water source is required":"நீர் ஆதாரத்தின் குறைந்தபட்சம் ஒரு புகைப்படம் தேவைப்படுகிறது.",
+    "pH is required":"pH தேவைப்படுகிறது",
+    "Overall soil fertility is required":"ஒட்டுமொத்த மண் வளம் தேவைப்படுகிறது",
+    "Land ownership is required":"நில உரிமை தேவைப்படுகிறது",
+    "Ownership status is required":"உரிமை நிலை தேவைப்படுகிறது",
+    "Knowledge field is required":"துறை சார்ந்த அறிவு தேவைப்படுகிறது",
+    "Previous experience is required":"முன் அனுபவம் தேவை"
   },
   "Login": {
     "Welcome": "வரவேற்கிறோம்",
@@ -137,7 +148,7 @@
     "Password": "கடவுச்சொல்",
     "Sign in": "உள்நுழை",
     "Please enter Employee ID in uppercase letters": "பணியாளர் ஐடியை பெரிய எழுத்துக்களில் உள்ளிடவும்.",
-    "Password & Employee ID are not allowed to be empty": "கடவுச்சொல் மற்றும் பணியாளர் எண் வெறுமையாக இருக்க அனுமதிக்கப்படவில்லை.",
+    "Password and Employee ID are required": "கடவுச்சொல் மற்றும் பணியாளர் அடையாள எண் தேவை.",
     "Password is not allowed to be empty": "கடவுச்சொல் வெறுமையாக இருக்க அனுமதி இல்லை.",
     "Employee ID is not allowed to be empty": "பணியாளர் எண் காலியாக இருக்க அனுமதி இல்லை.",
     "Invalid EMP ID & Password": "தவறான பணியாளர் எண் மற்றும் கடவுச்சொல்",
@@ -152,7 +163,8 @@
     "Assigned Target": "ஒதுக்கப்பட்ட இலக்கு",
     "No Jobs for Today": "No Jobs for Today",
     "No Saved Drafts for Today": "No Saved Drafts for Today",
-    "Capital Requests": "Capital Requests"
+    "Capital Requests": "Capital Requests",
+    "Onboard Suppliers": "புதிய சப்ளையர்கள்"
   },
   "Drawer": {
     "Language": "மொழி மாற்றம்",
@@ -713,5 +725,37 @@
     "HeaderOn": "உறுதிப்படுத்தல்",
     "UndoSuccess": "அனைத்து ஆய்வுத் தரவும் வெற்றிகரமாக நீக்கப்பட்டது.",
     "UndoFailed": "ஆய்வுத் தரவை நீக்க முடியவில்லை."
+  },
+  "OnboardSupplier": {
+    "Onboard Supplier": "புதிய சப்ளையர்கள்",
+    "Supplier Full Name": "--வழங்குநரின் முழுப் பெயர்--",
+    "Contact": "--தொடர்புக்கு (எ.கா. 07XXXXXXXX)--",
+    "Email Address": "--மின்னஞ்சல் முகவரி--",
+    "NIC Number": "--என்ஐசி எண்--",
+    "Cancel": "ரத்து செய்",
+    "Next": "அடுத்து",
+    "Supplier Full Name is required": "வழங்குநரின் முழுப் பெயர் தேவை.",
+    "OTP Verification": "OTP சரிபார்ப்பு",
+    "We have sent a Verification Code to the given mobile number": "கொடுக்கப்பட்ட கைபேசி எண்ணுக்கு நாங்கள் ஒரு சரிபார்ப்புக் குறியீட்டை அனுப்பியுள்ளோம்.",
+    "Submit": "சமர்ப்பிக்கவும்",
+    "Back": "பின்னால்",
+    "Didn't receive the OTP": "OTP வரவில்லையா?",
+    "Account created successfully": "கணக்கு வெற்றிகரமாக உருவாக்கப்பட்டது"
+  },
+  "Permission":{
+   "locationAccess": "Location Access",
+    "enableLocationMessage": "Enable location access to access location information.",
+    "allow": "Allow",
+    "requesting": "Requesting...",
+    "success": "Success",
+    "locationEnabled": "Location access enabled successfully!",
+    "permissionDenied": "Permission Denied",
+    "enableLocationManually": "Location access is required. Please enable it in settings.",
+    "openSettings": "Open Settings",
+    "permissionError": "Unable to request location permission. Please try again.",
+    "skipLocation": "Skip Location?",
+    "skipMessage": "Some features may not work properly without location access. Are you sure?",
+    "skip": "Skip",
+    "skipForNow": "Skip for now"
   }
 }

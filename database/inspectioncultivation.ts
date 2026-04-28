@@ -19,7 +19,7 @@ export const initCultivationTable = () => {
         soilType TEXT,
         soilfertility TEXT,
         waterSources TEXT,
-        otherWaterSource TEXT,
+        otherWaterSources TEXT,
         waterImage TEXT,
         isRecevieRainFall TEXT,
         isRainFallSuitableCrop TEXT,
@@ -30,9 +30,8 @@ export const initCultivationTable = () => {
         updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
       );`,
     );
-    console.log("Cultivation table created/verified");
   } catch (error) {
-    console.error(" Error initializing cultivation table:", error);
+    console.error("Error initializing cultivation table:", error);
     throw error;
   }
 };
@@ -56,7 +55,7 @@ export interface CultivationInfo {
   soilType: string;
   soilfertility: string;
   waterSources: string[];
-  otherWaterSource: string;
+  otherWaterSources: string;
   waterImages: WaterImage[];
   isRecevieRainFall: "Yes" | "No" | undefined;
   isRainFallSuitableCrop: "Yes" | "No" | undefined;
@@ -65,7 +64,6 @@ export interface CultivationInfo {
   ispumpOrirrigation: "Yes" | "No" | undefined;
 }
 
-// Save or update cultivation info
 export const saveCultivationInfo = (
   requestId: number,
   data: Partial<CultivationInfo>,
@@ -84,7 +82,6 @@ export const saveCultivationInfo = (
       return null;
     };
 
-    // Climate parameters
     if (data.temperature !== undefined) {
       dbData.temperature = yesNoToBool(data.temperature);
     }
@@ -107,7 +104,6 @@ export const saveCultivationInfo = (
       dbData.zone = yesNoToBool(data.zone);
     }
 
-    // Yes/No fields
     if (data.isCropSuitale !== undefined) {
       dbData.isCropSuitale = data.isCropSuitale;
     }
@@ -127,8 +123,7 @@ export const saveCultivationInfo = (
       dbData.ispumpOrirrigation = data.ispumpOrirrigation;
     }
 
-    // Other fields
-    if (data.ph !== undefined) {
+    if (data.ph !== undefined && data.ph !== null) {
       dbData.ph = data.ph;
     }
     if (data.soilType !== undefined) {
@@ -137,8 +132,8 @@ export const saveCultivationInfo = (
     if (data.soilfertility !== undefined) {
       dbData.soilfertility = data.soilfertility;
     }
-    if (data.otherWaterSource !== undefined) {
-      dbData.otherWaterSource = data.otherWaterSource;
+    if (data.otherWaterSources !== undefined) {
+      dbData.otherWaterSources = data.otherWaterSources;
     }
 
     if (data.waterSources && Array.isArray(data.waterSources)) {
@@ -163,7 +158,7 @@ export const saveCultivationInfo = (
         requestId,
       ];
 
-      const result = db.runSync(
+      db.runSync(
         `UPDATE inspectioncultivation SET ${fields}, updatedAt = ? WHERE requestId = ?`,
         values as SQLite.SQLiteBindParams,
       );
@@ -186,15 +181,15 @@ export const saveCultivationInfo = (
         new Date().toISOString(),
       ];
 
-      const result = db.runSync(
+      db.runSync(
         `INSERT INTO inspectioncultivation (${fields}) VALUES (${placeholders})`,
         values as SQLite.SQLiteBindParams,
       );
 
-      console.log(" Cultivation info inserted into SQLite");
+      console.log("Cultivation info inserted into SQLite");
     }
   } catch (error) {
-    console.error(" Error saving cultivation info:", error);
+    console.error("Error saving cultivation info:", error);
     throw error;
   }
 };
@@ -245,11 +240,12 @@ export const getCultivationInfo = (
         windDirection: boolToYesNo(row.windDirection),
         zone: boolToYesNo(row.zone),
         isCropSuitale: row.isCropSuitale as "Yes" | "No" | undefined,
-        ph: row.ph ? parseFloat(row.ph) : 0,
+
+        ph: row.ph !== null && row.ph !== undefined ? parseFloat(row.ph) : 0,
         soilType: row.soilType || "",
         soilfertility: row.soilfertility || "",
         waterSources,
-        otherWaterSource: row.otherWaterSource || "",
+        otherWaterSources: row.otherWaterSources || "",
         waterImages,
         isRecevieRainFall: row.isRecevieRainFall as "Yes" | "No" | undefined,
         isRainFallSuitableCrop: row.isRainFallSuitableCrop as
@@ -272,8 +268,7 @@ export const getCultivationInfo = (
 
     return null;
   } catch (error) {
-    console.error("❌ Error fetching cultivation info:", error);
-
+    console.error("Error fetching cultivation info:", error);
     return null;
   }
 };

@@ -64,11 +64,9 @@ const FormTabs: React.FC<FormTabsProps> = ({
       try {
         let lastCompletedIndex = -1;
         
-        // Check each table in order
         for (let i = 0; i < tableNames.length; i++) {
           const tableName = tableNames[i];
           
-          // Check if record exists in this table
           const result = db.getFirstSync<{ requestId: number }>(
             `SELECT requestId FROM ${tableName} WHERE requestId = ?`,
             [requestId]
@@ -77,13 +75,10 @@ const FormTabs: React.FC<FormTabsProps> = ({
           if (result) {
             lastCompletedIndex = i;
           } else {
-            // Stop at first missing table
             break;
           }
         }
         
-        // Set max accessible index to last completed form
-        // This only allows navigation to forms that have been completed
         setMaxAccessibleIndex(lastCompletedIndex);
         
       } catch (error) {
@@ -108,8 +103,6 @@ const FormTabs: React.FC<FormTabsProps> = ({
   const currentIndex = tabs.indexOf(activeKey);
 
   const isTabAccessible = (index: number): boolean => {
-    // Only allow forms that have been completed (have data in database)
-    // Current form is always accessible
     return index === currentIndex || index <= maxAccessibleIndex;
   };
 
@@ -169,25 +162,23 @@ const FormTabs: React.FC<FormTabsProps> = ({
             const isCompleted = index <= maxAccessibleIndex;
             const isCurrent = key === activeKey;
 
-            // Determine text color based on status
-            let textColor = "text-[#A8A8A8]"; // Default: not clickable (gray)
+            let textColor = "text-[#A8A8A8]"; 
             
             if (isCurrent) {
-              textColor = "text-[#FA345A]"; // Current form (orange/pink)
+              textColor = "text-[#FA345A]"; 
             } else if (isCompleted && index < currentIndex) {
-              textColor = "text-[#5D5D5D]"; // Completed before current (dark gray)
+              textColor = "text-[#5D5D5D]"; 
             } else if (isCompleted && index > currentIndex) {
-              textColor = "text-[#5D5D5D]"; // Completed after current (dark gray)
+              textColor = "text-[#5D5D5D]"; 
             } else if (isAccessible && index < currentIndex) {
-              textColor = "text-[#5D5D5D]"; // Accessible before current (dark gray)
+              textColor = "text-[#5D5D5D]"; 
             }
 
-            // Determine indicator color
-            let indicatorColor = "bg-[#A8A8A8]"; // Default: not clickable
+            let indicatorColor = "bg-[#A8A8A8]"; 
             if (isCurrent) {
-              indicatorColor = "bg-[#FA345A]"; // Current form
+              indicatorColor = "bg-[#FA345A]"; 
             } else if (isCompleted) {
-              indicatorColor = "bg-[#5D5D5D]"; // Completed forms
+              indicatorColor = "bg-[#5D5D5D]"; 
             }
 
             return (

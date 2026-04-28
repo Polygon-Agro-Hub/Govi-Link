@@ -4,7 +4,6 @@ import {
   Text,
   TouchableOpacity,
   ScrollView,
-  StatusBar,
   Alert,
   KeyboardAvoidingView,
   Platform,
@@ -12,14 +11,14 @@ import {
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import * as ImagePicker from "expo-image-picker";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { RouteProp, useRoute, useFocusEffect } from "@react-navigation/native";
-import CustomHeader from "../common/CustomHeader";
+import CustomHeader from "../commons/CustomHeader";
 
 type AddOfficerStep3NavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -64,6 +63,8 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
       }
     }, [isnewthirdstep]),
   );
+
+  // FIXED: Updated to use new MediaType syntax
   const pickImage = async (type: string) => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
@@ -76,7 +77,7 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
     }
 
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ["images"],
       allowsEditing: false,
       aspect: [4, 3],
       quality: 1,
@@ -317,7 +318,7 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
   }) => (
     <View className="mb-10">
       <TouchableOpacity
-        className={`bg-[#D9D9D9] rounded-3xl px-6 py-4 flex-row justify-center items-center ${
+        className={`bg-[#D9D9D9] rounded-3xl items-center justify-center h-[50px] flex-row justify-center items-center ${
           error ? "border border-red-500" : ""
         }`}
         onPress={() => pickImage(type)}
@@ -325,7 +326,7 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
       >
         <View className="flex-row items-center">
           <MaterialIcons name="file-upload" size={24} color="#534E4E" />
-          <Text className="text-base text-[#534E4E] ml-4">{title}</Text>
+          <Text className="text-lg text-[#534E4E] ml-4">{title}</Text>
         </View>
       </TouchableOpacity>
 
@@ -356,12 +357,10 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1, backgroundColor: "white" }}
     >
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <CustomHeader
         title={t("AddOfficer.AddOfficer")}
         navigation={navigation}
         showBackButton={true}
-        showLanguageSelector={false}
         onBackPress={handleGoBack}
       />
       <ScrollView
@@ -407,24 +406,24 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
           {/* Buttons */}
           <View className="flex-col w-full gap-4 mt-4">
             <TouchableOpacity
-              className="bg-[#D9D9D9] rounded-3xl px-6 py-4 w-full items-center"
+              className="bg-[#D9D9D9] rounded-3xl items-center justify-center h-[50px] w-full items-center"
               onPress={handleGoBack}
               disabled={loading}
             >
-              <Text className="text-[#686868] font-semibold">
+              <Text className="text-[#686868] font-semibold text-lg">
                 {t("AddOfficer.GoBack")}
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              className="bg-black rounded-3xl px-6 py-4 w-full items-center"
+              className="bg-black rounded-3xl items-center justify-center h-[50px] w-full items-center"
               onPress={handleSubmit}
               disabled={loading}
             >
               {loading ? (
                 <ActivityIndicator color="white" size="small" />
               ) : (
-                <Text className="text-white font-semibold">
+                <Text className="text-white font-semibold text-lg">
                   {t("AddOfficer.Submit")}
                 </Text>
               )}

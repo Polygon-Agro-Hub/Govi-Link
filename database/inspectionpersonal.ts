@@ -28,7 +28,7 @@ export const initPersonalTable = () => {
         updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
       );`,
     );
-    console.log("Personal info table created/verified");
+    
   } catch (error) {
     console.error("Error initializing personal info table:", error);
     throw error;

@@ -8,16 +8,17 @@ import {
   Alert,
   Animated,
   Easing,
+  BackHandler,
 } from "react-native";
-import { RootStackParamList } from "@/component/types";
+import { RootStackParamList } from "@/component/types/types";
 import { useTranslation } from "react-i18next";
 import { LinearGradient } from "expo-linear-gradient";
 import { MaterialIcons } from "@expo/vector-icons";
 import Svg, { Circle, G, Text as SvgText } from "react-native-svg";
-import { RouteProp, useRoute, useFocusEffect } from "@react-navigation/native";
+import { RouteProp, useRoute } from "@react-navigation/native";
 import { environment } from "@/environment/environment";
 import axios from "axios";
-import { deleteAllInspectionData } from "@/database/deleteInspectionData";
+import ConfirmationModal from "@/Items/ConfirmationModal";
 
 type ConfirmationCapitalRequestNavigationProps = StackNavigationProp<
   RootStackParamList,
@@ -34,25 +35,47 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
   const route =
     useRoute<RouteProp<RootStackParamList, "ConfirmationCapitalRequest">>();
   const { formData, requestNumber, requestId } = route.params;
-
   const { t } = useTranslation();
   const [assigning, setAssigning] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(true);
-  const [countdown, setCountdown] = useState(20);
-
+  const [successModalVisible, setSuccessModalVisible] = useState(false);
+  const [countdown, setCountdown] = useState(30);
   const progressAnim = useRef(new Animated.Value(100)).current;
-  const countdownAnim = useRef(new Animated.Value(20)).current;
-
+  const countdownAnim = useRef(new Animated.Value(30)).current;
   const animationRef = useRef<Animated.CompositeAnimation | null>(null);
   const hasNavigatedRef = useRef(false);
   const isAnimationStartedRef = useRef(false);
+  const cancelledRef = useRef(false);
+
+  useEffect(() => {
+    cancelledRef.current = false;
+    return () => {
+      cancelledRef.current = true;
+    };
+  }, []);
 
   const navigateToCapitalRequests = useCallback(() => {
-    if (hasNavigatedRef.current) {
-      return;
-    }
+    if (hasNavigatedRef.current) return;
+    hasNavigatedRef.current = true;
+    navigation.replace("Main", {
+      screen: "MainTabs",
+      params: {
+        screen: "CapitalRequests",
+      },
+    });
+  }, [navigation]);
+
+  const handleSuccessClose = useCallback(() => {
+    setSuccessModalVisible(false);
+    navigateToCapitalRequests();
+  }, [navigateToCapitalRequests]);
+
+  const handleAutoAssign = useCallback(() => {
+    if (hasNavigatedRef.current) return;
+    if (cancelledRef.current) return;
 
     hasNavigatedRef.current = true;
+    setShowConfirmationModal(false);
 
     navigation.replace("Main", {
       screen: "MainTabs",
@@ -62,39 +85,13 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
     });
   }, [navigation]);
 
-  const handleAutoAssign = useCallback(() => {
-    if (hasNavigatedRef.current) {
-      return;
-    }
-
-    hasNavigatedRef.current = true;
-    setShowConfirmationModal(false);
-
-    setAssigning(true);
-    setTimeout(() => {
-      setAssigning(false);
-      Alert.alert(
-        t("Main.Success"),
-        t("ConfirmationCapitalRequest.AutoAssignSuccess"),
-        [
-          {
-            text: t("Main.ok"),
-            onPress: navigateToCapitalRequests,
-          },
-        ],
-      );
-    }, 1500);
-  }, [t, navigateToCapitalRequests]);
-
   const startCountdownAnimation = useCallback(() => {
-    if (isAnimationStartedRef.current) {
-      return;
-    }
+    if (isAnimationStartedRef.current) return;
 
     isAnimationStartedRef.current = true;
 
     progressAnim.setValue(100);
-    countdownAnim.setValue(20);
+    countdownAnim.setValue(30);
 
     if (animationRef.current) {
       animationRef.current.stop();
@@ -103,13 +100,13 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
     animationRef.current = Animated.parallel([
       Animated.timing(progressAnim, {
         toValue: 0,
-        duration: 20000,
+        duration: 30000,
         easing: Easing.linear,
         useNativeDriver: false,
       }),
       Animated.timing(countdownAnim, {
         toValue: 0,
-        duration: 20000,
+        duration: 30000,
         easing: Easing.linear,
         useNativeDriver: false,
       }),
@@ -129,7 +126,6 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
       if (animationRef.current) {
         animationRef.current.stop();
       }
-
       isAnimationStartedRef.current = false;
       hasNavigatedRef.current = false;
     };
@@ -146,68 +142,34 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
     };
   }, [countdownAnim]);
 
-  useFocusEffect(
-    useCallback(() => {
-      console.log("ConfirmationCapitalRequest focused");
-
-      return () => {
-        console.log("ConfirmationCapitalRequest blurred");
-      };
-    }, []),
-  );
-
   const handleUndo = async () => {
-    if (hasNavigatedRef.current) {
-      return;
-    }
+    if (hasNavigatedRef.current) return;
+
+    cancelledRef.current = true;
+    hasNavigatedRef.current = true;
 
     if (animationRef.current) {
       animationRef.current.stop();
     }
 
     setAssigning(true);
+    setAssigning(false);
+    setShowConfirmationModal(false);
 
-    try {
-      const response = await axios.delete(
-        `${environment.API_BASE_URL}api/capital-request/inspection/delete/${requestId}`,
-      );
-
-      if (response.data.success) {
-        await deleteAllInspectionData(requestId.toString());
-
-        setAssigning(false);
-        setShowConfirmationModal(false);
-
-        Alert.alert(
-          t("Main.Success"),
-          t("ConfirmationCapitalRequest.UndoSuccess"),
-          [
-            {
-              text: t("Main.ok"),
-              onPress: navigateToCapitalRequests,
-            },
-          ],
-        );
-      } else {
-        throw new Error(response.data.message || "Delete failed");
-      }
-    } catch (error: any) {
-      console.error("Error deleting inspection data:", error);
-      setAssigning(false);
-
-      Alert.alert(
-        t("Main.Error"),
-        error.response?.data?.message ||
-          t("ConfirmationCapitalRequest.UndoFailed"),
-        [{ text: t("Main.ok") }],
-      );
-    }
+    Alert.alert(
+      t("Main.Success"),
+      t("ConfirmationCapitalRequest.UndoSuccess"),
+      [
+        {
+          text: t("Main.ok"),
+          onPress: () => navigation.goBack(),
+        },
+      ],
+    );
   };
 
   const handleConfirmAndLeave = async () => {
-    if (hasNavigatedRef.current) {
-      return;
-    }
+    if (hasNavigatedRef.current) return;
 
     if (animationRef.current) {
       animationRef.current.stop();
@@ -221,23 +183,17 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
         `${environment.API_BASE_URL}api/capital-request/confirm-leave/${requestId}`,
       );
 
+      if (cancelledRef.current) return;
+
       if (response.data.success) {
         setAssigning(false);
-
-        Alert.alert(
-          t("Main.Success"),
-          t("ConfirmationCapitalRequest.ConfirmSuccess"),
-          [
-            {
-              text: t("Main.ok"),
-              onPress: navigateToCapitalRequests,
-            },
-          ],
-        );
+        setSuccessModalVisible(true);
       } else {
         throw new Error(response.data.message || "Confirmation failed");
       }
     } catch (error: any) {
+      if (cancelledRef.current) return;
+
       console.error("Error confirming request:", error);
       setAssigning(false);
 
@@ -266,19 +222,46 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
 
   const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
+  useEffect(() => {
+    const handleBackPress = () => {
+      cancelledRef.current = true;
+      hasNavigatedRef.current = true;
+
+      if (animationRef.current) {
+        animationRef.current.stop();
+      }
+
+      navigation.navigate("Main", {
+        screen: "MainTabs",
+        params: { screen: "CapitalRequests" },
+      });
+      return true;
+    };
+
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      handleBackPress,
+    );
+
+    return () => subscription.remove();
+  }, [navigation]);
+
   return (
     <View className="flex-1 bg-white">
       <View className="flex-row items-center px-4 py-3 border-b border-gray-200">
         <TouchableOpacity
           onPress={() => {
-            if (hasNavigatedRef.current) {
-              return;
+            cancelledRef.current = true;
+            hasNavigatedRef.current = true;
+
+            if (animationRef.current) {
+              animationRef.current.stop();
             }
-            if (showConfirmationModal) {
-              handleUndo();
-            } else {
-              navigateToCapitalRequests();
-            }
+
+            navigation.navigate("Main", {
+              screen: "MainTabs",
+              params: { screen: "CapitalRequests" },
+            });
           }}
           className="bg-[#F6F6F680] rounded-full py-4 px-3"
         >
@@ -362,19 +345,33 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
               <TouchableOpacity
                 onPress={handleUndo}
                 disabled={assigning || hasNavigatedRef.current}
-                className={`px-10 py-3 rounded-3xl items-center ml-3 mt-auto ${
-                  assigning || hasNavigatedRef.current
-                    ? "bg-gray-400"
-                    : "bg-black"
-                }`}
+                className="ml-3 mt-auto"
               >
-                {assigning ? (
-                  <ActivityIndicator size="small" color="white" />
-                ) : (
-                  <Text className="text-white text-md font-semibold">
-                    {t("ConfirmationCapitalRequest.UndoButton")}
-                  </Text>
-                )}
+                <LinearGradient
+                  colors={
+                    assigning || hasNavigatedRef.current
+                      ? ["#CCCCCC", "#CCCCCC"]
+                      : ["#2C2C2C", "#000000"]
+                  }
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  className="px-10 py-3 rounded-3xl items-center"
+                  style={{
+                    shadowColor: "#000000",
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: 0.25,
+                    shadowRadius: 10,
+                    elevation: 6,
+                  }}
+                >
+                  {assigning ? (
+                    <ActivityIndicator size="small" color="white" />
+                  ) : (
+                    <Text className="text-white text-md font-semibold">
+                      {t("ConfirmationCapitalRequest.UndoButton")}
+                    </Text>
+                  )}
+                </LinearGradient>
               </TouchableOpacity>
             </View>
           </View>
@@ -394,7 +391,14 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
               }
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
-              className="rounded-3xl px-6 py-4 items-center"
+              className="rounded-3xl px-6 h-[50px] items-center justify-center"
+              style={{
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 3 },
+                shadowOpacity: 0.25,
+                shadowRadius: 5,
+                elevation: 6,
+              }}
             >
               {assigning ? (
                 <ActivityIndicator size="small" color="white" />
@@ -407,6 +411,12 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
           </TouchableOpacity>
         </View>
       </View>
+
+      <ConfirmationModal
+        visible={successModalVisible}
+        type="success"
+        onClose={handleSuccessClose}
+      />
     </View>
   );
 };

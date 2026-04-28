@@ -5,17 +5,17 @@ import {
   TextInput,
   ScrollView,
   TouchableOpacity,
-  StatusBar,
   Alert,
   KeyboardAvoidingView,
   Platform,
   Modal,
+  BackHandler,
 } from "react-native";
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, FontAwesome } from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
 import { useTranslation } from "react-i18next";
 import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 import FormFooterButton from "./FormFooterButton";
@@ -24,6 +24,41 @@ import {
   getProfitInfo,
   ProfitRiskData,
 } from "@/database/inspectionprofit";
+import { updateLastScreen } from "@/database/inspectionprogress";
+
+const ErrorMessage = ({ message }: { message?: string }) => {
+  if (!message) return null;
+  return (
+    <View className="flex-row items-center mt-1 ml-4">
+      <FontAwesome name="exclamation-triangle" size={14} color="#EF4444" />
+      <Text className="text-red-500 text-sm ml-1">{message}</Text>
+    </View>
+  );
+};
+
+const FormLabel = ({
+  label,
+  required = false,
+  extra,
+  className: extraClass = "",
+}: {
+  label: string;
+  required?: boolean;
+  extra?: string;
+  className?: string;
+}) => {
+  const baseStyle = "text-sm text-[#070707]";
+
+  return (
+    <View className="mb-2">
+      <Text className={`${baseStyle} ${extraClass}`}>
+        {label}
+        {extra ? <Text className="text-black font-bold"> {extra}</Text> : null}
+        {required ? <Text className="text-black"> *</Text> : null}
+      </Text>
+    </View>
+  );
+};
 
 const Input = ({
   label,
@@ -45,26 +80,23 @@ const Input = ({
   extra?: any;
 }) => (
   <View className="mb-4">
-    <Text className="text-sm text-[#070707] mb-2">
-      {label} {extra && <Text className="text-black font-bold">{extra} </Text>}
-      {required && <Text className="text-black">*</Text>}
-    </Text>
+    <FormLabel label={label} required={required} extra={extra} />
     <View
-      className={`bg-[#F6F6F6] rounded-full flex-row items-center ${
+      className={`bg-[#F6F6F6] rounded-3xl flex-row items-center ${
         error ? "border border-red-500" : ""
       }`}
     >
       <TextInput
         placeholder={placeholder}
         placeholderTextColor="#838B8C"
-        className="px-5 py-4 text-base text-black flex-1"
+        className="px-5 h-[50px] text-base text-black flex-1"
         value={value}
         onChangeText={onChangeText}
         keyboardType={keyboardType}
       />
     </View>
 
-    {error && <Text className="text-red-500 text-sm mt-1 ml-4">{error}</Text>}
+    <ErrorMessage message={error} />
   </View>
 );
 
@@ -95,11 +127,11 @@ const YesNoSelect = ({
           activeOpacity={1}
           onPress={onClose}
         >
-          <View className="bg-white w-80 rounded-2xl overflow-hidden">
+          <View className="bg-white w-64 rounded-2xl overflow-hidden">
             {["Yes", "No"].map((item, index, arr) => (
               <View key={item}>
                 <TouchableOpacity
-                  className="py-4"
+                  className="py-3"
                   onPress={() => {
                     onSelect(item as "Yes" | "No");
                     onClose();
@@ -137,8 +169,7 @@ const YesNoSelect = ({
               {t("InspectionForm.--Select From Here--")}
             </Text>
           )}
-
-          {!value && <AntDesign name="down" size={20} color="#838B8C" />}
+          <AntDesign name="down" size={20} color="#838B8C" />
         </TouchableOpacity>
       </View>
     </>
@@ -186,7 +217,6 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
   const route = useRoute<RouteProp<RootStackParamList, "ProfitRisk">>();
   const { requestNumber, requestId } = route.params;
   const { t } = useTranslation();
-
   const [formData, setFormData] = useState<ProfitRiskData>({
     profit: "",
     isProfitable: undefined,
@@ -196,13 +226,18 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
     manageRisk: undefined,
     worthToTakeRisk: "",
   });
-
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [yesNoModalVisible, setYesNoModalVisible] = useState(false);
   const [activeYesNoField, setActiveYesNoField] = useState<string | null>(null);
   const [isNextEnabled, setIsNextEnabled] = useState(false);
   const [isExistingData, setIsExistingData] = useState(false);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      updateLastScreen(requestId, "ProfitRisk");
+    }, [requestId]),
+  );
 
   useFocusEffect(
     useCallback(() => {
@@ -522,13 +557,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
           t("InspectionForm.Could not save to server. Data saved locally."),
           [
             {
-              text: t("Main.Continue"),
-              onPress: () => {
-                navigation.navigate("Economical", {
-                  requestNumber,
-                  requestId,
-                });
-              },
+              text: t("Main.ok"),
             },
           ],
         );
@@ -540,22 +569,14 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
         t("InspectionForm.Could not save to server. Data saved locally."),
         [
           {
-            text: t("Main.Continue"),
-            onPress: () => {
-              navigation.navigate("Economical", {
-                requestNumber,
-                requestId,
-              });
-            },
+            text: t("Main.ok"),
           },
         ],
       );
     }
   };
 
-  // Handle tab navigation
   const handleTabPress = (tabKey: string) => {
-    // Map tab keys to navigation routes
     const routeMap: Record<string, string> = {
       "Personal Info": "PersonalInfo",
       "ID Proof": "IDProof",
@@ -565,8 +586,8 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
       "Cultivation Info": "CultivationInfo",
       "Cropping Systems": "CroppingSystems",
       "Profit & Risk": "ProfitRisk",
-      "Economical": "Economical",
-      "Labour": "Labour",
+      Economical: "Economical",
+      Labour: "Labour",
       "Harvest Storage": "HarvestStorage",
     };
 
@@ -579,15 +600,30 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
     }
   };
 
+  useEffect(() => {
+    const handleBackPress = () => {
+      navigation.navigate("Main", {
+        screen: "MainTabs",
+        params: { screen: "CapitalRequests" },
+      });
+      return true;
+    };
+
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      handleBackPress,
+    );
+
+    return () => subscription.remove();
+  }, [navigation]);
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1, backgroundColor: "white" }}
+      keyboardVerticalOffset={Platform.OS === "android" ? -200 : 0}
     >
       <View className="flex-1 bg-[#F3F3F3] ">
-        <StatusBar barStyle="dark-content" />
-
-        {/* Tabs */}
         <FormTabs
           activeKey="Profit & Risk"
           navigation={navigation}
@@ -657,12 +693,12 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
           {formData.isRisk === "Yes" && (
             <>
               <View className="mt-4">
-                <Text className="text-sm text-[#070707] mb-2">
-                  {t(
+                <FormLabel
+                  label={t(
                     "InspectionForm.What are the risks you are anticipating in the proposed crop / cropping system",
-                  )}{" "}
-                  <Text className="text-black">*</Text>
-                </Text>
+                  )}
+                  required
+                />
 
                 <View
                   className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${
@@ -699,18 +735,14 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
                   />
                 </View>
 
-                {errors.risk && (
-                  <Text className="text-red-500 text-sm mt-1 ml-2">
-                    {errors.risk}
-                  </Text>
-                )}
+                <ErrorMessage message={errors.risk} />
               </View>
 
               <View className="mt-4">
-                <Text className="text-sm text-[#070707] mb-2">
-                  {t("InspectionForm.Do you have the solution")}{" "}
-                  <Text className="text-black">*</Text>
-                </Text>
+                <FormLabel
+                  label={t("InspectionForm.Do you have the solution")}
+                  required
+                />
 
                 <View
                   className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${
@@ -747,11 +779,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
                   />
                 </View>
 
-                {errors.solution && (
-                  <Text className="text-red-500 text-sm mt-1 ml-2">
-                    {errors.solution}
-                  </Text>
-                )}
+                <ErrorMessage message={errors.solution} />
               </View>
 
               <YesNoSelect
@@ -773,12 +801,12 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
               />
 
               <View className="mt-4">
-                <Text className="text-sm text-[#070707] mb-2">
-                  {t(
+                <FormLabel
+                  label={t(
                     "InspectionForm.Is it worth to take the risks for anticipated profits",
-                  )}{" "}
-                  <Text className="text-black">*</Text>
-                </Text>
+                  )}
+                  required
+                />
 
                 <View
                   className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${
@@ -817,11 +845,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
                   />
                 </View>
 
-                {errors.worthToTakeRisk && (
-                  <Text className="text-red-500 text-sm mt-1 ml-2">
-                    {errors.worthToTakeRisk}
-                  </Text>
-                )}
+                <ErrorMessage message={errors.worthToTakeRisk} />
               </View>
             </>
           )}
@@ -831,7 +855,12 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
           exitText={t("InspectionForm.Back")}
           nextText={t("InspectionForm.Next")}
           isNextEnabled={isNextEnabled}
-          onExit={() => navigation.goBack()}
+          onExit={() =>
+            navigation.navigate("CroppingSystems", {
+              requestNumber,
+              requestId,
+            })
+          }
           onNext={handleNext}
         />
       </View>

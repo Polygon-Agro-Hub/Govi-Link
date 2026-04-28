@@ -11,7 +11,7 @@ import {
   Platform,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { environment } from "@/environment/environment";
@@ -20,9 +20,9 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { LinearGradient } from "expo-linear-gradient";
-import { Entypo } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import i18n from "@/i18n/i18n";
+import CustomHeader from "../commons/CustomHeader";
 
 type ProfileScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -131,23 +131,12 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                   }}
                 />
               </View>
-              <View className="ml-3">
-                <TouchableOpacity
-                  onPress={() => navigation.goBack()}
-                  style={{ position: "absolute", top: hp(2) }}
-                >
-                  <Entypo
-                    name="chevron-left"
-                    size={25}
-                    color={"black"}
-                    style={{
-                      backgroundColor: "#F6F6F680",
-                      borderRadius: 50,
-                      padding: wp(2.5),
-                    }}
-                  />
-                </TouchableOpacity>
-              </View>
+              <CustomHeader
+                title=""
+                showBackButton={true}
+                navigation={navigation}
+                transparent
+              />
 
               <View className="bg-white rounded-t-3xl pt-4 mt-48">
                 <View className="items-center" style={{ marginTop: -hp(12) }}>
@@ -195,12 +184,12 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
               </View>
 
               <View className="bg-white">
-                <View className="px-4 mb-8">
+                <View className="px-6 mb-8">
                   <View className="mb-4">
                     <Text className="text-black mb-1">
                       {t("Profile.Employee ID")}
                     </Text>
-                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-4 py-4 text-[#8492A3]">
+                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-4 py-4 text-[#8492A3] h-[50px]">
                       {formData.empId}
                     </Text>
                   </View>
@@ -209,7 +198,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                     <Text className="text-black mb-1">
                       {t("Profile.First Name")}
                     </Text>
-                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-4 py-4 text-[#8492A3]">
+                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-4 py-4 text-[#8492A3] h-[50px]">
                       {i18n.language === "si"
                         ? formData.firstNameSinhala
                         : i18n.language === "ta"
@@ -222,7 +211,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                     <Text className="text-black mb-1">
                       {t("Profile.Last Name")}
                     </Text>
-                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-4 py-4 text-[#8492A3]">
+                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-4 py-4 text-[#8492A3] h-[50px]">
                       {i18n.language === "si"
                         ? formData.lastNameSinhala
                         : i18n.language === "ta"
@@ -235,7 +224,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                     <Text className="text-black mb-1">
                       {t("Profile.Phone Number - 1")}
                     </Text>
-                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-4 py-4 text-[#8492A3]">
+                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-4 py-4 text-[#8492A3] h-[50px]">
                       {formData.phoneNumber1}
                     </Text>
                   </View>
@@ -244,7 +233,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                     <Text className="text-black mb-1">
                       {t("Profile.Phone Number - 2")}
                     </Text>
-                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-4 py-4 text-[#8492A3]">
+                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-4 py-4 text-[#8492A3] h-[50px]">
                       {formData.phoneNumber2 || "---"}
                     </Text>
                   </View>
@@ -253,7 +242,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                     <Text className="text-black mb-1">
                       {t("Profile.NIC Number")}
                     </Text>
-                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-4 py-4 text-[#8492A3]">
+                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-4 py-4 text-[#8492A3] h-[50px]">
                       {formData.nic}
                     </Text>
                   </View>
@@ -263,7 +252,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                       {t("Profile.Email Address")}
                     </Text>
 
-                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-4 py-4 text-[#8492A3]">
+                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-4 py-4 text-[#8492A3] h-[50px]">
                       {formData.email}
                     </Text>
                   </View>
@@ -272,7 +261,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                     <Text className="text-black mb-1">
                       {t("Profile.Building / House No")}
                     </Text>
-                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-4 py-4 text-[#8492A3]">
+                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-4 py-4 text-[#8492A3] h-[50px]">
                       {formData.house}
                     </Text>
                   </View>
@@ -281,14 +270,14 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                     <Text className="text-black mb-1">
                       {t("Profile.Street Name")}
                     </Text>
-                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-4 py-4 text-[#8492A3]">
+                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-4 py-4 text-[#8492A3] h-[50px]">
                       {formData.street}
                     </Text>
                   </View>
 
                   <View className="mb-14">
                     <Text className="text-black mb-1">{t("Profile.City")}</Text>
-                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-4 py-4 text-[#8492A3]">
+                    <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-4 py-4 text-[#8492A3] h-[50px]">
                       {formData.city}
                     </Text>
                   </View>

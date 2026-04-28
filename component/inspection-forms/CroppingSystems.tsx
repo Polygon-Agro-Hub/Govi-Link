@@ -5,18 +5,18 @@ import {
   TextInput,
   ScrollView,
   TouchableOpacity,
-  StatusBar,
   Alert,
   KeyboardAvoidingView,
   Platform,
   Modal,
+  BackHandler,
 } from "react-native";
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, FontAwesome } from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
 import { useTranslation } from "react-i18next";
 import Checkbox from "expo-checkbox";
 import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 import FormFooterButton from "./FormFooterButton";
@@ -25,6 +25,14 @@ import {
   getCroppingInfo,
   CroppingSystemsData,
 } from "@/database/inspectioncropping";
+import { updateLastScreen } from "@/database/inspectionprogress";
+
+const ErrorMessage = ({ message }: { message: string }) => (
+  <View className="flex-row items-center mt-1 ml-1 gap-1">
+    <FontAwesome name="exclamation-triangle" size={14} color="#EF4444" />
+    <Text className="text-red-500 text-sm ml-1">{message}</Text>
+  </View>
+);
 
 const YesNoSelect = ({
   label,
@@ -53,11 +61,11 @@ const YesNoSelect = ({
           activeOpacity={1}
           onPress={onClose}
         >
-          <View className="bg-white w-80 rounded-2xl overflow-hidden">
+          <View className="bg-white w-64 rounded-2xl overflow-hidden">
             {["Yes", "No"].map((item, index, arr) => (
               <View key={item}>
                 <TouchableOpacity
-                  className="py-4"
+                  className="py-3"
                   onPress={() => {
                     onSelect(item as "Yes" | "No");
                     onClose();
@@ -95,8 +103,7 @@ const YesNoSelect = ({
               {t("InspectionForm.--Select From Here--")}
             </Text>
           )}
-
-          {!value && <AntDesign name="down" size={20} color="#838B8C" />}
+          <AntDesign name="down" size={20} color="#838B8C" />
         </TouchableOpacity>
       </View>
     </>
@@ -105,6 +112,29 @@ const YesNoSelect = ({
 
 type CroppingSystemsProps = {
   navigation: any;
+};
+
+const isOpportunitySelectionValid = (
+  opportunity: string[],
+  otherOpportunity: string,
+): boolean => {
+  if (opportunity.length === 0) return false;
+  if (opportunity.includes("Other") && !otherOpportunity?.trim()) return false;
+  return true;
+};
+
+const getOpportunityError = (
+  opportunity: string[],
+  otherOpportunity: string,
+  t: (key: string) => string,
+): string => {
+  if (opportunity.length === 0) {
+    return t("Error.Please select at least one opportunity to go for");
+  }
+  if (opportunity.includes("Other") && !otherOpportunity?.trim()) {
+    return t("Error.Please specify the other opportunity to go for");
+  }
+  return "";
 };
 
 const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
@@ -123,10 +153,15 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
   const [isNextEnabled, setIsNextEnabled] = useState(false);
   const [yesNoModalVisible, setYesNoModalVisible] = useState(false);
   const [activeYesNoField, setActiveYesNoField] = useState<string | null>(null);
-  const [overallSoilFertilityVisible, setOverallSoilFertilityVisible] =
-    useState(false);
+  const [experienceModalVisible, setExperienceModalVisible] = useState(false);
   const [isExistingData, setIsExistingData] = useState(false);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      updateLastScreen(requestId, "CroppingSystems");
+    }, [requestId]),
+  );
 
   useFocusEffect(
     useCallback(() => {
@@ -150,6 +185,41 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
 
             setFormData(normalizedData);
             setIsExistingData(true);
+
+            const restoredErrors: Record<string, string> = {};
+
+            if (
+              !isOpportunitySelectionValid(
+                normalizedData.opportunity,
+                normalizedData.otherOpportunity || "",
+              )
+            ) {
+              restoredErrors.opportunity = getOpportunityError(
+                normalizedData.opportunity,
+                normalizedData.otherOpportunity || "",
+                t,
+              );
+            }
+
+            if (!normalizedData.hasKnowlage) {
+              restoredErrors.hasKnowlage = t(
+                "Error.Knowledge field is required",
+              );
+            }
+
+            if (!normalizedData.prevExperince) {
+              restoredErrors.prevExperince = t(
+                "Error.Previous experience is required",
+              );
+            }
+
+            if (!normalizedData.opinion?.trim()) {
+              restoredErrors.opinion = t(
+                "Error.General opinion of your friends is required",
+              );
+            }
+
+            setErrors(restoredErrors);
           } else {
             setIsExistingData(false);
           }
@@ -184,26 +254,29 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
   }, [formData, requestId, isDataLoaded]);
 
   useEffect(() => {
-    const isOpportunityValid =
-      (formData.opportunity?.length ?? 0) > 0 &&
-      (!formData.opportunity?.includes("Other") ||
-        !!formData.otherOpportunity?.trim());
+    const hasErrors = Object.values(errors).some((error) => error !== "");
+
+    if (hasErrors) {
+      setIsNextEnabled(false);
+      return;
+    }
+
+    const isOpportunityValid = isOpportunitySelectionValid(
+      formData.opportunity ?? [],
+      formData.otherOpportunity ?? "",
+    );
 
     const isKnowledgeValid =
       formData.hasKnowlage === "Yes" || formData.hasKnowlage === "No";
 
     const isExperienceValid = !!formData.prevExperince;
     const isOpinionValid = !!formData.opinion?.trim();
-    const hasErrors = Object.values(errors).some(Boolean);
 
     setIsNextEnabled(
-      !!(
-        isOpportunityValid &&
+      isOpportunityValid &&
         isKnowledgeValid &&
         isExperienceValid &&
-        isOpinionValid &&
-        !hasErrors
-      ),
+        isOpinionValid,
     );
   }, [formData, errors]);
 
@@ -213,6 +286,10 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
 
   const handleyesNOFieldChange = (key: string, value: "Yes" | "No") => {
     updateFormData({ [key]: value } as any);
+
+    if (key === "hasKnowlage") {
+      setErrors((prev) => ({ ...prev, hasKnowlage: "" }));
+    }
   };
 
   const handleOpportunityToggle = (option: string) => {
@@ -224,31 +301,64 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
         ? prevOptions.filter((o) => o !== option)
         : [...prevOptions, option];
 
+      const otherOpportunity =
+        option === "Other" && isSelected ? "" : (prev.otherOpportunity ?? "");
+
+      const errorMsg = isOpportunitySelectionValid(
+        updatedOptions,
+        otherOpportunity,
+      )
+        ? ""
+        : getOpportunityError(updatedOptions, otherOpportunity, t);
+
+      setErrors((prevErr) => ({ ...prevErr, opportunity: errorMsg }));
+
       return {
         ...prev,
         opportunity: updatedOptions,
-        otherOpportunity:
-          option === "Other" && isSelected ? "" : prev.otherOpportunity,
+        otherOpportunity,
       };
     });
   };
 
   const handleOtherOpportunityChange = (text: string) => {
-    updateFormData({ otherOpportunity: text });
+    const trimmedText = text.replace(/^\s+/, "");
 
-    let errorMsg = "";
+    updateFormData({ otherOpportunity: trimmedText });
+
     const opportunities = formData.opportunity || [];
-    const validOpportunities = opportunities.filter(
-      (source: string) => source !== "Other",
-    );
-
-    if (validOpportunities.length === 0) {
-      errorMsg = t("Error.Please select at least one opportunity to go for");
-    } else if (opportunities.includes("Other") && !text.trim()) {
-      errorMsg = t("Error.Please specify the other opportunity to go for");
-    }
+    const errorMsg = isOpportunitySelectionValid(opportunities, trimmedText)
+      ? ""
+      : getOpportunityError(opportunities, trimmedText, t);
 
     setErrors((prev) => ({ ...prev, opportunity: errorMsg }));
+  };
+
+  const handleExperienceSelect = (item: string) => {
+    updateFormData({ prevExperince: item });
+    setExperienceModalVisible(false);
+
+    setErrors((prev) => ({ ...prev, prevExperince: "" }));
+  };
+
+  const handleOpinionChange = (text: string) => {
+    let formattedText = text.replace(/^\s+/, "");
+
+    if (formattedText.length > 0 && !text.startsWith("\n")) {
+      formattedText =
+        formattedText.charAt(0).toUpperCase() + formattedText.slice(1);
+    }
+
+    updateFormData({ opinion: formattedText });
+
+    let error = "";
+    if (!formattedText || formattedText.trim() === "") {
+      error = t("Error.General opinion of your friends is required");
+    }
+    setErrors((prev) => ({
+      ...prev,
+      opinion: error,
+    }));
   };
 
   const saveToBackend = async (
@@ -324,27 +434,29 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
   const handleNext = async () => {
     const validationErrors: Record<string, string> = {};
 
-    if (!formData.opportunity || formData.opportunity.length === 0) {
-      validationErrors.opportunity = t(
-        "Error.Please select at least one opportunity to go for",
-      );
-    }
     if (
-      formData.opportunity?.includes("Other") &&
-      !formData.otherOpportunity?.trim()
+      !isOpportunitySelectionValid(
+        formData.opportunity ?? [],
+        formData.otherOpportunity ?? "",
+      )
     ) {
-      validationErrors.opportunity = t(
-        "Error.Please specify the other opportunity to go for",
+      validationErrors.opportunity = getOpportunityError(
+        formData.opportunity ?? [],
+        formData.otherOpportunity ?? "",
+        t,
       );
     }
+
     if (!formData.hasKnowlage) {
       validationErrors.hasKnowlage = t("Error.Knowledge field is required");
     }
+
     if (!formData.prevExperince) {
       validationErrors.prevExperince = t(
         "Error.Previous experience is required",
       );
     }
+
     if (!formData.opinion?.trim()) {
       validationErrors.opinion = t(
         "Error.General opinion of your friends is required",
@@ -421,13 +533,7 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
           t("InspectionForm.Could not save to server. Data saved locally."),
           [
             {
-              text: t("Main.Continue"),
-              onPress: () => {
-                navigation.navigate("ProfitRisk", {
-                  requestNumber,
-                  requestId,
-                });
-              },
+              text: t("Main.ok"),
             },
           ],
         );
@@ -439,22 +545,14 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
         t("InspectionForm.Could not save to server. Data saved locally."),
         [
           {
-            text: t("Main.Continue"),
-            onPress: () => {
-              navigation.navigate("ProfitRisk", {
-                requestNumber,
-                requestId,
-              });
-            },
+            text: t("Main.ok"),
           },
         ],
       );
     }
   };
 
-  // Handle tab navigation
   const handleTabPress = (tabKey: string) => {
-    // Map tab keys to navigation routes
     const routeMap: Record<string, string> = {
       "Personal Info": "PersonalInfo",
       "ID Proof": "IDProof",
@@ -464,8 +562,8 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
       "Cultivation Info": "CultivationInfo",
       "Cropping Systems": "CroppingSystems",
       "Profit & Risk": "ProfitRisk",
-      "Economical": "Economical",
-      "Labour": "Labour",
+      Economical: "Economical",
+      Labour: "Labour",
       "Harvest Storage": "HarvestStorage",
     };
 
@@ -478,14 +576,30 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
     }
   };
 
+  useEffect(() => {
+    const handleBackPress = () => {
+      navigation.navigate("Main", {
+        screen: "MainTabs",
+        params: { screen: "CapitalRequests" },
+      });
+      return true;
+    };
+
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      handleBackPress,
+    );
+
+    return () => subscription.remove();
+  }, [navigation]);
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1, backgroundColor: "white" }}
+      keyboardVerticalOffset={Platform.OS === "android" ? -200 : 0}
     >
       <View className="flex-1 bg-[#F3F3F3] ">
-        <StatusBar barStyle="dark-content" />
-
         {/* Tabs */}
         <FormTabs
           activeKey="Cropping Systems"
@@ -497,7 +611,7 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
         <ScrollView
           className="flex-1 px-6 bg-white rounded-t-3xl"
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 80 }}
+          contentContainerStyle={{ paddingBottom: 120 }}
         >
           <View className="h-6" />
 
@@ -548,20 +662,15 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
               <TextInput
                 placeholder={t("InspectionForm.--Mention Other--")}
                 placeholderTextColor="#838B8C"
-                className="bg-[#F6F6F6] px-4 py-4 rounded-full text-black mb-2"
+                className="bg-[#F6F6F6] px-4 h-[50px] rounded-3xl text-black mb-2"
                 value={formData.otherOpportunity || ""}
-                onChangeText={(text) => {
-                  const trimmedText = text.replace(/^\s+/, "");
-                  handleOtherOpportunityChange(trimmedText);
-                }}
+                onChangeText={handleOtherOpportunityChange}
               />
             )}
 
-            {errors.opportunity ? (
-              <Text className="text-red-500 text-sm mt-1">
-                {errors.opportunity}
-              </Text>
-            ) : null}
+            {errors.opportunity && (
+              <ErrorMessage message={errors.opportunity} />
+            )}
           </View>
 
           <YesNoSelect
@@ -581,6 +690,7 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
             }}
             onSelect={(value) => handleyesNOFieldChange("hasKnowlage", value)}
           />
+          {errors.hasKnowlage && <ErrorMessage message={errors.hasKnowlage} />}
 
           <View className="mt-2">
             <Text className="text-sm text-[#070707] mb-2">
@@ -593,23 +703,27 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
             <TouchableOpacity
               className="bg-[#F6F6F6] px-4 py-4 flex-row items-center justify-between rounded-full"
               onPress={() => {
-                setOverallSoilFertilityVisible(true);
+                setExperienceModalVisible(true);
               }}
             >
-              <Text
-                className={
-                  formData.prevExperince ? "text-black" : "text-[#A3A3A3]"
-                }
-              >
-                {formData.prevExperince
-                  ? t(`InspectionForm.${formData.prevExperince}`)
-                  : t("InspectionForm.--Select From Here--")}
-              </Text>
-
-              {!formData.prevExperince && (
-                <AntDesign name="down" size={20} color="#838B8C" />
-              )}
+              <View className="flex-1 mr-2">
+                <Text
+                  className={
+                    formData.prevExperince ? "text-black" : "text-[#A3A3A3]"
+                  }
+                  numberOfLines={2}
+                >
+                  {formData.prevExperince
+                    ? t(`InspectionForm.${formData.prevExperince}`)
+                    : t("InspectionForm.--Select From Here--")}
+                </Text>
+              </View>
+              <AntDesign name="down" size={20} color="#838B8C" />
             </TouchableOpacity>
+
+            {errors.prevExperince && (
+              <ErrorMessage message={errors.prevExperince} />
+            )}
           </View>
 
           <View className="mt-4">
@@ -625,38 +739,13 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
               <TextInput
                 placeholder={t("InspectionForm.Type here...")}
                 value={formData.opinion || ""}
-                onChangeText={(text) => {
-                  let formattedText = text.replace(/^\s+/, "");
-
-                  if (formattedText.length > 0 && !text.startsWith("\n")) {
-                    formattedText =
-                      formattedText.charAt(0).toUpperCase() +
-                      formattedText.slice(1);
-                  }
-
-                  updateFormData({ opinion: formattedText });
-
-                  let error = "";
-                  if (!formattedText || formattedText.trim() === "") {
-                    error = t(
-                      "Error.General opinion of your friends is required",
-                    );
-                  }
-                  setErrors((prev) => ({
-                    ...prev,
-                    opinion: error,
-                  }));
-                }}
+                onChangeText={handleOpinionChange}
                 keyboardType="default"
                 multiline={true}
                 textAlignVertical="top"
               />
             </View>
-            {errors.opinion && (
-              <Text className="text-red-500 text-sm mt-1 ml-2">
-                {errors.opinion}
-              </Text>
-            )}
+            {errors.opinion && <ErrorMessage message={errors.opinion} />}
           </View>
         </ScrollView>
 
@@ -664,22 +753,23 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
           exitText={t("InspectionForm.Back")}
           nextText={t("InspectionForm.Next")}
           isNextEnabled={isNextEnabled}
-          onExit={() => navigation.goBack()}
+          onExit={() =>
+            navigation.navigate("CultivationInfo", {
+              requestNumber,
+              requestId,
+            })
+          }
           onNext={handleNext}
         />
       </View>
 
       {/* Experience Modal */}
-      <Modal
-        transparent
-        animationType="fade"
-        visible={overallSoilFertilityVisible}
-      >
+      <Modal transparent animationType="fade" visible={experienceModalVisible}>
         <TouchableOpacity
           className="flex-1 bg-black/40 justify-center items-center"
           activeOpacity={1}
           onPress={() => {
-            setOverallSoilFertilityVisible(false);
+            setExperienceModalVisible(false);
           }}
         >
           <View className="bg-white w-80 rounded-2xl overflow-hidden">
@@ -692,10 +782,7 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
               <View key={item}>
                 <TouchableOpacity
                   className="py-4"
-                  onPress={() => {
-                    updateFormData({ prevExperince: item });
-                    setOverallSoilFertilityVisible(false);
-                  }}
+                  onPress={() => handleExperienceSelect(item)}
                 >
                   <Text className="text-center text-base text-black">
                     {t(`InspectionForm.${item}`)}

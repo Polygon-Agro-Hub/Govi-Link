@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp, useRoute, useFocusEffect } from "@react-navigation/native";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
@@ -25,6 +25,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import CustomHeader from "../commons/CustomHeader";
 
 type CertificateQuesanoryNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -506,10 +507,12 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
 
   return (
     <View className="flex-1 bg-white">
-      <View className="flex-row items-center px-4 py-4 bg-white shadow-sm border-b border-[#E5E5E5]">
-        <TouchableOpacity
-          className="bg-[#F6F6F680] rounded-full p-2 justify-center w-10 z-20"
-          onPress={() =>
+     
+       <CustomHeader
+        title={`#${jobId}`}
+        navigation={navigation}
+        showBackButton={true}
+        onBackPress={() =>
             navigation.navigate("Main", {
               screen: "MainTabs",
               params: {
@@ -517,14 +520,8 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
               },
             })
           }
-        >
-          <AntDesign name="left" size={22} color="#000" />
-        </TouchableOpacity>
-
-        <View className="flex-1">
-          <Text className="text-base font-semibold text-center">#{jobId}</Text>
-        </View>
-      </View>
+      />
+      <View className="shadow-sm border-b border-[#E5E5E5]" />
 
       {loaingCertificate ? (
         <LoadingSkeleton />
@@ -535,7 +532,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
               <View className="w-full items-center mb-8">
                 <View className="flex-row items-center justify-center max-w-[240px]">
                   <Image
-                    source={require("../../assets/staraward.png")}
+                    source={require("../../assets/images/public/staraward.webp")}
                     style={{ width: 40, height: 100 }}
                     resizeMode="contain"
                   />
@@ -618,7 +615,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
 
       <View className="flex-row justify-between p-4 border-t border-gray-200 px-6">
         <TouchableOpacity
-          className="flex-row items-center bg-[#444444] px-9 py-3 rounded-full"
+          className="flex-row items-center bg-[#444444] px-11 h-[50px] rounded-3xl"
           onPress={() => {
             navigation.navigate("Main", {
               screen: "MainTabs",
@@ -629,7 +626,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
           }}
         >
           <AntDesign name="arrow-left" size={20} color="#fff" />
-          <Text className="ml-4 text-white font-semibold text-base ">
+          <Text className="ml-4 text-white font-semibold text-lg">
             {t("CertificateQuesanory.Exit")}
           </Text>
         </TouchableOpacity>
@@ -642,9 +639,9 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
             colors={["#F35125", "#FF1D85"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
-            className="flex-row items-center px-9 py-3 rounded-full"
+            className="flex-row items-center px-10 h-[50px] rounded-3xl"
           >
-            <Text className="mr-4 text-white font-semibold text-base">
+            <Text className="mr-4 text-white font-semibold text-lg">
               {t("CertificateQuesanory.Next")}
             </Text>
             <AntDesign name="arrow-right" size={20} color="#fff" />

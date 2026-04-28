@@ -5,7 +5,6 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  StatusBar,
   KeyboardAvoidingView,
   Platform,
   Alert,
@@ -14,16 +13,16 @@ import {
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../types";
-import countryData from "@/assets/json/countryflag.json";
-import banksData from "@/assets/json/banks.json";
-import branchesData from "@/assets/json/branches.json";
+import { RootStackParamList } from "../types/types";
+import countryData from "@/assets/json/country-flag.json";
+import banksData from "@/assets/json/bank-names.json";
+import branchesData from "@/assets/json/bank-branches.json";
 import { useTranslation } from "react-i18next";
 import i18n from "@/i18n/i18n";
 import { RouteProp, useRoute, useFocusEffect } from "@react-navigation/native";
-import GlobalSearchModal from "@/component/common/GlobalSearchModal";
+import GlobalSearchModal from "@/component/commons/GlobalSearchModal";
 import { useModal } from "@/hooks/useModal";
-import CustomHeader from "@/component/common/CustomHeader";
+import CustomHeader from "@/component/commons/CustomHeader";
 
 type AddOfficerStep2NavigationProps = StackNavigationProp<
   RootStackParamList,
@@ -698,13 +697,10 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1, backgroundColor: "white" }}
     >
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-
       <CustomHeader
         title={t("AddOfficer.AddOfficer")}
         navigation={navigation}
         showBackButton={true}
-        showLanguageSelector={false}
         onBackPress={() =>
           navigation.navigate("AddOfficerStep1", { isnew: false })
         }
@@ -720,15 +716,18 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
           <View className="px-2 mt-4">
             <View className="space-y-4">
               <View>
-                <TextInput
-                  placeholder={t("AddOfficer.HousePlotNumber")}
-                  placeholderTextColor="#7D7D7D"
-                  className={`bg-[#F4F4F4] rounded-2xl px-4 py-4 ${
+                <View
+                  className={`bg-[#F4F4F4] rounded-3xl  h-[50px] px-4 justify-center ${
                     errors.housePlotNo ? "border border-red-500" : ""
                   }`}
-                  value={housePlotNo}
-                  onChangeText={handleHousePlotNoChange}
-                />
+                >
+                  <TextInput
+                    placeholder={t("AddOfficer.HousePlotNumber")}
+                    placeholderTextColor="#7D7D7D"
+                    value={housePlotNo}
+                    onChangeText={handleHousePlotNoChange}
+                  />
+                </View>
                 {errors.housePlotNo && (
                   <Text className="text-red-500 text-sm mt-1 ml-2">
                     {errors.housePlotNo}
@@ -737,15 +736,18 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
               </View>
 
               <View>
-                <TextInput
-                  placeholder={t("AddOfficer.StreetName")}
-                  placeholderTextColor="#7D7D7D"
-                  className={`bg-[#F4F4F4] rounded-2xl px-4 py-4 ${
+                <View
+                  className={`bg-[#F4F4F4] rounded-3xl px-4 h-[50px] justify-center ${
                     errors.streetName ? "border border-red-500" : ""
                   }`}
-                  value={streetName}
-                  onChangeText={handleStreetNameChange}
-                />
+                >
+                  <TextInput
+                    placeholder={t("AddOfficer.StreetName")}
+                    placeholderTextColor="#7D7D7D"
+                    value={streetName}
+                    onChangeText={handleStreetNameChange}
+                  />
+                </View>
                 {errors.streetName && (
                   <Text className="text-red-500 text-sm mt-1 ml-2">
                     {errors.streetName}
@@ -754,15 +756,18 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
               </View>
 
               <View>
-                <TextInput
-                  placeholder={t("AddOfficer.City")}
-                  placeholderTextColor="#7D7D7D"
-                  className={`bg-[#F4F4F4] rounded-2xl px-4 py-4 ${
+                <View
+                  className={`bg-[#F4F4F4] rounded-3xl px-4 h-[50px] justify-center ${
                     errors.city ? "border border-red-500" : ""
                   }`}
-                  value={city}
-                  onChangeText={handleCityChange}
-                />
+                >
+                  <TextInput
+                    placeholder={t("AddOfficer.City")}
+                    placeholderTextColor="#7D7D7D"
+                    value={city}
+                    onChangeText={handleCityChange}
+                  />
+                </View>
                 {errors.city && (
                   <Text className="text-red-500 text-sm mt-1 ml-2">
                     {errors.city}
@@ -773,7 +778,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
               {/* Country Dropdown */}
               <View>
                 <TouchableOpacity
-                  className={`bg-[#F4F4F4] rounded-2xl px-4 py-3 flex-row justify-between items-center ${
+                  className={`bg-[#F4F4F4] rounded-3xl px-4 h-[50px] flex-row justify-between items-center ${
                     errors.country ? "border border-red-500" : ""
                   }`}
                   onPress={countryModal.show}
@@ -801,7 +806,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
               {/* Province Dropdown */}
               <View>
                 <TouchableOpacity
-                  className={`bg-[#F4F4F4] rounded-2xl px-4 py-3 flex-row justify-between items-center ${
+                  className={`bg-[#F4F4F4] rounded-3xl px-4 h-[50px] flex-row justify-between items-center ${
                     errors.province ? "border border-red-500" : ""
                   }`}
                   onPress={provinceModal.show}
@@ -830,7 +835,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
               {/* District Dropdown */}
               <View>
                 <TouchableOpacity
-                  className={`bg-[#F4F4F4] rounded-2xl px-4 py-3 flex-row justify-between items-center ${
+                  className={`bg-[#F4F4F4] rounded-3xl px-4 h-[50px] flex-row justify-between items-center ${
                     errors.district ? "border border-red-500" : ""
                   }`}
                   onPress={districtModal.show}
@@ -864,16 +869,19 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
           <View className="px-2 mt-6">
             <View className="space-y-4">
               <View>
-                <TextInput
-                  placeholder={t("AddOfficer.CommissionAmount")}
-                  placeholderTextColor="#7D7D7D"
-                  className={`bg-[#F4F4F4] rounded-2xl px-4 py-4 ${
+                <View
+                  className={`bg-[#F4F4F4] rounded-3xl px-4 h-[50px] justify-center ${
                     errors.commissionAmount ? "border border-red-500" : ""
                   }`}
-                  value={commissionAmount}
-                  onChangeText={handleCommissionAmountChange}
-                  keyboardType="numeric"
-                />
+                >
+                  <TextInput
+                    placeholder={t("AddOfficer.CommissionAmount")}
+                    placeholderTextColor="#7D7D7D"
+                    value={commissionAmount}
+                    onChangeText={handleCommissionAmountChange}
+                    keyboardType="numeric"
+                  />
+                </View>
                 {errors.commissionAmount && (
                   <Text className="text-red-500 text-sm mt-1 ml-2">
                     {errors.commissionAmount}
@@ -882,15 +890,18 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
               </View>
 
               <View>
-                <TextInput
-                  placeholder={t("AddOfficer.AccountHolderName")}
-                  placeholderTextColor="#7D7D7D"
-                  className={`bg-[#F4F4F4] rounded-2xl px-4 py-4 ${
+                <View
+                  className={`bg-[#F4F4F4] rounded-3xl px-4 h-[50px] justify-center ${
                     errors.accountHolderName ? "border border-red-500" : ""
                   }`}
-                  value={accountHolderName}
-                  onChangeText={handleAccountHolderNameChange}
-                />
+                >
+                  <TextInput
+                    placeholder={t("AddOfficer.AccountHolderName")}
+                    placeholderTextColor="#7D7D7D"
+                    value={accountHolderName}
+                    onChangeText={handleAccountHolderNameChange}
+                  />
+                </View>
                 {errors.accountHolderName && (
                   <Text className="text-red-500 text-sm mt-1 ml-2">
                     {errors.accountHolderName}
@@ -899,16 +910,19 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
               </View>
 
               <View>
-                <TextInput
-                  placeholder={t("AddOfficer.AccountNumber")}
-                  placeholderTextColor="#7D7D7D"
-                  className={`bg-[#F4F4F4] rounded-2xl px-4 py-4 ${
+                <View
+                  className={`bg-[#F4F4F4] rounded-3xl px-4 h-[50px] justify-center ${
                     errors.accountNumber ? "border border-red-500" : ""
                   }`}
-                  value={accountNumber}
-                  onChangeText={handleAccountNumberChange}
-                  keyboardType="numeric"
-                />
+                >
+                  <TextInput
+                    placeholder={t("AddOfficer.AccountNumber")}
+                    placeholderTextColor="#7D7D7D"
+                    value={accountNumber}
+                    onChangeText={handleAccountNumberChange}
+                    keyboardType="numeric"
+                  />
+                </View>
                 {errors.accountNumber && (
                   <Text className="text-red-500 text-sm mt-1 ml-2">
                     {errors.accountNumber}
@@ -917,16 +931,19 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
               </View>
 
               <View>
-                <TextInput
-                  placeholder={t("AddOfficer.ConfirmAccountNumber")}
-                  placeholderTextColor="#7D7D7D"
-                  className={`bg-[#F4F4F4] rounded-2xl px-4 py-4 ${
+                <View
+                  className={`bg-[#F4F4F4] rounded-3xl px-4 h-[50px] justify-center ${
                     errors.confirmAccountNumber ? "border border-red-500" : ""
                   }`}
-                  value={confirmAccountNumber}
-                  onChangeText={handleConfirmAccountNumberChange}
-                  keyboardType="numeric"
-                />
+                >
+                  <TextInput
+                    placeholder={t("AddOfficer.ConfirmAccountNumber")}
+                    placeholderTextColor="#7D7D7D"
+                    value={confirmAccountNumber}
+                    onChangeText={handleConfirmAccountNumberChange}
+                    keyboardType="numeric"
+                  />
+                </View>
                 {errors.confirmAccountNumber && (
                   <Text className="text-red-500 text-sm mt-1 ml-2">
                     {errors.confirmAccountNumber}
@@ -937,7 +954,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
               {/* Bank Dropdown */}
               <View>
                 <TouchableOpacity
-                  className={`bg-[#F4F4F4] rounded-2xl px-4 py-3 flex-row justify-between items-center ${
+                  className={`bg-[#F4F4F4] rounded-3xl px-4 h-[50px] flex-row justify-between items-center ${
                     errors.bank ? "border border-red-500" : ""
                   }`}
                   onPress={bankModal.show}
@@ -965,7 +982,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
               {/* Branch Dropdown */}
               <View>
                 <TouchableOpacity
-                  className={`bg-[#F4F4F4] rounded-2xl px-4 py-3 flex-row justify-between items-center ${
+                  className={`bg-[#F4F4F4] rounded-3xl px-4 h-[50px] flex-row justify-between items-center ${
                     errors.branch ? "border border-red-500" : ""
                   }`}
                   onPress={branchModal.show}
@@ -996,25 +1013,25 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
           {/* Buttons */}
           <View className="px-2 flex-col w-full gap-4 mt-4">
             <TouchableOpacity
-              className="bg-[#D9D9D9] rounded-3xl px-6 py-4 w-full items-center"
+              className="bg-[#D9D9D9] rounded-3xl items-center justify-center h-[50px] w-full items-center"
               onPress={() =>
                 navigation.navigate("AddOfficerStep1", { isnew: false })
               }
             >
-              <Text className="text-[#686868] font-semibold">
+              <Text className="text-[#686868] font-semibold text-lg">
                 {t("AddOfficer.GoBack")}
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              className="bg-black rounded-3xl px-6 py-4 w-full items-center"
+              className="bg-black rounded-3xl items-center justify-center h-[50px] w-full items-center"
               onPress={handleNext}
               disabled={loading}
             >
               {loading ? (
                 <ActivityIndicator color="white" size="small" />
               ) : (
-                <Text className="text-white font-semibold">
+                <Text className="text-white font-semibold text-lg">
                   {t("AddOfficer.Next")}
                 </Text>
               )}

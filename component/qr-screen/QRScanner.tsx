@@ -11,15 +11,17 @@ import {
   Pressable,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/types";
 import { CameraView, Camera } from "expo-camera";
 import { useTranslation } from "react-i18next";
-import { AntDesign, Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { useRoute, RouteProp, useFocusEffect } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { environment } from "@/environment/environment";
+import CustomHeader from "../commons/CustomHeader";
+import CameraAccess from "../permission/CameraAccess";
 
 type QRScannerNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -48,25 +50,16 @@ const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
   } = route.params;
 
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+  const [showCameraAccess, setShowCameraAccess] = useState<boolean>(false);
   const [scanned, setScanned] = useState<boolean>(false);
-  const [showPermissionModal, setShowPermissionModal] =
-    useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { t } = useTranslation();
-
   const [isUnsuccessfulModalVisible, setIsUnsuccessfulModalVisible] =
     useState<boolean>(false);
-
-  const [unsuccessfulLoadingBarWidth, setUnsuccessfulLoadingBarWidth] =
-    useState(new Animated.Value(100));
+  const [unsuccessfulLoadingBarWidth] = useState(new Animated.Value(100));
 
   useEffect(() => {
-    const getCameraPermissions = async () => {
-      const { status } = await Camera.requestCameraPermissionsAsync();
-      setHasPermission(status === "granted");
-    };
-
-    getCameraPermissions();
+    checkCameraPermissions();
 
     const unsubscribe = navigation.addListener("focus", () => {
       setScanned(false);
@@ -77,17 +70,30 @@ const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
     return unsubscribe;
   }, [navigation]);
 
+  const checkCameraPermissions = async () => {
+    const { status } = await Camera.getCameraPermissionsAsync();
+    if (status === "granted") {
+      setHasPermission(true);
+      setShowCameraAccess(false);
+    } else {
+      setHasPermission(false);
+      setShowCameraAccess(true);
+    }
+  };
+
+  const handleCameraPermissionGranted = () => {
+    setShowCameraAccess(false);
+    setHasPermission(true);
+  };
+
   const updateStatus = async (feildauditId: number, jobId: any) => {
     try {
       const token = await AsyncStorage.getItem("token");
-
       if (token) {
-        const response = await axios.post(
-          `${environment.API_BASE_URL}api/cluster-audit/status/onGoing/${feildauditId}`,
+        await axios.post(
+          `${environment.API_BASE_URL}api/cluster-audit/status/on-going/${feildauditId}`,
           { jobId },
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
+          { headers: { Authorization: `Bearer ${token}` } },
         );
       }
     } catch (error) {
@@ -105,7 +111,6 @@ const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
 
     try {
       const qrData = JSON.parse(data);
-
       const userId = qrData.userInfo?.id;
 
       if (!userId) {
@@ -114,22 +119,21 @@ const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
       if (userId !== farmerId) {
         throw new Error(t("QRScanner.Wrong QR code"));
       }
-      if (userId == farmerId) {
-        if (auditId && jobId) {
-          await updateStatus(auditId, jobId);
-        }
 
-        navigation.navigate("CertificateQuesanory", {
-          jobId,
-          certificationpaymentId,
-          farmerMobile,
-          clusterId,
-          farmId,
-          isClusterAudit,
-          auditId,
-          screenName: screenName,
-        });
+      if (auditId && jobId) {
+        await updateStatus(auditId, jobId);
       }
+
+      navigation.navigate("CertificateQuesanory", {
+        jobId,
+        certificationpaymentId,
+        farmerMobile,
+        clusterId,
+        farmId,
+        isClusterAudit,
+        auditId,
+        screenName: screenName,
+      });
     } catch (error) {
       console.error("QR Parsing Error:", error);
       setErrorMessage(
@@ -149,34 +153,45 @@ const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
       setTimeout(() => {
         setIsUnsuccessfulModalVisible(false);
         setErrorMessage(null);
+        setScanned(false);
       }, 5000);
+    }
+  };
+
+  const handleBackPress = () => {
+    if (screenName === "AssignJobs") {
+      navigation.goBack();
+    } else {
+      navigation.navigate("Main", {
+        screen: "MainTabs",
+        params: { screen: screenName },
+      });
     }
   };
 
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
-        if (screenName === "AssignJobs") {
-          navigation.goBack();
-        } else {
-          navigation.navigate("Main", {
-            screen: "MainTabs",
-            params: {
-              screen: screenName,
-            },
-          });
-        }
+        handleBackPress();
         return true;
       };
-
       const subscription = BackHandler.addEventListener(
         "hardwareBackPress",
         onBackPress,
       );
-
       return () => subscription.remove();
     }, [screenName]),
   );
+
+  if (showCameraAccess) {
+    return (
+      <CameraAccess
+        navigation={navigation as any}
+        onPermissionGranted={handleCameraPermissionGranted}
+        returnScreen="QRScanner"
+      />
+    );
+  }
 
   if (hasPermission === null) {
     return (
@@ -188,96 +203,19 @@ const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
     );
   }
 
-  if (hasPermission === false) {
-    return (
-      <Modal
-        visible={showPermissionModal}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setShowPermissionModal(false)}
-      >
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-            backgroundColor: "rgba(0,0,0,0.7)",
-          }}
-        >
-          <View
-            style={{
-              backgroundColor: "white",
-              padding: 20,
-              borderRadius: 10,
-              shadowColor: "black",
-              width: "80%",
-            }}
-          >
-            <Text
-              style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}
-            >
-              {t("QRScanner.CameraRequired")}
-            </Text>
-            <Text style={{ color: "#555", marginBottom: 0 }}>
-              {t("QRScanner.WeneedCamera")}
-            </Text>
-            <TouchableOpacity
-              style={{
-                backgroundColor: "#34D399",
-                padding: 10,
-                borderRadius: 8,
-              }}
-              onPress={() => {
-                setShowPermissionModal(false);
-                navigation.navigate("Dashboard");
-              }}
-            >
-              <Text
-                style={{ color: "white", textAlign: "center", fontSize: 16 }}
-              >
-                {" "}
-                {t("QRScanner.Close")}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-    );
-  }
-
   return (
     <View style={{ flex: 1, position: "relative" }}>
-      <View className="flex-row items-center px-4 py-4 bg-white shadow-sm">
-        <TouchableOpacity
-          className="bg-[#F6F6F680] rounded-full p-2 justify-center w-10 z-20 "
-          onPress={() => {
-            if (screenName === "AssignJobs") {
-              navigation.goBack();
-            } else {
-              navigation.navigate("Main", {
-                screen: "MainTabs",
-                params: {
-                  screen: screenName,
-                },
-              });
-            }
-          }}
-        >
-          <AntDesign name="left" size={22} color="#000" />
-        </TouchableOpacity>
+      <CustomHeader
+        title={t("QRScanner.Scan the QR")}
+        navigation={navigation}
+        showBackButton={true}
+        onBackPress={handleBackPress}
+      />
 
-        <View className="flex-1 ">
-          <Text className="text-lg font-bold text-center -ml-8">
-            {t("QRScanner.Scan the QR")}
-          </Text>
-        </View>
-      </View>
       <CameraView
-        className="flex-1 "
+        className="flex-1"
         onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
-        barcodeScannerSettings={{
-          barcodeTypes: ["qr", "pdf417"],
-        }}
+        barcodeScannerSettings={{ barcodeTypes: ["qr", "pdf417"] }}
         style={{ flex: 1 }}
       />
 
@@ -307,16 +245,12 @@ const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
         <View
           style={{ position: "absolute", bottom: 100, alignSelf: "center" }}
         >
-          <TouchableOpacity
-            onPress={() => {
-              setScanned(false);
-            }}
-          >
+          <TouchableOpacity onPress={() => setScanned(false)}>
             <LinearGradient
               colors={["#F2561D", "#FF1D85"]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
-              className={`items-center justify-center rounded-full mt-4 p-4 px-12`}
+              className="items-center justify-center rounded-full mt-4 p-4 px-12"
             >
               <Text style={{ color: "#fff", fontSize: 16 }}>
                 {t("QRScanner.Scan Again")}
@@ -345,7 +279,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
               </Text>
               <View className="mb-4">
                 <Image
-                  source={require("../../assets/error.png")}
+                  source={require("../../assets/images/public/error.webp")}
                   className="w-32 h-32"
                   resizeMode="contain"
                 />
@@ -354,7 +288,6 @@ const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
                 {t("QRScanner.Wrong QR code")}
               </Text>
             </View>
-
             <View className="absolute bottom-0 left-0 w-full h-2 bg-gray-300">
               <Animated.View
                 className="h-full bg-red-500"
