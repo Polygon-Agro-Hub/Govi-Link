@@ -28,7 +28,7 @@ export const initCultivationTable = () => {
         ispumpOrirrigation TEXT,
         createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
         updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
-      );`,
+      );`
     );
   } catch (error) {
     console.error("Error initializing cultivation table:", error);
@@ -74,72 +74,41 @@ export const saveCultivationInfo = (
       [requestId],
     );
 
-    const dbData: any = {};
-
     const yesNoToBool = (val: any): number | null => {
       if (val === "yes") return 1;
       if (val === "no") return 0;
       return null;
     };
 
-    if (data.temperature !== undefined) {
-      dbData.temperature = yesNoToBool(data.temperature);
-    }
-    if (data.rainfall !== undefined) {
-      dbData.rainfall = yesNoToBool(data.rainfall);
-    }
-    if (data.sunShine !== undefined) {
-      dbData.sunShine = yesNoToBool(data.sunShine);
-    }
-    if (data.humidity !== undefined) {
-      dbData.humidity = yesNoToBool(data.humidity);
-    }
-    if (data.windVelocity !== undefined) {
-      dbData.windVelocity = yesNoToBool(data.windVelocity);
-    }
-    if (data.windDirection !== undefined) {
-      dbData.windDirection = yesNoToBool(data.windDirection);
-    }
-    if (data.zone !== undefined) {
-      dbData.zone = yesNoToBool(data.zone);
-    }
+    const dbData: any = {};
 
-    if (data.isCropSuitale !== undefined) {
-      dbData.isCropSuitale = data.isCropSuitale;
-    }
-    if (data.isRecevieRainFall !== undefined) {
-      dbData.isRecevieRainFall = data.isRecevieRainFall;
-    }
-    if (data.isRainFallSuitableCrop !== undefined) {
-      dbData.isRainFallSuitableCrop = data.isRainFallSuitableCrop;
-    }
-    if (data.isRainFallSuitableCultivation !== undefined) {
-      dbData.isRainFallSuitableCultivation = data.isRainFallSuitableCultivation;
-    }
-    if (data.isElectrocityAvailable !== undefined) {
-      dbData.isElectrocityAvailable = data.isElectrocityAvailable;
-    }
-    if (data.ispumpOrirrigation !== undefined) {
-      dbData.ispumpOrirrigation = data.ispumpOrirrigation;
-    }
+    // Climate Parameters
+    if (data.temperature !== undefined) dbData.temperature = yesNoToBool(data.temperature);
+    if (data.rainfall !== undefined) dbData.rainfall = yesNoToBool(data.rainfall);
+    if (data.sunShine !== undefined) dbData.sunShine = yesNoToBool(data.sunShine);
+    if (data.humidity !== undefined) dbData.humidity = yesNoToBool(data.humidity);
+    if (data.windVelocity !== undefined) dbData.windVelocity = yesNoToBool(data.windVelocity);
+    if (data.windDirection !== undefined) dbData.windDirection = yesNoToBool(data.windDirection);
+    if (data.zone !== undefined) dbData.zone = yesNoToBool(data.zone);
 
+    // Other fields
+    if (data.isCropSuitale !== undefined) dbData.isCropSuitale = data.isCropSuitale;
     if (data.ph !== undefined && data.ph !== null) {
-      dbData.ph = data.ph;
+      dbData.ph = typeof data.ph === "string" ? parseFloat(data.ph) : data.ph;
     }
-    if (data.soilType !== undefined) {
-      dbData.soilType = data.soilType;
-    }
-    if (data.soilfertility !== undefined) {
-      dbData.soilfertility = data.soilfertility;
-    }
-    if (data.otherWaterSources !== undefined) {
-      dbData.otherWaterSources = data.otherWaterSources;
-    }
+    if (data.soilType !== undefined) dbData.soilType = data.soilType;
+    if (data.soilfertility !== undefined) dbData.soilfertility = data.soilfertility;
+    if (data.otherWaterSources !== undefined) dbData.otherWaterSources = data.otherWaterSources;
+    if (data.isRecevieRainFall !== undefined) dbData.isRecevieRainFall = data.isRecevieRainFall;
+    if (data.isRainFallSuitableCrop !== undefined) dbData.isRainFallSuitableCrop = data.isRainFallSuitableCrop;
+    if (data.isRainFallSuitableCultivation !== undefined) dbData.isRainFallSuitableCultivation = data.isRainFallSuitableCultivation;
+    if (data.isElectrocityAvailable !== undefined) dbData.isElectrocityAvailable = data.isElectrocityAvailable;
+    if (data.ispumpOrirrigation !== undefined) dbData.ispumpOrirrigation = data.ispumpOrirrigation;
 
+    // JSON fields
     if (data.waterSources && Array.isArray(data.waterSources)) {
       dbData.waterSources = JSON.stringify(data.waterSources);
     }
-
     if (data.waterImages && Array.isArray(data.waterImages)) {
       dbData.waterImage = JSON.stringify(data.waterImages);
     }
@@ -148,12 +117,12 @@ export const saveCultivationInfo = (
       return;
     }
 
+    const keys = Object.keys(dbData);
+
     if (existing) {
-      const fields = Object.keys(dbData)
-        .map((key) => `${key} = ?`)
-        .join(", ");
+      const fields = keys.map((key) => `${key} = ?`).join(", ");
       const values = [
-        ...Object.values(dbData),
+        ...keys.map((key) => dbData[key]),
         new Date().toISOString(),
         requestId,
       ];
@@ -162,21 +131,13 @@ export const saveCultivationInfo = (
         `UPDATE inspectioncultivation SET ${fields}, updatedAt = ? WHERE requestId = ?`,
         values as SQLite.SQLiteBindParams,
       );
-
-      console.log("Cultivation info updated in SQLite");
+      console.log(`Cultivation info updated in SQLite for requestId: ${requestId}`);
     } else {
-      const fields = [
-        "requestId",
-        ...Object.keys(dbData),
-        "createdAt",
-        "updatedAt",
-      ].join(", ");
-      const placeholders = new Array(Object.keys(dbData).length + 3)
-        .fill("?")
-        .join(", ");
+      const fields = ["requestId", ...keys, "createdAt", "updatedAt"].join(", ");
+      const placeholders = new Array(keys.length + 3).fill("?").join(", ");
       const values = [
         requestId,
-        ...Object.values(dbData),
+        ...keys.map((key) => dbData[key]),
         new Date().toISOString(),
         new Date().toISOString(),
       ];
@@ -185,8 +146,7 @@ export const saveCultivationInfo = (
         `INSERT INTO inspectioncultivation (${fields}) VALUES (${placeholders})`,
         values as SQLite.SQLiteBindParams,
       );
-
-      console.log("Cultivation info inserted into SQLite");
+      console.log(`Cultivation info inserted into SQLite for requestId: ${requestId}`);
     }
   } catch (error) {
     console.error("Error saving cultivation info:", error);

@@ -17,6 +17,7 @@ import {
   FontAwesome6,
   AntDesign,
   FontAwesome,
+  MaterialIcons,
 } from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
 import { useTranslation } from "react-i18next";
@@ -532,7 +533,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
                     ? t(`InspectionForm.${formData.pType}`)
                     : t("InspectionForm.Select Proof Type")}
                 </Text>
-                <AntDesign name="down" size={20} color="#838B8C" />
+                <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
               </View>
             </TouchableOpacity>
 
@@ -547,9 +548,8 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
                   </Text>
                 </Text>
                 <View
-                  className={`bg-[#F6F6F6] rounded-3xl flex-row items-center ${
-                    errors.nic ? "border border-red-500" : ""
-                  }`}
+                  className={`bg-[#F6F6F6] rounded-3xl flex-row items-center ${errors.nic ? "border border-red-500" : ""
+                    }`}
                 >
                   <TextInput
                     placeholder="----"

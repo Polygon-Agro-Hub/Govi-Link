@@ -182,6 +182,7 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
       await AsyncStorage.setItem("token", token);
       await AsyncStorage.setItem("jobRole", role);
       await AsyncStorage.setItem("empid", empId.toString());
+      await AsyncStorage.removeItem("intentional_logout");
       dispatch(setUser({ token, role, empId: empId.toString() }));
 
       if (token) {
@@ -226,6 +227,20 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
 
   useFocusEffect(
     useCallback(() => {
+      const checkLogoutStatus = async () => {
+        const intentionalLogout = await AsyncStorage.getItem(
+          "intentional_logout",
+        );
+        if (intentionalLogout === "true") {
+          Alert.alert(t("Main.Success"), t("Login.Logout Successful"), [
+            { text: t("Main.ok") },
+          ]);
+          await AsyncStorage.removeItem("intentional_logout");
+        }
+      };
+
+      checkLogoutStatus();
+
       const onBackPress = () => true;
       BackHandler.addEventListener("hardwareBackPress", onBackPress);
       const subscription = BackHandler.addEventListener(
@@ -269,78 +284,77 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
           {t("Login.Please Sign in to login")}
         </Text>
 
-        {loading ? (
-          <View className="justify-center items-center mt-6">
-            <ActivityIndicator size="large" color="#FF1D85" />
-          </View>
-        ) : (
-          <View style={{ width: `100%`, marginTop: hp(4) }}>
-            <Text className="text-base pb-[2%] font-light">
-              {t("Login.Employee ID")}
-            </Text>
-            <View
-              className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] mb-2 px-3 ${
-                empIdError ? "border-red-500" : "border-[#F4F4F4]"
+        <View style={{ width: `100%`, marginTop: hp(4) }}>
+          <Text className="text-base pb-[2%] font-light">
+            {t("Login.Employee ID")}
+          </Text>
+          <View
+            className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] mb-2 px-3 ${empIdError ? "border-red-500" : "border-[#F4F4F4]"
               }`}
-            >
-              <FontAwesome name="user-o" size={20} color="#353535" />
-              <TextInput
-                className="flex-1  text-base pl-2"
-                autoCapitalize="characters"
-                value={empid}
-                onChangeText={handleEmpIdChange}
-              />
-            </View>
-            {empIdError && (
-              <Text className="text-red-500 text-sm pl-3 mb-4">
-                {empIdError}
-              </Text>
-            )}
-
-            <Text className="text-base pb-[2%] font-light">
-              {t("Login.Password")}
+          >
+            <FontAwesome name="user-o" size={20} color="#353535" />
+            <TextInput
+              className="flex-1 text-base pl-2"
+              autoCapitalize="characters"
+              value={empid}
+              onChangeText={handleEmpIdChange}
+              editable={!loading}
+              style={{ opacity: loading ? 0.6 : 1 }}
+            />
+          </View>
+          {empIdError && (
+            <Text className="text-red-500 text-sm pl-3 mb-4">
+              {empIdError}
             </Text>
-            <View className="flex-row items-center bg-[#F4F4F4] border border-[#F4F4F4] rounded-3xl h-[50px] mb-8 px-3">
-              <SimpleLineIcons name="lock" size={22} color="#353535" />{" "}
-              <TextInput
-                className="flex-1  text-base pl-2"
-                secureTextEntry={secureTextEntry}
-                value={password}
-                onChangeText={handlePasswordChange}
-              />
-              <TouchableOpacity
-                onPress={() => setSecureTextEntry(!secureTextEntry)}
-              >
-                <Ionicons
-                  name={secureTextEntry ? "eye-off-outline" : "eye-outline"}
-                  size={24}
-                  color="black"
-                />
-              </TouchableOpacity>
-            </View>
+          )}
 
+          <Text className="text-base pb-[2%] font-light">
+            {t("Login.Password")}
+          </Text>
+          <View className="flex-row items-center bg-[#F4F4F4] border border-[#F4F4F4] rounded-3xl h-[50px] mb-8 px-3">
+            <SimpleLineIcons name="lock" size={22} color="#353535" />
+            <TextInput
+              className="flex-1 text-base pl-2"
+              secureTextEntry={secureTextEntry}
+              value={password}
+              onChangeText={handlePasswordChange}
+              editable={!loading}
+              style={{ opacity: loading ? 0.6 : 1 }}
+            />
             <TouchableOpacity
-              className="rounded-3xl mb-5 overflow-hidden h-[50px] w-full self-center"
+              onPress={() => setSecureTextEntry(!secureTextEntry)}
               disabled={loading}
-              onPress={handleLogin}
             >
-              <LinearGradient
-                colors={["#F2561D", "#FF1D85"]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                className="flex-1 items-center justify-center"
-              >
-                {loading ? (
-                  <ActivityIndicator color="white" size="small" />
-                ) : (
-                  <Text className="text-white text-lg font-semibold tracking-wide text-center">
-                    {t("Login.Sign in")}
-                  </Text>
-                )}
-              </LinearGradient>
+              <Ionicons
+                name={secureTextEntry ? "eye-off-outline" : "eye-outline"}
+                size={24}
+                color={loading ? "#999" : "black"}
+              />
             </TouchableOpacity>
           </View>
-        )}
+
+          <TouchableOpacity
+            className="rounded-3xl mb-5 overflow-hidden h-[50px] w-full self-center"
+            disabled={loading}
+            onPress={handleLogin}
+            style={{ opacity: loading ? 0.7 : 1 }}
+          >
+            <LinearGradient
+              colors={["#F2561D", "#FF1D85"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              className="flex-1 items-center justify-center"
+            >
+              {loading ? (
+                <ActivityIndicator color="white" size="small" />
+              ) : (
+                <Text className="text-white text-lg font-semibold tracking-wide text-center">
+                  {t("Login.Sign in")}
+                </Text>
+              )}
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );

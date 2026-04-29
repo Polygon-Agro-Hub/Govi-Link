@@ -103,7 +103,7 @@
     "debtsOfFarmer is required": "Existing debts of the farmer is required",
     "ID Proof Type is required": "ID proof type is required",
     "At least one": "At least one {{category}} option must be selected",
-    "Please specify any special farm tools utilized by the farmer.": "Please specify any special farm tools utilized by the farmer.",
+    "At least one option must be selected.": "At least one option must be selected.",
     "Permission Denied": "Permission Denied",
     "Location permission is required to use this feature.": "Location permission is required to use this feature.",
     "Unable to get your current location": "Unable to get your current location",
@@ -128,18 +128,18 @@
     "Land number must be 9 digits long": "Land number must be 9 digits long",
     "Land number must start with 0": "Land number must start with 0",
     "Invalid land number format": "Invalid land number format",
-    "Phone number must be 10 digits":"Phone number must be 10 digits",
-    "This phone number is already registered":"This phone number is already registered",
-    "This email is already registered":"This email is already registered",
-    "This NIC is already registered":"This NIC is already registered",
-    "Please enter a valid License ID number":"Please enter a valid License ID number (1 capital letter + 7 digits or 10–12 digits)",
-    "At least one image of the water source is required":"At least one image of the water source is required",
-    "pH is required":"pH is required",
-    "Overall soil fertility is required":"Overall soil fertility is required",
-    "Land ownership is required":"Land ownership is required",
-    "Ownership status is required":"Ownership status is required",
-    "Knowledge field is required":"Knowledge field is required",
-    "Previous experience is required":"Previous experience is required"
+    "Phone number must be 10 digits": "Phone number must be 10 digits",
+    "This phone number is already registered": "This phone number is already registered",
+    "This email is already registered": "This email is already registered",
+    "This NIC is already registered": "This NIC is already registered",
+    "Please enter a valid License ID number": "Please enter a valid License ID number (1 capital letter + 7 digits or 10–12 digits)",
+    "At least one image of the water source is required": "At least one image of the water source is required",
+    "pH is required": "pH is required",
+    "Overall soil fertility is required": "Overall soil fertility is required",
+    "Land ownership is required": "Land ownership is required",
+    "Ownership status is required": "Ownership status is required",
+    "Knowledge field is required": "Knowledge field is required",
+    "Previous experience is required": "Previous experience is required"
   },
   "Login": {
     "Welcome": "Welcome!",
@@ -153,7 +153,8 @@
     "Employee ID is not allowed to be empty": "Employee ID is not allowed to be empty",
     "Invalid EMP ID & Password": "Invalid EMP ID & Password",
     "Invalid Password. Please try again.": "Invalid Password. Please try again.",
-    "Invalid EMP ID": "Invalid EMP ID"
+    "Invalid EMP ID": "Invalid EMP ID",
+    "Logout Successful": "Logout Successful"
   },
   "Dashboard": {
     "Hello": "Hello",
@@ -164,7 +165,7 @@
     "No Jobs for Today": "No Jobs for Today",
     "No Saved Drafts for Today": "No Saved Drafts for Today",
     "Capital Requests": "Capital Requests",
-    "Onboard Suppliers":"Onboard Suppliers"
+    "Onboard Suppliers": "Onboard Suppliers"
   },
   "Drawer": {
     "Language": "Language",
@@ -172,8 +173,11 @@
     "Complaints": "Complaints",
     "Change Password": "Change Password",
     "Logout": "Logout",
+    "Cancel": "Cancel",
     "Report Complaint": "Report a Complaint",
-    "View Complaint History": "View Complaint History"
+    "View Complaint History": "View Complaint History",
+    "Logging out...": "Logging out...",
+    "Are you sure you want to logout?": "Are you sure you want to logout?"
   },
   "AddComplaint": {
     "Tell us the problem": "Tell us the problem",
@@ -726,27 +730,27 @@
     "UndoSuccess": "The request completion process was cancelled. Your submitted data remains unchanged.",
     "UndoFailed": "Deleting inspection data failed."
   },
-  "OnboardSupplier":{
-    "Onboard Supplier":"Onboard Supplier",
-    "Supplier Full Name":"--Supplier Full Name--",
-    "Contact":"--Contact (e.g. 07XXXXXXXX)--",
-    "Email Address":"--Email Address--",
-    "NIC Number":"--NIC Number--",
-    "Cancel":"Cancel",
-    "Next":"Next",
-    "Supplier Full Name is required":"Supplier Full Name is required",
-    "OTP Verification":"OTP Verification",
-    "We have sent a Verification Code to the given mobile number":"We have sent a Verification Code to the given mobile number",
-    "Submit":"Submit",
-    "Back":"Back",
-    "Didn't receive the OTP":"Didn't receive the OTP ?",
+  "OnboardSupplier": {
+    "Onboard Supplier": "Onboard Supplier",
+    "Supplier Full Name": "--Supplier Full Name--",
+    "Contact": "--Contact (e.g. 07XXXXXXXX)--",
+    "Email Address": "--Email Address--",
+    "NIC Number": "--NIC Number--",
+    "Cancel": "Cancel",
+    "Next": "Next",
+    "Supplier Full Name is required": "Supplier Full Name is required",
+    "OTP Verification": "OTP Verification",
+    "We have sent a Verification Code to the given mobile number": "We have sent a Verification Code to the given mobile number",
+    "Submit": "Submit",
+    "Back": "Back",
+    "Didn't receive the OTP": "Didn't receive the OTP ?",
     "Account created successfully": "Account created successfully"
   },
-  "Permission":{
-   "locationAccess": "Location Access",
-   "CameraAccess":"Camera Access",
+  "Permission": {
+    "locationAccess": "Location Access",
+    "CameraAccess": "Camera Access",
     "enableLocationMessage": "Enable location access to access location information.",
-    "enableCameraMessage":"Enable access to the camera to take photos.",
+    "enableCameraMessage": "Enable access to the camera to take photos.",
     "allow": "Allow",
     "requesting": "Requesting...",
     "success": "Success",

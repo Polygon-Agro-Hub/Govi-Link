@@ -103,7 +103,7 @@
     "debtsOfFarmer is required": "ගොවියාගේ පවතින ණය ගෙවීම අවශ්‍ය වේ",
     "ID Proof Type is required": "හැඳුනුම්පත් සාක්ෂි වර්ගය අවශ්‍යයි",
     "At least one": "අවම වශයෙන් එක් {{category}} විකල්පයක්වත් තෝරා ගත යුතුය.",
-    "Please specify any special farm tools utilized by the farmer.": "ගොවියා විසින් භාවිතා කරන විශේෂ ගොවිපල මෙවලම් තිබේ නම් කරුණාකර සඳහන් කරන්න.",
+    "At least one option must be selected.": "අවම වශයෙන් එක් විකල්පයක් තෝරා ගත යුතුය.",
     "Permission Denied": "අවසරය ප්රතික්ෂේප කෙරිණි",
     "Location permission is required to use this feature.": "මෙම විශේෂාංගය භාවිතා කිරීමට ස්ථාන අවසරය අවශ්‍ය වේ.",
     "Unable to get your current location": "ඔබගේ වත්මන් ස්ථානය ලබා ගත නොහැක.",
@@ -132,14 +132,14 @@
     "This phone number is already registered": "මෙම දුරකථන අංකය දැනටමත් ලියාපදිංචි කර ඇත.",
     "This email is already registered": "මෙම ඊතැපෑල දැනටමත් ලියාපදිංචි කර ඇත",
     "This NIC is already registered": "මෙම ජාතික හැඳුනුම්පත දැනටමත් ලියාපදිංචි කර ඇත.",
-    "Please enter a valid License ID number":"වලංගු බලපත්‍ර හැඳුනුම්පත් අංකයක් (1 ලොකු අකුර + ඉලක්කම් 7 හෝ ඉලක්කම් 10–12) ඇතුළත් කරන්න.",
-    "At least one image of the water source is required":"ජල මූලාශ්‍රයේ අවම වශයෙන් එක් රූපයක්වත් අවශ්‍ය වේ.",
-    "pH is required":"pH අගය අවශ්‍යයි",
-    "Overall soil fertility is required":"සමස්ත පසේ සාරවත් බව අවශ්‍ය වේ.",
-    "Land ownership is required":"ඉඩම් හිමිකම අවශ්‍යයි",
-    "Ownership status is required":"හිමිකාරිත්ව තත්ත්වය අවශ්‍යයි",
-    "Knowledge field is required":"දැනුම ක්ෂේත්‍රය අවශ්‍යයි",
-    "Previous experience is required":"පෙර අත්දැකීම් අවශ්‍යයි"
+    "Please enter a valid License ID number": "වලංගු බලපත්‍ර හැඳුනුම්පත් අංකයක් (1 ලොකු අකුර + ඉලක්කම් 7 හෝ ඉලක්කම් 10–12) ඇතුළත් කරන්න.",
+    "At least one image of the water source is required": "ජල මූලාශ්‍රයේ අවම වශයෙන් එක් රූපයක්වත් අවශ්‍ය වේ.",
+    "pH is required": "pH අගය අවශ්‍යයි",
+    "Overall soil fertility is required": "සමස්ත පසේ සාරවත් බව අවශ්‍ය වේ.",
+    "Land ownership is required": "ඉඩම් හිමිකම අවශ්‍යයි",
+    "Ownership status is required": "හිමිකාරිත්ව තත්ත්වය අවශ්‍යයි",
+    "Knowledge field is required": "දැනුම ක්ෂේත්‍රය අවශ්‍යයි",
+    "Previous experience is required": "පෙර අත්දැකීම් අවශ්‍යයි"
   },
   "Login": {
     "Welcome": "සාදරයෙන් පිළිගනිමු!",
@@ -153,7 +153,8 @@
     "Employee ID is not allowed to be empty": "මුරපදය සහ සේවක පරිශීලක අංකය හිස්ව තැබිය නොහැක.",
     "Invalid EMP ID & Password": "වැරදි සේවක අංකයක් සහ මුරපදයකි",
     "Invalid Password. Please try again.": "වැරදි මුරපදයකි. කරුණාකර නැවත උත්සාහ කරන්න.",
-    "Invalid EMP ID": "වැරදි සේවක අංකයකි"
+    "Invalid EMP ID": "වැරදි සේවක අංකයකි",
+    "Logout Successful": "පිටවීම සාර්ථකයි"
   },
   "Dashboard": {
     "Hello": "හෙලෝ",
@@ -173,7 +174,9 @@
     "Change Password": "මුරපදය වෙනස් කරන්න",
     "Logout": "පිටවීම",
     "Report Complaint": "පැමිණිල්ලක් වාර්තා කරන්න",
-    "View Complaint History": "පැමිණිලි ඉතිහාසය බලන්න"
+    "View Complaint History": "පැමිණිලි ඉතිහාසය බලන්න",
+    "Are you sure you want to logout?": "ඔබට පිටවීමට අවශ්‍ය දැයි ඔබ තහවුරු කරනවාද?",
+    "Logging out...": "පිටවෙමින් සිටී..."
   },
   "AddComplaint": {
     "Tell us the problem": "ඔබේ ගැටලුව අපට කියන්න",
@@ -742,8 +745,8 @@
     "Didn't receive the OTP": "OTP එක ලැබුනේ නැද්ද?",
     "Account created successfully": "ගිණුම සාර්ථකව නිර්මාණය කරන ලදී."
   },
-  "Permission":{
-   "locationAccess": "Location Access",
+  "Permission": {
+    "locationAccess": "Location Access",
     "enableLocationMessage": "Enable location access to access location information.",
     "allow": "Allow",
     "requesting": "Requesting...",

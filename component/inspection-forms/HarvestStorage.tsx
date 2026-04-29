@@ -9,7 +9,7 @@ import {
   Platform,
   Modal,
 } from "react-native";
-import { AntDesign } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
 import { useTranslation } from "react-i18next";
 import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
@@ -21,7 +21,6 @@ import FormFooterButton from "./FormFooterButton";
 import {
   saveHarvestStorageInfo,
   getHarvestStorageInfo,
-  clearHarvestStorageInfo,
   HarvestStorageData,
 } from "@/database/inspectionharvest";
 import { updateLastScreen } from "@/database/inspectionprogress";
@@ -100,7 +99,7 @@ const YesNoSelect = ({
               {t("InspectionForm.--Select From Here--")}
             </Text>
           )}
-          <AntDesign name="down" size={20} color="#838B8C" />
+          <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
         </TouchableOpacity>
       </View>
     </>
@@ -232,12 +231,12 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
 
     setIsNextEnabled(
       hasOwnStorageValid &&
-        facilityAccessValid &&
-        primaryProcessingValid &&
-        valueAdditionTechValid &&
-        marketLinkageValid &&
-        qualityStandardsValid &&
-        !hasErrors,
+      facilityAccessValid &&
+      primaryProcessingValid &&
+      valueAdditionTechValid &&
+      marketLinkageValid &&
+      qualityStandardsValid &&
+      !hasErrors,
     );
   }, [formData, errors]);
 

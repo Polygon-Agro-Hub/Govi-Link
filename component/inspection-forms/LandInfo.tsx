@@ -13,7 +13,6 @@ import {
   BackHandler,
 } from "react-native";
 import {
-  AntDesign,
   Feather,
   FontAwesome,
   FontAwesome6,
@@ -64,7 +63,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
   const [showCamera, setShowCamera] = useState(false);
   const [isNextEnabled, setIsNextEnabled] = useState(false);
   const [isExistingData, setIsExistingData] = useState(false);
-  
+
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const [showCameraAccess, setShowCameraAccess] = useState(false);
   const [hasLocationPermission, setHasLocationPermission] = useState<boolean | null>(null);
@@ -99,13 +98,13 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
     return () => clearTimeout(timer);
   }, [formData, requestId]);
 
-  
+
   useEffect(() => {
     checkPermissions();
   }, []);
 
   const checkPermissions = async () => {
-    
+
     const { status: cameraStatus } = await ImagePicker.getCameraPermissionsAsync();
     if (cameraStatus === "granted") {
       setHasCameraPermission(true);
@@ -113,7 +112,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
       setHasCameraPermission(false);
     }
 
-   
+
     const { status: locationStatus } = await Location.getForegroundPermissionsAsync();
     if (locationStatus === "granted") {
       setHasLocationPermission(true);
@@ -164,7 +163,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
     if (hasCameraPermission === null) {
       await checkPermissions();
     }
-    
+
     if (hasCameraPermission === false) {
       setShowCameraAccess(true);
     } else {
@@ -176,7 +175,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
     if (hasLocationPermission === null) {
       await checkPermissions();
     }
-    
+
     if (hasLocationPermission === false) {
       setPendingGeoLocationAction(true);
       setShowLocationAccess(true);
@@ -490,7 +489,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
     }
   };
 
-  
+
   if (showCameraAccess) {
     return (
       <CameraAccess
@@ -501,7 +500,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
     );
   }
 
-  
+
   if (showLocationAccess) {
     return (
       <LocationAccess
@@ -558,7 +557,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
                   </Text>
                 )}
               </View>
-              <AntDesign name="down" size={20} color="#838B8C" />
+              <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
             </TouchableOpacity>
             {touched.isOwnByFarmer &&
               errors.isOwnByFarmer &&
@@ -601,7 +600,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
                   </Text>
                 )}
               </View>
-              <AntDesign name="down" size={20} color="#838B8C" />
+              <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
             </TouchableOpacity>
             {touched.ownershipStatus &&
               errors.ownershipStatus &&

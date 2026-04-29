@@ -58,9 +58,8 @@ const Input = ({
       {label} {required && <Text className="text-black">*</Text>}
     </Text>
     <View
-      className={`bg-[#F6F6F6] rounded-3xl flex-row items-center ${
-        error ? "border border-red-500" : ""
-      }`}
+      className={`bg-[#F6F6F6] rounded-3xl flex-row items-center ${error ? "border border-red-500" : ""
+        }`}
     >
       <TextInput
         placeholder={placeholder}
@@ -218,10 +217,10 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
 
     setIsNextEnabled(
       allFilled &&
-        accountNumbersMatch &&
-        hasAssets &&
-        hasBankInfo &&
-        !hasErrors,
+      accountNumbersMatch &&
+      hasAssets &&
+      hasBankInfo &&
+      !hasErrors,
     );
   }, [formData, errors]);
 
@@ -248,7 +247,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
       setErrors((prev) => ({
         ...prev,
         assets: t(
-          "Error.Please specify any special farm tools utilized by the farmer.",
+          "Error.At least one option must be selected.",
         ),
       }));
     } else {
@@ -485,11 +484,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
                 setCheckedAssets(builtChecked);
                 applyBankData(localData);
 
-                const draftErrors = validateAllFinanceFields(
-                  localData,
-                  builtChecked,
-                );
-                setErrors(draftErrors);
+                // Validation errors are delayed until user interaction or form submission
                 isDataLoadedRef.current = true;
                 return;
               }
@@ -503,11 +498,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
                 setCheckedAssets(builtChecked);
                 applyBankData(backendData);
 
-                const draftErrors = validateAllFinanceFields(
-                  backendData,
-                  builtChecked,
-                );
-                setErrors(draftErrors);
+                // Validation errors are delayed until user interaction or form submission
                 isDataLoadedRef.current = true;
                 return;
               }
@@ -977,9 +968,8 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               {t("InspectionForm.Bank Name")} *
             </Text>
             <TouchableOpacity
-              className={`bg-[#F4F4F4] rounded-full px-4 py-4 flex-row justify-between items-center ${
-                errors.bank ? "border border-red-500" : ""
-              }`}
+              className={`bg-[#F4F4F4] rounded-full px-4 py-4 flex-row justify-between items-center ${errors.bank ? "border border-red-500" : ""
+                }`}
               onPress={() => setShowBankDropdown(true)}
             >
               <Text
@@ -1008,9 +998,8 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               {t("InspectionForm.Branch Name")} *
             </Text>
             <TouchableOpacity
-              className={`bg-[#F4F4F4] rounded-full px-4 py-4 flex-row justify-between items-center ${
-                errors.branch ? "border border-red-500" : ""
-              }`}
+              className={`bg-[#F4F4F4] rounded-full px-4 py-4 flex-row justify-between items-center ${errors.branch ? "border border-red-500" : ""
+                }`}
               onPress={() => setShowBranchDropdown(true)}
               disabled={availableBranches.length === 0}
             >
@@ -1042,9 +1031,8 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               {t("InspectionForm.Existing debts of the farmer")} *
             </Text>
             <View
-              className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${
-                errors.debtsOfFarmer ? "border border-red-500" : ""
-              }`}
+              className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${errors.debtsOfFarmer ? "border border-red-500" : ""
+                }`}
             >
               <TextInput
                 placeholder={t("InspectionForm.Type here...")}
@@ -1197,7 +1185,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
             })}
 
             {errors.assets && (
-              <View className="flex-row  ml-4 justify-center">
+              <View className="flex-row ml-4">
                 <FontAwesome
                   name="exclamation-triangle"
                   size={16}

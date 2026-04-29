@@ -229,14 +229,18 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
   const fetchUserProfile = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
+      const intentionalLogout = await AsyncStorage.getItem("intentional_logout");
+
       if (!token) {
-        Alert.alert(
-          t("Error.Sorry"),
-          t(
-            "Error.Your login session has expired. Please log in again to continue.",
-          ),
-          [{ text: t("Main.ok") }],
-        );
+        if (intentionalLogout !== "true") {
+          Alert.alert(
+            t("Error.Sorry"),
+            t(
+              "Error.Your login session has expired. Please log in again to continue.",
+            ),
+            [{ text: t("Main.ok") }],
+          );
+        }
         return;
       }
       if (token) {
@@ -543,8 +547,8 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                         completionPercentage =
                           totalTasks > 0
                             ? Math.round(
-                                ((item.totalCompleted || 0) / totalTasks) * 100,
-                              )
+                              ((item.totalCompleted || 0) / totalTasks) * 100,
+                            )
                             : 0;
                       }
 
@@ -560,9 +564,8 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                           width: wp("72%"),
                           opacity: isDisabled ? 0.6 : 1,
                         }}
-                        className={`border ${
-                          isDisabled ? "border-[#9DB2CE]" : "border-[#FF1D85]"
-                        } rounded-lg p-3 mr-4`}
+                        className={`border ${isDisabled ? "border-[#9DB2CE]" : "border-[#FF1D85]"
+                          } rounded-lg p-3 mr-4`}
                         activeOpacity={0.8}
                         disabled={isDisabled}
                         onPress={() => {
@@ -633,9 +636,8 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
 
                           {displayStatus ? (
                             <Text
-                              className={`text-xs mt-1 font-medium ${
-                                isDisabled ? "text-[#9DB2CE]" : "text-[#FF1D85]"
-                              }`}
+                              className={`text-xs mt-1 font-medium ${isDisabled ? "text-[#9DB2CE]" : "text-[#FF1D85]"
+                                }`}
                             >
                               {displayStatus}
                             </Text>
@@ -659,7 +661,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                     size={24}
                     color={
                       !filteredVisitsData ||
-                      currentIndex >= filteredVisitsData.length - 1
+                        currentIndex >= filteredVisitsData.length - 1
                         ? "#ccc"
                         : "#00000"
                     }
@@ -873,7 +875,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
             />
           </TouchableOpacity>
         </View>
-         <View className="px-8 mt-4 mb-[15%]">
+        <View className="px-8 mt-4 mb-[15%]">
           <TouchableOpacity
             className="bg-[#FFF5BE] rounded-lg p-3 h-20 mr-4 w-full flex-row justify-between items-center"
             style={{
@@ -992,11 +994,10 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                         }}
                       >
                         <View
-                          className={`flex flex-row items-center justify-center rounded-full py-2 border ${
-                            selectedItem?.latitude && selectedItem?.longitude
+                          className={`flex flex-row items-center justify-center rounded-full py-2 border ${selectedItem?.latitude && selectedItem?.longitude
                               ? "border-[#F83B4F]"
                               : "border-[#9DB2CE]"
-                          }`}
+                            }`}
                         >
                           <FontAwesome6
                             name="location-dot"
@@ -1008,11 +1009,10 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                             }
                           />
                           <Text
-                            className={`text-base font-semibold ml-2 ${
-                              selectedItem?.latitude && selectedItem?.longitude
+                            className={`text-base font-semibold ml-2 ${selectedItem?.latitude && selectedItem?.longitude
                                 ? "text-[#000000]"
                                 : "text-[#9DB2CE]"
-                            }`}
+                              }`}
                           >
                             {t("VisitPopup.Location")}
                           </Text>
@@ -1032,8 +1032,8 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                       </TouchableOpacity>
                     </View>
                     {selectedItem.city ||
-                    selectedItem.plotNo ||
-                    selectedItem.street ? (
+                      selectedItem.plotNo ||
+                      selectedItem.street ? (
                       <View className="flex text-center justify-center items-center ">
                         <Text className="text-sm font-semibold text-[#4E6393] mb-2">
                           {t("VisitPopup.Address")}
@@ -1085,13 +1085,12 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                     colors={["#F2561D", "#FF1D85"]}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
-                    className={`py-2 items-center justify-center rounded-full mt-4 ${
-                      i18n.language === "si"
+                    className={`py-2 items-center justify-center rounded-full mt-4 ${i18n.language === "si"
                         ? "px-24"
                         : i18n.language === "ta"
                           ? "px-24"
                           : "px-[40%]"
-                    }`}
+                      }`}
                     style={{
                       marginBottom: 30,
                     }}

@@ -103,7 +103,7 @@
     "debtsOfFarmer is required": "Existing debts of the farmer is required",
     "ID Proof Type is required": "ID proof type is required",
     "At least one": "At least one {{category}} option must be selected",
-    "Please specify any special farm tools utilized by the farmer.": "Please specify any special farm tools utilized by the farmer.",
+    "At least one option must be selected.": "At least one option must be selected.",
     "Permission Denied": "Permission Denied",
     "Location permission is required to use this feature.": "Location permission is required to use this feature.",
     "Unable to get your current location": "Unable to get your current location",
@@ -132,14 +132,14 @@
     "This phone number is already registered": "இந்த தொலைபேசி எண் ஏற்கனவே பதிவு செய்யப்பட்டுள்ளது",
     "This email is already registered": "இந்த மின்னஞ்சல் ஏற்கனவே பதிவு செய்யப்பட்டுள்ளது",
     "This NIC is already registered": "இந்த NIC ஏற்கனவே பதிவு செய்யப்பட்டுள்ளது",
-    "Please enter a valid License ID number":"சரியான உரிம அடையாள எண்ணை (1 பெரிய எழுத்து + 7 இலக்கங்கள் அல்லது 10–12 இலக்கங்கள்) உள்ளிடவும்.",
-    "At least one image of the water source is required":"நீர் ஆதாரத்தின் குறைந்தபட்சம் ஒரு புகைப்படம் தேவைப்படுகிறது.",
-    "pH is required":"pH தேவைப்படுகிறது",
-    "Overall soil fertility is required":"ஒட்டுமொத்த மண் வளம் தேவைப்படுகிறது",
-    "Land ownership is required":"நில உரிமை தேவைப்படுகிறது",
-    "Ownership status is required":"உரிமை நிலை தேவைப்படுகிறது",
-    "Knowledge field is required":"துறை சார்ந்த அறிவு தேவைப்படுகிறது",
-    "Previous experience is required":"முன் அனுபவம் தேவை"
+    "Please enter a valid License ID number": "சரியான உரிம அடையாள எண்ணை (1 பெரிய எழுத்து + 7 இலக்கங்கள் அல்லது 10–12 இலக்கங்கள்) உள்ளிடவும்.",
+    "At least one image of the water source is required": "நீர் ஆதாரத்தின் குறைந்தபட்சம் ஒரு புகைப்படம் தேவைப்படுகிறது.",
+    "pH is required": "pH தேவைப்படுகிறது",
+    "Overall soil fertility is required": "ஒட்டுமொத்த மண் வளம் தேவைப்படுகிறது",
+    "Land ownership is required": "நில உரிமை தேவைப்படுகிறது",
+    "Ownership status is required": "உரிமை நிலை தேவைப்படுகிறது",
+    "Knowledge field is required": "துறை சார்ந்த அறிவு தேவைப்படுகிறது",
+    "Previous experience is required": "முன் அனுபவம் தேவை"
   },
   "Login": {
     "Welcome": "வரவேற்கிறோம்",
@@ -153,7 +153,8 @@
     "Employee ID is not allowed to be empty": "பணியாளர் எண் காலியாக இருக்க அனுமதி இல்லை.",
     "Invalid EMP ID & Password": "தவறான பணியாளர் எண் மற்றும் கடவுச்சொல்",
     "Invalid Password. Please try again.": "தவறான கடவுச்சொல். மீண்டும் முயற்சிக்கவும்.",
-    "Invalid EMP ID": "தவறான பணியாளர் எண்"
+    "Invalid EMP ID": "தவறான பணியாளர் எண்",
+    "Logout Successful": "வெளியேறுதல் வெற்றி"
   },
   "Dashboard": {
     "Hello": "Hello",
@@ -173,7 +174,9 @@
     "Change Password": "கடவுச்சொல்லை மாற்றவும்",
     "Logout": "வெளியேறு",
     "Report Complaint": "புகாரைப் புகாரளிக்கவும்",
-    "View Complaint History": "புகார் வரலாற்றைப் காட்டவும்"
+    "View Complaint History": "புகார் வரலாற்றைப் காட்டவும்",
+    "Logging out...": "வெளியேறுதல்...",
+    "Are you sure you want to logout?": "Are you sure you want to logout?"
   },
   "AddComplaint": {
     "Tell us the problem": "பிரச்சனையை சொல்லுங்கள் பிரச்சனை",
@@ -742,8 +745,8 @@
     "Didn't receive the OTP": "OTP வரவில்லையா?",
     "Account created successfully": "கணக்கு வெற்றிகரமாக உருவாக்கப்பட்டது"
   },
-  "Permission":{
-   "locationAccess": "Location Access",
+  "Permission": {
+    "locationAccess": "Location Access",
     "enableLocationMessage": "Enable location access to access location information.",
     "allow": "Allow",
     "requesting": "Requesting...",

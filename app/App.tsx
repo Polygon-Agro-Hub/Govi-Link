@@ -338,10 +338,10 @@ export default function App() {
     const initializeDatabase = () => {
       try {
         initDatabase();
-        console.log("SQLite Database initialized successfully");
+        console.log("✅ SQLite Database initialized successfully");
         setDbReady(true);
       } catch (error) {
-        console.error(" SQLite Database initialization failed:", error);
+        console.error("❌ SQLite Database initialization failed:", error);
 
         setDbReady(true);
       }
