@@ -12,7 +12,7 @@ import {
   FlatList,
   BackHandler,
 } from "react-native";
-import { MaterialIcons, AntDesign, FontAwesome } from "@expo/vector-icons";
+import { MaterialIcons, FontAwesome } from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
@@ -66,9 +66,8 @@ const Input = ({
       {label} {required && <Text className="text-black">*</Text>}
     </Text>
     <View
-      className={`bg-[#F6F6F6] rounded-3xl h-[50px] flex-row items-center ${
-        error ? "border border-red-500" : ""
-      }`}
+      className={`bg-[#F6F6F6] rounded-3xl h-[50px] flex-row items-center ${error ? "border border-red-500" : ""
+        }`}
     >
       <TextInput
         placeholder={placeholder}
@@ -162,7 +161,7 @@ const validateAndFormat = (
         const isDuplicate = rules.uniqueWith.some(
           (key) =>
             formData[key]?.toLowerCase().trim() ===
-              value.toLowerCase().trim() && key !== currentKey,
+            value.toLowerCase().trim() && key !== currentKey,
         );
         if (isDuplicate) error = t("Error.Email addresses cannot be the same");
       }
@@ -186,7 +185,7 @@ const validateAndFormat = (
       const isDuplicate = rules.uniqueWith.some(
         (key) =>
           formData[key]?.replace(/[^0-9]/g, "").replace(/^0+/, "") ===
-            numbersOnly && key !== currentKey,
+          numbersOnly && key !== currentKey,
       );
       if (isDuplicate) error = t("Error.Phone numbers cannot be the same");
     }
@@ -213,7 +212,7 @@ const validateAndFormat = (
       const isDuplicate = rules.uniqueWith.some(
         (key) =>
           formData[key]?.replace(/[^0-9]/g, "").replace(/^0+/, "") ===
-            numbersOnly && key !== currentKey,
+          numbersOnly && key !== currentKey,
       );
       if (isDuplicate) error = t("Error.Phone numbers cannot be the same");
     }
@@ -230,59 +229,59 @@ const validateAllFields = (
     key: keyof PersonalInfo;
     rules: ValidationRule;
   }> = [
-    { key: "firstName", rules: { required: true, type: "firstName" } },
-    { key: "lastName", rules: { required: true, type: "lastName" } },
-    { key: "otherName", rules: { required: true, type: "otherName" } },
-    { key: "callName", rules: { required: true, type: "callName" } },
-    {
-      key: "phone1",
-      rules: {
-        required: true,
-        type: "phone1",
-        uniqueWith: ["phone2", "familyPhone", "landWork", "landHome"],
+      { key: "firstName", rules: { required: true, type: "firstName" } },
+      { key: "lastName", rules: { required: true, type: "lastName" } },
+      { key: "otherName", rules: { required: true, type: "otherName" } },
+      { key: "callName", rules: { required: true, type: "callName" } },
+      {
+        key: "phone1",
+        rules: {
+          required: true,
+          type: "phone1",
+          uniqueWith: ["phone2", "familyPhone", "landWork", "landHome"],
+        },
       },
-    },
-    {
-      key: "phone2",
-      rules: {
-        type: "phone2",
-        uniqueWith: ["phone1", "familyPhone", "landWork", "landHome"],
+      {
+        key: "phone2",
+        rules: {
+          type: "phone2",
+          uniqueWith: ["phone1", "familyPhone", "landWork", "landHome"],
+        },
       },
-    },
-    {
-      key: "familyPhone",
-      rules: {
-        required: true,
-        type: "familyPhone",
-        uniqueWith: ["phone1", "phone2", "landWork", "landHome"],
+      {
+        key: "familyPhone",
+        rules: {
+          required: true,
+          type: "familyPhone",
+          uniqueWith: ["phone1", "phone2", "landWork", "landHome"],
+        },
       },
-    },
-    {
-      key: "landHome",
-      rules: {
-        type: "landHome",
-        uniqueWith: ["phone1", "phone2", "familyPhone", "landWork"],
+      {
+        key: "landHome",
+        rules: {
+          type: "landHome",
+          uniqueWith: ["phone1", "phone2", "familyPhone", "landWork"],
+        },
       },
-    },
-    {
-      key: "landWork",
-      rules: {
-        type: "landWork",
-        uniqueWith: ["phone1", "phone2", "familyPhone", "landHome"],
+      {
+        key: "landWork",
+        rules: {
+          type: "landWork",
+          uniqueWith: ["phone1", "phone2", "familyPhone", "landHome"],
+        },
       },
-    },
-    {
-      key: "email1",
-      rules: { required: true, type: "email1", uniqueWith: ["email2"] },
-    },
-    {
-      key: "email2",
-      rules: { type: "email2", uniqueWith: ["email1"] },
-    },
-    { key: "house", rules: { required: true, type: "house" } },
-    { key: "street", rules: { required: true, type: "street" } },
-    { key: "cityName", rules: { required: true, type: "cityName" } },
-  ];
+      {
+        key: "email1",
+        rules: { required: true, type: "email1", uniqueWith: ["email2"] },
+      },
+      {
+        key: "email2",
+        rules: { type: "email2", uniqueWith: ["email1"] },
+      },
+      { key: "house", rules: { required: true, type: "house" } },
+      { key: "street", rules: { required: true, type: "street" } },
+      { key: "cityName", rules: { required: true, type: "cityName" } },
+    ];
 
   const errors: Record<string, string> = {};
 
@@ -395,8 +394,8 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             setDisplayProvince(
               provinceObj
                 ? provinceObj.name[
-                    i18n.language as keyof typeof provinceObj.name
-                  ] || provinceObj.name.en
+                i18n.language as keyof typeof provinceObj.name
+                ] || provinceObj.name.en
                 : "",
             );
 
@@ -406,13 +405,13 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             setDisplayCountry(
               countryObj
                 ? countryObj.name[
-                    i18n.language as keyof typeof countryObj.name
-                  ] || countryObj.name.en
+                i18n.language as keyof typeof countryObj.name
+                ] || countryObj.name.en
                 : localData.country || "Sri Lanka",
             );
 
-            const draftErrors = validateAllFields(localData, t);
-            setErrors(draftErrors);
+            // Delay validation errors until form interaction
+
           } else {
             setIsExistingData(false);
           }
@@ -719,7 +718,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
 
     const displayProv = province
       ? province.name[i18n.language as keyof typeof province.name] ||
-        province.name.en
+      province.name.en
       : "";
 
     setSelectedProvince(province?.name.en || null);
@@ -834,9 +833,9 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
   );
 
   const handleExit = () => {
-    navigation.navigate("RequestDetails", {
-      requestId,
-      requestNumber,
+    navigation.navigate("Main", {
+      screen: "MainTabs",
+      params: { screen: "CapitalRequests" },
     });
   };
 
@@ -1099,7 +1098,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
                 >
                   {displayCountry || t("InspectionForm.-- Select Country --")}
                 </Text>
-                <AntDesign name="down" size={20} color="#838B8C" />
+                <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
               </View>
             </TouchableOpacity>
           </View>
@@ -1124,7 +1123,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
                         ? t(`Districts.${selectedDistrict}`)
                         : t("InspectionForm.-- Select District --")}
                     </Text>
-                    <AntDesign name="down" size={20} color="#838B8C" />
+                    <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
                   </View>
                 </TouchableOpacity>
                 {errors.district && (

@@ -26,6 +26,7 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import CustomHeader from "../commons/CustomHeader";
+import FormFooterButton from "../inspection-forms/FormFooterButton";
 
 type CertificateQuesanoryNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -278,10 +279,10 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
                     prev.map((item) =>
                       item.id === q.id
                         ? {
-                            ...item,
-                            officerTickResult: 0,
-                            officerUploadImage: null,
-                          }
+                          ...item,
+                          officerTickResult: 0,
+                          officerUploadImage: null,
+                        }
                         : item,
                     ),
                   );
@@ -427,10 +428,10 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
           prev.map((item) =>
             item.id === selectedQuestion.id
               ? {
-                  ...item,
-                  officerTickResult: 1,
-                  officerUploadImage: capturedImage,
-                }
+                ...item,
+                officerTickResult: 1,
+                officerUploadImage: capturedImage,
+              }
               : item,
           ),
         );
@@ -462,6 +463,15 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
       setCapturedImage(imageUri);
       setShowCameraModal(true);
     }
+  };
+
+  const handleExit = () => {
+    navigation.navigate("Main", {
+      screen: "MainTabs",
+      params: {
+        screen: screenName,
+      },
+    });
   };
 
   const handleNextButtonPress = () => {
@@ -507,19 +517,11 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
 
   return (
     <View className="flex-1 bg-white">
-     
-       <CustomHeader
+      <CustomHeader
         title={`#${jobId}`}
         navigation={navigation}
         showBackButton={true}
-        onBackPress={() =>
-            navigation.navigate("Main", {
-              screen: "MainTabs",
-              params: {
-                screen: screenName,
-              },
-            })
-          }
+        onBackPress={handleExit}
       />
       <View className="shadow-sm border-b border-[#E5E5E5]" />
 
@@ -527,8 +529,8 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
         <LoadingSkeleton />
       ) : (
         <>
-          <ScrollView className="p-6">
-            <View className="mb-10 ">
+          <ScrollView className="p-6" showsVerticalScrollIndicator={false}>
+            <View className="mb-10">
               <View className="w-full items-center mb-8">
                 <View className="flex-row items-center justify-center max-w-[240px]">
                   <Image
@@ -537,7 +539,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
                     resizeMode="contain"
                   />
 
-                  <View className="ml-4 ">
+                  <View className="ml-4">
                     <Text className="text-lg font-semibold text-left">
                       {CertificateData?.srtName}
                     </Text>
@@ -546,12 +548,12 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
                       {t("CertificateQuesanory.Started on")} :{" "}
                       {CertificateData?.createdAt
                         ? new Date(
-                            CertificateData.createdAt,
-                          ).toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          })
+                          CertificateData.createdAt,
+                        ).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })
                         : ""}
                     </Text>
                   </View>
@@ -571,11 +573,10 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
                   className="bg-white rounded-xl p-6 mb-6 border border-gray-200 relative"
                 >
                   <TouchableOpacity
-                    className={`absolute top-4  right-4 border border-black p-1 rounded-full ${
-                      q.officerTickResult === 1 || q.officerUploadImage != null
+                    className={`absolute top-4 right-4 border border-black p-1 rounded-full ${q.officerTickResult === 1 || q.officerUploadImage != null
                         ? "bg-black"
                         : "bg-white"
-                    }`}
+                      }`}
                     onPress={() => handleCheck(q)}
                     disabled={loadingQuestionId === q.id}
                   >
@@ -584,7 +585,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
                         size="small"
                         color={
                           q.officerTickResult === 1 ||
-                          q.officerUploadImage != null
+                            q.officerUploadImage != null
                             ? "#fff"
                             : "#555"
                         }
@@ -595,7 +596,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
                         size={16}
                         color={
                           q.officerTickResult === 1 ||
-                          q.officerUploadImage != null
+                            q.officerUploadImage != null
                             ? "#fff"
                             : "#555"
                         }
@@ -604,7 +605,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
                   </TouchableOpacity>
 
                   <View className="flex-row justify-between items-center mr-5">
-                    <Text className="flex-1  ">{getLocalizedQuestion(q)}</Text>
+                    <Text className="flex-1">{getLocalizedQuestion(q)}</Text>
                   </View>
                 </View>
               ))}
@@ -613,41 +614,14 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
         </>
       )}
 
-      <View className="flex-row justify-between p-4 border-t border-gray-200 px-6">
-        <TouchableOpacity
-          className="flex-row items-center bg-[#444444] px-11 h-[50px] rounded-3xl"
-          onPress={() => {
-            navigation.navigate("Main", {
-              screen: "MainTabs",
-              params: {
-                screen: "ViewAllVisits",
-              },
-            });
-          }}
-        >
-          <AntDesign name="arrow-left" size={20} color="#fff" />
-          <Text className="ml-4 text-white font-semibold text-lg">
-            {t("CertificateQuesanory.Exit")}
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={handleNextButtonPress}
-          className="rounded-full overflow-hidden"
-        >
-          <LinearGradient
-            colors={["#F35125", "#FF1D85"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            className="flex-row items-center px-10 h-[50px] rounded-3xl"
-          >
-            <Text className="mr-4 text-white font-semibold text-lg">
-              {t("CertificateQuesanory.Next")}
-            </Text>
-            <AntDesign name="arrow-right" size={20} color="#fff" />
-          </LinearGradient>
-        </TouchableOpacity>
-      </View>
+      {/* Form Footer Button with same design */}
+      <FormFooterButton
+        exitText={t("CertificateQuesanory.Exit")}
+        nextText={t("CertificateQuesanory.Next")}
+        isNextEnabled={true}
+        onExit={handleExit}
+        onNext={handleNextButtonPress}
+      />
 
       <Modal
         visible={showConfirmationModal}
@@ -675,7 +649,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
             <View className="flex-row justify-between w-full space-x-4">
               <TouchableOpacity
                 onPress={() => setShowConfirmationModal(false)}
-                className="flex-row items-center px-8 py-3 rounded-full bg-[#444444]  "
+                className="flex-row items-center px-8 py-3 rounded-full bg-[#444444]"
               >
                 <Text className="text-white font-semibold text-base">
                   {t("CertificateQuesanory.Cancel")}
@@ -692,7 +666,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
                   colors={["#F35125", "#FF1D85"]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
-                  className="flex-row items-center px-7  py-3 rounded-full mr-2 "
+                  className="flex-row items-center px-7 py-3 rounded-full mr-2"
                 >
                   <Text className="text-white font-semibold text-base">
                     {t("CertificateQuesanory.Continue")}
@@ -757,7 +731,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
                   )}
                   <TouchableOpacity
                     onPress={() => setShowCamera(true)}
-                    className=" border border-black rounded-3xl  py-3 items-center "
+                    className="border border-black rounded-3xl py-3 items-center"
                   >
                     <Text className="text-black font-semibold text-base">
                       {t("CertificateQuesanory.Retake Previous Photo")}
@@ -768,7 +742,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
                     onPress={() => {
                       if (selectedQuestion) handleSubmitPhoto(selectedQuestion);
                     }}
-                    className="bg-[#353535] rounded-3xl  py-3 items-center mt-4"
+                    className="bg-[#353535] rounded-3xl py-3 items-center mt-4"
                     disabled={
                       loadingQuestionId === selectedQuestion?.id ||
                       !isButtonEnabled

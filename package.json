@@ -98,6 +98,7 @@
   "devDependencies": {
     "@types/react": "~19.1.0",
     "babel-preset-expo": "^54.0.2",
+    "baseline-browser-mapping": "^2.10.24",
     "typescript": "~5.9.2"
   },
   "private": true

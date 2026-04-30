@@ -448,11 +448,10 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
           ))}
           <View className="items-center mt-2">
             <TouchableOpacity
-              className={`bg-[#1A1A1A] w-2/3 h-[50px] rounded-3xl flex justify-center items-center flex-row ${
-                editingId !== null || problems.some((p) => !p.saved)
-                  ? "opacity-50"
-                  : ""
-              }`}
+              className={`bg-[#1A1A1A] w-2/3 h-[50px] rounded-3xl flex justify-center items-center flex-row ${editingId !== null || problems.some((p) => !p.saved)
+                ? "opacity-50"
+                : ""
+                }`}
               onPress={handleAddProblem}
               disabled={editingId !== null || problems.some((p) => !p.saved)}
             >

@@ -59,24 +59,26 @@ export const saveProfitInfo = (
       [requestId],
     );
 
-    const storageData: any = { ...data };
+    const storageData: any = {};
 
-    if (data.isProfitable !== undefined) {
-      storageData.isProfitable = data.isProfitable;
+    if (data.profit !== undefined) storageData.profit = data.profit;
+    if (data.isProfitable !== undefined) storageData.isProfitable = data.isProfitable;
+    if (data.isRisk !== undefined) storageData.isRisk = data.isRisk;
+    if (data.risk !== undefined) storageData.risk = data.risk;
+    if (data.solution !== undefined) storageData.solution = data.solution;
+    if (data.manageRisk !== undefined) storageData.manageRisk = data.manageRisk;
+    if (data.worthToTakeRisk !== undefined) storageData.worthToTakeRisk = data.worthToTakeRisk;
+
+    if (Object.keys(storageData).length === 0) {
+      return;
     }
-    if (data.isRisk !== undefined) {
-      storageData.isRisk = data.isRisk;
-    }
-    if (data.manageRisk !== undefined) {
-      storageData.manageRisk = data.manageRisk;
-    }
+
+    const keys = Object.keys(storageData);
 
     if (existing) {
-      const fields = Object.keys(storageData)
-        .map((key) => `${key} = ?`)
-        .join(", ");
+      const fields = keys.map((key) => `${key} = ?`).join(", ");
       const values = [
-        ...Object.values(storageData),
+        ...keys.map((key) => storageData[key]),
         new Date().toISOString(),
         requestId,
       ];
@@ -87,18 +89,11 @@ export const saveProfitInfo = (
       );
       console.log("Profit/risk info updated in SQLite");
     } else {
-      const fields = [
-        "requestId",
-        ...Object.keys(storageData),
-        "createdAt",
-        "updatedAt",
-      ].join(", ");
-      const placeholders = new Array(Object.keys(storageData).length + 3)
-        .fill("?")
-        .join(", ");
+      const fields = ["requestId", ...keys, "createdAt", "updatedAt"].join(", ");
+      const placeholders = new Array(keys.length + 3).fill("?").join(", ");
       const values = [
         requestId,
-        ...Object.values(storageData),
+        ...keys.map((key) => storageData[key]),
         new Date().toISOString(),
         new Date().toISOString(),
       ];
@@ -107,6 +102,7 @@ export const saveProfitInfo = (
         `INSERT INTO inspectionprofit (${fields}) VALUES (${placeholders})`,
         values as SQLite.SQLiteBindParams,
       );
+      console.log("Profit/risk info inserted into SQLite");
     }
   } catch (error) {
     console.error("Error saving profit/risk info:", error);

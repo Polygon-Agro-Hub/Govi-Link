@@ -406,11 +406,10 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
               ref={(el: TextInput | null) => {
                 inputRefs.current[index] = el;
               }}
-              className={`w-12 h-12 text-lg text-center rounded-lg ${
-                otpCode[index]
+              className={`w-12 h-12 text-lg text-center rounded-lg ${otpCode[index]
                   ? "bg-[#FF1D85] text-white pb-2"
                   : "bg-[#FFE8F3] text-black"
-              }`}
+                }`}
               keyboardType="numeric"
               maxLength={1}
               value={otpCode[index] || ""}
@@ -455,9 +454,8 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
               colors={["#F35125", "#FF1D85"]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
-              className={`flex items-center h-[50px] justify-center rounded-3xl ${
-                !isOtpValid || isVerified ? "bg-gray-400" : "bg-[#000000]"
-              }`}
+              className={`flex items-center h-[50px] justify-center rounded-3xl ${!isOtpValid || isVerified ? "bg-gray-400" : "bg-[#000000]"
+                }`}
             >
               <Text className="text-white text-lg font-semibold">
                 {t("Otpverification.Verify")}

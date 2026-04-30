@@ -10,6 +10,7 @@ import {
   Alert,
   ActivityIndicator,
   Keyboard,
+  BackHandler,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -79,7 +80,7 @@ const sriLankaData = {
         { en: "Kilinochchi", si: "කිලිනොච්චි", ta: "கில்லினோச்சி" },
         { en: "Mullaitivu", si: "මුල්ලිතිවු", ta: "முல்லைத்தீவு" },
         { en: "Vavuniya", si: "වවුනියාව", ta: "வவுனியா" },
-        { en: "Mannar", si: "මන්නාරම", ta: "மன்னார்" },
+        { en: "Mannar", si: "මන්නාරම", ta: "මන්නාරම" },
       ],
     },
     {
@@ -155,6 +156,19 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
     id: bank.ID,
     name: bank.name,
   }));
+
+  // Handle Android hardware back button
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      () => {
+        navigation.navigate("AddOfficerStep1", { isnew: isnewsecondstep || false });
+        return true;
+      }
+    );
+
+    return () => backHandler.remove();
+  }, [navigation, isnewsecondstep]);
 
   useFocusEffect(
     useCallback(() => {
@@ -570,7 +584,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
 
   const renderProvinceItem = (item: any, isSelected: boolean) => (
     <TouchableOpacity
-      className="px-4 py-3 border-b border-gray-200"
+      className="px-4 py-3 border-b border-gray-200 flex-row justify-between items-center"
       onPress={() => handleProvinceSelect([item.value])}
     >
       <Text className="text-base text-gray-800">{item.label}</Text>
@@ -580,7 +594,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
 
   const renderDistrictItem = (item: any, isSelected: boolean) => (
     <TouchableOpacity
-      className="px-4 py-3 border-b border-gray-200"
+      className="px-4 py-3 border-b border-gray-200 flex-row justify-between items-center"
       onPress={() => handleDistrictSelect([item.value])}
     >
       <Text className="text-base text-gray-800">{item.label}</Text>
@@ -590,7 +604,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
 
   const renderBankItem = (item: any, isSelected: boolean) => (
     <TouchableOpacity
-      className="px-4 py-3 border-b border-gray-200"
+      className="px-4 py-3 border-b border-gray-200 flex-row justify-between items-center"
       onPress={() => handleBankSelect([item.value])}
     >
       <Text className="text-base text-gray-800">{item.label}</Text>
@@ -600,7 +614,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
 
   const renderBranchItem = (item: any, isSelected: boolean) => (
     <TouchableOpacity
-      className="px-4 py-3 border-b border-gray-200"
+      className="px-4 py-3 border-b border-gray-200 flex-row justify-between items-center"
       onPress={() => handleBranchSelect([item.value])}
     >
       <Text className="text-base text-gray-800">{item.label}</Text>
@@ -692,6 +706,10 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
     });
   };
 
+  const handleGoBack = () => {
+    navigation.navigate("AddOfficerStep1", { isnew: isnewsecondstep || false });
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -701,9 +719,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
         title={t("AddOfficer.AddOfficer")}
         navigation={navigation}
         showBackButton={true}
-        onBackPress={() =>
-          navigation.navigate("AddOfficerStep1", { isnew: false })
-        }
+        onBackPress={handleGoBack}
       />
 
       <ScrollView
@@ -1013,10 +1029,8 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
           {/* Buttons */}
           <View className="px-2 flex-col w-full gap-4 mt-4">
             <TouchableOpacity
-              className="bg-[#D9D9D9] rounded-3xl items-center justify-center h-[50px] w-full items-center"
-              onPress={() =>
-                navigation.navigate("AddOfficerStep1", { isnew: false })
-              }
+              className="bg-[#D9D9D9] rounded-3xl items-center justify-center h-[50px] w-full"
+              onPress={handleGoBack}
             >
               <Text className="text-[#686868] font-semibold text-lg">
                 {t("AddOfficer.GoBack")}
@@ -1024,7 +1038,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
             </TouchableOpacity>
 
             <TouchableOpacity
-              className="bg-black rounded-3xl items-center justify-center h-[50px] w-full items-center"
+              className="bg-black rounded-3xl items-center justify-center h-[50px] w-full"
               onPress={handleNext}
               disabled={loading}
             >

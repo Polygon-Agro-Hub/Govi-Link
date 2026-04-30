@@ -223,14 +223,18 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
   const fetchUserProfile = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
+      const intentionalLogout = await AsyncStorage.getItem("intentional_logout");
+
       if (!token) {
-        Alert.alert(
-          t("Error.Sorry"),
-          t(
-            "Error.Your login session has expired. Please log in again to continue.",
-          ),
-          [{ text: t("Main.ok") }],
-        );
+        if (intentionalLogout !== "true") {
+          Alert.alert(
+            t("Error.Sorry"),
+            t(
+              "Error.Your login session has expired. Please log in again to continue.",
+            ),
+            [{ text: t("Main.ok") }],
+          );
+        }
         return;
       }
       if (token) {

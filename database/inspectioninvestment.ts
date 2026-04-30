@@ -14,7 +14,7 @@ export const initInvestmentTable = () => {
         updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
       );`,
     );
-    
+
   } catch (error) {
     console.error("Error initializing investment info table:", error);
     throw error;
@@ -51,7 +51,7 @@ export const saveInvestmentInfo = (
         `UPDATE inspectioninvestment SET ${fields}, updatedAt = ? WHERE requestId = ?`,
         values,
       );
-      console.log(" Investment info updated in SQLite");
+      console.log("Investment info updated in SQLite");
     } else {
       const fields = [
         "requestId",

@@ -193,21 +193,7 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
             setFormData(localData);
             setIsExistingData(true);
 
-            const draftErrors: Record<string, string> = {};
-
-            if (!localData.expected || localData.expected === 0) {
-              draftErrors.expected = t("Error.expected is required");
-            }
-            if (!localData.purpose || localData.purpose.trim() === "") {
-              draftErrors.purpose = t("Error.purpose is required");
-            }
-            if (!localData.repaymentMonth || localData.repaymentMonth === 0) {
-              draftErrors.repaymentMonth = t(
-                "Error.repaymentMonth is required",
-              );
-            }
-
-            setErrors(draftErrors);
+            // Validation errors are delayed until user interaction or form submission
           } else {
             setIsExistingData(false);
           }
