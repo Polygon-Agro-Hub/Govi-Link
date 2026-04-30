@@ -162,13 +162,13 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
       () => {
-        navigation.navigate("AddOfficerStep1", { isnew: isnewsecondstep || false });
+        navigation.navigate("AddOfficerStep1", { isnew: false });
         return true;
       }
     );
 
     return () => backHandler.remove();
-  }, [navigation, isnewsecondstep]);
+  }, [navigation]);
 
   useFocusEffect(
     useCallback(() => {
@@ -707,7 +707,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
   };
 
   const handleGoBack = () => {
-    navigation.navigate("AddOfficerStep1", { isnew: isnewsecondstep || false });
+    navigation.navigate("AddOfficerStep1", { isnew: false });
   };
 
   return (
