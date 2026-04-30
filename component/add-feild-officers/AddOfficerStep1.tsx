@@ -576,7 +576,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
 
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ["images"],
-        allowsEditing: true,
+        allowsEditing: false,
         aspect: [1, 1],
         quality: 0.8,
       });
@@ -1095,15 +1095,15 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
             <View>
               <TouchableOpacity
                 className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${errors.districts && touched.districts
-                    ? "border-red-500"
-                    : "border-[#F4F4F4]"
+                  ? "border-red-500"
+                  : "border-[#F4F4F4]"
                   }`}
                 onPress={districtModal.show}
               >
                 <Text
                   className={`flex-1 text-base ${selectedDistricts.length > 0
-                      ? "text-black"
-                      : "text-[#7D7D7D]"
+                    ? "text-black"
+                    : "text-[#7D7D7D]"
                     }`}
                 >
                   {getDistrictDisplayText()}
@@ -1121,8 +1121,8 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
             <View>
               <View
                 className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${errors.firstNameEN && touched.firstNameEN
-                    ? "border-red-500"
-                    : "border-[#F4F4F4]"
+                  ? "border-red-500"
+                  : "border-[#F4F4F4]"
                   }`}
               >
                 <TextInput
@@ -1148,8 +1148,8 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
             <View>
               <View
                 className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${errors.lastNameEN && touched.lastNameEN
-                    ? "border-red-500"
-                    : "border-[#F4F4F4]"
+                  ? "border-red-500"
+                  : "border-[#F4F4F4]"
                   }`}
               >
                 <TextInput
@@ -1175,8 +1175,8 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
             <View>
               <View
                 className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${errors.firstNameSI && touched.firstNameSI
-                    ? "border-red-500"
-                    : "border-[#F4F4F4]"
+                  ? "border-red-500"
+                  : "border-[#F4F4F4]"
                   }`}
               >
                 <TextInput
@@ -1202,8 +1202,8 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
             <View>
               <View
                 className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${errors.lastNameSI && touched.lastNameSI
-                    ? "border-red-500"
-                    : "border-[#F4F4F4]"
+                  ? "border-red-500"
+                  : "border-[#F4F4F4]"
                   }`}
               >
                 <TextInput
@@ -1229,8 +1229,8 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
             <View>
               <View
                 className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${errors.firstNameTA && touched.firstNameTA
-                    ? "border-red-500"
-                    : "border-[#F4F4F4]"
+                  ? "border-red-500"
+                  : "border-[#F4F4F4]"
                   }`}
               >
                 <TextInput
@@ -1256,8 +1256,8 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
             <View>
               <View
                 className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${errors.lastNameTA && touched.lastNameTA
-                    ? "border-red-500"
-                    : "border-[#F4F4F4]"
+                  ? "border-red-500"
+                  : "border-[#F4F4F4]"
                   }`}
               >
                 <TextInput
@@ -1300,8 +1300,8 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
 
                 <View
                   className={`flex-1 flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${errors.phone1 && touched.phone1
-                      ? "border-red-500"
-                      : "border-[#F4F4F4]"
+                    ? "border-red-500"
+                    : "border-[#F4F4F4]"
                     }`}
                 >
                   <TextInput
@@ -1340,8 +1340,8 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
 
                 <View
                   className={`flex-1 flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${errors.phone2 && touched.phone2
-                      ? "border-red-500"
-                      : "border-[#F4F4F4]"
+                    ? "border-red-500"
+                    : "border-[#F4F4F4]"
                     }`}
                 >
                   <TextInput
@@ -1367,8 +1367,8 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
             <View>
               <View
                 className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${errors.nic && touched.nic
-                    ? "border-red-500"
-                    : "border-[#F4F4F4]"
+                  ? "border-red-500"
+                  : "border-[#F4F4F4]"
                   }`}
               >
                 <TextInput
@@ -1393,8 +1393,8 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
             <View>
               <View
                 className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${errors.email && touched.email
-                    ? "border-red-500"
-                    : "border-[#F4F4F4]"
+                  ? "border-red-500"
+                  : "border-[#F4F4F4]"
                   }`}
               >
                 <TextInput
