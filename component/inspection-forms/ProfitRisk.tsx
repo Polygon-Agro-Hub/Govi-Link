@@ -26,6 +26,31 @@ import {
 } from "@/database/inspectionprofit";
 import { updateLastScreen } from "@/database/inspectionprogress";
 
+// Helper function to format number with commas
+const formatNumberWithCommas = (value: string): string => {
+  // Remove all non-digit characters except decimal point
+  const cleanValue = value.replace(/[^0-9.]/g, "");
+
+  // Split into integer and decimal parts
+  const parts = cleanValue.split(".");
+  let integerPart = parts[0];
+  const decimalPart = parts[1] ? "." + parts[1] : "";
+
+  // Remove leading zeros
+  integerPart = integerPart.replace(/^0+/, "");
+  if (integerPart === "") integerPart = "0";
+
+  // Add commas to integer part
+  integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+  return integerPart + decimalPart;
+};
+
+// Helper function to parse formatted number back to raw number string
+const parseFormattedNumber = (formattedValue: string): string => {
+  return formattedValue.replace(/,/g, "");
+};
+
 const ErrorMessage = ({ message }: { message?: string }) => {
   if (!message) return null;
   return (
@@ -82,8 +107,9 @@ const Input = ({
   <View className="mb-4">
     <FormLabel label={label} required={required} extra={extra} />
     <View
-      className={`bg-[#F6F6F6] rounded-3xl flex-row items-center ${error ? "border border-red-500" : ""
-        }`}
+      className={`bg-[#F6F6F6] rounded-3xl flex-row items-center ${
+        error ? "border border-red-500" : ""
+      }`}
     >
       <TextInput
         placeholder={placeholder}
@@ -185,7 +211,9 @@ const validateAndFormat = (text: string, rules: ValidationRule, t: any) => {
   let error = "";
 
   if (rules.type === "profit") {
-    value = value.replace(/[^0-9.]/g, "");
+    // Remove commas for validation
+    const rawValue = value.replace(/,/g, "");
+    value = rawValue.replace(/[^0-9.]/g, "");
 
     if (value.startsWith(".")) {
       value = value.slice(1);
@@ -225,6 +253,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
     manageRisk: undefined,
     worthToTakeRisk: "",
   });
+  const [displayProfit, setDisplayProfit] = useState(""); // For displaying formatted value
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [yesNoModalVisible, setYesNoModalVisible] = useState(false);
   const [activeYesNoField, setActiveYesNoField] = useState<string | null>(null);
@@ -259,6 +288,10 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
             };
 
             setFormData(normalizedData);
+            // Format the profit value for display
+            if (localData.profit && localData.profit !== "") {
+              setDisplayProfit(formatNumberWithCommas(localData.profit));
+            }
             setIsExistingData(true);
           } else {
             setIsExistingData(false);
@@ -315,9 +348,9 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
     const risksYesValid =
       isRisk === "Yes"
         ? risk?.trim() !== "" &&
-        solution?.trim() !== "" &&
-        (manageRisk === "Yes" || manageRisk === "No") &&
-        worthToTakeRisk?.trim() !== ""
+          solution?.trim() !== "" &&
+          (manageRisk === "Yes" || manageRisk === "No") &&
+          worthToTakeRisk?.trim() !== ""
         : true;
 
     const filteredErrors = { ...errors };
@@ -347,6 +380,27 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
     const { value, error } = validateAndFormat(text, rules, t);
     updateFormData({ [key]: value } as any);
     setErrors((prev) => ({ ...prev, [key]: error || "" }));
+  };
+
+  // Handle profit input with comma formatting
+  const handleProfitChange = (text: string) => {
+    // Format the display value with commas
+    const formattedValue = formatNumberWithCommas(text);
+    setDisplayProfit(formattedValue);
+
+    // Get the raw number (without commas) for storage and validation
+    const rawValue = parseFormattedNumber(formattedValue);
+
+    // Validate the raw value
+    const { value, error } = validateAndFormat(
+      rawValue,
+      { required: true, type: "profit" },
+      t,
+    );
+
+    // Update form data with raw value
+    updateFormData({ profit: value });
+    setErrors((prev) => ({ ...prev, profit: error || "" }));
   };
 
   const handleyesNOFieldChange = (key: string, value: "Yes" | "No") => {
@@ -637,23 +691,30 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
         >
           <View className="h-6" />
 
-          <Input
-            label={t(
-              "InspectionForm.How much profit are you expecting from the proposed crop/cropping system",
-            )}
-            placeholder="0.00"
-            value={formData.profit}
-            onChangeText={(text) =>
-              handleFieldChange("profit", text, {
-                required: true,
-                type: "profit",
-              })
-            }
-            required
-            extra={t("InspectionForm.Rs")}
-            keyboardType={"phone-pad"}
-            error={errors.profit}
-          />
+          <View className="mb-4">
+            <FormLabel
+              label={t(
+                "InspectionForm.How much profit are you expecting from the proposed crop/cropping system",
+              )}
+              required
+              extra={t("InspectionForm.Rs")}
+            />
+            <View
+              className={`bg-[#F6F6F6] rounded-3xl flex-row items-center ${
+                errors.profit ? "border border-red-500" : ""
+              }`}
+            >
+              <TextInput
+                placeholder="0.00"
+                placeholderTextColor="#838B8C"
+                className="px-5 h-[50px] text-base text-black flex-1"
+                value={displayProfit}
+                onChangeText={handleProfitChange}
+                keyboardType="numeric"
+              />
+            </View>
+            <ErrorMessage message={errors.profit} />
+          </View>
 
           <YesNoSelect
             label={t(
@@ -700,8 +761,9 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
                 />
 
                 <View
-                  className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${errors.risk ? "border border-red-500" : ""
-                    }`}
+                  className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${
+                    errors.risk ? "border border-red-500" : ""
+                  }`}
                 >
                   <TextInput
                     placeholder={t("InspectionForm.Type here...")}
@@ -722,8 +784,8 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
                         risk:
                           formattedText.trim() === ""
                             ? t(
-                              "Error.What are the risks you are anticipating in the proposed crop / cropping system is required",
-                            )
+                                "Error.What are the risks you are anticipating in the proposed crop / cropping system is required",
+                              )
                             : "",
                       }));
                     }}
@@ -743,8 +805,9 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
                 />
 
                 <View
-                  className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${errors.solution ? "border border-red-500" : ""
-                    }`}
+                  className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${
+                    errors.solution ? "border border-red-500" : ""
+                  }`}
                 >
                   <TextInput
                     placeholder={t("InspectionForm.Type here...")}
@@ -806,8 +869,9 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
                 />
 
                 <View
-                  className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${errors.worthToTakeRisk ? "border border-red-500" : ""
-                    }`}
+                  className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${
+                    errors.worthToTakeRisk ? "border border-red-500" : ""
+                  }`}
                 >
                   <TextInput
                     placeholder={t("InspectionForm.Type here...")}
@@ -826,8 +890,8 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
                         worthToTakeRisk:
                           formattedText.trim() === ""
                             ? t(
-                              "Error.Is it worth to take the risks for anticipated profits is required",
-                            )
+                                "Error.Is it worth to take the risks for anticipated profits is required",
+                              )
                             : "",
                       }));
 

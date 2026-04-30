@@ -277,19 +277,19 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
       className="flex-1 bg-white"
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-     
+
       <CustomHeader
         title={`#${jobId}`}
         navigation={navigation}
         showBackButton={true}
         onBackPress={() =>
-            navigation.navigate("Main", {
-              screen: "MainTabs",
-              params: {
-                screen: screenName,
-              },
-            })
-          }
+          navigation.navigate("Main", {
+            screen: "MainTabs",
+            params: {
+              screen: screenName,
+            },
+          })
+        }
       />
 
       <View className="px-6 mt-6">

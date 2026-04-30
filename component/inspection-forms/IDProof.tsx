@@ -174,7 +174,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
     if (
       formData.frontImg &&
       formData.backImg &&
-      formData.pNumber.trim().length >= 10 &&
+      formData.pNumber.trim().length >= 8 &&
       !errors.nic
     ) {
       setIsNextEnabled(true);

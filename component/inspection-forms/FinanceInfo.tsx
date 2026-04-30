@@ -243,7 +243,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
 
   useEffect(() => {
     const valid = hasValidAssetSelection();
-    if (!valid && Object.values(checkedAssets).some(Boolean)) {
+    if (!valid) {
       setErrors((prev) => ({
         ...prev,
         assets: t(
@@ -1162,40 +1162,61 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
                   )}
 
                   {category.key === "assetsFarmTool" && isChecked && (
-                    <View className="mt-2 bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ml-[-5%]">
-                      <TextInput
-                        placeholder={t("InspectionForm.Type here...")}
-                        value={formData.assetsFarmTool || ""}
-                        onChangeText={(text) => {
-                          let formattedText = text.replace(/^\s+/, "");
-                          if (formattedText.length > 0) {
-                            formattedText =
-                              formattedText.charAt(0).toUpperCase() +
-                              formattedText.slice(1);
-                          }
-                          updateFormData({ assetsFarmTool: formattedText });
-                        }}
-                        multiline
-                        textAlignVertical="top"
-                      />
+                    <View className="mt-2 ml-4">
+                      <View className="bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ml-[-5%]">
+                        <TextInput
+                          placeholder={t("InspectionForm.Type here...")}
+                          value={formData.assetsFarmTool || ""}
+                          onChangeText={(text) => {
+                            let formattedText = text.replace(/^\s+/, "");
+                            if (formattedText.length > 0) {
+                              formattedText =
+                                formattedText.charAt(0).toUpperCase() +
+                                formattedText.slice(1);
+                            }
+                            updateFormData({ assetsFarmTool: formattedText });
+                          }}
+                          multiline
+                          textAlignVertical="top"
+                        />
+                      </View>
+                      {(!formData.assetsFarmTool || formData.assetsFarmTool.trim() === "") && (
+                        <View className="flex-row items-start mt-2">
+                          <FontAwesome
+                            name="exclamation-triangle"
+                            size={14}
+                            color="#EF4444"
+                            style={{ marginTop: 2 }}
+                          />
+                          <Text className="text-red-500 text-sm ml-2 flex-1">
+                            {t("InspectionForm.Special Farm Tools Instruction")}
+                          </Text>
+                        </View>
+                      )}
                     </View>
                   )}
                 </View>
               );
             })}
 
-            {errors.assets && (
-              <View className="flex-row ml-4">
-                <FontAwesome
-                  name="exclamation-triangle"
-                  size={16}
-                  color="#EF4444"
-                />
-                <Text className="text-red-500 text-sm  ml-2">
-                  {errors.assets}
-                </Text>
-              </View>
-            )}
+            {errors.assets &&
+              !(
+                checkedAssets.assetsFarmTool &&
+                (!formData.assetsFarmTool ||
+                  formData.assetsFarmTool.trim() === "")
+              ) && (
+                <View className="flex-row items-start ml-4">
+                  <FontAwesome
+                    name="exclamation-triangle"
+                    size={16}
+                    color="#EF4444"
+                    style={{ marginTop: 2 }}
+                  />
+                  <Text className="text-red-500 text-sm  ml-2">
+                    {errors.assets}
+                  </Text>
+                </View>
+              )}
           </View>
         </ScrollView>
 
