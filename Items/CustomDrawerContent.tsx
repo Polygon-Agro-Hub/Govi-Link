@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Alert } from "react-native";
 import React, { useEffect, useState, useContext } from "react";
 import {
   DrawerContentScrollView,
@@ -18,8 +18,9 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/services/store";
 import { LanguageContext } from "@/context/LanguageContext";
 import { useDispatch } from "react-redux";
-import { logoutUser } from "@/store/authSlice";
+import { logoutUser, clearAuth } from "@/store/authSlice";
 import { useDrawerStatus } from "@react-navigation/drawer";
+import LoadingPage from "@/component/commons/LoadingPage";
 
 export default function CustomDrawerContent(props: any) {
   const { t } = useTranslation();
@@ -28,6 +29,7 @@ export default function CustomDrawerContent(props: any) {
   const [isLanguageDropdownOpen, setLanguageDropdownOpen] =
     useState<boolean>(false);
   const [selectedLanguage, setSelectedLanguage] = useState<string>("en");
+  const [isLoggingOut, setIsLoggingOut] = useState<boolean>(false);
 
   const [selectedComplaint, setSelectedComplaint] = useState<string | null>(
     null,
@@ -91,7 +93,7 @@ export default function CustomDrawerContent(props: any) {
     setLanguageDropdownOpen(false);
     try {
       await AsyncStorage.setItem("user_language", language);
-    } catch (error) {}
+    } catch (error) { }
   };
 
   const handleComplaintSelect = (complaint: string) => {
@@ -107,26 +109,81 @@ export default function CustomDrawerContent(props: any) {
   const dispatch = useDispatch();
 
   const handleLogout = async () => {
-    try {
-      await AsyncStorage.clear();
-      await new Promise((resolve) => {
-        dispatch(logoutUser());
-        setTimeout(resolve, 100);
-      });
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "Login" }],
-      });
-    } catch (error) {
-      console.error("Error logging out:", error);
-    }
+    // Show confirmation alert before logout
+    Alert.alert(
+      t("Drawer.Logout"),
+      t("Drawer.Are you sure you want to logout?"),
+      [
+        {
+          text: t("Drawer.Cancel"),
+          style: "cancel",
+        },
+        {
+          text: t("Drawer.Logout"),
+          style: "destructive",
+          onPress: async () => {
+            try {
+              // Set intentional logout flag to prevent session expired message
+              await AsyncStorage.setItem("intentional_logout", "true");
+
+              // Show loading page
+              setIsLoggingOut(true);
+
+              // Clear all AsyncStorage data
+              await AsyncStorage.multiRemove([
+                "token",
+                "jobRole",
+                "empId",
+                "userProfile",
+                "tokenStoredTime",
+                "tokenExpirationTime",
+                "@user_language",
+              ]);
+
+              // Dispatch logout action to clear Redux state
+              dispatch(logoutUser());
+              dispatch(clearAuth());
+
+              // Small delay to ensure loading page is shown
+              setTimeout(() => {
+                // Reset navigation stack and navigate to Login
+                navigation.reset({
+                  index: 0,
+                  routes: [{ name: "Login" }],
+                });
+                setIsLoggingOut(false);
+              }, 1500);
+            } catch (error) {
+              console.error("Error logging out:", error);
+              setIsLoggingOut(false);
+              // Force navigation even if there's an error
+              navigation.reset({
+                index: 0,
+                routes: [{ name: "Login" }],
+              });
+            }
+          },
+        },
+      ],
+      { cancelable: false }
+    );
   };
+
+  // Show loading page while logging out
+  if (isLoggingOut) {
+    return (
+      <LoadingPage
+        fullScreen={true}
+        message={t("Drawer.Logging out...")}
+        color="#F35125"
+      />
+    );
+  }
 
   return (
     <View style={{ flex: 1 }}>
       <DrawerContentScrollView {...props}>
         <View style={{ padding: 0 }}>
-          {/* Example: List of items */}
           <DrawerItemList {...props} />
 
           <View className="ml-4">
@@ -178,18 +235,16 @@ export default function CustomDrawerContent(props: any) {
                     <TouchableOpacity
                       key={language}
                       onPress={() => handleLanguageSelect(language)}
-                      className={`flex-row items-center py-2 px-4 rounded-lg my-1 ${
-                        selectedLanguage === language
-                          ? "bg-[#FFDFF7]"
-                          : "bg-transparent"
-                      }`}
+                      className={`flex-row items-center py-2 px-4 rounded-lg my-1 ${selectedLanguage === language
+                        ? "bg-[#FFDFF7]"
+                        : "bg-transparent"
+                        }`}
                     >
                       <Text
-                        className={`text-base ${
-                          selectedLanguage === language
-                            ? "text-black"
-                            : "text-[#434343]"
-                        }`}
+                        className={`text-base ${selectedLanguage === language
+                          ? "text-black"
+                          : "text-[#434343]"
+                          }`}
                       >
                         {displayLanguage}
                       </Text>
@@ -255,19 +310,17 @@ export default function CustomDrawerContent(props: any) {
                   <TouchableOpacity
                     key={complaint}
                     onPress={() => handleComplaintSelect(complaint)}
-                    className={`flex-row items-center py-2 px-4 rounded-lg my-1 ${
-                      selectedComplaint === complaint ? "bg-green-200" : ""
-                    }`}
+                    className={`flex-row items-center py-2 px-4 rounded-lg my-1 ${selectedComplaint === complaint ? "bg-green-200" : ""
+                      }`}
                   >
                     <Text
                       style={{
                         fontSize: 15,
                       }}
-                      className={` font-bold ${
-                        selectedComplaint === complaint
-                          ? "text-black"
-                          : "#434343"
-                      }`}
+                      className={` font-bold ${selectedComplaint === complaint
+                        ? "text-black"
+                        : "#434343"
+                        }`}
                     >
                       {complaint}
                     </Text>

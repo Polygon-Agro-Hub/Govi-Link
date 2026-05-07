@@ -258,11 +258,15 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     return /^7[0-9]{8}$/.test(phone);
   };
 
+  // Properly handle name field changes with correct validation
   const handleNameENChange = (text: string, fieldName: string) => {
     const filteredText = text.replace(/[^a-zA-Z\s]/g, "");
     const capitalizedText =
       filteredText.charAt(0).toUpperCase() + filteredText.slice(1);
+
     let errorname = "";
+    let setterFunction: (value: string) => void;
+
     switch (fieldName) {
       case "firstNameEN":
         setFirstNameEN(capitalizedText);
@@ -272,38 +276,19 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
         setLastNameEN(capitalizedText);
         errorname = "Last name";
         break;
-      case "firstNameSI":
-        setFirstNameSI(capitalizedText);
-        errorname = "Sinhala first name";
-        break;
-      case "lastNameSI":
-        setLastNameSI(capitalizedText);
-        errorname = "Sinhala last name";
-        break;
-      case "firstNameTA":
-        setFirstNameTA(capitalizedText);
-        errorname = "Tamil first name";
-        break;
-      case "lastNameTA":
-        setLastNameTA(capitalizedText);
-        errorname = "Tamil last name";
-        break;
+      default:
+        return;
     }
 
+    // Clear error immediately when field is empty
     if (capitalizedText.length === 0) {
-      setErrors((prev) => ({
-        ...prev,
-        [fieldName]: t(`Error.${errorname} is required`),
-      }));
+      clearFieldError(fieldName);
     } else {
-      setErrors((prev) => {
-        const updated = { ...prev };
-        delete updated[fieldName];
-        return updated;
-      });
+      clearFieldError(fieldName);
     }
   };
 
+  // Properly handle Unicode name changes (Sinhala/Tamil)
   const handleUnicodeNameChange = (text: string, fieldName: string) => {
     switch (fieldName) {
       case "firstNameSI":
@@ -320,16 +305,15 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
         break;
     }
 
+    // Clear error immediately when user types or clears
     if (!text.trim()) {
-      setErrors((prev) => ({
-        ...prev,
-        [fieldName]: t("Error.Field is required"),
-      }));
+      clearFieldError(fieldName);
     } else {
       clearFieldError(fieldName);
     }
   };
 
+  // Validate on blur, not on every change
   const handleFirstNameENBlur = () => {
     markFieldAsTouched("firstNameEN");
     if (!firstNameEN.trim()) {
@@ -351,6 +335,54 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
       }));
     } else {
       clearFieldError("lastNameEN");
+    }
+  };
+
+  const handleFirstNameSIBlur = () => {
+    markFieldAsTouched("firstNameSI");
+    if (!firstNameSI.trim()) {
+      setErrors((prev) => ({
+        ...prev,
+        firstNameSI: t("Error.Sinhala first name is required"),
+      }));
+    } else {
+      clearFieldError("firstNameSI");
+    }
+  };
+
+  const handleLastNameSIBlur = () => {
+    markFieldAsTouched("lastNameSI");
+    if (!lastNameSI.trim()) {
+      setErrors((prev) => ({
+        ...prev,
+        lastNameSI: t("Error.Sinhala last name is required"),
+      }));
+    } else {
+      clearFieldError("lastNameSI");
+    }
+  };
+
+  const handleFirstNameTABlur = () => {
+    markFieldAsTouched("firstNameTA");
+    if (!firstNameTA.trim()) {
+      setErrors((prev) => ({
+        ...prev,
+        firstNameTA: t("Error.Tamil first name is required"),
+      }));
+    } else {
+      clearFieldError("firstNameTA");
+    }
+  };
+
+  const handleLastNameTABlur = () => {
+    markFieldAsTouched("lastNameTA");
+    if (!lastNameTA.trim()) {
+      setErrors((prev) => ({
+        ...prev,
+        lastNameTA: t("Error.Tamil last name is required"),
+      }));
+    } else {
+      clearFieldError("lastNameTA");
     }
   };
 
@@ -503,6 +535,12 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     markFieldAsTouched("email");
     const trimmedInput = input.trim();
     setEmail(trimmedInput);
+
+    if (trimmedInput.length === 0) {
+      clearFieldError("email");
+      return;
+    }
+
     if (!validateEmail(trimmedInput)) {
       const emailLower = trimmedInput.toLowerCase();
       const domain = emailLower.split("@")[1];
@@ -523,54 +561,6 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     checkEmailExists(trimmedInput);
   };
 
-  const handleFirstNameSIBlur = () => {
-    markFieldAsTouched("firstNameSI");
-    if (!firstNameSI.trim()) {
-      setErrors((prev) => ({
-        ...prev,
-        firstNameSI: t("Error.Sinhala first name is required"),
-      }));
-    } else {
-      clearFieldError("firstNameSI");
-    }
-  };
-
-  const handleLastNameSIBlur = () => {
-    markFieldAsTouched("lastNameSI");
-    if (!lastNameSI.trim()) {
-      setErrors((prev) => ({
-        ...prev,
-        lastNameSI: t("Error.Sinhala last name is required"),
-      }));
-    } else {
-      clearFieldError("lastNameSI");
-    }
-  };
-
-  const handleFirstNameTABlur = () => {
-    markFieldAsTouched("firstNameTA");
-    if (!firstNameTA.trim()) {
-      setErrors((prev) => ({
-        ...prev,
-        firstNameTA: t("Error.Tamil first name is required"),
-      }));
-    } else {
-      clearFieldError("firstNameTA");
-    }
-  };
-
-  const handleLastNameTABlur = () => {
-    markFieldAsTouched("lastNameTA");
-    if (!lastNameTA.trim()) {
-      setErrors((prev) => ({
-        ...prev,
-        lastNameTA: t("Error.Tamil last name is required"),
-      }));
-    } else {
-      clearFieldError("lastNameTA");
-    }
-  };
-
   const pickProfileImage = async () => {
     try {
       const { status } =
@@ -586,7 +576,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
 
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ["images"],
-        allowsEditing: true,
+        allowsEditing: false,
         aspect: [1, 1],
         quality: 0.8,
       });
@@ -603,6 +593,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
   };
 
   const checkNICExists = async (nicNumber: string): Promise<boolean> => {
+    if (!nicNumber.trim()) return false;
     try {
       setIsValidating(true);
       const token = await AsyncStorage.getItem("token");
@@ -630,6 +621,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
   };
 
   const checkEmailExists = async (email: string): Promise<boolean> => {
+    if (!email.trim()) return false;
     try {
       setIsValidating(true);
       const token = await AsyncStorage.getItem("token");
@@ -725,8 +717,6 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
 
   const handleDistrictSelect = (selectedValues: string[]) => {
     setSelectedDistricts(selectedValues);
-    districtModal.hide();
-
     markFieldAsTouched("districts");
     if (selectedValues.length === 0) {
       setErrors((prev) => ({
@@ -794,12 +784,24 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
   const renderDistrictItem = (item: any, isSelected: boolean) => (
     <TouchableOpacity
       className="px-4 py-3 border-b border-gray-200 flex-row justify-between items-center"
-      onPress={() => handleDistrictSelect([item.value])}
+      onPress={() => {
+        if (selectedDistricts.includes(item.value)) {
+          handleDistrictSelect(selectedDistricts.filter((d) => d !== item.value));
+        } else {
+          handleDistrictSelect([...selectedDistricts, item.value]);
+        }
+      }}
     >
       <Text className="text-base text-gray-800">{item.label}</Text>
       <Checkbox
         value={isSelected}
-        onValueChange={() => handleDistrictSelect([item.value])}
+        onValueChange={() => {
+          if (selectedDistricts.includes(item.value)) {
+            handleDistrictSelect(selectedDistricts.filter((d) => d !== item.value));
+          } else {
+            handleDistrictSelect([...selectedDistricts, item.value]);
+          }
+        }}
         color={isSelected ? "#21202B" : undefined}
       />
     </TouchableOpacity>
@@ -1092,19 +1094,17 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
             {/* District */}
             <View>
               <TouchableOpacity
-                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${
-                  errors.districts && touched.districts
-                    ? "border-red-500"
-                    : "border-[#F4F4F4]"
-                }`}
+                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${errors.districts && touched.districts
+                  ? "border-red-500"
+                  : "border-[#F4F4F4]"
+                  }`}
                 onPress={districtModal.show}
               >
                 <Text
-                  className={`flex-1 text-base ${
-                    selectedDistricts.length > 0
-                      ? "text-black"
-                      : "text-[#7D7D7D]"
-                  }`}
+                  className={`flex-1 text-base ${selectedDistricts.length > 0
+                    ? "text-black"
+                    : "text-[#7D7D7D]"
+                    }`}
                 >
                   {getDistrictDisplayText()}
                 </Text>
@@ -1120,11 +1120,10 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
             {/* First Name English */}
             <View>
               <View
-                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${
-                  errors.firstNameEN && touched.firstNameEN
-                    ? "border-red-500"
-                    : "border-[#F4F4F4]"
-                }`}
+                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${errors.firstNameEN && touched.firstNameEN
+                  ? "border-red-500"
+                  : "border-[#F4F4F4]"
+                  }`}
               >
                 <TextInput
                   placeholder={t("AddOfficer.FirstNameEnglish")}
@@ -1148,11 +1147,10 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
             {/* Last Name English */}
             <View>
               <View
-                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${
-                  errors.lastNameEN && touched.lastNameEN
-                    ? "border-red-500"
-                    : "border-[#F4F4F4]"
-                }`}
+                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${errors.lastNameEN && touched.lastNameEN
+                  ? "border-red-500"
+                  : "border-[#F4F4F4]"
+                  }`}
               >
                 <TextInput
                   placeholder={t("AddOfficer.LastNameEnglish")}
@@ -1176,11 +1174,10 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
             {/* First Name Sinhala */}
             <View>
               <View
-                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${
-                  errors.firstNameSI && touched.firstNameSI
-                    ? "border-red-500"
-                    : "border-[#F4F4F4]"
-                }`}
+                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${errors.firstNameSI && touched.firstNameSI
+                  ? "border-red-500"
+                  : "border-[#F4F4F4]"
+                  }`}
               >
                 <TextInput
                   placeholder={t("AddOfficer.FirstNameSinhala")}
@@ -1204,11 +1201,10 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
             {/* Last Name Sinhala */}
             <View>
               <View
-                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${
-                  errors.lastNameSI && touched.lastNameSI
-                    ? "border-red-500"
-                    : "border-[#F4F4F4]"
-                }`}
+                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${errors.lastNameSI && touched.lastNameSI
+                  ? "border-red-500"
+                  : "border-[#F4F4F4]"
+                  }`}
               >
                 <TextInput
                   placeholder={t("AddOfficer.LastNameSinhala")}
@@ -1232,11 +1228,10 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
             {/* First Name Tamil */}
             <View>
               <View
-                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${
-                  errors.firstNameTA && touched.firstNameTA
-                    ? "border-red-500"
-                    : "border-[#F4F4F4]"
-                }`}
+                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${errors.firstNameTA && touched.firstNameTA
+                  ? "border-red-500"
+                  : "border-[#F4F4F4]"
+                  }`}
               >
                 <TextInput
                   placeholder={t("AddOfficer.FirstNameTamil")}
@@ -1260,11 +1255,10 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
             {/* Last Name Tamil */}
             <View>
               <View
-                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${
-                  errors.lastNameTA && touched.lastNameTA
-                    ? "border-red-500"
-                    : "border-[#F4F4F4]"
-                }`}
+                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${errors.lastNameTA && touched.lastNameTA
+                  ? "border-red-500"
+                  : "border-[#F4F4F4]"
+                  }`}
               >
                 <TextInput
                   placeholder={t("AddOfficer.LastNameTamil")}
@@ -1305,11 +1299,10 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
                 </TouchableOpacity>
 
                 <View
-                  className={`flex-1 flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${
-                    errors.phone1 && touched.phone1
-                      ? "border-red-500"
-                      : "border-[#F4F4F4]"
-                  }`}
+                  className={`flex-1 flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${errors.phone1 && touched.phone1
+                    ? "border-red-500"
+                    : "border-[#F4F4F4]"
+                    }`}
                 >
                   <TextInput
                     placeholder="7XXXXXXXX"
@@ -1346,11 +1339,10 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
                 </TouchableOpacity>
 
                 <View
-                  className={`flex-1 flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${
-                    errors.phone2 && touched.phone2
-                      ? "border-red-500"
-                      : "border-[#F4F4F4]"
-                  }`}
+                  className={`flex-1 flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${errors.phone2 && touched.phone2
+                    ? "border-red-500"
+                    : "border-[#F4F4F4]"
+                    }`}
                 >
                   <TextInput
                     placeholder="7XXXXXXXX"
@@ -1374,11 +1366,10 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
             {/* NIC */}
             <View>
               <View
-                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${
-                  errors.nic && touched.nic
-                    ? "border-red-500"
-                    : "border-[#F4F4F4]"
-                }`}
+                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${errors.nic && touched.nic
+                  ? "border-red-500"
+                  : "border-[#F4F4F4]"
+                  }`}
               >
                 <TextInput
                   placeholder={t("AddOfficer.NICNumber")}
@@ -1401,11 +1392,10 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
             {/* Email */}
             <View>
               <View
-                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${
-                  errors.email && touched.email
-                    ? "border-red-500"
-                    : "border-[#F4F4F4]"
-                }`}
+                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${errors.email && touched.email
+                  ? "border-red-500"
+                  : "border-[#F4F4F4]"
+                  }`}
               >
                 <TextInput
                   placeholder={t("AddOfficer.EmailAddress")}

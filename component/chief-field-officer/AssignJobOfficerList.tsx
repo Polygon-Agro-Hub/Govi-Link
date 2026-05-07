@@ -13,7 +13,7 @@ import {
 import { RootStackParamList } from "@/component/types/types";
 import { useTranslation } from "react-i18next";
 import { LinearGradient } from "expo-linear-gradient";
-import { MaterialIcons } from "@expo/vector-icons";
+import { Entypo, MaterialIcons } from "@expo/vector-icons";
 import Svg, { Circle, G, Text as SvgText } from "react-native-svg";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -93,13 +93,11 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
 
     switch (currentLanguage) {
       case "si":
-        return `${officer.firstNameSinhala || officer.firstName} ${
-          officer.lastNameSinhala || officer.lastName
-        }`;
+        return `${officer.firstNameSinhala || officer.firstName} ${officer.lastNameSinhala || officer.lastName
+          }`;
       case "ta":
-        return `${officer.firstNameTamil || officer.firstName} ${
-          officer.lastNameTamil || officer.lastName
-        }`;
+        return `${officer.firstNameTamil || officer.firstName} ${officer.lastNameTamil || officer.lastName
+          }`;
       default:
         return `${officer.firstName} ${officer.lastName}`;
     }
@@ -383,11 +381,10 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
           }}
           className="bg-[#F6F6F680] rounded-full py-4 px-3"
         >
-          <MaterialIcons
-            name="arrow-back-ios"
-            size={24}
-            color="black"
-            style={{ marginLeft: 10 }}
+          <Entypo
+            name="chevron-left"
+            size={25}
+            color={"black"}
           />
         </TouchableOpacity>
 
@@ -444,9 +441,8 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
                     <TouchableOpacity
                       onPress={() => handleAssignToOfficer(officer)}
                       disabled={assigning}
-                      className={`px-5 py-3 rounded-3xl items-center mt-auto ml-3 ${
-                        assigning ? "bg-gray-400" : "bg-black"
-                      }`}
+                      className={`px-5 py-3 rounded-3xl items-center mt-auto ml-3 ${assigning ? "bg-gray-400" : "bg-black"
+                        }`}
                     >
                       {assigning ? (
                         <ActivityIndicator size="small" color="white" />

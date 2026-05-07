@@ -417,11 +417,10 @@ const OtpverificationOnboardSupplier: React.FC = ({
               ref={(el: TextInput | null) => {
                 inputRefs.current[index] = el;
               }}
-              className={`w-12 h-12 text-lg text-center rounded-lg ${
-                otpCode[index]
+              className={`w-12 h-12 text-lg text-center rounded-lg ${otpCode[index]
                   ? "bg-[#FF1D85] text-white pb-2"
                   : "bg-[#FFE8F3] text-black"
-              }`}
+                }`}
               keyboardType="numeric"
               maxLength={1}
               value={otpCode[index] || ""}

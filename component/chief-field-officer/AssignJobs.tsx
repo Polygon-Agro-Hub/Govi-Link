@@ -383,15 +383,13 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
             }
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
-            className={`flex-row items-center px-2 pl-3 h-10 rounded-full mr-2 border ${
-              isOverdueSelected ? "border-transparent" : "border-[#F83B4F]"
-            }`}
+            className={`flex-row items-center px-2 pl-3 h-10 rounded-full mr-2 border ${isOverdueSelected ? "border-transparent" : "border-[#F83B4F]"
+              }`}
           >
             <View className="flex-row items-center">
               <Text
-                className={`font-semibold mr-2 ${
-                  isOverdueSelected ? "text-white" : "text-[#F83B4F]"
-                }`}
+                className={`font-semibold mr-2 ${isOverdueSelected ? "text-white" : "text-[#F83B4F]"
+                  }`}
               >
                 {t("Visits.Over Due")}
               </Text>
@@ -419,15 +417,13 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
             }
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
-            className={`flex-row items-center px-2 pl-3 h-10 rounded-full mr-2 border ${
-              !isOverdueSelected ? "border-transparent" : "border-[#F83B4F]"
-            }`}
+            className={`flex-row items-center px-2 pl-3 h-10 rounded-full mr-2 border ${!isOverdueSelected ? "border-transparent" : "border-[#F83B4F]"
+              }`}
           >
             <View className="flex-row items-center">
               <Text
-                className={`font-semibold mr-2 ${
-                  !isOverdueSelected ? "text-white" : "text-[#F83B4F]"
-                }`}
+                className={`font-semibold mr-2 ${!isOverdueSelected ? "text-white" : "text-[#F83B4F]"
+                  }`}
               >
                 {t("Visits.Today")}
               </Text>
@@ -503,11 +499,10 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
                       e.stopPropagation();
                       toggleJobSelection(item.jobId);
                     }}
-                    className={`w-5 h-5 rounded-sm border-2 flex items-center justify-center mr-3 my-auto ${
-                      selectedJobs.includes(item.jobId)
-                        ? "bg-black border-black"
-                        : "bg-white border-gray-400"
-                    }`}
+                    className={`w-5 h-5 rounded-sm border-2 flex items-center justify-center mr-3 my-auto ${selectedJobs.includes(item.jobId)
+                      ? "bg-black border-black"
+                      : "bg-white border-gray-400"
+                      }`}
                   >
                     {selectedJobs.includes(item.jobId) && (
                       <AntDesign name="check" size={14} color="white" />
@@ -610,11 +605,10 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
                       }}
                     >
                       <View
-                        className={`flex flex-row items-center justify-center rounded-full py-2 border ${
-                          selectedItem?.latitude && selectedItem?.longitude
-                            ? "border-[#F83B4F]"
-                            : "border-[#9DB2CE]"
-                        }`}
+                        className={`flex flex-row items-center justify-center rounded-full py-2 border ${selectedItem?.latitude && selectedItem?.longitude
+                          ? "border-[#F83B4F]"
+                          : "border-[#9DB2CE]"
+                          }`}
                       >
                         <FontAwesome6
                           name="location-dot"
@@ -626,11 +620,10 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
                           }
                         />
                         <Text
-                          className={`text-base font-semibold ml-2 ${
-                            selectedItem?.latitude && selectedItem?.longitude
-                              ? "text-[#000000]"
-                              : "text-[#9DB2CE]"
-                          }`}
+                          className={`text-base font-semibold ml-2 ${selectedItem?.latitude && selectedItem?.longitude
+                            ? "text-[#000000]"
+                            : "text-[#9DB2CE]"
+                            }`}
                         >
                           {t("VisitPopup.Location")}
                         </Text>
@@ -653,22 +646,22 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
                   {(selectedItem.city ||
                     selectedItem.plotNo ||
                     selectedItem.street) && (
-                    <View className="flex text-center justify-center items-center">
-                      <Text className="text-sm font-semibold text-[#4E6393] mb-2">
-                        {t("VisitPopup.Address")}
-                      </Text>
-                      <Text className="text-base font-medium text-[#434343]">
-                        {selectedItem.plotNo}, {selectedItem.street},
-                      </Text>
-                      <Text className="text-base font-medium text-[#434343]">
-                        {selectedItem.city}
-                      </Text>
-                    </View>
-                  )}
+                      <View className="flex text-center justify-center items-center">
+                        <Text className="text-sm font-semibold text-[#4E6393] mb-2">
+                          {t("VisitPopup.Address")}
+                        </Text>
+                        <Text className="text-base font-medium text-[#434343]">
+                          {selectedItem.plotNo}, {selectedItem.street},
+                        </Text>
+                        <Text className="text-base font-medium text-[#434343]">
+                          {selectedItem.city}
+                        </Text>
+                      </View>
+                    )}
                 </>
               )}
 
-              <View className="flex-row justify-between w-full mt-6 px-4 gap-x-4">
+              <View className="flex-row justify-between w-full mt-6 px-4 gap-x-4 pb-10">
                 <TouchableOpacity
                   className="flex-1"
                   onPress={handleStartJobFromModal}

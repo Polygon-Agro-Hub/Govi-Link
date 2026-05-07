@@ -10,7 +10,6 @@ import {
   Modal,
   BackHandler,
 } from "react-native";
-import { AntDesign } from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
 import { useTranslation } from "react-i18next";
 import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
@@ -24,6 +23,7 @@ import {
   LabourData,
 } from "@/database/inspectionlabour";
 import { updateLastScreen } from "@/database/inspectionprogress";
+import { MaterialIcons } from "@expo/vector-icons";
 
 type LabourProps = {
   navigation: any;
@@ -98,7 +98,7 @@ const YesNoSelect = ({
               {t("InspectionForm.--Select From Here--")}
             </Text>
           )}
-          <AntDesign name="down" size={20} color="#838B8C" />
+          <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
         </TouchableOpacity>
       </View>
     </>
@@ -225,12 +225,12 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
 
     setIsNextEnabled(
       hasBaseAnswer &&
-        conditionalValid &&
-        mechanizationValid &&
-        machineryAvailableValid &&
-        machineryAffordableValid &&
-        machineryCostEffectiveValid &&
-        !hasErrors,
+      conditionalValid &&
+      mechanizationValid &&
+      machineryAvailableValid &&
+      machineryAffordableValid &&
+      machineryCostEffectiveValid &&
+      !hasErrors,
     );
   }, [formData, errors]);
 

@@ -95,6 +95,7 @@ export type RootStackParamList = {
   };
   AddOfficerStep1: {
     isnew?: boolean;
+    existingData?: any; 
   };
   AddOfficerStep2: {
     formData: any;

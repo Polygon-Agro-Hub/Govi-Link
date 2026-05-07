@@ -364,34 +364,25 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
                 const getStatusRank = (item: VisitItem) => {
                   if (item.status === "Ongoing") return 1;
 
-                  if (
-                    item.propose === "Cluster" &&
-                    item.totalClusterCount &&
-                    item.completedClusterCount !== undefined &&
-                    item.completedClusterCount > 0 &&
-                    item.completedClusterCount < item.totalClusterCount
-                  ) {
-                    return 2;
-                  }
+                  if (item.propose === "Cluster" && item.totalClusterCount) {
+                    if (item.completedClusterCount === item.totalClusterCount)
+                      return 4;
 
-                  if (item.status === "Pending") return 3;
-                  if (
-                    item.propose === "Cluster" &&
-                    item.totalClusterCount &&
-                    (!item.completedClusterCount ||
-                      item.completedClusterCount === 0)
-                  ) {
+                    if (
+                      item.completedClusterCount &&
+                      item.completedClusterCount > 0
+                    ) {
+                      if (item.completionPercentage >= "20") return 4;
+                      return 2;
+                    }
+
                     return 3;
                   }
 
+                  if (item.status === "Pending") return 3;
+
                   if (item.status === "Completed" || item.status === "Finished")
                     return 4;
-                  if (
-                    item.propose === "Cluster" &&
-                    item.completedClusterCount === item.totalClusterCount
-                  ) {
-                    return 4;
-                  }
 
                   return 3;
                 };

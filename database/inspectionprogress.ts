@@ -48,7 +48,55 @@ export const getLastScreen = (requestId: number): string | null => {
       "SELECT lastScreen FROM inspectionprogress WHERE requestId = ?",
       [requestId],
     );
-    return row ? row.lastScreen : null;
+    
+    // Fallback: Check actual data tables to find furthest reached screen
+    const tableToScreenMap: Record<string, string> = {
+      inspectionpersonal: "PersonalInfo",
+      inspectionidproof: "IDProof",
+      inspectionfinance: "FinanceInfo",
+      inspectionland: "LandInfo",
+      inspectioninvestment: "InvestmentInfo",
+      inspectioncultivation: "CultivationInfo",
+      inspectioncropping: "CroppingSystems",
+      inspectionprofit: "ProfitRisk",
+      inspectioneconomical: "Economical",
+      inspectionlabour: "Labour",
+      inspectionharveststorage: "HarvestStorage",
+    };
+
+    const tableNames = Object.keys(tableToScreenMap);
+    let furthestScreen = row ? row.lastScreen : null;
+    let lastFoundTableScreen = null;
+
+    for (const tableName of tableNames) {
+      try {
+        const result = db.getFirstSync<{ requestId: number }>(
+          `SELECT requestId FROM ${tableName} WHERE requestId = ?`,
+          [requestId],
+        );
+        if (result) {
+          lastFoundTableScreen = tableToScreenMap[tableName];
+        } else {
+          break;
+        }
+      } catch (e) {
+        // Table might not exist yet
+      }
+    }
+
+    // If lastFoundTableScreen is further than lastScreen, use it
+    if (lastFoundTableScreen) {
+
+      const screenList = Object.values(tableToScreenMap);
+      const lastIdx = screenList.indexOf(furthestScreen || "");
+      const foundIdx = screenList.indexOf(lastFoundTableScreen);
+      
+      if (foundIdx > lastIdx) {
+        return lastFoundTableScreen;
+      }
+    }
+
+    return furthestScreen;
   } catch (error) {
     console.error("Error fetching last screen:", error);
     return null;

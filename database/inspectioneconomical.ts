@@ -50,7 +50,7 @@ export const saveEconomicalInfo = (
       [requestId],
     );
 
-    const storageData: any = { ...data };
+    const storageData: any = {};
 
     if (data.isSuitaleSize !== undefined) {
       storageData.isSuitaleSize = data.isSuitaleSize;
@@ -62,12 +62,16 @@ export const saveEconomicalInfo = (
       storageData.isAltRoutes = data.isAltRoutes;
     }
 
+    if (Object.keys(storageData).length === 0) {
+      return;
+    }
+
+    const keys = Object.keys(storageData);
+
     if (existing) {
-      const fields = Object.keys(storageData)
-        .map((key) => `${key} = ?`)
-        .join(", ");
+      const fields = keys.map((key) => `${key} = ?`).join(", ");
       const values = [
-        ...Object.values(storageData),
+        ...keys.map((key) => storageData[key]),
         new Date().toISOString(),
         requestId,
       ];
@@ -78,18 +82,11 @@ export const saveEconomicalInfo = (
       );
       console.log("Economical info updated in SQLite");
     } else {
-      const fields = [
-        "requestId",
-        ...Object.keys(storageData),
-        "createdAt",
-        "updatedAt",
-      ].join(", ");
-      const placeholders = new Array(Object.keys(storageData).length + 3)
-        .fill("?")
-        .join(", ");
+      const fields = ["requestId", ...keys, "createdAt", "updatedAt"].join(", ");
+      const placeholders = new Array(keys.length + 3).fill("?").join(", ");
       const values = [
         requestId,
-        ...Object.values(storageData),
+        ...keys.map((key) => storageData[key]),
         new Date().toISOString(),
         new Date().toISOString(),
       ];

@@ -77,12 +77,16 @@ export const saveHarvestStorageInfo = async (
       storageData.awareOfQualityStandards = data.awareOfQualityStandards;
     }
 
+    if (Object.keys(storageData).length === 0) {
+      return;
+    }
+
+    const keys = Object.keys(storageData);
+
     if (existing) {
-      const fields = Object.keys(storageData)
-        .map((key) => `${key} = ?`)
-        .join(", ");
+      const fields = keys.map((key) => `${key} = ?`).join(", ");
       const values = [
-        ...Object.values(storageData),
+        ...keys.map((key) => storageData[key]),
         new Date().toISOString(),
         requestId,
       ];
@@ -92,18 +96,11 @@ export const saveHarvestStorageInfo = async (
         values as SQLite.SQLiteBindParams,
       );
     } else {
-      const fields = [
-        "requestId",
-        ...Object.keys(storageData),
-        "createdAt",
-        "updatedAt",
-      ].join(", ");
-      const placeholders = new Array(Object.keys(storageData).length + 3)
-        .fill("?")
-        .join(", ");
+      const fields = ["requestId", ...keys, "createdAt", "updatedAt"].join(", ");
+      const placeholders = new Array(keys.length + 3).fill("?").join(", ");
       const values = [
         requestId,
-        ...Object.values(storageData),
+        ...keys.map((key) => storageData[key]),
         new Date().toISOString(),
         new Date().toISOString(),
       ];

@@ -34,13 +34,13 @@ const tableNames = [
   "inspectionidproof",
   "inspectionfinance",
   "inspectionland",
-  "inspectioncultivation",
   "inspectioninvestment",
+  "inspectioncultivation",
   "inspectioncropping",
   "inspectionprofit",
   "inspectioneconomical",
   "inspectionlabour",
-  "inspectionharvest",
+  "inspectionharveststorage",
 ];
 
 const FormTabs: React.FC<FormTabsProps> = ({
@@ -103,7 +103,7 @@ const FormTabs: React.FC<FormTabsProps> = ({
   const currentIndex = tabs.indexOf(activeKey);
 
   const isTabAccessible = (index: number): boolean => {
-    return index === currentIndex || index <= maxAccessibleIndex;
+    return index === currentIndex || index <= maxAccessibleIndex + 1;
   };
 
   const handleTabClick = (key: string, index: number) => {
