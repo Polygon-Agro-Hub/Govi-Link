@@ -99,6 +99,7 @@ const FormFooterButton: React.FC<FormFooterButtonProps> = ({
                 shadowOpacity: 0.25,
                 shadowRadius: 5,
                 elevation: 6,
+                overflow: "hidden",
                 ...nextButtonStyle,
               }}
             >

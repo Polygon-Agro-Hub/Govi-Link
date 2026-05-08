@@ -730,7 +730,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
         <View className="p-2">
           {/* Address Section */}
           <View className="px-2 mt-4">
-            <View className="space-y-4">
+            <View className="gap-4">
               <View>
                 <View
                   className={`bg-[#F4F4F4] rounded-3xl  h-[50px] px-4 justify-center ${
@@ -883,7 +883,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
 
           {/* Bank Details Section */}
           <View className="px-2 mt-6">
-            <View className="space-y-4">
+            <View className="gap-4">
               <View>
                 <View
                   className={`bg-[#F4F4F4] rounded-3xl px-4 h-[50px] justify-center ${

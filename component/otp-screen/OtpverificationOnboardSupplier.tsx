@@ -480,6 +480,7 @@ const OtpverificationOnboardSupplier: React.FC = ({
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               className="flex-1 items-center justify-center rounded-3xl h-[50px]"
+              style={{ overflow: "hidden" }}
             >
               <Text className="text-white text-lg font-semibold">
                 {t("OnboardSupplier.Submit")}

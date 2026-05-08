@@ -646,7 +646,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
               )}
             </Text>
 
-            <View className="flex-row justify-between w-full space-x-4">
+            <View className="flex-row justify-between w-full gap-4">
               <TouchableOpacity
                 onPress={() => setShowConfirmationModal(false)}
                 className="flex-row items-center px-8 py-3 rounded-full bg-[#444444]"

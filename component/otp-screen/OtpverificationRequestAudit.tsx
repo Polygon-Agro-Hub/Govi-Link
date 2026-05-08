@@ -456,6 +456,7 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
               end={{ x: 1, y: 0 }}
               className={`flex items-center h-[50px] justify-center rounded-3xl ${!isOtpValid || isVerified ? "bg-gray-400" : "bg-[#000000]"
                 }`}
+              style={{ overflow: "hidden" }}
             >
               <Text className="text-white text-lg font-semibold">
                 {t("Otpverification.Verify")}

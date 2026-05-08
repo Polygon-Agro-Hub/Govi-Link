@@ -278,6 +278,7 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               className="py-3 rounded-3xl flex-row items-center justify-center h-[50px]"
+              style={{ overflow: "hidden" }}
             >
               {loading ? (
                 <>

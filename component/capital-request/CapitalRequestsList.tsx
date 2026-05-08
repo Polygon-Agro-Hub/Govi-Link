@@ -166,7 +166,7 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 70 }}
       >
-        <View className="px-6 py-4 space-y-5">
+        <View className="px-6 py-4 gap-5">
           {sortedRequests.length === 0 ? (
             <View className="flex justify-center items-center mt-[70%]">
               <Image
@@ -208,7 +208,7 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
                     }}
                   >
                     <View className="flex-1">
-                      <View className="flex-row space-x-2 items-baseline">
+                      <View className="flex-row gap-2 items-baseline">
                         <Text className="text-[#000000] text-base">
                           #{request.jobId}
                         </Text>

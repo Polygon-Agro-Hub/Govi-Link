@@ -485,6 +485,7 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
                 className="flex-1 items-center justify-center"
+                style={{ overflow: "hidden" }}
               >
                 <Text className="text-white text-lg font-semibold">
                   {t("Otpverification.Verify")}

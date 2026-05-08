@@ -385,6 +385,7 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
             end={{ x: 1, y: 0 }}
             className={`flex-row items-center px-2 pl-3 h-10 rounded-full mr-2 border ${isOverdueSelected ? "border-transparent" : "border-[#F83B4F]"
               }`}
+            style={{ overflow: "hidden" }}
           >
             <View className="flex-row items-center">
               <Text
@@ -419,6 +420,7 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
             end={{ x: 1, y: 0 }}
             className={`flex-row items-center px-2 pl-3 h-10 rounded-full mr-2 border ${!isOverdueSelected ? "border-transparent" : "border-[#F83B4F]"
               }`}
+            style={{ overflow: "hidden" }}
           >
             <View className="flex-row items-center">
               <Text
@@ -440,7 +442,7 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
       </View>
 
       {selectedJobs.length > 0 && (
-        <View className="flex-row p-4 justify-between items-center space-x-6">
+        <View className="flex-row p-4 justify-between items-center gap-6">
           <View className="flex-1"></View>
           <View className="flex-1 items-center">
             <TouchableOpacity onPress={handleStartJob}>
@@ -449,6 +451,7 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
                 className="flex-row p-3 rounded-full items-center justify-center min-w-[120px]"
+                style={{ overflow: "hidden" }}
               >
                 <Text
                   className={`text-white  font-bold ${i18n.language === "si" ? "text-base" : i18n.language === "ta" ? "text-base" : "text-lg"}`}
@@ -671,6 +674,7 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
                     className="py-3 items-center justify-center rounded-full"
+                    style={{ overflow: "hidden" }}
                   >
                     <Text
                       className={`text-white  font-semibold ${i18n.language === "si" ? "text-base" : i18n.language === "ta" ? "text-base" : "text-lg"}`}

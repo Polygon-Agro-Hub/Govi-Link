@@ -356,12 +356,14 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
                   className="px-10 py-3 rounded-3xl items-center"
+                  
                   style={{
                     shadowColor: "#000000",
                     shadowOffset: { width: 0, height: 4 },
                     shadowOpacity: 0.25,
                     shadowRadius: 10,
                     elevation: 6,
+                    overflow: "hidden"
                   }}
                 >
                   {assigning ? (
@@ -398,6 +400,7 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
                 shadowOpacity: 0.25,
                 shadowRadius: 5,
                 elevation: 6,
+                overflow: "hidden" 
               }}
             >
               {assigning ? (
