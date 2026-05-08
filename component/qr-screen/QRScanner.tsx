@@ -251,6 +251,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               className="items-center justify-center rounded-full mt-4 p-4 px-12"
+              style={{ overflow: "hidden" }}
             >
               <Text style={{ color: "#fff", fontSize: 16 }}>
                 {t("QRScanner.Scan Again")}

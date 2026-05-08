@@ -199,7 +199,7 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 100, flexGrow: 1 }}
       >
-        <View className="px-6 py-4 space-y-3 flex-1">
+        <View className="px-6 py-4 gap-3 flex-1">
           <Text className="mt-2 text-[#21202B] text-base">
             <Text className="font-bold">
               {t("ManageOfficers.OfficersList")}{" "}

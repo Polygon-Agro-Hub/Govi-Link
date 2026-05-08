@@ -228,7 +228,7 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
             {t("RequestLetter.The project details are as follows")}
           </Text>
 
-          <View className="space-y-3 mb-6">
+          <View className="gap-3 mb-6">
             <View>
               <ProjectDetails
                 label={t("RequestLetter.District")}

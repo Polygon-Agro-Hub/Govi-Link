@@ -405,6 +405,7 @@ const AddOnboardSupplierOfficer: React.FC<AddOnboardSupplierOfficerProps> = ({
                 shadowOpacity: 0.25,
                 shadowRadius: 10,
                 elevation: 6,
+                overflow: "hidden",
               }}
             >
               <TouchableOpacity

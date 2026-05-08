@@ -333,7 +333,7 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
         />
         <TouchableOpacity
           onPress={() => setShowCamera(true)}
-          className="bg-black rounded-3xl w-2/3 self-center h-[50px] items-center justify-center flex-row space-x-4"
+          className="bg-black rounded-3xl w-2/3 self-center h-[50px] items-center justify-center flex-row gap-4"
         >
           <FontAwesome6 name="camera" size={24} color="white" />
           <Text className="text-white font-semibold text-sm">

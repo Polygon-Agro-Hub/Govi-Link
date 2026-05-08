@@ -1022,7 +1022,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
 
         <View className="p-2 px-4">
           <View className="px-2 mt-6 items-center">
-            <View className="flex flex-row items-center space-x-2 justify-between">
+            <View className="flex flex-row items-center gap-2 justify-between">
               <Text className="text-base font-medium">
                 {t("AddOfficer.Type")}:
               </Text>
@@ -1064,10 +1064,10 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
             <Text className="text-base font-medium mb-4">
               {t("AddOfficer.PreferredLanguages")}:
             </Text>
-            <View className="flex-row justify-between space-x-4">
+            <View className="flex-row justify-between gap-4">
               {(Object.keys(languages) as Array<keyof typeof languages>).map(
                 (lang) => (
-                  <View key={lang} className="flex-row items-center space-x-1">
+                  <View key={lang} className="flex-row items-center gap-1">
                     <Checkbox
                       value={languages[lang]}
                       onValueChange={() => toggleLanguage(lang)}
@@ -1090,7 +1090,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
           <View className="border border-[#ADADAD] border-b-0 mt-4" />
 
           {/* Form Fields */}
-          <View className="px-2 mt-4 space-y-4">
+          <View className="px-2 mt-4 gap-4">
             {/* District */}
             <View>
               <TouchableOpacity
@@ -1282,10 +1282,10 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
 
           <View className="border border-[#ADADAD] border-b-0 mt-4" />
 
-          <View className="px-2 mt-4 space-y-4">
+          <View className="px-2 mt-4 gap-4">
             {/* Phone 1 */}
             <View>
-              <View className="flex-row space-x-2">
+              <View className="flex-row gap-2">
                 <TouchableOpacity
                   className="bg-[#F4F4F4] border border-[#F4F4F4] rounded-3xl px-3 h-[50px] w-20 flex-row justify-between items-center"
                   onPress={() => openCountryCodeModal("phone1")}
@@ -1325,7 +1325,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
 
             {/* Phone 2 */}
             <View>
-              <View className="flex-row space-x-2">
+              <View className="flex-row gap-2">
                 <TouchableOpacity
                   className="bg-[#F4F4F4] border border-[#F4F4F4] rounded-3xl px-3 h-[50px] w-20 flex-row justify-between items-center"
                   onPress={() => openCountryCodeModal("phone2")}

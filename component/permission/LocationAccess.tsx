@@ -154,6 +154,7 @@ const LocationAccess: React.FC<LocationAccessProps> = ({
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
                   className="w-full rounded-full h-14 justify-center items-center"
+                  style={{ overflow: "hidden" }}
                 >
                   <Text className="text-white font-semibold text-center text-lg">
                     {isLoading

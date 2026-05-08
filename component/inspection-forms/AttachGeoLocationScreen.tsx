@@ -339,6 +339,7 @@ const AttachGeoLocationScreen: React.FC<AttachGeoLocationScreenProps> = ({
               shadowOpacity: 0.25,
               shadowRadius: 5,
               elevation: 6,
+              overflow: "hidden",
             }}
           >
             <MaterialIcons name="done" size={24} color="#fff" />

@@ -277,6 +277,7 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
             className={`flex-row items-center px-2 h-10 rounded-full mr-2 border ${
               isOverdueSelected ? "border-transparent" : "border-[#F83B4F]"
             }`}
+            style={{ overflow: "hidden" }}
           >
             <View className="flex-row items-center">
               <Text
@@ -322,6 +323,7 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
                       start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 0 }}
                       className="border flex-row gap-x-4 rounded-full w-20 h-10 items-center justify-center border-[#F83B4F] ml-1"
+                      style={{ overflow: "hidden" }}
                     >
                       <Text className="font-semibold text-white">
                         {dayNumber}
@@ -699,6 +701,7 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
                   end={{ x: 1, y: 0 }}
                   style={{
                     marginBottom: 30,
+                    overflow: "hidden",
                   }}
                   className={`py-2 items-center justify-center rounded-full mt-4 ${i18n.language === "si" ? "px-24" : i18n.language === "ta" ? "px-24" : "px-[40%]"}`}
                 >

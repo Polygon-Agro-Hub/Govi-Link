@@ -192,7 +192,7 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ navigation }) => {
         style={{ paddingHorizontal: wp(6) }}
       >
         <View
-          className={`flex-row items-center justify-center space-x-[-30%] ml-[5%]`}
+          className={`flex-row items-center justify-center gap-[-30%] ml-[5%]`}
         >
           <Image
             source={require("@/assets/images/public/logo.webp")}
@@ -285,6 +285,7 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ navigation }) => {
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               className="w-full p-3 rounded-3xl items-center justify-center h-[50px]"
+              style={{ overflow: "hidden" }}
             >
               <Text className="text-lg font-semibold text-white">
                 {t("ChangePassword.Next")}
