@@ -31,7 +31,6 @@ import Splash from "@/component/auth/Splash";
 import Lanuage from "@/component/officers-common-screen/Lanuage";
 import Login from "@/component/auth/Login";
 import Dashboard from "@/component/chief-field-officer/Dashboard";
-import { NativeWindStyleSheet } from "nativewind";
 import CustomDrawerContent from "@/Items/CustomDrawerContent";
 import FieldOfficerDashboard from "@/component/feild-officers/FieldOfficerDashboard";
 import ProfileScreen from "@/component/auth/Profile";
@@ -81,7 +80,7 @@ import CameraAccess from "@/component/permission/CameraAccess";
 import { initDatabase } from "@/database/index";
 
 LogBox.ignoreAllLogs(true);
-NativeWindStyleSheet.setOutput({ default: "native" });
+
 
 (Text as any).defaultProps = {
   ...(Text as any).defaultProps,
