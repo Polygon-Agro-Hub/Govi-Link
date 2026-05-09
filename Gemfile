@@ -1,6 +1,7 @@
 # Gemfile — Ruby gem dependencies for Fastlane
 # This file ensures everyone uses the same Fastlane version.
 # Run: bundle install
+ruby "3.3"
 
 source "https://rubygems.org"
 

@@ -23,7 +23,7 @@ storage_mode("git")
 type("appstore")
 
 # Your app's bundle identifier — MUST match app.json ios.bundleIdentifier
-app_identifier(["com.polygonagro.SalesDash"])
+app_identifier(["com.polygonagro.GoviLink"])
 
 # Apple ID (used for local setup; in CI, the API Key is used instead)
 username("polygonagro@icloud.com")

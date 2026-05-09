@@ -1,6 +1,6 @@
 # .github/workflows/ios-deploy.yml
 #
-# iOS CI/CD Pipeline — Sales Dash
+# iOS CI/CD Pipeline — GoVi Link
 #
 # TRIGGERS:
 #   Push to dev-main → Upload to TestFlight (QA testing)
@@ -9,7 +9,9 @@
 # PREREQUISITES (all must be set up — see SETUP_GUIDE.md):
 #   GitHub Secrets: ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_CONTENT,
 #                   MATCH_GIT_URL, MATCH_GIT_BASIC_AUTHORIZATION,
-#                   MATCH_PASSWORD, DEV_API_URL, PROD_API_URL
+#                   MATCH_PASSWORD, DEV_API_URL, PROD_API_URL,
+#                   DEV_SHOUTOUT_API_KEY, PROD_SHOUTOUT_API_KEY,
+#                   APPLE_TEAM_ID
 
 name: iOS Deploy
 
@@ -29,11 +31,13 @@ jobs:
   deploy:
     name: "iOS Build & Deploy"
 
-    # MUST be macos — only Apple hardware can build iOS apps
-    # macos-latest = macOS 14 (Sonoma) with Xcode pre-installed
-    runs-on: macos-latest
+    # FIX: Changed from macos-latest (= macOS 15, Xcode 16.x only) to macos-26.
+    # macos-26 is macOS 26 Tahoe — the only runner that has Xcode 26.x installed.
+    # Apple requires the iOS 26 SDK for all App Store uploads.
+    # The Fastfile selects Xcode_26.4.1.app which only exists on this runner.
+    runs-on: macos-26
 
-    # Timeout after 90 minutes to avoid runaway builds eating up minutes
+    # Timeout after 120 minutes to avoid runaway builds eating up minutes.
     timeout-minutes: 120
 
     steps:
@@ -45,13 +49,16 @@ jobs:
 
       # ─────────────────────────────────────────────────────────────────
       # STEP 2: Set up Ruby
-      # ruby/setup-ruby automatically reads the ruby-version from Gemfile
-      # bundler-cache: true speeds up builds by caching installed gems
+      # FIX: Changed from 3.2.2 to 3.3.
+      # macos-26 ships with Ruby 3.4.x. Pinning to 3.2.2 forces
+      # ruby/setup-ruby to compile Ruby from source on every run,
+      # adding ~5 minutes. Ruby 3.3 is pre-built for this image,
+      # so it installs in seconds and is fully compatible with Fastlane 2.225.
       # ─────────────────────────────────────────────────────────────────
       - name: "💎 Set up Ruby"
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: "3.2.2"
+          ruby-version: "3.3"
           bundler-cache: true   # Caches gems between runs — saves 2-3 min
 
       # ─────────────────────────────────────────────────────────────────
@@ -76,6 +83,7 @@ jobs:
       # STEP 5a: Write DEV environment (dev-main branch only)
       # Overwrites environment/environment.ts with DEV API URL before building.
       # This does NOT change the committed file — only the build-time file.
+      # Requires GitHub Secrets: DEV_API_URL, DEV_SHOUTOUT_API_KEY
       # ─────────────────────────────────────────────────────────────────
       - name: "🔧 Write DEV environment (dev-main → TestFlight)"
         if: github.ref == 'refs/heads/dev-main'
@@ -95,6 +103,7 @@ jobs:
 
       # ─────────────────────────────────────────────────────────────────
       # STEP 5b: Write PROD environment (main branch only)
+      # Requires GitHub Secrets: PROD_API_URL, PROD_SHOUTOUT_API_KEY
       # ─────────────────────────────────────────────────────────────────
       - name: "🔧 Write PROD environment (main → App Store)"
         if: github.ref == 'refs/heads/main'
@@ -131,12 +140,6 @@ jobs:
         uses: actions/cache@v4
         id: pods-cache
         with:
-          # path: |
-          #   ios/Pods
-          #   ~/.cocoapods
-          # key: pods-${{ hashFiles('ios/Podfile.lock') }}
-          # restore-keys: |
-          #   pods-
           path: |
             ios/Pods
             ~/Library/Caches/CocoaPods
@@ -159,7 +162,8 @@ jobs:
       # ─────────────────────────────────────────────────────────────────
       # STEP 9a: Deploy to TestFlight (dev-main branch)
       # Runs: fastlane beta
-      # Which: syncs certs, sets build number, builds .ipa, uploads
+      # Which: selects Xcode 26.4.1, syncs certs, sets build number,
+      #        builds .ipa, uploads to TestFlight
       # ─────────────────────────────────────────────────────────────────
       - name: "🚀 Deploy to TestFlight [dev-main]"
         if: github.ref == 'refs/heads/dev-main'
@@ -175,13 +179,14 @@ jobs:
           MATCH_PASSWORD:                 ${{ secrets.MATCH_PASSWORD }}
           # Used as the iOS build number — auto-increments with each CI run
           GITHUB_RUN_NUMBER: ${{ github.run_number }}
-          #Apple Team ID
+          # Apple Team ID
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
 
       # ─────────────────────────────────────────────────────────────────
       # STEP 9b: Deploy to App Store (main branch)
       # Runs: fastlane release
-      # Which: syncs certs, sets build number, builds .ipa, uploads to ASC
+      # Which: selects Xcode 26.4.1, syncs certs, sets build number,
+      #        builds .ipa, uploads to App Store Connect
       # ─────────────────────────────────────────────────────────────────
       - name: "🏪 Deploy to App Store [main]"
         if: github.ref == 'refs/heads/main'
@@ -197,8 +202,9 @@ jobs:
           MATCH_PASSWORD:                 ${{ secrets.MATCH_PASSWORD }}
           # Build number
           GITHUB_RUN_NUMBER: ${{ github.run_number }}
-          #Apple Team ID
+          # Apple Team ID
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+
       # ─────────────────────────────────────────────────────────────────
       # STEP 10: Upload build artifacts (for debugging if build fails)
       # Saves the .ipa file as a GitHub Actions artifact for 7 days.
