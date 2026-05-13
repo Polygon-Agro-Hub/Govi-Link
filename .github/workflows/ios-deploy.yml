@@ -1,6 +1,6 @@
 # .github/workflows/ios-deploy.yml
 #
-# iOS CI/CD Pipeline — GoVi Link
+# iOS CI/CD Pipeline — GoVi-Transport
 #
 # TRIGGERS:
 #   Push to dev-main → Upload to TestFlight (QA testing)
@@ -9,9 +9,7 @@
 # PREREQUISITES (all must be set up — see SETUP_GUIDE.md):
 #   GitHub Secrets: ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_CONTENT,
 #                   MATCH_GIT_URL, MATCH_GIT_BASIC_AUTHORIZATION,
-#                   MATCH_PASSWORD, DEV_API_URL, PROD_API_URL,
-#                   DEV_SHOUTOUT_API_KEY, PROD_SHOUTOUT_API_KEY,
-#                   APPLE_TEAM_ID
+#                   MATCH_PASSWORD, DEV_API_URL, PROD_API_URL
 
 name: iOS Deploy
 
@@ -31,13 +29,11 @@ jobs:
   deploy:
     name: "iOS Build & Deploy"
 
-    # FIX: Changed from macos-latest (= macOS 15, Xcode 16.x only) to macos-26.
-    # macos-26 is macOS 26 Tahoe — the only runner that has Xcode 26.x installed.
-    # Apple requires the iOS 26 SDK for all App Store uploads.
-    # The Fastfile selects Xcode_26.4.1.app which only exists on this runner.
-    runs-on: macos-26
+    # MUST be macos — only Apple hardware can build iOS apps
+    # macos-latest = macOS 14 (Sonoma) with Xcode pre-installed
+    runs-on: macos-latest
 
-    # Timeout after 120 minutes to avoid runaway builds eating up minutes.
+    # Timeout after 90 minutes to avoid runaway builds eating up minutes
     timeout-minutes: 120
 
     steps:
@@ -48,21 +44,31 @@ jobs:
         uses: actions/checkout@v4
 
       # ─────────────────────────────────────────────────────────────────
-      # STEP 2: Set up Ruby
-      # FIX: Changed from 3.2.2 to 3.3.
-      # macos-26 ships with Ruby 3.4.x. Pinning to 3.2.2 forces
-      # ruby/setup-ruby to compile Ruby from source on every run,
-      # adding ~5 minutes. Ruby 3.3 is pre-built for this image,
-      # so it installs in seconds and is fully compatible with Fastlane 2.225.
+      # STEP 2: Pin Xcode version
+      # FIX: macos-latest now ships with Xcode 16 which enforces Swift
+      # strict concurrency checking. expo-modules-core isn't compatible
+      # with those rules yet, causing compilation failures.
+      # Xcode 16.2 is the latest stable version that compiles Expo apps
+      # reliably. Update this only after verifying a newer version works.
+      # ─────────────────────────────────────────────────────────────────
+      - name: "🔨 Select Xcode 16.2"
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: "16.2"
+
+      # ─────────────────────────────────────────────────────────────────
+      # STEP 3: Set up Ruby
+      # ruby/setup-ruby automatically reads the ruby-version from Gemfile
+      # bundler-cache: true speeds up builds by caching installed gems
       # ─────────────────────────────────────────────────────────────────
       - name: "💎 Set up Ruby"
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: "3.3"
+          ruby-version: "3.2.2"
           bundler-cache: true   # Caches gems between runs — saves 2-3 min
 
       # ─────────────────────────────────────────────────────────────────
-      # STEP 3: Set up Node.js
+      # STEP 4: Set up Node.js
       # ─────────────────────────────────────────────────────────────────
       - name: "⬢ Set up Node.js"
         uses: actions/setup-node@v4
@@ -71,7 +77,7 @@ jobs:
           cache: "npm"   # Caches node_modules between runs — saves 1-2 min
 
       # ─────────────────────────────────────────────────────────────────
-      # STEP 4: Install JavaScript dependencies
+      # STEP 5: Install JavaScript dependencies
       # npm ci is stricter than npm install — better for CI:
       # - Uses package-lock.json exactly
       # - Fails if package-lock.json is out of sync
@@ -80,49 +86,41 @@ jobs:
         run: npm ci
 
       # ─────────────────────────────────────────────────────────────────
-      # STEP 5a: Write DEV environment (dev-main branch only)
+      # STEP 6a: Write DEV environment (dev-main branch only)
       # Overwrites environment/environment.ts with DEV API URL before building.
       # This does NOT change the committed file — only the build-time file.
-      # Requires GitHub Secrets: DEV_API_URL, DEV_SHOUTOUT_API_KEY
       # ─────────────────────────────────────────────────────────────────
       - name: "🔧 Write DEV environment (dev-main → TestFlight)"
         if: github.ref == 'refs/heads/dev-main'
         env:
           DEV_API_URL: ${{ secrets.DEV_API_URL }}
-          SHOUTOUT_API_KEY: ${{ secrets.DEV_SHOUTOUT_API_KEY }}
         run: |
           cat > environment/environment.ts << ENVEOF
-          const environment = {
+          export const environment = {
             production: false,
-            API_BASE_URL: "${DEV_API_URL}",
-            SHOUTOUT_API_KEY: "${SHOUTOUT_API_KEY}"
+            API_BASE_URL: "${DEV_API_URL}"
           };
-          export default environment;
           ENVEOF
           echo "✅ DEV environment.ts written with API: ${DEV_API_URL}"
 
       # ─────────────────────────────────────────────────────────────────
-      # STEP 5b: Write PROD environment (main branch only)
-      # Requires GitHub Secrets: PROD_API_URL, PROD_SHOUTOUT_API_KEY
+      # STEP 6b: Write PROD environment (main branch only)
       # ─────────────────────────────────────────────────────────────────
       - name: "🔧 Write PROD environment (main → App Store)"
         if: github.ref == 'refs/heads/main'
         env:
           PROD_API_URL: ${{ secrets.PROD_API_URL }}
-          SHOUTOUT_API_KEY: ${{ secrets.PROD_SHOUTOUT_API_KEY }}
         run: |
           cat > environment/environment.ts << ENVEOF
-          const environment = {
+          export const environment = {
             production: true,
-            API_BASE_URL: "${PROD_API_URL}",
-            SHOUTOUT_API_KEY: "${SHOUTOUT_API_KEY}"
+            API_BASE_URL: "${PROD_API_URL}"
           };
-          export default environment;
           ENVEOF
           echo "✅ PROD environment.ts written with API: ${PROD_API_URL}"
 
       # ─────────────────────────────────────────────────────────────────
-      # STEP 6: Run Expo Prebuild
+      # STEP 7: Run Expo Prebuild
       # This generates the native ios/ folder from your JavaScript/TS code.
       # --clean: removes any existing ios/ folder first (fresh generation)
       # --non-interactive: no prompts (required for CI)
@@ -132,7 +130,7 @@ jobs:
         run: npx expo prebuild --platform ios --non-interactive --clean
 
       # ─────────────────────────────────────────────────────────────────
-      # STEP 7: Cache CocoaPods
+      # STEP 8: Cache CocoaPods
       # Caches the downloaded iOS native packages to speed up future builds.
       # The cache is invalidated when Podfile.lock changes.
       # ─────────────────────────────────────────────────────────────────
@@ -149,7 +147,7 @@ jobs:
             pods-${{ runner.os }}-
 
       # ─────────────────────────────────────────────────────────────────
-      # STEP 8: Install CocoaPods dependencies
+      # STEP 9: Install CocoaPods dependencies
       # Installs native iOS packages defined in the Podfile
       # (generated by expo prebuild)
       # ─────────────────────────────────────────────────────────────────
@@ -160,10 +158,9 @@ jobs:
           cd ..
 
       # ─────────────────────────────────────────────────────────────────
-      # STEP 9a: Deploy to TestFlight (dev-main branch)
+      # STEP 10a: Deploy to TestFlight (dev-main branch)
       # Runs: fastlane beta
-      # Which: selects Xcode 26.4.1, syncs certs, sets build number,
-      #        builds .ipa, uploads to TestFlight
+      # Which: syncs certs, sets build number, builds .ipa, uploads
       # ─────────────────────────────────────────────────────────────────
       - name: "🚀 Deploy to TestFlight [dev-main]"
         if: github.ref == 'refs/heads/dev-main'
@@ -179,14 +176,13 @@ jobs:
           MATCH_PASSWORD:                 ${{ secrets.MATCH_PASSWORD }}
           # Used as the iOS build number — auto-increments with each CI run
           GITHUB_RUN_NUMBER: ${{ github.run_number }}
-          # Apple Team ID
+          #Apple Team ID
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
 
       # ─────────────────────────────────────────────────────────────────
-      # STEP 9b: Deploy to App Store (main branch)
+      # STEP 10b: Deploy to App Store (main branch)
       # Runs: fastlane release
-      # Which: selects Xcode 26.4.1, syncs certs, sets build number,
-      #        builds .ipa, uploads to App Store Connect
+      # Which: syncs certs, sets build number, builds .ipa, uploads to ASC
       # ─────────────────────────────────────────────────────────────────
       - name: "🏪 Deploy to App Store [main]"
         if: github.ref == 'refs/heads/main'
@@ -202,11 +198,11 @@ jobs:
           MATCH_PASSWORD:                 ${{ secrets.MATCH_PASSWORD }}
           # Build number
           GITHUB_RUN_NUMBER: ${{ github.run_number }}
-          # Apple Team ID
+          #Apple Team ID
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
 
       # ─────────────────────────────────────────────────────────────────
-      # STEP 10: Upload build artifacts (for debugging if build fails)
+      # STEP 11: Upload build artifacts (for debugging if build fails)
       # Saves the .ipa file as a GitHub Actions artifact for 7 days.
       # You can download it from the GitHub Actions run page.
       # ─────────────────────────────────────────────────────────────────
