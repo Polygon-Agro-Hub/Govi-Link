@@ -1,6 +1,6 @@
 # .github/workflows/ios-deploy.yml
 #
-# iOS CI/CD Pipeline — GoVi-Transport
+# iOS CI/CD Pipeline — Sales Dash
 #
 # TRIGGERS:
 #   Push to dev-main → Upload to TestFlight (QA testing)
@@ -44,20 +44,7 @@ jobs:
         uses: actions/checkout@v4
 
       # ─────────────────────────────────────────────────────────────────
-      # STEP 2: Pin Xcode version
-      # FIX: macos-latest now ships with Xcode 16 which enforces Swift
-      # strict concurrency checking. expo-modules-core isn't compatible
-      # with those rules yet, causing compilation failures.
-      # Xcode 16.2 is the latest stable version that compiles Expo apps
-      # reliably. Update this only after verifying a newer version works.
-      # ─────────────────────────────────────────────────────────────────
-      - name: "🔨 Select Xcode 16.2"
-        uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: "16.2"
-
-      # ─────────────────────────────────────────────────────────────────
-      # STEP 3: Set up Ruby
+      # STEP 2: Set up Ruby
       # ruby/setup-ruby automatically reads the ruby-version from Gemfile
       # bundler-cache: true speeds up builds by caching installed gems
       # ─────────────────────────────────────────────────────────────────
@@ -68,7 +55,7 @@ jobs:
           bundler-cache: true   # Caches gems between runs — saves 2-3 min
 
       # ─────────────────────────────────────────────────────────────────
-      # STEP 4: Set up Node.js
+      # STEP 3: Set up Node.js
       # ─────────────────────────────────────────────────────────────────
       - name: "⬢ Set up Node.js"
         uses: actions/setup-node@v4
@@ -77,7 +64,7 @@ jobs:
           cache: "npm"   # Caches node_modules between runs — saves 1-2 min
 
       # ─────────────────────────────────────────────────────────────────
-      # STEP 5: Install JavaScript dependencies
+      # STEP 4: Install JavaScript dependencies
       # npm ci is stricter than npm install — better for CI:
       # - Uses package-lock.json exactly
       # - Fails if package-lock.json is out of sync
@@ -86,7 +73,7 @@ jobs:
         run: npm ci
 
       # ─────────────────────────────────────────────────────────────────
-      # STEP 6a: Write DEV environment (dev-main branch only)
+      # STEP 5a: Write DEV environment (dev-main branch only)
       # Overwrites environment/environment.ts with DEV API URL before building.
       # This does NOT change the committed file — only the build-time file.
       # ─────────────────────────────────────────────────────────────────
@@ -94,33 +81,39 @@ jobs:
         if: github.ref == 'refs/heads/dev-main'
         env:
           DEV_API_URL: ${{ secrets.DEV_API_URL }}
+          SHOUTOUT_API_KEY: ${{ secrets.DEV_SHOUTOUT_API_KEY }}
         run: |
           cat > environment/environment.ts << ENVEOF
-          export const environment = {
+          const environment = {
             production: false,
-            API_BASE_URL: "${DEV_API_URL}"
+            API_BASE_URL: "${DEV_API_URL}",
+            SHOUTOUT_API_KEY: "${SHOUTOUT_API_KEY}"
           };
+          export default environment;
           ENVEOF
           echo "✅ DEV environment.ts written with API: ${DEV_API_URL}"
 
       # ─────────────────────────────────────────────────────────────────
-      # STEP 6b: Write PROD environment (main branch only)
+      # STEP 5b: Write PROD environment (main branch only)
       # ─────────────────────────────────────────────────────────────────
       - name: "🔧 Write PROD environment (main → App Store)"
         if: github.ref == 'refs/heads/main'
         env:
           PROD_API_URL: ${{ secrets.PROD_API_URL }}
+          SHOUTOUT_API_KEY: ${{ secrets.PROD_SHOUTOUT_API_KEY }}
         run: |
           cat > environment/environment.ts << ENVEOF
-          export const environment = {
+          const environment = {
             production: true,
-            API_BASE_URL: "${PROD_API_URL}"
+            API_BASE_URL: "${PROD_API_URL}",
+            SHOUTOUT_API_KEY: "${SHOUTOUT_API_KEY}"
           };
+          export default environment;
           ENVEOF
           echo "✅ PROD environment.ts written with API: ${PROD_API_URL}"
 
       # ─────────────────────────────────────────────────────────────────
-      # STEP 7: Run Expo Prebuild
+      # STEP 6: Run Expo Prebuild
       # This generates the native ios/ folder from your JavaScript/TS code.
       # --clean: removes any existing ios/ folder first (fresh generation)
       # --non-interactive: no prompts (required for CI)
@@ -130,7 +123,7 @@ jobs:
         run: npx expo prebuild --platform ios --non-interactive --clean
 
       # ─────────────────────────────────────────────────────────────────
-      # STEP 8: Cache CocoaPods
+      # STEP 7: Cache CocoaPods
       # Caches the downloaded iOS native packages to speed up future builds.
       # The cache is invalidated when Podfile.lock changes.
       # ─────────────────────────────────────────────────────────────────
@@ -138,27 +131,35 @@ jobs:
         uses: actions/cache@v4
         id: pods-cache
         with:
+          # path: |
+          #   ios/Pods
+          #   ~/.cocoapods
+          # key: pods-${{ hashFiles('ios/Podfile.lock') }}
+          # restore-keys: |
+          #   pods-
           path: |
-            ios/Pods
-            ~/Library/Caches/CocoaPods
-            ~/.cocoapods
-          key: pods-${{ runner.os }}-${{ hashFiles('ios/Podfile.lock') }}
+              ~/Library/Caches/CocoaPods
+              ~/.cocoapods
+          key: pods-v2-${{ runner.os }}-${{ hashFiles('ios/Podfile.lock') }}
           restore-keys: |
-            pods-${{ runner.os }}-
-
+            pods-v2-${{ runner.os }}-
+#
       # ─────────────────────────────────────────────────────────────────
-      # STEP 9: Install CocoaPods dependencies
+      # STEP 8: Install CocoaPods dependencies
       # Installs native iOS packages defined in the Podfile
       # (generated by expo prebuild)
       # ─────────────────────────────────────────────────────────────────
       - name: "🍫 Install CocoaPods dependencies"
         run: |
           cd ios
+          # Clear the stale React-Core-prebuilt podspec that causes version conflicts
+          # after React Native upgrades (Expo 54→55 / RN 0.77→0.83)
+          pod cache clean "React-Core-prebuilt" 2>/dev/null || true
           pod install
           cd ..
 
       # ─────────────────────────────────────────────────────────────────
-      # STEP 10a: Deploy to TestFlight (dev-main branch)
+      # STEP 9a: Deploy to TestFlight (dev-main branch)
       # Runs: fastlane beta
       # Which: syncs certs, sets build number, builds .ipa, uploads
       # ─────────────────────────────────────────────────────────────────
@@ -180,7 +181,7 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
 
       # ─────────────────────────────────────────────────────────────────
-      # STEP 10b: Deploy to App Store (main branch)
+      # STEP 9b: Deploy to App Store (main branch)
       # Runs: fastlane release
       # Which: syncs certs, sets build number, builds .ipa, uploads to ASC
       # ─────────────────────────────────────────────────────────────────
@@ -200,9 +201,8 @@ jobs:
           GITHUB_RUN_NUMBER: ${{ github.run_number }}
           #Apple Team ID
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-
       # ─────────────────────────────────────────────────────────────────
-      # STEP 11: Upload build artifacts (for debugging if build fails)
+      # STEP 10: Upload build artifacts (for debugging if build fails)
       # Saves the .ipa file as a GitHub Actions artifact for 7 days.
       # You can download it from the GitHub Actions run page.
       # ─────────────────────────────────────────────────────────────────
