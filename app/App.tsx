@@ -80,7 +80,6 @@ import { initDatabase } from "@/database/index";
 
 LogBox.ignoreAllLogs(true);
 
-
 (Text as any).defaultProps = {
   ...(Text as any).defaultProps,
   allowFontScaling: false,
