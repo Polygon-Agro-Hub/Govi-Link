@@ -22,7 +22,6 @@ import { Provider, useSelector } from "react-redux";
 import NetInfo from "@react-native-community/netinfo";
 import { useTranslation } from "react-i18next";
 import { LogBox } from "react-native";
-
 import store, { RootState } from "@/services/store";
 import { navigationRef } from "../navigationRef";
 import { LanguageProvider } from "@/context/LanguageContext";
