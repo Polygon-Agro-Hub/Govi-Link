@@ -74,12 +74,34 @@
       ],
       "expo-font",
       [
+        "expo-audio",
+        {
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone."
+        }
+      ],
+      [
         "expo-build-properties",
         {
+          "ios": {
+            "deploymentTarget": "15.1"
+          },
           "android": {
             "compileSdkVersion": 35,
             "targetSdkVersion": 35,
-            "minSdkVersion": 24
+            "minSdkVersion": 24,
+            "ndkVersion": "28.0.12433566",
+            "enableProguardInReleaseBuilds": true,
+            "packagingOptions": {
+              "jniLibs": {
+                "useLegacyPackaging": false
+              }
+            },
+            "gradleProperties": {
+              "android.useAndroidX": "true",
+              "android.enableJetifier": "true",
+              "ANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES": "true"
+            },
+            "enableMinifyInReleaseBuilds": true
           }
         }
       ],
