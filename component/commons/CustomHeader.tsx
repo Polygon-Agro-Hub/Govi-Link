@@ -1,7 +1,6 @@
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import Entypo from "@expo/vector-icons/Entypo";
-import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { LinearGradient } from "expo-linear-gradient";
 
@@ -28,44 +27,40 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
   rightComponent,
   showBottomBorder = false,
 }) => {
-  const containerStyle = [
-    styles.container,
-    {
-      position: transparent ? ("absolute" as const) : ("relative" as const),
-    },
-  ];
+  const containerClass = `top-0 left-0 right-0 z-10 h-[70px] ${
+    transparent ? "absolute" : "relative"
+  }`;
 
   const HeaderContent = () => (
-    <View style={styles.innerContainer}>
+    <View className="flex-row items-center px-4 h-full">
       {/* Left Side (Back Button) */}
-      <View style={{ width: wp(15) }}>
+      <View className="w-16 items-start">
         {showBackButton && navigation && (
           <TouchableOpacity
             onPress={onBackPress ?? (() => navigation.goBack())}
-            style={styles.backButtonWrapper}
           >
             <Entypo
               name="chevron-left"
               size={25}
-              color={"black"}
-              style={[
-                styles.icon,
-                {
-                  backgroundColor: "#F6F6F680",
-                },
-              ]}
+              color="black"
+              className="rounded-full p-3 bg-[#F6F6F6]/50"
             />
           </TouchableOpacity>
         )}
       </View>
 
       {/* Title */}
-      <View style={styles.titleContainer}>
-        <Text style={[styles.title, { color: titleColor }]}>{title}</Text>
+      <View className="flex-1 items-center">
+        <Text
+          style={{ color: titleColor }}
+          className="text-[22px] font-semibold text-center"
+        >
+          {title}
+        </Text>
       </View>
 
       {/* Right Spacer */}
-      <View style={{ width: wp(15), alignItems: "flex-end" }}>
+      <View className="w-16 items-end">
         {rightComponent}
       </View>
     </View>
@@ -73,7 +68,10 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
 
   if (linearGradient) {
     return (
-      <LinearGradient colors={["#6839CF", "#854EDC"]} style={containerStyle}>
+      <LinearGradient
+        colors={["#6839CF", "#854EDC"]}
+        className={containerClass}
+      >
         <HeaderContent />
       </LinearGradient>
     );
@@ -81,14 +79,9 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
 
   return (
     <View
-      style={[
-        containerStyle,
-        {
-          backgroundColor: transparent ? "transparent" : "white",
-          borderBottomWidth: showBottomBorder ? 1 : 0,
-          borderBottomColor: "#E5E5E5",
-        },
-      ]}
+      className={`${containerClass} ${
+        transparent ? "bg-transparent" : "bg-white"
+      } ${showBottomBorder ? "border-b border-[#E5E5E5]" : ""}`}
     >
       <HeaderContent />
     </View>
@@ -96,35 +89,3 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
 };
 
 export default CustomHeader;
-
-const styles = StyleSheet.create({
-  container: {
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 10,
-    height: 70,
-  },
-  innerContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    height: "100%",
-  },
-  backButtonWrapper: {
-    alignItems: "flex-start",
-  },
-  icon: {
-    borderRadius: 50,
-    padding: wp(2.5),
-  },
-  titleContainer: {
-    flex: 1,
-    alignItems: "center",
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: "600",
-    textAlign: "center",
-  },
-});

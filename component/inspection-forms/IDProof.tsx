@@ -617,11 +617,11 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
 
       <Modal visible={showIdProofDropdown} transparent animationType="none">
         <TouchableOpacity
-          className="flex-1 bg-black/40 justify-center px-6"
+          className="flex-1 bg-black/40 justify-center items-center"
           activeOpacity={1}
           onPress={() => setShowIdProofDropdown(false)}
         >
-          <View className="bg-white rounded-2xl p-4">
+          <View className="bg-white rounded-2xl p-4 w-10/12">
             {idProofOptions.map((option, index) => (
               <TouchableOpacity
                 key={option.key}

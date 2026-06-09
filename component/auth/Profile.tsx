@@ -124,7 +124,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                   resizeMode="cover"
                   style={{
                     width: "100%",
-                    height: hp(50),
+                    height: 200,
                     position: "absolute",
                     top: 0,
                     left: 0,
@@ -139,7 +139,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
               />
 
               <View className="bg-white rounded-t-3xl pt-4 mt-48">
-                <View className="items-center" style={{ marginTop: -hp(12) }}>
+                <View className="items-center -mt-20">
                   <TouchableOpacity className="relative">
                     {formData.image ? (
                       <Image

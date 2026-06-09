@@ -79,7 +79,7 @@ const CameraAccess: React.FC<CameraAccessProps> = ({
           t("Permission.enableCameraManually") ||
             "Camera access is required. Please enable it in settings.",
           [
-            { text: t("PublicForum.Cancel") || "Cancel", style: "cancel" },
+            { text: t("Main.Cancel") || "Cancel", style: "cancel" },
             {
               text: t("Permission.openSettings") || "Open Settings",
               onPress: () => Linking.openSettings(),
@@ -147,7 +147,7 @@ const CameraAccess: React.FC<CameraAccessProps> = ({
                   colors={["#EE8D5F", "#B31A51"]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
-                  className="w-full rounded-full h-14 justify-center items-center"
+                  className="w-full rounded-full h-[50px] justify-center items-center"
                   style={{ overflow: "hidden" }}
                 >
                   <Text className="text-white font-semibold text-center text-lg">

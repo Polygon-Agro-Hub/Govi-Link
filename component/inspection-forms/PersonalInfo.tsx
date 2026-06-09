@@ -1167,7 +1167,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
         onRequestClose={() => setShowDistrictDropdown(false)}
       >
         <View className="flex-1 bg-black/50 justify-center items-center">
-          <View className="bg-white rounded-2xl w-11/12 max-h-3/4">
+          <View className="bg-white rounded-2xl w-10/12 max-h-3/4">
             <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
               <Text className="text-lg font-semibold">
                 {t("AddOfficer.SelectDistricts")}
@@ -1204,7 +1204,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
         onRequestClose={() => setShowCountryDropdown(false)}
       >
         <View className="flex-1 bg-black/50 justify-center items-center">
-          <View className="bg-white rounded-2xl w-11/12 max-h-3/4">
+          <View className="bg-white rounded-2xl w-10/12 max-h-3/4">
             <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
               <Text className="text-lg font-semibold">
                 {t("AddOfficer.SelectCountry")}

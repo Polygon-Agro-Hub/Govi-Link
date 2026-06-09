@@ -54,7 +54,7 @@ const climateParameters = [
 type Selection = "yes" | "no" | null;
 
 const ErrorMessage = ({ message }: { message: string }) => (
-  <View className="flex-row items-center mt-1 ml-1 gap-1">
+  <View className="flex-row items-center mb-2 ml-1 gap-1">
     <FontAwesome name="exclamation-triangle" size={14} color="#EF4444" />
     <Text className="text-red-500 text-sm ml-1">{message}</Text>
   </View>
@@ -116,9 +116,9 @@ const YesNoSelect = ({
         <Text className="text-sm text-[#070707] mb-2">
           {label} {required && <Text className="text-black">*</Text>}
         </Text>
-
+        {error && <ErrorMessage message={error} />}
         <TouchableOpacity
-          className="bg-[#F6F6F6] rounded-full px-4 py-4 flex-row items-center justify-between"
+          className="bg-[#F6F6F6] rounded-full px-4 h-[50px] flex-row items-center justify-between"
           onPress={onOpen}
           activeOpacity={0.7}
         >
@@ -131,7 +131,6 @@ const YesNoSelect = ({
           )}
           <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
         </TouchableOpacity>
-        {error && <ErrorMessage message={error} />}
       </View>
     </>
   );
@@ -161,6 +160,7 @@ const Input = ({
       {label} {extra && <Text className="text-black font-bold">{extra} </Text>}
       {required && <Text className="text-black">*</Text>}
     </Text>
+    {error && <ErrorMessage message={error} />}
     <View
       className={`bg-[#F6F6F6] rounded-3xl flex-row items-center ${error ? "border border-red-500" : ""
         }`}
@@ -174,7 +174,6 @@ const Input = ({
         keyboardType={keyboardType}
       />
     </View>
-    {error && <ErrorMessage message={error} />}
   </View>
 );
 
@@ -210,6 +209,11 @@ const validateAndFormat = (text: string, rules: ValidationRule, t: any) => {
     value = value.replace(/\.{2,}/g, ".");
     if (rules.required && value.trim().length === 0) {
       error = t(`Error.${rules.type} is required`);
+    } else if (value.trim().length > 0) {
+      const numVal = parseFloat(value);
+      if (isNaN(numVal) || numVal < 0 || numVal > 14) {
+        error = t("Error.pH must be between 0 and 14");
+      }
     }
   }
 
@@ -355,8 +359,9 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
         selections[param.key] === "yes" || selections[param.key] === "no",
     );
 
+    const phVal = parseFloat(formData.ph?.toString() || "0");
     const isPHValid =
-      formData.ph !== null && formData.ph !== undefined && formData.ph > 0;
+      !isNaN(phVal) && phVal > 0 && phVal <= 14;
     const isSoilTypeValid = !!formData.soilType?.trim();
 
     const waterSources = formData.waterSources || [];
@@ -670,8 +675,11 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
       );
     }
 
-    if (!formData?.ph || formData.ph <= 0) {
+    const phVal = parseFloat(formData?.ph?.toString() || "0");
+    if (!formData?.ph || phVal <= 0) {
       validationErrors.ph = t("Error.pH is required");
+    } else if (phVal > 14) {
+      validationErrors.ph = t("Error.pH must be between 0 and 14");
     }
     if (!formData?.soilType || formData.soilType.trim() === "") {
       validationErrors.soilType = t("Error.soilType is required");
@@ -972,8 +980,12 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
               <Text className="text-black-500">*</Text>
             </Text>
 
+            {hasAttemptedNext && errors.soilfertility ? (
+              <ErrorMessage message={errors.soilfertility} />
+            ) : null}
+
             <TouchableOpacity
-              className="bg-[#F6F6F6] px-4 py-4 flex-row items-center justify-between rounded-full"
+              className="bg-[#F6F6F6] px-4 h-[50px] flex-row items-center justify-between rounded-full"
               onPress={() => {
                 setOverallSoilFertilityVisible(true);
               }}
@@ -990,10 +1002,6 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
 
               <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
             </TouchableOpacity>
-
-            {hasAttemptedNext && errors.soilfertility ? (
-              <ErrorMessage message={errors.soilfertility} />
-            ) : null}
           </View>
 
           {/* Water Sources */}
@@ -1002,6 +1010,10 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
               {t("InspectionForm.Water sources")}{" "}
               <Text className="text-black-500">*</Text>
             </Text>
+
+            {hasAttemptedNext && errors.waterSources ? (
+              <ErrorMessage message={errors.waterSources} />
+            ) : null}
 
             {["Tanks", "Wells", "River", "Dams", "Other"].map((option) => {
               const selected = formData.waterSources?.includes(option) || false;
@@ -1029,10 +1041,6 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
                 onChangeText={handleOtherWaterSourceChange}
               />
             )}
-
-            {hasAttemptedNext && errors.waterSources ? (
-              <ErrorMessage message={errors.waterSources} />
-            ) : null}
           </View>
 
           <View className="mb-2 mt-4">
@@ -1040,6 +1048,11 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
               {t("InspectionForm.Images of the water source")}{" "}
               <Text className="text-black-500">*</Text>
             </Text>
+
+            {hasAttemptedNext && errors.waterImages ? (
+              <ErrorMessage message={errors.waterImages} />
+            ) : null}
+
             <TouchableOpacity
               className="bg-[#1A1A1A] rounded-3xl px-6 h-[50px] flex-row justify-center items-center mb-1"
               onPress={async () => {
@@ -1077,10 +1090,6 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
                 ))}
               </View>
             )}
-
-            {hasAttemptedNext && errors.waterImages ? (
-              <ErrorMessage message={errors.waterImages} />
-            ) : null}
           </View>
 
           <YesNoSelect
@@ -1226,7 +1235,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
             setOverallSoilFertilityVisible(false);
           }}
         >
-          <View className="bg-white w-80 rounded-2xl overflow-hidden">
+          <View className="bg-white w-10/12 rounded-2xl overflow-hidden">
             {[
               "Excellent",
               "Good",

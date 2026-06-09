@@ -195,8 +195,7 @@ const ComplainHistory: React.FC<ComplainHistoryProps> = ({ navigation }) => {
           </View>
         ) : (
           <ScrollView
-            className="px-4 flex-1"
-            contentContainerStyle={{ paddingBottom: hp(4) }}
+            className="px-6 flex-1 pb-20"
           >
             {complains.map((complain) => (
               <View
@@ -254,7 +253,7 @@ const ComplainHistory: React.FC<ComplainHistoryProps> = ({ navigation }) => {
             className="flex-1 items-center bg-white bg-opacity-50"
           >
             <ScrollView
-              className="bg-white rounded-lg shadow-lg w-full"
+              className="bg-white rounded-lg shadow-lg w-full mt-10"
               contentContainerStyle={{ padding: 24, paddingBottom: 70 }}
               showsVerticalScrollIndicator={false}
             >
