@@ -849,7 +849,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
         )}
         <View className="px-8 mt-8">
           <TouchableOpacity
-            className="bg-[#FEE5E6] rounded-lg p-3 h-20 mr-4 w-full flex-row justify-between items-center"
+            className="bg-[#FEE5E6] rounded-lg p-3 h-24 mr-4 w-full flex-row justify-between items-center"
             style={{
               shadowColor: "#000",
               shadowOffset: { width: 1, height: 1 },
@@ -877,7 +877,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
         </View>
         <View className="px-8 mt-4 mb-[15%]">
           <TouchableOpacity
-            className="bg-[#FFF5BE] rounded-lg p-3 h-20 mr-4 w-full flex-row justify-between items-center"
+            className="bg-[#FFF5BE] rounded-lg p-3 h-24 mr-4 w-full flex-row justify-between items-center"
             style={{
               shadowColor: "#000",
               shadowOffset: { width: 1, height: 1 },
