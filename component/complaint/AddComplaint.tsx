@@ -204,10 +204,9 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
       />
       <ScrollView
         keyboardShouldPersistTaps="handled"
-        style={{ paddingHorizontal: wp(4), paddingVertical: hp(4) }}
-        className="flex-1 bg-white"
+        className="flex-1 bg-white px-0"
       >
-        <View className="flex-1 p-4">
+        <View className="flex-1 p-6">
           <View className="items-center mb-6 -mt-12">
             <Image
               source={require("@/assets/images/complaint/add-complaint.webp")}
@@ -247,6 +246,7 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
               placeholder={t("AddComplaint.Add the Complaint here..")}
               placeholderTextColor="#808FA2"
               className="text-black bg-white border border-[#9DB2CE] rounded-lg p-4 min-h-[280px]"
+              style={{ fontStyle: complaintText ? "normal" : "italic" }}
               value={complaintText}
               onChangeText={(text) => {
                 if (text.startsWith(" ")) {
@@ -270,7 +270,7 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
 
           <TouchableOpacity
             onPress={handleSubmit}
-            className="mx-auto shadow-lg px-4 w-full pb-8"
+            className="mx-auto shadow-lg px-6 w-full pb-8"
             disabled={loading}
           >
             <LinearGradient

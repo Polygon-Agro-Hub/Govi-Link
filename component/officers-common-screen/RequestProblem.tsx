@@ -15,7 +15,7 @@ import {
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp, useRoute, useFocusEffect } from "@react-navigation/native";
 import { RootStackParamList } from "../types/types";
-import { AntDesign, FontAwesome6 } from "@expo/vector-icons";
+import { AntDesign, FontAwesome6, Ionicons } from "@expo/vector-icons";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
@@ -277,7 +277,6 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
       className="flex-1 bg-white"
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-
       <CustomHeader
         title={`#${jobId}`}
         navigation={navigation}
@@ -309,7 +308,7 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
           {t("RequestProblem.FarmerSay")}
         </Text>
         <TextInput
-          className="border border-[#9DB2CE] rounded-3xl p-2 mb-4"
+          className="border border-[#9DB2CE] rounded-lg p-2 mb-4"
           multiline
           placeholder={t("CertificateSuggestions.Type here...")}
           textAlignVertical="top"
@@ -323,7 +322,7 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
         </Text>
 
         <TextInput
-          className="border border-[#9DB2CE] rounded-3xl p-2 mb-6"
+          className="border border-[#9DB2CE] rounded-lg p-2 mb-6"
           multiline
           placeholder={t("CertificateSuggestions.Type here...")}
           textAlignVertical="top"
@@ -347,9 +346,22 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
         )}
       </ScrollView>
 
-      <View className="flex-row justify-between p-4 border-t border-gray-200 px-6">
+      <View
+        className="flex-row px-6 py-3 gap-4 bg-white border-t border-gray-200 w-full"
+        style={{
+          paddingBottom: Platform.OS === "android" ? 8 : 12,
+        }}
+      >
         <TouchableOpacity
-          className="flex-row items-center bg-[#444444] px-11 h-[50px] rounded-3xl "
+          className="flex-1 bg-[#444444] rounded-full h-[50px] flex-row items-center justify-center"
+          activeOpacity={0.8}
+          style={{
+            shadowColor: "#000000",
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.25,
+            shadowRadius: 10,
+            elevation: 6,
+          }}
           onPress={() =>
             navigation.navigate("Main", {
               screen: "MainTabs",
@@ -359,22 +371,31 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
             })
           }
         >
-          <AntDesign name="arrow-left" size={20} color="#fff" />
-          <Text className="ml-4 text-white font-semibold text-lg">
+          <Ionicons name="arrow-back" size={25} color="#fff" />
+          <Text className="text-white text-base font-semibold ml-2">
             {t("CertificateQuesanory.Exit")}
           </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           disabled={loading}
+          className="flex-1"
           onPress={handleNext}
-          className="rounded-full overflow-hidden"
+          activeOpacity={0.8}
         >
           <LinearGradient
             colors={["#F35125", "#FF1D85"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
-            className="flex-row items-center px-10 h-[50px] rounded-3xl"
+            className="rounded-full h-[50px] flex-row items-center justify-center w-full"
+            style={{
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 3 },
+              shadowOpacity: 0.25,
+              shadowRadius: 5,
+              elevation: 6,
+              overflow: "hidden",
+            }}
           >
             {loading ? (
               <ActivityIndicator
@@ -383,12 +404,11 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
                 style={{ marginRight: 8 }}
               />
             ) : (
-              <Text className="mr-4 text-white font-semibold text-lg">
+              <Text className="text-white text-base font-semibold mr-2">
                 {t("CertificateQuesanory.Next")}
               </Text>
             )}
-
-            <AntDesign name="arrow-right" size={20} color="#fff" />
+            <Ionicons name="arrow-forward" size={25} color="#fff" />
           </LinearGradient>
         </TouchableOpacity>
       </View>

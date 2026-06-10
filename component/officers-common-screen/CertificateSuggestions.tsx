@@ -439,7 +439,7 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
                       {t("CertificateSuggestions.Identified Problem")}
                     </Text>
                     <TextInput
-                      className="border border-[#9DB2CE] rounded-3xl p-2 mb-4"
+                      className="border border-[#9DB2CE] rounded-lg p-2 mb-4"
                       multiline
                       placeholder={t("CertificateSuggestions.Type here...")}
                       textAlignVertical="top"
@@ -454,7 +454,7 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
                       {t("CertificateSuggestions.Suggested Solution")}
                     </Text>
                     <TextInput
-                      className="border border-[#9DB2CE] rounded-3xl p-2 mb-4"
+                      className="border border-[#9DB2CE] rounded-lg p-2 mb-4"
                       multiline
                       placeholder={t("CertificateSuggestions.Type here...")}
                       textAlignVertical="top"
@@ -466,7 +466,7 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
                     />
 
                     <TouchableOpacity
-                      className="bg-[#1A1A1A] p-4 rounded-3xl w-full flex justify-center items-center mb-1"
+                      className="bg-[#1A1A1A] rounded-3xl w-full flex justify-center items-center h-[50px] mb-1"
                       onPress={() => handleSaveProblem(item)}
                     >
                       <Text className="text-white text-center font-semibold text-base">
@@ -476,7 +476,7 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
                       </Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                      className="bg-[#C4C4C4] p-4 rounded-3xl w-full flex-1 justify-center items-center mt-2"
+                      className="bg-[#C4C4C4] rounded-3xl w-full justify-center items-center h-[50px] mt-2"
                       onPress={() => handleCancelEdit(item.id)}
                     >
                       <Text className="text-white text-center font-semibold text-base">

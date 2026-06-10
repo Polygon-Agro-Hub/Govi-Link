@@ -968,7 +968,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               {t("InspectionForm.Bank Name")} *
             </Text>
             <TouchableOpacity
-              className={`bg-[#F4F4F4] rounded-full px-4 py-4 flex-row justify-between items-center ${errors.bank ? "border border-red-500" : ""
+              className={`bg-[#F4F4F4] rounded-full px-4 h-[50px] flex-row justify-between items-center ${errors.bank ? "border border-red-500" : ""
                 }`}
               onPress={() => setShowBankDropdown(true)}
             >
@@ -998,7 +998,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               {t("InspectionForm.Branch Name")} *
             </Text>
             <TouchableOpacity
-              className={`bg-[#F4F4F4] rounded-full px-4 py-4 flex-row justify-between items-center ${errors.branch ? "border border-red-500" : ""
+              className={`bg-[#F4F4F4] rounded-full px-4 h-[50px] flex-row justify-between items-center ${errors.branch ? "border border-red-500" : ""
                 }`}
               onPress={() => setShowBranchDropdown(true)}
               disabled={availableBranches.length === 0}
@@ -1227,7 +1227,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
           onRequestClose={() => handleModalClose("bank")}
         >
           <View className="flex-1 bg-black/50 justify-center items-center">
-            <View className="bg-white rounded-2xl w-11/12 max-h-3/4">
+            <View className="bg-white rounded-2xl w-10/12 max-h-3/4">
               <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
                 <Text className="text-lg font-semibold">
                   {t("AddOfficer.SelectBank")}
@@ -1259,7 +1259,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
           onRequestClose={() => handleModalClose("branch")}
         >
           <View className="flex-1 bg-black/50 justify-center items-center">
-            <View className="bg-white rounded-2xl w-11/12 max-h-3/4">
+            <View className="bg-white rounded-2xl w-10/12 max-h-3/4">
               <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
                 <Text className="text-lg font-semibold">
                   {t("AddOfficer.SelectBranch")}

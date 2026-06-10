@@ -422,14 +422,13 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
       : text;
   };
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex bg-white">
       <ScrollView
         className="bg-white p-3"
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
         showsVerticalScrollIndicator={true}
-        contentContainerStyle={{ flexGrow: 1, paddingBottom: 50 }}
       >
         <View className="flex flex-row ">
           <TouchableOpacity
@@ -461,7 +460,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
           <LoadingSkeleton />
         ) : (
           <>
-            <View className="p-2 mt-4">
+            <View className="flex-1 bg-white p-2 my-4">
               <View className="flex-row justify-between items-center mb-1">
                 <Text className="text-base font-bold">
                   {t("Dashboard.Today Visits")}{" "}
@@ -684,7 +683,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
               </View>
             )}
 
-            <View className="p-2 mt-10">
+            <View className="p-2 my-6">
               <Text className="text-base font-bold mb-3">
                 {t("Dashboard.Saved Draft")}
               </Text>
@@ -849,7 +848,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
         )}
         <View className="px-8 mt-8">
           <TouchableOpacity
-            className="bg-[#FEE5E6] rounded-lg p-3 h-20 mr-4 w-full flex-row justify-between items-center"
+            className="bg-[#FEE5E6] rounded-lg p-3 h-28 mr-4 w-full flex-row justify-between items-center"
             style={{
               shadowColor: "#000",
               shadowOffset: { width: 1, height: 1 },
@@ -875,9 +874,9 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
             />
           </TouchableOpacity>
         </View>
-        <View className="px-8 mt-4 mb-[15%]">
+        <View className="px-8 mt-4 mb-80">
           <TouchableOpacity
-            className="bg-[#FFF5BE] rounded-lg p-3 h-20 mr-4 w-full flex-row justify-between items-center"
+            className="bg-[#FFF5BE] rounded-lg p-3 h-28 mr-4 w-full flex-row justify-between items-center"
             style={{
               shadowColor: "#000",
               shadowOffset: { width: 1, height: 1 },

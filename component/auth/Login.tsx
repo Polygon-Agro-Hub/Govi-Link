@@ -263,6 +263,7 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
         onBackPress={() => handleNavBack()}
       />
       <ScrollView
+        style={{ backgroundColor: "white" }}
         contentContainerStyle={{
           flexGrow: 1,
           justifyContent: "center",

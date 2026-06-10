@@ -17,6 +17,7 @@ import {
   FontAwesome,
   FontAwesome6,
   MaterialIcons,
+  AntDesign,
 } from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
 import { useTranslation } from "react-i18next";
@@ -538,7 +539,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
               {t("InspectionForm.Is the land own by farmer")} *
             </Text>
             <TouchableOpacity
-              className="bg-[#F6F6F6] rounded-full px-4 py-4 flex-row items-center justify-between"
+              className="bg-[#F6F6F6] rounded-full px-4 h-[50px] flex-row items-center justify-between"
               onPress={() => setlandownNoModal(true)}
               activeOpacity={0.7}
             >
@@ -581,7 +582,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
               {t("InspectionForm.Legal status of the ownership of the land")} *
             </Text>
             <TouchableOpacity
-              className="bg-[#F6F6F6] rounded-full px-4 py-4 flex-row items-center justify-between"
+              className="bg-[#F6F6F6] rounded-full px-4 h-[50px] flex-row items-center justify-between"
               onPress={() => setLegalStatusModal(true)}
               activeOpacity={0.7}
             >
@@ -740,10 +741,10 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
               *
             </Text>
             <TouchableOpacity
-              className="bg-[#1A1A1A] rounded-3xl px-4 h-[50px] flex-row items-center justify-center gap-x-2"
+              className="bg-[#1A1A1A] rounded-3xl px-4 h-[54px] flex-row items-center justify-center gap-x-2"
               onPress={handleOpenCamera}
             >
-              <FontAwesome6 name="camera" size={22} color="#fff" />
+              <FontAwesome6 name="camera" size={24} color="#fff" />
               <Text className="text-white font-semibold text-lg">
                 {t("InspectionForm.Capture Photos")}
               </Text>
@@ -777,10 +778,10 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
                       className="w-full h-40 rounded-2xl"
                     />
                     <TouchableOpacity
-                      className="absolute top-1 right-1 bg-red-500 rounded-full w-6 h-6 justify-center items-center"
                       onPress={() => handleRemoveImage(index)}
+                      className="absolute top-[-8] right-[-8] bg-[#f21d1d] p-2 rounded-full"
                     >
-                      <Text className="text-white text-xs font-bold">×</Text>
+                      <AntDesign name="close" size={14} color="white" />
                     </TouchableOpacity>
                   </View>
                 ))}
@@ -820,7 +821,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
             {["Yes", "No"].map((item, index, arr) => (
               <View key={item}>
                 <TouchableOpacity
-                  className="py-4"
+                  className="h-[50px] justify-center items-center"
                   onPress={() => {
                     updateFormData({ isOwnByFarmer: item as "Yes" | "No" });
                     setTouched((prev) => ({ ...prev, isOwnByFarmer: true }));
@@ -857,11 +858,11 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
             }
           }}
         >
-          <View className="bg-white w-64 rounded-2xl overflow-hidden">
+          <View className="bg-white w-10/12 rounded-2xl overflow-hidden">
             {LEGAL_STATUS_OPTIONS.map((item, index) => (
               <View key={item}>
                 <TouchableOpacity
-                  className="py-4 px-4"
+                  className="px-4 h-[50px] justify-center items-center"
                   onPress={() => {
                     updateFormData({ ownershipStatus: item });
                     setTouched((prev) => ({ ...prev, ownershipStatus: true }));

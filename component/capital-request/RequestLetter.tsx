@@ -430,7 +430,7 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
                 console.log("Error navigating to QR Scanner:", e);
               }
             }}
-            className="rounded-3xl overflow-hidden h-[50px] w-[300px] self-center "
+            className="rounded-full overflow-hidden h-[50px] w-[300px] self-center "
           >
             <LinearGradient
               colors={["#F2561D", "#FF1D85"]}

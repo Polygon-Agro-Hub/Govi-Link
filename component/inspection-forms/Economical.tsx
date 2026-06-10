@@ -87,7 +87,7 @@ const YesNoSelect = ({
         </Text>
 
         <TouchableOpacity
-          className="bg-[#F6F6F6] rounded-full px-4 py-4 flex-row items-center justify-between"
+          className="bg-[#F6F6F6] rounded-full px-4 h-[50px] flex-row items-center justify-between"
           onPress={onOpen}
           activeOpacity={0.7}
         >

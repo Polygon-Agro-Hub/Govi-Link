@@ -8,6 +8,8 @@ import {
   Alert,
   Keyboard,
   AppState,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -23,7 +25,7 @@ const OtpverificationOnboardSupplier: React.FC = ({
   route,
 }: any) => {
   const { supplierName, contact, email, nic } = route.params;
-  const [otpCode, setOtpCode] = useState<string>("");
+  const [otpCode, setOtpCode] = useState<string[]>(["", "", "", "", ""]);
   const [referenceId, setReferenceId] = useState<string | null>(null);
   const [timer, setTimer] = useState<number>(300);
   const [isVerified, setIsVerified] = useState<boolean>(false);
@@ -33,6 +35,15 @@ const OtpverificationOnboardSupplier: React.FC = ({
   const [verificationAttempts, setVerificationAttempts] = useState<number>(0);
   const [isOtpExpired, setIsOtpExpired] = useState<boolean>(false);
   const [isActive, setIsActive] = useState<boolean>(true);
+
+  // Check if OTP is valid whenever otpCode changes
+  useEffect(() => {
+    const isValid = otpCode.every((digit) => digit !== "");
+    setIsOtpValid(isValid);
+    if (isValid) {
+      Keyboard.dismiss();
+    }
+  }, [otpCode]);
 
   const inputRefs = useRef<Array<TextInput | null>>([]);
   const backgroundTime = useRef<number | null>(null);
@@ -127,36 +138,25 @@ const OtpverificationOnboardSupplier: React.FC = ({
 
   const handleOtpChange = (text: string, index: number) => {
     const numeric = text.replace(/[^0-9]/g, "");
-    const updatedOtpCode = otpCode.split("");
-    updatedOtpCode[index] = numeric;
-    const newOtp = updatedOtpCode.join("");
-    setOtpCode(newOtp);
+    const newOtpCode = [...otpCode];
+    newOtpCode[index] = numeric.slice(-1);
+    setOtpCode(newOtpCode);
 
-    const allFilled =
-      updatedOtpCode.length === 5 &&
-      updatedOtpCode.every((char) => char !== "" && char !== undefined);
-    setIsOtpValid(allFilled);
-
-    if (text && inputRefs.current[index + 1]) {
+    if (numeric && index < 4) {
       inputRefs.current[index + 1]?.focus();
-    }
-    if (allFilled) {
-      Keyboard.dismiss();
     }
   };
 
   const handleKeyPress = (e: any, index: number) => {
     if (e.nativeEvent.key === "Backspace") {
-      const updatedOtpCode = otpCode.split("");
-
-      if (updatedOtpCode[index]) {
-        updatedOtpCode[index] = "";
-        setOtpCode(updatedOtpCode.join(""));
-        setIsOtpValid(false);
+      if (otpCode[index] !== "") {
+        const newOtpCode = [...otpCode];
+        newOtpCode[index] = "";
+        setOtpCode(newOtpCode);
       } else if (index > 0) {
-        updatedOtpCode[index - 1] = "";
-        setOtpCode(updatedOtpCode.join(""));
-        setIsOtpValid(false);
+        const newOtpCode = [...otpCode];
+        newOtpCode[index - 1] = "";
+        setOtpCode(newOtpCode);
         inputRefs.current[index - 1]?.focus();
       }
     }
@@ -171,6 +171,9 @@ const OtpverificationOnboardSupplier: React.FC = ({
         t("Otpverification.A new OTP has been sent to your mobile number."),
         [{ text: t("Main.ok") }],
       );
+      setOtpCode(["", "", "", "", ""]);
+      setIsOtpValid(false);
+      inputRefs.current[0]?.focus();
     } else {
       Alert.alert(
         t("Error.Sorry"),
@@ -222,7 +225,7 @@ const OtpverificationOnboardSupplier: React.FC = ({
   };
 
   const handleVerify = async () => {
-    const code = otpCode;
+    const code = otpCode.join("");
     Keyboard.dismiss();
 
     if (code.length !== 5) {
@@ -307,7 +310,7 @@ const OtpverificationOnboardSupplier: React.FC = ({
                 {
                   text: t("Otpverification.Try Again"),
                   onPress: () => {
-                    setOtpCode("");
+                    setOtpCode(["", "", "", "", ""]);
                     setIsOtpValid(false);
                     inputRefs.current[0]?.focus();
                   },
@@ -382,114 +385,124 @@ const OtpverificationOnboardSupplier: React.FC = ({
   };
 
   return (
-    <ScrollView className="flex-1 bg-white">
-      <CustomHeader
-        title={t("OnboardSupplier.OTP Verification")}
-        navigation={navigation}
-        showBackButton={true}
-        onBackPress={() => navigation.goBack()}
-        titleColor="black"
-      />
-
-      <View className="flex justify-center items-center mt-3">
-        <Image
-          source={require("../../assets/images/otp/otp-verify.webp")}
-          style={{ width: 500, height: 150 }}
-          resizeMode="contain"
+    <KeyboardAvoidingView
+      style={{ flex: 1, backgroundColor: "white" }}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+    >
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        <CustomHeader
+          title={t("OnboardSupplier.OTP Verification")}
+          navigation={navigation}
+          showBackButton={true}
+          onBackPress={() => navigation.goBack()}
+          titleColor="black"
         />
+        <View className="border-b border-[#E5E5E5]" />
 
-        <View>
+        <View className="flex-1 justify-center items-center px-6 pt-10 pb-10">
+          <Image
+            source={require("../../assets/images/otp/otp-verify.webp")}
+            style={{ width: 300, height: 150 }}
+            resizeMode="contain"
+          />
+
           <Text className="mt-8 text-lg text-black text-center font-semibold">
             {t("Otpverification.Enter Verification Code")}
           </Text>
-          <Text className="text-base text-[#808080] text-center p-4">
+
+          <Text className="text-base text-[#808080] text-center mt-2 px-4">
             {t(
               "OnboardSupplier.We have sent a Verification Code to the given mobile number",
             )}
           </Text>
-        </View>
 
-        {/* OTP Input Boxes */}
-        <View className="flex-row justify-center gap-3 mt-4 px-4">
-          {Array.from({ length: 5 }).map((_, index) => (
-            <TextInput
-              key={index}
-              ref={(el: TextInput | null) => {
-                inputRefs.current[index] = el;
-              }}
-              className={`w-12 h-12 text-lg text-center rounded-lg ${otpCode[index]
-                  ? "bg-[#FF1D85] text-white pb-2"
+          {/* OTP Input Fields */}
+          <View className="flex-row justify-center gap-3 mt-8">
+            {Array.from({ length: 5 }).map((_, index) => (
+              <TextInput
+                key={index}
+                ref={(el: TextInput | null) => {
+                  inputRefs.current[index] = el;
+                }}
+                className={`w-14 h-14 text-center text-xl rounded-lg ${otpCode[index]
+                  ? "bg-[#FF1D85] text-white"
                   : "bg-[#FFE8F3] text-black"
-                }`}
-              keyboardType="numeric"
-              maxLength={1}
-              value={otpCode[index] || ""}
-              onChangeText={(text) => handleOtpChange(text, index)}
-              placeholderTextColor="lightgray"
-              onKeyPress={(e) => handleKeyPress(e, index)}
-            />
-          ))}
-        </View>
+                  }`}
+                keyboardType="number-pad"
+                maxLength={1}
+                value={otpCode[index] || ""}
+                onChangeText={(text) => handleOtpChange(text, index)}
+                onKeyPress={(e) => handleKeyPress(e, index)}
+                selectionColor="#FF1D85"
+                textAlign="center"
+              />
+            ))}
+          </View>
 
-        {/* Timer */}
-        <View className="mt-6">
-          <Text className="text-base">{formatTime(timer)}</Text>
-        </View>
-
-        {/* Resend OTP */}
-        <View className="mt-4 mb-10 flex-row justify-center items-center">
-          <Text className="text-md text-[#707070]">
-            {t("OnboardSupplier.Didn't receive the OTP")}
-          </Text>
-          <View className="ml-2">
-            <Text
-              className="text-md font-semibold text-center underline"
-              onPress={disabledResend ? undefined : handleResendOTP}
-              style={{ color: disabledResend ? "gray" : "black" }}
-            >
-              {t("Otpverification.RESEND OTP")}
+          {/* Timer */}
+          <View className="mt-6">
+            <Text className="text-base text-[#808080]">
+              {formatTime(timer)}
             </Text>
           </View>
-        </View>
 
-        {/* Buttons */}
-        <View className="w-2/3">
-          {/* Back Button */}
-          <TouchableOpacity
-            className="bg-[#D9D9D9] h-[50px]  justify-center rounded-3xl mb-4"
-            onPress={() => navigation.goBack()}
-          >
-            <Text className="text-[#686868] text-lg text-center">
-              {t("OnboardSupplier.Back")}
+          {/* Resend OTP */}
+          <View className="mt-4 mb-8 flex-row justify-center items-center">
+            <Text className="text-md text-[#707070]">
+              {t("OnboardSupplier.Didn't receive the OTP")}
             </Text>
-          </TouchableOpacity>
-
-          {/* Submit Button */}
-          <TouchableOpacity
-            onPress={handleVerify}
-            disabled={!isOtpValid || isVerified}
-            activeOpacity={0.8}
-            className="justify-center rounded-full mb-4"
-          >
-            <LinearGradient
-              colors={
-                !isOtpValid || isVerified
-                  ? ["#C4C4C4", "#C4C4C4"]
-                  : ["#F35125", "#FF1D85"]
-              }
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              className="flex-1 items-center justify-center rounded-3xl h-[50px]"
-              style={{ overflow: "hidden" }}
+            <TouchableOpacity
+              onPress={disabledResend ? undefined : handleResendOTP}
+              disabled={disabledResend}
+              activeOpacity={disabledResend ? 1 : 0.7}
             >
-              <Text className="text-white text-lg font-semibold">
-                {t("OnboardSupplier.Submit")}
+              <Text
+                className="text-md font-semibold text-black text-center underline ml-2"
+                style={{ color: disabledResend ? "#999999" : "#000000" }}
+              >
+                {t("Otpverification.RESEND OTP")}
               </Text>
-            </LinearGradient>
-          </TouchableOpacity>
+            </TouchableOpacity>
+          </View>
+
+          {/* Buttons */}
+          <View className="w-full items-center gap-4 mt-4">
+            <TouchableOpacity
+              className="w-2/3 h-[50px] bg-[#444444] justify-center items-center rounded-full"
+              onPress={() => navigation.goBack()}
+              activeOpacity={0.7}
+            >
+              <Text className="text-white text-lg text-center font-semibold">
+                {t("OnboardSupplier.Back")}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              className="w-2/3 h-[50px] rounded-full overflow-hidden"
+              onPress={handleVerify}
+              disabled={!isOtpValid || isVerified}
+              activeOpacity={!isOtpValid || isVerified ? 1 : 0.7}
+            >
+              <LinearGradient
+                colors={!isOtpValid || isVerified ? ["#CCCCCC", "#CCCCCC"] : ["#F35125", "#FF1D85"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                className="flex-1 items-center justify-center"
+                style={{ overflow: "hidden" }}
+              >
+                <Text className="text-white text-lg font-semibold">
+                  {t("OnboardSupplier.Submit")}
+                </Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 

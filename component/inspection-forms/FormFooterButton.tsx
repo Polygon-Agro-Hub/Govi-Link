@@ -58,7 +58,7 @@ const FormFooterButton: React.FC<FormFooterButtonProps> = ({
       ]}
     >
       <TouchableOpacity
-        className="flex-1 bg-[#444444] rounded-full py-4 flex-row items-center justify-center"
+        className="flex-1 bg-[#444444] rounded-full h-[50px] flex-row items-center justify-center"
         onPress={onExit}
         activeOpacity={0.8}
         style={[
@@ -92,7 +92,7 @@ const FormFooterButton: React.FC<FormFooterButtonProps> = ({
               colors={gradientColors}
               start={gradientStart}
               end={gradientEnd}
-              className="rounded-full py-4 flex-row items-center justify-center"
+              className="rounded-full h-[50px] flex-row items-center justify-center"
               style={{
                 shadowColor: "#000",
                 shadowOffset: { width: 0, height: 3 },
@@ -115,7 +115,7 @@ const FormFooterButton: React.FC<FormFooterButtonProps> = ({
         </View>
       ) : (
         <View
-          className="flex-1 bg-gray-300 rounded-full py-4 flex-row items-center justify-center"
+          className="flex-1 bg-gray-300 rounded-full h-[50px] flex-row items-center justify-center"
           style={[
             {
               shadowColor: "#000000",

@@ -24,6 +24,7 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import CustomHeader from "../commons/CustomHeader";
+import FormFooterButton from "../inspection-forms/FormFooterButton";
 type RequestSuggestionsNavigationProp = StackNavigationProp<
   RootStackParamList,
   "RequestSuggestions"
@@ -338,6 +339,35 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
     }
   };
 
+  const handleExit = () => {
+    const hasUnsaved = problems.some(
+      (p) =>
+        !p.saved &&
+        (p.problem.trim() !== "" || p.solution.trim() !== "")
+    );
+
+    if (hasUnsaved) {
+      Alert.alert(
+        t("CertificateSuggestions.Unsaved Problem"),
+        t(
+          "CertificateSuggestions.You have unsaved problems. Do you want to go back without saving?",
+        ),
+        [
+          {
+            text: t("CertificateQuesanory.Cancel"),
+            style: "cancel",
+          },
+          {
+            text: t("CertificateSuggestions.Go Back"),
+            onPress: () => navigation.goBack(),
+          },
+        ],
+      );
+    } else {
+      navigation.goBack();
+    }
+  };
+
   return (
     <KeyboardAvoidingView
       className="flex-1 bg-white"
@@ -347,7 +377,7 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
         title={`#${jobId}`}
         navigation={navigation}
         showBackButton={true}
-        onBackPress={() => navigation.goBack()}
+        onBackPress={handleExit}
       />
       <View className="shadow-sm border-b border-[#E5E5E5]" />
 
@@ -364,7 +394,7 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
         <ScrollView
           className="p-6 flex-1"
           keyboardShouldPersistTaps="handled"
-          contentContainerStyle={{ paddingBottom: 120 }}
+          contentContainerStyle={{ paddingBottom: 20 }}
         >
           {problems.map((item, index) => (
             <View key={item.id} className="mb-6">
@@ -397,7 +427,7 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
                       {t("CertificateSuggestions.Identified Problem")}
                     </Text>
                     <TextInput
-                      className="border border-[#9DB2CE] rounded-xl p-2 mb-4"
+                      className="border border-[#9DB2CE] rounded-lg p-2 mb-4"
                       multiline
                       placeholder={t("CertificateSuggestions.Type here...")}
                       textAlignVertical="top"
@@ -412,7 +442,7 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
                       {t("CertificateSuggestions.Suggested Solution")}
                     </Text>
                     <TextInput
-                      className="border border-[#9DB2CE] rounded-xl p-2 mb-4"
+                      className="border border-[#9DB2CE] rounded-lg p-2 mb-4"
                       multiline
                       placeholder={t("CertificateSuggestions.Type here...")}
                       textAlignVertical="top"
@@ -463,72 +493,40 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
           </View>
         </ScrollView>
       )}
-      <View className="flex-row justify-between p-4 border-t border-gray-200 px-6">
-        <TouchableOpacity
-          className="flex-row items-center bg-[#444444] px-9 h-[50px] rounded-3xl "
-          onPress={() => navigation.goBack()}
-        >
-          <AntDesign name="arrow-left" size={20} color="#fff" />
-          <Text className="ml-4 text-white font-semibold text-lg">
-            {t("CertificateQuesanory.Back")}
-          </Text>
-        </TouchableOpacity>
-        {loading || editingId !== null ? (
-          <View className="flex-row items-center bg-[#444444] px-9 h-[50px] rounded-3xl ">
-            <Text className="mr-2 text-white font-semibold text-lg">
-              {t("CertificateQuesanory.Next")}
-            </Text>
-            <AntDesign name="arrow-right" size={20} color="#fff" />
-          </View>
-        ) : (
-          <>
-            <TouchableOpacity
-              disabled={loading}
-              onPress={() => {
-                const hasUnsaved = problems.some(
-                  (p) =>
-                    !p.saved &&
-                    (p.problem.trim() !== "" || p.solution.trim() !== ""),
-                );
+      <FormFooterButton
+        exitText={t("CertificateQuesanory.Back")}
+        nextText={t("CertificateQuesanory.Next")}
+        isNextEnabled={!OtpSendLoading && editingId === null}
+        onExit={handleExit}
+        onNext={() => {
+          const hasUnsaved = problems.some(
+            (p) =>
+              !p.saved &&
+              (p.problem.trim() !== "" || p.solution.trim() !== "")
+          );
 
-                if (hasUnsaved) {
-                  Alert.alert(
-                    t("CertificateSuggestions.Unsaved Problem"),
-                    t(
-                      "CertificateSuggestions.You have unsaved problems. Do you want to continue without saving?",
-                    ),
-                    [
-                      {
-                        text: t("CertificateQuesanory.Cancel"),
-                        style: "cancel",
-                      },
-                      {
-                        text: t("CertificateSuggestions.Continue"),
-                        onPress: () => handleNext(),
-                      },
-                    ],
-                  );
-                } else {
-                  handleNext();
-                }
-              }}
-              className="rounded-full overflow-hidden"
-            >
-              <LinearGradient
-                colors={["#F35125", "#FF1D85"]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                className="flex-row items-center px-9 h-[50px] rounded-3xl"
-              >
-                <Text className="mr-4 text-white font-semibold text-lg">
-                  {t("CertificateQuesanory.Next")}
-                </Text>
-                <AntDesign name="arrow-right" size={20} color="#fff" />
-              </LinearGradient>
-            </TouchableOpacity>
-          </>
-        )}
-      </View>
+          if (hasUnsaved) {
+            Alert.alert(
+              t("CertificateSuggestions.Unsaved Problem"),
+              t(
+                "CertificateSuggestions.You have unsaved problems. Do you want to continue without saving?",
+              ),
+              [
+                {
+                  text: t("CertificateQuesanory.Cancel"),
+                  style: "cancel",
+                },
+                {
+                  text: t("CertificateSuggestions.Continue"),
+                  onPress: () => handleNext(),
+                },
+              ],
+            );
+          } else {
+            handleNext();
+          }
+        }}
+      />
     </KeyboardAvoidingView>
   );
 };

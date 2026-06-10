@@ -11,7 +11,8 @@
     "Your login session has expired. Please log in again to continue.": "Your login session has expired. Please log in again to continue.",
     "Success": "Success",
     "Go Back": "Go Back",
-    "Continue": "Continue"
+    "Continue": "Continue",
+    "Cancel": "Cancel"
   },
   "Error": {
     "error": "Sorry",
@@ -135,6 +136,7 @@
     "Please enter a valid License ID number": "Please enter a valid License ID number (1 capital letter + 7 digits or 10–12 digits)",
     "At least one image of the water source is required": "At least one image of the water source is required",
     "pH is required": "pH is required",
+    "pH must be between 0 and 14": "pH must be between 0 and 14",
     "Overall soil fertility is required": "Overall soil fertility is required",
     "Land ownership is required": "Land ownership is required",
     "Ownership status is required": "Ownership status is required",
@@ -763,6 +765,7 @@
     "skipLocation": "Skip Location?",
     "skipMessage": "Some features may not work properly without location access. Are you sure?",
     "skip": "Skip",
-    "skipForNow": "Skip for now"
+    "skipForNow": "Skip for now",
+    "enableCameraManually": "Camera access is required. Please enable it in settings."
   }
 }

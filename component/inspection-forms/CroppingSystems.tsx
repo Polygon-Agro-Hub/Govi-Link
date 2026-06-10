@@ -625,7 +625,7 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
             </Text>
 
             <TouchableOpacity
-              className={`bg-[#F6F6F6] rounded-full px-4 py-4 flex-row items-center justify-between ${errors.hasKnowlage ? "border border-red-500" : ""
+              className={`bg-[#F6F6F6] rounded-full px-4 h-[50px] flex-row items-center justify-between ${errors.hasKnowlage ? "border border-red-500" : ""
                 }`}
               onPress={() => {
                 setActiveYesNoField("hasKnowlage");
@@ -661,7 +661,7 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
             </Text>
 
             <TouchableOpacity
-              className={`bg-[#F6F6F6] px-4 py-4 flex-row items-center justify-between rounded-full ${errors.prevExperince ? "border border-red-500" : ""
+              className={`bg-[#F6F6F6] px-4 h-[50px] flex-row items-center justify-between rounded-full ${errors.prevExperince ? "border border-red-500" : ""
                 }`}
               onPress={() => {
                 setExperienceModalVisible(true);
@@ -778,7 +778,7 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
             setExperienceModalVisible(false);
           }}
         >
-          <View className="bg-white w-80 rounded-2xl overflow-hidden">
+          <View className="bg-white w-10/12 rounded-2xl overflow-hidden">
             {experienceOptions.map((item, index, arr) => (
               <View key={item}>
                 <TouchableOpacity

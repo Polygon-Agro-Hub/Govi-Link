@@ -93,11 +93,13 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
 
     switch (currentLanguage) {
       case "si":
-        return `${officer.firstNameSinhala || officer.firstName} ${officer.lastNameSinhala || officer.lastName
-          }`;
+        return `${officer.firstNameSinhala || officer.firstName} ${
+          officer.lastNameSinhala || officer.lastName
+        }`;
       case "ta":
-        return `${officer.firstNameTamil || officer.firstName} ${officer.lastNameTamil || officer.lastName
-          }`;
+        return `${officer.firstNameTamil || officer.firstName} ${
+          officer.lastNameTamil || officer.lastName
+        }`;
       default:
         return `${officer.firstName} ${officer.lastName}`;
     }
@@ -370,23 +372,25 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
 
   return (
     <View className="flex-1 bg-white">
-      <View className="flex-row items-center px-4 py-3 border-b border-gray-200">
-        <TouchableOpacity
-          onPress={() => {
-            if (showConfirmationModal) {
-              handleUndo();
-            } else {
-              navigation.navigate("AssignJobs");
-            }
-          }}
-          className="bg-[#F6F6F680] rounded-full py-4 px-3"
-        >
-          <Entypo
-            name="chevron-left"
-            size={25}
-            color={"black"}
-          />
-        </TouchableOpacity>
+      <View className="flex-row items-center px-4 h-[70px] border-b border-gray-200">
+        <View className="w-16 items-start">
+          <TouchableOpacity
+            onPress={() => {
+              if (showConfirmationModal) {
+                handleUndo();
+              } else {
+                navigation.navigate("AssignJobs");
+              }
+            }}
+          >
+            <Entypo
+              name="chevron-left"
+              size={25}
+              color="black"
+              className="rounded-full p-3 bg-[#F6F6F6]/50"
+            />
+          </TouchableOpacity>
+        </View>
 
         <View className="flex-1 items-center">
           <Text className="text-lg font-bold text-black">
@@ -399,7 +403,7 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
           </Text>
         </View>
 
-        <View style={{ width: 55 }} />
+        <View className="w-16 items-end" />
       </View>
 
       {!showConfirmationModal ? (
@@ -432,17 +436,20 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
                         {officer.empId}
                       </Text>
 
-                      <Text className="text-sm font-medium text-[#000000]">
-                        {t("AssignJobOfficerList.OfficerAssignedJobs")}:{" "}
-                        {officer.assigned}
-                      </Text>
+                      <Text className="text-sm font-normal text-[#000000]">
+  {t("AssignJobOfficerList.OfficerAssignedJobs")}:{" "}
+  <Text className="font-medium">
+    {officer.assigned}
+  </Text>
+</Text>
                     </View>
 
                     <TouchableOpacity
                       onPress={() => handleAssignToOfficer(officer)}
                       disabled={assigning}
-                      className={`px-5 py-3 rounded-3xl items-center mt-auto ml-3 ${assigning ? "bg-gray-400" : "bg-black"
-                        }`}
+                      className={`px-5 py-3 rounded-full items-center mt-auto ml-3 ${
+                        assigning ? "bg-gray-400" : "bg-black"
+                      }`}
                     >
                       {assigning ? (
                         <ActivityIndicator size="small" color="white" />
@@ -527,16 +534,18 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
                     <Text className="text-sm font-medium text-[#4E6393] mt-1">
                       {selectedOfficer.empId}
                     </Text>
-                    <Text className="text-sm font-medium text-[#000000]">
-                      {t("AssignJobOfficerList.OfficerAssignedJobs")}:{" "}
-                      {selectedOfficer.assigned}
+                    <Text className="text-sm font-normal text-[#000000]">
+                      {t("AssignJobOfficerList.OfficerAssignedJobs")}:
+                      <Text className="font-medium">
+                        {selectedOfficer.assigned}
+                      </Text>
                     </Text>
                   </View>
 
                   <TouchableOpacity
                     onPress={handleUndo}
                     disabled={assigning}
-                    className="ml-3 mt-auto"
+                    className="ml-3 mt-auto rounded-full overflow-hidden"
                   >
                     <LinearGradient
                       colors={
@@ -546,7 +555,7 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
                       }
                       start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 0 }}
-                      className="px-10 py-3 rounded-3xl items-center"
+                      className="px-10 rounded-full items-center justify-center h-[50px]"
                       style={{
                         shadowColor: "#000",
                         shadowOffset: { width: 0, height: 3 },
@@ -573,7 +582,7 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
             <TouchableOpacity
               onPress={handleConfirmAndLeave}
               disabled={assigning}
-              className="w-full"
+              className="w-full rounded-full overflow-hidden"
             >
               <LinearGradient
                 colors={
@@ -581,7 +590,7 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
                 }
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
-                className="rounded-3xl px-6 py-4 items-center"
+                className="rounded-full px-6 items-center justify-center h-[50px]"
               >
                 {assigning ? (
                   <ActivityIndicator size="small" color="white" />

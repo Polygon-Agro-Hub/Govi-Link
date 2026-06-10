@@ -88,7 +88,7 @@ const CapitalRequstQRScanner: React.FC<CapitalRequstQRScannerProps> = ({
         t("Permission.enableCameraManually") ||
           "Camera access is required to scan QR codes. Please enable it in settings.",
         [
-          { text: t("PublicForum.Cancel") || "Cancel", style: "cancel" },
+          { text: t("Main.Cancel") || "Cancel", style: "cancel" },
           {
             text: t("Permission.openSettings") || "Open Settings",
             onPress: () => Linking.openSettings(),
