@@ -55,7 +55,11 @@
         "ACCESS_NETWORK_STATE",
         "FOREGROUND_SERVICE",
         "NOTIFICATIONS",
-        "CALL_PHONE"
+        "CALL_PHONE",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
       ]
     },
     "web": {
@@ -86,8 +90,8 @@
             "deploymentTarget": "15.1"
           },
           "android": {
-            "compileSdkVersion": 35,
-            "targetSdkVersion": 35,
+            "compileSdkVersion": 36,
+            "targetSdkVersion": 36,
             "minSdkVersion": 24,
             "ndkVersion": "28.0.12433566",
             "enableProguardInReleaseBuilds": true,
@@ -116,7 +120,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": ""
+        "projectId": "db45a757-6422-457e-943d-a8eac3dbd3f4"
       }
     },
     "expo-camera": {
