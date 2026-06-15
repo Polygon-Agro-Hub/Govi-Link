@@ -205,4 +205,8 @@ export type RootStackParamList = {
   };
   LocationAccess:undefined;
   CameraAccess:undefined;
+  BannedScreen: {
+    statusType?: string;
+    message?: string;
+  };
 };

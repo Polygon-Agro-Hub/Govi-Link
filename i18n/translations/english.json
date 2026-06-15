@@ -767,5 +767,17 @@
     "skip": "Skip",
     "skipForNow": "Skip for now",
     "enableCameraManually": "Camera access is required. Please enable it in settings."
+  },
+  "Banned": {
+    "AccessDenied": "Access Denied",
+    "DefaultDescription": "Your account has been rejected or is not approved.",
+    "AccountRejected": "Account Rejected",
+    "RejectedDescription": "Your account approval has been revoked by the administrator.",
+    "AccountNotApproved": "Account Not Approved",
+    "NotApprovedDescription": "Your account approval has been revoked by the administrator.",
+    "PendingVerification": "Pending Verification",
+    "PendingDescription": "Your account status is pending verification.",
+    "SupportMessage": "Please contact Polygon Customer Support for further details.",
+    "BackToLogin": "Back to Login"
   }
 }

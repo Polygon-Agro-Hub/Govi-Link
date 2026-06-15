@@ -761,5 +761,17 @@
     "skipMessage": "Some features may not work properly without location access. Are you sure?",
     "skip": "Skip",
     "skipForNow": "Skip for now"
+  },
+  "Banned": {
+    "AccessDenied": "ප්‍රවේශය ප්‍රතික්ෂේප කර ඇත",
+    "DefaultDescription": "ඔබගේ ගිණුම ප්‍රතික්ෂේප කර ඇත හෝ අනුමත කර නැත.",
+    "AccountRejected": "ගිණුම ප්‍රතික්ෂේප කරන ලදී",
+    "RejectedDescription": "පරිපාලක විසින් ඔබගේ ගිණුමේ අනුමැතිය අවලංගු කර ඇත.",
+    "AccountNotApproved": "ගිණුම අනුමත කර නැත",
+    "NotApprovedDescription": "පරිපාලක විසින් ඔබගේ ගිණුමේ අනුමැතිය අවලංගු කර ඇත.",
+    "PendingVerification": "සත්‍යාපනය වෙමින් පවතී",
+    "PendingDescription": "ඔබගේ ගිණුමේ තත්ත්වය සත්‍යාපනය වෙමින් පවතී.",
+    "SupportMessage": "වැඩි විස්තර සඳහා කරුණාකර Polygon පාරිභෝගික සහාය අමතන්න.",
+    "BackToLogin": "නැවත පුරන්න"
   }
 }
