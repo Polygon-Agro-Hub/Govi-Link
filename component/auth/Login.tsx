@@ -151,25 +151,38 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
       if (!response.ok || !data.success) {
         setLoading(false);
 
-        const message = data.message?.toLowerCase() || "";
+        const errorMessage = data.message;
+        const lowerMessage = data.message?.toLowerCase() || "";
+        const statusType = data.statusType;
 
-        if (message.includes("invalid password")) {
+        if (
+          statusType === "rejected" ||
+          statusType === "not_approved" ||
+          statusType === "pending" ||
+          lowerMessage.includes("user not approved") ||
+          lowerMessage.includes("rejected") ||
+          lowerMessage.includes("pending")
+        ) {
+          let mappedStatus = statusType;
+          if (!mappedStatus) {
+            if (lowerMessage.includes("rejected")) mappedStatus = "rejected";
+            else if (lowerMessage.includes("pending")) mappedStatus = "pending";
+            else mappedStatus = "not_approved";
+          }
+          navigation.navigate("BannedScreen", {
+            statusType: mappedStatus,
+            message: errorMessage,
+          });
+          return;
+        }
+
+        if (lowerMessage.includes("invalid password")) {
           Alert.alert(
             t("Error.error"),
             t("Login.Invalid Password. Please try again."),
           );
-        } else if (message.includes("user not found")) {
+        } else if (lowerMessage.includes("user not found")) {
           Alert.alert(t("Error.error"), t("Login.Invalid EMP ID & Password"));
-        } else if (message.includes("user not approved")) {
-          Alert.alert(
-            t("Error.error"),
-            t("Error.This EMP ID is not approved."),
-          );
-        } else if (message.includes("rejected")) {
-          Alert.alert(
-            t("Error.error"),
-            t("Error.This Employee ID is Rejected"),
-          );
         } else {
           Alert.alert(t("Error.error"), t("Main.somethingWentWrong"));
         }

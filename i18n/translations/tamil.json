@@ -761,5 +761,17 @@
     "skipMessage": "Some features may not work properly without location access. Are you sure?",
     "skip": "Skip",
     "skipForNow": "Skip for now"
+  },
+  "Banned": {
+    "AccessDenied": "அணுகல் மறுக்கப்பட்டது",
+    "DefaultDescription": "உங்கள் கணக்கு நிராகரிக்கப்பட்டது அல்லது அங்கீகரிக்கப்படவில்லை.",
+    "AccountRejected": "கணக்கு நிராகரிக்கப்பட்டது",
+    "RejectedDescription": "நிர்வாகியால் உங்கள் கணக்கு அனுமதி ரத்து செய்யப்பட்டுள்ளது.",
+    "AccountNotApproved": "கணக்கு அங்கீகரிக்கப்படவில்லை",
+    "NotApprovedDescription": "நிர்வாகியால் உங்கள் கணக்கு அனுமதி ரத்து செய்யப்பட்டுள்ளது.",
+    "PendingVerification": "சரிபார்ப்பு நிலுவையில் உள்ளது",
+    "PendingDescription": "உங்கள் கணக்கு நிலை சரிபார்ப்பு நிலுவையில் உள்ளது.",
+    "SupportMessage": "கூடுதல் விவரங்களுக்கு Polygon வாடிக்கையாளர் ஆதரவைத் தொடர்பு கொள்ளவும்.",
+    "BackToLogin": "உள்நுழைவுக்குத் திரும்பு"
   }
 }

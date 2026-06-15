@@ -75,6 +75,10 @@ import OtpverificationOnboardSupplier from "@/component/otp-screen/Otpverificati
 import AddOnboardSupplierOfficer from "@/component/onboard-supplier/AddOnboardSupplierOfficer";
 import LocationAccess from "@/component/permission/LocationAccess";
 import CameraAccess from "@/component/permission/CameraAccess";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import BannedScreen from "@/component/auth/BannedScreen";
+import { AlertModal, setGlobalAlertListener } from "@/component/commons/AlertModal";
 
 import { initDatabase } from "@/database/index";
 
@@ -191,6 +195,35 @@ function AppContent() {
   const { t } = useTranslation();
   const [isOfflineAlertShown, setIsOfflineAlertShown] = useState(false);
 
+  const [alertState, setAlertState] = useState({
+    visible: false,
+    title: "",
+    message: "" as string | React.ReactNode,
+    type: "error" as "success" | "error",
+    onClose: (() => {}) as () => void,
+    autoClose: true,
+    showOkButton: undefined as boolean | undefined,
+  });
+
+  useEffect(() => {
+    setGlobalAlertListener((title, message, type, onClose, autoClose, showOkButton) => {
+      setAlertState({
+        visible: true,
+        title,
+        message,
+        type,
+        onClose: () => {
+          setAlertState((prev) => ({ ...prev, visible: false }));
+          if (onClose) {
+            onClose();
+          }
+        },
+        autoClose,
+        showOkButton,
+      });
+    });
+  }, []);
+
   useEffect(() => {
     const unsubscribeNetInfo = NetInfo.addEventListener((state) => {
       if (!state.isConnected && !isOfflineAlertShown) {
@@ -213,7 +246,7 @@ function AppContent() {
   useEffect(() => {
     const backAction = () => {
       if (!navigationRef.isReady()) return false;
-      const currentRouteName = navigationRef.getCurrentRoute()?.name ?? "";
+      const currentRouteName = (navigationRef.getCurrentRoute() as any)?.name ?? "";
       if (currentRouteName === "Dashboard") {
         BackHandler.exitApp();
         return true;
@@ -228,6 +261,73 @@ function AppContent() {
       backAction,
     );
     return () => backHandler.remove();
+  }, []);
+
+  useEffect(() => {
+    const interceptor = axios.interceptors.response.use(
+      (response) => response,
+      async (error) => {
+        const errorResponse = error.response;
+        if (
+          errorResponse &&
+          errorResponse.status === 403 &&
+          (errorResponse.data?.statusType === "not_approved" ||
+            errorResponse.data?.statusType === "rejected" ||
+            errorResponse.data?.statusType === "pending" ||
+            errorResponse.data?.message === "This Employee ID is Rejected" ||
+            errorResponse.data?.message === "User not approved" ||
+            errorResponse.data?.message === "Account status is pending verification")
+        ) {
+          let currentRouteName = "";
+          if (navigationRef.isReady()) {
+            const route = navigationRef.getCurrentRoute() as any;
+            currentRouteName = route?.name || "";
+          }
+
+          if (
+            currentRouteName !== "Login" &&
+            currentRouteName !== "Splash" &&
+            currentRouteName !== "BannedScreen"
+          ) {
+            try {
+              // Clear auth tokens
+              await AsyncStorage.multiRemove([
+                "token",
+                "jobRole",
+                "empid",
+                "tokenStoredTime",
+                "tokenExpirationTime",
+              ]);
+
+              if (navigationRef.isReady()) {
+                navigationRef.reset({
+                  index: 0,
+                  routes: [
+                    {
+                      name: "BannedScreen",
+                      params: {
+                        statusType: errorResponse.data?.statusType,
+                        message: errorResponse.data?.message,
+                      },
+                    },
+                  ],
+                });
+              }
+            } catch (e) {
+              console.error("Failed to perform force logout:", e);
+            }
+
+            // Return a promise that never resolves or rejects to prevent component error logs
+            return new Promise(() => {});
+          }
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    return () => {
+      axios.interceptors.response.eject(interceptor);
+    };
   }, []);
 
   return (
@@ -302,6 +402,7 @@ function AppContent() {
             <Stack.Screen name="Economical" component={Economical} />
             <Stack.Screen name="Labour" component={Labour} />
             <Stack.Screen name="HarvestStorage" component={HarvestStorage} />
+            <Stack.Screen name="BannedScreen" component={BannedScreen as any} />
             <Stack.Screen name="LocationAccess" component={LocationAccess} />
             <Stack.Screen name="CameraAccess" component={CameraAccess} />
             <Stack.Screen
@@ -323,6 +424,15 @@ function AppContent() {
             />
           </Stack.Navigator>
         </NavigationContainer>
+        <AlertModal
+          visible={alertState.visible}
+          title={alertState.title}
+          message={alertState.message}
+          type={alertState.type}
+          onClose={alertState.onClose}
+          autoClose={alertState.autoClose}
+          showOkButton={alertState.showOkButton}
+        />
       </SafeAreaView>
     </GestureHandlerRootView>
   );
