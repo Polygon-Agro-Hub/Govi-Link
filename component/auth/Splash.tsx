@@ -108,7 +108,7 @@ const Splash: React.FC = () => {
   return (
     <View className="bg-white flex-1 justify-center items-center">
       <Image source={logo} className="w-full h-48" resizeMode="contain" />
-      <Text className="mt-4 text-gray-700">POWERED BY POLYGON</Text>
+      <Text className="mt-4 text-gray-700">POWERED POLYGON</Text>
 
       <View className=" mt-6">
         <Progress.Bar
