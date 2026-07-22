@@ -371,9 +371,9 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
         nic: t("Error.ID Proof Type is required"),
       }));
       Alert.alert(
-        t("Error.Validation Error"),
+        t("Error.ValidationError"),
         "• " + t("Error.ID Proof Type is required"),
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
       return;
     }
@@ -384,9 +384,9 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
         nic: t(`Error.${formData.pType} is required`),
       }));
       Alert.alert(
-        t("Error.Validation Error"),
+        t("Error.ValidationError"),
         "• " + t(`Error.${formData.pType} is required`),
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
       return;
     }
@@ -398,9 +398,9 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
 
     if (!formData.frontImg || !formData.backImg) {
       Alert.alert(
-        t("Error.Validation Error"),
+        t("Error.ValidationError"),
         t("Error.Both ID images are required"),
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
       return;
     }
@@ -409,7 +409,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
       Alert.alert(
         t("Error.Error"),
         "Request ID is missing. Please go back and try again.",
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
       return;
     }
@@ -419,7 +419,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
       Alert.alert(
         t("Error.Error"),
         "Invalid request ID. Please go back and try again.",
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
       return;
     }
@@ -447,7 +447,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
         t("InspectionForm.Data saved successfully"),
         [
           {
-            text: t("Main.ok"),
+            text: t("Main.OK"),
             onPress: () => {
               navigation.navigate("FinanceInfo", { requestNumber, requestId });
             },
@@ -458,7 +458,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
       Alert.alert(
         t("Main.Warning"),
         t("InspectionForm.Could not save to server. Data saved locally."),
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
     }
   };

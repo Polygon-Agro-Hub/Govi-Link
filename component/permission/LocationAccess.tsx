@@ -90,9 +90,8 @@ const LocationAccess: React.FC<LocationAccessProps> = ({
     } catch (error) {
       console.error("Error requesting location permission:", error);
       Alert.alert(
-        t("Main.error") || "Error",
-        t("Permission.permissionError") ||
-          "Unable to request location permission. Please try again.",
+        t("Main.Sorry"),
+        t("Permission.permissionError"),
         [{ text: t("PublicForum.OK") || "OK" }],
       );
     } finally {

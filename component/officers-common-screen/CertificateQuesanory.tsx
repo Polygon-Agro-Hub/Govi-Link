@@ -251,9 +251,9 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
         Alert.alert(
           t("Error.Sorry"),
           t(
-            "Error.Your login session has expired. Please log in again to continue.",
+            "Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue",
           ),
-          [{ text: t("Main.ok") }],
+          [{ text: t("Main.OK") }],
         );
         return;
       }
@@ -325,9 +325,9 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
     } catch (err) {
       console.error(" Error updating tickResult:", err);
       Alert.alert(
-        t("Error.error"),
+        t("Error.Sorry"),
         t("CertificateQuesanory.Something went wrong while updating question."),
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
     } finally {
       setLoadingQuestionId(null);
@@ -357,16 +357,16 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
           Alert.alert(
             t("CertificateQuesanory.Success"),
             t("CertificateQuesanory.Task complete successfully!"),
-            [{ text: t("Main.ok") }],
+            [{ text: t("Main.OK") }],
           );
         }
       }
     } catch (err) {
       console.error(" Error updating tickResult:", err);
       Alert.alert(
-        t("Error.error"),
+        t("Error.Sorry"),
         t("CertificateQuesanory.Something went wrong while updating question."),
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
     } finally {
       setLoadingQuestionId(null);
@@ -383,9 +383,9 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
         Alert.alert(
           t("Error.Sorry"),
           t(
-            "Error.Your login session has expired. Please log in again to continue.",
+            "Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue",
           ),
-          [{ text: t("Main.ok") }],
+          [{ text: t("Main.OK") }],
         );
         return;
       }
@@ -422,7 +422,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
         Alert.alert(
           t("CertificateQuesanory.Success"),
           t("CertificateQuesanory.Task complete successfully!"),
-          [{ text: t("Main.ok") }],
+          [{ text: t("Main.OK") }],
         );
         setQuestions((prev) =>
           prev.map((item) =>
@@ -440,17 +440,17 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
         setSelectedQuestion(null);
       } else {
         Alert.alert(
-          t("Error.error"),
+          t("Error.Sorry"),
           t("CertificateQuesanory.Failed to complete task, Please try again"),
-          [{ text: t("Main.ok") }],
+          [{ text: t("Main.OK") }],
         );
       }
     } catch (err) {
       console.error("Upload photo failed:", err);
       Alert.alert(
-        t("Error.error"),
+        t("Error.Sorry"),
         t("CertificateQuesanory.Failed to complete task, Please try again"),
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
     } finally {
       setLoadingQuestionId(null);

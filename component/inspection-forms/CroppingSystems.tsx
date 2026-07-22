@@ -409,16 +409,16 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       Alert.alert(
-        t("Error.Validation Error"),
+        t("Error.ValidationError"),
         "• " + Object.values(validationErrors).join("\n• "),
-        [{ text: t("Main.ok") }]
+        [{ text: t("Main.OK") }]
       );
       return;
     }
 
     if (!requestId) {
       Alert.alert(t("Error.Error"), "Request ID is missing", [
-        { text: t("Main.ok") },
+        { text: t("Main.OK") },
       ]);
       return;
     }
@@ -426,7 +426,7 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
     const reqId = Number(requestId);
     if (isNaN(reqId) || reqId <= 0) {
       Alert.alert(t("Error.Error"), "Invalid request ID", [
-        { text: t("Main.ok") },
+        { text: t("Main.OK") },
       ]);
       return;
     }
@@ -452,7 +452,7 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
         t("InspectionForm.Data saved successfully"),
         [
           {
-            text: t("Main.ok"),
+            text: t("Main.OK"),
             onPress: () => {
               navigation.navigate("ProfitRisk", {
                 requestNumber,
@@ -466,7 +466,7 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
       Alert.alert(
         t("Main.Warning"),
         t("InspectionForm.Could not save to server. Data saved locally."),
-        [{ text: t("Main.ok") }]
+        [{ text: t("Main.OK") }]
       );
     }
   };

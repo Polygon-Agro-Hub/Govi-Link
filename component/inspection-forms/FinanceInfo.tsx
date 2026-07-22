@@ -229,7 +229,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
       if (formData.confirmAccountNumber !== formData.accountNumber) {
         setErrors((prev) => ({
           ...prev,
-          confirmAccountNumber: t("Error.Account numbers do not match"),
+          confirmAccountNumber: t("Error.AccountNumbersDoNotMatch"),
         }));
       } else {
         setErrors((prev) => {
@@ -425,13 +425,13 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     ) {
       errs.confirmAccountNumber = t("Error.Confirm account number is required");
     } else if (data.confirmAccountNumber !== data.accountNumber) {
-      errs.confirmAccountNumber = t("Error.Account numbers do not match");
+      errs.confirmAccountNumber = t("Error.AccountNumbersDoNotMatch");
     }
     if (!data.bank || data.bank.trim() === "") {
-      errs.bank = t("Error.Bank is required");
+      errs.bank = t("Error.BankIsRequired");
     }
     if (!data.branch || data.branch.trim() === "") {
-      errs.branch = t("Error.Branch is required");
+      errs.branch = t("Error.BranchIsRequired");
     }
 
     if (!data.debtsOfFarmer || data.debtsOfFarmer.trim() === "") {
@@ -550,7 +550,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
       );
     } else if (formData.confirmAccountNumber !== formData.accountNumber) {
       validationErrors.confirmAccountNumber = t(
-        "Error.Account numbers do not match",
+        "Error.AccountNumbersDoNotMatch",
       );
     }
     if (!hasValidAssetSelection()) {
@@ -579,17 +579,17 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     }
 
     if (!formData.bank || formData.bank === "") {
-      validationErrors.bank = t("Error.Bank is required");
+      validationErrors.bank = t("Error.BankIsRequired");
     }
     if (!formData.branch || formData.branch === "") {
-      validationErrors.branch = t("Error.Branch is required");
+      validationErrors.branch = t("Error.BranchIsRequired");
     }
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       const errorMessage = "• " + Object.values(validationErrors).join("\n• ");
-      Alert.alert(t("Error.Validation Error"), errorMessage, [
-        { text: t("Main.ok") },
+      Alert.alert(t("Error.ValidationError"), errorMessage, [
+        { text: t("Main.OK") },
       ]);
       return;
     }
@@ -598,7 +598,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
       Alert.alert(
         t("Error.Error"),
         "Request ID is missing. Please go back and try again.",
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
       return;
     }
@@ -608,7 +608,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
       Alert.alert(
         t("Error.Error"),
         "Invalid request ID. Please go back and try again.",
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
       return;
     }
@@ -637,7 +637,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
           t("InspectionForm.Data saved successfully"),
           [
             {
-              text: t("Main.ok"),
+              text: t("Main.OK"),
               onPress: () =>
                 navigation.navigate("LandInfo", { requestNumber, requestId }),
             },
@@ -649,7 +649,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
           t("InspectionForm.Could not save to server. Data saved locally."),
           [
             {
-              text: t("Main.ok"),
+              text: t("Main.OK"),
             },
           ],
         );
@@ -661,7 +661,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
         t("InspectionForm.Could not save to server. Data saved locally."),
         [
           {
-            text: t("Main.ok"),
+            text: t("Main.OK"),
           },
         ],
       );
@@ -954,7 +954,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               if (!numericValue) {
                 error = t("Error.Confirm account number is required");
               } else if (numericValue !== formData.accountNumber) {
-                error = t("Error.Account numbers do not match");
+                error = t("Error.AccountNumbersDoNotMatch");
               }
               setErrors((prev) => ({ ...prev, confirmAccountNumber: error }));
             }}

@@ -149,14 +149,14 @@ const validateAndFormat = (
   if (rules.type === "email1" || rules.type === "email2") {
     value = value.trim();
     if (value.length === 0 && rules.type === "email1") {
-      error = rules.required ? t("Error.Email is required") : "";
+      error = rules.required ? t("Error.EmailIsRequired") : "";
     } else if (value.length > 0) {
       if (!validateEmail(value)) {
         const domain = value.toLowerCase().split("@")[1];
         error =
           domain === "gmail.com" || domain === "googlemail.com"
             ? t("Error.Invalid Gmail address")
-            : t("Error.Invalid email address Example");
+            : t("Error.InvalidEmailAddress");
       } else if (rules.uniqueWith) {
         const isDuplicate = rules.uniqueWith.some(
           (key) =>
@@ -175,19 +175,19 @@ const validateAndFormat = (
 
     if (numbersOnly.length === 0) {
       if (rules.type === "phone1" || rules.type === "familyPhone") {
-        error = t("Error.Phone number is required");
+        error = t("Error.MobileNumberIsRequired");
       }
     } else if (!numbersOnly.startsWith("7")) {
-      error = t("Error.Invalid phone number");
+      error = t("Error.InvalidMobileNumber");
     } else if (numbersOnly.length < 9) {
-      error = t("Error.Phone number must be 9 digits long");
+      error = t("Error.MobileNumberMustBe9DigitsLong");
     } else if (rules.uniqueWith) {
       const isDuplicate = rules.uniqueWith.some(
         (key) =>
           formData[key]?.replace(/[^0-9]/g, "").replace(/^0+/, "") ===
           numbersOnly && key !== currentKey,
       );
-      if (isDuplicate) error = t("Error.Phone numbers cannot be the same");
+      if (isDuplicate) error = t("Error.LandNumbersCannotBeTheSame");
     }
   }
 
@@ -214,7 +214,7 @@ const validateAndFormat = (
           formData[key]?.replace(/[^0-9]/g, "").replace(/^0+/, "") ===
           numbersOnly && key !== currentKey,
       );
-      if (isDuplicate) error = t("Error.Phone numbers cannot be the same");
+      if (isDuplicate) error = t("Error.LandNumbersCannotBeTheSame");
     }
   }
 
@@ -292,10 +292,10 @@ const validateAllFields = (
   }
 
   if (!data.district) {
-    errors.district = t("Error.District is required");
+    errors.district = t("Error.DistrictIsRequired");
   }
   if (!data.province) {
-    errors.province = t("Error.Province is required");
+    errors.province = t("Error.ProvinceIsRequired");
   }
 
   return errors;
@@ -626,16 +626,16 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
     if (Object.keys(validationErrors).length > 0) {
       setErrors((prev) => ({ ...prev, ...validationErrors }));
       Alert.alert(
-        t("Error.Validation Error"),
+        t("Error.ValidationError"),
         "• " + Object.values(validationErrors).join("\n• "),
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
       return;
     }
 
     if (!requestId) {
       Alert.alert(t("Error.Error"), "Request ID is missing", [
-        { text: t("Main.ok") },
+        { text: t("Main.OK") },
       ]);
       return;
     }
@@ -643,7 +643,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
     const reqId = Number(requestId);
     if (isNaN(reqId) || reqId <= 0) {
       Alert.alert(t("Error.Error"), "Invalid request ID", [
-        { text: t("Main.ok") },
+        { text: t("Main.OK") },
       ]);
       return;
     }
@@ -669,7 +669,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
         t("InspectionForm.Data saved successfully"),
         [
           {
-            text: t("Main.ok"),
+            text: t("Main.OK"),
             onPress: () => {
               navigation.navigate("IDProof", {
                 formData: { inspectionpersonal: formData },
@@ -686,7 +686,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
         t("InspectionForm.Could not save to server. Data saved locally."),
         [
           {
-            text: t("Main.ok"),
+            text: t("Main.OK"),
           },
         ],
       );

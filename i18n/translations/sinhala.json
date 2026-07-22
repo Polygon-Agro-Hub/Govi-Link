@@ -6,7 +6,7 @@
     "ok": "හරි",
     "Sorry": "සමාවන්න",
     "userBlocked": "මෙම උපාංගයෙන් ඉල්ලීම් අධික ලෙස යවනු ලැබ ඇත. කරුණාකර විනාඩි 30කට පසු නැවත උත්සාහ කරන්න.",
-    "No Internet Connection": "අන්තර්ජාල සම්බන්ධතාවයක් නොමැත",
+    "NoInternetConnection": "අන්තර්ජාල සම්බන්ධතාවයක් නොමැත",
     "Please turn on mobile data or Wi-Fi to continue.": "ඉදිරියට යාම සඳහා කරුණාකර Mobile Data හෝ Wi-Fi සක්‍රීය කරන්න.",
     "Your login session has expired. Please log in again to continue.": "ඔබගේ පුරනය වීමේ සැසිය කල් ඉකුත් වී ඇත. ඉදිරියට යාම සඳහා කරුණාකර නැවත පුරනය වන්න.",
     "Success": "සාර්ථකයි",

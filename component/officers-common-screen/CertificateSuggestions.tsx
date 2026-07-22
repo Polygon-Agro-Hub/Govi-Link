@@ -178,7 +178,7 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
       Alert.alert(
         t("Error.Sorry"),
         t("CertificateSuggestions.Both problem and solution must be filled."),
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
       return;
     }
@@ -190,9 +190,9 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
         Alert.alert(
           t("Error.Sorry"),
           t(
-            "Error.Your login session has expired. Please log in again to continue.",
+            "Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue",
           ),
-          [{ text: t("Main.ok") }],
+          [{ text: t("Main.OK") }],
         );
         return;
       }
@@ -230,13 +230,13 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
         Alert.alert(
           t("Error.Sorry"),
           t("CertificateSuggestions.Failed to save problem."),
-          [{ text: t("Main.ok") }],
+          [{ text: t("Main.OK") }],
         );
       }
     } catch (err) {
       console.error("Error saving/updating problem:", err);
-      Alert.alert(t("Error.Sorry"), t("Main.somethingWentWrong"), [
-        { text: t("Main.ok") },
+      Alert.alert(t("Error.Sorry"), t("Main.SomethingWentWrongPleaseTryAgainLater"), [
+        { text: t("Main.OK") },
       ]);
     } finally {
       setLoading(false);
@@ -255,9 +255,9 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
         Alert.alert(
           t("Error.Sorry"),
           t(
-            "Error.Your login session has expired. Please log in again to continue.",
+            "Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue",
           ),
-          [{ text: t("Main.ok") }],
+          [{ text: t("Main.OK") }],
         );
         return;
       }
@@ -337,9 +337,9 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
       setIsButtonDisabled(false);
       setOtpSendLoading(false);
     } catch (error) {
-      Alert.alert(t("Main.error"), t("SignupForum.otpSendFailed"), [
+      Alert.alert(t("Main.Sorry"), t("SignupForum.otpSendFailed"), [
         {
-          text: t("Main.ok"),
+          text: t("Main.OK"),
         },
       ]);
       setOtpSendLoading(false);

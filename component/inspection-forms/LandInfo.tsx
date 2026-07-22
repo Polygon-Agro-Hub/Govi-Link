@@ -396,8 +396,8 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
         images: true,
       });
       const errorMessage = "• " + Object.values(validationErrors).join("\n• ");
-      Alert.alert(t("Error.Validation Error"), errorMessage, [
-        { text: t("Main.ok") },
+      Alert.alert(t("Error.ValidationError"), errorMessage, [
+        { text: t("Main.OK") },
       ]);
       return;
     }
@@ -406,7 +406,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
       Alert.alert(
         t("Error.Error"),
         "Request ID is missing. Please go back and try again.",
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
       return;
     }
@@ -416,7 +416,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
       Alert.alert(
         t("Error.Error"),
         "Invalid request ID. Please go back and try again.",
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
       return;
     }
@@ -443,7 +443,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
           t("InspectionForm.Data saved successfully"),
           [
             {
-              text: t("Main.ok"),
+              text: t("Main.OK"),
               onPress: () => {
                 navigation.navigate("InvestmentInfo", {
                   requestNumber,
@@ -457,7 +457,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
         Alert.alert(
           t("Main.Warning"),
           t("InspectionForm.Could not save to server. Data saved locally."),
-          [{ text: t("Main.ok") }],
+          [{ text: t("Main.OK") }],
         );
       }
     } catch (error) {
@@ -465,7 +465,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
       Alert.alert(
         t("Main.Warning"),
         t("InspectionForm.Could not save to server. Data saved locally."),
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
     }
   };

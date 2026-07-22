@@ -97,27 +97,27 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
 
     if (!selectedCategory && !complaintText.trim()) {
       Alert.alert(
-        t("Error.error"),
+        t("Error.Sorry"),
         t("AddComplaint.Please fill out all fields."),
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
       return;
     }
 
     if (!selectedCategory && complaintText.trim()) {
       Alert.alert(
-        t("Error.error"),
+        t("Error.Sorry"),
         t("AddComplaint.Please select a category."),
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
       return;
     }
 
     if (selectedCategory && !complaintText.trim()) {
       Alert.alert(
-        t("Error.error"),
+        t("Error.Sorry"),
         t("AddComplaint.Please enter your complaint."),
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
       return;
     }
@@ -128,9 +128,9 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
         Alert.alert(
           t("Error.Sorry"),
           t(
-            "Error.Your login session has expired. Please log in again to continue.",
+            "Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue",
           ),
-          [{ text: t("Main.ok") }],
+          [{ text: t("Main.OK") }],
         );
         return;
       }
@@ -154,7 +154,7 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
       Alert.alert(
         t("Main.Success"),
         t("AddComplaint.Complaint submitted successfully!"),
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.Ok") }],
       );
       resetForm();
       navigation.navigate("Main", { screen: "Dashboard" });
@@ -164,12 +164,12 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
         Alert.alert(
           t("Error.Sorry"),
           t("AddComplaint.Failed to submit complaint. Please try again."),
-          [{ text: t("Main.ok") }],
+          [{ text: t("Main.OK") }],
         );
       } else {
         console.error("An unknown error occurred.");
-        Alert.alert(t("Error.Sorry"), t("Main.somethingWentWrong"), [
-          { text: t("Main.ok") },
+        Alert.alert(t("Error.Sorry"), t("Main.SomethingWentWrongPleaseTryAgainLater"), [
+          { text: t("Main.OK") },
         ]);
       }
     } finally {

@@ -110,7 +110,7 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
       Alert.alert(
         t("Error.Sorry"),
         t("CertificateSuggestions.Both problem and solution must be filled."),
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
       return;
     }
@@ -141,9 +141,9 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
         Alert.alert(
           t("Error.Sorry"),
           t(
-            "Main.Your login session has expired. Please log in again to continue.",
+            "Main.YourLoginSessionHasExpiredPleaseLogInAgainToContinue",
           ),
-          [{ text: t("Main.ok") }],
+          [{ text: t("Main.OK") }],
         );
         return;
       }
@@ -214,13 +214,13 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
         Alert.alert(
           t("Error.Sorry"),
           t("RequestProblem.Failed to save problem. Please try again."),
-          [{ text: t("Main.ok") }],
+          [{ text: t("Main.OK") }],
         );
       }
     } catch (err) {
       console.error(" Error saving/updating problem:", err);
-      Alert.alert(t("Error.Sorry"), t("Main.somethingWentWrong"), [
-        { text: t("Main.ok") },
+      Alert.alert(t("Error.Sorry"), t("Main.SomethingWentWrongPleaseTryAgainLater"), [
+        { text: t("Main.OK") },
       ]);
     } finally {
       setLoading(false);

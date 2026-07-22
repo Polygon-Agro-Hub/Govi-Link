@@ -161,7 +161,7 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
       t("ConfirmationCapitalRequest.UndoSuccess"),
       [
         {
-          text: t("Main.ok"),
+          text: t("Main.OK"),
           onPress: () => navigation.goBack(),
         },
       ],
@@ -198,10 +198,10 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
       setAssigning(false);
 
       Alert.alert(
-        t("Main.Error"),
+        t("Main.Sorry"),
         error.response?.data?.message ||
           t("ConfirmationCapitalRequest.ConfirmFailed"),
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
     }
   };

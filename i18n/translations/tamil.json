@@ -6,7 +6,7 @@
     "ok": "சரி",
     "Sorry": "மன்னிக்கவும்",
     "userBlocked": "இந்த சாதனத்திலிருந்து அதிகமான கோரிக்கைகள் உள்ளன, 30 நிமிடங்களில் மீண்டும் முயற்சிக்கவும்.",
-    "No Internet Connection": "இணைய இணைப்பு இல்லை",
+    "NoInternetConnection": "இணைய இணைப்பு இல்லை",
     "Please turn on mobile data or Wi-Fi to continue.": "தயவுசெய்து மொபைல் தரவுகள் அல்லது Wi-Fi ஐ இயக்கவும்.",
     "Your login session has expired. Please log in again to continue.": "Your login session has expired. Please log in again to continue.",
     "Success": "வெற்றி",

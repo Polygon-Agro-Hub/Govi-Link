@@ -236,9 +236,9 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
           Alert.alert(
             t("Error.Sorry"),
             t(
-              "Error.Your login session has expired. Please log in again to continue.",
+              "Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue",
             ),
-            [{ text: t("Main.ok") }],
+            [{ text: t("Main.OK") }],
           );
         }
         return;
@@ -259,9 +259,9 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
         Alert.alert(
           t("Error.Sorry"),
           t(
-            "Error.Your login session has expired. Please log in again to continue.",
+            "Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue",
           ),
-          [{ text: t("Main.ok") }],
+          [{ text: t("Main.OK") }],
         );
         navigation.navigate("Login");
       }

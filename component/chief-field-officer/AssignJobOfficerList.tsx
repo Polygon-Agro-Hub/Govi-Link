@@ -184,8 +184,8 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
     try {
       const token = await AsyncStorage.getItem("token");
       if (!token) {
-        Alert.alert(t("Error.Error"), t("Error.AuthTokenNotFound"), [
-          { text: t("Main.ok") },
+        Alert.alert(t("Error.Error"), t("Error.AuthTokenNotFoundPleaseLogInAgain"), [
+          { text: t("Main.OK") },
         ]);
         return;
       }
@@ -208,7 +208,7 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
         Alert.alert(
           t("Error.Error"),
           t("AssignJobOfficerList.FailedToFetchOfficers"),
-          [{ text: t("Main.ok") }],
+          [{ text: t("Main.OK") }],
         );
       }
     } catch (error) {
@@ -216,7 +216,7 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
       Alert.alert(
         t("Error.Error"),
         t("AssignJobOfficerList.FailedToLoadOfficers"),
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
     } finally {
       setLoading(false);
@@ -257,8 +257,8 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
     try {
       const token = await AsyncStorage.getItem("token");
       if (!token) {
-        Alert.alert(t("Error.Error"), t("Error.AuthTokenNotFound"), [
-          { text: t("Main.ok") },
+        Alert.alert(t("Error.Error"), t("Error.AuthTokenNotFoundPleaseLogInAgain"), [
+          { text: t("Main.OK") },
         ]);
         return;
       }
@@ -289,16 +289,16 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
           }),
           [
             {
-              text: t("Main.ok"),
+              text: t("Main.OK"),
               onPress: () => navigation.navigate("AssignJobs"),
             },
           ],
         );
       } else {
         Alert.alert(
-          t("Main.Error"),
+          t("Main.Sorry"),
           t("AssignJobOfficerList.FailedToAssignJobs"),
-          [{ text: t("Main.ok") }],
+          [{ text: t("Main.OK") }],
         );
       }
     } catch (error: any) {
@@ -324,9 +324,9 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
       }
 
       Alert.alert(
-        t("Main.Error"),
+        t("Main.Sorry"),
         t("AssignJobOfficerList.FailedToAssignJobs"),
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
     } finally {
       setAssigning(false);

@@ -60,7 +60,7 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
         t(
           "Error.You are not authorized to access this system. Please use a valid Employee ID",
         ),
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
       return false;
     }
@@ -88,7 +88,7 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
 
     if (!empid && !password) {
       Alert.alert(
-        t("Error.error"),
+        t("Error.Sorry"),
         t("Login.Password and Employee ID are required"),
       );
       return false;
@@ -96,7 +96,7 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
 
     if (empid && !password) {
       Alert.alert(
-        t("Error.error"),
+        t("Error.Sorry"),
         t("Login.Password is not allowed to be empty"),
       );
       return false;
@@ -104,7 +104,7 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
 
     if (!empid && password) {
       Alert.alert(
-        t("Error.error"),
+        t("Error.Sorry"),
         t("Login.Employee ID is not allowed to be empty"),
       );
       return false;
@@ -125,7 +125,7 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
     const netState = await NetInfo.fetch();
     if (!netState.isConnected) {
       setLoading(false);
-      Alert.alert(t("Error.error"), "No internet connection");
+      Alert.alert(t("Error.Sorry"), t("Main.NoInternetConnection"));
       return;
     }
 
@@ -178,13 +178,13 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
 
         if (lowerMessage.includes("invalid password")) {
           Alert.alert(
-            t("Error.error"),
+            t("Error.Sorry"),
             t("Login.Invalid Password. Please try again."),
           );
         } else if (lowerMessage.includes("user not found")) {
-          Alert.alert(t("Error.error"), t("Login.Invalid EMP ID & Password"));
+          Alert.alert(t("Error.Sorry"), t("Login.Invalid EMP ID & Password"));
         } else {
-          Alert.alert(t("Error.error"), t("Main.somethingWentWrong"));
+          Alert.alert(t("Error.Sorry"), t("Main.SomethingWentWrongPleaseTryAgainLater"));
         }
 
         return;
@@ -229,7 +229,7 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
     } catch (error) {
       setLoading(false);
       console.error("Login error:", error);
-      Alert.alert(t("Error.error"), t("Main.somethingWentWrong"));
+      Alert.alert(t("Error.Sorry"), t("Main.SomethingWentWrongPleaseTryAgainLater"));
     }
   };
 
@@ -246,7 +246,7 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
         );
         if (intentionalLogout === "true") {
           Alert.alert(t("Main.Success"), t("Login.Logout Successful"), [
-            { text: t("Main.ok") },
+            { text: t("Main.OK") },
           ]);
           await AsyncStorage.removeItem("intentional_logout");
         }

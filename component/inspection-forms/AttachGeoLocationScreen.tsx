@@ -69,7 +69,7 @@ const AttachGeoLocationScreen: React.FC<AttachGeoLocationScreenProps> = ({
         Alert.alert(
           t("Error.Permission Denied"),
           t("Error.Location permission is required to use this feature."),
-          [{ text: t("Main.ok") }],
+          [{ text: t("Main.OK") }],
         );
         setIsLoading(false);
         return;
@@ -102,7 +102,7 @@ const AttachGeoLocationScreen: React.FC<AttachGeoLocationScreenProps> = ({
       Alert.alert(
         t("Error.Error"),
         t("Error.Unable to get your current location"),
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
     } finally {
       setIsLoading(false);

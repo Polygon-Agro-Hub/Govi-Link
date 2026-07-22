@@ -89,13 +89,13 @@ const AddOnboardSupplier: React.FC<AddOnboardSupplierProps> = ({
     if (digits.length === 0) {
       clearError("contact");
     } else if (digits.length === 1 && digits !== "0") {
-      setError("contact", t("Error.Invalid phone number"));
+      setError("contact", t("Error.InvalidMobileNumber"));
     } else if (digits.length >= 2 && !digits.startsWith("07")) {
-      setError("contact", t("Error.Invalid phone number"));
+      setError("contact", t("Error.InvalidMobileNumber"));
     } else if (digits.length < 10) {
       setError("contact", t("Error.Phone number must be 10 digits"));
     } else if (!validatePhoneNumber(digits)) {
-      setError("contact", t("Error.Invalid phone number"));
+      setError("contact", t("Error.InvalidMobileNumber"));
     } else {
       clearError("contact");
     }
@@ -134,7 +134,7 @@ const AddOnboardSupplier: React.FC<AddOnboardSupplierProps> = ({
       if (domain === "gmail.com" || domain === "googlemail.com") {
         setError("email", t("Error.Invalid Gmail address"));
       } else {
-        setError("email", t("Error.Invalid email address Example"));
+        setError("email", t("Error.InvalidEmailAddress"));
       }
     } else {
       clearError("email");
@@ -150,15 +150,15 @@ const AddOnboardSupplier: React.FC<AddOnboardSupplierProps> = ({
       );
 
     if (!contact.trim()) {
-      newErrors.contact = t("Error.Phone number is required");
+      newErrors.contact = t("Error.MobileNumberIsRequired");
     } else if (contact.length < 10) {
       newErrors.contact = t("Error.Phone number must be 10 digits long");
     } else if (!validatePhoneNumber(contact)) {
-      newErrors.contact = t("Error.Invalid phone number");
+      newErrors.contact = t("Error.InvalidMobileNumber");
     }
 
     if (!nic.trim()) {
-      newErrors.nic = t("Error.NIC is required");
+      newErrors.nic = t("Error.NicNumberIsRequired");
     } else if (!validateNicNumber(nic)) {
       newErrors.nic = t(
         "Error.NIC Number must be 9 digits followed by 'V' or 12 digits.",
@@ -166,9 +166,9 @@ const AddOnboardSupplier: React.FC<AddOnboardSupplierProps> = ({
     }
 
     if (!email.trim()) {
-      newErrors.email = t("Error.Email is required");
+      newErrors.email = t("Error.EmailIsRequired");
     } else if (!validateEmail(email)) {
-      newErrors.email = t("Error.Invalid email address Example");
+      newErrors.email = t("Error.InvalidEmailAddress");
     }
 
     return newErrors;
@@ -181,7 +181,7 @@ const AddOnboardSupplier: React.FC<AddOnboardSupplierProps> = ({
         Alert.alert(
           t("Error.Sorry"),
           t(
-            "Error.Your login session has expired. Please log in again to continue.",
+            "Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue",
           ),
         );
         return false;

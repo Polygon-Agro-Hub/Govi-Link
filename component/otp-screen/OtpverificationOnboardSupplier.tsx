@@ -169,7 +169,7 @@ const OtpverificationOnboardSupplier: React.FC = ({
       Alert.alert(
         t("Otpverification.Success"),
         t("Otpverification.A new OTP has been sent to your mobile number."),
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
       setOtpCode(["", "", "", "", ""]);
       setIsOtpValid(false);
@@ -178,7 +178,7 @@ const OtpverificationOnboardSupplier: React.FC = ({
       Alert.alert(
         t("Error.Sorry"),
         t("Otpverification.We couldn't send the OTP. Please try again later."),
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
     }
   };
@@ -190,9 +190,9 @@ const OtpverificationOnboardSupplier: React.FC = ({
         Alert.alert(
           t("Error.Sorry"),
           t(
-            "Error.Your login session has expired. Please log in again to continue.",
+            "Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue",
           ),
-          [{ text: t("Main.ok") }],
+          [{ text: t("Main.OK") }],
         );
         return false;
       }
@@ -232,7 +232,7 @@ const OtpverificationOnboardSupplier: React.FC = ({
       Alert.alert(
         t("Error.Sorry"),
         t("Otpverification.Please enter the 5-digit OTP sent to your phone."),
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
       return;
     }
@@ -252,9 +252,9 @@ const OtpverificationOnboardSupplier: React.FC = ({
     const netState = await NetInfo.fetch();
     if (!netState.isConnected) {
       Alert.alert(
-        t("Main.No Internet Connection"),
-        t("Main.Please turn on Mobile Data or Wi-Fi to continue."),
-        [{ text: t("Main.ok") }],
+        t("Main.NoInternetConnection"),
+        t("Main.PleaseTurnOnMobileDataOrWiFiToContinue"),
+        [{ text: t("Main.OK") }],
       );
       return;
     }
@@ -286,7 +286,7 @@ const OtpverificationOnboardSupplier: React.FC = ({
               t("OnboardSupplier.Account created successfully"),
               [
                 {
-                  text: t("Main.ok"),
+                  text: t("Main.OK"),
                   onPress: () => navigation.navigate("Main"),
                 },
               ],
@@ -323,7 +323,7 @@ const OtpverificationOnboardSupplier: React.FC = ({
               t(
                 "Otpverification.The OTP you entered is incorrect. Please try again.",
               ),
-              [{ text: t("Main.ok") }],
+              [{ text: t("Main.OK") }],
             );
           }
           break;
@@ -343,8 +343,8 @@ const OtpverificationOnboardSupplier: React.FC = ({
           break;
 
         default:
-          Alert.alert(t("Error.Sorry"), t("Main.somethingWentWrong"), [
-            { text: t("Main.ok") },
+          Alert.alert(t("Error.Sorry"), t("Main.SomethingWentWrongPleaseTryAgainLater"), [
+            { text: t("Main.OK") },
           ]);
       }
     } catch (error: any) {
@@ -368,11 +368,11 @@ const OtpverificationOnboardSupplier: React.FC = ({
           t(
             "Otpverification.The OTP you entered is incorrect. Please try again.",
           ),
-          [{ text: t("Main.ok") }],
+          [{ text: t("Main.OK") }],
         );
       } else {
-        Alert.alert(t("Error.Sorry"), t("Main.somethingWentWrong"), [
-          { text: t("Main.ok") },
+        Alert.alert(t("Error.Sorry"), t("Main.SomethingWentWrongPleaseTryAgainLater"), [
+          { text: t("Main.OK") },
         ]);
       }
     }
