@@ -112,8 +112,7 @@
       "expo-sqlite",
       "expo-web-browser",
       "@react-native-community/datetimepicker",
-      "expo-asset",
-      "expo-sharing"
+      "expo-asset"
     ],
     "extra": {
       "router": {
