@@ -32,13 +32,11 @@ jobs:
     # MUST be macos — only Apple hardware can build iOS apps
     #
     # PINNED to macos-15 on purpose — do NOT change this back to macos-latest.
-    # GitHub is migrating the `macos-latest` label from macOS 15 -> macOS 26
+    # GitHub is migrating the `macos-latest` label from macOS 15 -> macOS 16
     # between 2026-06-15 and 2026-07-15. That swap changes the default Xcode
-    # (16.4 -> 26.4.1), Ruby (3.3 -> 3.4), OpenSSL (1.1.1 -> 3.6.2), Node
-    # (22 -> 24) and more, with zero changes on our side — a very likely
-    # cause of "it just started failing" incidents during this window.
-    # Re-evaluate once we've deliberately tested on macos-26.
-    # Ref: https://github.com/actions/runner-images/issues/14167
+    # (16.4 -> 16.4.1), Ruby (3.3 -> 3.4), OpenSSL (1.1.1 -> 3.6.2), Node
+    # (22 -> 24) and more, with zero changes on our side.
+    # Re-evaluate once we've deliberately tested on macos-16.
     runs-on: macos-15
 
     # Timeout after 90 minutes to avoid runaway builds eating up minutes
