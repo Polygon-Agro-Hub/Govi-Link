@@ -155,7 +155,7 @@ const validateAndFormat = (
         const domain = value.toLowerCase().split("@")[1];
         error =
           domain === "gmail.com" || domain === "googlemail.com"
-            ? t("Error.Invalid Gmail address")
+            ? t("Error.InvalidGmailAddressGmailAddressesCannotHaveConsecutiveDotsLeadingTrailingDotsOrSpecialCharacters")
             : t("Error.InvalidEmailAddress");
       } else if (rules.uniqueWith) {
         const isDuplicate = rules.uniqueWith.some(
@@ -163,7 +163,7 @@ const validateAndFormat = (
             formData[key]?.toLowerCase().trim() ===
             value.toLowerCase().trim() && key !== currentKey,
         );
-        if (isDuplicate) error = t("Error.Email addresses cannot be the same");
+        if (isDuplicate) error = t("Error.EmailAddressesCannotBeTheSame");
       }
     }
   }
@@ -207,7 +207,7 @@ const validateAndFormat = (
     value = numbersOnly;
 
     if (numbersOnly.length !== 0 && numbersOnly.length < 9) {
-      error = t("Error.Land number must be 9 digits long");
+      error = t("Error.LandNumberMustBe9DigitsLong");
     } else if (rules.uniqueWith && numbersOnly.length > 0) {
       const isDuplicate = rules.uniqueWith.some(
         (key) =>
@@ -776,7 +776,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
       <View className="bg-gray-100 h-[50px] rounded-3xl px-3 flex-row items-center">
         <MaterialIcons name="search" size={20} color="#666" />
         <TextInput
-          placeholder={t("AddOfficer.SearchDistrict") || "Search district..."}
+          placeholder={t("AddOfficer.SearchDistrict...") || "Search district..."}
           value={districtSearch}
           onChangeText={setDistrictSearch}
           className="flex-1 ml-2 text-base"
@@ -1188,7 +1188,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
               ListEmptyComponent={
                 <View className="px-4 py-8 items-center">
                   <Text className="text-gray-500 text-base">
-                    {t("AddOfficer.NoDistrictsFound") || "No districts found"}
+                    {t("AddOfficer.NoDistrictsFound")}
                   </Text>
                 </View>
               }
@@ -1217,7 +1217,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             {renderSearchInput(
               countrySearch,
               setCountrySearch,
-              t("AddOfficer.SearchCountry") || "Search country...",
+              t("AddOfficer.SearchCountry..."),
             )}
 
             <FlatList

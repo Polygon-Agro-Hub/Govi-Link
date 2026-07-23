@@ -68,8 +68,8 @@ const ExpandableText: React.FC<{ text: string; maxLength?: number }> = ({
         <TouchableOpacity onPress={() => setExpanded(!expanded)}>
           <Text className="text-blue-500 font-semibold ml-1 mb-[-4]">
             {expanded
-              ? t("ComplainHistory.See less")
-              : t("ComplainHistory.See more")}
+              ? t("ComplainHistory.SeeLess...")
+              : t("ComplainHistory.SeeMore...")}
           </Text>
         </TouchableOpacity>
       )}
@@ -165,7 +165,7 @@ const ComplainHistory: React.FC<ComplainHistoryProps> = ({ navigation }) => {
       setSelectedComplain(complain);
       setModalVisible(true);
     } else {
-      Alert.alert(t("Main.Sorry"), t("ComplainHistory.No Reply"), [
+      Alert.alert(t("Main.Sorry"), t("ComplainHistory.NoReply"), [
         { text: t("Main.OK") },
       ]);
     }
@@ -178,7 +178,7 @@ const ComplainHistory: React.FC<ComplainHistoryProps> = ({ navigation }) => {
       style={{ flex: 1, backgroundColor: "#F9F9FA" }}
     >
       <CustomHeader
-        title={t("ComplainHistory.Complaint History")}
+        title={t("ComplainHistory.ComplaintHistory")}
         navigation={navigation}
         showBackButton={true}
         onBackPress={() => navigation.goBack()}
@@ -186,12 +186,12 @@ const ComplainHistory: React.FC<ComplainHistoryProps> = ({ navigation }) => {
       <View className="flex-1 bg-white">
         {loading ? (
           <LoadingPage
-            message={t("ComplainHistory.Loading Complaints...")}
+            message={t("ComplainHistory.LoadingComplaints...")}
             fullScreen={true}
           />
         ) : complains.length === 0 ? (
           <View className="flex-1 items-center justify-center -mt-[10%]">
-             <NoDataComponent message={t("ComplainHistory.No Data")} />
+             <NoDataComponent message={t("ComplainHistory.NoComplainstHere")} />
           </View>
         ) : (
           <ScrollView
@@ -219,7 +219,7 @@ const ComplainHistory: React.FC<ComplainHistoryProps> = ({ navigation }) => {
                       onPress={() => handleViewReply(complain)}
                     >
                       <Text className="text-white text-xs">
-                        {t("ComplainHistory.View Response")}
+                        {t("ComplainHistory.ViewResponse")}
                       </Text>
                     </TouchableOpacity>
                   )}

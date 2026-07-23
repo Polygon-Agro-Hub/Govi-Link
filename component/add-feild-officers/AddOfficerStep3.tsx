@@ -70,7 +70,7 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
     if (status !== "granted") {
       Alert.alert(
         t("AddOfficer.PermissionRequired"),
-        t("AddOfficer.PermissionRequiredMessage"),
+        t("AddOfficer.SorryWeNeedCameraRollPermissionsToMakeThisWork"),
         [{ text: t("Main.OK") }],
       );
       return;
@@ -270,7 +270,7 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
       if (response.data.status === "success" || response.data.id) {
         Alert.alert(
           t("AddOfficer.Success"),
-          t("AddOfficer.OfficerAddedSuccess"),
+          t("AddOfficer.OfficerAddedSuccessully"),
           [{ text: t("Main.OK") }],
         );
 

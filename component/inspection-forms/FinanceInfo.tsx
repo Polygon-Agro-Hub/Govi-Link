@@ -247,7 +247,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
       setErrors((prev) => ({
         ...prev,
         assets: t(
-          "Error.At least one option must be selected.",
+          "Error.AtLeastOneCategoryOptionMustBeSelected",
         ),
       }));
     } else {
@@ -414,10 +414,10 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     const errs: Record<string, string> = {};
 
     if (!data.accHolder || data.accHolder.trim() === "") {
-      errs.accHolder = t("Error.accHolder is required");
+      errs.accHolder = t("Error.AccountHoldersNameIsRequired");
     }
     if (!data.accountNumber || data.accountNumber.toString().trim() === "") {
-      errs.accountNumber = t("Error.accountNumber is required");
+      errs.accountNumber = t("Error.AccountNumberIsRequired");
     }
     if (
       !data.confirmAccountNumber ||
@@ -435,16 +435,16 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     }
 
     if (!data.debtsOfFarmer || data.debtsOfFarmer.trim() === "") {
-      errs.debtsOfFarmer = t("Error.debtsOfFarmer is required");
+      errs.debtsOfFarmer = t("Error.ExistingDebtsOfTheFarmerIsRequired");
     }
 
     if (!data.noOfDependents || data.noOfDependents.toString().trim() === "") {
-      errs.noOfDependents = t("Error.noOfDependents is required");
+      errs.noOfDependents = t("Error.NumberOfDependentsIsRequired");
     }
 
     const anyChecked = Object.values(checked).some(Boolean);
     if (!anyChecked) {
-      errs.assets = t("Error.At least one option must be selected.");
+      errs.assets = t("Error.AtLeastOneCategoryOptionMustBeSelected");
     } else {
       const assetInvalid = assetCategories.some((category) => {
         const isChecked = !!checked[category.key];
@@ -459,7 +459,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
         return false;
       });
       if (assetInvalid) {
-        errs.assets = t("Error.At least one option must be selected.");
+        errs.assets = t("Error.AtLeastOneCategoryOptionMustBeSelected");
       }
     }
 
@@ -536,13 +536,13 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     const validationErrors: Record<string, string> = {};
 
     if (!formData.accHolder || formData.accHolder.trim() === "") {
-      validationErrors.accHolder = t("Error.accHolder is required");
+      validationErrors.accHolder = t("Error.AccountHoldersNameIsRequired");
     }
     if (
       !formData.accountNumber ||
       formData.accountNumber.toString().trim() === ""
     ) {
-      validationErrors.accountNumber = t("Error.accountNumber is required");
+      validationErrors.accountNumber = t("Error.AccountNumberIsRequired");
     }
     if (!formData.confirmAccountNumber) {
       validationErrors.confirmAccountNumber = t(
@@ -555,7 +555,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     }
     if (!hasValidAssetSelection()) {
       validationErrors.assets = t(
-        "Error.At least one option must be selected.",
+        "Error.AtLeastOneCategoryOptionMustBeSelected",
       );
     }
 
@@ -574,7 +574,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     });
     if (!anyAssetSelected) {
       validationErrors.assets = t(
-        "Error.At least one option must be selected.",
+        "Error.AtLeastOneCategoryOptionMustBeSelected",
       );
     }
 
@@ -930,7 +930,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               const numericValue = text.replace(/[^0-9]/g, "");
               setFormData((prev) => ({ ...prev, accountNumber: numericValue }));
               const error = !numericValue.trim()
-                ? t("Error.accountNumber is required")
+                ? t("Error.AccountNumberIsRequired")
                 : "";
               setErrors((prev) => ({ ...prev, accountNumber: error }));
             }}
@@ -1050,7 +1050,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
                   }));
                   const error =
                     formattedText.trim() === ""
-                      ? t("Error.debtsOfFarmer is required")
+                      ? t("Error.ExistingDebtsOfTheFarmerIsRequired")
                       : "";
                   setErrors((prev) => ({ ...prev, debtsOfFarmer: error }));
                 }}
@@ -1239,7 +1239,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               {renderSearchInput(
                 bankSearch,
                 setBankSearch,
-                t("AddOfficer.SearchBank") || "Search bank...",
+                t("AddOfficer.SearchBank..."),
               )}
               <FlatList
                 data={getFilteredBanks()}
@@ -1271,7 +1271,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               {renderSearchInput(
                 branchSearch,
                 setBranchSearch,
-                t("AddOfficer.SearchBranch") || "Search branch...",
+                t("AddOfficer.SearchBranch..."),
               )}
               <FlatList
                 data={getFilteredBranches()}

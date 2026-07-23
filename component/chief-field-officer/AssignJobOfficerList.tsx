@@ -284,7 +284,7 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
       if (response.data.status === "success") {
         Alert.alert(
           t("Main.Success"),
-          t("AssignJobOfficerList.AssignSuccess", {
+          t("AssignJobOfficerList.JobsAssignedSuccessfully", {
             name: getOfficerName(selectedOfficer),
           }),
           [
@@ -297,14 +297,14 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
       } else {
         Alert.alert(
           t("Main.Sorry"),
-          t("AssignJobOfficerList.FailedToAssignJobs"),
+          t("AssignJobOfficerList.FailedToAssignJobsPleaseTryAgain"),
           [{ text: t("Main.OK") }],
         );
       }
     } catch (error: any) {
       console.error("Failed to assign jobs:", error);
 
-      let errorMessage = t("AssignJobOfficerList.FailedToAssignJobs");
+      let errorMessage = t("AssignJobOfficerList.FailedToAssignJobsPleaseTryAgain");
 
       if (error.response) {
         console.error("Error response data:", error.response.data);
@@ -325,7 +325,7 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
 
       Alert.alert(
         t("Main.Sorry"),
-        t("AssignJobOfficerList.FailedToAssignJobs"),
+        t("AssignJobOfficerList.FailedToAssignJobsPleaseTryAgain"),
         [{ text: t("Main.OK") }],
       );
     } finally {
@@ -411,7 +411,7 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
           <View className="flex-1 justify-center items-center">
             <ActivityIndicator size="large" color="#FF1D85" />
             <Text className="mt-4 text-[#565559]">
-              {t("AssignJobOfficerList.LoadingOfficers")}
+              {t("AssignJobOfficerList.LoadingOfficers...")}
             </Text>
           </View>
         ) : officers.length > 0 ? (
@@ -455,7 +455,7 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
                         <ActivityIndicator size="small" color="white" />
                       ) : (
                         <Text className="text-white text-[14px] font-semibold">
-                          {t("AssignJobOfficerList.AssignButton")}
+                          {t("AssignJobOfficerList.Assign")}
                         </Text>
                       )}
                     </TouchableOpacity>
@@ -514,14 +514,14 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
             </View>
 
             <Text className="text-md text-center text-[#4E6393] mb-1 leading-6">
-              {t("AssignJobOfficerList.CountdownInstruction1")}{" "}
+              {t("AssignJobOfficerList.PleaseConFirmWithin")}{" "}
               <Text className="underline font-semibold text-black">
                 {formatTime(countdown)}
               </Text>{" "}
-              {t("AssignJobOfficerList.CountdownInstruction2")}
+              {t("AssignJobOfficerList.Seconds")}
             </Text>
             <Text className="text-md text-center text-[#4E6393] mb-8 leading-6">
-              {t("AssignJobOfficerList.CountdownInstruction3")}
+              {t("AssignJobOfficerList.YouCanUndoOtherwiseThisOfficerWillBeAssignedAutomatically")}
             </Text>
 
             {selectedOfficer && (
@@ -568,7 +568,7 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
                         <ActivityIndicator size="small" color="white" />
                       ) : (
                         <Text className="text-white text-md font-semibold">
-                          {t("AssignJobOfficerList.UndoButton")}
+                          {t("AssignJobOfficerList.Undo")}
                         </Text>
                       )}
                     </LinearGradient>
@@ -596,7 +596,7 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
                   <ActivityIndicator size="small" color="white" />
                 ) : (
                   <Text className="text-white text-lg font-semibold">
-                    {t("AssignJobOfficerList.ConfirmLeaveButton")}
+                    {t("AssignJobOfficerList.ConfirmAndLeave")}
                   </Text>
                 )}
               </LinearGradient>

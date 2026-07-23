@@ -46,9 +46,9 @@ const validateField = (
     const otherOpportunity = formData.otherOpportunity || "";
 
     if (rules.required && opportunities.length === 0) {
-      error = t("Error.Please select at least one opportunity to go for");
+      error = t("Error.PleaseSelectAtLeastOneOpportunityToGoFor");
     } else if (opportunities.includes("Other") && !otherOpportunity.trim()) {
-      error = t("Error.Please specify the other opportunity to go for");
+      error = t("Error.PleaseSpecifyTheOtherOpportunityToGoFor");
     }
     return { value: opportunities, error };
   }
@@ -58,21 +58,21 @@ const validateField = (
     const trimmedValue = value.replace(/^\s+/, "");
 
     if (opportunities.includes("Other") && rules.required && !trimmedValue) {
-      error = t("Error.Please specify the other opportunity to go for");
+      error = t("Error.PleaseSpecifyTheOtherOpportunityToGoFor");
     }
     return { value: trimmedValue, error };
   }
 
   if (rules.type === "hasKnowlage") {
     if (rules.required && !value) {
-      error = t("Error.Knowledge field is required");
+      error = t("Error.KnowledgeFieldIsRequired");
     }
     return { value, error };
   }
 
   if (rules.type === "prevExperince") {
     if (rules.required && !value) {
-      error = t("Error.Previous experience is required");
+      error = t("Error.PreviousExperienceIsRequired");
     }
     return { value, error };
   }
@@ -86,7 +86,7 @@ const validateField = (
     }
 
     if (rules.required && !formattedValue.trim()) {
-      error = t("Error.General opinion of your friends is required");
+      error = t("Error.GeneralOpinionOfYourFriendsIsRequired");
     }
     return { value: formattedValue, error };
   }

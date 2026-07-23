@@ -199,15 +199,15 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
             const validationErrors: Record<string, string> = {};
             if (!localData.landDiscription?.trim())
               validationErrors.landDiscription = t(
-                "Error.landDiscription is required",
+                "Error.CultivationLandsDescriptionIsRequired",
               );
             if (!localData.isOwnByFarmer)
               validationErrors.isOwnByFarmer = t(
-                "Error.Land ownership is required",
+                "Error.LandOwnershipIsRequired",
               );
             if (!localData.ownershipStatus)
               validationErrors.ownershipStatus = t(
-                "Error.Ownership status is required",
+                "Error.LandOwnershipIsRequired",
               );
             if (!localData.geoLocation)
               validationErrors.geoLocation = t(
@@ -215,7 +215,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
               );
             if (!localData.images?.length)
               validationErrors.images = t(
-                "Error.At least one image is required",
+                "Error.AtLeastOneCategoryOptionMustBeSelected",
               );
 
             setErrors(validationErrors);
@@ -266,7 +266,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
     if (field === "landDiscription") {
       if (!formData.landDiscription || formData.landDiscription.trim() === "") {
         validationErrors.landDiscription = t(
-          "Error.landDiscription is required",
+          "Error.CultivationLandsDescriptionIsRequired",
         );
       } else {
         validationErrors.landDiscription = "";
@@ -369,21 +369,21 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
     const validationErrors: Record<string, string> = {};
 
     if (!formData.landDiscription || formData.landDiscription.trim() === "") {
-      validationErrors.landDiscription = t("Error.landDiscription is required");
+      validationErrors.landDiscription = t("Error.CultivationLandsDescriptionIsRequired");
     }
     if (!formData.isOwnByFarmer) {
-      validationErrors.isOwnByFarmer = t("Error.Land ownership is required");
+      validationErrors.isOwnByFarmer = t("Error.LandOwnershipIsRequired");
     }
     if (!formData.ownershipStatus) {
       validationErrors.ownershipStatus = t(
-        "Error.Ownership status is required",
+        "Error.OwnershipStatusIsRequired",
       );
     }
     if (!formData.geoLocation) {
       validationErrors.geoLocation = t("Error.Geo location is required");
     }
     if (!formData.images || formData.images.length === 0) {
-      validationErrors.images = t("Error.At least one image is required");
+      validationErrors.images = t("Error.AtLeastOneCategoryOptionMustBeSelected");
     }
 
     if (Object.keys(validationErrors).length > 0) {
@@ -812,7 +812,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
               setTouched((prev) => ({ ...prev, isOwnByFarmer: true }));
               setErrors((prev) => ({
                 ...prev,
-                isOwnByFarmer: t("Error.Land ownership is required"),
+                isOwnByFarmer: t("Error.LandOwnershipIsRequired"),
               }));
             }
           }}
@@ -853,7 +853,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
               setTouched((prev) => ({ ...prev, ownershipStatus: true }));
               setErrors((prev) => ({
                 ...prev,
-                ownershipStatus: t("Error.Ownership status is required"),
+                ownershipStatus: t("Error.OwnershipStatusIsRequired"),
               }));
             }
           }}

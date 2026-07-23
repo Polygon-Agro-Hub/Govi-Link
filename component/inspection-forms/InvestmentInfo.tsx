@@ -99,7 +99,7 @@ const validateAndFormat = (text: string, rules: ValidationRule, t: any) => {
 
     value = value.replace(/\.{2,}/g, ".");
     if (value === "0") {
-      error = t("Error.Value must be greater than 0");
+      error = t("Error.ValueMustBeGreaterThan0");
     } else if (rules.required && value.trim().length === 0) {
       error = t(`Error.${rules.type} is required`);
     }
@@ -111,7 +111,7 @@ const validateAndFormat = (text: string, rules: ValidationRule, t: any) => {
       value = value.slice(1);
     }
     if (rules.required && value.length === 0) {
-      error = t(`Error.repaymentMonth is required`);
+      error = t(`Error.ExpectedRepaymentPeriodAsPerTheFarmerInMonthsIsRequired`);
     }
   }
 
@@ -131,7 +131,7 @@ const validateAndFormat = (text: string, rules: ValidationRule, t: any) => {
     }
 
     if (rules.required && value.trim().length === 0) {
-      error = t("Error.purpose is required");
+      error = t("Error.PurposeForInvestmentRequiredAsPerTheFarmerIsRequired");
     }
   }
 
@@ -303,10 +303,10 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
       formData.expected.toString().trim() === "" ||
       formData.expected === 0
     ) {
-      validationErrors.expected = t("Error.expected is required");
+      validationErrors.expected = t("Error.ExpectedInvestmentByTheFarmerIsRequired");
     }
     if (!formData?.purpose || formData.purpose.trim() === "") {
-      validationErrors.purpose = t("Error.purpose is required");
+      validationErrors.purpose = t("Error.PurposeForInvestmentRequiredAsPerTheFarmerIsRequired");
     }
     if (formData?.purpose && formData.purpose.length > 50) {
       validationErrors.purpose = t("Error.purpose max 50 characters");
@@ -316,7 +316,7 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
       formData.repaymentMonth.toString().trim() === "" ||
       formData.repaymentMonth === 0
     ) {
-      validationErrors.repaymentMonth = t("Error.repaymentMonth is required");
+      validationErrors.repaymentMonth = t("Error.ExpectedRepaymentPeriodAsPerTheFarmerInMonthsIsRequired");
     }
 
     if (Object.keys(validationErrors).length > 0) {

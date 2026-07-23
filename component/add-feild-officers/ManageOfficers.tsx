@@ -172,7 +172,7 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
   if (loading && !refreshing) {
     return (
       <LoadingPage
-        message={t("ManageOfficers.LoadingOfficers")}
+        message={t("ManageOfficers.LoadingOfficers...")}
         fullScreen={true}
       />
     );
@@ -211,7 +211,7 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
 
           {officers.length === 0 ? (
             <View className="flex-1 items-center justify-center">
-            <NoDataComponent message={t("ManageOfficers.NoOfficers")} />
+            <NoDataComponent message={t("ManageOfficers.NoOfficersFound")} />
             </View>
           ) : (
             officers.map((officer, index) => (

@@ -518,7 +518,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
       setErrors((prev) => ({
         ...prev,
         nic: t(
-          "Error.NIC Number must be 9 digits followed by 'V' or 12 digits.",
+          "Error.NicNumberMustBe9DigitsFollowedByVOr12Digits",
         ),
       }));
     } else {
@@ -548,7 +548,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
       if (domain === "gmail.com" || domain === "googlemail.com") {
         setErrors((prev) => ({
           ...prev,
-          email: t("Error.Invalid Gmail address"),
+          email: t("Error.InvalidGmailAddressGmailAddressesCannotHaveConsecutiveDotsLeadingTrailingDotsOrSpecialCharacters"),
         }));
       } else {
         setErrors((prev) => ({
@@ -567,7 +567,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
         await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== "granted") {
         Alert.alert(
-          t("Error.Permission Denied"),
+          t("Error.PermissionDenied"),
           t("Error.Gallery permission is required"),
           [{ text: t("Main.OK") }],
         );
@@ -607,7 +607,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
       if (response.data.exists) {
         setErrors((prev) => ({
           ...prev,
-          nic: t("Error.This NIC is already registered in the system."),
+          nic: t("Error.ThisNicIsAlreadyRegisteredInTheSystem"),
         }));
         return true;
       }
@@ -918,8 +918,8 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
 
     if (isValidating) {
       Alert.alert(
-        t("Error.Please Wait"),
-        t("Error.Validating your information, please wait..."),
+        t("Error.PleaseWait"),
+        t("Error.ValidatingYourInformationPleaseWait..."),
         [{ text: t("Main.OK") }],
       );
       return;
@@ -1451,7 +1451,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
         data={getDistrictsData()}
         selectedItems={selectedDistricts}
         onSelect={handleDistrictSelect}
-        searchPlaceholder={t("AddOfficer.SearchDistrict")}
+        searchPlaceholder={t("AddOfficer.SearchDistrict...")}
         doneButtonText={t("AddOfficer.Done")}
         noResultsText={t("AddOfficer.NoDistrictsFound")}
         multiSelect={true}
@@ -1466,7 +1466,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
         data={getCountryData()}
         selectedItems={[selectedCountryCode1]}
         onSelect={handleCountryCodeSelect}
-        searchPlaceholder={t("AddOfficer.SearchCountry")}
+        searchPlaceholder={t("AddOfficer.SearchCountry...")}
         doneButtonText={t("AddOfficer.Select")}
         noResultsText={t("AddOfficer.NoCountriesFound")}
         multiSelect={false}
@@ -1481,7 +1481,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
         data={getCountryData()}
         selectedItems={[selectedCountryCode2]}
         onSelect={handleCountryCodeSelect}
-        searchPlaceholder={t("AddOfficer.SearchCountry")}
+        searchPlaceholder={t("AddOfficer.SearchCountry...")}
         doneButtonText={t("AddOfficer.Select")}
         noResultsText={t("AddOfficer.NoCountriesFound")}
         multiSelect={false}

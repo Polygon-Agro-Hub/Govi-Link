@@ -93,7 +93,7 @@ const AddOnboardSupplierOfficer: React.FC<AddOnboardSupplierOfficerProps> = ({
     } else if (digits.length >= 2 && !digits.startsWith("07")) {
       setError("contact", t("Error.InvalidMobileNumber"));
     } else if (digits.length < 10) {
-      setError("contact", t("Error.Phone number must be 10 digits"));
+      setError("contact", t("Error.PhoneNumberMustBe10Digits"));
     } else if (!validatePhoneNumber(digits)) {
       setError("contact", t("Error.InvalidMobileNumber"));
     } else {
@@ -112,7 +112,7 @@ const AddOnboardSupplierOfficer: React.FC<AddOnboardSupplierOfficerProps> = ({
     } else if (!validateNicNumber(filtered)) {
       setError(
         "nic",
-        t("Error.NIC Number must be 9 digits followed by 'V' or 12 digits."),
+        t("Error.NicNumberMustBe9DigitsFollowedByVOr12Digits"),
       );
     } else {
       clearError("nic");
@@ -132,7 +132,7 @@ const AddOnboardSupplierOfficer: React.FC<AddOnboardSupplierOfficerProps> = ({
     if (!validateEmail(trimmed)) {
       const domain = trimmed.toLowerCase().split("@")[1];
       if (domain === "gmail.com" || domain === "googlemail.com") {
-        setError("email", t("Error.Invalid Gmail address"));
+        setError("email", t("Error.InvalidGmailAddressGmailAddressesCannotHaveConsecutiveDotsLeadingTrailingDotsOrSpecialCharacters"));
       } else {
         setError("email", t("Error.InvalidEmailAddress"));
       }
@@ -152,7 +152,7 @@ const AddOnboardSupplierOfficer: React.FC<AddOnboardSupplierOfficerProps> = ({
     if (!contact.trim()) {
       newErrors.contact = t("Error.MobileNumberIsRequired");
     } else if (contact.length < 10) {
-      newErrors.contact = t("Error.Phone number must be 10 digits long");
+      newErrors.contact = t("Error.PhoneNumberMustBe10Digits");
     } else if (!validatePhoneNumber(contact)) {
       newErrors.contact = t("Error.InvalidMobileNumber");
     }
@@ -161,7 +161,7 @@ const AddOnboardSupplierOfficer: React.FC<AddOnboardSupplierOfficerProps> = ({
       newErrors.nic = t("Error.NicNumberIsRequired");
     } else if (!validateNicNumber(nic)) {
       newErrors.nic = t(
-        "Error.NIC Number must be 9 digits followed by 'V' or 12 digits.",
+        "Error.NicNumberMustBe9DigitsFollowedByVOr12Digits",
       );
     }
 
@@ -200,12 +200,12 @@ const AddOnboardSupplierOfficer: React.FC<AddOnboardSupplierOfficerProps> = ({
       const duplicateErrors: Record<string, string> = {};
       if (contactExists)
         duplicateErrors.contact = t(
-          "Error.This phone number is already registered",
+          "Error.ThisPhoneNumberIsAlreadyRegistered",
         );
       if (emailExists)
-        duplicateErrors.email = t("Error.This email is already registered");
+        duplicateErrors.email = t("Error.ThisEmailIsAlreadyRegistered");
       if (nicExists)
-        duplicateErrors.nic = t("Error.This NIC is already registered");
+        duplicateErrors.nic = t("Error.ThisNicIsAlreadyRegistered");
 
       if (Object.keys(duplicateErrors).length > 0) {
         setErrors((prev) => ({ ...prev, ...duplicateErrors }));

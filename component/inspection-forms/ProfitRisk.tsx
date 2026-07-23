@@ -227,7 +227,7 @@ const validateAndFormat = (text: string, rules: ValidationRule, t: any) => {
     value = value.replace(/\.{2,}/g, ".");
 
     if (value === "0") {
-      error = t("Error.Value must be greater than 0");
+      error = t("Error.ValueMustBeGreaterThan0");
     } else if (rules.required && value.trim().length === 0) {
       error = t(`Error.${rules.type} is required`);
     }
@@ -506,7 +506,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
       formData.profit.trim() === "" ||
       formData.profit === "0"
     ) {
-      validationErrors.profit = t("Error.profit is required");
+      validationErrors.profit = t("Error.HowMuchProfitAreYouExpectingFromTheProposedCropCroppingSystemIsRequired");
     }
     if (!formData.isProfitable) {
       validationErrors.isProfitable = t(
@@ -520,12 +520,12 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
     if (formData.isRisk === "Yes") {
       if (!formData.risk || formData.risk.trim() === "") {
         validationErrors.risk = t(
-          "Error.What are the risks you are anticipating in the proposed crop / cropping system is required",
+          "WhatAreTheRisksYouAreAnticipatingInTheProposedCropCroppingSystemIsRequired",
         );
       }
       if (!formData.solution || formData.solution.trim() === "") {
         validationErrors.solution = t(
-          "Error.Do you have the solution is required",
+          "Error.DoYouHaveTheSolutionIsRequired",
         );
       }
       if (!formData.manageRisk) {
@@ -535,7 +535,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
       }
       if (!formData.worthToTakeRisk || formData.worthToTakeRisk.trim() === "") {
         validationErrors.worthToTakeRisk = t(
-          "Error.Is it worth to take the risks for anticipated profits is required",
+          "Error.IsItWorthToTakeTheRisksForAnticipatedProfitsIsRequired",
         );
       }
     }
@@ -784,7 +784,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
                         risk:
                           formattedText.trim() === ""
                             ? t(
-                                "Error.What are the risks you are anticipating in the proposed crop / cropping system is required",
+                                "WhatAreTheRisksYouAreAnticipatingInTheProposedCropCroppingSystemIsRequired",
                               )
                             : "",
                       }));
@@ -825,7 +825,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
                         ...prev,
                         solution:
                           formattedText.trim() === ""
-                            ? t("Error.Do you have the solution is required")
+                            ? t("Error.DoYouHaveTheSolutionIsRequired")
                             : "",
                       }));
 
@@ -890,7 +890,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
                         worthToTakeRisk:
                           formattedText.trim() === ""
                             ? t(
-                                "Error.Is it worth to take the risks for anticipated profits is required",
+                                "Error.IsItWorthToTakeTheRisksForAnticipatedProfitsIsRequired",
                               )
                             : "",
                       }));

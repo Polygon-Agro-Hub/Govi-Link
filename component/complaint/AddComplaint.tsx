@@ -98,7 +98,7 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
     if (!selectedCategory && !complaintText.trim()) {
       Alert.alert(
         t("Error.Sorry"),
-        t("AddComplaint.Please fill out all fields."),
+        t("AddComplaint.PleaseFillOutAllFields"),
         [{ text: t("Main.OK") }],
       );
       return;
@@ -107,7 +107,7 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
     if (!selectedCategory && complaintText.trim()) {
       Alert.alert(
         t("Error.Sorry"),
-        t("AddComplaint.Please select a category."),
+        t("AddComplaint.PleaseSelectACategory"),
         [{ text: t("Main.OK") }],
       );
       return;
@@ -116,7 +116,7 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
     if (selectedCategory && !complaintText.trim()) {
       Alert.alert(
         t("Error.Sorry"),
-        t("AddComplaint.Please enter your complaint."),
+        t("AddComplaint.PleaseEnterYourComplaint"),
         [{ text: t("Main.OK") }],
       );
       return;
@@ -153,7 +153,7 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
 
       Alert.alert(
         t("Main.Success"),
-        t("AddComplaint.Complaint submitted successfully!"),
+        t("AddComplaint.ComplaintSubmittedSuccessfully"),
         [{ text: t("Main.Ok") }],
       );
       resetForm();
@@ -163,7 +163,7 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
         console.error("Error message:", error.message);
         Alert.alert(
           t("Error.Sorry"),
-          t("AddComplaint.Failed to submit complaint. Please try again."),
+          t("AddComplaint.FailedToSubmitComplaintPleaseTryAgain"),
           [{ text: t("Main.OK") }],
         );
       } else {
@@ -187,7 +187,7 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
     const selected = category.find((item) => item.value === selectedCategory);
     return selected
       ? selected.label
-      : t("AddComplaint.Select Complaint Category");
+      : t("AddComplaint.SelectComplaintCategory");
   };
 
   return (
@@ -217,7 +217,7 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
               resizeMode="contain"
             />
             <Text className="text-xl font-bold text-[#424242] mt-2">
-              {t("AddComplaint.Tell us the problem")}
+              {t("AddComplaint.TellUsTheProblem")}
             </Text>
           </View>
 
@@ -235,7 +235,7 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
           </TouchableOpacity>
 
           <Text className="text-center text-black mb-4 mt-4">
-            -- {t("AddComplaint.We will get back to you within 2 days")} --
+            -- {t("AddComplaint.WeWillGetBackToYouWithin2Days")} --
           </Text>
 
           <View className="mb-8">
@@ -243,7 +243,7 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
               multiline
               numberOfLines={6}
               textAlignVertical="top"
-              placeholder={t("AddComplaint.Add the Complaint here..")}
+              placeholder={t("AddComplaint.AddTheComplaintHere")}
               placeholderTextColor="#808FA2"
               className="text-black bg-white border border-[#9DB2CE] rounded-lg p-4 min-h-[280px]"
               style={{ fontStyle: complaintText ? "normal" : "italic" }}
@@ -300,11 +300,11 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
       <GlobalSearchModal
         visible={categoryModal.isVisible}
         onClose={categoryModal.hide}
-        title={t("AddComplaint.Select Complaint Category")}
+        title={t("AddComplaint.SelectComplaintCategory")}
         data={category}
         selectedItems={selectedCategory ? [selectedCategory] : []}
         onSelect={handleCategorySelect}
-        searchPlaceholder={t("AddComplaint.Search category...")}
+        searchPlaceholder={t("AddComplaint.SearchCategory...")}
         doneButtonText={t("AddComplaint.Done") || "Done"}
         noResultsText={t("AddComplaint.No categories found")}
         multiSelect={false}

@@ -83,8 +83,8 @@ export default function CustomDrawerContent(props: any) {
   };
 
   const complaintOptions = [
-    t("Drawer.Report Complaint"),
-    t("Drawer.View Complaint History"),
+    t("Drawer.ReportComplaint"),
+    t("Drawer.ViewComplaintHistory"),
   ];
 
   const handleLanguageSelect = async (language: string) => {
@@ -99,9 +99,9 @@ export default function CustomDrawerContent(props: any) {
   const handleComplaintSelect = (complaint: string) => {
     setComplaintDropdownOpen(false);
 
-    if (complaint === t("Drawer.Report Complaint")) {
+    if (complaint === t("Drawer.ReportComplaint")) {
       navigation.navigate("AddComplaint");
-    } else if (complaint === t("Drawer.View Complaint History")) {
+    } else if (complaint === t("Drawer.ViewComplaintHistory")) {
       navigation.navigate("ComplainHistory");
     }
   };
@@ -112,7 +112,7 @@ export default function CustomDrawerContent(props: any) {
     // Show confirmation alert before logout
     Alert.alert(
       t("Drawer.Logout"),
-      t("Drawer.Are you sure you want to logout?"),
+      t("Drawer.AreYouSureYouWantToLogout"),
       [
         {
           text: t("Drawer.Cancel"),
@@ -174,7 +174,7 @@ export default function CustomDrawerContent(props: any) {
     return (
       <LoadingPage
         fullScreen={true}
-        message={t("Drawer.Logging out...")}
+        message={t("Drawer.LoggingOut...")}
         color="#F35125"
       />
     );
@@ -344,7 +344,7 @@ export default function CustomDrawerContent(props: any) {
                 <Entypo name="lock" size={20} color="#999999" />
               </View>
               <Text className="flex-1 text-lg ml-2">
-                {t("Drawer.Change Password")}
+                {t("Drawer.ChangePassword")}
               </Text>
               <Ionicons
                 name={"chevron-forward-sharp"}

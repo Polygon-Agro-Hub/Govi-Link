@@ -424,7 +424,7 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
           <View className="p-2 mt-4">
             <View className="flex-row justify-between items-center mb-1">
               <Text className="text-base font-bold">
-                {t("Dashboard.Today Visits")}{" "}
+                {t("Dashboard.TodayVisits")}{" "}
                 <Text className="text-[#4E6393]">
                   ({visitsData.length.toString().padStart(2, "0")})
                 </Text>
@@ -437,7 +437,7 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
                 }
               >
                 <Text className="text-pink-500 font-semibold">
-                  {t("Dashboard.View All")}
+                  {t("Dashboard.ViewAll")}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -571,14 +571,14 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
                 resizeMode="contain"
               />
               <Text className="italic text-[#787878] mt-2 text-center">
-                {t("Dashboard.No Jobs for Today")}
+                {t("Dashboard.NoJobsForToday")}
               </Text>
             </View>
           )}
 
           <View className="p-2 mt-10">
             <Text className="text-base font-bold mb-3">
-              {t("Dashboard.Saved Draft")}
+              {t("Dashboard.SavedDraft")}
             </Text>
           </View>
 
@@ -731,7 +731,7 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
                   resizeMode="contain"
                 />
                 <Text className="italic text-[#787878] mt-4 text-center">
-                  {t("Dashboard.No Saved Drafts for Today")}
+                  {t("Dashboard.NoSavedDraftsForToday")}
                 </Text>
               </View>
             )}
@@ -753,7 +753,7 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
                 }}
               >
                 <Text className="text-base font-bold text-[#434343]">
-                  {t("Dashboard.Assigned Target")}
+                  {t("Dashboard.AssignedTarget")}
                 </Text>
                 <Image
                   source={require("../../assets/images/dashboard/assigned-target.webp")}
@@ -788,7 +788,7 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
                 }
               >
                 <Text className="text-base font-bold text-[#434343] ml-2">
-                  {t("Dashboard.Capital Requests")}
+                  {t("Dashboard.CapitalRequests")}
                 </Text>
                 <Image
                   source={require("../../assets/images/dashboard/request.webp")}
@@ -816,7 +816,7 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
                 onPress={() => navigation.navigate("AddOnboardSupplierOfficer")}
               >
                 <Text className="text-base font-bold text-[#434343] ml-2">
-                  {t("Dashboard.Onboard Suppliers")}
+                  {t("Dashboard.OnboardSuppliers")}
                 </Text>
                 <Image
                   source={require("../../assets/images/dashboard/onboard-suppliers.webp")}
@@ -955,7 +955,7 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
                       <View className="flex-row items-center justify-center border border-[#F83B4F] rounded-full px-6 h-[50px]">
                         <Ionicons name="call" size={20} color="#F83B4F" />
                         <Text className="text-base font-semibold  ml-2">
-                          {t("VisitPopup.Get Call")}
+                          {t("VisitPopup.GetCall")}
                         </Text>
                       </View>
                     </TouchableOpacity>

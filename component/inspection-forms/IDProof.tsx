@@ -133,11 +133,11 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
     if (!pNumber.trim()) return t(`Error.${pType} is required`);
     if (pType === "NIC Number" && !validateNicNumber(pNumber)) {
       return t(
-        "Error.NIC Number must be 9 digits followed by 'V' or 12 digits.",
+        "Error.NicNumberMustBe9DigitsFollowedByVOr12Digits",
       );
     }
     if (pType === "Driving License ID" && !validateDrivingLicense(pNumber)) {
-      return t("Error.Please enter a valid License ID number");
+      return t("Error.PleaseEnterAValidLicenseIdNumber1CapitalLetter7DigitsOr1012Digits");
     }
     return "";
   };
@@ -259,13 +259,13 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
       error = t(`Error.${rules.type} is required`);
     } else if (formData.pType === "NIC Number" && !validateNicNumber(value)) {
       error = t(
-        "Error.NIC Number must be 9 digits followed by 'V' or 12 digits.",
+        "Error.NicNumberMustBe9DigitsFollowedByVOr12Digits",
       );
     } else if (
       formData.pType === "Driving License ID" &&
       !validateDrivingLicense(value)
     ) {
-      error = t("Error.Please enter a valid License ID number");
+      error = t("Error.PleaseEnterAValidLicenseIdNumber1CapitalLetter7DigitsOr1012Digits");
     }
 
     setErrors((prev) => ({ ...prev, nic: error }));
@@ -368,11 +368,11 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
     if (!formData.pType) {
       setErrors((prev) => ({
         ...prev,
-        nic: t("Error.ID Proof Type is required"),
+        nic: t("Error.IdProofTypeIsRequired"),
       }));
       Alert.alert(
         t("Error.ValidationError"),
-        "• " + t("Error.ID Proof Type is required"),
+        "• " + t("Error.IdProofTypeIsRequired"),
         [{ text: t("Main.OK") }],
       );
       return;
@@ -399,7 +399,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
     if (!formData.frontImg || !formData.backImg) {
       Alert.alert(
         t("Error.ValidationError"),
-        t("Error.Both ID images are required"),
+        t("Error.BothIdImagesAreRequired"),
         [{ text: t("Main.OK") }],
       );
       return;

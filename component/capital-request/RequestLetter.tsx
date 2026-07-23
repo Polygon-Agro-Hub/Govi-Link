@@ -164,7 +164,7 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
   if (loading) {
     return (
       <LoadingPage
-        message={t("CapitalRequests.LoadingRequests")}
+        message={t("CapitalRequests.LoadingRequests...")}
         fullScreen={true}
       />
     );
@@ -186,7 +186,7 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
   return (
     <View className="flex-1 bg-white">
       <CustomHeader
-        title={t("RequestLetter.Request Letter")}
+        title={t("RequestLetter.RequestLetter")}
         navigation={navigation}
         showBackButton={true}
         onBackPress={() => navigation.goBack()}
@@ -267,7 +267,7 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
                 }
               />
               <ProjectDetails
-                label={t("RequestLetter.Expected Investment")}
+                label={t("RequestLetter.ExpectedInvestment")}
                 value={
                   <>
                     <Text>{t("RequestLetter.Rs")}. </Text>
@@ -278,7 +278,7 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
                 }
               />
               <ProjectDetails
-                label={t("RequestLetter.Expected Yield")}
+                label={t("RequestLetter.ExpectedYield")}
                 value={
                   <>
                     <Text className="font-bold">
@@ -393,7 +393,7 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
             <View className="flex-row self-center w-2/3 h-[50px] items-center justify-center border border-[#F83B4F] rounded-full py-2.5">
               <FontAwesome6 name="phone-volume" size={18} color="#F83B4F" />
               <Text className="text-lg font-semibold ml-3 text-[#070707]">
-                {t("VisitPopup.Get Call")}
+                {t("VisitPopup.GetCall")}
               </Text>
             </View>
           </TouchableOpacity>

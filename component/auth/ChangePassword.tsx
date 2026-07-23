@@ -131,7 +131,7 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ navigation }) => {
 
       Alert.alert(
         t("Main.Success"),
-        t("ChangePassword.Password updated successfully"),
+        t("ChangePassword.PasswordUpdatedSuccessfully"),
         [{ text: t("Main.OK") }],
       );
       navigation.navigate("Login");
@@ -140,13 +140,13 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ navigation }) => {
         if (error.response.status === 401) {
           Alert.alert(
             t("Error.Sorry"),
-            t("ChangePassword.Invalid current password"),
+            t("ChangePassword.InvalidCurrentPassword"),
             [{ text: t("Ok") }],
           );
         } else {
           Alert.alert(
             t("Error.Sorry"),
-            t("ChangePassword.Failed to update password"),
+            t("ChangePassword.FailedToUpdatePassword"),
             [{ text: t("Main.OK") }],
           );
         }

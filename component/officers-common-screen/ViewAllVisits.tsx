@@ -285,7 +285,7 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
                   isOverdueSelected ? "text-white" : "text-[#F83B4F]"
                 }`}
               >
-                {t("Visits.Over Due")}
+                {t("Visits.OverDue")}
               </Text>
               {isOverdueSelected && (
                 <View className="bg-white rounded-full w-6 h-6 items-center justify-center ml-2">
@@ -511,7 +511,7 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
               })
           ) : (
             <View className="flex-1 items-center justify-center mt-[75%]">
-              <NoDataComponent message={t("Visits.No Jobs Available")} />
+              <NoDataComponent message={t("Visits.NoJobsAvailable")} />
             </View>
           )}
         </ScrollView>
@@ -639,7 +639,7 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
                       <View className="flex-row items-center justify-center border border-[#F83B4F] rounded-full px-6 h-[50px]">
                         <Ionicons name="call" size={20} color="#F83B4F" />
                         <Text className="text-base font-semibold  ml-2">
-                          {t("VisitPopup.Get Call")}
+                          {t("VisitPopup.GetCall")}
                         </Text>
                       </View>
                     </TouchableOpacity>

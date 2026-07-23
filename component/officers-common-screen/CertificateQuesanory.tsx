@@ -261,9 +261,9 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
       if (q.type === "Photo Proof") {
         if (q.officerUploadImage) {
           Alert.alert(
-            t("CertificateQuesanory.Confirm Untick"),
+            t("CertificateQuesanory.ConfirmUntick"),
             t(
-              "CertificateQuesanory.This will remove the uploaded photo for this task. Are you sure you want to continue?",
+              "CertificateQuesanory.ThisWillRemoveTheUploadedPhotoForThisTaskAreYouSureYouWantToContinue",
             ),
             [
               { text: t("CertificateQuesanory.Cancel"), style: "cancel" },
@@ -302,9 +302,9 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
       const newTickResult = q.officerTickResult === 1 ? 0 : 1;
       if (newTickResult === 0) {
         Alert.alert(
-          t("CertificateQuesanory.Confirm Untick"),
+          t("CertificateQuesanory.ConfirmUntick"),
           t(
-            "CertificateQuesanory.Are you sure you want to mark this task as incomplete?",
+            "CertificateQuesanory.AreYouSureYouWantToMarkThisTaskAsIncomplete",
           ),
           [
             { text: t("CertificateQuesanory.Cancel"), style: "cancel" },
@@ -326,7 +326,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
       console.error(" Error updating tickResult:", err);
       Alert.alert(
         t("Error.Sorry"),
-        t("CertificateQuesanory.Something went wrong while updating question."),
+        t("CertificateQuesanory.SomethingWentWrongWhileUpdatingQuestion"),
         [{ text: t("Main.OK") }],
       );
     } finally {
@@ -356,7 +356,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
         if (newValue === 1) {
           Alert.alert(
             t("CertificateQuesanory.Success"),
-            t("CertificateQuesanory.Task complete successfully!"),
+            t("CertificateQuesanory.TaskCompleteSuccessfully"),
             [{ text: t("Main.OK") }],
           );
         }
@@ -365,7 +365,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
       console.error(" Error updating tickResult:", err);
       Alert.alert(
         t("Error.Sorry"),
-        t("CertificateQuesanory.Something went wrong while updating question."),
+        t("CertificateQuesanory.SomethingWentWrongWhileUpdatingQuestion"),
         [{ text: t("Main.OK") }],
       );
     } finally {
@@ -421,7 +421,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
       if (response.data?.success || response.status === 200) {
         Alert.alert(
           t("CertificateQuesanory.Success"),
-          t("CertificateQuesanory.Task complete successfully!"),
+          t("CertificateQuesanory.TaskCompleteSuccessfully"),
           [{ text: t("Main.OK") }],
         );
         setQuestions((prev) =>
@@ -441,7 +441,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
       } else {
         Alert.alert(
           t("Error.Sorry"),
-          t("CertificateQuesanory.Failed to complete task, Please try again"),
+          t("CertificateQuesanory.FailedToCompleteTaskPleaseTryAgain"),
           [{ text: t("Main.OK") }],
         );
       }
@@ -449,7 +449,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
       console.error("Upload photo failed:", err);
       Alert.alert(
         t("Error.Sorry"),
-        t("CertificateQuesanory.Failed to complete task, Please try again"),
+        t("CertificateQuesanory.FailedToCompleteTaskPleaseTryAgain"),
         [{ text: t("Main.OK") }],
       );
     } finally {
@@ -545,7 +545,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
                     </Text>
 
                     <Text className="text-[#555555] text-left mt-1">
-                      {t("CertificateQuesanory.Started on")} :{" "}
+                      {t("CertificateQuesanory.StartedOn")} :{" "}
                       {CertificateData?.createdAt
                         ? new Date(
                           CertificateData.createdAt,
@@ -637,12 +637,12 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
             </View>
 
             <Text className="text-md text-black text-center mb-1">
-              {t("CertificateQuesanory.Are you sure you want to continue?")}
+              {t("CertificateQuesanory.AreYouSureYouWantToContinue")}
             </Text>
 
             <Text className="text-md text-black text-center mb-6">
               {t(
-                "CertificateQuesanory.You haven’t marked any tasks as completed.",
+                "CertificateQuesanory.YouHaventMarkedAnyTasksAsCompleted",
               )}
             </Text>
 
@@ -692,14 +692,14 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
             </View>
 
             <Text className="text-lg font-semibold mt-2 text-center">
-              {t("CertificateQuesanory.Click a Photo")}
+              {t("CertificateQuesanory.ClickAPhoto")}
             </Text>
 
             {!capturedImage ? (
               <>
                 <Text className="text-gray-500 text-center mt-2 mb-6">
                   {t(
-                    "CertificateQuesanory.Please take a photo of the completed work in the field.",
+                    "CertificateQuesanory.PleaseTakeAPhotoOfTheCompletedWorkInTheField",
                   )}
                 </Text>
                 <TouchableOpacity
@@ -707,7 +707,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
                   className="bg-black rounded-3xl w-full py-3 items-center justify-center"
                 >
                   <Text className="text-white font-semibold text-base">
-                    {t("CertificateQuesanory.Open Camera")}
+                    {t("CertificateQuesanory.OpenCamera")}
                   </Text>
                 </TouchableOpacity>
               </>
@@ -722,7 +722,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
                 <View className="flex justify-center w-full -mt-2">
                   {isButtonEnabled ? (
                     <Text className="text-center font-semibold mb-2">
-                      {t("CertificateQuesanory.Ready To Submit")}
+                      {t("CertificateQuesanory.ReadyToSubmit")}
                     </Text>
                   ) : (
                     <Text className="text-gray-600 text-center mb-2">
@@ -734,7 +734,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
                     className="border border-black rounded-3xl py-3 items-center"
                   >
                     <Text className="text-black font-semibold text-base">
-                      {t("CertificateQuesanory.Retake Previous Photo")}
+                      {t("CertificateQuesanory.RetakePreviousPhoto")}
                     </Text>
                   </TouchableOpacity>
 

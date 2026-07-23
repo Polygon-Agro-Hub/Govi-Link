@@ -212,7 +212,7 @@ const validateAndFormat = (text: string, rules: ValidationRule, t: any) => {
     } else if (value.trim().length > 0) {
       const numVal = parseFloat(value);
       if (isNaN(numVal) || numVal < 0 || numVal > 14) {
-        error = t("Error.pH must be between 0 and 14");
+        error = t("Error.PhMustBeBetween0And14");
       }
     }
   }
@@ -471,7 +471,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
       setErrors((prev) => ({
         ...prev,
         waterImages: t(
-          "Error.At least one image of the water source is required",
+          "Error.AtLeastOneCategoryOptionMustBeSelected",
         ),
       }));
     }
@@ -502,9 +502,9 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
     const otherFilled = (formData.otherWaterSources?.trim().length ?? 0) > 0;
 
     if (updatedOptions.length === 0) {
-      errorMsg = t("Error.Please select at least one water source");
+      errorMsg = t("Error.PleaseSelectAtLeastOneWaterSource");
     } else if (hasOther && !otherFilled) {
-      errorMsg = t("Error.Please specify the other water source");
+      errorMsg = t("Error.PleaseSpecifyTheOtherWaterSource");
     }
 
     setErrors((prev) => ({ ...prev, waterSources: errorMsg }));
@@ -519,9 +519,9 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
     const hasOther = waterSources.includes("Other");
 
     if (waterSources.length === 0) {
-      errorMsg = t("Error.Please select at least one water source");
+      errorMsg = t("Error.PleaseSelectAtLeastOneWaterSource");
     } else if (hasOther && trimmedText.trim().length === 0) {
-      errorMsg = t("Error.Please specify the other water source");
+      errorMsg = t("Error.PleaseSpecifyTheOtherWaterSource");
     }
 
     setErrors((prev) => ({ ...prev, waterSources: errorMsg }));
@@ -671,27 +671,27 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
 
     if (!allClimateSelected) {
       validationErrors.climate = t(
-        "Error.Please select Yes or No for all climate parameters",
+        "Error.PleaseSelectYesOrNoForMissing",
       );
     }
 
     const phVal = parseFloat(formData?.ph?.toString() || "0");
     if (!formData?.ph || phVal <= 0) {
-      validationErrors.ph = t("Error.pH is required");
+      validationErrors.ph = t("Error.PhIsRequired");
     } else if (phVal > 14) {
-      validationErrors.ph = t("Error.pH must be between 0 and 14");
+      validationErrors.ph = t("Error.PhMustBeBetween0And14");
     }
     if (!formData?.soilType || formData.soilType.trim() === "") {
-      validationErrors.soilType = t("Error.soilType is required");
+      validationErrors.soilType = t("Error.SoilTypeIsRequired");
     }
     if (!formData?.soilfertility) {
       validationErrors.soilfertility = t(
-        "Error.Overall soil fertility is required",
+        "Error.OverallSoilFertilityIsRequired",
       );
     }
     if (!formData?.waterImages || formData.waterImages.length === 0) {
       validationErrors.waterImages = t(
-        "Error.At least one image of the water source is required",
+        "Error.AtLeastOneCategoryOptionMustBeSelected",
       );
     }
 

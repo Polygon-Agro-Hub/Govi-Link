@@ -51,14 +51,14 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
     const trimmedEmpId = empId.trim();
 
     if (trimmedEmpId !== trimmedEmpId.toUpperCase()) {
-      setEmpIdError(t("Login.Please enter Employee ID in uppercase letters"));
+      setEmpIdError(t("Login.PleaseEnterEmployeeIdInUppercaseLetters"));
       return false;
     }
     if (!trimmedEmpId.startsWith("CFO") && !trimmedEmpId.startsWith("FIO")) {
       Alert.alert(
-        t("Error.Unauthorized Access"),
+        t("Error.UnauthorizedAccess"),
         t(
-          "Error.You are not authorized to access this system. Please use a valid Employee ID",
+          "Error.YouAreNotAuthorizedToAccessThisSystemPleaseUseAValidEmployeeId",
         ),
         [{ text: t("Main.OK") }],
       );
@@ -89,7 +89,7 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
     if (!empid && !password) {
       Alert.alert(
         t("Error.Sorry"),
-        t("Login.Password and Employee ID are required"),
+        t("Login.PasswordAndEmployeeIdAreRequired"),
       );
       return false;
     }
@@ -105,7 +105,7 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
     if (!empid && password) {
       Alert.alert(
         t("Error.Sorry"),
-        t("Login.Employee ID is not allowed to be empty"),
+        t("Login.EmployeeIdIsNotAllowedToBeEmpty"),
       );
       return false;
     }
@@ -179,10 +179,10 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
         if (lowerMessage.includes("invalid password")) {
           Alert.alert(
             t("Error.Sorry"),
-            t("Login.Invalid Password. Please try again."),
+            t("Login.InvalidPasswordPleaseTryAgain"),
           );
         } else if (lowerMessage.includes("user not found")) {
-          Alert.alert(t("Error.Sorry"), t("Login.Invalid EMP ID & Password"));
+          Alert.alert(t("Error.Sorry"), t("Login.InvalidEmpIdPassword"));
         } else {
           Alert.alert(t("Error.Sorry"), t("Main.SomethingWentWrongPleaseTryAgainLater"));
         }
@@ -245,7 +245,7 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
           "intentional_logout",
         );
         if (intentionalLogout === "true") {
-          Alert.alert(t("Main.Success"), t("Login.Logout Successful"), [
+          Alert.alert(t("Main.Success"), t("Login.LogoutSuccessful"), [
             { text: t("Main.OK") },
           ]);
           await AsyncStorage.removeItem("intentional_logout");
@@ -295,12 +295,12 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
           {t("Login.Welcome")}
         </Text>
         <Text className="text-center mt-2">
-          {t("Login.Please Sign in to login")}
+          {t("Login.PleaseSignInToLogin")}
         </Text>
 
         <View style={{ width: `100%`, marginTop: hp(4) }}>
           <Text className="text-base pb-[2%] font-light">
-            {t("Login.Employee ID")}
+            {t("Login.EmployeeID")}
           </Text>
           <View
             className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] mb-2 px-3 ${empIdError ? "border-red-500" : "border-[#F4F4F4]"
@@ -363,7 +363,7 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
                 <ActivityIndicator color="white" size="small" />
               ) : (
                 <Text className="text-white text-lg font-semibold tracking-wide text-center">
-                  {t("Login.Sign in")}
+                  {t("Login.SignIn")}
                 </Text>
               )}
             </LinearGradient>

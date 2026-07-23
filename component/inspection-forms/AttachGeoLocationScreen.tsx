@@ -67,8 +67,8 @@ const AttachGeoLocationScreen: React.FC<AttachGeoLocationScreenProps> = ({
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
         Alert.alert(
-          t("Error.Permission Denied"),
-          t("Error.Location permission is required to use this feature."),
+          t("Error.PermissionDenied"),
+          t("Error.LocationPermissionIsRequiredToUseThisFeature"),
           [{ text: t("Main.OK") }],
         );
         setIsLoading(false);
@@ -101,7 +101,7 @@ const AttachGeoLocationScreen: React.FC<AttachGeoLocationScreenProps> = ({
       console.error("Error getting location:", error);
       Alert.alert(
         t("Error.Error"),
-        t("Error.Unable to get your current location"),
+        t("Error.UnableToGetYourCurrentLocation"),
         [{ text: t("Main.OK") }],
       );
     } finally {

@@ -107,7 +107,7 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
     if (code.length !== 5) {
       Alert.alert(
         t("Error.Sorry"),
-        t("Otpverification.Please enter the 5-digit OTP sent to your phone."),
+        t("Otpverification.PleaseEnterThe5DigitOtpSentToYourMobile"),
         [{ text: t("Main.OK") }],
       );
       return;
@@ -116,9 +116,9 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
     if (isOtpExpired) {
       Alert.alert(
         t("Error.Sorry"),
-        t("Otpverification.Your OTP is invalid or expired."),
+        t("Otpverification.YourOtpHasExpiredPleaseRequestANewOneToContinue"),
         [
-          { text: t("Otpverification.Resend OTP"), onPress: handleResendOTP },
+          { text: t("Otpverification.ResendOTP"), onPress: handleResendOTP },
           { text: t("Otpverification.Cancel", "Cancel"), style: "cancel" },
         ],
       );
@@ -162,7 +162,7 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
           } else {
             Alert.alert(
               t("Error.Sorry"),
-              t("Otpverification.Audit completion failed. Please try again."),
+              t("Otpverification.AuditCompletionFailedPleaseTryAgain"),
               [{ text: t("Main.OK") }],
             );
           }
@@ -173,15 +173,15 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
 
           if (verificationAttempts >= 2) {
             Alert.alert(
-              t("Otpverification.Invalid OTP"),
-              t("Otpverification.Your OTP is invalid or expired."),
+              t("Otpverification.InvalidOTP"),
+              t("Otpverification.YourOtpHasExpiredPleaseRequestANewOneToContinue"),
               [
                 {
-                  text: t("Otpverification.Resend OTP"),
+                  text: t("Otpverification.ResendOTP"),
                   onPress: handleResendOTP,
                 },
                 {
-                  text: t("Otpverification.Try Again"),
+                  text: t("Otpverification.TryAgain"),
                   onPress: () => {
                     setOtpCode(["", "", "", "", ""]);
                     setIsOtpValid(false);
@@ -192,9 +192,9 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
             );
           } else {
             Alert.alert(
-              t("Otpverification.Invalid OTP"),
+              t("Otpverification.InvalidOTP"),
               t(
-                "Otpverification.The OTP you entered is incorrect. Please try again.",
+                "Otpverification.TheOtpYouEnteredIsIncorrectPleaseTryAgain",
               ),
               [{ text: t("Main.OK") }],
             );
@@ -203,11 +203,11 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
         case "1002":
           setIsOtpExpired(true);
           Alert.alert(
-            t("Otpverification.OTP Expired"),
-            t("Otpverification.Your OTP is invalid or expired."),
+            t("Otpverification.OTPExpired"),
+            t("Otpverification.YourOtpHasExpiredPleaseRequestANewOneToContinue"),
             [
               {
-                text: t("Otpverification.Resend OTP"),
+                text: t("Otpverification.ResendOTP"),
                 onPress: handleResendOTP,
               },
             ],
@@ -226,13 +226,13 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
         setIsOtpExpired(true);
         Alert.alert(
           t("Error.Sorry"),
-          t("Otpverification.Your OTP is invalid or expired."),
-          [{ text: t("Otpverification.Resend OTP"), onPress: handleResendOTP }],
+          t("Otpverification.YourOtpHasExpiredPleaseRequestANewOneToContinue"),
+          [{ text: t("Otpverification.ResendOTP"), onPress: handleResendOTP }],
         );
       } else if (error.response?.data?.statusCode === "1001") {
         Alert.alert(
           t("Error.Sorry"),
-          t("Otpverification.Your OTP is invalid or expired."),
+          t("Otpverification.YourOtpHasExpiredPleaseRequestANewOneToContinue"),
           [{ text: t("Main.OK") }],
         );
       } else {
@@ -278,7 +278,7 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
         setIsOtpExpired(false);
         Alert.alert(
           t("Otpverification.Success"),
-          t("Otpverification.A new OTP has been sent to your mobile number."),
+          t("Otpverification.ANewOtpHasBeenSentToYourMobileNumber"),
           [{ text: t("Main.OK") }],
         );
         setTimer(240);
@@ -290,7 +290,7 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
         Alert.alert(
           t("Error.Sorry"),
           t(
-            "Otpverification.We couldn’t send the OTP. Please try again later.",
+            "Otpverification.WeCouldntSendTheOtpPleaseTryAgainLater",
           ),
           [{ text: t("Main.OK") }],
         );
@@ -404,7 +404,7 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
           />
 
           <Text className="mt-8 text-lg text-black text-center font-semibold">
-            {t("Otpverification.Enter Verification Code")}
+            {t("Otpverification.EnterVerificationCode")}
           </Text>
 
           <Text className="text-base text-[#808080] text-center mt-2 px-4">
@@ -446,7 +446,7 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
           {/* Resend OTP */}
           <View className="mt-4 mb-8 flex-row justify-center items-center">
             <Text className="text-md text-[#707070]">
-              {t("Otpverification.Didn’t receive the OTP ?")}
+              {t("Otpverification.DidntReceiveTheOtp")}
             </Text>
             <TouchableOpacity
               onPress={disabledResend ? undefined : handleResendOTP}
@@ -457,7 +457,7 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
                 className="text-md font-semibold text-black text-center underline ml-2"
                 style={{ color: disabledResend ? "#999999" : "#000000" }}
               >
-                {t("Otpverification.RESEND OTP")}
+                {t("Otpverification.RESENDOTP")}
               </Text>
             </TouchableOpacity>
           </View>
@@ -470,7 +470,7 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
               activeOpacity={0.7}
             >
               <Text className="text-white text-lg text-center font-semibold">
-                {t("Otpverification.Go Back")}
+                {t("Otpverification.GoBack")}
               </Text>
             </TouchableOpacity>
 

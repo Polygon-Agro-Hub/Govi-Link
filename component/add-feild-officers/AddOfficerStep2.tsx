@@ -326,7 +326,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
     if (!isNaN(value) && value > 100) {
       setErrors((prev) => ({
         ...prev,
-        commissionAmount: t("Error.Commission amount cannot exceed 100"),
+        commissionAmount: t("Error.CommissionAmountCannotExceed100"),
       }));
       return;
     }
@@ -661,7 +661,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
     }
     if (commissionAmount && parseFloat(commissionAmount) > 100) {
       newErrors.commissionAmount = t(
-        "Error.Commission amount cannot exceed 100",
+        "Error.CommissionAmountCannotExceed100",
       );
     }
 
@@ -1061,7 +1061,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
         data={getCountriesData()}
         selectedItems={[selectedCountry]}
         onSelect={handleCountrySelect}
-        searchPlaceholder={t("AddOfficer.SearchCountry")}
+        searchPlaceholder={t("AddOfficer.SearchCountry...")}
         doneButtonText={t("AddOfficer.Select")}
         noResultsText={t("AddOfficer.NoCountriesFound")}
         multiSelect={false}
@@ -1076,7 +1076,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
         data={getProvincesData()}
         selectedItems={[selectedProvince]}
         onSelect={handleProvinceSelect}
-        searchPlaceholder={t("AddOfficer.SearchProvince")}
+        searchPlaceholder={t("AddOfficer.SearchProvince...")}
         doneButtonText={t("AddOfficer.Select")}
         noResultsText={t("AddOfficer.NoProvincesFound")}
         multiSelect={false}
@@ -1091,7 +1091,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
         data={getDistrictsData()}
         selectedItems={[selectedDistrict]}
         onSelect={handleDistrictSelect}
-        searchPlaceholder={t("AddOfficer.SearchDistrict")}
+        searchPlaceholder={t("AddOfficer.SearchDistrict...")}
         doneButtonText={t("AddOfficer.Select")}
         noResultsText={t("AddOfficer.NoDistrictsFound")}
         multiSelect={false}
@@ -1106,7 +1106,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
         data={getBanksData()}
         selectedItems={[selectedBank]}
         onSelect={handleBankSelect}
-        searchPlaceholder={t("AddOfficer.SearchBank")}
+        searchPlaceholder={t("AddOfficer.SearchBank...")}
         doneButtonText={t("AddOfficer.Select")}
         noResultsText={t("AddOfficer.NoBanksFound")}
         multiSelect={false}
@@ -1121,7 +1121,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
         data={getBranchesData()}
         selectedItems={[selectedBranch]}
         onSelect={handleBranchSelect}
-        searchPlaceholder={t("AddOfficer.SearchBranch")}
+        searchPlaceholder={t("AddOfficer.SearchBranch...")}
         doneButtonText={t("AddOfficer.Select")}
         noResultsText={t("AddOfficer.NoBranchesFound")}
         multiSelect={false}

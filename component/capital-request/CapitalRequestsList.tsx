@@ -137,7 +137,7 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
   if (loading && !refreshing) {
     return (
       <LoadingPage
-        message={t("CapitalRequests.LoadingRequests")}
+        message={t("CapitalRequests.LoadingRequests...")}
         fullScreen={true}
       />
     );
