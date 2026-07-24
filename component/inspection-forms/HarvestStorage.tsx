@@ -476,7 +476,7 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
           <View className="h-6" />
 
           <YesNoSelect
-            label={t("InspectionForm.Does the farmer own storage facility")}
+            label={t("InspectionForm.DoesTheFarmerOwnStorageFacility")}
             required
             value={formData.hasOwnStorage || null}
             visible={yesNoModalVisible && activeYesNoField === "hasOwnStorage"}
@@ -494,7 +494,7 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
           {formData.hasOwnStorage === "No" && (
             <YesNoSelect
               label={t(
-                "InspectionForm.If not, does the farmer have access to such facility",
+                "InspectionForm.IfNotDoesTheFarmerHaveAccessToSuchFacility",
               )}
               required
               value={formData.ifNotHasFacilityAccess || null}
@@ -518,7 +518,7 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
 
           <YesNoSelect
             label={t(
-              "InspectionForm.Does the farmer has access to primary processing facility",
+              "InspectionForm.DoesTheFarmerHasAccessToPrimaryProcessingFacility",
             )}
             required
             value={formData.hasPrimaryProcessingAccess || null}
@@ -541,7 +541,7 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
 
           <YesNoSelect
             label={t(
-              "InspectionForm.Does the farmer knows technologies for value addition of your crop",
+              "InspectionForm.DoesTheFarmerKnowsTechnologiesForValueAdditionOfYourCrop",
             )}
             required
             value={formData.knowsValueAdditionTech || null}
@@ -563,7 +563,7 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
 
           <YesNoSelect
             label={t(
-              "InspectionForm.Does the farmer has market linkage for value added products",
+              "InspectionForm.DoesTheFarmerHasMarketLinkageForValueAddedProducts",
             )}
             required
             value={formData.hasValueAddedMarketLinkage || null}
@@ -586,7 +586,7 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
 
           <YesNoSelect
             label={t(
-              "InspectionForm.Is farmer aware about required quality standards of value added products of proposed crops",
+              "InspectionForm.IsFarmerAwareAboutRequiredQualityStandardsOfValueAddedProductsOfProposedCrops",
             )}
             required
             value={formData.awareOfQualityStandards || null}

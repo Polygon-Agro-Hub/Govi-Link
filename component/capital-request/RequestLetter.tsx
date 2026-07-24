@@ -203,18 +203,18 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
       >
         <View className="mx-6 my-4 bg-white rounded-lg p-2">
           <Text className="text-base mb-4 text-[#070707] leading-6">
-            {t("RequestLetter.Dear Sir/Madam")}
+            {t("RequestLetter.DearSirOrMadam")}
           </Text>
 
           <Text className="text-base mb-4 text-[#070707] leading-6">
-            {t("RequestLetter.IRequestFarm", {
+            {t("RequestLetter.IFarmerNameAFarmerFromDistrictAmWritingToFormallyRequestAnAgriculturalLoanForTheUpcomingCultivationSeason", {
               farmerName: requestData.farmerName,
               district: t(`Districts.${requestData.district}`),
             })}
           </Text>
 
           <Text className="text-base mb-4 text-[#070707] leading-6">
-            {t("RequestLetter.IamPlaning", {
+            {t("RequestLetter.IAmPlanningToCultivateCropName", {
               cropName:
                 i18n.language === "si"
                   ? requestData.cropNameSinhala
@@ -225,7 +225,7 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
           </Text>
 
           <Text className="text-base mb-4 text-[#070707]">
-            {t("RequestLetter.The project details are as follows")}
+            {t("RequestLetter.TheProjectDetailsAreAsFollows")}
           </Text>
 
           <View className="gap-3 mb-6">
@@ -259,10 +259,10 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
                     <Text className="font-bold">{requestData.extentac}</Text>
                     <Text>
                       {" "}
-                      {t("RequestLetter.acres")}, {t("RequestLetter.and")}{" "}
+                      {t("RequestLetter.Acres")}, {t("RequestLetter.And")}{" "}
                     </Text>
                     <Text className="font-bold">{requestData.extentp}</Text>
-                    <Text> {t("RequestLetter.perches")}</Text>
+                    <Text> {t("RequestLetter.Perches")}</Text>
                   </>
                 }
               />
@@ -284,12 +284,12 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
                     <Text className="font-bold">
                       {requestData.expectedYield}
                     </Text>
-                    <Text> {t("RequestLetter.kg")}</Text>
+                    <Text> {t("RequestLetter.Kg")}</Text>
                   </>
                 }
               />
               <ProjectDetails
-                label={t("RequestLetter.Cultivation Start Date")}
+                label={t("RequestLetter.CultivationStartDate")}
                 value={
                   <Text className="font-bold">{requestData.startDate}</Text>
                 }
@@ -299,13 +299,13 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
 
           <Text className="text-base mb-4 text-black leading-6">
             {t(
-              "RequestLetter.This investment is essential for covering the costst",
+              "RequestLetter.ThisInvestmentIsEssentialForCoveringTheCostsOfHighQualitySeedsFertilizersPesticidesIrrigationAndLaborRequiredToAchieveTheProjectedYield",
             )}
           </Text>
 
           <Text className="text-base mb-4 text-black leading-6">
             {t(
-              "RequestLetter.I have attached the necessary documents for your perusal.",
+              "RequestLetter.IHaveAttachedTheNecessaryDocumentsForYourPerusal",
             )}
           </Text>
 
@@ -336,7 +336,7 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
 
           <Text className="text-base mt-2 text-black leading-6">
             {t(
-              "RequestLetter.I am confident in the success of this venture and request",
+              "RequestLetter.IAmConfidentInTheSuccessOfThisVentureAndRequestYouToKindlyApproveMyLoanApplicationAtTheEarliestThankYouForYourTimeAndConsideration",
             )}
           </Text>
 

@@ -84,13 +84,12 @@ const CapitalRequstQRScanner: React.FC<CapitalRequstQRScannerProps> = ({
     } else {
       setHasPermission(false);
       Alert.alert(
-        t("Permission.permissionDenied") || "Permission Denied",
-        t("Permission.enableCameraManually") ||
-          "Camera access is required to scan QR codes. Please enable it in settings.",
+        t("Permission.PermissionDenied") || "Permission Denied",
+        t("Permission.CameraAccessIsRequiredPleaseEnableItInSettings"),
         [
           { text: t("Main.Cancel") || "Cancel", style: "cancel" },
           {
-            text: t("Permission.openSettings") || "Open Settings",
+            text: t("Permission.OpenSettings") || "Open Settings",
             onPress: () => Linking.openSettings(),
           },
         ],

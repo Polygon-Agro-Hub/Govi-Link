@@ -352,7 +352,7 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
 
     Alert.alert(
       t("InspectionForm.Saving"),
-      t("InspectionForm.Please wait..."),
+      t("InspectionForm.PleaseWait..."),
       [],
       { cancelable: false },
     );
@@ -370,7 +370,7 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
 
         Alert.alert(
           t("Main.Success"),
-          t("InspectionForm.Data saved successfully"),
+          t("InspectionForm.DataSavedSuccessfully"),
           [
             {
               text: t("Main.OK"),
@@ -386,7 +386,7 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
       } else {
         Alert.alert(
           t("Main.Warning"),
-          t("InspectionForm.Could not save to server. Data saved locally."),
+          t("InspectionForm.CouldNotSaveToServerDataSavedLocally"),
           [
             {
               text: t("Main.OK"),
@@ -398,7 +398,7 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
       console.error("Error during final save:", error);
       Alert.alert(
         t("Main.Warning"),
-        t("InspectionForm.Could not save to server. Data saved locally."),
+        t("InspectionForm.CouldNotSaveToServerDataSavedLocally"),
         [
           {
             text: t("Main.OK"),
@@ -477,7 +477,7 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
           <View className="h-6" />
 
           <Input
-            label={t("InspectionForm.Expected investment by the farmer")}
+            label={t("InspectionForm.ExpectedInvestmentByTheFarmer")}
             placeholder="0.00"
             value={
               formData.expected
@@ -499,7 +499,7 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
 
           <Input
             label={t(
-              "InspectionForm.Purpose for investment required as per the farmer",
+              "InspectionForm.PurposeForInvestmentRequiredAsPerTheFarmer",
             )}
             placeholder="----"
             value={formData.purpose}
@@ -516,7 +516,7 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
 
           <Input
             label={t(
-              "InspectionForm.Expected repayment period as per the farmer in months",
+              "InspectionForm.ExpectedRepaymentPeriodAsPerTheFarmerInMonths",
             )}
             placeholder="--"
             value={

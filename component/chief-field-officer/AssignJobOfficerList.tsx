@@ -514,7 +514,7 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
             </View>
 
             <Text className="text-md text-center text-[#4E6393] mb-1 leading-6">
-              {t("AssignJobOfficerList.PleaseConFirmWithin")}{" "}
+              {t("AssignJobOfficerList.PleaseConfirmWithin")}{" "}
               <Text className="underline font-semibold text-black">
                 {formatTime(countdown)}
               </Text>{" "}

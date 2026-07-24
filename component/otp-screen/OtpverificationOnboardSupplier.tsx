@@ -283,7 +283,7 @@ const OtpverificationOnboardSupplier: React.FC = ({
           if (completeSuccess) {
             Alert.alert(
               t("Otpverification.Success"),
-              t("OnboardSupplier.Account created successfully"),
+              t("OnboardSupplier.AccountCreatedSuccessfully"),
               [
                 {
                   text: t("Main.OK"),
@@ -395,7 +395,7 @@ const OtpverificationOnboardSupplier: React.FC = ({
         showsVerticalScrollIndicator={false}
       >
         <CustomHeader
-          title={t("OnboardSupplier.OTP Verification")}
+          title={t("OnboardSupplier.OTPVerification")}
           navigation={navigation}
           showBackButton={true}
           onBackPress={() => navigation.goBack()}
@@ -416,7 +416,7 @@ const OtpverificationOnboardSupplier: React.FC = ({
 
           <Text className="text-base text-[#808080] text-center mt-2 px-4">
             {t(
-              "OnboardSupplier.We have sent a Verification Code to the given mobile number",
+              "OnboardSupplier.WeHaveSentAVerificationCodeToTheGivenMobileNumber",
             )}
           </Text>
 
@@ -453,7 +453,7 @@ const OtpverificationOnboardSupplier: React.FC = ({
           {/* Resend OTP */}
           <View className="mt-4 mb-8 flex-row justify-center items-center">
             <Text className="text-md text-[#707070]">
-              {t("OnboardSupplier.Didn't receive the OTP")}
+              {t("OnboardSupplier.DidntReceiveTheOTP")}
             </Text>
             <TouchableOpacity
               onPress={disabledResend ? undefined : handleResendOTP}

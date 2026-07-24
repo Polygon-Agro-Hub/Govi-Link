@@ -222,7 +222,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 
                   <View className="mb-4">
                     <Text className="text-black mb-1">
-                      {t("Profile.PhoneNumber1")}
+                      {t("Profile.MobileNumber1")}
                     </Text>
                     <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-4 py-4 text-[#8492A3] h-[50px]">
                       {formData.phoneNumber1}
@@ -231,7 +231,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 
                   <View className="mb-4">
                     <Text className="text-black mb-1">
-                      {t("Profile.PhoneNumber2")}
+                      {t("Profile.MobileNumber2")}
                     </Text>
                     <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-4 py-4 text-[#8492A3] h-[50px]">
                       {formData.phoneNumber2 || "---"}

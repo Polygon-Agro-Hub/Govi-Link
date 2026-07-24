@@ -338,7 +338,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
   const [showCountryDropdown, setShowCountryDropdown] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState("Sri Lanka");
   const [displayCountry, setDisplayCountry] = useState(
-    t("InspectionForm.Sri Lanka"),
+    t("InspectionForm.SriLanka"),
   );
   const [countrySearch, setCountrySearch] = useState("");
   const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
@@ -650,7 +650,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
 
     Alert.alert(
       t("InspectionForm.Saving"),
-      t("InspectionForm.Please wait..."),
+      t("InspectionForm.PleaseWait..."),
       [],
       { cancelable: false },
     );
@@ -666,7 +666,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
       setIsExistingData(true);
       Alert.alert(
         t("Main.Success"),
-        t("InspectionForm.Data saved successfully"),
+        t("InspectionForm.Data saved successfuDataSavedSuccessfully"),
         [
           {
             text: t("Main.OK"),
@@ -683,7 +683,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
     } else {
       Alert.alert(
         t("Main.Warning"),
-        t("InspectionForm.Could not save to server. Data saved locally."),
+        t("InspectionForm.CouldNotSaveToServerDataSavedLocally"),
         [
           {
             text: t("Main.OK"),
@@ -884,7 +884,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
         >
           <View className="h-6" />
           <Input
-            label={t("InspectionForm.First Name")}
+            label={t("InspectionForm.FirstName")}
             placeholder="----"
             value={formData.firstName}
             onChangeText={(text) =>
@@ -897,7 +897,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             error={errors.firstName}
           />
           <Input
-            label={t("InspectionForm.Last Name")}
+            label={t("InspectionForm.LastName")}
             placeholder="----"
             value={formData.lastName}
             onChangeText={(text) =>
@@ -910,7 +910,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             error={errors.lastName}
           />
           <Input
-            label={t("InspectionForm.Other Names")}
+            label={t("InspectionForm.OtherNames")}
             placeholder="----"
             value={formData.otherName}
             onChangeText={(text) =>
@@ -923,7 +923,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             error={errors.otherName}
           />
           <Input
-            label={t("InspectionForm.Call Name")}
+            label={t("InspectionForm.CallName")}
             placeholder="----"
             value={formData.callName}
             onChangeText={(text) =>
@@ -939,7 +939,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           <View className="border-t border-[#CACACA] my-4 mb-8" />
 
           <Input
-            label={t("InspectionForm.Mobile Number - 1")}
+            label={t("InspectionForm.MobileNumber1")}
             placeholder="7XXXXXXXX"
             value={formData.phone1}
             onChangeText={(text) =>
@@ -955,7 +955,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             required
           />
           <Input
-            label={t("InspectionForm.Mobile Number - 2")}
+            label={t("InspectionForm.MobileNumber2")}
             placeholder="7XXXXXXXX"
             value={formData.phone2}
             onChangeText={(text) =>
@@ -969,7 +969,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             isMobile
           />
           <Input
-            label={t("InspectionForm.Mobile Number of a family member")}
+            label={t("InspectionForm.MobileNumberOfAFamilyMember")}
             placeholder="7XXXXXXXX"
             value={formData.familyPhone}
             keyboardType="phone-pad"
@@ -985,7 +985,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             required
           />
           <Input
-            label={t("InspectionForm.Land Phone Number - Home")}
+            label={t("InspectionForm.LandPhoneNumberHome")}
             placeholder="XXXXXXXXX"
             value={formData.landHome}
             onChangeText={(text) =>
@@ -999,7 +999,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             isMobile
           />
           <Input
-            label={t("InspectionForm.Land Phone Number - Work")}
+            label={t("InspectionForm.LandPhoneNumberWork")}
             placeholder="XXXXXXXXX"
             value={formData.landWork}
             onChangeText={(text) =>
@@ -1013,7 +1013,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             isMobile
           />
           <Input
-            label={t("InspectionForm.Email Address - 1")}
+            label={t("InspectionForm.EmailAddress1")}
             placeholder="----"
             value={formData.email1}
             onChangeText={(text) =>
@@ -1028,7 +1028,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             error={errors.email1}
           />
           <Input
-            label={t("InspectionForm.Email Address - 2")}
+            label={t("InspectionForm.EmailAddress2")}
             placeholder="----"
             value={formData.email2}
             onChangeText={(text) =>
@@ -1043,7 +1043,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           <View className="border-t border-[#CACACA] my-4 mb-8" />
 
           <Input
-            label={t("InspectionForm.House / Plot Number")}
+            label={t("InspectionForm.HousePlotNumber")}
             placeholder="----"
             value={formData.house}
             onChangeText={(text) =>
@@ -1056,7 +1056,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             error={errors.house}
           />
           <Input
-            label={t("InspectionForm.Street Name")}
+            label={t("InspectionForm.StreetName")}
             placeholder="----"
             value={formData.street}
             onChangeText={(text) =>
@@ -1069,7 +1069,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             error={errors.street}
           />
           <Input
-            label={t("InspectionForm.City / Town Name")}
+            label={t("InspectionForm.CityTownName")}
             placeholder="----"
             value={formData.cityName}
             onChangeText={(text) =>
@@ -1096,7 +1096,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
                 <Text
                   className={`text-base ${selectedCountry ? "text-black" : "text-[#838B8C]"}`}
                 >
-                  {displayCountry || t("InspectionForm.-- Select Country --")}
+                  {displayCountry || t("InspectionForm.SelectCountry")}
                 </Text>
                 <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
               </View>
@@ -1121,7 +1121,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
                     >
                       {selectedDistrict
                         ? t(`Districts.${selectedDistrict}`)
-                        : t("InspectionForm.-- Select District --")}
+                        : t("InspectionForm.SelectDistrict")}
                     </Text>
                     <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
                   </View>
@@ -1151,7 +1151,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
                   >
                     {selectedProvince
                       ? displayProvince
-                      : t("InspectionForm.-- Select Province --")}
+                      : t("InspectionForm.SelectProvince")}
                   </Text>
                 </View>
               </View>

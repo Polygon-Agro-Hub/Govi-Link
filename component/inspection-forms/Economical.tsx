@@ -303,7 +303,7 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
 
     Alert.alert(
       t("InspectionForm.Saving"),
-      t("InspectionForm.Please wait..."),
+      t("InspectionForm.PleaseWait..."),
       [],
       { cancelable: false },
     );
@@ -321,7 +321,7 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
 
         Alert.alert(
           t("Main.Success"),
-          t("InspectionForm.Data saved successfully"),
+          t("InspectionForm.DataSavedSuccessfully"),
           [
             {
               text: t("Main.OK"),
@@ -337,7 +337,7 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
       } else {
         Alert.alert(
           t("Main.Warning"),
-          t("InspectionForm.Could not save to server. Data saved locally."),
+          t("InspectionForm.CouldNotSaveToServerDataSavedLocally"),
           [
             {
               text: t("Main.OK"),
@@ -349,7 +349,7 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
       console.error("Error during final save:", error);
       Alert.alert(
         t("Main.Warning"),
-        t("InspectionForm.Could not save to server. Data saved locally."),
+        t("InspectionForm.CouldNotSaveToServerDataSavedLocally"),
         [
           {
             text: t("Main.OK"),
@@ -422,7 +422,7 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
 
           <YesNoSelect
             label={t(
-              "InspectionForm.Are the proposed crop/cropping systems suitable for the farmer's size of land holding",
+              "InspectionForm.AreTheProposedCropCroppingSystemsSuitableForTheFarmersSizeOfLandHolding",
             )}
             required
             value={formData.isSuitaleSize || null}
@@ -440,7 +440,7 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
 
           <YesNoSelect
             label={t(
-              "InspectionForm.Are the financial resources adequate to manage the proposed crop/cropping system",
+              "InspectionForm.AreTheFinancialResourcesAdequateToManageTheProposedCropCroppingSystem",
             )}
             required
             value={formData.isFinanceResource || null}
@@ -462,7 +462,7 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
 
           <YesNoSelect
             label={t(
-              "InspectionForm.If not, can the farmer mobilize financial resources through alternative routes",
+              "InspectionForm.IfNotCanTheFarmerMobilizeFinancialResourcesThroughAlternativeRoutes",
             )}
             required
             value={formData.isAltRoutes || null}

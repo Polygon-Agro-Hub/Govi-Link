@@ -214,7 +214,7 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
                         </Text>
                         {isDraft && (
                           <Text className="font-bold text-[#FA345A]">
-                            ({t("RequestLetter.Saved Draft")})
+                            ({t("RequestLetter.SavedDraft")})
                           </Text>
                         )}
                       </View>
@@ -224,7 +224,7 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
                       </Text>
 
                       <Text className="text-[#4E6393] text-sm mt-1">
-                        {t("RequestLetter.Investment Request")}
+                        {t("RequestLetter.InvestmentRequest")}
                       </Text>
                     </View>
 

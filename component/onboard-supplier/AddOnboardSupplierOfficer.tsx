@@ -146,7 +146,7 @@ const AddOnboardSupplierOfficer: React.FC<AddOnboardSupplierOfficerProps> = ({
 
     if (!supplierName.trim())
       newErrors.supplierName = t(
-        "OnboardSupplier.Supplier Full Name is required",
+        "OnboardSupplier.SupplierFullNameIsRequired",
       );
 
     if (!contact.trim()) {
@@ -270,7 +270,7 @@ const AddOnboardSupplierOfficer: React.FC<AddOnboardSupplierOfficerProps> = ({
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <CustomHeader
-        title={t("OnboardSupplier.Onboard Supplier")}
+        title={t("OnboardSupplier.OnboardSupplier")}
         navigation={navigation}
         showBackButton={true}
         onBackPress={() => navigation.goBack()}
@@ -290,7 +290,7 @@ const AddOnboardSupplierOfficer: React.FC<AddOnboardSupplierOfficerProps> = ({
           <View>
             <TextInput
               className={inputCls("supplierName")}
-              placeholder={t("OnboardSupplier.Supplier Full Name")}
+              placeholder={t("OnboardSupplier.SupplierFullName")}
               placeholderTextColor="#7D7D7D"
               value={supplierName}
               onChangeText={(text) => {
@@ -303,7 +303,7 @@ const AddOnboardSupplierOfficer: React.FC<AddOnboardSupplierOfficerProps> = ({
                 if (!filtered.trim()) {
                   setError(
                     "supplierName",
-                    t("OnboardSupplier.Supplier Full Name is required"),
+                    t("OnboardSupplier.SupplierFullNameIsRequired"),
                   );
                 } else {
                   clearError("supplierName");
@@ -337,7 +337,7 @@ const AddOnboardSupplierOfficer: React.FC<AddOnboardSupplierOfficerProps> = ({
           <View>
             <TextInput
               className={inputCls("email")}
-              placeholder={t("OnboardSupplier.Email Address")}
+              placeholder={t("OnboardSupplier.EmailAddress")}
               placeholderTextColor="#7D7D7D"
               keyboardType="email-address"
               autoCapitalize="none"
@@ -354,7 +354,7 @@ const AddOnboardSupplierOfficer: React.FC<AddOnboardSupplierOfficerProps> = ({
           <View>
             <TextInput
               className={inputCls("nic")}
-              placeholder={t("OnboardSupplier.NIC Number")}
+              placeholder={t("OnboardSupplier.NICNumber")}
               placeholderTextColor="#7D7D7D"
               autoCapitalize="characters"
               value={nic}

@@ -144,7 +144,7 @@ const FormTabs: React.FC<FormTabsProps> = ({
 
         <View className="flex-1 items-center">
           <Text className="text-xl font-semibold text-black text-center">
-            {t("InspectionForm.Inspection Form")}
+            {t("InspectionForm.InspectionForm")}
           </Text>
         </View>
 

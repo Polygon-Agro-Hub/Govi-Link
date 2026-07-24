@@ -412,7 +412,7 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
 
     Alert.alert(
       t("InspectionForm.Saving"),
-      t("InspectionForm.Please wait..."),
+      t("InspectionForm.PleaseWait..."),
       [],
       { cancelable: false },
     );
@@ -430,7 +430,7 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
 
         Alert.alert(
           t("Main.Success"),
-          t("InspectionForm.Data saved successfully"),
+          t("InspectionForm.DataSavedSuccessfully"),
           [
             {
               text: t("Main.OK"),
@@ -446,7 +446,7 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
       } else {
         Alert.alert(
           t("Main.Warning"),
-          t("InspectionForm.Could not save to server. Data saved locally."),
+          t("InspectionForm.CouldNotSaveToServerDataSavedLocally"),
           [
             {
               text: t("Main.OK"),
@@ -458,7 +458,7 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
       console.error("Error during final save:", error);
       Alert.alert(
         t("Main.Warning"),
-        t("InspectionForm.Could not save to server. Data saved locally."),
+        t("InspectionForm.CouldNotSaveToServerDataSavedLocally"),
         [
           {
             text: t("Main.OK"),
@@ -531,7 +531,7 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
 
           <YesNoSelect
             label={t(
-              "InspectionForm.Can the farmer manage the proposed crop/cropping system through your family labour",
+              "InspectionForm.CanTheFarmerManageTheProposedCropCroppingSystemThroughYourFamilyLabour",
             )}
             required
             value={formData.isManageFamilyLabour || null}
@@ -554,7 +554,7 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
           {formData.isManageFamilyLabour === "Yes" && (
             <YesNoSelect
               label={t(
-                "InspectionForm.Is family/hired labour equipped to handle the proposed crop/cropping system",
+                "InspectionForm.IsFamilyHiredLabourEquippedToHandleTheProposedCropCroppingSystem",
               )}
               required
               value={formData.isFamilyHiredLabourEquipped || null}
@@ -579,7 +579,7 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
           {formData.isManageFamilyLabour === "No" && (
             <YesNoSelect
               label={t(
-                "InspectionForm.If not, do you have adequate labours to manage the same",
+                "InspectionForm.IfNotDoYouHaveAdequateLaboursToManageTheSame",
               )}
               required
               value={formData.hasAdequateAlternativeLabour || null}
@@ -603,7 +603,7 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
 
           <YesNoSelect
             label={t(
-              "InspectionForm.Are there any mechanization options to substitute the labour",
+              "InspectionForm.AreThereAnyMechanizationOptionsToSubstituteTheLabour",
             )}
             required
             value={formData.areThereMechanizationOptions || null}
@@ -625,7 +625,7 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
           />
 
           <YesNoSelect
-            label={t("InspectionForm.Is machinery available")}
+            label={t("InspectionForm.IsMachineryAvailable")}
             required
             value={formData.isMachineryAvailable || null}
             visible={
@@ -645,7 +645,7 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
           />
 
           <YesNoSelect
-            label={t("InspectionForm.Is machinery affordable")}
+            label={t("InspectionForm.IsMachineryAffordable")}
             required
             value={formData.isMachineryAffordable || null}
             visible={
@@ -665,7 +665,7 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
           />
 
           <YesNoSelect
-            label={t("InspectionForm.Is machinery cost effective")}
+            label={t("InspectionForm.IsMachineryCostEffective")}
             required
             value={formData.isMachineryCostEffective || null}
             visible={

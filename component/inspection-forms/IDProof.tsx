@@ -426,7 +426,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
 
     Alert.alert(
       t("InspectionForm.Saving"),
-      t("InspectionForm.Please wait..."),
+      t("InspectionForm.PleaseWait..."),
       [],
       {
         cancelable: false,
@@ -444,7 +444,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
       setIsExistingData(true);
       Alert.alert(
         t("Main.Success"),
-        t("InspectionForm.Data saved successfully"),
+        t("InspectionForm.DataSavedSuccessfully"),
         [
           {
             text: t("Main.OK"),
@@ -457,7 +457,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
     } else {
       Alert.alert(
         t("Main.Warning"),
-        t("InspectionForm.Could not save to server. Data saved locally."),
+        t("InspectionForm.CouldNotSaveToServerDataSavedLocally"),
         [{ text: t("Main.OK") }],
       );
     }
@@ -518,7 +518,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
           <View className="relative mb-4">
             <Text className="text-sm text-[#070707] mb-2">
               <Text className="text-black">
-                {t("InspectionForm.ID Proof Type")} *
+                {t("InspectionForm.IDProof Type")} *
               </Text>
             </Text>
             <TouchableOpacity
@@ -531,7 +531,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
                 >
                   {formData.pType
                     ? t(`InspectionForm.${formData.pType}`)
-                    : t("InspectionForm.Select Proof Type")}
+                    : t("InspectionForm.SelectProofType")}
                 </Text>
                 <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
               </View>
@@ -542,8 +542,8 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
                 <Text className="text-sm text-[#070707] mb-2">
                   <Text className="text-black">
                     {formData.pType === "NIC Number"
-                      ? t("InspectionForm.NIC Number")
-                      : t("InspectionForm.Driving License ID")}{" "}
+                      ? t("InspectionForm.NICNumber")
+                      : t("InspectionForm.DrivingLicenseID")}{" "}
                     *
                   </Text>
                 </Text>
@@ -583,8 +583,8 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
               <UploadButton
                 title={
                   formData.pType === "NIC Number"
-                    ? t("InspectionForm.NIC Front Photo")
-                    : t("InspectionForm.Driving License Front Photo")
+                    ? t("InspectionForm.NICFrontPhoto")
+                    : t("InspectionForm.DrivingLicenseFrontPhoto")
                 }
                 onPress={() => openCamera("front")}
                 image={formData.frontImg}
@@ -593,8 +593,8 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
               <UploadButton
                 title={
                   formData.pType === "NIC Number"
-                    ? t("InspectionForm.NIC Back Photo")
-                    : t("InspectionForm.Driving License Back Photo")
+                    ? t("InspectionForm.NICBackPhoto")
+                    : t("InspectionForm.DrivingLicenseBackPhoto")
                 }
                 onPress={() => openCamera("back")}
                 image={formData.backImg}

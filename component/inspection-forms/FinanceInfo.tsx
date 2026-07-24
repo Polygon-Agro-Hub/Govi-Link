@@ -615,7 +615,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
 
     Alert.alert(
       t("InspectionForm.Saving"),
-      t("InspectionForm.Please wait..."),
+      t("InspectionForm.PleaseWait..."),
       [],
       {
         cancelable: false,
@@ -634,7 +634,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
         setIsExistingData(true);
         Alert.alert(
           t("Main.Success"),
-          t("InspectionForm.Data saved successfully"),
+          t("InspectionForm.DataSavedSuccessfully"),
           [
             {
               text: t("Main.OK"),
@@ -646,7 +646,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
       } else {
         Alert.alert(
           t("Main.Warning"),
-          t("InspectionForm.Could not save to server. Data saved locally."),
+          t("InspectionForm.CouldNotSaveToServerDataSavedLocally"),
           [
             {
               text: t("Main.OK"),
@@ -658,7 +658,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
       console.error("Error during final save:", error);
       Alert.alert(
         t("Main.Warning"),
-        t("InspectionForm.Could not save to server. Data saved locally."),
+        t("InspectionForm.CouldNotSaveToServerDataSavedLocally"),
         [
           {
             text: t("Main.OK"),
@@ -800,9 +800,9 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
       subCategories: [
         {
           key: "Land Residential",
-          label: t("InspectionForm.Land Residential"),
+          label: t("InspectionForm.LandResidential"),
         },
-        { key: "Land Farm", label: t("InspectionForm.Land Farm") },
+        { key: "Land Farm", label: t("InspectionForm.LandFarm") },
       ],
     },
     {
@@ -811,11 +811,11 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
       subCategories: [
         {
           key: "House Residential",
-          label: t("InspectionForm.House Residential"),
+          label: t("InspectionForm.HouseResidential"),
         },
         {
           key: "Building at the farm",
-          label: t("InspectionForm.Building at the farm"),
+          label: t("InspectionForm.BuildingAtTheFarm"),
         },
       ],
     },
@@ -823,10 +823,10 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
       key: "assetsVehicle",
       label: t("InspectionForm.Vehicle"),
       subCategories: [
-        { key: "Motor bike", label: t("InspectionForm.Motor bike") },
-        { key: "Three Wheeler", label: t("InspectionForm.Three Wheeler") },
-        { key: "Motor car", label: t("InspectionForm.Motor car") },
-        { key: "Motor van", label: t("InspectionForm.Motor van") },
+        { key: "Motor bike", label: t("InspectionForm.MotorBike") },
+        { key: "Three Wheeler", label: t("InspectionForm.ThreeWheeler") },
+        { key: "Motor car", label: t("InspectionForm.MotorCar") },
+        { key: "Motor van", label: t("InspectionForm.MotorVan") },
         { key: "Tractor", label: t("InspectionForm.Tractor") },
       ],
     },
@@ -836,14 +836,14 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
       subCategories: [
         {
           key: "Combined Harvestor",
-          label: t("InspectionForm.Combined Harvestor"),
+          label: t("InspectionForm.CombinedHarvestor"),
         },
         { key: "JCB", label: t("InspectionForm.JCB") },
       ],
     },
     {
       key: "assetsFarmTool",
-      label: t("InspectionForm.Special Farm Tools"),
+      label: t("InspectionForm.SpecialFarmTools"),
     },
   ];
 
@@ -909,7 +909,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
           <View className="h-6" />
 
           <Input
-            label={t("InspectionForm.Account Holder Name")}
+            label={t("InspectionForm.AccountHoldersName")}
             placeholder="----"
             value={formData.accHolder || ""}
             onChangeText={(text) =>
@@ -923,7 +923,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
           />
 
           <Input
-            label={t("InspectionForm.Account Number")}
+            label={t("InspectionForm.AccountNumber")}
             placeholder="----"
             value={formData.accountNumber?.toString() || ""}
             onChangeText={(text) => {
@@ -940,7 +940,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
           />
 
           <Input
-            label={t("InspectionForm.Confirm Account Number")}
+            label={t("InspectionForm.ConfirmAccountNumber")}
             placeholder="----"
             value={formData.confirmAccountNumber?.toString() || ""}
             onChangeText={(text) => {
@@ -965,7 +965,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
 
           <View className="mt-4">
             <Text className="text-sm text-[#070707] mb-2">
-              {t("InspectionForm.Bank Name")} *
+              {t("InspectionForm.BankName")} *
             </Text>
             <TouchableOpacity
               className={`bg-[#F4F4F4] rounded-full px-4 h-[50px] flex-row justify-between items-center ${errors.bank ? "border border-red-500" : ""
@@ -975,7 +975,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               <Text
                 className={`${selectedBank ? "text-black" : "text-[#7D7D7D]"}`}
               >
-                {selectedBank || t("InspectionForm.Select Bank")}
+                {selectedBank || t("InspectionForm.SelectBank")}
               </Text>
               <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
             </TouchableOpacity>
@@ -995,7 +995,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
 
           <View className="mt-4">
             <Text className="text-sm text-[#070707] mb-2">
-              {t("InspectionForm.Branch Name")} *
+              {t("InspectionForm.BranchName")} *
             </Text>
             <TouchableOpacity
               className={`bg-[#F4F4F4] rounded-full px-4 h-[50px] flex-row justify-between items-center ${errors.branch ? "border border-red-500" : ""
@@ -1006,7 +1006,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               <Text
                 className={`${selectedBranch ? "text-black" : "text-[#7D7D7D]"}`}
               >
-                {selectedBranch || t("InspectionForm.Select Branch")}
+                {selectedBranch || t("InspectionForm.SelectBranch")}
               </Text>
               <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
             </TouchableOpacity>
@@ -1028,14 +1028,14 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
 
           <View className="mt-4">
             <Text className="text-sm text-[#070707] mb-2">
-              {t("InspectionForm.Existing debts of the farmer")} *
+              {t("InspectionForm.ExistingDebtsOfTheFarmer")} *
             </Text>
             <View
               className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${errors.debtsOfFarmer ? "border border-red-500" : ""
                 }`}
             >
               <TextInput
-                placeholder={t("InspectionForm.Type here...")}
+                placeholder={t("InspectionForm.TypeHere...")}
                 value={formData.debtsOfFarmer || ""}
                 onChangeText={(text) => {
                   let formattedText = text.replace(/^\s+/, "");
@@ -1075,8 +1075,8 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
 
           <View className="mt-4">
             <Input
-              label={t("InspectionForm.No of Dependents")}
-              placeholder={t("InspectionForm.0 or more")}
+              label={t("InspectionForm.NoOfDependents")}
+              placeholder={t("InspectionForm.0OrMore")}
               value={formData.noOfDependents || ""}
               onChangeText={(text) =>
                 handleFieldChange("noOfDependents", text, {
@@ -1092,7 +1092,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
 
           <View className="mt-4">
             <Text className="text-sm text-[#070707] mb-4">
-              {t("InspectionForm.Assets owned by the farmer")} *
+              {t("InspectionForm.AssetsOwnedByTheFarmer")} *
             </Text>
 
             {assetCategories.map((category) => {
@@ -1165,7 +1165,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
                     <View className="mt-2 ml-4">
                       <View className="bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ml-[-5%]">
                         <TextInput
-                          placeholder={t("InspectionForm.Type here...")}
+                          placeholder={t("InspectionForm.TypeHere...")}
                           value={formData.assetsFarmTool || ""}
                           onChangeText={(text) => {
                             let formattedText = text.replace(/^\s+/, "");
@@ -1189,7 +1189,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
                             style={{ marginTop: 2 }}
                           />
                           <Text className="text-red-500 text-sm ml-2 flex-1">
-                            {t("InspectionForm.Special Farm Tools Instruction")}
+                            {t("InspectionForm.PleaseSpecifyAnySpecialFarmToolsUtilizedByTheFarmer")}
                           </Text>
                         </View>
                       )}

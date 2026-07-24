@@ -270,7 +270,7 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
       if (response.data.status === "success" || response.data.id) {
         Alert.alert(
           t("AddOfficer.Success"),
-          t("AddOfficer.OfficerAddedSuccessully"),
+          t("AddOfficer.OfficerAddedSuccessfully"),
           [{ text: t("Main.OK") }],
         );
 

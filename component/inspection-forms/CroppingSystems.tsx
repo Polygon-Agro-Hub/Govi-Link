@@ -433,7 +433,7 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
 
     Alert.alert(
       t("InspectionForm.Saving"),
-      t("InspectionForm.Please wait..."),
+      t("InspectionForm.PleaseWait..."),
       [],
       { cancelable: false }
     );
@@ -449,7 +449,7 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
       setIsExistingData(true);
       Alert.alert(
         t("Main.Success"),
-        t("InspectionForm.Data saved successfully"),
+        t("InspectionForm.DataSavedSuccessfully"),
         [
           {
             text: t("Main.OK"),
@@ -465,7 +465,7 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
     } else {
       Alert.alert(
         t("Main.Warning"),
-        t("InspectionForm.Could not save to server. Data saved locally."),
+        t("InspectionForm.CouldNotSaveToServerDataSavedLocally"),
         [{ text: t("Main.OK") }]
       );
     }
@@ -558,7 +558,7 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
           {/* Opportunity Section */}
           <View className="mt-2">
             <Text className="text-sm text-[#070707] mb-4">
-              {t("InspectionForm.An opportunity to go for")}{" "}
+              {t("InspectionForm.AnOpportunityToGoFor")}{" "}
               <Text className="text-black">*</Text>
             </Text>
 
@@ -598,7 +598,7 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
                   }`}
               >
                 <TextInput
-                  placeholder={t("InspectionForm.--Mention Other--")}
+                  placeholder={t("InspectionForm.MentionOther")}
                   placeholderTextColor="#838B8C"
                   className="px-5 text-base text-black"
                   value={formData.otherOpportunity || ""}
@@ -620,7 +620,7 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
           {/* Knowledge Field - Yes/No */}
           <View className="mt-4">
             <Text className="text-sm text-[#070707] mb-2">
-              {t("InspectionForm.Does the farmer has the knowledge on cropping systems management")}{" "}
+              {t("InspectionForm.DoesTheFarmerHasTheKnowledgeOnCroppingSystemsManagement")}{" "}
               <Text className="text-black">*</Text>
             </Text>
 
@@ -637,7 +637,7 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
                 <Text className="text-black">{t(`InspectionForm.${formData.hasKnowlage}`)}</Text>
               ) : (
                 <Text className="text-[#838B8C]">
-                  {t("InspectionForm.--Select From Here--")}
+                  {t("InspectionForm.SelectFromHere")}
                 </Text>
               )}
               <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
@@ -656,7 +656,7 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
           {/* Previous Experience */}
           <View className="mt-4">
             <Text className="text-sm text-[#070707] mb-2">
-              {t("InspectionForm.What is your previous experiences with regard to the crop/cropping systems that the farmer is planning to choose")}{" "}
+              {t("InspectionForm.WhatIsYourPreviousExperiencesWithRegardToTheCropCroppingSystemsThatTheFarmerIsPlanningToChoose")}{" "}
               <Text className="text-black">*</Text>
             </Text>
 
@@ -695,7 +695,7 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
           {/* Opinion */}
           <View className="mt-4 mb-8">
             <Text className="text-sm text-[#070707] mb-2">
-              {t("InspectionForm.What is the general opinion of your friends, neighborhood farmers on proposed crop / cropping systems")}{" "}
+              {t("InspectionForm.WhatIsTheGeneralOpinionOfYourFriendsNeighborhoodFarmersOnProposedCropCroppingSystems")}{" "}
               <Text className="text-black">*</Text>
             </Text>
             <View
@@ -703,7 +703,7 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
                 }`}
             >
               <TextInput
-                placeholder={t("InspectionForm.Type here...")}
+                placeholder={t("InspectionForm.TypeHere...")}
                 placeholderTextColor="#838B8C"
                 value={formData.opinion || ""}
                 onChangeText={handleOpinionChange}

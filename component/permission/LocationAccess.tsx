@@ -75,13 +75,13 @@ const LocationAccess: React.FC<LocationAccessProps> = ({
         }
       } else if (status === "denied") {
         Alert.alert(
-          t("Permission.permissionDenied") || "Permission Denied",
-          t("Permission.enableLocationManually") ||
+          t("Permission.PermissionDenied") || "Permission Denied",
+          t("Permission.LocationAccessIsRequiredPleaseEnableItInSettings") ||
             "Location access is required. Please enable it in settings.",
           [
             { text: t("Main.Cancel") || "Cancel", style: "cancel" },
             {
-              text: t("Permission.openSettings") || "Open Settings",
+              text: t("Permission.OpenSettings") || "Open Settings",
               onPress: () => Linking.openSettings(),
             },
           ],
@@ -91,7 +91,7 @@ const LocationAccess: React.FC<LocationAccessProps> = ({
       console.error("Error requesting location permission:", error);
       Alert.alert(
         t("Main.Sorry"),
-        t("Permission.permissionError"),
+        t("Permission.UnableToRequestLocationPermissionPleaseTryAgain"),
         [{ text: t("PublicForum.OK") || "OK" }],
       );
     } finally {
@@ -121,12 +121,12 @@ const LocationAccess: React.FC<LocationAccessProps> = ({
 
           {/* Title */}
           <Text className="text-white font-bold text-center mt-8 text-2xl">
-            {t("Permission.locationAccess") || "Location Access"}
+            {t("Permission.LocationAccess") || "Location Access"}
           </Text>
 
           {/* Description */}
           <Text className="text-gray-400 text-center mt-4 px-8 text-base">
-            {t("Permission.enableLocationMessage") ||
+            {t("Permission.EnableLocationAccessToAccessLocationInformation") ||
               "Enable location access to access location information for better service delivery and personalized experience."}
           </Text>
 
@@ -157,8 +157,8 @@ const LocationAccess: React.FC<LocationAccessProps> = ({
                 >
                   <Text className="text-white font-semibold text-center text-lg">
                     {isLoading
-                      ? t("Permission.requesting") || "Requesting..."
-                      : t("Permission.allow") || "Allow"}
+                      ? t("Permission.Requesting...") || "Requesting..."
+                      : t("Permission.Allow")}
                   </Text>
                 </LinearGradient>
               </TouchableOpacity>
