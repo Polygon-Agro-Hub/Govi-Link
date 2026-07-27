@@ -79,7 +79,6 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import BannedScreen from "@/component/auth/BannedScreen";
 import { AlertModal, setGlobalAlertListener } from "@/component/commons/AlertModal";
-
 import { initDatabase } from "@/database/index";
 
 LogBox.ignoreAllLogs(true);
