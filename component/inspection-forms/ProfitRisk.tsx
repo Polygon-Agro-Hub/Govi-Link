@@ -227,7 +227,7 @@ const validateAndFormat = (text: string, rules: ValidationRule, t: any) => {
     value = value.replace(/\.{2,}/g, ".");
 
     if (value === "0") {
-      error = t("Error.Value must be greater than 0");
+      error = t("Error.ValueMustBeGreaterThan0");
     } else if (rules.required && value.trim().length === 0) {
       error = t(`Error.${rules.type} is required`);
     }
@@ -506,7 +506,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
       formData.profit.trim() === "" ||
       formData.profit === "0"
     ) {
-      validationErrors.profit = t("Error.profit is required");
+      validationErrors.profit = t("Error.HowMuchProfitAreYouExpectingFromTheProposedCropCroppingSystemIsRequired");
     }
     if (!formData.isProfitable) {
       validationErrors.isProfitable = t(
@@ -520,12 +520,12 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
     if (formData.isRisk === "Yes") {
       if (!formData.risk || formData.risk.trim() === "") {
         validationErrors.risk = t(
-          "Error.What are the risks you are anticipating in the proposed crop / cropping system is required",
+          "WhatAreTheRisksYouAreAnticipatingInTheProposedCropCroppingSystemIsRequired",
         );
       }
       if (!formData.solution || formData.solution.trim() === "") {
         validationErrors.solution = t(
-          "Error.Do you have the solution is required",
+          "Error.DoYouHaveTheSolutionIsRequired",
         );
       }
       if (!formData.manageRisk) {
@@ -535,7 +535,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
       }
       if (!formData.worthToTakeRisk || formData.worthToTakeRisk.trim() === "") {
         validationErrors.worthToTakeRisk = t(
-          "Error.Is it worth to take the risks for anticipated profits is required",
+          "Error.IsItWorthToTakeTheRisksForAnticipatedProfitsIsRequired",
         );
       }
     }
@@ -543,8 +543,8 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       const errorMessage = "• " + Object.values(validationErrors).join("\n• ");
-      Alert.alert(t("Error.Validation Error"), errorMessage, [
-        { text: t("Main.ok") },
+      Alert.alert(t("Error.ValidationError"), errorMessage, [
+        { text: t("Main.OK") },
       ]);
       return;
     }
@@ -554,7 +554,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
       Alert.alert(
         t("Error.Error"),
         "Request ID is missing. Please go back and try again.",
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
       return;
     }
@@ -566,14 +566,14 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
       Alert.alert(
         t("Error.Error"),
         "Invalid request ID. Please go back and try again.",
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
       return;
     }
 
     Alert.alert(
       t("InspectionForm.Saving"),
-      t("InspectionForm.Please wait..."),
+      t("InspectionForm.PleaseWait..."),
       [],
       { cancelable: false },
     );
@@ -591,10 +591,10 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
 
         Alert.alert(
           t("Main.Success"),
-          t("InspectionForm.Data saved successfully"),
+          t("InspectionForm.DataSavedSuccessfully"),
           [
             {
-              text: t("Main.ok"),
+              text: t("Main.OK"),
               onPress: () => {
                 navigation.navigate("Economical", {
                   requestNumber,
@@ -607,10 +607,10 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
       } else {
         Alert.alert(
           t("Main.Warning"),
-          t("InspectionForm.Could not save to server. Data saved locally."),
+          t("InspectionForm.CouldNotSaveToServerDataSavedLocally"),
           [
             {
-              text: t("Main.ok"),
+              text: t("Main.OK"),
             },
           ],
         );
@@ -619,10 +619,10 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
       console.error("Error during final save:", error);
       Alert.alert(
         t("Main.Warning"),
-        t("InspectionForm.Could not save to server. Data saved locally."),
+        t("InspectionForm.CouldNotSaveToServerDataSavedLocally"),
         [
           {
-            text: t("Main.ok"),
+            text: t("Main.OK"),
           },
         ],
       );
@@ -694,7 +694,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
           <View className="mb-4">
             <FormLabel
               label={t(
-                "InspectionForm.How much profit are you expecting from the proposed crop/cropping system",
+                "InspectionForm.HowMuchProfitAreYouExpectingFromTheProposedCropCroppingSystem",
               )}
               required
               extra={t("InspectionForm.Rs")}
@@ -718,7 +718,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
 
           <YesNoSelect
             label={t(
-              "InspectionForm.Is this profitable than the existing crop / cropping system",
+              "InspectionForm.IsThisProfitableThanTheExistingCropCroppingSystem",
             )}
             required
             value={formData.isProfitable || null}
@@ -735,7 +735,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
           />
 
           <YesNoSelect
-            label={t("InspectionForm.Are there any risks")}
+            label={t("InspectionForm.AreThereAnyRisks")}
             required
             value={formData.isRisk || null}
             visible={yesNoModalVisible && activeYesNoField === "isRisk"}
@@ -755,7 +755,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
               <View className="mt-4">
                 <FormLabel
                   label={t(
-                    "InspectionForm.What are the risks you are anticipating in the proposed crop / cropping system",
+                    "InspectionForm.WhatAreTheRisksYouAreAnticipatingInTheProposedCropCroppingSystem",
                   )}
                   required
                 />
@@ -766,7 +766,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
                   }`}
                 >
                   <TextInput
-                    placeholder={t("InspectionForm.Type here...")}
+                    placeholder={t("InspectionForm.TypeHere...")}
                     value={formData.risk || ""}
                     onChangeText={(text) => {
                       let formattedText = text.replace(/^\s+/, "");
@@ -784,7 +784,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
                         risk:
                           formattedText.trim() === ""
                             ? t(
-                                "Error.What are the risks you are anticipating in the proposed crop / cropping system is required",
+                                "WhatAreTheRisksYouAreAnticipatingInTheProposedCropCroppingSystemIsRequired",
                               )
                             : "",
                       }));
@@ -800,7 +800,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
 
               <View className="mt-4">
                 <FormLabel
-                  label={t("InspectionForm.Do you have the solution")}
+                  label={t("InspectionForm.DoYouHaveTheSolution")}
                   required
                 />
 
@@ -810,7 +810,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
                   }`}
                 >
                   <TextInput
-                    placeholder={t("InspectionForm.Type here...")}
+                    placeholder={t("InspectionForm.TypeHere...")}
                     value={formData.solution || ""}
                     onChangeText={(text) => {
                       let formattedText = text.replace(/^\s+/, "");
@@ -825,7 +825,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
                         ...prev,
                         solution:
                           formattedText.trim() === ""
-                            ? t("Error.Do you have the solution is required")
+                            ? t("Error.DoYouHaveTheSolutionIsRequired")
                             : "",
                       }));
 
@@ -843,7 +843,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
               </View>
 
               <YesNoSelect
-                label={t("InspectionForm.Can the farmer manage the risks")}
+                label={t("InspectionForm.CanTheFarmerManageTheRisks")}
                 required
                 value={formData.manageRisk || null}
                 visible={yesNoModalVisible && activeYesNoField === "manageRisk"}
@@ -863,7 +863,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
               <View className="mt-4">
                 <FormLabel
                   label={t(
-                    "InspectionForm.Is it worth to take the risks for anticipated profits",
+                    "InspectionForm.IsItWorthToTakeTheRisksForAnticipatedProfits",
                   )}
                   required
                 />
@@ -874,7 +874,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
                   }`}
                 >
                   <TextInput
-                    placeholder={t("InspectionForm.Type here...")}
+                    placeholder={t("InspectionForm.TypeHere...")}
                     value={formData.worthToTakeRisk || ""}
                     onChangeText={(text) => {
                       let formattedText = text.replace(/^\s+/, "");
@@ -890,7 +890,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
                         worthToTakeRisk:
                           formattedText.trim() === ""
                             ? t(
-                                "Error.Is it worth to take the risks for anticipated profits is required",
+                                "Error.IsItWorthToTakeTheRisksForAnticipatedProfitsIsRequired",
                               )
                             : "",
                       }));

@@ -99,7 +99,7 @@ const validateAndFormat = (text: string, rules: ValidationRule, t: any) => {
 
     value = value.replace(/\.{2,}/g, ".");
     if (value === "0") {
-      error = t("Error.Value must be greater than 0");
+      error = t("Error.ValueMustBeGreaterThan0");
     } else if (rules.required && value.trim().length === 0) {
       error = t(`Error.${rules.type} is required`);
     }
@@ -111,7 +111,7 @@ const validateAndFormat = (text: string, rules: ValidationRule, t: any) => {
       value = value.slice(1);
     }
     if (rules.required && value.length === 0) {
-      error = t(`Error.repaymentMonth is required`);
+      error = t(`Error.ExpectedRepaymentPeriodAsPerTheFarmerInMonthsIsRequired`);
     }
   }
 
@@ -131,7 +131,7 @@ const validateAndFormat = (text: string, rules: ValidationRule, t: any) => {
     }
 
     if (rules.required && value.trim().length === 0) {
-      error = t("Error.purpose is required");
+      error = t("Error.PurposeForInvestmentRequiredAsPerTheFarmerIsRequired");
     }
   }
 
@@ -303,10 +303,10 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
       formData.expected.toString().trim() === "" ||
       formData.expected === 0
     ) {
-      validationErrors.expected = t("Error.expected is required");
+      validationErrors.expected = t("Error.ExpectedInvestmentByTheFarmerIsRequired");
     }
     if (!formData?.purpose || formData.purpose.trim() === "") {
-      validationErrors.purpose = t("Error.purpose is required");
+      validationErrors.purpose = t("Error.PurposeForInvestmentRequiredAsPerTheFarmerIsRequired");
     }
     if (formData?.purpose && formData.purpose.length > 50) {
       validationErrors.purpose = t("Error.purpose max 50 characters");
@@ -316,14 +316,14 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
       formData.repaymentMonth.toString().trim() === "" ||
       formData.repaymentMonth === 0
     ) {
-      validationErrors.repaymentMonth = t("Error.repaymentMonth is required");
+      validationErrors.repaymentMonth = t("Error.ExpectedRepaymentPeriodAsPerTheFarmerInMonthsIsRequired");
     }
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       const errorMessage = "• " + Object.values(validationErrors).join("\n• ");
-      Alert.alert(t("Error.Validation Error"), errorMessage, [
-        { text: t("Main.ok") },
+      Alert.alert(t("Error.ValidationError"), errorMessage, [
+        { text: t("Main.OK") },
       ]);
       return;
     }
@@ -333,7 +333,7 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
       Alert.alert(
         t("Error.Error"),
         "Request ID is missing. Please go back and try again.",
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
       return;
     }
@@ -345,14 +345,14 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
       Alert.alert(
         t("Error.Error"),
         "Invalid request ID. Please go back and try again.",
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
       return;
     }
 
     Alert.alert(
       t("InspectionForm.Saving"),
-      t("InspectionForm.Please wait..."),
+      t("InspectionForm.PleaseWait..."),
       [],
       { cancelable: false },
     );
@@ -370,10 +370,10 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
 
         Alert.alert(
           t("Main.Success"),
-          t("InspectionForm.Data saved successfully"),
+          t("InspectionForm.DataSavedSuccessfully"),
           [
             {
-              text: t("Main.ok"),
+              text: t("Main.OK"),
               onPress: () => {
                 navigation.navigate("CultivationInfo", {
                   requestNumber,
@@ -386,10 +386,10 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
       } else {
         Alert.alert(
           t("Main.Warning"),
-          t("InspectionForm.Could not save to server. Data saved locally."),
+          t("InspectionForm.CouldNotSaveToServerDataSavedLocally"),
           [
             {
-              text: t("Main.ok"),
+              text: t("Main.OK"),
             },
           ],
         );
@@ -398,10 +398,10 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
       console.error("Error during final save:", error);
       Alert.alert(
         t("Main.Warning"),
-        t("InspectionForm.Could not save to server. Data saved locally."),
+        t("InspectionForm.CouldNotSaveToServerDataSavedLocally"),
         [
           {
-            text: t("Main.ok"),
+            text: t("Main.OK"),
           },
         ],
       );
@@ -477,7 +477,7 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
           <View className="h-6" />
 
           <Input
-            label={t("InspectionForm.Expected investment by the farmer")}
+            label={t("InspectionForm.ExpectedInvestmentByTheFarmer")}
             placeholder="0.00"
             value={
               formData.expected
@@ -499,7 +499,7 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
 
           <Input
             label={t(
-              "InspectionForm.Purpose for investment required as per the farmer",
+              "InspectionForm.PurposeForInvestmentRequiredAsPerTheFarmer",
             )}
             placeholder="----"
             value={formData.purpose}
@@ -516,7 +516,7 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
 
           <Input
             label={t(
-              "InspectionForm.Expected repayment period as per the farmer in months",
+              "InspectionForm.ExpectedRepaymentPeriodAsPerTheFarmerInMonths",
             )}
             placeholder="--"
             value={

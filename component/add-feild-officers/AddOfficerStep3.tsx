@@ -70,8 +70,8 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
     if (status !== "granted") {
       Alert.alert(
         t("AddOfficer.PermissionRequired"),
-        t("AddOfficer.PermissionRequiredMessage"),
-        [{ text: t("Main.ok") }],
+        t("AddOfficer.SorryWeNeedCameraRollPermissionsToMakeThisWork"),
+        [{ text: t("Main.OK") }],
       );
       return;
     }
@@ -137,13 +137,13 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
     const newErrors: Record<string, string> = {};
 
     if (!nicFrontImage)
-      newErrors.nicFront = t("Error.NIC front image is required");
+      newErrors.nicFront = t("Error.NicFrontImageIsRequired");
     if (!nicBackImage)
-      newErrors.nicBack = t("Error.NIC back image is required");
+      newErrors.nicBack = t("Error.NicBackImageIsRequired");
     if (!passbookImage)
-      newErrors.passbook = t("Error.Passbook image is required");
+      newErrors.passbook = t("Error.PassbookImageIsRequired");
     if (!contractImage)
-      newErrors.contract = t("Error.Contract image is required");
+      newErrors.contract = t("Error.ContractImageIsRequired");
     setErrors(newErrors);
     return newErrors;
   };
@@ -172,8 +172,8 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
     if (Object.keys(validationErrors).length > 0) {
       const errorMessage = Object.values(validationErrors).join("\n• ");
 
-      Alert.alert(t("Error.Validation Error"), `• ${errorMessage}`, [
-        { text: t("Main.ok") },
+      Alert.alert(t("Error.ValidationError"), `• ${errorMessage}`, [
+        { text: t("Main.OK") },
       ]);
       return;
     }
@@ -185,7 +185,7 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
         Alert.alert(
           t("Error.Sorry"),
           t("Error.Your login session has expired"),
-          [{ text: t("Main.ok") }],
+          [{ text: t("Main.OK") }],
         );
         navigation.navigate("Login");
         return;
@@ -270,8 +270,8 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
       if (response.data.status === "success" || response.data.id) {
         Alert.alert(
           t("AddOfficer.Success"),
-          t("AddOfficer.OfficerAddedSuccess"),
-          [{ text: t("Main.ok") }],
+          t("AddOfficer.OfficerAddedSuccessfully"),
+          [{ text: t("Main.OK") }],
         );
 
         clearAllFormData();
@@ -295,8 +295,8 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
         errorMessage = t("Error.RequestTimeout");
       }
 
-      Alert.alert(t("Error.Error"), t("Error.somethingWentWrong"), [
-        { text: t("Main.ok") },
+      Alert.alert(t("Error.Error"), t("Error.SomethingWentWrongPleaseTryAgainLater"), [
+        { text: t("Main.OK") },
       ]);
     } finally {
       setLoading(false);

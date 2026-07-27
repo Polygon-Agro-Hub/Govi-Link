@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   BackHandler,
   Keyboard,
+  Dimensions,
 } from "react-native";
 import React, { useCallback, useState } from "react";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -38,6 +39,8 @@ interface ChangePasswordProps {
   navigation: ChangePasswordNavigationProp;
 }
 
+const { height: SCREEN_HEIGHT } = Dimensions.get("window");
+
 const ChangePassword: React.FC<ChangePasswordProps> = ({ navigation }) => {
   const route = useRoute<RouteProp<RootStackParamList, "ChangePassword">>();
   const { passwordUpdate } = route.params;
@@ -51,49 +54,51 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ navigation }) => {
 
   const validatePassword = () => {
     if (!currentPassword || !newPassword || !confirmPassword) {
-      Alert.alert(t("Error.error"), t("Error.All fields are required"), [
-        { text: t("Main.ok") },
+      Alert.alert(t("Error.Sorry"), t("Error.AllFieldsAreRequired"), [
+        { text: t("Main.OK") },
       ]);
       return false;
     }
 
     if (newPassword.length < 8) {
-      Alert.alert(t("Error.error"), t("Error.Your password must contain"), [
-        { text: t("Main.ok") },
+      Alert.alert(t("Error.Sorry"), t("Error.YourPasswordMustContainAMinimumOf8CharactersWith1UppercaseNumbersSpecialCharacters"), [
+        { text: t("Main.OK") },
       ]);
       return false;
     }
 
     if (!/[A-Z]/.test(newPassword)) {
       Alert.alert(
-        t("Error.error"),
-        t("Error.Your password must contain a minimum"),
-        [{ text: t("Main.ok") }],
+        t("Error.Sorry"),
+        t("Error.YourPasswordMustContainAMinimumOf8CharactersWith1UppercaseNumbersSpecialCharacters"),
+        [{ text: t("Main.Ok") }],
       );
       return false;
     }
 
     if (!/[0-9]/.test(newPassword)) {
-      Alert.alert(t("Error.error"), t("Error.Your password must contain"), [
-        { text: t("Main.ok") },
-      ]);
+      Alert.alert(
+        t("Error.Sorry"),
+        t("Error.YourPasswordMustContainAMinimumOf8CharactersWith1UppercaseNumbersSpecialCharacters"),
+        [{ text: t("Main.OK") }],
+      );
       return false;
     }
 
     if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(newPassword)) {
       Alert.alert(
-        t("Error.error"),
-        t("Error.Your password must contain a minimum"),
-        [{ text: t("Main.ok") }],
+        t("Error.Sorry"),
+        t("Error.YourPasswordMustContainAMinimumOf8CharactersWith1UppercaseNumbersSpecialCharacters"),
+        [{ text: t("Main.OK") }],
       );
       return false;
     }
 
     if (newPassword !== confirmPassword) {
       Alert.alert(
-        t("Error.error"),
-        t("Error.New password and confirm password do not match"),
-        [{ text: t("Main.ok") }],
+        t("Error.Sorry"),
+        t("Error.NewPasswordAndConfirmPasswordDoNotMatch"),
+        [{ text: t("Main.OK") }],
       );
       return false;
     }
@@ -129,28 +134,28 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ navigation }) => {
 
       Alert.alert(
         t("Main.Success"),
-        t("ChangePassword.Password updated successfully"),
-        [{ text: t("Main.ok") }],
+        t("ChangePassword.PasswordUpdatedSuccessfully"),
+        [{ text: t("Main.OK") }],
       );
       navigation.navigate("Login");
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         if (error.response.status === 401) {
           Alert.alert(
-            t("Error.error"),
-            t("ChangePassword.Invalid current password"),
-            [{ text: t("Main.ok") }],
+            t("Error.Sorry"),
+            t("ChangePassword.InvalidCurrentPassword"),
+            [{ text: t("Ok") }],
           );
         } else {
           Alert.alert(
-            t("Error.error"),
-            t("ChangePassword.Failed to update password"),
-            [{ text: t("Main.ok") }],
+            t("Error.Sorry"),
+            t("ChangePassword.FailedToUpdatePassword"),
+            [{ text: t("Main.OK") }],
           );
         }
       } else {
-        Alert.alert(t("Error.error"), t("Main.somethingWentWrong"), [
-          { text: t("Main.ok") },
+        Alert.alert(t("Error.Sorry"), t("Main.SomethingWentWrongPleaseTryAgainLater"), [
+          { text: t("Main.OK") },
         ]);
       }
     }
@@ -275,23 +280,47 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ navigation }) => {
           </View>
         </View>
 
-        <View className="items-center justify-center pt-7 gap-y-5 mb-20">
-          <TouchableOpacity
-            className="w-full  items-center justify-center h-[50px]"
-            onPress={handleChangePassword}
+        <View style={{ width: "100%", alignItems: "center", marginTop: 28, marginBottom: 80 }}>
+          <View
+            style={{
+              width: "100%",
+              borderRadius: 999,
+              shadowColor: "#FF1D85",
+              shadowOffset: { width: 0, height: 8 },
+              shadowOpacity: 0.45,
+              shadowRadius: 12,
+              elevation: 12,
+            }}
           >
-            <LinearGradient
-              colors={["#F2561D", "#FF1D85"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              className="w-full p-3 rounded-3xl items-center justify-center h-[50px]"
-              style={{ overflow: "hidden" }}
+            <TouchableOpacity
+              onPress={handleChangePassword}
+              activeOpacity={0.8}
+              style={{ width: "100%", borderRadius: 999 }}
             >
-              <Text className="text-lg font-semibold text-white">
-                {t("ChangePassword.Next")}
-              </Text>
-            </LinearGradient>
-          </TouchableOpacity>
+              <LinearGradient
+                colors={["#F2561D", "#FF1D85"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={{
+                  borderRadius: 999,
+                  paddingVertical: 16,
+                  width: "100%",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Text
+                  style={{
+                    color: "white",
+                    fontSize: SCREEN_HEIGHT > 900 ? 20 : 18,
+                    fontWeight: "700",
+                  }}
+                >
+                  {t("ChangePassword.Next")}
+                </Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

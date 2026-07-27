@@ -1,5 +1,5 @@
 import { StackNavigationProp } from "@react-navigation/stack";
-import React, { useCallback, useEffect, useState, useRef } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,34 +7,25 @@ import {
   TouchableOpacity,
   ScrollView,
   RefreshControl,
-  FlatList,
-  Pressable,
-  Modal,
-  BackHandler,
-  Linking,
-  Alert,
   Dimensions,
-  Animated,
-  PanResponder,
+  Alert,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { environment } from "@/environment/environment";
-import { useFocusEffect } from "@react-navigation/native";
 import { RootStackParamList } from "../types/types";
 import { useTranslation } from "react-i18next";
 import { DrawerActions } from "@react-navigation/native";
 import i18n from "@/i18n/i18n";
 import { useDispatch } from "react-redux";
 import { setUserProfile } from "@/store/authSlice";
-import { LinearGradient } from "expo-linear-gradient";
-import { AntDesign, Ionicons, FontAwesome6 } from "@expo/vector-icons";
-import { AnimatedCircularProgress } from "react-native-circular-progress";
-import ContentLoader, { Rect } from "react-content-loader/native";
+import { AntDesign } from "@expo/vector-icons";
+import LottieView from "lottie-react-native";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+
 type FieldOfficerDashboardNavigationProps = StackNavigationProp<
   RootStackParamList,
   "FieldOfficerDashboard"
@@ -43,6 +34,7 @@ type FieldOfficerDashboardNavigationProps = StackNavigationProp<
 interface FieldOfficerDashboardProps {
   navigation: FieldOfficerDashboardNavigationProps;
 }
+
 interface ProfileData {
   firstName: string;
   lastName: string;
@@ -53,235 +45,43 @@ interface ProfileData {
   lastNameTamil: string;
   empId: string;
 }
-interface VisitsData {
-  farmerName: string;
-  farmerMobile: number;
-  jobId: string;
-  propose: string;
-  serviceenglishName: string;
-  servicesinhalaName: string;
-  servicetamilName: string;
-  clusterId: number;
-  farmId: number;
-}
 
-interface DraftVisit {
-  certificationpaymentId: number;
-  jobId: string;
-  userId: number;
-  tickCompleted: number;
-  photoCompleted: number;
-  totalCompleted: number;
-  completionPercentage: number;
-  farmerName?: string;
-  farmerId: number;
-  propose?: string;
-  farmerMobile: number;
-  id: number;
-  clusterId: number;
-  farmId: number;
-}
-
-const LoadingSkeleton = () => {
-  const contentWidth = wp("100%") - 24;
-  return (
-    <View
-      style={{ flex: 1, backgroundColor: "#fff", paddingVertical: hp("1%") }}
-    >
-      <ContentLoader
-        speed={1}
-        width={contentWidth}
-        height={640}
-        viewBox={`0 0 ${contentWidth} 640`}
-        backgroundColor="#f3f3f3"
-        foregroundColor="#ecebeb"
-      >
-        {/* Today Visits Header */}
-        <Rect x={8} y={15} rx={4} ry={4} width={130} height={18} />
-        <Rect x={contentWidth - 8 - 65} y={15} rx={4} ry={4} width={65} height={18} />
-        
-        {/* Today Visits Carousel */}
-        <Rect x={8} y={85} rx={4} ry={4} width={18} height={24} />
-        <Rect x={wp("14%") - 12} y={45} rx={10} ry={10} width={wp("72%")} height={110} />
-        <Rect x={contentWidth - 8 - 18} y={85} rx={4} ry={4} width={18} height={24} />
-
-        {/* Saved Draft Header */}
-        <Rect x={8} y={185} rx={4} ry={4} width={100} height={18} />
-        
-        {/* Saved Draft Carousel */}
-        <Rect x={8} y={255} rx={4} ry={4} width={18} height={24} />
-        <Rect x={wp("14%") - 12} y={215} rx={10} ry={10} width={wp("72%")} height={110} />
-        <Rect x={contentWidth - 8 - 18} y={255} rx={4} ry={4} width={18} height={24} />
-
-        {/* Assigned Target Button Skeleton */}
-        <Rect x={32} y={345} rx={10} ry={10} width={contentWidth - 64} height={80} />
-
-        {/* Capital Requests Button Skeleton */}
-        <Rect x={32} y={441} rx={10} ry={10} width={contentWidth - 64} height={80} />
-
-        {/* Onboard Suppliers Button Skeleton */}
-        <Rect x={32} y={537} rx={10} ry={10} width={contentWidth - 64} height={80} />
-      </ContentLoader>
-    </View>
-  );
-};
-
-const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
-  navigation,
-}) => {
+const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
   const { t } = useTranslation();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const dispatch = useDispatch();
-  const flatListRef = useRef<FlatList>(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [showPopup, setShowPopup] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<any>(null);
-  const [visitsData, setVisitsData] = useState<VisitsData[]>([]);
-  const [draftVisits, setDraftVisits] = useState<DraftVisit[]>([]);
-  const [loadingVisitsdrafts, setLoadingVisitsdrafts] = useState(false);
-  const [currentDraftIndex, setCurrentDraftIndex] = useState(0);
-  const draftFlatListRef = useRef<FlatList>(null);
+
   const openDrawer = () => {
     navigation.dispatch(DrawerActions.openDrawer());
   };
-  const { width, height } = Dimensions.get("window");
-  const screenWidth = width;
-  const dynamicStyles = {
-    cropcardPadding: screenWidth < width ? 0 : 25,
-    dynamicMarginLeft: screenWidth < 376 ? "-ml-5" : "",
-  };
 
-  const translateY = useRef(new Animated.Value(0)).current;
-
-  const panResponder = useRef(
-    PanResponder.create({
-      onMoveShouldSetPanResponderCapture: (_, g) => g.dy > 5,
-      onStartShouldSetPanResponder: () => true,
-
-      onPanResponderMove: (_, g) => {
-        if (g.dy > 0) translateY.setValue(g.dy);
-      },
-
-      onPanResponderRelease: (_, g) => {
-        if (g.dy > 120) {
-          setShowPopup(false);
-          Animated.timing(translateY, {
-            toValue: 600,
-            duration: 100,
-            useNativeDriver: true,
-          }).start(() => {
-            translateY.setValue(0);
-            setShowPopup(false);
-            setSelectedItem(null);
-          });
-        } else {
-          Animated.spring(translateY, {
-            toValue: 0,
-            useNativeDriver: true,
-          }).start();
-        }
-      },
-    }),
-  ).current;
-
-  useEffect(() => {
-    if (showPopup) {
-      translateY.setValue(0);
-    }
-  }, [showPopup]);
-
-  const scrollToIndex = (index: number) => {
-    if (!flatListRef.current || !visitsData || visitsData.length === 0) return;
-
-    const validIndex = Math.max(0, Math.min(index, visitsData.length - 1));
-
-    try {
-      flatListRef.current.scrollToIndex({ index: validIndex, animated: true });
-      setCurrentIndex(validIndex);
-    } catch (error) {
-      console.warn("scrollToIndex error:", error);
-      flatListRef.current.scrollToOffset({
-        offset: validIndex * 320,
-        animated: true,
-      });
-    }
-  };
-  const scrollDraftToIndex = (index: number) => {
-    if (!draftFlatListRef.current || !draftVisits || draftVisits.length === 0)
-      return;
-    const validIndex = Math.max(0, Math.min(index, draftVisits.length - 1));
-    try {
-      draftFlatListRef.current.scrollToIndex({
-        index: validIndex,
-        animated: true,
-      });
-      setCurrentDraftIndex(validIndex);
-    } catch (error) {
-      draftFlatListRef.current.scrollToOffset({
-        offset: validIndex * 320,
-        animated: true,
-      });
-    }
-  };
   const fetchUserProfile = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
-      const intentionalLogout = await AsyncStorage.getItem("intentional_logout");
-
-      if (!token) {
-        if (intentionalLogout !== "true") {
-          Alert.alert(
-            t("Error.Sorry"),
-            t(
-              "Error.Your login session has expired. Please log in again to continue.",
-            ),
-            [{ text: t("Main.ok") }],
-          );
+      if (!token) return;
+      
+      const response = await axios.get(
+        `${environment.API_BASE_URL}api/auth/user-profile`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
         }
-        return;
-      }
-      if (token) {
-        const response = await axios.get(
-          `${environment.API_BASE_URL}api/auth/user-profile`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
-        );
-        setProfile(response.data.data);
-        dispatch(setUserProfile(response.data.data));
-      }
+      );
+      setProfile(response.data.data);
+      dispatch(setUserProfile(response.data.data));
     } catch (error: any) {
       console.error("Failed to fetch user profile:", error);
-      if (error.response?.status === 401) {
-        Alert.alert(
-          t("Error.Sorry"),
-          t(
-            "Error.Your login session has expired. Please log in again to continue.",
-          ),
-          [{ text: t("Main.ok") }],
-        );
-        navigation.navigate("Login");
-      }
-    } finally {
-      setRefreshing(false);
     }
   };
 
   useEffect(() => {
     fetchUserProfile();
-    fetchAllVisits();
   }, []);
 
   const onRefresh = useCallback(async () => {
-    try {
-      setRefreshing(true);
-      await Promise.all([fetchUserProfile(), fetchAllVisits()]);
-    } catch (error) {
-      console.error("Refresh error:", error);
-    } finally {
-      setRefreshing(false);
-    }
+    setRefreshing(true);
+    await fetchUserProfile();
+    setRefreshing(false);
   }, []);
 
   const getName = () => {
@@ -296,24 +96,6 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
     }
   };
 
-  useFocusEffect(
-    React.useCallback(() => {
-      const backAction = () => {
-        if (showPopup) {
-          setShowPopup(false);
-          setSelectedItem(null);
-          return true;
-        }
-        return false;
-      };
-      const backHandler = BackHandler.addEventListener(
-        "hardwareBackPress",
-        backAction,
-      );
-      return () => backHandler.remove();
-    }, [showPopup]),
-  );
-
   const getTextStyle = () => {
     if (i18n.language === "si") {
       return {
@@ -323,720 +105,54 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
     }
   };
 
-  useEffect(() => {
-    const backAction = () => {
-      if (showPopup) {
-        setShowPopup(false);
-        return true;
-      }
-      return false;
-    };
-
-    const backHandler = BackHandler.addEventListener(
-      "hardwareBackPress",
-      backAction,
-    );
-
-    return () => backHandler.remove();
-  }, [showPopup]);
-
-  const handleDial = (farmerMobile: string) => {
-    const phoneUrl = `tel:${farmerMobile}`;
-    Linking.openURL(phoneUrl).catch((err) =>
-      console.error("Failed to open dial pad:", err),
-    );
-  };
-
-  const fetchAllVisits = async () => {
-    try {
-      setLoadingVisitsdrafts(true);
-      const token = await AsyncStorage.getItem("token");
-      if (!token) return;
-
-      const response = await axios.get(
-        `${environment.API_BASE_URL}api/officer/visits`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
-
-      const { visits, draftVisits } = response.data.data;
-
-      setVisitsData(visits || []);
-      setDraftVisits(draftVisits || []);
-    } catch (error) {
-      console.error("Failed to fetch officer visits:", error);
-    } finally {
-      setLoadingVisitsdrafts(false);
-    }
-  };
-
-  const truncateText = (text: string, maxLength = 30) => {
-    if (!text) return "";
-    return text.length > maxLength
-      ? text.substring(0, maxLength) + "..."
-      : text;
-  };
-
-  const truncateTextDraft = (text: string, maxLength = 20) => {
-    if (!text) return "";
-    return text.length > maxLength
-      ? text.substring(0, maxLength) + "..."
-      : text;
-  };
   return (
-    <ScrollView
-      className={`flex-1 bg-white p-3  `}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-    >
-      <View className="flex flex-row ">
-        <TouchableOpacity
-          className="flex-row items-center mb-4 p-4"
-          onPress={openDrawer}
-        >
-          <Image
-            source={
-              profile?.profileImg
-                ? { uri: profile.profileImg }
-                : require("@/assets/images/auth/my-profile.webp")
-            }
-            className="w-16 h-16 rounded-full mr-3"
-          />
-
-          <View>
-            <Text
-              style={[{ fontSize: 16 }, getTextStyle()]}
-              className="text-lg font-bold"
-            >
-              {t("Dashboard.Hello")}, {getName()}
-            </Text>
-            <Text className="text-[#6E7F96] text-lg">{profile?.empId}</Text>
-          </View>
-        </TouchableOpacity>
-        <View></View>
-      </View>
-      {loadingVisitsdrafts ? (
-        <LoadingSkeleton />
-      ) : (
-        <>
-          <View className="p-2 mt-4">
-            <View className="flex-row justify-between items-center mb-1">
-              <Text className="text-base font-bold">
-                {t("Dashboard.Today Visits")}{" "}
-                <Text className="text-[#4E6393]">
-                  ({visitsData.length.toString().padStart(2, "0")})
-                </Text>
-              </Text>
-              <TouchableOpacity
-                onPress={() =>
-                  navigation.navigate("ViewAllVisits", {
-                    officerId: profile?.empId ?? "",
-                  })
-                }
-              >
-                <Text className="text-pink-500 font-semibold">
-                  {t("Dashboard.View All")}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-          {visitsData.length > 0 ? (
-            <View
-              className="flex-row"
-              style={{
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <TouchableOpacity
-                disabled={!visitsData || currentIndex <= 0}
-                onPress={() => scrollToIndex(currentIndex - 1)}
-                className="p-1"
-              >
-                <AntDesign
-                  name="left"
-                  size={24}
-                  color={!visitsData || currentIndex <= 0 ? "#ccc" : "#00000"}
-                />
-              </TouchableOpacity>
-
-              <FlatList
-                ref={flatListRef}
-                horizontal
-                data={visitsData}
-                keyExtractor={(item, index) => `${item.jobId}-${index}`}
-                showsHorizontalScrollIndicator={false}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    style={{
-                      marginHorizontal: 10,
-                      padding: dynamicStyles.cropcardPadding,
-                      width: wp("72%"),
-                    }}
-                    className="border border-[#FF1D85] rounded-lg p-3 mr-4"
-                    activeOpacity={0.8}
-                    onPress={() => {
-                      if (
-                        item.propose === "Individual" ||
-                        item.propose === "Requested"
-                      ) {
-                        setSelectedItem(item);
-                        setShowPopup(true);
-                      } else {
-                        navigation.navigate("ViewFarmsCluster", {
-                          jobId: item.jobId,
-                          feildauditId: item.id,
-                          farmName: item.farmerName,
-                          screenName: "Dashboard",
-                        });
-                      }
-                    }}
-                  >
-                    <View>
-                      <Text className="text-black text-sm font-medium">
-                        #{item.jobId}
-                      </Text>
-                      {item.farmerName ? (
-                        <Text className="text-base font-bold mt-1">
-                          {item.farmerName}
-                        </Text>
-                      ) : null}
-
-                      <Text className="text-[#4E6393] text-sm mt-1">
-                        {truncateText(
-                          (() => {
-                            if (item.propose === "Cluster") {
-                              switch (i18n.language) {
-                                case "si":
-                                  return "ගොවි සමූහ විගණනය";
-                                case "ta":
-                                  return "உழவர் குழு தணிக்கை";
-                                default:
-                                  return "Farm Cluster Audit";
-                              }
-                            } else if (item.propose === "Individual") {
-                              switch (i18n.language) {
-                                case "si":
-                                  return "තනි ගොවි විගණනය";
-                                case "ta":
-                                  return "தனிப்பட்ட விவசாயி தணிக்கை";
-                                default:
-                                  return "Individual Farmer Audit";
-                              }
-                            } else {
-                              switch (i18n.language) {
-                                case "si":
-                                  return item.servicesinhalaName || "";
-                                case "ta":
-                                  return item.servicetamilName || "";
-                                default:
-                                  return item.serviceenglishName || "";
-                              }
-                            }
-                          })(),
-                        )}
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
-                )}
-              />
-
-              <TouchableOpacity
-                disabled={!visitsData || currentIndex >= visitsData.length - 1}
-                onPress={() => scrollToIndex(currentIndex + 1)}
-                className="p-1"
-              >
-                <AntDesign
-                  name="right"
-                  size={24}
-                  color={
-                    !visitsData || currentIndex >= visitsData.length - 1
-                      ? "#ccc"
-                      : "#00000"
-                  }
-                />
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <View className=" justify-center items-center mt-4">
-              <Image
-                source={require("../../assets/images/dashboard/no-tasks.webp")}
-                style={{
-                  width: 140,
-                  height: 100,
-                }}
-                resizeMode="contain"
-              />
-              <Text className="italic text-[#787878] mt-2 text-center">
-                {t("Dashboard.No Jobs for Today")}
-              </Text>
-            </View>
-          )}
-
-          <View className="p-2 mt-10">
-            <Text className="text-base font-bold mb-3">
-              {t("Dashboard.Saved Draft")}
-            </Text>
-          </View>
-
-          <View className="">
-            {draftVisits.length > 0 ? (
-              <View
-                className="flex-row"
-                style={{
-                  flex: 1,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <TouchableOpacity
-                  disabled={currentDraftIndex <= 0}
-                  onPress={() => scrollDraftToIndex(currentDraftIndex - 1)}
-                  className="p-1"
-                >
-                  <AntDesign
-                    name="left"
-                    size={24}
-                    color={currentDraftIndex <= 0 ? "#ccc" : "#00000"}
-                  />
-                </TouchableOpacity>
-
-                <FlatList
-                  ref={draftFlatListRef}
-                  horizontal
-                  data={draftVisits}
-                  keyExtractor={(item, index) => `${item.jobId}-${index}`}
-                  showsHorizontalScrollIndicator={false}
-                  renderItem={({ item }) => (
-                    <TouchableOpacity
-                      onPress={() => {
-                        if (
-                          item.propose === "Individual" ||
-                          item.propose === "Cluster"
-                        ) {
-                          navigation.navigate("CertificateQuesanory", {
-                            auditId: item.id,
-                            jobId: item.jobId,
-                            certificationpaymentId: item.certificationpaymentId,
-                            farmerMobile: item.farmerMobile,
-                            clusterId: item.clusterId,
-                            farmId: item.farmId,
-                            isClusterAudit: !!item.clusterId,
-                            screenName: "Dashboard",
-                          });
-                        } else {
-                          navigation.navigate("RequestProblem", {
-                            jobId: item.jobId,
-                            farmerId: item.farmerId,
-                            govilinkjobid: item.id,
-                            farmerMobile: item.farmerMobile,
-                            screenName: "Dashboard",
-                          });
-                        }
-                      }}
-                    >
-                      <View
-                        style={{
-                          marginHorizontal: 10,
-                          padding: dynamicStyles.cropcardPadding,
-                          width: wp("72%"),
-                        }}
-                        className="border border-[#FF1D85] rounded-lg p-3 mr-4 flex-row justify-between"
-                      >
-                        <View>
-                          <Text className="text-black text-sm font-medium">
-                            #{item.jobId}
-                          </Text>
-                          <Text className="text-base font-bold mt-1">
-                            {item.farmerName}
-                          </Text>
-                          <Text className="text-[#4E6393] text-sm mt-1">
-                            {truncateTextDraft(
-                              (() => {
-                                if (item.propose === "Cluster") {
-                                  switch (i18n.language) {
-                                    case "si":
-                                      return "ගොවි සමූහ විගණනය";
-                                    case "ta":
-                                      return "உழவர் குழு தணிக்கை";
-                                    default:
-                                      return "Farm Cluster Audit";
-                                  }
-                                } else if (item.propose === "Individual") {
-                                  switch (i18n.language) {
-                                    case "si":
-                                      return "තනි ගොවි විගණනය";
-                                    case "ta":
-                                      return "தனிப்பட்ட விவசாயி தணிக்கை";
-                                    default:
-                                      return "Individual Farmer Audit";
-                                  }
-                                } else {
-                                  switch (i18n.language) {
-                                    case "si":
-                                      return item.servicesinhalaName || "";
-                                    case "ta":
-                                      return item.servicetamilName || "";
-                                    default:
-                                      return item.serviceenglishName || "";
-                                  }
-                                }
-                              })(),
-                            )}
-                          </Text>
-                        </View>
-
-                        <AnimatedCircularProgress
-                          size={70}
-                          width={6}
-                          fill={item.completionPercentage || 0}
-                          tintColor="#FF6B6B"
-                          backgroundColor="#E8DEF8"
-                        >
-                          {(fill: number) => (
-                            <Text className="text-black text-base font-semibold">
-                              {Math.round(fill)}%
-                            </Text>
-                          )}
-                        </AnimatedCircularProgress>
-                      </View>
-                    </TouchableOpacity>
-                  )}
-                />
-
-                <TouchableOpacity
-                  disabled={currentDraftIndex >= draftVisits.length - 1}
-                  onPress={() => scrollDraftToIndex(currentDraftIndex + 1)}
-                  className="p-1"
-                >
-                  <AntDesign
-                    name="right"
-                    size={24}
-                    color={
-                      currentDraftIndex >= draftVisits.length - 1
-                        ? "#ccc"
-                        : "#00000"
-                    }
-                  />
-                </TouchableOpacity>
-              </View>
-            ) : (
-              <View className="items-center justify-center mt-2">
-                <Image
-                  source={require("../../assets/images/dashboard/no-drafts.webp")}
-                  style={{ width: 110, height: 80 }}
-                  resizeMode="contain"
-                />
-                <Text className="italic text-[#787878] mt-4 text-center">
-                  {t("Dashboard.No Saved Drafts for Today")}
-                </Text>
-              </View>
-            )}
-          </View>
-          <View className="mt-8 mx-8">
-              <TouchableOpacity
-                onPress={() =>
-                  navigation.navigate("ViewAllVisits", {
-                    officerId: profile?.empId ?? "",
-                  })
-                }
-                className="bg-[#FFE5D6] rounded-lg p-3 h-20 mr-4 w-full flex-row justify-between items-center"
-                style={{
-                  shadowColor: "#000",
-                  shadowOffset: { width: 1, height: 1 },
-                  shadowOpacity: 0.3,
-                  shadowRadius: 6,
-                  elevation: 2,
-                }}
-              >
-                <Text className="text-base font-bold text-[#434343]">
-                  {t("Dashboard.Assigned Target")}
-                </Text>
-                <Image
-                  source={require("../../assets/images/dashboard/assigned-target.webp")}
-                  style={{
-                    width: 100,
-                    height: 70,
-                    position: "absolute",
-                    bottom: 0,
-                    right: 10,
-                  }}
-                  resizeMode="contain"
-                />
-              </TouchableOpacity>
-            </View>
-            <View className="p-8">
-              <TouchableOpacity
-                className="bg-[#FEE5E6] rounded-lg p-3 h-20 mr-4 w-full flex-row justify-between items-center"
-                style={{
-                  shadowColor: "#000",
-                  shadowOffset: { width: 1, height: 1 },
-                  shadowOpacity: 0.3,
-                  shadowRadius: 6,
-                  elevation: 2,
-                }}
-                onPress={() =>
-                  navigation.navigate("Main", {
-                    screen: "MainTabs",
-                    params: {
-                      screen: "CapitalRequests",
-                    },
-                  })
-                }
-              >
-                <Text className="text-base font-bold text-[#434343] ml-2">
-                  {t("Dashboard.Capital Requests")}
-                </Text>
-                <Image
-                  source={require("../../assets/images/dashboard/request.webp")}
-                  style={{
-                    width: 100,
-                    height: 70,
-                    position: "absolute",
-                    bottom: 0,
-                    right: 10,
-                  }}
-                  resizeMode="contain"
-                />
-              </TouchableOpacity>
-            </View>
-            <View className="px-8  mb-[15%]">
-              <TouchableOpacity
-                className="bg-[#FFF5BE] rounded-lg p-3 h-20 mr-4 w-full flex-row justify-between items-center"
-                style={{
-                  shadowColor: "#000",
-                  shadowOffset: { width: 1, height: 1 },
-                  shadowOpacity: 0.3,
-                  shadowRadius: 6,
-                  elevation: 2,
-                }}
-                onPress={() => navigation.navigate("AddOnboardSupplierOfficer")}
-              >
-                <Text className="text-base font-bold text-[#434343] ml-2">
-                  {t("Dashboard.Onboard Suppliers")}
-                </Text>
-                <Image
-                  source={require("../../assets/images/dashboard/onboard-suppliers.webp")}
-                  style={{
-                    width: 100,
-                    height: 70,
-                    position: "absolute",
-                    bottom: 0,
-                    right: -5,
-                  }}
-                  resizeMode="contain"
-                />
-              </TouchableOpacity>
-            </View>
-          </>
-        )}
-      <Modal transparent visible={showPopup} animationType="none">
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: "rgba(0,0,0,0.3)",
-          }}
-        >
-          <Pressable
-            style={{ flex: 1 }}
-            onPress={() => {
-              setShowPopup(false);
-              setSelectedItem(null);
-            }}
-          />
-          <Animated.View
-            {...panResponder.panHandlers}
-            style={{
-              position: "absolute",
-              bottom: 0,
-              width: "100%",
-              transform: [{ translateY }],
-            }}
-            className="bg-white rounded-t-3xl p-5 w-full"
+    <View className="flex bg-white" style={{ flex: 1 }}>
+      <ScrollView
+        className="bg-white p-3"
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        showsVerticalScrollIndicator={true}
+      >
+        <View className="flex flex-row ">
+          <TouchableOpacity
+            className="flex-row items-center mb-4 p-4"
+            onPress={openDrawer}
           >
-            <View className="items-center mt-4">
-              <TouchableOpacity
-                className="z-50 justify-center items-center"
-                onPress={() => {
-                  setShowPopup(false);
-                  setSelectedItem(null);
-                }}
+            <Image
+              source={
+                profile?.profileImg
+                  ? { uri: profile.profileImg }
+                  : require("@/assets/images/auth/my-profile.webp")
+              }
+              className="w-16 h-16 rounded-full mr-3"
+            />
+
+            <View>
+              <Text
+                style={[{ fontSize: 16 }, getTextStyle()]}
+                className="text-lg font-bold"
               >
-                <View className="bg-[#D9D9D9] w-20 py-0.5 rounded-full -mt-6" />
-                <View className="bg-[#D9D9D9] w-8 py-0.5 rounded-full mt-1 mb-6" />
-              </TouchableOpacity>
-
-              {selectedItem && (
-                <>
-                  <Text className="text-base font-semibold text-[#747474]">
-                    #{selectedItem.jobId || "N/A"}
-                  </Text>
-                  <Text className="text-lg font-bold mt-2">
-                    {selectedItem.farmerName || "N/A"}
-                  </Text>
-                  <Text className="text-base font-semibold mt-1">
-                    {(() => {
-                      if (selectedItem.propose === "Individual") {
-                        switch (i18n.language) {
-                          case "si":
-                            return "තනි ගොවි විගණනය";
-                          case "ta":
-                            return "தனிப்பட்ட விவசாயி தணிக்கை";
-                          default:
-                            return "Individual Farmer Audit";
-                        }
-                      } else {
-                        switch (i18n.language) {
-                          case "si":
-                            return selectedItem.servicesinhalaName || "";
-                          case "ta":
-                            return selectedItem.servicetamilName || "";
-                          default:
-                            return selectedItem.serviceenglishName || "";
-                        }
-                      }
-                    })()}
-                  </Text>
-
-                  <Text className="text-sm font-medium text-[#4E6393] mt-1">
-                    {t(`Districts.${selectedItem.district}`)}{" "}
-                    {t("VisitPopup.District")}
-                  </Text>
-                  <View className="flex flex-row justify-center gap-x-2 mb-4 mt-6 px-4">
-                    <TouchableOpacity
-                      className="flex w-1/2"
-                      disabled={
-                        !selectedItem?.latitude || !selectedItem?.longitude
-                      }
-                      onPress={() => {
-                        if (selectedItem?.latitude && selectedItem?.longitude) {
-                          const lat = selectedItem.latitude;
-                          const lon = selectedItem.longitude;
-                          const url = `https://www.google.com/maps?q=${lat},${lon}`;
-                          Linking.openURL(url);
-                        }
-                      }}
-                    >
-                      <View
-                        className={`flex flex-row items-center justify-center rounded-full h-[50px] border ${
-                          selectedItem?.latitude && selectedItem?.longitude
-                            ? "border-[#F83B4F]"
-                            : "border-[#9DB2CE]"
-                        }`}
-                      >
-                        <FontAwesome6
-                          name="location-dot"
-                          size={20}
-                          color={
-                            selectedItem?.latitude && selectedItem?.longitude
-                              ? "#F83B4F"
-                              : "#9DB2CE"
-                          }
-                        />
-                        <Text
-                          className={`text-base font-semibold ml-2 ${
-                            selectedItem?.latitude && selectedItem?.longitude
-                              ? "text-[#000000]"
-                              : "text-[#9DB2CE]"
-                          }`}
-                        >
-                          {t("VisitPopup.Location")}
-                        </Text>
-                      </View>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      className="flex w-1/2"
-                      onPress={() => handleDial(selectedItem.farmerMobile)}
-                    >
-                      <View className="flex-row items-center justify-center border border-[#F83B4F] rounded-full px-6 h-[50px]">
-                        <Ionicons name="call" size={20} color="#F83B4F" />
-                        <Text className="text-base font-semibold  ml-2">
-                          {t("VisitPopup.Get Call")}
-                        </Text>
-                      </View>
-                    </TouchableOpacity>
-                  </View>
-                  {selectedItem.city ||
-                  selectedItem.plotNo ||
-                  selectedItem.street ? (
-                    <View className="flex text-center justify-center items-center ">
-                      <Text className="text-sm font-semibold text-[#4E6393] mb-2">
-                        {t("VisitPopup.Address")}
-                      </Text>
-
-                      <Text className="text-base font-medium text-[#434343]">
-                        {selectedItem.plotNo}, {selectedItem.street},
-                      </Text>
-
-                      <Text className="text-base  font-medium text-[#434343]">
-                        {selectedItem.city}
-                      </Text>
-                    </View>
-                  ) : null}
-                </>
-              )}
-
-              <TouchableOpacity
-                onPress={() => {
-                  setShowPopup(false);
-                  if (
-                    selectedItem?.farmerId &&
-                    selectedItem?.propose === "Individual"
-                  ) {
-                    navigation.navigate("QRScanner", {
-                      farmerId: selectedItem.farmerId,
-                      jobId: selectedItem.jobId,
-                      certificationpaymentId:
-                        selectedItem.certificationpaymentId,
-                      farmerMobile: selectedItem.farmerMobile,
-                      farmId: selectedItem.farmId,
-                      clusterId: selectedItem.clusterID,
-                      isClusterAudit: false,
-                      auditId: selectedItem.id,
-                      screenName: "Dashboard",
-                    });
-                  } else if (selectedItem?.propose === "Requested") {
-                    navigation.navigate("QRScaneerRequstAudit", {
-                      farmerId: selectedItem.farmerId,
-                      govilinkjobid: selectedItem.id,
-                      jobId: selectedItem.jobId,
-                      farmerMobile: selectedItem.farmerMobile,
-                      screenName: "Dashboard",
-                    });
-                  }
-                }}
-              >
-                <LinearGradient
-                  colors={["#F2561D", "#FF1D85"]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  className={`h-[50px] items-center justify-center rounded-full mt-4 ${
-                    i18n.language === "si"
-                      ? "px-24"
-                      : i18n.language === "ta"
-                        ? "px-24"
-                        : "px-[40%]"
-                  }`}
-                  style={{
-                    marginBottom: 30,
-                  }}
-                >
-                  <Text
-                    className={`text-white  font-semibold ${i18n.language === "si" ? "text-base" : i18n.language === "ta" ? "text-base" : "text-lg"}`}
-                  >
-                    {t("VisitPopup.Start")}
-                  </Text>
-                </LinearGradient>
-              </TouchableOpacity>
+                {t("Dashboard.Hello")}, {getName()}
+              </Text>
+              <Text className="text-[#6E7F96] text-lg">{profile?.empId}</Text>
             </View>
-          </Animated.View>
+          </TouchableOpacity>
         </View>
-      </Modal>
-    </ScrollView>
+
+        <View style={{ alignItems: "center", justifyContent: "center", marginTop: 40 }}>
+          <LottieView
+            source={require("@/assets/lottie/coming-soon.json")}
+            style={{ width: wp("70%"), height: hp("35%") }}
+            autoPlay
+            loop
+          />
+          <Text style={{ fontSize: 16, color: "#666", marginTop: 8, textAlign: "center", paddingHorizontal: 20 }}>
+            We're building something amazing.
+          </Text>
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 

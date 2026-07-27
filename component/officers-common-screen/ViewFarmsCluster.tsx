@@ -228,8 +228,8 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
             return (
               <Text className="text-base text-center text-gray-500 mt-1">
                 {displayCount === 1
-                  ? t("Visits.1 farm left to finish")
-                  : t("Visits.farms left to finish", { count: displayCount })}
+                  ? t("Visits.1FarmLeftToFinish")
+                  : t("Visits.CountFarmLeftToFinish", { count: displayCount })}
               </Text>
             );
           })()}
@@ -430,7 +430,7 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
                       <View className="flex-row items-center justify-center border border-[#F83B4F] rounded-full px-6 h-[50px]">
                         <Ionicons name="call" size={20} color="#F83B4F" />
                         <Text className="text-base font-semibold  ml-2">
-                          {t("VisitPopup.Get Call")}
+                          {t("VisitPopup.GetCall")}
                         </Text>
                       </View>
                     </TouchableOpacity>

@@ -212,7 +212,7 @@ const validateAndFormat = (text: string, rules: ValidationRule, t: any) => {
     } else if (value.trim().length > 0) {
       const numVal = parseFloat(value);
       if (isNaN(numVal) || numVal < 0 || numVal > 14) {
-        error = t("Error.pH must be between 0 and 14");
+        error = t("Error.PhMustBeBetween0And14");
       }
     }
   }
@@ -471,7 +471,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
       setErrors((prev) => ({
         ...prev,
         waterImages: t(
-          "Error.At least one image of the water source is required",
+          "Error.AtLeastOneCategoryOptionMustBeSelected",
         ),
       }));
     }
@@ -502,9 +502,9 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
     const otherFilled = (formData.otherWaterSources?.trim().length ?? 0) > 0;
 
     if (updatedOptions.length === 0) {
-      errorMsg = t("Error.Please select at least one water source");
+      errorMsg = t("Error.PleaseSelectAtLeastOneWaterSource");
     } else if (hasOther && !otherFilled) {
-      errorMsg = t("Error.Please specify the other water source");
+      errorMsg = t("Error.PleaseSpecifyTheOtherWaterSource");
     }
 
     setErrors((prev) => ({ ...prev, waterSources: errorMsg }));
@@ -519,9 +519,9 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
     const hasOther = waterSources.includes("Other");
 
     if (waterSources.length === 0) {
-      errorMsg = t("Error.Please select at least one water source");
+      errorMsg = t("Error.PleaseSelectAtLeastOneWaterSource");
     } else if (hasOther && trimmedText.trim().length === 0) {
-      errorMsg = t("Error.Please specify the other water source");
+      errorMsg = t("Error.PleaseSpecifyTheOtherWaterSource");
     }
 
     setErrors((prev) => ({ ...prev, waterSources: errorMsg }));
@@ -671,27 +671,27 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
 
     if (!allClimateSelected) {
       validationErrors.climate = t(
-        "Error.Please select Yes or No for all climate parameters",
+        "Error.PleaseSelectYesOrNoForMissing",
       );
     }
 
     const phVal = parseFloat(formData?.ph?.toString() || "0");
     if (!formData?.ph || phVal <= 0) {
-      validationErrors.ph = t("Error.pH is required");
+      validationErrors.ph = t("Error.PhIsRequired");
     } else if (phVal > 14) {
-      validationErrors.ph = t("Error.pH must be between 0 and 14");
+      validationErrors.ph = t("Error.PhMustBeBetween0And14");
     }
     if (!formData?.soilType || formData.soilType.trim() === "") {
-      validationErrors.soilType = t("Error.soilType is required");
+      validationErrors.soilType = t("Error.SoilTypeIsRequired");
     }
     if (!formData?.soilfertility) {
       validationErrors.soilfertility = t(
-        "Error.Overall soil fertility is required",
+        "Error.OverallSoilFertilityIsRequired",
       );
     }
     if (!formData?.waterImages || formData.waterImages.length === 0) {
       validationErrors.waterImages = t(
-        "Error.At least one image of the water source is required",
+        "Error.AtLeastOneCategoryOptionMustBeSelected",
       );
     }
 
@@ -713,8 +713,8 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       const errorMessage = "• " + Object.values(validationErrors).join("\n• ");
-      Alert.alert(t("Error.Validation Error"), errorMessage, [
-        { text: t("Main.ok") },
+      Alert.alert(t("Error.ValidationError"), errorMessage, [
+        { text: t("Main.OK") },
       ]);
       return;
     }
@@ -723,7 +723,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
       Alert.alert(
         t("Error.Error"),
         "Request ID is missing. Please go back and try again.",
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
       return;
     }
@@ -734,7 +734,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
       Alert.alert(
         t("Error.Error"),
         "Invalid request ID. Please go back and try again.",
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.Ok") }],
       );
       return;
     }
@@ -749,7 +749,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
 
     Alert.alert(
       t("InspectionForm.Saving"),
-      t("InspectionForm.Please wait..."),
+      t("InspectionForm.PleaseWait..."),
       [],
       { cancelable: false },
     );
@@ -767,10 +767,10 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
 
         Alert.alert(
           t("Main.Success"),
-          t("InspectionForm.Data saved successfully"),
+          t("InspectionForm.DataSavedSuccessfully"),
           [
             {
-              text: t("Main.ok"),
+              text: t("Main.OK"),
               onPress: () => {
                 navigation.navigate("CroppingSystems", {
                   requestNumber,
@@ -783,16 +783,16 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
       } else {
         Alert.alert(
           t("Main.Warning"),
-          t("InspectionForm.Could not save to server. Data saved locally."),
-          [{ text: t("Main.ok") }],
+          t("InspectionForm.CouldNotSaveToServerDataSavedLocally"),
+          [{ text: t("Main.OK") }],
         );
       }
     } catch (error) {
       console.error("Error during final save:", error);
       Alert.alert(
         t("Main.Warning"),
-        t("InspectionForm.Could not save to server. Data saved locally."),
-        [{ text: t("Main.ok") }],
+        t("InspectionForm.CouldNotSaveToServerDataSavedLocally"),
+        [{ text: t("Main.OK") }],
       );
     }
   };
@@ -866,7 +866,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
           <View>
             <Text className="text-sm text-[#070707] mb-2">
               {t(
-                "InspectionForm.Is the crop / cropping system suitable for overall local climatic parameters",
+                "InspectionForm.IsTheCropCroppingSystemSuitableForOverallLocalClimaticParameters",
               )}{" "}
               *
             </Text>
@@ -926,7 +926,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
 
           <YesNoSelect
             label={t(
-              "InspectionForm.Is the crop / cropping system suitable for local soil type",
+              "InspectionForm.IsTheCropCroppingSystemSuitableForLocalSoilType",
             )}
             required
             value={formData?.isCropSuitale || null}
@@ -946,7 +946,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
           <View className="mt-4" />
 
           <Input
-            label={t("InspectionForm.pH")}
+            label={t("InspectionForm.Ph")}
             placeholder="----"
             value={formData?.ph > 0 ? formData.ph.toString() : ""}
             onChangeText={(text) =>
@@ -961,7 +961,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
           />
 
           <Input
-            label={t("InspectionForm.Soil Type")}
+            label={t("InspectionForm.SoilType")}
             placeholder="----"
             value={formData?.soilType}
             onChangeText={(text) =>
@@ -976,7 +976,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
 
           <View className="mt-2">
             <Text className="text-sm text-[#070707] mb-2">
-              {t("InspectionForm.Overall soil fertility")}{" "}
+              {t("InspectionForm.OverallSoilFertility")}{" "}
               <Text className="text-black-500">*</Text>
             </Text>
 
@@ -1007,7 +1007,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
           {/* Water Sources */}
           <View className="mt-2">
             <Text className="text-sm text-[#070707] mb-4">
-              {t("InspectionForm.Water sources")}{" "}
+              {t("InspectionForm.WaterSources")}{" "}
               <Text className="text-black-500">*</Text>
             </Text>
 
@@ -1034,7 +1034,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
 
             {formData.waterSources?.includes("Other") && (
               <TextInput
-                placeholder={t("InspectionForm.--Mention Other--")}
+                placeholder={t("InspectionForm.MentionOther")}
                 placeholderTextColor="#838B8C"
                 className="bg-[#F6F6F6] px-4 h-[50px] rounded-3xl text-black mb-2"
                 value={formData.otherWaterSources || ""}
@@ -1045,7 +1045,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
 
           <View className="mb-2 mt-4">
             <Text className="text-sm text-[#070707] mb-2">
-              {t("InspectionForm.Images of the water source")}{" "}
+              {t("InspectionForm.ImagesOfTheWaterSource")}{" "}
               <Text className="text-black-500">*</Text>
             </Text>
 
@@ -1066,7 +1066,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
             >
               <FontAwesome6 name="camera" size={22} color="#fff" />
               <Text className="text-lg text-white ml-3">
-                {t("InspectionForm.Capture Photos")}
+                {t("InspectionForm.CapturePhotos")}
               </Text>
             </TouchableOpacity>
 
@@ -1093,7 +1093,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
           </View>
 
           <YesNoSelect
-            label={t("InspectionForm.Does this land receive adequate rainfall")}
+            label={t("InspectionForm.DoesThisLandReceiveAdequateRainfall")}
             required
             value={formData?.isRecevieRainFall || null}
             visible={
@@ -1115,7 +1115,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
 
           <YesNoSelect
             label={t(
-              "InspectionForm.Is the distribution of rainfall suitable to grow identified crops",
+              "InspectionForm.IsTheDistributionOfRainfallSuitableToGrowIdentifiedCrops",
             )}
             required
             value={formData?.isRainFallSuitableCrop || null}
@@ -1138,7 +1138,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
 
           <YesNoSelect
             label={t(
-              "InspectionForm.Is the water quality suitable for cultivation",
+              "InspectionForm.IsTheWaterQualitySuitableForCultivation",
             )}
             required
             value={formData?.isRainFallSuitableCultivation || null}
@@ -1164,7 +1164,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
 
           <YesNoSelect
             label={t(
-              "InspectionForm.Is electricity available for lifting the water",
+              "InspectionForm.IsElectricityAvailableForLiftingTheWater",
             )}
             required
             value={formData?.isElectrocityAvailable || null}
@@ -1189,7 +1189,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
 
           <YesNoSelect
             label={t(
-              "InspectionForm.Is there pump sets, micro irrigation systems",
+              "InspectionForm.IsTherePumpSetsMicroIrrigationSystems",
             )}
             required
             value={formData?.ispumpOrirrigation || null}

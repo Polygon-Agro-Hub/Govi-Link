@@ -109,8 +109,8 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
     if (!farmerFeedback.trim() || !advice.trim()) {
       Alert.alert(
         t("Error.Sorry"),
-        t("CertificateSuggestions.Both problem and solution must be filled."),
-        [{ text: t("Main.ok") }],
+        t("CertificateSuggestions.BothProblemAndSolutionMustBeFilled"),
+        [{ text: t("Main.OK") }],
       );
       return;
     }
@@ -141,9 +141,9 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
         Alert.alert(
           t("Error.Sorry"),
           t(
-            "Main.Your login session has expired. Please log in again to continue.",
+            "Main.YourLoginSessionHasExpiredPleaseLogInAgainToContinue",
           ),
-          [{ text: t("Main.ok") }],
+          [{ text: t("Main.OK") }],
         );
         return;
       }
@@ -193,8 +193,8 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
         Alert.alert(
           t("Success"),
           existingProblemId
-            ? t("RequestProblem.Problem updated successfully.")
-            : t("RequestProblem.Problem saved successfully."),
+            ? t("RequestProblem.ProblemUpdatedSuccessfully")
+            : t("RequestProblem.ProblemSavedSuccessfully"),
         );
 
         setExistingProblem({
@@ -213,14 +213,14 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
       } else {
         Alert.alert(
           t("Error.Sorry"),
-          t("RequestProblem.Failed to save problem. Please try again."),
-          [{ text: t("Main.ok") }],
+          t("RequestProblem.FailedToSaveProblemPleaseTryAgain"),
+          [{ text: t("Main.OK") }],
         );
       }
     } catch (err) {
       console.error(" Error saving/updating problem:", err);
-      Alert.alert(t("Error.Sorry"), t("Main.somethingWentWrong"), [
-        { text: t("Main.ok") },
+      Alert.alert(t("Error.Sorry"), t("Main.SomethingWentWrongPleaseTryAgainLater"), [
+        { text: t("Main.OK") },
       ]);
     } finally {
       setLoading(false);
@@ -294,7 +294,7 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
       <View className="px-6 mt-6">
         <Text className="text-center text-[#3B424C]">
           {t(
-            "CertificateSuggestions.Please mention identified problems and suggestions you made below.",
+            "CertificateSuggestions.PleaseMentionIdentifiedProblemsAndSuggestionsYouMadeBelow",
           )}
         </Text>
       </View>
@@ -305,12 +305,12 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
         contentContainerStyle={{ paddingBottom: 120 }}
       >
         <Text className="text-base font-semibold mb-2 mt-1">
-          {t("RequestProblem.FarmerSay")}
+          {t("RequestProblem.FarmersSay")}
         </Text>
         <TextInput
           className="border border-[#9DB2CE] rounded-lg p-2 mb-4"
           multiline
-          placeholder={t("CertificateSuggestions.Type here...")}
+          placeholder={t("CertificateSuggestions.TypeHere...")}
           textAlignVertical="top"
           value={farmerFeedback}
           onChangeText={handleFarmerFeedbackChange}
@@ -318,13 +318,13 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
         />
 
         <Text className="text-base font-semibold mb-2">
-          {t("RequestProblem.Advice Given")}
+          {t("RequestProblem.AdviceGiven")}
         </Text>
 
         <TextInput
           className="border border-[#9DB2CE] rounded-lg p-2 mb-6"
           multiline
-          placeholder={t("CertificateSuggestions.Type here...")}
+          placeholder={t("CertificateSuggestions.TypeHere...")}
           textAlignVertical="top"
           value={advice}
           onChangeText={handleAdviceChange}
@@ -341,7 +341,7 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
         </TouchableOpacity>
         {capturedImage && (
           <Text className="text-center text-[#415CFF] mt-3">
-            {t("RequestProblem.Image Uploaded")}
+            {t("RequestProblem.ImageUploaded")}
           </Text>
         )}
       </ScrollView>

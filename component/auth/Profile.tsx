@@ -187,7 +187,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                 <View className="px-6 mb-8">
                   <View className="mb-4">
                     <Text className="text-black mb-1">
-                      {t("Profile.Employee ID")}
+                      {t("Profile.EmployeeID")}
                     </Text>
                     <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-4 py-4 text-[#8492A3] h-[50px]">
                       {formData.empId}
@@ -196,7 +196,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 
                   <View className="mb-4">
                     <Text className="text-black mb-1">
-                      {t("Profile.First Name")}
+                      {t("Profile.FirstName")}
                     </Text>
                     <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-4 py-4 text-[#8492A3] h-[50px]">
                       {i18n.language === "si"
@@ -209,7 +209,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 
                   <View className="mb-4">
                     <Text className="text-black mb-1">
-                      {t("Profile.Last Name")}
+                      {t("Profile.LastName")}
                     </Text>
                     <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-4 py-4 text-[#8492A3] h-[50px]">
                       {i18n.language === "si"
@@ -222,7 +222,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 
                   <View className="mb-4">
                     <Text className="text-black mb-1">
-                      {t("Profile.Phone Number - 1")}
+                      {t("Profile.MobileNumber1")}
                     </Text>
                     <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-4 py-4 text-[#8492A3] h-[50px]">
                       {formData.phoneNumber1}
@@ -231,7 +231,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 
                   <View className="mb-4">
                     <Text className="text-black mb-1">
-                      {t("Profile.Phone Number - 2")}
+                      {t("Profile.MobileNumber2")}
                     </Text>
                     <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-4 py-4 text-[#8492A3] h-[50px]">
                       {formData.phoneNumber2 || "---"}
@@ -240,7 +240,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 
                   <View className="mb-4">
                     <Text className="text-black mb-1">
-                      {t("Profile.NIC Number")}
+                      {t("Profile.NICNumber")}
                     </Text>
                     <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-4 py-4 text-[#8492A3] h-[50px]">
                       {formData.nic}
@@ -249,7 +249,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 
                   <View className="mb-4">
                     <Text className="text-black mb-1">
-                      {t("Profile.Email Address")}
+                      {t("Profile.EmailAddress")}
                     </Text>
 
                     <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-4 py-4 text-[#8492A3] h-[50px]">
@@ -259,7 +259,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 
                   <View className="mb-4">
                     <Text className="text-black mb-1">
-                      {t("Profile.Building / House No")}
+                      {t("Profile.BuildingOrHouseNo")}
                     </Text>
                     <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-4 py-4 text-[#8492A3] h-[50px]">
                       {formData.house}
@@ -268,7 +268,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 
                   <View className="mb-4">
                     <Text className="text-black mb-1">
-                      {t("Profile.Street Name")}
+                      {t("Profile.StreetName")}
                     </Text>
                     <Text className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-4 py-4 text-[#8492A3] h-[50px]">
                       {formData.street}

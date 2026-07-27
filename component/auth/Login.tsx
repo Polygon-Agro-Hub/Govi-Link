@@ -10,6 +10,7 @@ import {
   Platform,
   Keyboard,
   BackHandler,
+  Dimensions,
 } from "react-native";
 import React, { useCallback, useState } from "react";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -38,6 +39,8 @@ interface LoginProps {
 
 const loginImage = require("@/assets/images/auth/login.webp");
 
+const { height: SCREEN_HEIGHT } = Dimensions.get("window");
+
 const Login: React.FC<LoginProps> = ({ navigation }) => {
   const [empid, setEmpid] = useState("");
   const [password, setPassword] = useState("");
@@ -51,16 +54,16 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
     const trimmedEmpId = empId.trim();
 
     if (trimmedEmpId !== trimmedEmpId.toUpperCase()) {
-      setEmpIdError(t("Login.Please enter Employee ID in uppercase letters"));
+      setEmpIdError(t("Login.PleaseEnterEmployeeIdInUppercaseLetters"));
       return false;
     }
     if (!trimmedEmpId.startsWith("CFO") && !trimmedEmpId.startsWith("FIO")) {
       Alert.alert(
-        t("Error.Unauthorized Access"),
+        t("Error.UnauthorizedAccess"),
         t(
-          "Error.You are not authorized to access this system. Please use a valid Employee ID",
+          "Error.YouAreNotAuthorizedToAccessThisSystemPleaseUseAValidEmployeeId",
         ),
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
       return false;
     }
@@ -88,15 +91,15 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
 
     if (!empid && !password) {
       Alert.alert(
-        t("Error.error"),
-        t("Login.Password and Employee ID are required"),
+        t("Error.Sorry"),
+        t("Login.PasswordAndEmployeeIdAreRequired"),
       );
       return false;
     }
 
     if (empid && !password) {
       Alert.alert(
-        t("Error.error"),
+        t("Error.Sorry"),
         t("Login.Password is not allowed to be empty"),
       );
       return false;
@@ -104,8 +107,8 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
 
     if (!empid && password) {
       Alert.alert(
-        t("Error.error"),
-        t("Login.Employee ID is not allowed to be empty"),
+        t("Error.Sorry"),
+        t("Login.EmployeeIdIsNotAllowedToBeEmpty"),
       );
       return false;
     }
@@ -125,7 +128,7 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
     const netState = await NetInfo.fetch();
     if (!netState.isConnected) {
       setLoading(false);
-      Alert.alert(t("Error.error"), "No internet connection");
+      Alert.alert(t("Error.Sorry"), t("Main.NoInternetConnection"));
       return;
     }
 
@@ -178,13 +181,13 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
 
         if (lowerMessage.includes("invalid password")) {
           Alert.alert(
-            t("Error.error"),
-            t("Login.Invalid Password. Please try again."),
+            t("Error.Sorry"),
+            t("Login.InvalidPasswordPleaseTryAgain"),
           );
         } else if (lowerMessage.includes("user not found")) {
-          Alert.alert(t("Error.error"), t("Login.Invalid EMP ID & Password"));
+          Alert.alert(t("Error.Sorry"), t("Login.InvalidEmpIdPassword"));
         } else {
-          Alert.alert(t("Error.error"), t("Main.somethingWentWrong"));
+          Alert.alert(t("Error.Sorry"), t("Main.SomethingWentWrongPleaseTryAgainLater"));
         }
 
         return;
@@ -229,7 +232,7 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
     } catch (error) {
       setLoading(false);
       console.error("Login error:", error);
-      Alert.alert(t("Error.error"), t("Main.somethingWentWrong"));
+      Alert.alert(t("Error.Sorry"), t("Main.SomethingWentWrongPleaseTryAgainLater"));
     }
   };
 
@@ -245,8 +248,8 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
           "intentional_logout",
         );
         if (intentionalLogout === "true") {
-          Alert.alert(t("Main.Success"), t("Login.Logout Successful"), [
-            { text: t("Main.ok") },
+          Alert.alert(t("Main.Success"), t("Login.LogoutSuccessful"), [
+            { text: t("Main.OK") },
           ]);
           await AsyncStorage.removeItem("intentional_logout");
         }
@@ -295,12 +298,12 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
           {t("Login.Welcome")}
         </Text>
         <Text className="text-center mt-2">
-          {t("Login.Please Sign in to login")}
+          {t("Login.PleaseSignInToLogin")}
         </Text>
 
         <View style={{ width: `100%`, marginTop: hp(4) }}>
           <Text className="text-base pb-[2%] font-light">
-            {t("Login.Employee ID")}
+            {t("Login.EmployeeID")}
           </Text>
           <View
             className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] mb-2 px-3 ${empIdError ? "border-red-500" : "border-[#F4F4F4]"
@@ -347,27 +350,53 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity
-            className="rounded-3xl mb-5 overflow-hidden h-[50px] w-full self-center"
-            disabled={loading}
-            onPress={handleLogin}
-            style={{ opacity: loading ? 0.7 : 1 }}
-          >
-            <LinearGradient
-              colors={["#F2561D", "#FF1D85"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              className="flex-1 items-center justify-center"
+          <View style={{ width: "100%", alignItems: "center", marginBottom: 20 }}>
+            <View
+              style={{
+                width: "100%",
+                borderRadius: 999,
+                shadowColor: "#FF1D85",
+                shadowOffset: { width: 0, height: 8 },
+                shadowOpacity: 0.45,
+                shadowRadius: 12,
+                elevation: 12,
+              }}
             >
-              {loading ? (
-                <ActivityIndicator color="white" size="small" />
-              ) : (
-                <Text className="text-white text-lg font-semibold tracking-wide text-center">
-                  {t("Login.Sign in")}
-                </Text>
-              )}
-            </LinearGradient>
-          </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handleLogin}
+                disabled={loading}
+                activeOpacity={0.8}
+                style={{ width: "100%", borderRadius: 999 }}
+              >
+                <LinearGradient
+                  colors={["#F2561D", "#FF1D85"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={{
+                    borderRadius: 999,
+                    paddingVertical: 16,
+                    width: "100%",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  {loading ? (
+                    <ActivityIndicator color="white" size="small" />
+                  ) : (
+                    <Text
+                      style={{
+                        color: "white",
+                        fontSize: SCREEN_HEIGHT > 900 ? 20 : 18,
+                        fontWeight: "700",
+                      }}
+                    >
+                      {t("Login.SignIn")}
+                    </Text>
+                  )}
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

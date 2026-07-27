@@ -11,6 +11,7 @@ import {
   ActivityIndicator,
   Alert,
   Keyboard,
+  Dimensions,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../types/types";
@@ -37,6 +38,8 @@ type AddComplaintScreenNavigationProp = StackNavigationProp<
 interface AddComplaintScreenProps {
   navigation: AddComplaintScreenNavigationProp;
 }
+
+const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
   navigation,
@@ -97,27 +100,27 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
 
     if (!selectedCategory && !complaintText.trim()) {
       Alert.alert(
-        t("Error.error"),
-        t("AddComplaint.Please fill out all fields."),
-        [{ text: t("Main.ok") }],
+        t("Error.Sorry"),
+        t("AddComplaint.PleaseFillOutAllFields"),
+        [{ text: t("Main.OK") }],
       );
       return;
     }
 
     if (!selectedCategory && complaintText.trim()) {
       Alert.alert(
-        t("Error.error"),
-        t("AddComplaint.Please select a category."),
-        [{ text: t("Main.ok") }],
+        t("Error.Sorry"),
+        t("AddComplaint.PleaseSelectACategory"),
+        [{ text: t("Main.OK") }],
       );
       return;
     }
 
     if (selectedCategory && !complaintText.trim()) {
       Alert.alert(
-        t("Error.error"),
-        t("AddComplaint.Please enter your complaint."),
-        [{ text: t("Main.ok") }],
+        t("Error.Sorry"),
+        t("AddComplaint.PleaseEnterYourComplaint"),
+        [{ text: t("Main.OK") }],
       );
       return;
     }
@@ -128,9 +131,9 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
         Alert.alert(
           t("Error.Sorry"),
           t(
-            "Error.Your login session has expired. Please log in again to continue.",
+            "Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue",
           ),
-          [{ text: t("Main.ok") }],
+          [{ text: t("Main.OK") }],
         );
         return;
       }
@@ -153,8 +156,8 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
 
       Alert.alert(
         t("Main.Success"),
-        t("AddComplaint.Complaint submitted successfully!"),
-        [{ text: t("Main.ok") }],
+        t("AddComplaint.ComplaintSubmittedSuccessfully"),
+        [{ text: t("Main.Ok") }],
       );
       resetForm();
       navigation.navigate("Main", { screen: "Dashboard" });
@@ -163,13 +166,13 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
         console.error("Error message:", error.message);
         Alert.alert(
           t("Error.Sorry"),
-          t("AddComplaint.Failed to submit complaint. Please try again."),
-          [{ text: t("Main.ok") }],
+          t("AddComplaint.FailedToSubmitComplaintPleaseTryAgain"),
+          [{ text: t("Main.OK") }],
         );
       } else {
         console.error("An unknown error occurred.");
-        Alert.alert(t("Error.Sorry"), t("Main.somethingWentWrong"), [
-          { text: t("Main.ok") },
+        Alert.alert(t("Error.Sorry"), t("Main.SomethingWentWrongPleaseTryAgainLater"), [
+          { text: t("Main.OK") },
         ]);
       }
     } finally {
@@ -187,7 +190,7 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
     const selected = category.find((item) => item.value === selectedCategory);
     return selected
       ? selected.label
-      : t("AddComplaint.Select Complaint Category");
+      : t("AddComplaint.SelectComplaintCategory");
   };
 
   return (
@@ -217,7 +220,7 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
               resizeMode="contain"
             />
             <Text className="text-xl font-bold text-[#424242] mt-2">
-              {t("AddComplaint.Tell us the problem")}
+              {t("AddComplaint.TellUsTheProblem")}
             </Text>
           </View>
 
@@ -235,7 +238,7 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
           </TouchableOpacity>
 
           <Text className="text-center text-black mb-4 mt-4">
-            -- {t("AddComplaint.We will get back to you within 2 days")} --
+            -- {t("AddComplaint.WeWillGetBackToYouWithin2Days")} --
           </Text>
 
           <View className="mb-8">
@@ -243,7 +246,7 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
               multiline
               numberOfLines={6}
               textAlignVertical="top"
-              placeholder={t("AddComplaint.Add the Complaint here..")}
+              placeholder={t("AddComplaint.AddTheComplaintHere")}
               placeholderTextColor="#808FA2"
               className="text-black bg-white border border-[#9DB2CE] rounded-lg p-4 min-h-[280px]"
               style={{ fontStyle: complaintText ? "normal" : "italic" }}
@@ -268,43 +271,77 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
             />
           </View>
 
-          <TouchableOpacity
-            onPress={handleSubmit}
-            className="mx-auto shadow-lg px-6 w-full pb-8"
-            disabled={loading}
-          >
-            <LinearGradient
-              colors={["#F2561D", "#FF1D85"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              className="py-3 rounded-3xl flex-row items-center justify-center h-[50px]"
-              style={{ overflow: "hidden" }}
+          <View style={{ width: "100%", alignItems: "center", marginBottom: 20 }}>
+            <View
+              style={{
+                width: "100%",
+                borderRadius: 999,
+                shadowColor: "#FF1D85",
+                shadowOffset: { width: 0, height: 8 },
+                shadowOpacity: 0.45,
+                shadowRadius: 12,
+                elevation: 12,
+              }}
             >
-              {loading ? (
-                <>
-                  <ActivityIndicator size="small" color="#fff" />
-                  <Text className="text-white text-lg font-bold ml-2">
-                    {t("AddComplaint.Submitting...")}
-                  </Text>
-                </>
-              ) : (
-                <Text className="text-white text-lg font-bold">
-                  {t("AddComplaint.Submit")}
-                </Text>
-              )}
-            </LinearGradient>
-          </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handleSubmit}
+                disabled={loading}
+                activeOpacity={0.8}
+                style={{ width: "100%", borderRadius: 999 }}
+              >
+                <LinearGradient
+                  colors={["#F2561D", "#FF1D85"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={{
+                    borderRadius: 999,
+                    paddingVertical: 16,
+                    width: "100%",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexDirection: "row",
+                  }}
+                >
+                  {loading ? (
+                    <>
+                      <ActivityIndicator size="small" color="#fff" />
+                      <Text
+                        style={{
+                          color: "white",
+                          fontSize: SCREEN_HEIGHT > 900 ? 20 : 18,
+                          fontWeight: "700",
+                          marginLeft: 8,
+                        }}
+                      >
+                        {t("AddComplaint.Submitting...")}
+                      </Text>
+                    </>
+                  ) : (
+                    <Text
+                      style={{
+                        color: "white",
+                        fontSize: SCREEN_HEIGHT > 900 ? 20 : 18,
+                        fontWeight: "700",
+                      }}
+                    >
+                      {t("AddComplaint.Submit")}
+                    </Text>
+                  )}
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
       </ScrollView>
 
       <GlobalSearchModal
         visible={categoryModal.isVisible}
         onClose={categoryModal.hide}
-        title={t("AddComplaint.Select Complaint Category")}
+        title={t("AddComplaint.SelectComplaintCategory")}
         data={category}
         selectedItems={selectedCategory ? [selectedCategory] : []}
         onSelect={handleCategorySelect}
-        searchPlaceholder={t("AddComplaint.Search category...")}
+        searchPlaceholder={t("AddComplaint.SearchCategory...")}
         doneButtonText={t("AddComplaint.Done") || "Done"}
         noResultsText={t("AddComplaint.No categories found")}
         multiSelect={false}
