@@ -51,49 +51,51 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ navigation }) => {
 
   const validatePassword = () => {
     if (!currentPassword || !newPassword || !confirmPassword) {
-      Alert.alert(t("Error.error"), t("Error.All fields are required"), [
-        { text: t("Main.ok") },
+      Alert.alert(t("Error.Sorry"), t("Error.AllFieldsAreRequired"), [
+        { text: t("Main.OK") },
       ]);
       return false;
     }
 
     if (newPassword.length < 8) {
-      Alert.alert(t("Error.error"), t("Error.Your password must contain"), [
-        { text: t("Main.ok") },
+      Alert.alert(t("Error.Sorry"), t("Error.YourPasswordMustContainAMinimumOf8CharactersWith1UppercaseNumbersSpecialCharacters"), [
+        { text: t("Main.OK") },
       ]);
       return false;
     }
 
     if (!/[A-Z]/.test(newPassword)) {
       Alert.alert(
-        t("Error.error"),
-        t("Error.Your password must contain a minimum"),
-        [{ text: t("Main.ok") }],
+        t("Error.Sorry"),
+        t("Error.YourPasswordMustContainAMinimumOf8CharactersWith1UppercaseNumbersSpecialCharacters"),
+        [{ text: t("Main.Ok") }],
       );
       return false;
     }
 
     if (!/[0-9]/.test(newPassword)) {
-      Alert.alert(t("Error.error"), t("Error.Your password must contain"), [
-        { text: t("Main.ok") },
-      ]);
+      Alert.alert(
+        t("Error.Sorry"),
+        t("Error.YourPasswordMustContainAMinimumOf8CharactersWith1UppercaseNumbersSpecialCharacters"),
+        [{ text: t("Main.OK") }],
+      );
       return false;
     }
 
     if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(newPassword)) {
       Alert.alert(
-        t("Error.error"),
-        t("Error.Your password must contain a minimum"),
-        [{ text: t("Main.ok") }],
+        t("Error.Sorry"),
+        t("Error.YourPasswordMustContainAMinimumOf8CharactersWith1UppercaseNumbersSpecialCharacters"),
+        [{ text: t("Main.OK") }],
       );
       return false;
     }
 
     if (newPassword !== confirmPassword) {
       Alert.alert(
-        t("Error.error"),
-        t("Error.New password and confirm password do not match"),
-        [{ text: t("Main.ok") }],
+        t("Error.Sorry"),
+        t("Error.NewPasswordAndConfirmPasswordDoNotMatch"),
+        [{ text: t("Main.OK") }],
       );
       return false;
     }
@@ -129,28 +131,28 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ navigation }) => {
 
       Alert.alert(
         t("Main.Success"),
-        t("ChangePassword.Password updated successfully"),
-        [{ text: t("Main.ok") }],
+        t("ChangePassword.PasswordUpdatedSuccessfully"),
+        [{ text: t("Main.OK") }],
       );
       navigation.navigate("Login");
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         if (error.response.status === 401) {
           Alert.alert(
-            t("Error.error"),
-            t("ChangePassword.Invalid current password"),
-            [{ text: t("Main.ok") }],
+            t("Error.Sorry"),
+            t("ChangePassword.InvalidCurrentPassword"),
+            [{ text: t("Ok") }],
           );
         } else {
           Alert.alert(
-            t("Error.error"),
-            t("ChangePassword.Failed to update password"),
-            [{ text: t("Main.ok") }],
+            t("Error.Sorry"),
+            t("ChangePassword.FailedToUpdatePassword"),
+            [{ text: t("Main.OK") }],
           );
         }
       } else {
-        Alert.alert(t("Error.error"), t("Main.somethingWentWrong"), [
-          { text: t("Main.ok") },
+        Alert.alert(t("Error.Sorry"), t("Main.SomethingWentWrongPleaseTryAgainLater"), [
+          { text: t("Main.OK") },
         ]);
       }
     }

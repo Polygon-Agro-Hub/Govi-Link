@@ -27,7 +27,7 @@ const NoDataComponent: React.FC<NoDataComponentProps> = ({
         loop
       />
       <Text className="text-center text-gray-600 -mt-[30%]">
-        {message || t("ComplainHistory.No Data")}
+        {message || t("ComplainHistory.NoComplaintsHere")}
       </Text>
     </View>
   );

@@ -69,27 +69,23 @@ const BannedScreen: React.FC<BannedScreenProps> = ({
 
   let title = t("Banned.AccessDenied", "Access Denied");
   let description = t(
-    "Banned.DefaultDescription",
-    "Your account has been rejected or is not approved."
+    "Banned.YourAccountHasBeenRejectedOrIsNotApproved"
   );
 
   if (statusType === "rejected") {
-    title = t("Banned.AccountRejected", "Account Rejected");
+    title = t("Banned.AccountRejected");
     description = t(
-      "Banned.RejectedDescription",
-      "Your account approval has been revoked by the administrator."
+      "Banned.YourAccountApprovalHasBeenRevokedByTheAdministrator"
     );
   } else if (statusType === "not_approved") {
-    title = t("Banned.AccountNotApproved", "Account Not Approved");
+    title = t("Banned.AccountNotApproved");
     description = t(
-      "Banned.NotApprovedDescription",
-      "Your account approval has been revoked by the administrator."
+      "Banned.YourAccountApprovalHasBeenRevokedByTheAdministrator"
     );
   } else if (statusType === "pending") {
-    title = t("Banned.PendingVerification", "Pending Verification");
+    title = t("Banned.PendingVerification");
     description = t(
-      "Banned.PendingDescription",
-      "Your account status is pending verification."
+      "Banned.YourAccountStatusIsPendingVerification"
     );
   }
 
@@ -130,7 +126,7 @@ const BannedScreen: React.FC<BannedScreenProps> = ({
               {description}
             </Text>
             <Text className="text-[#747474] text-center mt-2 text-base font-semibold">
-              {t("Banned.SupportMessage", "Please contact Polygon Customer Support for further details.")}
+              {t("Banned.PleaseContactPolygonCustomerSupportForFurtherDetails")}
             </Text>
           </View>
 
@@ -158,7 +154,7 @@ const BannedScreen: React.FC<BannedScreenProps> = ({
                 style={{ overflow: "hidden" }}
               >
                 <Text className="text-center text-white font-bold text-lg">
-                  {t("Banned.BackToLogin", "Back to Login")}
+                  {t("Banned.BackToLogin")}
                 </Text>
               </LinearGradient>
             </TouchableOpacity>

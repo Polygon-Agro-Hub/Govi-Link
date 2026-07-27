@@ -47,7 +47,7 @@ const OtpverificationSuccess: React.FC = ({ navigation }: any) => {
                 : { fontSize: 25 },
           ]}
         >
-          {t("OtpverificationSuccess.Well Done")}!
+          {t("OtpverificationSuccess.WellDone")}!
         </Text>
         <Text
           className="text-[#AAAAAA] mt-5 text-center px-12"
@@ -59,7 +59,7 @@ const OtpverificationSuccess: React.FC = ({ navigation }: any) => {
                 : { fontSize: 18 },
           ]}
         >
-          {t("OtpverificationSuccess.You have successfully completed the job")}
+          {t("OtpverificationSuccess.YouHaveSuccessfullyCompletedTheJob")}
         </Text>
 
         <TouchableOpacity
@@ -76,7 +76,7 @@ const OtpverificationSuccess: React.FC = ({ navigation }: any) => {
             ]}
             className="text-white font-semibold tracking-wide"
           >
-            {t("OtpverificationSuccess.Go Forward")}
+            {t("OtpverificationSuccess.GoForward")}
           </Text>
         </TouchableOpacity>
       </View>

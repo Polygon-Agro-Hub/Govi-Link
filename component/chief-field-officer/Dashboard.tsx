@@ -236,9 +236,9 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
           Alert.alert(
             t("Error.Sorry"),
             t(
-              "Error.Your login session has expired. Please log in again to continue.",
+              "Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue",
             ),
-            [{ text: t("Main.ok") }],
+            [{ text: t("Main.OK") }],
           );
         }
         return;
@@ -259,9 +259,9 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
         Alert.alert(
           t("Error.Sorry"),
           t(
-            "Error.Your login session has expired. Please log in again to continue.",
+            "Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue",
           ),
-          [{ text: t("Main.ok") }],
+          [{ text: t("Main.OK") }],
         );
         navigation.navigate("Login");
       }
@@ -463,7 +463,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
             <View className="flex-1 bg-white p-2 my-4">
               <View className="flex-row justify-between items-center mb-1">
                 <Text className="text-base font-bold">
-                  {t("Dashboard.Today Visits")}{" "}
+                  {t("Dashboard.TodayVisits")}{" "}
                   <Text className="text-[#4E6393]">
                     ({visitsData.length.toString().padStart(2, "0")})
                   </Text>
@@ -476,7 +476,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                   }
                 >
                   <Text className="text-pink-500 font-semibold">
-                    {t("Dashboard.View All")}
+                    {t("Dashboard.ViewAll")}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -678,14 +678,14 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                   resizeMode="contain"
                 />
                 <Text className="italic text-[#787878] mt-2 text-center">
-                  {t("Dashboard.No Jobs for Today")}
+                  {t("Dashboard.NoJobsForToday")}
                 </Text>
               </View>
             )}
 
             <View className="p-2 my-6">
               <Text className="text-base font-bold mb-3">
-                {t("Dashboard.Saved Draft")}
+                {t("Dashboard.SavedDraft")}
               </Text>
             </View>
 
@@ -839,7 +839,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                     resizeMode="contain"
                   />
                   <Text className="italic text-[#787878] mt-4 text-center">
-                    {t("Dashboard.No Saved Drafts for Today")}
+                    {t("Dashboard.NoSavedDraftsForToday")}
                   </Text>
                 </View>
               )}
@@ -859,7 +859,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
             onPress={() => navigation.navigate("CapitalRequests")}
           >
             <Text className="text-base font-bold text-[#434343] ml-2">
-              {t("Dashboard.Capital Requests")}
+              {t("Dashboard.CapitalRequests")}
             </Text>
             <Image
               source={require("../../assets/images/dashboard/request.webp")}
@@ -887,7 +887,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
             onPress={() => navigation.navigate("AddOnboardSupplier")}
           >
             <Text className="text-base font-bold text-[#434343] ml-2">
-              {t("Dashboard.Onboard Suppliers")}
+              {t("Dashboard.OnboardSuppliers")}
             </Text>
             <Image
               source={require("../../assets/images/dashboard/onboard-suppliers.webp")}
@@ -1025,7 +1025,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                         <View className="flex-row items-center justify-center border border-[#F83B4F] rounded-full px-6 py-2">
                           <Ionicons name="call" size={20} color="#F83B4F" />
                           <Text className="text-base font-semibold  ml-2">
-                            {t("VisitPopup.Get Call")}
+                            {t("VisitPopup.GetCall")}
                           </Text>
                         </View>
                       </TouchableOpacity>

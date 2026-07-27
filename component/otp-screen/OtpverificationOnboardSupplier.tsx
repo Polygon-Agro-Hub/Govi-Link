@@ -168,8 +168,8 @@ const OtpverificationOnboardSupplier: React.FC = ({
     if (success) {
       Alert.alert(
         t("Otpverification.Success"),
-        t("Otpverification.A new OTP has been sent to your mobile number."),
-        [{ text: t("Main.ok") }],
+        t("Otpverification.ANewOtpHasBeenSentToYourMobileNumber"),
+        [{ text: t("Main.OK") }],
       );
       setOtpCode(["", "", "", "", ""]);
       setIsOtpValid(false);
@@ -178,7 +178,7 @@ const OtpverificationOnboardSupplier: React.FC = ({
       Alert.alert(
         t("Error.Sorry"),
         t("Otpverification.We couldn't send the OTP. Please try again later."),
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
     }
   };
@@ -190,9 +190,9 @@ const OtpverificationOnboardSupplier: React.FC = ({
         Alert.alert(
           t("Error.Sorry"),
           t(
-            "Error.Your login session has expired. Please log in again to continue.",
+            "Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue",
           ),
-          [{ text: t("Main.ok") }],
+          [{ text: t("Main.OK") }],
         );
         return false;
       }
@@ -231,8 +231,8 @@ const OtpverificationOnboardSupplier: React.FC = ({
     if (code.length !== 5) {
       Alert.alert(
         t("Error.Sorry"),
-        t("Otpverification.Please enter the 5-digit OTP sent to your phone."),
-        [{ text: t("Main.ok") }],
+        t("Otpverification.PleaseEnterThe5DigitOtpSentToYourMobile"),
+        [{ text: t("Main.OK") }],
       );
       return;
     }
@@ -240,9 +240,9 @@ const OtpverificationOnboardSupplier: React.FC = ({
     if (isOtpExpired) {
       Alert.alert(
         t("Error.Sorry"),
-        t("Otpverification.Your OTP is invalid or expired."),
+        t("Otpverification.YourOtpHasExpiredPleaseRequestANewOneToContinue"),
         [
-          { text: t("Otpverification.Resend OTP"), onPress: handleResendOTP },
+          { text: t("Otpverification.ResendOTP"), onPress: handleResendOTP },
           { text: t("Otpverification.Cancel"), style: "cancel" },
         ],
       );
@@ -252,9 +252,9 @@ const OtpverificationOnboardSupplier: React.FC = ({
     const netState = await NetInfo.fetch();
     if (!netState.isConnected) {
       Alert.alert(
-        t("Main.No Internet Connection"),
-        t("Main.Please turn on Mobile Data or Wi-Fi to continue."),
-        [{ text: t("Main.ok") }],
+        t("Main.NoInternetConnection"),
+        t("Main.PleaseTurnOnMobileDataOrWiFiToContinue"),
+        [{ text: t("Main.OK") }],
       );
       return;
     }
@@ -283,10 +283,10 @@ const OtpverificationOnboardSupplier: React.FC = ({
           if (completeSuccess) {
             Alert.alert(
               t("Otpverification.Success"),
-              t("OnboardSupplier.Account created successfully"),
+              t("OnboardSupplier.AccountCreatedSuccessfully"),
               [
                 {
-                  text: t("Main.ok"),
+                  text: t("Main.OK"),
                   onPress: () => navigation.navigate("Main"),
                 },
               ],
@@ -300,15 +300,15 @@ const OtpverificationOnboardSupplier: React.FC = ({
 
           if (verificationAttempts >= 2) {
             Alert.alert(
-              t("Otpverification.Invalid OTP"),
-              t("Otpverification.Your OTP is invalid or expired."),
+              t("Otpverification.InvalidOTP"),
+              t("Otpverification.YourOtpHasExpiredPleaseRequestANewOneToContinue"),
               [
                 {
-                  text: t("Otpverification.Resend OTP"),
+                  text: t("Otpverification.ResendOTP"),
                   onPress: handleResendOTP,
                 },
                 {
-                  text: t("Otpverification.Try Again"),
+                  text: t("Otpverification.TryAgain"),
                   onPress: () => {
                     setOtpCode(["", "", "", "", ""]);
                     setIsOtpValid(false);
@@ -319,11 +319,11 @@ const OtpverificationOnboardSupplier: React.FC = ({
             );
           } else {
             Alert.alert(
-              t("Otpverification.Invalid OTP"),
+              t("Otpverification.InvalidOTP"),
               t(
-                "Otpverification.The OTP you entered is incorrect. Please try again.",
+                "Otpverification.TheOtpYouEnteredIsIncorrectPleaseTryAgain",
               ),
-              [{ text: t("Main.ok") }],
+              [{ text: t("Main.OK") }],
             );
           }
           break;
@@ -331,11 +331,11 @@ const OtpverificationOnboardSupplier: React.FC = ({
         case "1002":
           setIsOtpExpired(true);
           Alert.alert(
-            t("Otpverification.OTP Expired"),
-            t("Otpverification.Your OTP is invalid or expired."),
+            t("Otpverification.OTPExpired"),
+            t("Otpverification.YourOtpHasExpiredPleaseRequestANewOneToContinue"),
             [
               {
-                text: t("Otpverification.Resend OTP"),
+                text: t("Otpverification.ResendOTP"),
                 onPress: handleResendOTP,
               },
             ],
@@ -343,8 +343,8 @@ const OtpverificationOnboardSupplier: React.FC = ({
           break;
 
         default:
-          Alert.alert(t("Error.Sorry"), t("Main.somethingWentWrong"), [
-            { text: t("Main.ok") },
+          Alert.alert(t("Error.Sorry"), t("Main.SomethingWentWrongPleaseTryAgainLater"), [
+            { text: t("Main.OK") },
           ]);
       }
     } catch (error: any) {
@@ -359,20 +359,20 @@ const OtpverificationOnboardSupplier: React.FC = ({
         setIsOtpExpired(true);
         Alert.alert(
           t("Error.Sorry"),
-          t("Otpverification.Your OTP is invalid or expired."),
-          [{ text: t("Otpverification.Resend OTP"), onPress: handleResendOTP }],
+          t("Otpverification.YourOtpHasExpiredPleaseRequestANewOneToContinue"),
+          [{ text: t("Otpverification.ResendOTP"), onPress: handleResendOTP }],
         );
       } else if (errCode === "1001") {
         Alert.alert(
           t("Error.Sorry"),
           t(
-            "Otpverification.The OTP you entered is incorrect. Please try again.",
+            "Otpverification.TheOtpYouEnteredIsIncorrectPleaseTryAgain",
           ),
-          [{ text: t("Main.ok") }],
+          [{ text: t("Main.OK") }],
         );
       } else {
-        Alert.alert(t("Error.Sorry"), t("Main.somethingWentWrong"), [
-          { text: t("Main.ok") },
+        Alert.alert(t("Error.Sorry"), t("Main.SomethingWentWrongPleaseTryAgainLater"), [
+          { text: t("Main.OK") },
         ]);
       }
     }
@@ -395,7 +395,7 @@ const OtpverificationOnboardSupplier: React.FC = ({
         showsVerticalScrollIndicator={false}
       >
         <CustomHeader
-          title={t("OnboardSupplier.OTP Verification")}
+          title={t("OnboardSupplier.OTPVerification")}
           navigation={navigation}
           showBackButton={true}
           onBackPress={() => navigation.goBack()}
@@ -411,12 +411,12 @@ const OtpverificationOnboardSupplier: React.FC = ({
           />
 
           <Text className="mt-8 text-lg text-black text-center font-semibold">
-            {t("Otpverification.Enter Verification Code")}
+            {t("Otpverification.EnterVerificationCode")}
           </Text>
 
           <Text className="text-base text-[#808080] text-center mt-2 px-4">
             {t(
-              "OnboardSupplier.We have sent a Verification Code to the given mobile number",
+              "OnboardSupplier.WeHaveSentAVerificationCodeToTheGivenMobileNumber",
             )}
           </Text>
 
@@ -453,7 +453,7 @@ const OtpverificationOnboardSupplier: React.FC = ({
           {/* Resend OTP */}
           <View className="mt-4 mb-8 flex-row justify-center items-center">
             <Text className="text-md text-[#707070]">
-              {t("OnboardSupplier.Didn't receive the OTP")}
+              {t("OnboardSupplier.DidntReceiveTheOTP")}
             </Text>
             <TouchableOpacity
               onPress={disabledResend ? undefined : handleResendOTP}
@@ -464,7 +464,7 @@ const OtpverificationOnboardSupplier: React.FC = ({
                 className="text-md font-semibold text-black text-center underline ml-2"
                 style={{ color: disabledResend ? "#999999" : "#000000" }}
               >
-                {t("Otpverification.RESEND OTP")}
+                {t("Otpverification.RESENDOTP")}
               </Text>
             </TouchableOpacity>
           </View>

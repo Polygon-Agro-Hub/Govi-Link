@@ -169,8 +169,8 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
     if (!item.problem.trim() || !item.solution.trim()) {
       Alert.alert(
         t("Error.Sorry"),
-        t("CertificateSuggestions.Both problem and solution must be filled."),
-        [{ text: t("Main.ok") }],
+        t("CertificateSuggestions.BothProblemAndSolutionMustBeFilled"),
+        [{ text: t("Main.OK") }],
       );
       return;
     }
@@ -182,9 +182,9 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
         Alert.alert(
           t("Error.Sorry"),
           t(
-            "Error.Your login session has expired. Please log in again to continue.",
+            "Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue",
           ),
-          [{ text: t("Main.ok") }],
+          [{ text: t("Main.OK") }],
         );
         return;
       }
@@ -221,8 +221,8 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
       } else {
         Alert.alert(
           t("Error.Sorry"),
-          t("CertificateSuggestions.Failed to save problem."),
-          [{ text: t("Main.ok") }],
+          t("CertificateSuggestions.FailedToSaveProblem"),
+          [{ text: t("Main.OK") }],
         );
       }
     } catch (err) {
@@ -230,7 +230,7 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
       Alert.alert(
         t("Error.Sorry"),
         t("Something went wrong while saving. try again later"),
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
     } finally {
       setLoading(false);
@@ -249,9 +249,9 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
         Alert.alert(
           t("Error.Sorry"),
           t(
-            "Error.Your login session has expired. Please log in again to continue.",
+            "Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue",
           ),
-          [{ text: t("Main.ok") }],
+          [{ text: t("Main.Ok") }],
         );
         return;
       }
@@ -330,8 +330,8 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
       setIsButtonDisabled(false);
       setOtpSendLoading(false);
     } catch (error) {
-      Alert.alert(t("Main.error"), t("SignupForum.otpSendFailed"), [
-        { text: t("Main.ok") },
+      Alert.alert(t("Main.Sorry"), t("SignupForum.otpSendFailed"), [
+        { text: t("Main.OK") },
       ]);
       setOtpSendLoading(false);
     } finally {
@@ -348,7 +348,7 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
 
     if (hasUnsaved) {
       Alert.alert(
-        t("CertificateSuggestions.Unsaved Problem"),
+        t("CertificateSuggestions.UnsavedProblem"),
         t(
           "CertificateSuggestions.You have unsaved problems. Do you want to go back without saving?",
         ),
@@ -384,7 +384,7 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
       <View className="px-6 mt-6">
         <Text className="text-center text-[#3B424C]">
           {t(
-            "CertificateSuggestions.Please mention identified problems and suggestions you made below.",
+            "CertificateSuggestions.PleaseMentionIdentifiedProblemsAndSuggestionsYouMadeBelow",
           )}
         </Text>
       </View>
@@ -424,12 +424,12 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
 
                   <View className="border border-[#9DB2CE] p-4 rounded-md">
                     <Text className="text-base font-semibold mb-2 mt-1">
-                      {t("CertificateSuggestions.Identified Problem")}
+                      {t("CertificateSuggestions.IdentifiedProblem")}
                     </Text>
                     <TextInput
                       className="border border-[#9DB2CE] rounded-lg p-2 mb-4"
                       multiline
-                      placeholder={t("CertificateSuggestions.Type here...")}
+                      placeholder={t("CertificateSuggestions.TypeHere....")}
                       textAlignVertical="top"
                       value={item.problem}
                       onChangeText={(text) =>
@@ -439,12 +439,12 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
                     />
 
                     <Text className="text-base font-semibold mb-2">
-                      {t("CertificateSuggestions.Suggested Solution")}
+                      {t("CertificateSuggestions.SuggestedSolution")}
                     </Text>
                     <TextInput
                       className="border border-[#9DB2CE] rounded-lg p-2 mb-4"
                       multiline
-                      placeholder={t("CertificateSuggestions.Type here...")}
+                      placeholder={t("CertificateSuggestions.TypeHere...")}
                       textAlignVertical="top"
                       value={item.solution}
                       onChangeText={(text) =>
@@ -460,7 +460,7 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
                       <Text className="text-white text-center font-semibold text-lg">
                         {item.saved
                           ? t("CertificateSuggestions.Update")
-                          : t("CertificateSuggestions.Save Problem")}
+                          : t("CertificateSuggestions.SaveProblem")}
                       </Text>
                     </TouchableOpacity>
                     <TouchableOpacity
@@ -487,7 +487,7 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
             >
               <Entypo name="plus" size={30} color="white" />
               <Text className="text-white text-center font-semibold text-base ml-1">
-                {t("CertificateSuggestions.Add more")}
+                {t("CertificateSuggestions.AddMore")}
               </Text>
             </TouchableOpacity>
           </View>
@@ -507,9 +507,9 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
 
           if (hasUnsaved) {
             Alert.alert(
-              t("CertificateSuggestions.Unsaved Problem"),
+              t("CertificateSuggestions.UnsavedProblem"),
               t(
-                "CertificateSuggestions.You have unsaved problems. Do you want to continue without saving?",
+                "CertificateSuggestions.YouHaveUnsavedProblemsDoYouWantToContinueWithoutSaving",
               ),
               [
                 {

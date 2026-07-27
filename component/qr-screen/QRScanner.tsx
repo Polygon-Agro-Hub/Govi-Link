@@ -114,10 +114,10 @@ const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
       const userId = qrData.userInfo?.id;
 
       if (!userId) {
-        throw new Error(t("QRScanner.User ID not found in QR code"));
+        throw new Error(t("QRScanner.UserIDNotFoundInQRCode"));
       }
       if (userId !== farmerId) {
-        throw new Error(t("QRScanner.Wrong QR code"));
+        throw new Error(t("QRScanner.WrongQRCode"));
       }
 
       if (auditId && jobId) {
@@ -138,7 +138,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
       console.error("QR Parsing Error:", error);
       setErrorMessage(
         t(
-          "QRScanner.The scanned QR code does not contain a valid user ID or is damaged.",
+          "QRScanner.TheScannedQRCodeDoesNotContainAValidUserIDOrIsDamaged",
         ),
       );
       setIsUnsuccessfulModalVisible(true);
@@ -197,7 +197,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <Text style={{ fontSize: 18, color: "#333" }}>
-          {t("QRScanner.Requesting for camera permission")}
+          {t("QRScanner.RequestingForCameraPermission")}
         </Text>
       </View>
     );
@@ -206,7 +206,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
   return (
     <View style={{ flex: 1, position: "relative" }}>
       <CustomHeader
-        title={t("QRScanner.Scan the QR")}
+        title={t("QRScanner.ScanTheQR")}
         navigation={navigation}
         showBackButton={true}
         onBackPress={handleBackPress}
@@ -254,7 +254,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
               style={{ overflow: "hidden" }}
             >
               <Text style={{ color: "#fff", fontSize: 16 }}>
-                {t("QRScanner.Scan Again")}
+                {t("QRScanner.ScanAgain")}
               </Text>
             </LinearGradient>
           </TouchableOpacity>
@@ -286,7 +286,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
                 />
               </View>
               <Text className="text-gray-700">
-                {t("QRScanner.Wrong QR code")}
+                {t("QRScanner.WrongQRCode")}
               </Text>
             </View>
             <View className="absolute bottom-0 left-0 w-full h-2 bg-gray-300">

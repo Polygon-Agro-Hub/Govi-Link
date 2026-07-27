@@ -99,7 +99,7 @@ const ViewLocationScreen: React.FC<ViewLocationScreenProps> = ({
           <AntDesign name="left" size={20} color="#000" />
         </TouchableOpacity>
         <Text className="text-lg font-semibold text-black">
-          {t("InspectionForm.View Geo Location")}
+          {t("InspectionForm.ViewGeoLocation")}
         </Text>
       </View>
 
