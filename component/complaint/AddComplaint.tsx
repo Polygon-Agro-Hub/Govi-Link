@@ -11,6 +11,7 @@ import {
   ActivityIndicator,
   Alert,
   Keyboard,
+  Dimensions,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../types/types";
@@ -37,6 +38,8 @@ type AddComplaintScreenNavigationProp = StackNavigationProp<
 interface AddComplaintScreenProps {
   navigation: AddComplaintScreenNavigationProp;
 }
+
+const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
   navigation,
@@ -268,32 +271,66 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
             />
           </View>
 
-          <TouchableOpacity
-            onPress={handleSubmit}
-            className="mx-auto shadow-lg px-6 w-full pb-8"
-            disabled={loading}
-          >
-            <LinearGradient
-              colors={["#F2561D", "#FF1D85"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              className="py-3 rounded-3xl flex-row items-center justify-center h-[50px]"
-              style={{ overflow: "hidden" }}
+          <View style={{ width: "100%", alignItems: "center", marginBottom: 20 }}>
+            <View
+              style={{
+                width: "100%",
+                borderRadius: 999,
+                shadowColor: "#FF1D85",
+                shadowOffset: { width: 0, height: 8 },
+                shadowOpacity: 0.45,
+                shadowRadius: 12,
+                elevation: 12,
+              }}
             >
-              {loading ? (
-                <>
-                  <ActivityIndicator size="small" color="#fff" />
-                  <Text className="text-white text-lg font-bold ml-2">
-                    {t("AddComplaint.Submitting...")}
-                  </Text>
-                </>
-              ) : (
-                <Text className="text-white text-lg font-bold">
-                  {t("AddComplaint.Submit")}
-                </Text>
-              )}
-            </LinearGradient>
-          </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handleSubmit}
+                disabled={loading}
+                activeOpacity={0.8}
+                style={{ width: "100%", borderRadius: 999 }}
+              >
+                <LinearGradient
+                  colors={["#F2561D", "#FF1D85"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={{
+                    borderRadius: 999,
+                    paddingVertical: 16,
+                    width: "100%",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexDirection: "row",
+                  }}
+                >
+                  {loading ? (
+                    <>
+                      <ActivityIndicator size="small" color="#fff" />
+                      <Text
+                        style={{
+                          color: "white",
+                          fontSize: SCREEN_HEIGHT > 900 ? 20 : 18,
+                          fontWeight: "700",
+                          marginLeft: 8,
+                        }}
+                      >
+                        {t("AddComplaint.Submitting...")}
+                      </Text>
+                    </>
+                  ) : (
+                    <Text
+                      style={{
+                        color: "white",
+                        fontSize: SCREEN_HEIGHT > 900 ? 20 : 18,
+                        fontWeight: "700",
+                      }}
+                    >
+                      {t("AddComplaint.Submit")}
+                    </Text>
+                  )}
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
       </ScrollView>
 

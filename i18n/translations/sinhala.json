@@ -160,7 +160,8 @@
     "PleaseSelectACategory": "කරුණාකර කාණ්ඩයක් තෝරන්න.",
     "PleaseEnterYourComplaint": "කරුණාකර ඔබේ පැමිණිල්ල ඇතුළත් කරන්න.",
     "AddTheComplaintHere": "පැමිණිල්ල මෙතනට එකතු කරන්න..",
-    "Submitting...": "යොමු කරමින් පවතී..."
+    "Submitting...": "යොමු කරමින් පවතී...",
+    "No categories found": "කාණ්ඩ කිසිවක් හමු නොවීය"
   },
   "Profile": {
     "EmployeeID": "පරිශීලක අංකය",
