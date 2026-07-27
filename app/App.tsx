@@ -118,9 +118,9 @@ function MainTabs() {
       screenOptions={{
         headerShown: false,
         tabBarHideOnKeyboard: false,
-        tabBarStyle: { position: "absolute", backgroundColor: "#fff" },
+        tabBarStyle: { display: "none" },
       }}
-      tabBar={(props) => <NavigationBar {...props} />}
+      tabBar={() => null}
     >
       {jobRole === "Chief Field Officer" ? (
         <>
