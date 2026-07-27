@@ -160,7 +160,8 @@
     "PleaseSelectACategory": "Please select a category.",
     "PleaseEnterYourComplaint": "Please enter your complaint.",
     "AddTheComplaintHere": "Add the Complaint here..",
-    "Submitting...": "Submitting..."
+    "Submitting...": "Submitting...",
+    "No categories found": "No categories found"
   },
   "Profile": {
     "EmployeeID": "Employee ID",

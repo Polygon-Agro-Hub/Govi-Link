@@ -160,7 +160,8 @@
     "PleaseSelectACategory": "ஒரு வகையைத் தேர்ந்தெடுக்கவும்.",
     "PleaseEnterYourComplaint": "உங்கள் புகாரை உள்ளிடவும்.",
     "AddTheComplaintHere": "Add the Complaint here..",
-    "Submitting...": "சமர்ப்பித்து கொண்டிருக்கிறது..."
+    "Submitting...": "சமர்ப்பித்து கொண்டிருக்கிறது...",
+    "No categories found": "வகைகள் எதுவும் கிடைக்கவில்லை"
   },
   "Profile": {
     "EmployeeID": "பணியாளர் அடையாள எண்",
