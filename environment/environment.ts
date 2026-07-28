@@ -4,13 +4,13 @@ export const environment = {
   // API_BASE_URL: "http://192.168.1.15:3000/govilink/",
 
   // DEV --------------------
-  API_BASE_URL: "https://govi-link-back-dev-api.vercel.app/govilink/",
+  // API_BASE_URL: "https://govi-link-back-dev-api.vercel.app/govilink/",
 
   // UAT --------------------
   // API_BASE_URL: "https://govi-link-api-uat.vercel.app/govilink/",
 
   // PROD --------------------
-  // API_BASE_URL: "https://govi-link-back-prod-api.vercel.app/govilink/",
+  API_BASE_URL: "https://govi-link-back-prod-api.vercel.app/govilink/",
 
   // DEV --------------------
   SHOUTOUT_API_KEY:

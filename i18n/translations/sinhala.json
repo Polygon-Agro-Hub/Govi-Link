@@ -160,7 +160,8 @@
     "PleaseSelectACategory": "කරුණාකර කාණ්ඩයක් තෝරන්න.",
     "PleaseEnterYourComplaint": "කරුණාකර ඔබේ පැමිණිල්ල ඇතුළත් කරන්න.",
     "AddTheComplaintHere": "පැමිණිල්ල මෙතනට එකතු කරන්න..",
-    "Submitting...": "යොමු කරමින් පවතී..."
+    "Submitting...": "යොමු කරමින් පවතී...",
+    "No categories found": "කාණ්ඩ කිසිවක් හමු නොවීය"
   },
   "Profile": {
     "EmployeeID": "පරිශීලක අංකය",
@@ -318,7 +319,10 @@
     "SearchDistrict...": "දිස්ත්‍රික්කය සොයන්න...",
     "SearchBank...": "බැංකුව සොයන්න...",
     "SearchBranch...": "ශාඛාව සොයන්න...",
-    "NoDistrictsFound": "දිස්ත්‍රික්ක හමු නොවීය"
+    "NoDistrictsFound": "දිස්ත්‍රික්ක හමු නොවීය",
+    "Sinhala": "සිංහල",
+    "Tamil": "දෙමළ",
+    "English": "ඉංග්‍රීසි"
   },
   "ManageOfficers": {
     "Officers": "නිලධාරීන්",
@@ -340,7 +344,8 @@
     "Open": "විවෘත",
     "ID": "අංක",
     "CountFarmLeftToFinish": "ගොවිපල {{count}} ක් අවසන් කිරීමට ඉතිරිව ඇත",
-    "1FarmLeftToFinish": "ගොවිපල 1 ක් අවසන් කිරීමට ඉතිරිව ඇත"
+    "1FarmLeftToFinish": "ගොවිපල 1 ක් අවසන් කිරීමට ඉතිරිව ඇත",
+    "Ongoing": "සිදුවෙමින් පවතින"
   },
   "ChangePassword": {
     "ChoosePassword": "මුරපදය වෙනස් කරන්න",
@@ -388,6 +393,33 @@
     "SelectAtLeastOneJob": "කරුණාකර පැවරීම සඳහා අවම වශයෙන් එක් වැඩයක් හෝ තෝරන්න.",
     "Start": "අරබන්න",
     "FailedToAssignJobsPleaseTryAgain": "වැඩ පැවරීම අසාර්ථක විය. කරුණාකර නැවත උත්සාහ කරන්න."
+  },
+  "Districts": {
+    "Ampara": "අම්පාර",
+    "Anuradhapura": "අනුරාධපුර",
+    "Badulla": "බදුල්ල",
+    "Batticaloa": "මඩකලපුව",
+    "Colombo": "කොළඹ",
+    "Galle": "ගාල්ල",
+    "Gampaha": "ගම්පහ",
+    "Hambantota": "හම්බන්තොට",
+    "Jaffna": "යාපනය",
+    "Kalutara": "කළුතර",
+    "Kandy": "මහනුවර",
+    "Kegalle": "කැගල්ල",
+    "Kilinochchi": "කිලිනොච්චි",
+    "Kurunegala": "කුරුණෑගල",
+    "Mannar": "මන්නාරම",
+    "Matale": "මාතලේ",
+    "Matara": "මාතර",
+    "Moneragala": "මොනරාගල",
+    "Mullaitivu": "මුල්ලයිதீவு",
+    "NuwaraEliya": "නුවරඑළිය",
+    "Polonnaruwa": "පොලොන්නරුව",
+    "Puttalam": "පුත්තලම",
+    "Rathnapura": "රත්නපුර",
+    "Trincomalee": "ත්‍රිකුණාමලය",
+    "Vavuniya": "වවුනියාව"
   },
   "RequestLetter": {
     "RequestLetter": "ඉල්ලීම් ලිපිය",
