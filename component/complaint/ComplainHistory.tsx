@@ -68,8 +68,8 @@ const ExpandableText: React.FC<{ text: string; maxLength?: number }> = ({
         <TouchableOpacity onPress={() => setExpanded(!expanded)}>
           <Text className="text-blue-500 font-semibold ml-1 mb-[-4]">
             {expanded
-              ? t("ComplainHistory.See less")
-              : t("ComplainHistory.See more")}
+              ? t("ComplainHistory.SeeLess...")
+              : t("ComplainHistory.SeeMore...")}
           </Text>
         </TouchableOpacity>
       )}
@@ -165,8 +165,8 @@ const ComplainHistory: React.FC<ComplainHistoryProps> = ({ navigation }) => {
       setSelectedComplain(complain);
       setModalVisible(true);
     } else {
-      Alert.alert(t("Main.Sorry"), t("ComplainHistory.No Reply"), [
-        { text: t("Main.ok") },
+      Alert.alert(t("Main.Sorry"), t("ComplainHistory.NoReply"), [
+        { text: t("Main.OK") },
       ]);
     }
   };
@@ -178,7 +178,7 @@ const ComplainHistory: React.FC<ComplainHistoryProps> = ({ navigation }) => {
       style={{ flex: 1, backgroundColor: "#F9F9FA" }}
     >
       <CustomHeader
-        title={t("ComplainHistory.Complaint History")}
+        title={t("ComplainHistory.ComplaintHistory")}
         navigation={navigation}
         showBackButton={true}
         onBackPress={() => navigation.goBack()}
@@ -186,17 +186,16 @@ const ComplainHistory: React.FC<ComplainHistoryProps> = ({ navigation }) => {
       <View className="flex-1 bg-white">
         {loading ? (
           <LoadingPage
-            message={t("ComplainHistory.Loading Complaints...")}
+            message={t("ComplainHistory.LoadingComplaints...")}
             fullScreen={true}
           />
         ) : complains.length === 0 ? (
           <View className="flex-1 items-center justify-center -mt-[10%]">
-             <NoDataComponent message={t("ComplainHistory.No Data")} />
+             <NoDataComponent message={t("ComplainHistory.NoComplainstHere")} />
           </View>
         ) : (
           <ScrollView
-            className="px-4 flex-1"
-            contentContainerStyle={{ paddingBottom: hp(4) }}
+            className="px-6 flex-1 pb-20"
           >
             {complains.map((complain) => (
               <View
@@ -220,7 +219,7 @@ const ComplainHistory: React.FC<ComplainHistoryProps> = ({ navigation }) => {
                       onPress={() => handleViewReply(complain)}
                     >
                       <Text className="text-white text-xs">
-                        {t("ComplainHistory.View Response")}
+                        {t("ComplainHistory.ViewResponse")}
                       </Text>
                     </TouchableOpacity>
                   )}
@@ -254,7 +253,7 @@ const ComplainHistory: React.FC<ComplainHistoryProps> = ({ navigation }) => {
             className="flex-1 items-center bg-white bg-opacity-50"
           >
             <ScrollView
-              className="bg-white rounded-lg shadow-lg w-full"
+              className="bg-white rounded-lg shadow-lg w-full mt-10"
               contentContainerStyle={{ padding: 24, paddingBottom: 70 }}
               showsVerticalScrollIndicator={false}
             >

@@ -164,7 +164,7 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
   if (loading) {
     return (
       <LoadingPage
-        message={t("CapitalRequests.LoadingRequests")}
+        message={t("CapitalRequests.LoadingRequests...")}
         fullScreen={true}
       />
     );
@@ -186,7 +186,7 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
   return (
     <View className="flex-1 bg-white">
       <CustomHeader
-        title={t("RequestLetter.Request Letter")}
+        title={t("RequestLetter.RequestLetter")}
         navigation={navigation}
         showBackButton={true}
         onBackPress={() => navigation.goBack()}
@@ -203,18 +203,18 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
       >
         <View className="mx-6 my-4 bg-white rounded-lg p-2">
           <Text className="text-base mb-4 text-[#070707] leading-6">
-            {t("RequestLetter.Dear Sir/Madam")}
+            {t("RequestLetter.DearSirOrMadam")}
           </Text>
 
           <Text className="text-base mb-4 text-[#070707] leading-6">
-            {t("RequestLetter.IRequestFarm", {
+            {t("RequestLetter.IFarmerNameAFarmerFromDistrictAmWritingToFormallyRequestAnAgriculturalLoanForTheUpcomingCultivationSeason", {
               farmerName: requestData.farmerName,
               district: t(`Districts.${requestData.district}`),
             })}
           </Text>
 
           <Text className="text-base mb-4 text-[#070707] leading-6">
-            {t("RequestLetter.IamPlaning", {
+            {t("RequestLetter.IAmPlanningToCultivateCropName", {
               cropName:
                 i18n.language === "si"
                   ? requestData.cropNameSinhala
@@ -225,10 +225,10 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
           </Text>
 
           <Text className="text-base mb-4 text-[#070707]">
-            {t("RequestLetter.The project details are as follows")}
+            {t("RequestLetter.TheProjectDetailsAreAsFollows")}
           </Text>
 
-          <View className="space-y-3 mb-6">
+          <View className="gap-3 mb-6">
             <View>
               <ProjectDetails
                 label={t("RequestLetter.District")}
@@ -259,15 +259,15 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
                     <Text className="font-bold">{requestData.extentac}</Text>
                     <Text>
                       {" "}
-                      {t("RequestLetter.acres")}, {t("RequestLetter.and")}{" "}
+                      {t("RequestLetter.Acres")}, {t("RequestLetter.And")}{" "}
                     </Text>
                     <Text className="font-bold">{requestData.extentp}</Text>
-                    <Text> {t("RequestLetter.perches")}</Text>
+                    <Text> {t("RequestLetter.Perches")}</Text>
                   </>
                 }
               />
               <ProjectDetails
-                label={t("RequestLetter.Expected Investment")}
+                label={t("RequestLetter.ExpectedInvestment")}
                 value={
                   <>
                     <Text>{t("RequestLetter.Rs")}. </Text>
@@ -278,18 +278,18 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
                 }
               />
               <ProjectDetails
-                label={t("RequestLetter.Expected Yield")}
+                label={t("RequestLetter.ExpectedYield")}
                 value={
                   <>
                     <Text className="font-bold">
                       {requestData.expectedYield}
                     </Text>
-                    <Text> {t("RequestLetter.kg")}</Text>
+                    <Text> {t("RequestLetter.Kg")}</Text>
                   </>
                 }
               />
               <ProjectDetails
-                label={t("RequestLetter.Cultivation Start Date")}
+                label={t("RequestLetter.CultivationStartDate")}
                 value={
                   <Text className="font-bold">{requestData.startDate}</Text>
                 }
@@ -299,13 +299,13 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
 
           <Text className="text-base mb-4 text-black leading-6">
             {t(
-              "RequestLetter.This investment is essential for covering the costst",
+              "RequestLetter.ThisInvestmentIsEssentialForCoveringTheCostsOfHighQualitySeedsFertilizersPesticidesIrrigationAndLaborRequiredToAchieveTheProjectedYield",
             )}
           </Text>
 
           <Text className="text-base mb-4 text-black leading-6">
             {t(
-              "RequestLetter.I have attached the necessary documents for your perusal.",
+              "RequestLetter.IHaveAttachedTheNecessaryDocumentsForYourPerusal",
             )}
           </Text>
 
@@ -336,7 +336,7 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
 
           <Text className="text-base mt-2 text-black leading-6">
             {t(
-              "RequestLetter.I am confident in the success of this venture and request",
+              "RequestLetter.IAmConfidentInTheSuccessOfThisVentureAndRequestYouToKindlyApproveMyLoanApplicationAtTheEarliestThankYouForYourTimeAndConsideration",
             )}
           </Text>
 
@@ -393,7 +393,7 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
             <View className="flex-row self-center w-2/3 h-[50px] items-center justify-center border border-[#F83B4F] rounded-full py-2.5">
               <FontAwesome6 name="phone-volume" size={18} color="#F83B4F" />
               <Text className="text-lg font-semibold ml-3 text-[#070707]">
-                {t("VisitPopup.Get Call")}
+                {t("VisitPopup.GetCall")}
               </Text>
             </View>
           </TouchableOpacity>
@@ -430,7 +430,7 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
                 console.log("Error navigating to QR Scanner:", e);
               }
             }}
-            className="rounded-3xl overflow-hidden h-[50px] w-[300px] self-center "
+            className="rounded-full overflow-hidden h-[50px] w-[300px] self-center "
           >
             <LinearGradient
               colors={["#F2561D", "#FF1D85"]}

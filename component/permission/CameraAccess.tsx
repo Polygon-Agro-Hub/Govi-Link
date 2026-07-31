@@ -75,13 +75,12 @@ const CameraAccess: React.FC<CameraAccessProps> = ({
         }
       } else if (status === "denied") {
         Alert.alert(
-          t("Permission.permissionDenied") || "Permission Denied",
-          t("Permission.enableCameraManually") ||
-            "Camera access is required. Please enable it in settings.",
+          t("Permission.PermissionDenied") || "Permission Denied",
+          t("Permission.CameraAccessIsRequiredPleaseEnableItInSettings"),
           [
-            { text: t("PublicForum.Cancel") || "Cancel", style: "cancel" },
+            { text: t("Main.Cancel") || "Cancel", style: "cancel" },
             {
-              text: t("Permission.openSettings") || "Open Settings",
+              text: t("Permission.OpenSettings") || "Open Settings",
               onPress: () => Linking.openSettings(),
             },
           ],
@@ -116,12 +115,12 @@ const CameraAccess: React.FC<CameraAccessProps> = ({
 
           {/* Title */}
           <Text className="text-white font-bold text-center mt-8 text-2xl">
-            {t("Permission.CameraAccess") || "Camera Access"}
+            {t("Permission.CameraAccess")}
           </Text>
 
           {/* Description */}
           <Text className="text-gray-400 text-center mt-4 px-8 text-base">
-            {t("Permission.enableCameraMessage") ||
+            {t("Permission.EnableAccessToTheCameraToTakePhotos") ||
               "Enable access to the camera to take photos."}
           </Text>
 
@@ -147,12 +146,13 @@ const CameraAccess: React.FC<CameraAccessProps> = ({
                   colors={["#EE8D5F", "#B31A51"]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
-                  className="w-full rounded-full h-14 justify-center items-center"
+                  className="w-full rounded-full h-[50px] justify-center items-center"
+                  style={{ overflow: "hidden" }}
                 >
                   <Text className="text-white font-semibold text-center text-lg">
                     {isLoading
-                      ? t("Permission.requesting") || "Requesting..."
-                      : t("Permission.allow") || "Allow"}
+                      ? t("Permission.Requesting...") || "Requesting..."
+                      : t("Permission.Allow")}
                   </Text>
                 </LinearGradient>
               </TouchableOpacity>

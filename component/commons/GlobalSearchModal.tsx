@@ -23,6 +23,9 @@ interface GlobalSearchModalProps {
   multiSelect?: boolean;
   renderItem?: (item: any, isSelected: boolean) => React.ReactNode;
   searchKeys?: string[];
+  // New props for external search term control
+  searchTerm?: string;
+  onSearchTermChange?: (term: string) => void;
 }
 
 const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
@@ -38,15 +41,33 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
   multiSelect = false,
   renderItem,
   searchKeys = ["label"],
+  searchTerm: externalSearchTerm,
+  onSearchTermChange,
 }) => {
   const { t } = useTranslation();
-  const [searchValue, setSearchValue] = useState("");
+  // Use internal state if external search term is not provided
+  const [internalSearchValue, setInternalSearchValue] = useState("");
   const [filteredData, setFilteredData] = useState(data);
   const [selectedValues, setSelectedValues] = useState<string[]>(selectedItems);
+
+  // Determine which search value to use (external or internal)
+  const searchValue = externalSearchTerm !== undefined ? externalSearchTerm : internalSearchValue;
 
   useEffect(() => {
     setSelectedValues(selectedItems);
   }, [selectedItems, visible]);
+
+  // Reset search when modal becomes visible
+  useEffect(() => {
+    if (visible) {
+      // Clear search when modal opens
+      if (onSearchTermChange) {
+        onSearchTermChange("");
+      } else {
+        setInternalSearchValue("");
+      }
+    }
+  }, [visible]);
 
   useEffect(() => {
     if (!searchValue.trim()) {
@@ -94,7 +115,19 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
   };
 
   const clearSearch = () => {
-    setSearchValue("");
+    if (onSearchTermChange) {
+      onSearchTermChange("");
+    } else {
+      setInternalSearchValue("");
+    }
+  };
+
+  const handleSearchChange = (text: string) => {
+    if (onSearchTermChange) {
+      onSearchTermChange(text);
+    } else {
+      setInternalSearchValue(text);
+    }
   };
 
   const renderDefaultItem = (item: any, isSelected: boolean) => (
@@ -114,7 +147,7 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         <TextInput
           placeholder={searchPlaceholder}
           value={searchValue}
-          onChangeText={setSearchValue}
+          onChangeText={handleSearchChange}
           className="flex-1 ml-2 text-base"
           placeholderTextColor="#666"
           autoCapitalize="none"
@@ -137,7 +170,7 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
       onRequestClose={onClose}
     >
       <View className="flex-1 bg-black/50 justify-center items-center">
-        <View className="bg-white rounded-2xl w-11/12 max-h-3/4">
+        <View className="bg-white rounded-2xl w-11/12 max-h-3/4 overflow-hidden">
           <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
             <View>
               <Text className="text-lg font-semibold">{title}</Text>

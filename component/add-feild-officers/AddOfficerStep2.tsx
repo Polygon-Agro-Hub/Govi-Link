@@ -10,6 +10,7 @@ import {
   Alert,
   ActivityIndicator,
   Keyboard,
+  BackHandler,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -79,7 +80,7 @@ const sriLankaData = {
         { en: "Kilinochchi", si: "කිලිනොච්චි", ta: "கில்லினோச்சி" },
         { en: "Mullaitivu", si: "මුල්ලිතිවු", ta: "முல்லைத்தீவு" },
         { en: "Vavuniya", si: "වවුනියාව", ta: "வவுனியா" },
-        { en: "Mannar", si: "මන්නාරම", ta: "மன்னார்" },
+        { en: "Mannar", si: "මන්නාරම", ta: "මන්නාරම" },
       ],
     },
     {
@@ -155,6 +156,19 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
     id: bank.ID,
     name: bank.name,
   }));
+
+  // Handle Android hardware back button
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      () => {
+        navigation.navigate("AddOfficerStep1", { isnew: false });
+        return true;
+      }
+    );
+
+    return () => backHandler.remove();
+  }, [navigation]);
 
   useFocusEffect(
     useCallback(() => {
@@ -259,7 +273,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
     if (text.length === 0) {
       setErrors((prev) => ({
         ...prev,
-        housePlotNo: t("Error.House/Plot number is required"),
+        housePlotNo: t("Error.HousePlotNumberIsRequired"),
       }));
     }
     setHousePlotNo(text);
@@ -271,7 +285,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
     if (text.length === 0) {
       setErrors((prev) => ({
         ...prev,
-        streetName: t("Error.Street name is required"),
+        streetName: t("Error.StreetNameIsRequired"),
       }));
     }
     setStreetName(capitalizedText);
@@ -282,7 +296,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
     if (text.length === 0) {
       setErrors((prev) => ({
         ...prev,
-        city: t("Error.City is required"),
+        city: t("Error.CityIsRequired"),
       }));
     }
     const capitalizedText = text.charAt(0).toUpperCase() + text.slice(1);
@@ -294,7 +308,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
     if (text.length === 0) {
       setErrors((prev) => ({
         ...prev,
-        commissionAmount: t("Error.Commission amount is required"),
+        commissionAmount: t("Error.CommissionAmountIsRequired"),
       }));
     }
     let filteredText = text.replace(/[^0-9.]/g, "");
@@ -312,7 +326,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
     if (!isNaN(value) && value > 100) {
       setErrors((prev) => ({
         ...prev,
-        commissionAmount: t("Error.Commission amount cannot exceed 100"),
+        commissionAmount: t("Error.CommissionAmountCannotExceed100"),
       }));
       return;
     }
@@ -327,7 +341,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
     if (text.length === 0) {
       setErrors((prev) => ({
         ...prev,
-        accountHolderName: t("Error.Account holder name is required"),
+        accountHolderName: t("Error.AccountHoldersNameIsRequired"),
       }));
     }
     const filteredText = text.replace(/[^a-zA-Z\s]/g, "");
@@ -341,7 +355,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
     if (text.length === 0) {
       setErrors((prev) => ({
         ...prev,
-        accountNumber: t("Error.Account number is required"),
+        accountNumber: t("Error.AccountNumberIsRequired"),
       }));
     }
     const numbersOnly = text.replace(/[^0-9]/g, "");
@@ -359,7 +373,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
     if (text.length !== 0 && accountNumber && text !== accountNumber) {
       setErrors((prev) => ({
         ...prev,
-        confirmAccountNumber: t("Error.Account numbers do not match"),
+        confirmAccountNumber: t("Error.AccountNumbersDoNotMatch"),
       }));
     }
     const numbersOnly = text.replace(/[^0-9]/g, "");
@@ -570,7 +584,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
 
   const renderProvinceItem = (item: any, isSelected: boolean) => (
     <TouchableOpacity
-      className="px-4 py-3 border-b border-gray-200"
+      className="px-4 py-3 border-b border-gray-200 flex-row justify-between items-center"
       onPress={() => handleProvinceSelect([item.value])}
     >
       <Text className="text-base text-gray-800">{item.label}</Text>
@@ -580,7 +594,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
 
   const renderDistrictItem = (item: any, isSelected: boolean) => (
     <TouchableOpacity
-      className="px-4 py-3 border-b border-gray-200"
+      className="px-4 py-3 border-b border-gray-200 flex-row justify-between items-center"
       onPress={() => handleDistrictSelect([item.value])}
     >
       <Text className="text-base text-gray-800">{item.label}</Text>
@@ -590,7 +604,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
 
   const renderBankItem = (item: any, isSelected: boolean) => (
     <TouchableOpacity
-      className="px-4 py-3 border-b border-gray-200"
+      className="px-4 py-3 border-b border-gray-200 flex-row justify-between items-center"
       onPress={() => handleBankSelect([item.value])}
     >
       <Text className="text-base text-gray-800">{item.label}</Text>
@@ -600,7 +614,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
 
   const renderBranchItem = (item: any, isSelected: boolean) => (
     <TouchableOpacity
-      className="px-4 py-3 border-b border-gray-200"
+      className="px-4 py-3 border-b border-gray-200 flex-row justify-between items-center"
       onPress={() => handleBranchSelect([item.value])}
     >
       <Text className="text-base text-gray-800">{item.label}</Text>
@@ -612,22 +626,22 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
     const newErrors: Record<string, string> = {};
 
     if (!housePlotNo.trim())
-      newErrors.housePlotNo = t("Error.House/Plot number is required");
+      newErrors.housePlotNo = t("Error.HousePlotNumberIsRequired");
     if (!streetName.trim())
-      newErrors.streetName = t("Error.Street name is required");
-    if (!city.trim()) newErrors.city = t("Error.City is required");
-    if (!selectedCountry) newErrors.country = t("Error.Country is required");
-    if (!selectedProvince) newErrors.province = t("Error.Province is required");
-    if (!selectedDistrict) newErrors.district = t("Error.District is required");
+      newErrors.streetName = t("Error.StreetNameIsRequired");
+    if (!city.trim()) newErrors.city = t("Error.CityIsRequired");
+    if (!selectedCountry) newErrors.country = t("Error.CountryIsRequired");
+    if (!selectedProvince) newErrors.province = t("Error.ProvinceIsRequired");
+    if (!selectedDistrict) newErrors.district = t("Error.DistrictIsRequired");
     if (!commissionAmount.trim())
-      newErrors.commissionAmount = t("Error.Commission amount is required");
+      newErrors.commissionAmount = t("Error.CommissionAmountIsRequired");
     if (!accountHolderName.trim())
-      newErrors.accountHolderName = t("Error.Account holder name is required");
+      newErrors.accountHolderName = t("Error.AccountHoldersNameIsRequired");
     if (!accountNumber.trim())
-      newErrors.accountNumber = t("Error.Account number is required");
+      newErrors.accountNumber = t("Error.AccountNumberIsRequired");
     if (!confirmAccountNumber.trim())
       newErrors.confirmAccountNumber = t(
-        "Error.Confirm account number is required",
+        "Error.ConfirmAccountNumberIsRequired",
       );
 
     if (
@@ -635,19 +649,19 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
       confirmAccountNumber.trim() &&
       accountNumber !== confirmAccountNumber
     ) {
-      newErrors.confirmAccountNumber = t("Error.Account numbers do not match");
+      newErrors.confirmAccountNumber = t("Error.AccountNumbersDoNotMatch");
     }
-    if (!selectedBank) newErrors.bank = t("Error.Bank is required");
-    if (!selectedBranch) newErrors.branch = t("Error.Branch is required");
+    if (!selectedBank) newErrors.bank = t("Error.BankIsRequired");
+    if (!selectedBranch) newErrors.branch = t("Error.BranchIsRequired");
 
     if (commissionAmount && isNaN(parseFloat(commissionAmount))) {
       newErrors.commissionAmount = t(
-        "Error.Commission amount must be a number",
+        "Error.CommissionAmountMustBeANumber",
       );
     }
     if (commissionAmount && parseFloat(commissionAmount) > 100) {
       newErrors.commissionAmount = t(
-        "Error.Commission amount cannot exceed 100",
+        "Error.CommissionAmountCannotExceed100",
       );
     }
 
@@ -661,8 +675,8 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
 
     if (Object.keys(validationErrors).length > 0) {
       const errorMessage = Object.values(validationErrors).join("\n• ");
-      Alert.alert(t("Error.Validation Error"), `• ${errorMessage}`, [
-        { text: t("Main.ok") },
+      Alert.alert(t("Error.ValidationError"), `• ${errorMessage}`, [
+        { text: t("Main.OK") },
       ]);
       return;
     }
@@ -692,6 +706,10 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
     });
   };
 
+  const handleGoBack = () => {
+    navigation.navigate("AddOfficerStep1", { isnew: false });
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -701,9 +719,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
         title={t("AddOfficer.AddOfficer")}
         navigation={navigation}
         showBackButton={true}
-        onBackPress={() =>
-          navigation.navigate("AddOfficerStep1", { isnew: false })
-        }
+        onBackPress={handleGoBack}
       />
 
       <ScrollView
@@ -714,7 +730,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
         <View className="p-2">
           {/* Address Section */}
           <View className="px-2 mt-4">
-            <View className="space-y-4">
+            <View className="gap-4">
               <View>
                 <View
                   className={`bg-[#F4F4F4] rounded-3xl  h-[50px] px-4 justify-center ${
@@ -867,7 +883,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
 
           {/* Bank Details Section */}
           <View className="px-2 mt-6">
-            <View className="space-y-4">
+            <View className="gap-4">
               <View>
                 <View
                   className={`bg-[#F4F4F4] rounded-3xl px-4 h-[50px] justify-center ${
@@ -1013,10 +1029,8 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
           {/* Buttons */}
           <View className="px-2 flex-col w-full gap-4 mt-4">
             <TouchableOpacity
-              className="bg-[#D9D9D9] rounded-3xl items-center justify-center h-[50px] w-full items-center"
-              onPress={() =>
-                navigation.navigate("AddOfficerStep1", { isnew: false })
-              }
+              className="bg-[#D9D9D9] rounded-3xl items-center justify-center h-[50px] w-full"
+              onPress={handleGoBack}
             >
               <Text className="text-[#686868] font-semibold text-lg">
                 {t("AddOfficer.GoBack")}
@@ -1024,7 +1038,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
             </TouchableOpacity>
 
             <TouchableOpacity
-              className="bg-black rounded-3xl items-center justify-center h-[50px] w-full items-center"
+              className="bg-black rounded-3xl items-center justify-center h-[50px] w-full"
               onPress={handleNext}
               disabled={loading}
             >
@@ -1047,7 +1061,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
         data={getCountriesData()}
         selectedItems={[selectedCountry]}
         onSelect={handleCountrySelect}
-        searchPlaceholder={t("AddOfficer.SearchCountry")}
+        searchPlaceholder={t("AddOfficer.SearchCountry...")}
         doneButtonText={t("AddOfficer.Select")}
         noResultsText={t("AddOfficer.NoCountriesFound")}
         multiSelect={false}
@@ -1062,7 +1076,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
         data={getProvincesData()}
         selectedItems={[selectedProvince]}
         onSelect={handleProvinceSelect}
-        searchPlaceholder={t("AddOfficer.SearchProvince")}
+        searchPlaceholder={t("AddOfficer.SearchProvince...")}
         doneButtonText={t("AddOfficer.Select")}
         noResultsText={t("AddOfficer.NoProvincesFound")}
         multiSelect={false}
@@ -1077,7 +1091,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
         data={getDistrictsData()}
         selectedItems={[selectedDistrict]}
         onSelect={handleDistrictSelect}
-        searchPlaceholder={t("AddOfficer.SearchDistrict")}
+        searchPlaceholder={t("AddOfficer.SearchDistrict...")}
         doneButtonText={t("AddOfficer.Select")}
         noResultsText={t("AddOfficer.NoDistrictsFound")}
         multiSelect={false}
@@ -1092,7 +1106,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
         data={getBanksData()}
         selectedItems={[selectedBank]}
         onSelect={handleBankSelect}
-        searchPlaceholder={t("AddOfficer.SearchBank")}
+        searchPlaceholder={t("AddOfficer.SearchBank...")}
         doneButtonText={t("AddOfficer.Select")}
         noResultsText={t("AddOfficer.NoBanksFound")}
         multiSelect={false}
@@ -1107,7 +1121,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
         data={getBranchesData()}
         selectedItems={[selectedBranch]}
         onSelect={handleBranchSelect}
-        searchPlaceholder={t("AddOfficer.SearchBranch")}
+        searchPlaceholder={t("AddOfficer.SearchBranch...")}
         doneButtonText={t("AddOfficer.Select")}
         noResultsText={t("AddOfficer.NoBranchesFound")}
         multiSelect={false}

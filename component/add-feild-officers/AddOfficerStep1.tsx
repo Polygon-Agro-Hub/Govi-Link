@@ -141,10 +141,8 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
       if (!token) {
         Alert.alert(
           t("Error.Sorry"),
-          t(
-            "Error.Your login session has expired. Please log in again to continue.",
-          ),
-          [{ text: t("Main.ok") }],
+          t("Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue"),
+          [{ text: t("Main.OK") }],
         );
         return;
       }
@@ -204,24 +202,65 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     });
   };
 
+  const validateDomainFormat = (domain: string): boolean => {
+    if (!domain) return false;
+    if (domain.startsWith(".") || domain.endsWith(".")) return false;
+    if (domain.startsWith("-") || domain.endsWith("-")) return false;
+    if (domain.includes("..")) return false;
+
+    const labelRegex = /^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?$/;
+    const labels = domain.split(".");
+    return labels.every((label) => labelRegex.test(label));
+  };
+
   const validateGmailLocalPart = (localPart: string): boolean => {
     const validCharsRegex = /^[a-zA-Z0-9.+]+$/;
     if (!validCharsRegex.test(localPart)) {
       return false;
     }
-
     if (localPart.startsWith(".") || localPart.endsWith(".")) {
       return false;
     }
-
     if (localPart.includes("..")) {
       return false;
     }
-
-    if (localPart.length === 0) {
+    if (localPart.length === 0 || localPart.length > 30) {
       return false;
     }
+    return true;
+  };
 
+  const validateYahooLocalPart = (localPart: string): boolean => {
+    if (localPart.length < 4 || localPart.length > 32) {
+      return false;
+    }
+    const validCharsRegex = /^[a-zA-Z0-9._-]+$/;
+    if (!validCharsRegex.test(localPart)) {
+      return false;
+    }
+    if (/^[._-]|[._-]$/.test(localPart)) {
+      return false;
+    }
+    if (localPart.includes("..")) {
+      return false;
+    }
+    return true;
+  };
+
+  const validateGeneralLocalPart = (localPart: string): boolean => {
+    if (localPart.length < 1 || localPart.length > 64) {
+      return false;
+    }
+    const validCharsRegex = /^[a-zA-Z0-9._%+-]+$/;
+    if (!validCharsRegex.test(localPart)) {
+      return false;
+    }
+    if (localPart.startsWith(".") || localPart.endsWith(".")) {
+      return false;
+    }
+    if (localPart.includes("..")) {
+      return false;
+    }
     return true;
   };
 
@@ -235,6 +274,11 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
 
     const emailLower = email.toLowerCase();
     const [localPart, domain] = emailLower.split("@");
+
+    if (!validateDomainFormat(domain)) {
+      return false;
+    }
+
     const allowedTLDs = [".com", ".gov", ".lk"];
 
     if (domain === "gmail.com" || domain === "googlemail.com") {
@@ -242,12 +286,12 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     }
 
     if (domain === "yahoo.com") {
-      return true;
+      return validateYahooLocalPart(localPart);
     }
 
     for (const tld of allowedTLDs) {
       if (domain.endsWith(tld)) {
-        return true;
+        return validateGeneralLocalPart(localPart);
       }
     }
 
@@ -258,52 +302,27 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     return /^7[0-9]{8}$/.test(phone);
   };
 
+  // Properly handle name field changes with correct validation
   const handleNameENChange = (text: string, fieldName: string) => {
     const filteredText = text.replace(/[^a-zA-Z\s]/g, "");
     const capitalizedText =
       filteredText.charAt(0).toUpperCase() + filteredText.slice(1);
-    let errorname = "";
+
     switch (fieldName) {
       case "firstNameEN":
         setFirstNameEN(capitalizedText);
-        errorname = "First name";
         break;
       case "lastNameEN":
         setLastNameEN(capitalizedText);
-        errorname = "Last name";
         break;
-      case "firstNameSI":
-        setFirstNameSI(capitalizedText);
-        errorname = "Sinhala first name";
-        break;
-      case "lastNameSI":
-        setLastNameSI(capitalizedText);
-        errorname = "Sinhala last name";
-        break;
-      case "firstNameTA":
-        setFirstNameTA(capitalizedText);
-        errorname = "Tamil first name";
-        break;
-      case "lastNameTA":
-        setLastNameTA(capitalizedText);
-        errorname = "Tamil last name";
-        break;
+      default:
+        return;
     }
 
-    if (capitalizedText.length === 0) {
-      setErrors((prev) => ({
-        ...prev,
-        [fieldName]: t(`Error.${errorname} is required`),
-      }));
-    } else {
-      setErrors((prev) => {
-        const updated = { ...prev };
-        delete updated[fieldName];
-        return updated;
-      });
-    }
+    clearFieldError(fieldName);
   };
 
+  // Properly handle Unicode name changes (Sinhala/Tamil)
   const handleUnicodeNameChange = (text: string, fieldName: string) => {
     switch (fieldName) {
       case "firstNameSI":
@@ -320,22 +339,16 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
         break;
     }
 
-    if (!text.trim()) {
-      setErrors((prev) => ({
-        ...prev,
-        [fieldName]: t("Error.Field is required"),
-      }));
-    } else {
-      clearFieldError(fieldName);
-    }
+    clearFieldError(fieldName);
   };
 
+  // Validate on blur, not on every change
   const handleFirstNameENBlur = () => {
     markFieldAsTouched("firstNameEN");
     if (!firstNameEN.trim()) {
       setErrors((prev) => ({
         ...prev,
-        firstNameEN: t("Error.First name is required"),
+        firstNameEN: t("Error.FirstNameInEnglishIsRequired"),
       }));
     } else {
       clearFieldError("firstNameEN");
@@ -347,10 +360,58 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     if (!lastNameEN.trim()) {
       setErrors((prev) => ({
         ...prev,
-        lastNameEN: t("Error.Last name is required"),
+        lastNameEN: t("Error.LastNameInEnglishIsRequired"),
       }));
     } else {
       clearFieldError("lastNameEN");
+    }
+  };
+
+  const handleFirstNameSIBlur = () => {
+    markFieldAsTouched("firstNameSI");
+    if (!firstNameSI.trim()) {
+      setErrors((prev) => ({
+        ...prev,
+        firstNameSI: t("Error.FirstNameInSinhalaIsRequired"),
+      }));
+    } else {
+      clearFieldError("firstNameSI");
+    }
+  };
+
+  const handleLastNameSIBlur = () => {
+    markFieldAsTouched("lastNameSI");
+    if (!lastNameSI.trim()) {
+      setErrors((prev) => ({
+        ...prev,
+        lastNameSI: t("Error.LastNameInSinhalaIsRequired"),
+      }));
+    } else {
+      clearFieldError("lastNameSI");
+    }
+  };
+
+  const handleFirstNameTABlur = () => {
+    markFieldAsTouched("firstNameTA");
+    if (!firstNameTA.trim()) {
+      setErrors((prev) => ({
+        ...prev,
+        firstNameTA: t("Error.FirstNameInTamilIsRequired"),
+      }));
+    } else {
+      clearFieldError("firstNameTA");
+    }
+  };
+
+  const handleLastNameTABlur = () => {
+    markFieldAsTouched("lastNameTA");
+    if (!lastNameTA.trim()) {
+      setErrors((prev) => ({
+        ...prev,
+        lastNameTA: t("Error.LastNameInTamilIsRequired"),
+      }));
+    } else {
+      clearFieldError("lastNameTA");
     }
   };
 
@@ -359,11 +420,11 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
       setErrors((prev) => ({
         ...prev,
         phone1:
-          prev.phone1 === t("Error.Phone numbers cannot be the same")
+          prev.phone1 === t("Error.LandNumbersCannotBeTheSame")
             ? ""
             : prev.phone1,
         phone2:
-          prev.phone2 === t("Error.Phone numbers cannot be the same")
+          prev.phone2 === t("Error.LandNumbersCannotBeTheSame")
             ? ""
             : prev.phone2,
       }));
@@ -393,23 +454,23 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     ) {
       setErrors((prev) => ({
         ...prev,
-        phone1: t("Error.Phone numbers cannot be the same"),
+        phone1: t("Error.LandNumbersCannotBeTheSame"),
       }));
       return;
     } else if (!numbersOnly.startsWith("7")) {
       setErrors((prev) => ({
         ...prev,
-        phone1: t("Error.Invalid phone number"),
+        phone1: t("Error.InvalidMobileNumber"),
       }));
     } else if (numbersOnly.length < 9) {
       setErrors((prev) => ({
         ...prev,
-        phone1: t("Error.Phone number must be 9 digits long"),
+        phone1: t("Error.MobileNumberMustBe9DigitsLong"),
       }));
     } else if (!validatePhoneNumber(numbersOnly)) {
       setErrors((prev) => ({
         ...prev,
-        phone1: t("Error.Invalid phone number"),
+        phone1: t("Error.InvalidMobileNumber"),
       }));
     } else {
       setErrors((prev) => ({
@@ -442,23 +503,23 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     ) {
       setErrors((prev) => ({
         ...prev,
-        phone2: t("Error.Phone numbers cannot be the same"),
+        phone2: t("Error.LandNumbersCannotBeTheSame"),
       }));
       return;
     } else if (!numbersOnly.startsWith("7")) {
       setErrors((prev) => ({
         ...prev,
-        phone2: t("Error.Invalid phone number"),
+        phone2: t("Error.InvalidMobileNumber"),
       }));
     } else if (numbersOnly.length < 9) {
       setErrors((prev) => ({
         ...prev,
-        phone2: t("Error.Phone number must be 9 digits long"),
+        phone2: t("Error.MobileNumberMustBe9DigitsLong"),
       }));
     } else if (!validatePhoneNumber(numbersOnly)) {
       setErrors((prev) => ({
         ...prev,
-        phone2: t("Error.Invalid phone number"),
+        phone2: t("Error.InvalidMobileNumber"),
       }));
     } else {
       setErrors((prev) => ({
@@ -485,9 +546,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     } else if (!validateNicNumber(normalizedInput)) {
       setErrors((prev) => ({
         ...prev,
-        nic: t(
-          "Error.NIC Number must be 9 digits followed by 'V' or 12 digits.",
-        ),
+        nic: t("Error.NicNumberMustBe9DigitsFollowedByVOr12Digits"),
       }));
     } else {
       setErrors((prev) => ({
@@ -503,72 +562,65 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     markFieldAsTouched("email");
     const trimmedInput = input.trim();
     setEmail(trimmedInput);
-    if (!validateEmail(trimmedInput)) {
-      const emailLower = trimmedInput.toLowerCase();
-      const domain = emailLower.split("@")[1];
 
+    if (trimmedInput.length === 0) {
+      clearFieldError("email");
+      return;
+    }
+
+    const generalEmailRegex =
+      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    if (!generalEmailRegex.test(trimmedInput)) {
+      setErrors((prev) => ({
+        ...prev,
+        email: t("Error.InvalidEmailAddress"),
+      }));
+      return;
+    }
+
+    const emailLower = trimmedInput.toLowerCase();
+    const [localPart, domain] = emailLower.split("@");
+
+    if (!validateDomainFormat(domain)) {
+      setErrors((prev) => ({
+        ...prev,
+        email: t(
+          "Error.EmailDomainIsInvalidCheckForLeadingTrailingDotsOrHyphens",
+        ),
+      }));
+      return;
+    }
+
+    if (!validateEmail(trimmedInput)) {
       if (domain === "gmail.com" || domain === "googlemail.com") {
         setErrors((prev) => ({
           ...prev,
-          email: t("Error.Invalid Gmail address"),
+          email: t(
+            "Error.InvalidGmailAddressGmailAddressesCannotHaveConsecutiveDotsLeadingTrailingDotsOrSpecialCharacters",
+          ),
         }));
-      } else {
+      } else if (domain === "yahoo.com") {
         setErrors((prev) => ({
           ...prev,
-          email: t("Error.Invalid email address Example"),
+          email: t("Error.InvalidYahooAddress"),
+        }));
+      } else {
+        const allowedTLDs = [".com", ".gov", ".lk"];
+        const isDomainSupported = allowedTLDs.some((tld) =>
+          domain?.endsWith(tld),
+        );
+        setErrors((prev) => ({
+          ...prev,
+          email: isDomainSupported
+            ? t("Error.InvalidEmailAddress")
+            : t("Error.UnsupportedEmailDomain"),
         }));
       }
       return;
     }
+
     checkEmailExists(trimmedInput);
-  };
-
-  const handleFirstNameSIBlur = () => {
-    markFieldAsTouched("firstNameSI");
-    if (!firstNameSI.trim()) {
-      setErrors((prev) => ({
-        ...prev,
-        firstNameSI: t("Error.Sinhala first name is required"),
-      }));
-    } else {
-      clearFieldError("firstNameSI");
-    }
-  };
-
-  const handleLastNameSIBlur = () => {
-    markFieldAsTouched("lastNameSI");
-    if (!lastNameSI.trim()) {
-      setErrors((prev) => ({
-        ...prev,
-        lastNameSI: t("Error.Sinhala last name is required"),
-      }));
-    } else {
-      clearFieldError("lastNameSI");
-    }
-  };
-
-  const handleFirstNameTABlur = () => {
-    markFieldAsTouched("firstNameTA");
-    if (!firstNameTA.trim()) {
-      setErrors((prev) => ({
-        ...prev,
-        firstNameTA: t("Error.Tamil first name is required"),
-      }));
-    } else {
-      clearFieldError("firstNameTA");
-    }
-  };
-
-  const handleLastNameTABlur = () => {
-    markFieldAsTouched("lastNameTA");
-    if (!lastNameTA.trim()) {
-      setErrors((prev) => ({
-        ...prev,
-        lastNameTA: t("Error.Tamil last name is required"),
-      }));
-    } else {
-      clearFieldError("lastNameTA");
-    }
   };
 
   const pickProfileImage = async () => {
@@ -577,16 +629,16 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
         await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== "granted") {
         Alert.alert(
-          t("Error.Permission Denied"),
+          t("Error.PermissionDenied"),
           t("Error.Gallery permission is required"),
-          [{ text: t("Main.ok") }],
+          [{ text: t("Main.OK") }],
         );
         return;
       }
 
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ["images"],
-        allowsEditing: true,
+        allowsEditing: false,
         aspect: [1, 1],
         quality: 0.8,
       });
@@ -597,12 +649,13 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     } catch (error) {
       console.error("Error picking image:", error);
       Alert.alert(t("Error.Error"), t("Error.Failed to pick image"), [
-        { text: t("Main.ok") },
+        { text: t("Main.OK") },
       ]);
     }
   };
 
   const checkNICExists = async (nicNumber: string): Promise<boolean> => {
+    if (!nicNumber.trim()) return false;
     try {
       setIsValidating(true);
       const token = await AsyncStorage.getItem("token");
@@ -616,7 +669,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
       if (response.data.exists) {
         setErrors((prev) => ({
           ...prev,
-          nic: t("Error.This NIC is already registered in the system."),
+          nic: t("Error.ThisNicIsAlreadyRegisteredInTheSystem"),
         }));
         return true;
       }
@@ -630,6 +683,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
   };
 
   const checkEmailExists = async (email: string): Promise<boolean> => {
+    if (!email.trim()) return false;
     try {
       setIsValidating(true);
       const token = await AsyncStorage.getItem("token");
@@ -643,7 +697,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
       if (response.data.exists) {
         setErrors((prev) => ({
           ...prev,
-          email: t("Error.Email already exists"),
+          email: t("Error.EmailAlreadyExists"),
         }));
         return true;
       }
@@ -679,8 +733,8 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
           ...prev,
           [field]:
             field === "phone1"
-              ? t("Error.Phone already exists")
-              : t("Error.Phone 2 already exists"),
+              ? t("Error.MobileNumberIsAlreadyExist")
+              : t("Error.MobileNumber2IsAlreadyExist"),
         }));
         return true;
       } else {
@@ -725,13 +779,11 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
 
   const handleDistrictSelect = (selectedValues: string[]) => {
     setSelectedDistricts(selectedValues);
-    districtModal.hide();
-
     markFieldAsTouched("districts");
     if (selectedValues.length === 0) {
       setErrors((prev) => ({
         ...prev,
-        districts: t("Error.At least one district is required"),
+        districts: t("Error.PleaseSelectAtLeastOneDistrict"),
       }));
     } else {
       clearFieldError("districts");
@@ -794,12 +846,28 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
   const renderDistrictItem = (item: any, isSelected: boolean) => (
     <TouchableOpacity
       className="px-4 py-3 border-b border-gray-200 flex-row justify-between items-center"
-      onPress={() => handleDistrictSelect([item.value])}
+      onPress={() => {
+        if (selectedDistricts.includes(item.value)) {
+          handleDistrictSelect(
+            selectedDistricts.filter((d) => d !== item.value),
+          );
+        } else {
+          handleDistrictSelect([...selectedDistricts, item.value]);
+        }
+      }}
     >
       <Text className="text-base text-gray-800">{item.label}</Text>
       <Checkbox
         value={isSelected}
-        onValueChange={() => handleDistrictSelect([item.value])}
+        onValueChange={() => {
+          if (selectedDistricts.includes(item.value)) {
+            handleDistrictSelect(
+              selectedDistricts.filter((d) => d !== item.value),
+            );
+          } else {
+            handleDistrictSelect([...selectedDistricts, item.value]);
+          }
+        }}
         color={isSelected ? "#21202B" : undefined}
       />
     </TouchableOpacity>
@@ -825,35 +893,52 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     const newErrors: Record<string, string> = {};
 
     if (!firstNameEN.trim())
-      newErrors.firstNameEN = t("Error.First name is required");
+      newErrors.firstNameEN = t("Error.FirstNameInEnglishIsRequired");
     if (!lastNameEN.trim())
-      newErrors.lastNameEN = t("Error.Last name is required");
+      newErrors.lastNameEN = t("Error.LastNameInEnglishIsRequired");
     if (!firstNameSI.trim())
-      newErrors.firstNameSI = t("Error.Sinhala first name is required");
+      newErrors.firstNameSI = t("Error.FirstNameInSinhalaIsRequired");
     if (!lastNameSI.trim())
-      newErrors.lastNameSI = t("Error.Sinhala last name is required");
+      newErrors.lastNameSI = t("Error.LastNameInSinhalaIsRequired");
     if (!firstNameTA.trim())
-      newErrors.firstNameTA = t("Error.Tamil first name is required");
+      newErrors.firstNameTA = t("Error.FirstNameInTamilIsRequired");
     if (!lastNameTA.trim())
-      newErrors.lastNameTA = t("Error.Tamil last name is required");
-    if (!phone1.trim()) newErrors.phone1 = t("Error.Phone number is required");
-    if (!nic.trim()) newErrors.nic = t("Error.NIC is required");
-    if (!email.trim()) newErrors.email = t("Error.Email is required");
+      newErrors.lastNameTA = t("Error.LastNameInTamilIsRequired");
+    if (!phone1.trim()) newErrors.phone1 = t("Error.MobileNumberIsRequired");
+    if (!nic.trim()) newErrors.nic = t("Error.NicNumberIsRequired");
+    if (!email.trim()) newErrors.email = t("Error.EmailIsRequired");
     if (selectedDistricts.length === 0)
-      newErrors.districts = t("Error.At least one district is required");
+      newErrors.districts = t("Error.PleaseSelectAtLeastOneDistrict");
     if (Object.values(languages).every((val) => !val))
-      newErrors.languages = t("Error.At least one language is required");
+      newErrors.languages = t("Error.PleaseSelectAtLeastOnePreferredLanguage");
 
     if (phone1 && !validatePhoneNumber(phone1))
-      newErrors.phone1 = t("Error.Invalid phone number");
+      newErrors.phone1 = t("Error.InvalidMobileNumber");
     if (phone2 && !validatePhoneNumber(phone2))
-      newErrors.phone2 = t("Error.Invalid phone number");
+      newErrors.phone2 = t("Error.InvalidMobileNumber");
     if (nic && !validateNicNumber(nic))
-      newErrors.nic = t("Error.Invalid NIC format");
-    if (email && !validateEmail(email))
-      newErrors.email = t("Error.Invalid email address");
+      newErrors.nic = t("Error.InvalidNicFormat");
+
+    if (email) {
+      const generalEmailRegex =
+        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      if (!generalEmailRegex.test(email)) {
+        newErrors.email = t("Error.InvalidEmailAddress");
+      } else {
+        const emailLower = email.toLowerCase();
+        const [, domain] = emailLower.split("@");
+        if (!validateDomainFormat(domain)) {
+          newErrors.email = t(
+            "Error.EmailDomainIsInvalidCheckForLeadingTrailingDotsOrHyphens",
+          );
+        } else if (!validateEmail(email)) {
+          newErrors.email = t("Error.InvalidEmailAddress");
+        }
+      }
+    }
+
     if (phone1 && phone2 && phone1 === phone2)
-      newErrors.phone2 = t("Error.Phone numbers cannot be the same");
+      newErrors.phone2 = t("Error.LandNumbersCannotBeTheSame");
 
     setErrors(newErrors);
     return newErrors;
@@ -908,17 +993,17 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
 
     if (Object.keys(validationErrors).length > 0) {
       const errorMessage = Object.values(validationErrors).join("\n• ");
-      Alert.alert(t("Error.Validation Error"), `• ${errorMessage}`, [
-        { text: t("Main.ok") },
+      Alert.alert(t("Error.ValidationError"), `• ${errorMessage}`, [
+        { text: t("Main.OK") },
       ]);
       return;
     }
 
     if (isValidating) {
       Alert.alert(
-        t("Error.Please Wait"),
-        t("Error.Validating your information, please wait..."),
-        [{ text: t("Main.ok") }],
+        t("Error.PleaseWait"),
+        t("Error.ValidatingYourInformationPleaseWait..."),
+        [{ text: t("Main.OK") }],
       );
       return;
     }
@@ -939,9 +1024,9 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
 
       if (hasNicError || hasEmailError || hasPhone1Error || hasPhone2Error) {
         Alert.alert(
-          t("Error.Validation Error"),
-          t("Error.Please fix all errors before proceeding"),
-          [{ text: t("Main.ok") }],
+          t("Error.ValidationError"),
+          t("Error.PleaseFixAllErrorsBeforeProceeding"),
+          [{ text: t("Main.OK") }],
         );
         setLoading(false);
         return;
@@ -976,7 +1061,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
       Alert.alert(
         t("Error.Error"),
         t("Error.An error occurred during validation"),
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
     }
   };
@@ -1020,7 +1105,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
 
         <View className="p-2 px-4">
           <View className="px-2 mt-6 items-center">
-            <View className="flex flex-row items-center space-x-2 justify-between">
+            <View className="flex flex-row items-center gap-2 justify-between">
               <Text className="text-base font-medium">
                 {t("AddOfficer.Type")}:
               </Text>
@@ -1062,10 +1147,10 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
             <Text className="text-base font-medium mb-4">
               {t("AddOfficer.PreferredLanguages")}:
             </Text>
-            <View className="flex-row justify-between space-x-4">
+            <View className="flex-row justify-between gap-4">
               {(Object.keys(languages) as Array<keyof typeof languages>).map(
                 (lang) => (
-                  <View key={lang} className="flex-row items-center space-x-1">
+                  <View key={lang} className="flex-row items-center gap-1">
                     <Checkbox
                       value={languages[lang]}
                       onValueChange={() => toggleLanguage(lang)}
@@ -1088,7 +1173,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
           <View className="border border-[#ADADAD] border-b-0 mt-4" />
 
           {/* Form Fields */}
-          <View className="px-2 mt-4 space-y-4">
+          <View className="px-2 mt-4 gap-4">
             {/* District */}
             <View>
               <TouchableOpacity
@@ -1288,10 +1373,10 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
 
           <View className="border border-[#ADADAD] border-b-0 mt-4" />
 
-          <View className="px-2 mt-4 space-y-4">
+          <View className="px-2 mt-4 gap-4">
             {/* Phone 1 */}
             <View>
-              <View className="flex-row space-x-2">
+              <View className="flex-row gap-2">
                 <TouchableOpacity
                   className="bg-[#F4F4F4] border border-[#F4F4F4] rounded-3xl px-3 h-[50px] w-20 flex-row justify-between items-center"
                   onPress={() => openCountryCodeModal("phone1")}
@@ -1332,7 +1417,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
 
             {/* Phone 2 */}
             <View>
-              <View className="flex-row space-x-2">
+              <View className="flex-row gap-2">
                 <TouchableOpacity
                   className="bg-[#F4F4F4] border border-[#F4F4F4] rounded-3xl px-3 h-[50px] w-20 flex-row justify-between items-center"
                   onPress={() => openCountryCodeModal("phone2")}
@@ -1461,7 +1546,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
         data={getDistrictsData()}
         selectedItems={selectedDistricts}
         onSelect={handleDistrictSelect}
-        searchPlaceholder={t("AddOfficer.SearchDistrict")}
+        searchPlaceholder={t("AddOfficer.SearchDistrict...")}
         doneButtonText={t("AddOfficer.Done")}
         noResultsText={t("AddOfficer.NoDistrictsFound")}
         multiSelect={true}
@@ -1476,7 +1561,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
         data={getCountryData()}
         selectedItems={[selectedCountryCode1]}
         onSelect={handleCountryCodeSelect}
-        searchPlaceholder={t("AddOfficer.SearchCountry")}
+        searchPlaceholder={t("AddOfficer.SearchCountry...")}
         doneButtonText={t("AddOfficer.Select")}
         noResultsText={t("AddOfficer.NoCountriesFound")}
         multiSelect={false}
@@ -1491,7 +1576,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
         data={getCountryData()}
         selectedItems={[selectedCountryCode2]}
         onSelect={handleCountryCodeSelect}
-        searchPlaceholder={t("AddOfficer.SearchCountry")}
+        searchPlaceholder={t("AddOfficer.SearchCountry...")}
         doneButtonText={t("AddOfficer.Select")}
         noResultsText={t("AddOfficer.NoCountriesFound")}
         multiSelect={false}

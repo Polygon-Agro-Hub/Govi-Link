@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import {
   View,
   Text,
@@ -11,7 +11,7 @@ import {
   Pressable,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RouteProp, useRoute } from "@react-navigation/native";
+import { RouteProp, useRoute, useFocusEffect } from "@react-navigation/native";
 import { RootStackParamList } from "../types/types";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -193,9 +193,12 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
     } finally {
     }
   };
-  useEffect(() => {
-    fetchclusteVisits();
-  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchclusteVisits();
+    }, [feildauditId]),
+  );
 
   const handleDial = (farmerMobile: string) => {
     const phoneUrl = `tel:${farmerMobile}`;
@@ -228,8 +231,8 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
             return (
               <Text className="text-base text-center text-gray-500 mt-1">
                 {displayCount === 1
-                  ? t("Visits.1 farm left to finish")
-                  : t("Visits.farms left to finish", { count: displayCount })}
+                  ? t("Visits.1FarmLeftToFinish")
+                  : t("Visits.CountFarmLeftToFinish", { count: displayCount })}
               </Text>
             );
           })()}
@@ -267,6 +270,7 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
                     </View>
                   ) : item.jobStatus === "Opend" ? (
                     <TouchableOpacity
+                      className="rounded-full overflow-hidden w-24"
                       onPress={() =>
                         navigation.navigate("CertificateQuesanory", {
                           auditId: item.feildauditId,
@@ -284,7 +288,7 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
                         colors={["#FF416C", "#FF4B2B"]}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 0 }}
-                        className="rounded-full w-24 py-1.5"
+                        className="py-1.5"
                       >
                         <Text className="text-white text-base font-semibold text-center">
                           {t("Visits.Open")}
@@ -395,7 +399,7 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
                       }}
                     >
                       <View
-                        className={`flex flex-row items-center justify-center rounded-full py-2 border ${
+                        className={`flex flex-row items-center justify-center rounded-full h-[50px] border ${
                           selectedItem?.latitude && selectedItem?.longitude
                             ? "border-[#F83B4F]"
                             : "border-[#9DB2CE]"
@@ -426,10 +430,10 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
                       className="flex w-1/2"
                       onPress={() => handleDial(selectedItem.farmerMobile)}
                     >
-                      <View className="flex-row items-center justify-center border border-[#F83B4F] rounded-full px-6 py-2">
+                      <View className="flex-row items-center justify-center border border-[#F83B4F] rounded-full px-6 h-[50px]">
                         <Ionicons name="call" size={20} color="#F83B4F" />
                         <Text className="text-base font-semibold  ml-2">
-                          {t("VisitPopup.Get Call")}
+                          {t("VisitPopup.GetCall")}
                         </Text>
                       </View>
                     </TouchableOpacity>
@@ -455,6 +459,10 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
               )}
 
               <TouchableOpacity
+                className="rounded-full overflow-hidden mt-4"
+                style={{
+                  marginBottom: 30,
+                }}
                 onPress={() => {
                   setShowPopup(false);
 
@@ -478,16 +486,13 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
                   colors={["#F2561D", "#FF1D85"]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
-                  className={`py-2 items-center justify-center rounded-full mt-4 ${
+                  className={`items-center justify-center rounded-full h-[50px] ${
                     i18n.language === "si"
                       ? "px-24"
                       : i18n.language === "ta"
                         ? "px-24"
                         : "px-[40%]"
                   }`}
-                  style={{
-                    marginBottom: 30,
-                  }}
                 >
                   <Text
                     className={`text-white  font-semibold ${i18n.language === "si" ? "text-base" : i18n.language === "ta" ? "text-base" : "text-lg"}`}

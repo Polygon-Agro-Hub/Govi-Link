@@ -12,7 +12,7 @@ import {
   FlatList,
   BackHandler,
 } from "react-native";
-import { MaterialIcons, AntDesign, FontAwesome } from "@expo/vector-icons";
+import { MaterialIcons, FontAwesome } from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
@@ -98,11 +98,17 @@ type ValidationRule = {
 };
 
 const validateEmail = (email: string): boolean => {
-  const generalEmailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  const generalEmailRegex =
+    /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/;
+
   if (!generalEmailRegex.test(email)) return false;
 
   const emailLower = email.toLowerCase();
   const [localPart, domain] = emailLower.split("@");
+
+  if (domain.startsWith(".") || domain.endsWith(".") || domain.includes("..")) {
+    return false;
+  }
 
   if (domain === "gmail.com" || domain === "googlemail.com") {
     if (!/^[a-zA-Z0-9.+]+$/.test(localPart)) return false;
@@ -150,21 +156,23 @@ const validateAndFormat = (
   if (rules.type === "email1" || rules.type === "email2") {
     value = value.trim();
     if (value.length === 0 && rules.type === "email1") {
-      error = rules.required ? t("Error.Email is required") : "";
+      error = rules.required ? t("Error.EmailIsRequired") : "";
     } else if (value.length > 0) {
       if (!validateEmail(value)) {
         const domain = value.toLowerCase().split("@")[1];
         error =
           domain === "gmail.com" || domain === "googlemail.com"
-            ? t("Error.Invalid Gmail address")
-            : t("Error.Invalid email address Example");
+            ? t(
+                "Error.InvalidGmailAddressGmailAddressesCannotHaveConsecutiveDotsLeadingTrailingDotsOrSpecialCharacters",
+              )
+            : t("Error.InvalidEmailAddress");
       } else if (rules.uniqueWith) {
         const isDuplicate = rules.uniqueWith.some(
           (key) =>
             formData[key]?.toLowerCase().trim() ===
               value.toLowerCase().trim() && key !== currentKey,
         );
-        if (isDuplicate) error = t("Error.Email addresses cannot be the same");
+        if (isDuplicate) error = t("Error.EmailAddressesCannotBeTheSame");
       }
     }
   }
@@ -176,19 +184,19 @@ const validateAndFormat = (
 
     if (numbersOnly.length === 0) {
       if (rules.type === "phone1" || rules.type === "familyPhone") {
-        error = t("Error.Phone number is required");
+        error = t("Error.MobileNumberIsRequired");
       }
     } else if (!numbersOnly.startsWith("7")) {
-      error = t("Error.Invalid phone number");
+      error = t("Error.InvalidMobileNumber");
     } else if (numbersOnly.length < 9) {
-      error = t("Error.Phone number must be 9 digits long");
+      error = t("Error.MobileNumberMustBe9DigitsLong");
     } else if (rules.uniqueWith) {
       const isDuplicate = rules.uniqueWith.some(
         (key) =>
           formData[key]?.replace(/[^0-9]/g, "").replace(/^0+/, "") ===
             numbersOnly && key !== currentKey,
       );
-      if (isDuplicate) error = t("Error.Phone numbers cannot be the same");
+      if (isDuplicate) error = t("Error.LandNumbersCannotBeTheSame");
     }
   }
 
@@ -208,14 +216,14 @@ const validateAndFormat = (
     value = numbersOnly;
 
     if (numbersOnly.length !== 0 && numbersOnly.length < 9) {
-      error = t("Error.Land number must be 9 digits long");
+      error = t("Error.LandNumberMustBe9DigitsLong");
     } else if (rules.uniqueWith && numbersOnly.length > 0) {
       const isDuplicate = rules.uniqueWith.some(
         (key) =>
           formData[key]?.replace(/[^0-9]/g, "").replace(/^0+/, "") ===
             numbersOnly && key !== currentKey,
       );
-      if (isDuplicate) error = t("Error.Phone numbers cannot be the same");
+      if (isDuplicate) error = t("Error.LandNumbersCannotBeTheSame");
     }
   }
 
@@ -293,10 +301,10 @@ const validateAllFields = (
   }
 
   if (!data.district) {
-    errors.district = t("Error.District is required");
+    errors.district = t("Error.DistrictIsRequired");
   }
   if (!data.province) {
-    errors.province = t("Error.Province is required");
+    errors.province = t("Error.ProvinceIsRequired");
   }
 
   return errors;
@@ -339,7 +347,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
   const [showCountryDropdown, setShowCountryDropdown] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState("Sri Lanka");
   const [displayCountry, setDisplayCountry] = useState(
-    t("InspectionForm.Sri Lanka"),
+    t("InspectionForm.SriLanka"),
   );
   const [countrySearch, setCountrySearch] = useState("");
   const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
@@ -410,9 +418,6 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
                   ] || countryObj.name.en
                 : localData.country || "Sri Lanka",
             );
-
-            const draftErrors = validateAllFields(localData, t);
-            setErrors(draftErrors);
           } else {
             setIsExistingData(false);
           }
@@ -627,16 +632,16 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
     if (Object.keys(validationErrors).length > 0) {
       setErrors((prev) => ({ ...prev, ...validationErrors }));
       Alert.alert(
-        t("Error.Validation Error"),
+        t("Error.ValidationError"),
         "• " + Object.values(validationErrors).join("\n• "),
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
       return;
     }
 
     if (!requestId) {
       Alert.alert(t("Error.Error"), "Request ID is missing", [
-        { text: t("Main.ok") },
+        { text: t("Main.OK") },
       ]);
       return;
     }
@@ -644,14 +649,14 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
     const reqId = Number(requestId);
     if (isNaN(reqId) || reqId <= 0) {
       Alert.alert(t("Error.Error"), "Invalid request ID", [
-        { text: t("Main.ok") },
+        { text: t("Main.OK") },
       ]);
       return;
     }
 
     Alert.alert(
       t("InspectionForm.Saving"),
-      t("InspectionForm.Please wait..."),
+      t("InspectionForm.PleaseWait..."),
       [],
       { cancelable: false },
     );
@@ -667,10 +672,10 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
       setIsExistingData(true);
       Alert.alert(
         t("Main.Success"),
-        t("InspectionForm.Data saved successfully"),
+        t("InspectionForm.Data saved successfuDataSavedSuccessfully"),
         [
           {
-            text: t("Main.ok"),
+            text: t("Main.OK"),
             onPress: () => {
               navigation.navigate("IDProof", {
                 formData: { inspectionpersonal: formData },
@@ -684,10 +689,10 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
     } else {
       Alert.alert(
         t("Main.Warning"),
-        t("InspectionForm.Could not save to server. Data saved locally."),
+        t("InspectionForm.CouldNotSaveToServerDataSavedLocally"),
         [
           {
-            text: t("Main.ok"),
+            text: t("Main.OK"),
           },
         ],
       );
@@ -777,7 +782,9 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
       <View className="bg-gray-100 h-[50px] rounded-3xl px-3 flex-row items-center">
         <MaterialIcons name="search" size={20} color="#666" />
         <TextInput
-          placeholder={t("AddOfficer.SearchDistrict") || "Search district..."}
+          placeholder={
+            t("AddOfficer.SearchDistrict...") || "Search district..."
+          }
           value={districtSearch}
           onChangeText={setDistrictSearch}
           className="flex-1 ml-2 text-base"
@@ -834,9 +841,9 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
   );
 
   const handleExit = () => {
-    navigation.navigate("RequestDetails", {
-      requestId,
-      requestNumber,
+    navigation.navigate("Main", {
+      screen: "MainTabs",
+      params: { screen: "CapitalRequests" },
     });
   };
 
@@ -885,7 +892,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
         >
           <View className="h-6" />
           <Input
-            label={t("InspectionForm.First Name")}
+            label={t("InspectionForm.FirstName")}
             placeholder="----"
             value={formData.firstName}
             onChangeText={(text) =>
@@ -898,7 +905,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             error={errors.firstName}
           />
           <Input
-            label={t("InspectionForm.Last Name")}
+            label={t("InspectionForm.LastName")}
             placeholder="----"
             value={formData.lastName}
             onChangeText={(text) =>
@@ -911,7 +918,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             error={errors.lastName}
           />
           <Input
-            label={t("InspectionForm.Other Names")}
+            label={t("InspectionForm.OtherNames")}
             placeholder="----"
             value={formData.otherName}
             onChangeText={(text) =>
@@ -924,7 +931,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             error={errors.otherName}
           />
           <Input
-            label={t("InspectionForm.Call Name")}
+            label={t("InspectionForm.CallName")}
             placeholder="----"
             value={formData.callName}
             onChangeText={(text) =>
@@ -940,7 +947,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           <View className="border-t border-[#CACACA] my-4 mb-8" />
 
           <Input
-            label={t("InspectionForm.Mobile Number - 1")}
+            label={t("InspectionForm.MobileNumber1")}
             placeholder="7XXXXXXXX"
             value={formData.phone1}
             onChangeText={(text) =>
@@ -956,7 +963,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             required
           />
           <Input
-            label={t("InspectionForm.Mobile Number - 2")}
+            label={t("InspectionForm.MobileNumber2")}
             placeholder="7XXXXXXXX"
             value={formData.phone2}
             onChangeText={(text) =>
@@ -970,7 +977,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             isMobile
           />
           <Input
-            label={t("InspectionForm.Mobile Number of a family member")}
+            label={t("InspectionForm.MobileNumberOfAFamilyMember")}
             placeholder="7XXXXXXXX"
             value={formData.familyPhone}
             keyboardType="phone-pad"
@@ -986,7 +993,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             required
           />
           <Input
-            label={t("InspectionForm.Land Phone Number - Home")}
+            label={t("InspectionForm.LandPhoneNumberHome")}
             placeholder="XXXXXXXXX"
             value={formData.landHome}
             onChangeText={(text) =>
@@ -1000,7 +1007,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             isMobile
           />
           <Input
-            label={t("InspectionForm.Land Phone Number - Work")}
+            label={t("InspectionForm.LandPhoneNumberWork")}
             placeholder="XXXXXXXXX"
             value={formData.landWork}
             onChangeText={(text) =>
@@ -1014,7 +1021,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             isMobile
           />
           <Input
-            label={t("InspectionForm.Email Address - 1")}
+            label={t("InspectionForm.EmailAddress1")}
             placeholder="----"
             value={formData.email1}
             onChangeText={(text) =>
@@ -1029,7 +1036,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             error={errors.email1}
           />
           <Input
-            label={t("InspectionForm.Email Address - 2")}
+            label={t("InspectionForm.EmailAddress2")}
             placeholder="----"
             value={formData.email2}
             onChangeText={(text) =>
@@ -1044,7 +1051,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           <View className="border-t border-[#CACACA] my-4 mb-8" />
 
           <Input
-            label={t("InspectionForm.House / Plot Number")}
+            label={t("InspectionForm.HousePlotNumber")}
             placeholder="----"
             value={formData.house}
             onChangeText={(text) =>
@@ -1057,7 +1064,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             error={errors.house}
           />
           <Input
-            label={t("InspectionForm.Street Name")}
+            label={t("InspectionForm.StreetName")}
             placeholder="----"
             value={formData.street}
             onChangeText={(text) =>
@@ -1070,7 +1077,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             error={errors.street}
           />
           <Input
-            label={t("InspectionForm.City / Town Name")}
+            label={t("InspectionForm.CityTownName")}
             placeholder="----"
             value={formData.cityName}
             onChangeText={(text) =>
@@ -1097,9 +1104,9 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
                 <Text
                   className={`text-base ${selectedCountry ? "text-black" : "text-[#838B8C]"}`}
                 >
-                  {displayCountry || t("InspectionForm.-- Select Country --")}
+                  {displayCountry || t("InspectionForm.SelectCountry")}
                 </Text>
-                <AntDesign name="down" size={20} color="#838B8C" />
+                <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
               </View>
             </TouchableOpacity>
           </View>
@@ -1122,9 +1129,13 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
                     >
                       {selectedDistrict
                         ? t(`Districts.${selectedDistrict}`)
-                        : t("InspectionForm.-- Select District --")}
+                        : t("InspectionForm.SelectDistrict")}
                     </Text>
-                    <AntDesign name="down" size={20} color="#838B8C" />
+                    <MaterialIcons
+                      name="arrow-drop-down"
+                      size={24}
+                      color="#666"
+                    />
                   </View>
                 </TouchableOpacity>
                 {errors.district && (
@@ -1152,7 +1163,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
                   >
                     {selectedProvince
                       ? displayProvince
-                      : t("InspectionForm.-- Select Province --")}
+                      : t("InspectionForm.SelectProvince")}
                   </Text>
                 </View>
               </View>
@@ -1168,7 +1179,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
         onRequestClose={() => setShowDistrictDropdown(false)}
       >
         <View className="flex-1 bg-black/50 justify-center items-center">
-          <View className="bg-white rounded-2xl w-11/12 max-h-3/4">
+          <View className="bg-white rounded-2xl w-10/12 max-h-3/4">
             <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
               <Text className="text-lg font-semibold">
                 {t("AddOfficer.SelectDistricts")}
@@ -1189,7 +1200,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
               ListEmptyComponent={
                 <View className="px-4 py-8 items-center">
                   <Text className="text-gray-500 text-base">
-                    {t("AddOfficer.NoDistrictsFound") || "No districts found"}
+                    {t("AddOfficer.NoDistrictsFound")}
                   </Text>
                 </View>
               }
@@ -1205,7 +1216,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
         onRequestClose={() => setShowCountryDropdown(false)}
       >
         <View className="flex-1 bg-black/50 justify-center items-center">
-          <View className="bg-white rounded-2xl w-11/12 max-h-3/4">
+          <View className="bg-white rounded-2xl w-10/12 max-h-3/4">
             <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
               <Text className="text-lg font-semibold">
                 {t("AddOfficer.SelectCountry")}
@@ -1218,7 +1229,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             {renderSearchInput(
               countrySearch,
               setCountrySearch,
-              t("AddOfficer.SearchCountry") || "Search country...",
+              t("AddOfficer.SearchCountry..."),
             )}
 
             <FlatList

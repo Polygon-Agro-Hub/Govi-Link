@@ -65,12 +65,27 @@ const AddOnboardSupplier: React.FC<AddOnboardSupplierProps> = ({
     return true;
   };
 
+  const validateDomainStructure = (domain: string): boolean => {
+    if (!domain) return false;
+    if (domain.startsWith(".") || domain.endsWith(".")) return false;
+    if (domain.includes("..")) return false;
+
+    const labels = domain.split(".");
+    if (labels.length < 2) return false;
+
+    const labelRegex = /^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?$/;
+    return labels.every((label) => labelRegex.test(label));
+  };
+
   const validateEmail = (value: string): boolean => {
     const generalRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!generalRegex.test(value)) return false;
 
     const emailLower = value.toLowerCase();
     const [localPart, domain] = emailLower.split("@");
+
+    if (!validateDomainStructure(domain)) return false;
+
     const allowedTLDs = [".com", ".gov", ".lk"];
 
     if (domain === "gmail.com" || domain === "googlemail.com")
@@ -89,13 +104,13 @@ const AddOnboardSupplier: React.FC<AddOnboardSupplierProps> = ({
     if (digits.length === 0) {
       clearError("contact");
     } else if (digits.length === 1 && digits !== "0") {
-      setError("contact", t("Error.Invalid phone number"));
+      setError("contact", t("Error.InvalidMobileNumber"));
     } else if (digits.length >= 2 && !digits.startsWith("07")) {
-      setError("contact", t("Error.Invalid phone number"));
+      setError("contact", t("Error.InvalidMobileNumber"));
     } else if (digits.length < 10) {
-      setError("contact", t("Error.Phone number must be 10 digits"));
+      setError("contact", t("Error.PhoneNumberMustBe10Digits"));
     } else if (!validatePhoneNumber(digits)) {
-      setError("contact", t("Error.Invalid phone number"));
+      setError("contact", t("Error.InvalidMobileNumber"));
     } else {
       clearError("contact");
     }
@@ -112,7 +127,7 @@ const AddOnboardSupplier: React.FC<AddOnboardSupplierProps> = ({
     } else if (!validateNicNumber(filtered)) {
       setError(
         "nic",
-        t("Error.NIC Number must be 9 digits followed by 'V' or 12 digits."),
+        t("Error.NicNumberMustBe9DigitsFollowedByVOr12Digits"),
       );
     } else {
       clearError("nic");
@@ -132,9 +147,9 @@ const AddOnboardSupplier: React.FC<AddOnboardSupplierProps> = ({
     if (!validateEmail(trimmed)) {
       const domain = trimmed.toLowerCase().split("@")[1];
       if (domain === "gmail.com" || domain === "googlemail.com") {
-        setError("email", t("Error.Invalid Gmail address"));
+        setError("email", t("Error.InvalidGmailAddressGmailAddressesCannotHaveConsecutiveDotsLeadingTrailingDotsOrSpecialCharacters"));
       } else {
-        setError("email", t("Error.Invalid email address Example"));
+        setError("email", t("Error.InvalidEmailAddress"));
       }
     } else {
       clearError("email");
@@ -146,29 +161,29 @@ const AddOnboardSupplier: React.FC<AddOnboardSupplierProps> = ({
 
     if (!supplierName.trim())
       newErrors.supplierName = t(
-        "OnboardSupplier.Supplier Full Name is required",
+        "OnboardSupplier.SupplierFullNameIsRequired",
       );
 
     if (!contact.trim()) {
-      newErrors.contact = t("Error.Phone number is required");
+      newErrors.contact = t("Error.MobileNumberIsRequired");
     } else if (contact.length < 10) {
-      newErrors.contact = t("Error.Phone number must be 10 digits long");
+      newErrors.contact = t("Error.PhoneNumberMustBe10Digits");
     } else if (!validatePhoneNumber(contact)) {
-      newErrors.contact = t("Error.Invalid phone number");
+      newErrors.contact = t("Error.InvalidMobileNumber");
     }
 
     if (!nic.trim()) {
-      newErrors.nic = t("Error.NIC is required");
+      newErrors.nic = t("Error.NicNumberIsRequired");
     } else if (!validateNicNumber(nic)) {
       newErrors.nic = t(
-        "Error.NIC Number must be 9 digits followed by 'V' or 12 digits.",
+        "Error.NicNumberMustBe9DigitsFollowedByVOr12Digits",
       );
     }
 
     if (!email.trim()) {
-      newErrors.email = t("Error.Email is required");
+      newErrors.email = t("Error.EmailIsRequired");
     } else if (!validateEmail(email)) {
-      newErrors.email = t("Error.Invalid email address Example");
+      newErrors.email = t("Error.InvalidEmailAddress");
     }
 
     return newErrors;
@@ -181,7 +196,7 @@ const AddOnboardSupplier: React.FC<AddOnboardSupplierProps> = ({
         Alert.alert(
           t("Error.Sorry"),
           t(
-            "Error.Your login session has expired. Please log in again to continue.",
+            "Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue",
           ),
         );
         return false;
@@ -200,12 +215,12 @@ const AddOnboardSupplier: React.FC<AddOnboardSupplierProps> = ({
       const duplicateErrors: Record<string, string> = {};
       if (contactExists)
         duplicateErrors.contact = t(
-          "Error.This phone number is already registered",
+          "Error.ThisPhoneNumberIsAlreadyRegistered",
         );
       if (emailExists)
-        duplicateErrors.email = t("Error.This email is already registered");
+        duplicateErrors.email = t("Error.ThisEmailIsAlreadyRegistered");
       if (nicExists)
-        duplicateErrors.nic = t("Error.This NIC is already registered");
+        duplicateErrors.nic = t("Error.ThisNicIsAlreadyRegistered");
 
       if (Object.keys(duplicateErrors).length > 0) {
         setErrors((prev) => ({ ...prev, ...duplicateErrors }));
@@ -270,7 +285,7 @@ const AddOnboardSupplier: React.FC<AddOnboardSupplierProps> = ({
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <CustomHeader
-        title={t("OnboardSupplier.Onboard Supplier")}
+        title={t("OnboardSupplier.OnboardSupplier")}
         navigation={navigation}
         showBackButton={true}
         onBackPress={() => navigation.goBack()}
@@ -289,7 +304,7 @@ const AddOnboardSupplier: React.FC<AddOnboardSupplierProps> = ({
           <View>
             <TextInput
               className={inputCls("supplierName")}
-              placeholder={t("OnboardSupplier.Supplier Full Name")}
+              placeholder={t("OnboardSupplier.SupplierFullName")}
               placeholderTextColor="#7D7D7D"
               value={supplierName}
               onChangeText={(text) => {
@@ -302,7 +317,7 @@ const AddOnboardSupplier: React.FC<AddOnboardSupplierProps> = ({
                 if (!filtered.trim()) {
                   setError(
                     "supplierName",
-                    t("OnboardSupplier.Supplier Full Name is required"),
+                    t("OnboardSupplier.SupplierFullNameIsRequired"),
                   );
                 } else {
                   clearError("supplierName");
@@ -336,7 +351,7 @@ const AddOnboardSupplier: React.FC<AddOnboardSupplierProps> = ({
           <View>
             <TextInput
               className={inputCls("email")}
-              placeholder={t("OnboardSupplier.Email Address")}
+              placeholder={t("OnboardSupplier.EmailAddress")}
               placeholderTextColor="#7D7D7D"
               keyboardType="email-address"
               autoCapitalize="none"
@@ -353,7 +368,7 @@ const AddOnboardSupplier: React.FC<AddOnboardSupplierProps> = ({
           <View>
             <TextInput
               className={inputCls("nic")}
-              placeholder={t("OnboardSupplier.NIC Number")}
+              placeholder={t("OnboardSupplier.NICNumber")}
               placeholderTextColor="#7D7D7D"
               autoCapitalize="characters"
               value={nic}
@@ -404,6 +419,7 @@ const AddOnboardSupplier: React.FC<AddOnboardSupplierProps> = ({
                 shadowOpacity: 0.25,
                 shadowRadius: 10,
                 elevation: 6,
+                overflow: "hidden",
               }}
             >
               <TouchableOpacity

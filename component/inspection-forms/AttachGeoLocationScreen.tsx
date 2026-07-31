@@ -67,9 +67,9 @@ const AttachGeoLocationScreen: React.FC<AttachGeoLocationScreenProps> = ({
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
         Alert.alert(
-          t("Error.Permission Denied"),
-          t("Error.Location permission is required to use this feature."),
-          [{ text: t("Main.ok") }],
+          t("Error.PermissionDenied"),
+          t("Error.LocationPermissionIsRequiredToUseThisFeature"),
+          [{ text: t("Main.OK") }],
         );
         setIsLoading(false);
         return;
@@ -101,8 +101,8 @@ const AttachGeoLocationScreen: React.FC<AttachGeoLocationScreenProps> = ({
       console.error("Error getting location:", error);
       Alert.alert(
         t("Error.Error"),
-        t("Error.Unable to get your current location"),
-        [{ text: t("Main.ok") }],
+        t("Error.UnableToGetYourCurrentLocation"),
+        [{ text: t("Main.OK") }],
       );
     } finally {
       setIsLoading(false);
@@ -246,14 +246,14 @@ const AttachGeoLocationScreen: React.FC<AttachGeoLocationScreenProps> = ({
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
       {/* Header */}
       <CustomHeader
-        title={t("InspectionForm.Attach Geo Location")}
+        title={t("InspectionForm.AttachGeoLocation")}
         navigation={navigation}
         showBackButton={true}
         onBackPress={() => navigation.goBack()}
       />
       <View className="items-center justify-center mt-[2%]">
         <Text className="text-[#828282]">
-          {t("InspectionForm.Tap on the map to select a location.")}
+          {t("InspectionForm.TapOnTheMapToSelectALocation")}
         </Text>
       </View>
 
@@ -316,7 +316,7 @@ const AttachGeoLocationScreen: React.FC<AttachGeoLocationScreenProps> = ({
             ) : (
               <>
                 <Text className="text-white font-semibold ml-2 text-base">
-                  {t("InspectionForm.Use My Location")}
+                  {t("InspectionForm.UseMyLocation")}
                 </Text>
               </>
             )}
@@ -339,11 +339,12 @@ const AttachGeoLocationScreen: React.FC<AttachGeoLocationScreenProps> = ({
               shadowOpacity: 0.25,
               shadowRadius: 5,
               elevation: 6,
+              overflow: "hidden",
             }}
           >
             <MaterialIcons name="done" size={24} color="#fff" />
             <Text className="text-white text-base font-semibold ml-2">
-              {t("InspectionForm.Confirm Now")}
+              {t("InspectionForm.ConfirmNow")}
             </Text>
           </LinearGradient>
         </TouchableOpacity>
@@ -388,7 +389,7 @@ const AttachGeoLocationScreen: React.FC<AttachGeoLocationScreenProps> = ({
               }}
               className="mt-4"
             >
-              {t("InspectionForm.Attaching your geo location..")}
+              {t("InspectionForm.AttachingYourGeoLocation...")}
             </Text>
           </View>
         </View>

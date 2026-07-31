@@ -383,17 +383,16 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
             }
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
-            className={`flex-row items-center px-2 pl-3 h-10 rounded-full mr-2 border ${
-              isOverdueSelected ? "border-transparent" : "border-[#F83B4F]"
-            }`}
+            className={`flex-row items-center px-2 pl-3 h-10 rounded-full mr-2 border ${isOverdueSelected ? "border-transparent" : "border-[#F83B4F]"
+              }`}
+            style={{ overflow: "hidden" }}
           >
             <View className="flex-row items-center">
               <Text
-                className={`font-semibold mr-2 ${
-                  isOverdueSelected ? "text-white" : "text-[#F83B4F]"
-                }`}
+                className={`font-semibold mr-2 ${isOverdueSelected ? "text-white" : "text-[#F83B4F]"
+                  }`}
               >
-                {t("Visits.Over Due")}
+                {t("Visits.OverDue")}
               </Text>
               {isOverdueSelected && (
                 <View className="bg-white rounded-full w-6 h-6 items-center justify-center">
@@ -419,15 +418,14 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
             }
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
-            className={`flex-row items-center px-2 pl-3 h-10 rounded-full mr-2 border ${
-              !isOverdueSelected ? "border-transparent" : "border-[#F83B4F]"
-            }`}
+            className={`flex-row items-center px-2 pl-3 h-10 rounded-full mr-2 border ${!isOverdueSelected ? "border-transparent" : "border-[#F83B4F]"
+              }`}
+            style={{ overflow: "hidden" }}
           >
             <View className="flex-row items-center">
               <Text
-                className={`font-semibold mr-2 ${
-                  !isOverdueSelected ? "text-white" : "text-[#F83B4F]"
-                }`}
+                className={`font-semibold mr-2 ${!isOverdueSelected ? "text-white" : "text-[#F83B4F]"
+                  }`}
               >
                 {t("Visits.Today")}
               </Text>
@@ -444,45 +442,59 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
       </View>
 
       {selectedJobs.length > 0 && (
-        <View className="flex-row p-4 justify-between items-center space-x-6">
-          <View className="flex-1"></View>
-          <View className="flex-1 items-center">
-            <TouchableOpacity onPress={handleStartJob}>
-              <LinearGradient
-                colors={["#F2561D", "#FF1D85"]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                className="flex-row p-3 rounded-full items-center justify-center min-w-[120px]"
-              >
-                <Text
-                  className={`text-white  font-bold ${i18n.language === "si" ? "text-base" : i18n.language === "ta" ? "text-base" : "text-lg"}`}
-                >
-                  {t("AssignJobOfficerList.Start")}
-                </Text>
-              </LinearGradient>
-            </TouchableOpacity>
-          </View>
-          <View className="flex-1 pr-6">
-            <TouchableOpacity
-              onPress={handleAssignJobs}
-              className=" bg-black px-auto p-3 min-w-[120px] rounded-3xl items-center justify-center"
+        <View className="flex-row px-6 py-3 gap-4 bg-white border-t border-gray-100">
+          <View className="flex-1" />
+          <TouchableOpacity
+            onPress={handleStartJob}
+            className="flex-1 rounded-full overflow-hidden"
+            style={{
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 3 },
+              shadowOpacity: 0.25,
+              shadowRadius: 5,
+              elevation: 6,
+            }}
+          >
+            <LinearGradient
+              colors={["#F2561D", "#FF1D85"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              className="w-full h-[50px] rounded-full items-center justify-center"
             >
               <Text
-                className={`text-white  font-bold ${i18n.language === "si" ? "text-base" : i18n.language === "ta" ? "text-base" : "text-lg"}`}
+                className={`text-white font-bold ${i18n.language === "si" ? "text-base" : i18n.language === "ta" ? "text-base" : "text-lg"}`}
               >
-                {t("AssignJobOfficerList.AssignButton")}
+                {t("AssignJobOfficerList.Start")}
               </Text>
-            </TouchableOpacity>
-          </View>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={handleAssignJobs}
+            className="flex-1 bg-black rounded-full items-center justify-center h-[50px]"
+            style={{
+              shadowColor: "#000000",
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.25,
+              shadowRadius: 10,
+              elevation: 6,
+            }}
+          >
+            <Text
+              className={`text-white font-bold ${i18n.language === "si" ? "text-base" : i18n.language === "ta" ? "text-base" : "text-lg"}`}
+            >
+              {t("AssignJobOfficerList.Assign")}
+            </Text>
+          </TouchableOpacity>
         </View>
       )}
 
       {loading ? (
-        <View className="flex-1 justify-center items-center mt-6 px-4 bg-white rounded-t-3xl">
+        <View className="flex-1 justify-center items-center mt-6 px-6 bg-white rounded-t-3xl">
           <ActivityIndicator size="large" color="#FF1D85" />
         </View>
       ) : visits.length > 0 ? (
-        <ScrollView className="flex-1 mt-4 px-4 bg-white rounded-t-3xl mb-20">
+        <ScrollView className="flex-1 mt-4 px-6 bg-white rounded-t-3xl mb-20">
           {visits.map((item) => (
             <TouchableOpacity
               key={item.jobId}
@@ -503,11 +515,10 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
                       e.stopPropagation();
                       toggleJobSelection(item.jobId);
                     }}
-                    className={`w-5 h-5 rounded-sm border-2 flex items-center justify-center mr-3 my-auto ${
-                      selectedJobs.includes(item.jobId)
-                        ? "bg-black border-black"
-                        : "bg-white border-gray-400"
-                    }`}
+                    className={`w-5 h-5 rounded-sm border-2 flex items-center justify-center mr-3 my-auto ${selectedJobs.includes(item.jobId)
+                      ? "bg-black border-black"
+                      : "bg-white border-gray-400"
+                      }`}
                   >
                     {selectedJobs.includes(item.jobId) && (
                       <AntDesign name="check" size={14} color="white" />
@@ -530,7 +541,7 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
           ))}
         </ScrollView>
       ) : (
-        <NoDataComponent message={t("Visits.No Jobs Available")} />
+        <NoDataComponent message={t("Visits.NoJobsAvailable")} />
       )}
 
       <Modal
@@ -610,11 +621,10 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
                       }}
                     >
                       <View
-                        className={`flex flex-row items-center justify-center rounded-full py-2 border ${
-                          selectedItem?.latitude && selectedItem?.longitude
-                            ? "border-[#F83B4F]"
-                            : "border-[#9DB2CE]"
-                        }`}
+                        className={`flex flex-row items-center justify-center rounded-full h-[50px] border ${selectedItem?.latitude && selectedItem?.longitude
+                          ? "border-[#F83B4F]"
+                          : "border-[#9DB2CE]"
+                          }`}
                       >
                         <FontAwesome6
                           name="location-dot"
@@ -626,11 +636,10 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
                           }
                         />
                         <Text
-                          className={`text-base font-semibold ml-2 ${
-                            selectedItem?.latitude && selectedItem?.longitude
-                              ? "text-[#000000]"
-                              : "text-[#9DB2CE]"
-                          }`}
+                          className={`text-base font-semibold ml-2 ${selectedItem?.latitude && selectedItem?.longitude
+                            ? "text-[#000000]"
+                            : "text-[#9DB2CE]"
+                            }`}
                         >
                           {t("VisitPopup.Location")}
                         </Text>
@@ -641,10 +650,10 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
                       className="flex w-1/2"
                       onPress={() => handleDial(selectedItem.farmerMobile)}
                     >
-                      <View className="flex-row items-center justify-center border border-[#F83B4F] rounded-full px-6 py-2">
+                      <View className="flex-row items-center justify-center border border-[#F83B4F] rounded-full px-6 h-[50px]">
                         <Ionicons name="call" size={20} color="#F83B4F" />
                         <Text className="text-base font-semibold ml-2">
-                          {t("VisitPopup.Get Call")}
+                          {t("VisitPopup.GetCall")}
                         </Text>
                       </View>
                     </TouchableOpacity>
@@ -653,22 +662,22 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
                   {(selectedItem.city ||
                     selectedItem.plotNo ||
                     selectedItem.street) && (
-                    <View className="flex text-center justify-center items-center">
-                      <Text className="text-sm font-semibold text-[#4E6393] mb-2">
-                        {t("VisitPopup.Address")}
-                      </Text>
-                      <Text className="text-base font-medium text-[#434343]">
-                        {selectedItem.plotNo}, {selectedItem.street},
-                      </Text>
-                      <Text className="text-base font-medium text-[#434343]">
-                        {selectedItem.city}
-                      </Text>
-                    </View>
-                  )}
+                      <View className="flex text-center justify-center items-center">
+                        <Text className="text-sm font-semibold text-[#4E6393] mb-2">
+                          {t("VisitPopup.Address")}
+                        </Text>
+                        <Text className="text-base font-medium text-[#434343]">
+                          {selectedItem.plotNo}, {selectedItem.street},
+                        </Text>
+                        <Text className="text-base font-medium text-[#434343]">
+                          {selectedItem.city}
+                        </Text>
+                      </View>
+                    )}
                 </>
               )}
 
-              <View className="flex-row justify-between w-full mt-6 px-4 gap-x-4">
+              <View className="flex-row justify-between w-full mt-6 px-4 gap-x-4 pb-10">
                 <TouchableOpacity
                   className="flex-1"
                   onPress={handleStartJobFromModal}
@@ -677,7 +686,8 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
                     colors={["#F2561D", "#FF1D85"]}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
-                    className="py-3 items-center justify-center rounded-full"
+                    className="items-center justify-center rounded-full h-[50px]"
+                    style={{ overflow: "hidden" }}
                   >
                     <Text
                       className={`text-white  font-semibold ${i18n.language === "si" ? "text-base" : i18n.language === "ta" ? "text-base" : "text-lg"}`}

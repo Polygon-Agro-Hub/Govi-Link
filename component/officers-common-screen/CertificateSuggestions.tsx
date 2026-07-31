@@ -12,11 +12,10 @@ import {
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../types/types";
-import { AntDesign, Entypo, FontAwesome5 } from "@expo/vector-icons";
+import { Entypo, FontAwesome5 } from "@expo/vector-icons";
 import axios from "axios";
 import { environment } from "@/environment/environment";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { LinearGradient } from "expo-linear-gradient";
 import { useTranslation } from "react-i18next";
 import ContentLoader, { Rect } from "react-content-loader/native";
 import {
@@ -24,6 +23,8 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import CustomHeader from "../commons/CustomHeader";
+import FormFooterButton from "../inspection-forms/FormFooterButton";
+
 type CertificateSuggestionsNavigationProp = StackNavigationProp<
   RootStackParamList,
   "CertificateSuggestions"
@@ -122,6 +123,7 @@ const LoadingSkeleton = () => {
     </View>
   );
 };
+
 const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
   navigation,
 }) => {
@@ -175,8 +177,8 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
     if (!item.problem.trim() || !item.solution.trim()) {
       Alert.alert(
         t("Error.Sorry"),
-        t("CertificateSuggestions.Both problem and solution must be filled."),
-        [{ text: t("Main.ok") }],
+        t("CertificateSuggestions.BothProblemAndSolutionMustBeFilled"),
+        [{ text: t("Main.OK") }],
       );
       return;
     }
@@ -188,9 +190,9 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
         Alert.alert(
           t("Error.Sorry"),
           t(
-            "Error.Your login session has expired. Please log in again to continue.",
+            "Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue",
           ),
-          [{ text: t("Main.ok") }],
+          [{ text: t("Main.OK") }],
         );
         return;
       }
@@ -227,14 +229,14 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
       } else {
         Alert.alert(
           t("Error.Sorry"),
-          t("CertificateSuggestions.Failed to save problem."),
-          [{ text: t("Main.ok") }],
+          t("CertificateSuggestions.FailedToSaveProblem"),
+          [{ text: t("Main.OK") }],
         );
       }
     } catch (err) {
       console.error("Error saving/updating problem:", err);
-      Alert.alert(t("Error.Sorry"), t("Main.somethingWentWrong"), [
-        { text: t("Main.ok") },
+      Alert.alert(t("Error.Sorry"), t("Main.SomethingWentWrongPleaseTryAgainLater"), [
+        { text: t("Main.OK") },
       ]);
     } finally {
       setLoading(false);
@@ -253,9 +255,9 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
         Alert.alert(
           t("Error.Sorry"),
           t(
-            "Error.Your login session has expired. Please log in again to continue.",
+            "Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue",
           ),
-          [{ text: t("Main.ok") }],
+          [{ text: t("Main.OK") }],
         );
         return;
       }
@@ -335,9 +337,9 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
       setIsButtonDisabled(false);
       setOtpSendLoading(false);
     } catch (error) {
-      Alert.alert(t("Main.error"), t("SignupForum.otpSendFailed"), [
+      Alert.alert(t("Main.Sorry"), t("SignupForum.otpSendFailed"), [
         {
-          text: t("Main.ok"),
+          text: t("Main.OK"),
         },
       ]);
       setOtpSendLoading(false);
@@ -345,33 +347,66 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
       setOtpSendLoading(false);
     }
   };
+
+
+  const handleExit = () => {
+    const hasUnsaved = problems.some(
+      (p) =>
+        !p.saved &&
+        (p.problem.trim() !== "" || p.solution.trim() !== "")
+    );
+
+    if (hasUnsaved) {
+      Alert.alert(
+        t("CertificateSuggestions.UnsavedProblem"),
+        t(
+          "CertificateSuggestions.You have unsaved problems. Do you want to go back without saving?",
+        ),
+        [
+          {
+            text: t("CertificateQuesanory.Cancel"),
+            style: "cancel",
+          },
+          {
+            text: t("CertificateSuggestions.Go Back"),
+            onPress: () => navigation.goBack(),
+          },
+        ],
+      );
+    } else {
+      navigation.goBack();
+    }
+  };
+
   return (
     <KeyboardAvoidingView
       className="flex-1 bg-white"
       behavior={Platform.OS === "ios" ? "padding" : undefined}
+      style={{ flex: 1 }}
     >
       <CustomHeader
         title={`#${jobId}`}
         navigation={navigation}
         showBackButton={true}
-        onBackPress={() => navigation.goBack()}
+        onBackPress={handleExit}
       />
       <View className="shadow-sm border-b border-[#E5E5E5]" />
 
       <View className="px-6 mt-6">
         <Text className="text-center text-[#3B424C]">
           {t(
-            "CertificateSuggestions.Please mention identified problems and suggestions you made below.",
+            "CertificateSuggestions.PleaseMentionIdentifiedProblemsAndSuggestionsYouMadeBelow",
           )}
         </Text>
       </View>
+
       {loading ? (
         <LoadingSkeleton />
       ) : (
         <ScrollView
           className="p-6 flex-1"
           keyboardShouldPersistTaps="handled"
-          contentContainerStyle={{ paddingBottom: 120 }}
+          contentContainerStyle={{ paddingBottom: 20 }}
         >
           {problems.map((item, index) => (
             <View key={item.id} className="mb-6">
@@ -401,12 +436,12 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
 
                   <View className="border border-[#9DB2CE] p-4 rounded-md">
                     <Text className="text-base font-semibold mb-2 mt-1">
-                      {t("CertificateSuggestions.Identified Problem")}
+                      {t("CertificateSuggestions.IdentifiedProblem")}
                     </Text>
                     <TextInput
-                      className="border border-[#9DB2CE] rounded-3xl p-2 mb-4"
+                      className="border border-[#9DB2CE] rounded-lg p-2 mb-4"
                       multiline
-                      placeholder={t("CertificateSuggestions.Type here...")}
+                      placeholder={t("CertificateSuggestions.TypeHere...")}
                       textAlignVertical="top"
                       value={item.problem}
                       onChangeText={(text) =>
@@ -416,12 +451,12 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
                     />
 
                     <Text className="text-base font-semibold mb-2">
-                      {t("CertificateSuggestions.Suggested Solution")}
+                      {t("CertificateSuggestions.SuggestedSolution")}
                     </Text>
                     <TextInput
-                      className="border border-[#9DB2CE] rounded-3xl p-2 mb-4"
+                      className="border border-[#9DB2CE] rounded-lg p-2 mb-4"
                       multiline
-                      placeholder={t("CertificateSuggestions.Type here...")}
+                      placeholder={t("CertificateSuggestions.TypeHere...")}
                       textAlignVertical="top"
                       value={item.solution}
                       onChangeText={(text) =>
@@ -431,17 +466,17 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
                     />
 
                     <TouchableOpacity
-                      className="bg-[#1A1A1A] p-4 rounded-3xl w-full flex justify-center items-center mb-1"
+                      className="bg-[#1A1A1A] rounded-3xl w-full flex justify-center items-center h-[50px] mb-1"
                       onPress={() => handleSaveProblem(item)}
                     >
                       <Text className="text-white text-center font-semibold text-base">
                         {item.saved
                           ? t("CertificateSuggestions.Update")
-                          : t("CertificateSuggestions.Save Problem")}
+                          : t("CertificateSuggestions.SaveProblem")}
                       </Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                      className="bg-[#C4C4C4] p-4 rounded-3xl w-full flex-1 justify-center items-center mt-2"
+                      className="bg-[#C4C4C4] rounded-3xl w-full justify-center items-center h-[50px] mt-2"
                       onPress={() => handleCancelEdit(item.id)}
                     >
                       <Text className="text-white text-center font-semibold text-base">
@@ -453,91 +488,60 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
               )}
             </View>
           ))}
-          <View className="items-center mt-2">
+
+          <View className="items-center mt-2 mb-4">
             <TouchableOpacity
-              className={`bg-[#1A1A1A] h-[50px] w-2/3 flex-row rounded-3xl flex justify-center items-center ${
-                editingId !== null || problems.some((p) => !p.saved)
-                  ? "opacity-50"
-                  : ""
-              }`}
+              className={`bg-[#1A1A1A] h-[50px] w-2/3 flex-row rounded-3xl flex justify-center items-center ${editingId !== null || problems.some((p) => !p.saved)
+                ? "opacity-50"
+                : ""
+                }`}
               onPress={handleAddProblem}
               disabled={editingId !== null || problems.some((p) => !p.saved)}
             >
               <Entypo name="plus" size={25} color="white" />
-
-              <Text className="text-white text-center font-semibold text-lg">
-                {t("CertificateSuggestions.Add more")}
+              <Text className="text-white text-center font-semibold text-lg ml-2">
+                {t("CertificateSuggestions.AddMore")}
               </Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
       )}
-      <View className="flex-row justify-between p-4 border-t border-gray-200 px-6">
-        <TouchableOpacity
-          className="flex-row items-center bg-[#444444] px-10 h-[50px] rounded-3xl "
-          onPress={() => navigation.goBack()}
-        >
-          <AntDesign name="arrow-left" size={20} color="#fff" />
-          <Text className="ml-3 text-white font-semibold text-lg">
-            {t("CertificateQuesanory.Back")}
-          </Text>
-        </TouchableOpacity>
-        {loading || editingId !== null ? (
-          <View className="flex-row items-center px-11 h-[50px] rounded-3xl bg-[#C4C4C4] ">
-            <Text className="mr-2 text-white font-semibold text-lg">
-              {t("CertificateQuesanory.Next")}
-            </Text>
-            <AntDesign name="arrow-right" size={20} color="#fff" />
-          </View>
-        ) : (
-          <>
-            <TouchableOpacity
-              disabled={loading}
-              onPress={() => {
-                const hasUnsaved = problems.some(
-                  (p) =>
-                    !p.saved &&
-                    (p.problem.trim() !== "" || p.solution.trim() !== ""),
-                );
 
-                if (hasUnsaved) {
-                  Alert.alert(
-                    t("CertificateSuggestions.Unsaved Problem"),
-                    t(
-                      "CertificateSuggestions.You have unsaved problems. Do you want to continue without saving?",
-                    ),
-                    [
-                      {
-                        text: t("CertificateQuesanory.Cancel"),
-                        style: "cancel",
-                      },
-                      {
-                        text: t("CertificateSuggestions.Continue"),
-                        onPress: () => handleNext(),
-                      },
-                    ],
-                  );
-                } else {
-                  handleNext();
-                }
-              }}
-              className="rounded-full overflow-hidden"
-            >
-              <LinearGradient
-                colors={["#F35125", "#FF1D85"]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                className="flex-row items-center px-10 h-[50px] rounded-3xl"
-              >
-                <Text className="mr-4 text-white font-semibold text-lg">
-                  {t("CertificateQuesanory.Next")}
-                </Text>
-                <AntDesign name="arrow-right" size={20} color="#fff" />
-              </LinearGradient>
-            </TouchableOpacity>
-          </>
-        )}
-      </View>
+      {/* Form Footer Button with same design as reference */}
+      <FormFooterButton
+        exitText={t("CertificateQuesanory.Back")}
+        nextText={t("CertificateQuesanory.Next")}
+        isNextEnabled={!OtpSendLoading}
+        onExit={handleExit}
+        onNext={() => {
+          const hasUnsaved = problems.some(
+            (p) =>
+              !p.saved &&
+              (p.problem.trim() !== "" || p.solution.trim() !== "")
+          );
+
+          if (hasUnsaved) {
+            Alert.alert(
+              t("CertificateSuggestions.UnsavedProblem"),
+              t(
+                "CertificateSuggestions.YouHaveUnsavedProblemsDoYouWantToContinueWithoutSaving",
+              ),
+              [
+                {
+                  text: t("CertificateQuesanory.Cancel"),
+                  style: "cancel",
+                },
+                {
+                  text: t("CertificateSuggestions.Continue"),
+                  onPress: () => handleNext(),
+                },
+              ],
+            );
+          } else {
+            handleNext();
+          }
+        }}
+      />
     </KeyboardAvoidingView>
   );
 };

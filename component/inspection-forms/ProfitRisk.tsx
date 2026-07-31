@@ -11,7 +11,7 @@ import {
   Modal,
   BackHandler,
 } from "react-native";
-import { AntDesign, FontAwesome } from "@expo/vector-icons";
+import { AntDesign, FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
 import { useTranslation } from "react-i18next";
 import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
@@ -25,6 +25,31 @@ import {
   ProfitRiskData,
 } from "@/database/inspectionprofit";
 import { updateLastScreen } from "@/database/inspectionprogress";
+
+// Helper function to format number with commas
+const formatNumberWithCommas = (value: string): string => {
+  // Remove all non-digit characters except decimal point
+  const cleanValue = value.replace(/[^0-9.]/g, "");
+
+  // Split into integer and decimal parts
+  const parts = cleanValue.split(".");
+  let integerPart = parts[0];
+  const decimalPart = parts[1] ? "." + parts[1] : "";
+
+  // Remove leading zeros
+  integerPart = integerPart.replace(/^0+/, "");
+  if (integerPart === "") integerPart = "0";
+
+  // Add commas to integer part
+  integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+  return integerPart + decimalPart;
+};
+
+// Helper function to parse formatted number back to raw number string
+const parseFormattedNumber = (formattedValue: string): string => {
+  return formattedValue.replace(/,/g, "");
+};
 
 const ErrorMessage = ({ message }: { message?: string }) => {
   if (!message) return null;
@@ -158,7 +183,7 @@ const YesNoSelect = ({
         </Text>
 
         <TouchableOpacity
-          className="bg-[#F6F6F6] rounded-full px-4 py-4 flex-row items-center justify-between"
+          className="bg-[#F6F6F6] rounded-full px-4 h-[50px] flex-row items-center justify-between"
           onPress={onOpen}
           activeOpacity={0.7}
         >
@@ -169,7 +194,7 @@ const YesNoSelect = ({
               {t("InspectionForm.--Select From Here--")}
             </Text>
           )}
-          <AntDesign name="down" size={20} color="#838B8C" />
+          <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
         </TouchableOpacity>
       </View>
     </>
@@ -186,7 +211,9 @@ const validateAndFormat = (text: string, rules: ValidationRule, t: any) => {
   let error = "";
 
   if (rules.type === "profit") {
-    value = value.replace(/[^0-9.]/g, "");
+    // Remove commas for validation
+    const rawValue = value.replace(/,/g, "");
+    value = rawValue.replace(/[^0-9.]/g, "");
 
     if (value.startsWith(".")) {
       value = value.slice(1);
@@ -200,7 +227,7 @@ const validateAndFormat = (text: string, rules: ValidationRule, t: any) => {
     value = value.replace(/\.{2,}/g, ".");
 
     if (value === "0") {
-      error = t("Error.Value must be greater than 0");
+      error = t("Error.ValueMustBeGreaterThan0");
     } else if (rules.required && value.trim().length === 0) {
       error = t(`Error.${rules.type} is required`);
     }
@@ -226,6 +253,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
     manageRisk: undefined,
     worthToTakeRisk: "",
   });
+  const [displayProfit, setDisplayProfit] = useState(""); // For displaying formatted value
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [yesNoModalVisible, setYesNoModalVisible] = useState(false);
   const [activeYesNoField, setActiveYesNoField] = useState<string | null>(null);
@@ -260,6 +288,10 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
             };
 
             setFormData(normalizedData);
+            // Format the profit value for display
+            if (localData.profit && localData.profit !== "") {
+              setDisplayProfit(formatNumberWithCommas(localData.profit));
+            }
             setIsExistingData(true);
           } else {
             setIsExistingData(false);
@@ -348,6 +380,27 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
     const { value, error } = validateAndFormat(text, rules, t);
     updateFormData({ [key]: value } as any);
     setErrors((prev) => ({ ...prev, [key]: error || "" }));
+  };
+
+  // Handle profit input with comma formatting
+  const handleProfitChange = (text: string) => {
+    // Format the display value with commas
+    const formattedValue = formatNumberWithCommas(text);
+    setDisplayProfit(formattedValue);
+
+    // Get the raw number (without commas) for storage and validation
+    const rawValue = parseFormattedNumber(formattedValue);
+
+    // Validate the raw value
+    const { value, error } = validateAndFormat(
+      rawValue,
+      { required: true, type: "profit" },
+      t,
+    );
+
+    // Update form data with raw value
+    updateFormData({ profit: value });
+    setErrors((prev) => ({ ...prev, profit: error || "" }));
   };
 
   const handleyesNOFieldChange = (key: string, value: "Yes" | "No") => {
@@ -453,7 +506,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
       formData.profit.trim() === "" ||
       formData.profit === "0"
     ) {
-      validationErrors.profit = t("Error.profit is required");
+      validationErrors.profit = t("Error.HowMuchProfitAreYouExpectingFromTheProposedCropCroppingSystemIsRequired");
     }
     if (!formData.isProfitable) {
       validationErrors.isProfitable = t(
@@ -467,12 +520,12 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
     if (formData.isRisk === "Yes") {
       if (!formData.risk || formData.risk.trim() === "") {
         validationErrors.risk = t(
-          "Error.What are the risks you are anticipating in the proposed crop / cropping system is required",
+          "WhatAreTheRisksYouAreAnticipatingInTheProposedCropCroppingSystemIsRequired",
         );
       }
       if (!formData.solution || formData.solution.trim() === "") {
         validationErrors.solution = t(
-          "Error.Do you have the solution is required",
+          "Error.DoYouHaveTheSolutionIsRequired",
         );
       }
       if (!formData.manageRisk) {
@@ -482,7 +535,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
       }
       if (!formData.worthToTakeRisk || formData.worthToTakeRisk.trim() === "") {
         validationErrors.worthToTakeRisk = t(
-          "Error.Is it worth to take the risks for anticipated profits is required",
+          "Error.IsItWorthToTakeTheRisksForAnticipatedProfitsIsRequired",
         );
       }
     }
@@ -490,8 +543,8 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       const errorMessage = "• " + Object.values(validationErrors).join("\n• ");
-      Alert.alert(t("Error.Validation Error"), errorMessage, [
-        { text: t("Main.ok") },
+      Alert.alert(t("Error.ValidationError"), errorMessage, [
+        { text: t("Main.OK") },
       ]);
       return;
     }
@@ -501,7 +554,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
       Alert.alert(
         t("Error.Error"),
         "Request ID is missing. Please go back and try again.",
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
       return;
     }
@@ -513,14 +566,14 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
       Alert.alert(
         t("Error.Error"),
         "Invalid request ID. Please go back and try again.",
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
       return;
     }
 
     Alert.alert(
       t("InspectionForm.Saving"),
-      t("InspectionForm.Please wait..."),
+      t("InspectionForm.PleaseWait..."),
       [],
       { cancelable: false },
     );
@@ -538,10 +591,10 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
 
         Alert.alert(
           t("Main.Success"),
-          t("InspectionForm.Data saved successfully"),
+          t("InspectionForm.DataSavedSuccessfully"),
           [
             {
-              text: t("Main.ok"),
+              text: t("Main.OK"),
               onPress: () => {
                 navigation.navigate("Economical", {
                   requestNumber,
@@ -554,10 +607,10 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
       } else {
         Alert.alert(
           t("Main.Warning"),
-          t("InspectionForm.Could not save to server. Data saved locally."),
+          t("InspectionForm.CouldNotSaveToServerDataSavedLocally"),
           [
             {
-              text: t("Main.ok"),
+              text: t("Main.OK"),
             },
           ],
         );
@@ -566,10 +619,10 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
       console.error("Error during final save:", error);
       Alert.alert(
         t("Main.Warning"),
-        t("InspectionForm.Could not save to server. Data saved locally."),
+        t("InspectionForm.CouldNotSaveToServerDataSavedLocally"),
         [
           {
-            text: t("Main.ok"),
+            text: t("Main.OK"),
           },
         ],
       );
@@ -638,27 +691,34 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
         >
           <View className="h-6" />
 
-          <Input
-            label={t(
-              "InspectionForm.How much profit are you expecting from the proposed crop/cropping system",
-            )}
-            placeholder="0.00"
-            value={formData.profit}
-            onChangeText={(text) =>
-              handleFieldChange("profit", text, {
-                required: true,
-                type: "profit",
-              })
-            }
-            required
-            extra={t("InspectionForm.Rs")}
-            keyboardType={"phone-pad"}
-            error={errors.profit}
-          />
+          <View className="mb-4">
+            <FormLabel
+              label={t(
+                "InspectionForm.HowMuchProfitAreYouExpectingFromTheProposedCropCroppingSystem",
+              )}
+              required
+              extra={t("InspectionForm.Rs")}
+            />
+            <View
+              className={`bg-[#F6F6F6] rounded-3xl flex-row items-center ${
+                errors.profit ? "border border-red-500" : ""
+              }`}
+            >
+              <TextInput
+                placeholder="0.00"
+                placeholderTextColor="#838B8C"
+                className="px-5 h-[50px] text-base text-black flex-1"
+                value={displayProfit}
+                onChangeText={handleProfitChange}
+                keyboardType="numeric"
+              />
+            </View>
+            <ErrorMessage message={errors.profit} />
+          </View>
 
           <YesNoSelect
             label={t(
-              "InspectionForm.Is this profitable than the existing crop / cropping system",
+              "InspectionForm.IsThisProfitableThanTheExistingCropCroppingSystem",
             )}
             required
             value={formData.isProfitable || null}
@@ -675,7 +735,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
           />
 
           <YesNoSelect
-            label={t("InspectionForm.Are there any risks")}
+            label={t("InspectionForm.AreThereAnyRisks")}
             required
             value={formData.isRisk || null}
             visible={yesNoModalVisible && activeYesNoField === "isRisk"}
@@ -695,7 +755,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
               <View className="mt-4">
                 <FormLabel
                   label={t(
-                    "InspectionForm.What are the risks you are anticipating in the proposed crop / cropping system",
+                    "InspectionForm.WhatAreTheRisksYouAreAnticipatingInTheProposedCropCroppingSystem",
                   )}
                   required
                 />
@@ -706,7 +766,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
                   }`}
                 >
                   <TextInput
-                    placeholder={t("InspectionForm.Type here...")}
+                    placeholder={t("InspectionForm.TypeHere...")}
                     value={formData.risk || ""}
                     onChangeText={(text) => {
                       let formattedText = text.replace(/^\s+/, "");
@@ -724,7 +784,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
                         risk:
                           formattedText.trim() === ""
                             ? t(
-                                "Error.What are the risks you are anticipating in the proposed crop / cropping system is required",
+                                "WhatAreTheRisksYouAreAnticipatingInTheProposedCropCroppingSystemIsRequired",
                               )
                             : "",
                       }));
@@ -740,7 +800,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
 
               <View className="mt-4">
                 <FormLabel
-                  label={t("InspectionForm.Do you have the solution")}
+                  label={t("InspectionForm.DoYouHaveTheSolution")}
                   required
                 />
 
@@ -750,7 +810,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
                   }`}
                 >
                   <TextInput
-                    placeholder={t("InspectionForm.Type here...")}
+                    placeholder={t("InspectionForm.TypeHere...")}
                     value={formData.solution || ""}
                     onChangeText={(text) => {
                       let formattedText = text.replace(/^\s+/, "");
@@ -765,7 +825,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
                         ...prev,
                         solution:
                           formattedText.trim() === ""
-                            ? t("Error.Do you have the solution is required")
+                            ? t("Error.DoYouHaveTheSolutionIsRequired")
                             : "",
                       }));
 
@@ -783,7 +843,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
               </View>
 
               <YesNoSelect
-                label={t("InspectionForm.Can the farmer manage the risks")}
+                label={t("InspectionForm.CanTheFarmerManageTheRisks")}
                 required
                 value={formData.manageRisk || null}
                 visible={yesNoModalVisible && activeYesNoField === "manageRisk"}
@@ -803,7 +863,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
               <View className="mt-4">
                 <FormLabel
                   label={t(
-                    "InspectionForm.Is it worth to take the risks for anticipated profits",
+                    "InspectionForm.IsItWorthToTakeTheRisksForAnticipatedProfits",
                   )}
                   required
                 />
@@ -814,7 +874,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
                   }`}
                 >
                   <TextInput
-                    placeholder={t("InspectionForm.Type here...")}
+                    placeholder={t("InspectionForm.TypeHere...")}
                     value={formData.worthToTakeRisk || ""}
                     onChangeText={(text) => {
                       let formattedText = text.replace(/^\s+/, "");
@@ -830,7 +890,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
                         worthToTakeRisk:
                           formattedText.trim() === ""
                             ? t(
-                                "Error.Is it worth to take the risks for anticipated profits is required",
+                                "Error.IsItWorthToTakeTheRisksForAnticipatedProfitsIsRequired",
                               )
                             : "",
                       }));

@@ -10,7 +10,6 @@ import {
   Modal,
   BackHandler,
 } from "react-native";
-import { AntDesign } from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
 import { useTranslation } from "react-i18next";
 import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
@@ -24,6 +23,7 @@ import {
   EconomicalData,
 } from "@/database/inspectioneconomical";
 import { updateLastScreen } from "@/database/inspectionprogress";
+import { MaterialIcons } from "@expo/vector-icons";
 
 type EconomicalProps = {
   navigation: any;
@@ -87,7 +87,7 @@ const YesNoSelect = ({
         </Text>
 
         <TouchableOpacity
-          className="bg-[#F6F6F6] rounded-full px-4 py-4 flex-row items-center justify-between"
+          className="bg-[#F6F6F6] rounded-full px-4 h-[50px] flex-row items-center justify-between"
           onPress={onOpen}
           activeOpacity={0.7}
         >
@@ -98,7 +98,7 @@ const YesNoSelect = ({
               {t("InspectionForm.--Select From Here--")}
             </Text>
           )}
-          <AntDesign name="down" size={20} color="#838B8C" />
+          <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
         </TouchableOpacity>
       </View>
     </>
@@ -190,9 +190,9 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
 
     setIsNextEnabled(
       isSuitaleSizeValid &&
-        isFinanceResourceValid &&
-        isAltRoutesValid &&
-        !hasErrors,
+      isFinanceResourceValid &&
+      isAltRoutesValid &&
+      !hasErrors,
     );
   }, [formData, errors]);
 
@@ -273,8 +273,8 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       const errorMessage = "• " + Object.values(validationErrors).join("\n• ");
-      Alert.alert(t("Error.Validation Error"), errorMessage, [
-        { text: t("Main.ok") },
+      Alert.alert(t("Error.ValidationError"), errorMessage, [
+        { text: t("Main.OK") },
       ]);
       return;
     }
@@ -284,7 +284,7 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
       Alert.alert(
         t("Error.Error"),
         "Request ID is missing. Please go back and try again.",
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
       return;
     }
@@ -296,14 +296,14 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
       Alert.alert(
         t("Error.Error"),
         "Invalid request ID. Please go back and try again.",
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
       return;
     }
 
     Alert.alert(
       t("InspectionForm.Saving"),
-      t("InspectionForm.Please wait..."),
+      t("InspectionForm.PleaseWait..."),
       [],
       { cancelable: false },
     );
@@ -321,10 +321,10 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
 
         Alert.alert(
           t("Main.Success"),
-          t("InspectionForm.Data saved successfully"),
+          t("InspectionForm.DataSavedSuccessfully"),
           [
             {
-              text: t("Main.ok"),
+              text: t("Main.OK"),
               onPress: () => {
                 navigation.navigate("Labour", {
                   requestNumber,
@@ -337,10 +337,10 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
       } else {
         Alert.alert(
           t("Main.Warning"),
-          t("InspectionForm.Could not save to server. Data saved locally."),
+          t("InspectionForm.CouldNotSaveToServerDataSavedLocally"),
           [
             {
-              text: t("Main.ok"),
+              text: t("Main.OK"),
             },
           ],
         );
@@ -349,10 +349,10 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
       console.error("Error during final save:", error);
       Alert.alert(
         t("Main.Warning"),
-        t("InspectionForm.Could not save to server. Data saved locally."),
+        t("InspectionForm.CouldNotSaveToServerDataSavedLocally"),
         [
           {
-            text: t("Main.ok"),
+            text: t("Main.OK"),
           },
         ],
       );
@@ -422,7 +422,7 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
 
           <YesNoSelect
             label={t(
-              "InspectionForm.Are the proposed crop/cropping systems suitable for the farmer's size of land holding",
+              "InspectionForm.AreTheProposedCropCroppingSystemsSuitableForTheFarmersSizeOfLandHolding",
             )}
             required
             value={formData.isSuitaleSize || null}
@@ -440,7 +440,7 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
 
           <YesNoSelect
             label={t(
-              "InspectionForm.Are the financial resources adequate to manage the proposed crop/cropping system",
+              "InspectionForm.AreTheFinancialResourcesAdequateToManageTheProposedCropCroppingSystem",
             )}
             required
             value={formData.isFinanceResource || null}
@@ -462,7 +462,7 @@ const Economical: React.FC<EconomicalProps> = ({ navigation }) => {
 
           <YesNoSelect
             label={t(
-              "InspectionForm.If not, can the farmer mobilize financial resources through alternative routes",
+              "InspectionForm.IfNotCanTheFarmerMobilizeFinancialResourcesThroughAlternativeRoutes",
             )}
             required
             value={formData.isAltRoutes || null}

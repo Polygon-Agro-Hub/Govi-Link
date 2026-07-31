@@ -104,7 +104,7 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
     } catch (error: any) {
       console.error("Failed to fetch capital requests:", error);
       Alert.alert(t("Error.Error"), t("Error.FailedToLoadRequests"), [
-        { text: t("Main.ok") },
+        { text: t("Main.Ok") },
       ]);
     } finally {
       setLoading(false);
@@ -137,7 +137,7 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
   if (loading && !refreshing) {
     return (
       <LoadingPage
-        message={t("CapitalRequests.LoadingRequests")}
+        message={t("CapitalRequests.LoadingRequests...")}
         fullScreen={true}
       />
     );
@@ -166,7 +166,7 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 70 }}
       >
-        <View className="px-6 py-4 space-y-5">
+        <View className="px-6 py-4 gap-5">
           {sortedRequests.length === 0 ? (
             <View className="flex justify-center items-center mt-[70%]">
               <Image
@@ -208,13 +208,13 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
                     }}
                   >
                     <View className="flex-1">
-                      <View className="flex-row space-x-2 items-baseline">
+                      <View className="flex-row gap-2 items-baseline">
                         <Text className="text-[#000000] text-base">
                           #{request.jobId}
                         </Text>
                         {isDraft && (
                           <Text className="font-bold text-[#FA345A]">
-                            ({t("RequestLetter.Saved Draft")})
+                            ({t("RequestLetter.SavedDraft")})
                           </Text>
                         )}
                       </View>
@@ -224,7 +224,7 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
                       </Text>
 
                       <Text className="text-[#4E6393] text-sm mt-1">
-                        {t("RequestLetter.Investment Request")}
+                        {t("RequestLetter.InvestmentRequest")}
                       </Text>
                     </View>
 

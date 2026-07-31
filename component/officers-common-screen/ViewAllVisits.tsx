@@ -24,6 +24,8 @@ import { environment } from "@/environment/environment";
 import { Ionicons, FontAwesome6 } from "@expo/vector-icons";
 import { RouteProp } from "@react-navigation/native";
 import NoDataComponent from "../commons/NoDataComponent";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/services/store";
 
 type ViewAllVisitsNavigationProps = StackNavigationProp<
   RootStackParamList,
@@ -65,6 +67,17 @@ interface VisitItem {
 
 const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
   const { t, i18n } = useTranslation();
+  const userRole = useSelector((state: RootState) => state.auth.jobRole);
+  const [storedRole, setStoredRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    const getRole = async () => {
+      const role = await AsyncStorage.getItem("jobRole");
+      setStoredRole(role);
+    };
+    getRole();
+  }, []);
+
   const officerId = route.params?.officerId ?? "";
   const today = dayjs();
   const [selectedDate, setSelectedDate] = useState(dayjs());
@@ -241,8 +254,8 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
     );
   };
 
-  const shouldShowBackButton =
-    officerId && officerId.toString().startsWith("FIO");
+  const effectiveRole = userRole || storedRole;
+  const shouldShowBackButton = effectiveRole === "Field Officer";
 
   return (
     <View className="flex-1 bg-[#F5F7FB] pt-4">
@@ -277,6 +290,7 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
             className={`flex-row items-center px-2 h-10 rounded-full mr-2 border ${
               isOverdueSelected ? "border-transparent" : "border-[#F83B4F]"
             }`}
+            style={{ overflow: "hidden" }}
           >
             <View className="flex-row items-center">
               <Text
@@ -284,7 +298,7 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
                   isOverdueSelected ? "text-white" : "text-[#F83B4F]"
                 }`}
               >
-                {t("Visits.Over Due")}
+                {t("Visits.OverDue")}
               </Text>
               {isOverdueSelected && (
                 <View className="bg-white rounded-full w-6 h-6 items-center justify-center ml-2">
@@ -301,7 +315,6 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
           ref={scrollRef}
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingHorizontal: 4 }}
         >
           {dates.map((dateObj, index) => {
             const dayNumber = dateObj.date();
@@ -321,7 +334,8 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
                       colors={["#F2561D", "#FF1D85"]}
                       start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 0 }}
-                      className="border flex-row gap-x-4 rounded-full w-20 h-10 items-center justify-center border-[#F83B4F] ml-1"
+                      className="border flex-row gap-x-2 rounded-full w-20 h-10 items-center justify-center border-transparent ml-2 pl-2"
+                      style={{ overflow: "hidden" }}
                     >
                       <Text className="font-semibold text-white">
                         {dayNumber}
@@ -352,7 +366,7 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
         </View>
       ) : (
         <ScrollView
-          className="mt-6 px-4 bg-white rounded-t-3xl"
+          className="mt-6 px-6 bg-white rounded-t-3xl"
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
@@ -364,34 +378,25 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
                 const getStatusRank = (item: VisitItem) => {
                   if (item.status === "Ongoing") return 1;
 
-                  if (
-                    item.propose === "Cluster" &&
-                    item.totalClusterCount &&
-                    item.completedClusterCount !== undefined &&
-                    item.completedClusterCount > 0 &&
-                    item.completedClusterCount < item.totalClusterCount
-                  ) {
-                    return 2;
-                  }
+                  if (item.propose === "Cluster" && item.totalClusterCount) {
+                    if (item.completedClusterCount === item.totalClusterCount)
+                      return 4;
 
-                  if (item.status === "Pending") return 3;
-                  if (
-                    item.propose === "Cluster" &&
-                    item.totalClusterCount &&
-                    (!item.completedClusterCount ||
-                      item.completedClusterCount === 0)
-                  ) {
+                    if (
+                      item.completedClusterCount &&
+                      item.completedClusterCount > 0
+                    ) {
+                      if (item.completionPercentage >= "20") return 4;
+                      return 2;
+                    }
+
                     return 3;
                   }
 
+                  if (item.status === "Pending") return 3;
+
                   if (item.status === "Completed" || item.status === "Finished")
                     return 4;
-                  if (
-                    item.propose === "Cluster" &&
-                    item.completedClusterCount === item.totalClusterCount
-                  ) {
-                    return 4;
-                  }
 
                   return 3;
                 };
@@ -415,6 +420,8 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
                     item.completionPercentage < "20"
                   ) {
                     displayStatus = `${t("Visits.Pending")} (${item.completedClusterCount}/${item.totalClusterCount})`;
+                  } else if (item.status === "Ongoing") {
+                    displayStatus = `${t("Visits.Ongoing")} (${item.completedClusterCount || 0}/${item.totalClusterCount})`;
                   } else {
                     displayStatus = `${t("Visits.Pending")} (0/${item.totalClusterCount})`;
                   }
@@ -519,7 +526,7 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
               })
           ) : (
             <View className="flex-1 items-center justify-center mt-[75%]">
-              <NoDataComponent message={t("Visits.No Jobs Available")} />
+              <NoDataComponent message={t("Visits.NoJobsAvailable")} />
             </View>
           )}
         </ScrollView>
@@ -613,7 +620,7 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
                       }}
                     >
                       <View
-                        className={`flex flex-row items-center justify-center rounded-full py-2 border ${
+                        className={`flex flex-row items-center justify-center rounded-full h-[50px] border ${
                           selectedItem?.latitude && selectedItem?.longitude
                             ? "border-[#F83B4F]"
                             : "border-[#9DB2CE]"
@@ -644,10 +651,10 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
                       className="flex w-1/2"
                       onPress={() => handleDial(selectedItem.farmerMobile)}
                     >
-                      <View className="flex-row items-center justify-center border border-[#F83B4F] rounded-full px-6 py-2">
+                      <View className="flex-row items-center justify-center border border-[#F83B4F] rounded-full px-6 h-[50px]">
                         <Ionicons name="call" size={20} color="#F83B4F" />
                         <Text className="text-base font-semibold  ml-2">
-                          {t("VisitPopup.Get Call")}
+                          {t("VisitPopup.GetCall")}
                         </Text>
                       </View>
                     </TouchableOpacity>
@@ -708,8 +715,9 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
                   end={{ x: 1, y: 0 }}
                   style={{
                     marginBottom: 30,
+                    overflow: "hidden",
                   }}
-                  className={`py-2 items-center justify-center rounded-full mt-4 ${i18n.language === "si" ? "px-24" : i18n.language === "ta" ? "px-24" : "px-[40%]"}`}
+                  className={`h-[50px] items-center justify-center rounded-full mt-4 ${i18n.language === "si" ? "px-24" : i18n.language === "ta" ? "px-24" : "px-[40%]"}`}
                 >
                   <Text
                     className={`text-white  font-semibold ${i18n.language === "si" ? "text-base" : i18n.language === "ta" ? "text-base" : "text-lg"}`}

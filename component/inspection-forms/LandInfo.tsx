@@ -13,11 +13,11 @@ import {
   BackHandler,
 } from "react-native";
 import {
-  AntDesign,
   Feather,
   FontAwesome,
   FontAwesome6,
   MaterialIcons,
+  AntDesign,
 } from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
 import { useTranslation } from "react-i18next";
@@ -64,7 +64,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
   const [showCamera, setShowCamera] = useState(false);
   const [isNextEnabled, setIsNextEnabled] = useState(false);
   const [isExistingData, setIsExistingData] = useState(false);
-  
+
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const [showCameraAccess, setShowCameraAccess] = useState(false);
   const [hasLocationPermission, setHasLocationPermission] = useState<boolean | null>(null);
@@ -99,13 +99,13 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
     return () => clearTimeout(timer);
   }, [formData, requestId]);
 
-  
+
   useEffect(() => {
     checkPermissions();
   }, []);
 
   const checkPermissions = async () => {
-    
+
     const { status: cameraStatus } = await ImagePicker.getCameraPermissionsAsync();
     if (cameraStatus === "granted") {
       setHasCameraPermission(true);
@@ -113,7 +113,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
       setHasCameraPermission(false);
     }
 
-   
+
     const { status: locationStatus } = await Location.getForegroundPermissionsAsync();
     if (locationStatus === "granted") {
       setHasLocationPermission(true);
@@ -164,7 +164,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
     if (hasCameraPermission === null) {
       await checkPermissions();
     }
-    
+
     if (hasCameraPermission === false) {
       setShowCameraAccess(true);
     } else {
@@ -176,7 +176,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
     if (hasLocationPermission === null) {
       await checkPermissions();
     }
-    
+
     if (hasLocationPermission === false) {
       setPendingGeoLocationAction(true);
       setShowLocationAccess(true);
@@ -199,15 +199,15 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
             const validationErrors: Record<string, string> = {};
             if (!localData.landDiscription?.trim())
               validationErrors.landDiscription = t(
-                "Error.landDiscription is required",
+                "Error.CultivationLandsDescriptionIsRequired",
               );
             if (!localData.isOwnByFarmer)
               validationErrors.isOwnByFarmer = t(
-                "Error.Land ownership is required",
+                "Error.LandOwnershipIsRequired",
               );
             if (!localData.ownershipStatus)
               validationErrors.ownershipStatus = t(
-                "Error.Ownership status is required",
+                "Error.LandOwnershipIsRequired",
               );
             if (!localData.geoLocation)
               validationErrors.geoLocation = t(
@@ -215,7 +215,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
               );
             if (!localData.images?.length)
               validationErrors.images = t(
-                "Error.At least one image is required",
+                "Error.AtLeastOneCategoryOptionMustBeSelected",
               );
 
             setErrors(validationErrors);
@@ -266,7 +266,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
     if (field === "landDiscription") {
       if (!formData.landDiscription || formData.landDiscription.trim() === "") {
         validationErrors.landDiscription = t(
-          "Error.landDiscription is required",
+          "Error.CultivationLandsDescriptionIsRequired",
         );
       } else {
         validationErrors.landDiscription = "";
@@ -369,21 +369,21 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
     const validationErrors: Record<string, string> = {};
 
     if (!formData.landDiscription || formData.landDiscription.trim() === "") {
-      validationErrors.landDiscription = t("Error.landDiscription is required");
+      validationErrors.landDiscription = t("Error.CultivationLandsDescriptionIsRequired");
     }
     if (!formData.isOwnByFarmer) {
-      validationErrors.isOwnByFarmer = t("Error.Land ownership is required");
+      validationErrors.isOwnByFarmer = t("Error.LandOwnershipIsRequired");
     }
     if (!formData.ownershipStatus) {
       validationErrors.ownershipStatus = t(
-        "Error.Ownership status is required",
+        "Error.OwnershipStatusIsRequired",
       );
     }
     if (!formData.geoLocation) {
       validationErrors.geoLocation = t("Error.Geo location is required");
     }
     if (!formData.images || formData.images.length === 0) {
-      validationErrors.images = t("Error.At least one image is required");
+      validationErrors.images = t("Error.AtLeastOneCategoryOptionMustBeSelected");
     }
 
     if (Object.keys(validationErrors).length > 0) {
@@ -396,8 +396,8 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
         images: true,
       });
       const errorMessage = "• " + Object.values(validationErrors).join("\n• ");
-      Alert.alert(t("Error.Validation Error"), errorMessage, [
-        { text: t("Main.ok") },
+      Alert.alert(t("Error.ValidationError"), errorMessage, [
+        { text: t("Main.OK") },
       ]);
       return;
     }
@@ -406,7 +406,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
       Alert.alert(
         t("Error.Error"),
         "Request ID is missing. Please go back and try again.",
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
       return;
     }
@@ -416,14 +416,14 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
       Alert.alert(
         t("Error.Error"),
         "Invalid request ID. Please go back and try again.",
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
       return;
     }
 
     Alert.alert(
       t("InspectionForm.Saving"),
-      t("InspectionForm.Please wait..."),
+      t("InspectionForm.PleaseWait..."),
       [],
       { cancelable: false },
     );
@@ -440,10 +440,10 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
         setIsExistingData(true);
         Alert.alert(
           t("Main.Success"),
-          t("InspectionForm.Data saved successfully"),
+          t("InspectionForm.DataSavedSuccessfully"),
           [
             {
-              text: t("Main.ok"),
+              text: t("Main.OK"),
               onPress: () => {
                 navigation.navigate("InvestmentInfo", {
                   requestNumber,
@@ -456,16 +456,16 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
       } else {
         Alert.alert(
           t("Main.Warning"),
-          t("InspectionForm.Could not save to server. Data saved locally."),
-          [{ text: t("Main.ok") }],
+          t("InspectionForm.CouldNotSaveToServerDataSavedLocally"),
+          [{ text: t("Main.OK") }],
         );
       }
     } catch (error) {
       console.error("Error during final save:", error);
       Alert.alert(
         t("Main.Warning"),
-        t("InspectionForm.Could not save to server. Data saved locally."),
-        [{ text: t("Main.ok") }],
+        t("InspectionForm.CouldNotSaveToServerDataSavedLocally"),
+        [{ text: t("Main.OK") }],
       );
     }
   };
@@ -490,7 +490,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
     }
   };
 
-  
+
   if (showCameraAccess) {
     return (
       <CameraAccess
@@ -501,7 +501,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
     );
   }
 
-  
+
   if (showLocationAccess) {
     return (
       <LocationAccess
@@ -536,10 +536,10 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
           {/* Is land owned by farmer */}
           <View className="mt-4">
             <Text className="text-sm text-[#070707] mb-2">
-              {t("InspectionForm.Is the land own by farmer")} *
+              {t("InspectionForm.IsTheLandOwnByFarmer")} *
             </Text>
             <TouchableOpacity
-              className="bg-[#F6F6F6] rounded-full px-4 py-4 flex-row items-center justify-between"
+              className="bg-[#F6F6F6] rounded-full px-4 h-[50px] flex-row items-center justify-between"
               onPress={() => setlandownNoModal(true)}
               activeOpacity={0.7}
             >
@@ -558,7 +558,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
                   </Text>
                 )}
               </View>
-              <AntDesign name="down" size={20} color="#838B8C" />
+              <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
             </TouchableOpacity>
             {touched.isOwnByFarmer &&
               errors.isOwnByFarmer &&
@@ -579,10 +579,10 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
           {/* Legal status */}
           <View className="mt-4">
             <Text className="text-sm text-[#070707] mb-2">
-              {t("InspectionForm.Legal status of the ownership of the land")} *
+              {t("InspectionForm.LegalStatusOfTheOwnershipOfTheLand")} *
             </Text>
             <TouchableOpacity
-              className="bg-[#F6F6F6] rounded-full px-4 py-4 flex-row items-center justify-between"
+              className="bg-[#F6F6F6] rounded-full px-4 h-[50px] flex-row items-center justify-between"
               onPress={() => setLegalStatusModal(true)}
               activeOpacity={0.7}
             >
@@ -601,7 +601,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
                   </Text>
                 )}
               </View>
-              <AntDesign name="down" size={20} color="#838B8C" />
+              <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
             </TouchableOpacity>
             {touched.ownershipStatus &&
               errors.ownershipStatus &&
@@ -623,7 +623,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
           <View className="mt-4">
             <Text className="text-sm text-[#070707] mb-2">
               {t(
-                "InspectionForm.Provide brief description to reach the cultivation land",
+                "InspectionForm.ProvideBriefDescriptionToReachTheCultivationLand",
               )}{" "}
               *
             </Text>
@@ -636,7 +636,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
               }
             >
               <TextInput
-                placeholder={t("InspectionForm.Type here...")}
+                placeholder={t("InspectionForm.TypeHere...")}
                 value={formData.landDiscription}
                 onChangeText={(text) => {
                   let formattedText = text.replace(/^\s+/, "");
@@ -672,9 +672,9 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
           {/* Geo location */}
           <View className="mt-6">
             <Text className="text-sm text-[#070707] mb-2">
-              {t("InspectionForm.Tag the geo coordinates of the land")} *
+              {t("InspectionForm.TagTheGeoCoordinatesOfTheLand")} *
             </Text>
-            <View className="flex-row space-x-2 mb-2">
+            <View className="flex-row gap-2 mb-2">
               <TouchableOpacity
                 className="flex-1 bg-[#FA345A] rounded-3xl px-4 h-[50px] flex-row items-center justify-center gap-x-2"
                 onPress={handleOpenGeoLocation}
@@ -685,14 +685,14 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
                   <MaterialIcons name="gps-fixed" size={24} color="#fff" />
                 )}
                 <Text className="text-white font-semibold text-lg">
-                  {t("InspectionForm.Tag Geo Coordinate")}
+                  {t("InspectionForm.TagGeoCoordinate")}
                 </Text>
               </TouchableOpacity>
             </View>
 
             {formData.geoLocation && (
               <View>
-                <View className="flex-row space-x-2 mt-3">
+                <View className="flex-row gap-2 mt-3">
                   <TouchableOpacity
                     className="flex-1 bg-white rounded-full px-4 py-2 flex-row items-center justify-center"
                     onPress={() =>
@@ -709,7 +709,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
                       color="#FF0000"
                     />
                     <Text className="ml-1 text-[#FF0000] underline">
-                      {t("InspectionForm.View Here")}
+                      {t("InspectionForm.ViewHere")}
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -736,17 +736,17 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
           <View className="mt-6">
             <Text className="text-sm text-[#070707] mb-2">
               {t(
-                "InspectionForm.Images of the deed / lease / permit / any other formal document to prove the ownership of the land by the farmer",
+                "InspectionForm.ImagesOfTheDeedLeasePermitAnyOtherFormalDocumentToProveTheOwnershipOfTheLandByTheFarmer",
               )}{" "}
               *
             </Text>
             <TouchableOpacity
-              className="bg-[#1A1A1A] rounded-3xl px-4 h-[50px] flex-row items-center justify-center gap-x-2"
+              className="bg-[#1A1A1A] rounded-3xl px-4 h-[54px] flex-row items-center justify-center gap-x-2"
               onPress={handleOpenCamera}
             >
-              <FontAwesome6 name="camera" size={22} color="#fff" />
+              <FontAwesome6 name="camera" size={24} color="#fff" />
               <Text className="text-white font-semibold text-lg">
-                {t("InspectionForm.Capture Photos")}
+                {t("InspectionForm.CapturePhotos")}
               </Text>
             </TouchableOpacity>
             {touched.images &&
@@ -778,10 +778,10 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
                       className="w-full h-40 rounded-2xl"
                     />
                     <TouchableOpacity
-                      className="absolute top-1 right-1 bg-red-500 rounded-full w-6 h-6 justify-center items-center"
                       onPress={() => handleRemoveImage(index)}
+                      className="absolute top-[-8] right-[-8] bg-[#f21d1d] p-2 rounded-full"
                     >
-                      <Text className="text-white text-xs font-bold">×</Text>
+                      <AntDesign name="close" size={14} color="white" />
                     </TouchableOpacity>
                   </View>
                 ))}
@@ -812,7 +812,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
               setTouched((prev) => ({ ...prev, isOwnByFarmer: true }));
               setErrors((prev) => ({
                 ...prev,
-                isOwnByFarmer: t("Error.Land ownership is required"),
+                isOwnByFarmer: t("Error.LandOwnershipIsRequired"),
               }));
             }
           }}
@@ -821,7 +821,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
             {["Yes", "No"].map((item, index, arr) => (
               <View key={item}>
                 <TouchableOpacity
-                  className="py-4"
+                  className="h-[50px] justify-center items-center"
                   onPress={() => {
                     updateFormData({ isOwnByFarmer: item as "Yes" | "No" });
                     setTouched((prev) => ({ ...prev, isOwnByFarmer: true }));
@@ -853,16 +853,16 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
               setTouched((prev) => ({ ...prev, ownershipStatus: true }));
               setErrors((prev) => ({
                 ...prev,
-                ownershipStatus: t("Error.Ownership status is required"),
+                ownershipStatus: t("Error.OwnershipStatusIsRequired"),
               }));
             }
           }}
         >
-          <View className="bg-white w-64 rounded-2xl overflow-hidden">
+          <View className="bg-white w-10/12 rounded-2xl overflow-hidden">
             {LEGAL_STATUS_OPTIONS.map((item, index) => (
               <View key={item}>
                 <TouchableOpacity
-                  className="py-4 px-4"
+                  className="px-4 h-[50px] justify-center items-center"
                   onPress={() => {
                     updateFormData({ ownershipStatus: item });
                     setTouched((prev) => ({ ...prev, ownershipStatus: true }));

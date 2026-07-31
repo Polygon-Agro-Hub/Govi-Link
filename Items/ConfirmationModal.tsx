@@ -46,7 +46,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     if (title) return title;
     switch (type) {
       case "confirmation":
-        return t("InspectionForm.Submit Confirmation");
+        return t("InspectionForm.SubmitConfirmation");
       case "success":
         return t("InspectionForm.Success");
       case "error":
@@ -59,12 +59,12 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     switch (type) {
       case "confirmation":
         return t(
-          "InspectionForm.You have filled out all the forms. If you need to make any changes, you can go back. Otherwise, continuing will take you to the confirmation step.",
+          "InspectionForm.YouHaveFilledOutAllTheFormsIfYouNeedToMakeAnyChangesYouCanGoBackOtherwiseContinuingWillTakeYouToTheConfirmationStep",
         );
       case "success":
-        return t("InspectionForm.Inspection form completed successfully!");
+        return t("InspectionForm.InspectionFormCompletedSuccessfully");
       case "error":
-        return t("InspectionForm.Could not save to server. Please try again.");
+        return t("InspectionForm.CouldNotSaveToServerPleaseTryAgain");
     }
   };
 
@@ -98,7 +98,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                   }}
                 >
                   <Text className="text-black text-lg font-semibold">
-                    {t("Main.Go Back")}
+                    {t("Main.GoBack")}
                   </Text>
                 </TouchableOpacity>
 
@@ -128,7 +128,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                 activeOpacity={0.7}
               >
                 <Text className="text-white text-base font-semibold">
-                  {t("Main.ok")}
+                  {t("Main.OK")}
                 </Text>
               </TouchableOpacity>
             )}

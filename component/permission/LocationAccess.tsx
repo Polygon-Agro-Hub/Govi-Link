@@ -75,13 +75,13 @@ const LocationAccess: React.FC<LocationAccessProps> = ({
         }
       } else if (status === "denied") {
         Alert.alert(
-          t("Permission.permissionDenied") || "Permission Denied",
-          t("Permission.enableLocationManually") ||
+          t("Permission.PermissionDenied") || "Permission Denied",
+          t("Permission.LocationAccessIsRequiredPleaseEnableItInSettings") ||
             "Location access is required. Please enable it in settings.",
           [
-            { text: t("PublicForum.Cancel") || "Cancel", style: "cancel" },
+            { text: t("Main.Cancel") || "Cancel", style: "cancel" },
             {
-              text: t("Permission.openSettings") || "Open Settings",
+              text: t("Permission.OpenSettings") || "Open Settings",
               onPress: () => Linking.openSettings(),
             },
           ],
@@ -90,9 +90,8 @@ const LocationAccess: React.FC<LocationAccessProps> = ({
     } catch (error) {
       console.error("Error requesting location permission:", error);
       Alert.alert(
-        t("Main.error") || "Error",
-        t("Permission.permissionError") ||
-          "Unable to request location permission. Please try again.",
+        t("Main.Sorry"),
+        t("Permission.UnableToRequestLocationPermissionPleaseTryAgain"),
         [{ text: t("PublicForum.OK") || "OK" }],
       );
     } finally {
@@ -122,12 +121,12 @@ const LocationAccess: React.FC<LocationAccessProps> = ({
 
           {/* Title */}
           <Text className="text-white font-bold text-center mt-8 text-2xl">
-            {t("Permission.locationAccess") || "Location Access"}
+            {t("Permission.LocationAccess") || "Location Access"}
           </Text>
 
           {/* Description */}
           <Text className="text-gray-400 text-center mt-4 px-8 text-base">
-            {t("Permission.enableLocationMessage") ||
+            {t("Permission.EnableLocationAccessToAccessLocationInformation") ||
               "Enable location access to access location information for better service delivery and personalized experience."}
           </Text>
 
@@ -153,12 +152,13 @@ const LocationAccess: React.FC<LocationAccessProps> = ({
                   colors={["#EE8D5F", "#B31A51"]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
-                  className="w-full rounded-full h-14 justify-center items-center"
+                  className="w-full rounded-full h-[50px] justify-center items-center"
+                  style={{ overflow: "hidden" }}
                 >
                   <Text className="text-white font-semibold text-center text-lg">
                     {isLoading
-                      ? t("Permission.requesting") || "Requesting..."
-                      : t("Permission.allow") || "Allow"}
+                      ? t("Permission.Requesting...") || "Requesting..."
+                      : t("Permission.Allow")}
                   </Text>
                 </LinearGradient>
               </TouchableOpacity>

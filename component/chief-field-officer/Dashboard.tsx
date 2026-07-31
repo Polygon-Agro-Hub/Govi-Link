@@ -229,14 +229,18 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
   const fetchUserProfile = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
+      const intentionalLogout = await AsyncStorage.getItem("intentional_logout");
+
       if (!token) {
-        Alert.alert(
-          t("Error.Sorry"),
-          t(
-            "Error.Your login session has expired. Please log in again to continue.",
-          ),
-          [{ text: t("Main.ok") }],
-        );
+        if (intentionalLogout !== "true") {
+          Alert.alert(
+            t("Error.Sorry"),
+            t(
+              "Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue",
+            ),
+            [{ text: t("Main.OK") }],
+          );
+        }
         return;
       }
       if (token) {
@@ -255,9 +259,9 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
         Alert.alert(
           t("Error.Sorry"),
           t(
-            "Error.Your login session has expired. Please log in again to continue.",
+            "Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue",
           ),
-          [{ text: t("Main.ok") }],
+          [{ text: t("Main.OK") }],
         );
         navigation.navigate("Login");
       }
@@ -418,14 +422,13 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
       : text;
   };
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex bg-white">
       <ScrollView
         className="bg-white p-3"
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
         showsVerticalScrollIndicator={true}
-        contentContainerStyle={{ flexGrow: 1, paddingBottom: 50 }}
       >
         <View className="flex flex-row ">
           <TouchableOpacity
@@ -457,10 +460,10 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
           <LoadingSkeleton />
         ) : (
           <>
-            <View className="p-2 mt-4">
+            <View className="flex-1 bg-white p-2 my-4">
               <View className="flex-row justify-between items-center mb-1">
                 <Text className="text-base font-bold">
-                  {t("Dashboard.Today Visits")}{" "}
+                  {t("Dashboard.TodayVisits")}{" "}
                   <Text className="text-[#4E6393]">
                     ({visitsData.length.toString().padStart(2, "0")})
                   </Text>
@@ -473,7 +476,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                   }
                 >
                   <Text className="text-pink-500 font-semibold">
-                    {t("Dashboard.View All")}
+                    {t("Dashboard.ViewAll")}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -543,8 +546,8 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                         completionPercentage =
                           totalTasks > 0
                             ? Math.round(
-                                ((item.totalCompleted || 0) / totalTasks) * 100,
-                              )
+                              ((item.totalCompleted || 0) / totalTasks) * 100,
+                            )
                             : 0;
                       }
 
@@ -560,9 +563,8 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                           width: wp("72%"),
                           opacity: isDisabled ? 0.6 : 1,
                         }}
-                        className={`border ${
-                          isDisabled ? "border-[#9DB2CE]" : "border-[#FF1D85]"
-                        } rounded-lg p-3 mr-4`}
+                        className={`border ${isDisabled ? "border-[#9DB2CE]" : "border-[#FF1D85]"
+                          } rounded-lg p-3 mr-4`}
                         activeOpacity={0.8}
                         disabled={isDisabled}
                         onPress={() => {
@@ -633,9 +635,8 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
 
                           {displayStatus ? (
                             <Text
-                              className={`text-xs mt-1 font-medium ${
-                                isDisabled ? "text-[#9DB2CE]" : "text-[#FF1D85]"
-                              }`}
+                              className={`text-xs mt-1 font-medium ${isDisabled ? "text-[#9DB2CE]" : "text-[#FF1D85]"
+                                }`}
                             >
                               {displayStatus}
                             </Text>
@@ -659,7 +660,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                     size={24}
                     color={
                       !filteredVisitsData ||
-                      currentIndex >= filteredVisitsData.length - 1
+                        currentIndex >= filteredVisitsData.length - 1
                         ? "#ccc"
                         : "#00000"
                     }
@@ -677,14 +678,14 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                   resizeMode="contain"
                 />
                 <Text className="italic text-[#787878] mt-2 text-center">
-                  {t("Dashboard.No Jobs for Today")}
+                  {t("Dashboard.NoJobsForToday")}
                 </Text>
               </View>
             )}
 
-            <View className="p-2 mt-10">
+            <View className="p-2 my-6">
               <Text className="text-base font-bold mb-3">
-                {t("Dashboard.Saved Draft")}
+                {t("Dashboard.SavedDraft")}
               </Text>
             </View>
 
@@ -838,7 +839,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                     resizeMode="contain"
                   />
                   <Text className="italic text-[#787878] mt-4 text-center">
-                    {t("Dashboard.No Saved Drafts for Today")}
+                    {t("Dashboard.NoSavedDraftsForToday")}
                   </Text>
                 </View>
               )}
@@ -847,7 +848,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
         )}
         <View className="px-8 mt-8">
           <TouchableOpacity
-            className="bg-[#FEE5E6] rounded-lg p-3 h-20 mr-4 w-full flex-row justify-between items-center"
+            className="bg-[#FEE5E6] rounded-lg p-3 h-28 mr-4 w-full flex-row justify-between items-center"
             style={{
               shadowColor: "#000",
               shadowOffset: { width: 1, height: 1 },
@@ -858,7 +859,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
             onPress={() => navigation.navigate("CapitalRequests")}
           >
             <Text className="text-base font-bold text-[#434343] ml-2">
-              {t("Dashboard.Capital Requests")}
+              {t("Dashboard.CapitalRequests")}
             </Text>
             <Image
               source={require("../../assets/images/dashboard/request.webp")}
@@ -873,9 +874,9 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
             />
           </TouchableOpacity>
         </View>
-         <View className="px-8 mt-4 mb-[15%]">
+        <View className="px-8 mt-4 mb-80">
           <TouchableOpacity
-            className="bg-[#FFF5BE] rounded-lg p-3 h-20 mr-4 w-full flex-row justify-between items-center"
+            className="bg-[#FFF5BE] rounded-lg p-3 h-28 mr-4 w-full flex-row justify-between items-center"
             style={{
               shadowColor: "#000",
               shadowOffset: { width: 1, height: 1 },
@@ -886,7 +887,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
             onPress={() => navigation.navigate("AddOnboardSupplier")}
           >
             <Text className="text-base font-bold text-[#434343] ml-2">
-              {t("Dashboard.Onboard Suppliers")}
+              {t("Dashboard.OnboardSuppliers")}
             </Text>
             <Image
               source={require("../../assets/images/dashboard/onboard-suppliers.webp")}
@@ -992,11 +993,10 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                         }}
                       >
                         <View
-                          className={`flex flex-row items-center justify-center rounded-full py-2 border ${
-                            selectedItem?.latitude && selectedItem?.longitude
+                          className={`flex flex-row items-center justify-center rounded-full py-2 border ${selectedItem?.latitude && selectedItem?.longitude
                               ? "border-[#F83B4F]"
                               : "border-[#9DB2CE]"
-                          }`}
+                            }`}
                         >
                           <FontAwesome6
                             name="location-dot"
@@ -1008,11 +1008,10 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                             }
                           />
                           <Text
-                            className={`text-base font-semibold ml-2 ${
-                              selectedItem?.latitude && selectedItem?.longitude
+                            className={`text-base font-semibold ml-2 ${selectedItem?.latitude && selectedItem?.longitude
                                 ? "text-[#000000]"
                                 : "text-[#9DB2CE]"
-                            }`}
+                              }`}
                           >
                             {t("VisitPopup.Location")}
                           </Text>
@@ -1026,14 +1025,14 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                         <View className="flex-row items-center justify-center border border-[#F83B4F] rounded-full px-6 py-2">
                           <Ionicons name="call" size={20} color="#F83B4F" />
                           <Text className="text-base font-semibold  ml-2">
-                            {t("VisitPopup.Get Call")}
+                            {t("VisitPopup.GetCall")}
                           </Text>
                         </View>
                       </TouchableOpacity>
                     </View>
                     {selectedItem.city ||
-                    selectedItem.plotNo ||
-                    selectedItem.street ? (
+                      selectedItem.plotNo ||
+                      selectedItem.street ? (
                       <View className="flex text-center justify-center items-center ">
                         <Text className="text-sm font-semibold text-[#4E6393] mb-2">
                           {t("VisitPopup.Address")}
@@ -1085,13 +1084,12 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                     colors={["#F2561D", "#FF1D85"]}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
-                    className={`py-2 items-center justify-center rounded-full mt-4 ${
-                      i18n.language === "si"
+                    className={`py-2 items-center justify-center rounded-full mt-4 ${i18n.language === "si"
                         ? "px-24"
                         : i18n.language === "ta"
                           ? "px-24"
                           : "px-[40%]"
-                    }`}
+                      }`}
                     style={{
                       marginBottom: 30,
                     }}

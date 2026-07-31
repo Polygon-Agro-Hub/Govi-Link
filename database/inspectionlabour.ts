@@ -59,7 +59,7 @@ export const saveLabourInfo = (
       [requestId],
     );
 
-    const storageData: any = { ...data };
+    const storageData: any = {};
 
     if (data.isManageFamilyLabour !== undefined) {
       storageData.isManageFamilyLabour = data.isManageFamilyLabour;
@@ -86,12 +86,16 @@ export const saveLabourInfo = (
       storageData.isMachineryCostEffective = data.isMachineryCostEffective;
     }
 
+    if (Object.keys(storageData).length === 0) {
+      return;
+    }
+
+    const keys = Object.keys(storageData);
+
     if (existing) {
-      const fields = Object.keys(storageData)
-        .map((key) => `${key} = ?`)
-        .join(", ");
+      const fields = keys.map((key) => `${key} = ?`).join(", ");
       const values = [
-        ...Object.values(storageData),
+        ...keys.map((key) => storageData[key]),
         new Date().toISOString(),
         requestId,
       ];
@@ -102,18 +106,11 @@ export const saveLabourInfo = (
       );
       console.log("Labour info updated in SQLite");
     } else {
-      const fields = [
-        "requestId",
-        ...Object.keys(storageData),
-        "createdAt",
-        "updatedAt",
-      ].join(", ");
-      const placeholders = new Array(Object.keys(storageData).length + 3)
-        .fill("?")
-        .join(", ");
+      const fields = ["requestId", ...keys, "createdAt", "updatedAt"].join(", ");
+      const placeholders = new Array(keys.length + 3).fill("?").join(", ");
       const values = [
         requestId,
-        ...Object.values(storageData),
+        ...keys.map((key) => storageData[key]),
         new Date().toISOString(),
         new Date().toISOString(),
       ];

@@ -13,7 +13,7 @@ import {
 import { RootStackParamList } from "@/component/types/types";
 import { useTranslation } from "react-i18next";
 import { LinearGradient } from "expo-linear-gradient";
-import { MaterialIcons } from "@expo/vector-icons";
+import { Entypo, MaterialIcons } from "@expo/vector-icons";
 import Svg, { Circle, G, Text as SvgText } from "react-native-svg";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -184,8 +184,8 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
     try {
       const token = await AsyncStorage.getItem("token");
       if (!token) {
-        Alert.alert(t("Error.Error"), t("Error.AuthTokenNotFound"), [
-          { text: t("Main.ok") },
+        Alert.alert(t("Error.Error"), t("Error.AuthTokenNotFoundPleaseLogInAgain"), [
+          { text: t("Main.OK") },
         ]);
         return;
       }
@@ -208,7 +208,7 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
         Alert.alert(
           t("Error.Error"),
           t("AssignJobOfficerList.FailedToFetchOfficers"),
-          [{ text: t("Main.ok") }],
+          [{ text: t("Main.OK") }],
         );
       }
     } catch (error) {
@@ -216,7 +216,7 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
       Alert.alert(
         t("Error.Error"),
         t("AssignJobOfficerList.FailedToLoadOfficers"),
-        [{ text: t("Main.ok") }],
+        [{ text: t("Main.OK") }],
       );
     } finally {
       setLoading(false);
@@ -257,8 +257,8 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
     try {
       const token = await AsyncStorage.getItem("token");
       if (!token) {
-        Alert.alert(t("Error.Error"), t("Error.AuthTokenNotFound"), [
-          { text: t("Main.ok") },
+        Alert.alert(t("Error.Error"), t("Error.AuthTokenNotFoundPleaseLogInAgain"), [
+          { text: t("Main.OK") },
         ]);
         return;
       }
@@ -284,27 +284,27 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
       if (response.data.status === "success") {
         Alert.alert(
           t("Main.Success"),
-          t("AssignJobOfficerList.AssignSuccess", {
+          t("AssignJobOfficerList.JobsAssignedSuccessfully", {
             name: getOfficerName(selectedOfficer),
           }),
           [
             {
-              text: t("Main.ok"),
+              text: t("Main.OK"),
               onPress: () => navigation.navigate("AssignJobs"),
             },
           ],
         );
       } else {
         Alert.alert(
-          t("Main.Error"),
-          t("AssignJobOfficerList.FailedToAssignJobs"),
-          [{ text: t("Main.ok") }],
+          t("Main.Sorry"),
+          t("AssignJobOfficerList.FailedToAssignJobsPleaseTryAgain"),
+          [{ text: t("Main.OK") }],
         );
       }
     } catch (error: any) {
       console.error("Failed to assign jobs:", error);
 
-      let errorMessage = t("AssignJobOfficerList.FailedToAssignJobs");
+      let errorMessage = t("AssignJobOfficerList.FailedToAssignJobsPleaseTryAgain");
 
       if (error.response) {
         console.error("Error response data:", error.response.data);
@@ -324,9 +324,9 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
       }
 
       Alert.alert(
-        t("Main.Error"),
-        t("AssignJobOfficerList.FailedToAssignJobs"),
-        [{ text: t("Main.ok") }],
+        t("Main.Sorry"),
+        t("AssignJobOfficerList.FailedToAssignJobsPleaseTryAgain"),
+        [{ text: t("Main.OK") }],
       );
     } finally {
       setAssigning(false);
@@ -372,24 +372,25 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
 
   return (
     <View className="flex-1 bg-white">
-      <View className="flex-row items-center px-4 py-3 border-b border-gray-200">
-        <TouchableOpacity
-          onPress={() => {
-            if (showConfirmationModal) {
-              handleUndo();
-            } else {
-              navigation.navigate("AssignJobs");
-            }
-          }}
-          className="bg-[#F6F6F680] rounded-full py-4 px-3"
-        >
-          <MaterialIcons
-            name="arrow-back-ios"
-            size={24}
-            color="black"
-            style={{ marginLeft: 10 }}
-          />
-        </TouchableOpacity>
+      <View className="flex-row items-center px-4 h-[70px] border-b border-gray-200">
+        <View className="w-16 items-start">
+          <TouchableOpacity
+            onPress={() => {
+              if (showConfirmationModal) {
+                handleUndo();
+              } else {
+                navigation.navigate("AssignJobs");
+              }
+            }}
+          >
+            <Entypo
+              name="chevron-left"
+              size={25}
+              color="black"
+              className="rounded-full p-3 bg-[#F6F6F6]/50"
+            />
+          </TouchableOpacity>
+        </View>
 
         <View className="flex-1 items-center">
           <Text className="text-lg font-bold text-black">
@@ -402,7 +403,7 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
           </Text>
         </View>
 
-        <View style={{ width: 55 }} />
+        <View className="w-16 items-end" />
       </View>
 
       {!showConfirmationModal ? (
@@ -410,7 +411,7 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
           <View className="flex-1 justify-center items-center">
             <ActivityIndicator size="large" color="#FF1D85" />
             <Text className="mt-4 text-[#565559]">
-              {t("AssignJobOfficerList.LoadingOfficers")}
+              {t("AssignJobOfficerList.LoadingOfficers...")}
             </Text>
           </View>
         ) : officers.length > 0 ? (
@@ -435,16 +436,18 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
                         {officer.empId}
                       </Text>
 
-                      <Text className="text-sm font-medium text-[#000000]">
-                        {t("AssignJobOfficerList.OfficerAssignedJobs")}:{" "}
-                        {officer.assigned}
-                      </Text>
+                      <Text className="text-sm font-normal text-[#000000]">
+  {t("AssignJobOfficerList.OfficerAssignedJobs")}:{" "}
+  <Text className="font-medium">
+    {officer.assigned}
+  </Text>
+</Text>
                     </View>
 
                     <TouchableOpacity
                       onPress={() => handleAssignToOfficer(officer)}
                       disabled={assigning}
-                      className={`px-5 py-3 rounded-3xl items-center mt-auto ml-3 ${
+                      className={`px-5 py-3 rounded-full items-center mt-auto ml-3 ${
                         assigning ? "bg-gray-400" : "bg-black"
                       }`}
                     >
@@ -452,7 +455,7 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
                         <ActivityIndicator size="small" color="white" />
                       ) : (
                         <Text className="text-white text-[14px] font-semibold">
-                          {t("AssignJobOfficerList.AssignButton")}
+                          {t("AssignJobOfficerList.Assign")}
                         </Text>
                       )}
                     </TouchableOpacity>
@@ -511,14 +514,14 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
             </View>
 
             <Text className="text-md text-center text-[#4E6393] mb-1 leading-6">
-              {t("AssignJobOfficerList.CountdownInstruction1")}{" "}
+              {t("AssignJobOfficerList.PleaseConfirmWithin")}{" "}
               <Text className="underline font-semibold text-black">
                 {formatTime(countdown)}
               </Text>{" "}
-              {t("AssignJobOfficerList.CountdownInstruction2")}
+              {t("AssignJobOfficerList.Seconds")}
             </Text>
             <Text className="text-md text-center text-[#4E6393] mb-8 leading-6">
-              {t("AssignJobOfficerList.CountdownInstruction3")}
+              {t("AssignJobOfficerList.YouCanUndoOtherwiseThisOfficerWillBeAssignedAutomatically")}
             </Text>
 
             {selectedOfficer && (
@@ -531,16 +534,18 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
                     <Text className="text-sm font-medium text-[#4E6393] mt-1">
                       {selectedOfficer.empId}
                     </Text>
-                    <Text className="text-sm font-medium text-[#000000]">
-                      {t("AssignJobOfficerList.OfficerAssignedJobs")}:{" "}
-                      {selectedOfficer.assigned}
+                    <Text className="text-sm font-normal text-[#000000]">
+                      {t("AssignJobOfficerList.OfficerAssignedJobs")}:
+                      <Text className="font-medium">
+                        {selectedOfficer.assigned}
+                      </Text>
                     </Text>
                   </View>
 
                   <TouchableOpacity
                     onPress={handleUndo}
                     disabled={assigning}
-                    className="ml-3 mt-auto"
+                    className="ml-3 mt-auto rounded-full overflow-hidden"
                   >
                     <LinearGradient
                       colors={
@@ -550,7 +555,7 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
                       }
                       start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 0 }}
-                      className="px-10 py-3 rounded-3xl items-center"
+                      className="px-10 rounded-full items-center justify-center h-[50px]"
                       style={{
                         shadowColor: "#000",
                         shadowOffset: { width: 0, height: 3 },
@@ -563,7 +568,7 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
                         <ActivityIndicator size="small" color="white" />
                       ) : (
                         <Text className="text-white text-md font-semibold">
-                          {t("AssignJobOfficerList.UndoButton")}
+                          {t("AssignJobOfficerList.Undo")}
                         </Text>
                       )}
                     </LinearGradient>
@@ -577,7 +582,7 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
             <TouchableOpacity
               onPress={handleConfirmAndLeave}
               disabled={assigning}
-              className="w-full"
+              className="w-full rounded-full overflow-hidden"
             >
               <LinearGradient
                 colors={
@@ -585,13 +590,13 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
                 }
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
-                className="rounded-3xl px-6 py-4 items-center"
+                className="rounded-full px-6 items-center justify-center h-[50px]"
               >
                 {assigning ? (
                   <ActivityIndicator size="small" color="white" />
                 ) : (
                   <Text className="text-white text-lg font-semibold">
-                    {t("AssignJobOfficerList.ConfirmLeaveButton")}
+                    {t("AssignJobOfficerList.ConfirmAndLeave")}
                   </Text>
                 )}
               </LinearGradient>

@@ -84,9 +84,9 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
         Alert.alert(
           t("Error.Sorry"),
           t(
-            "Error.Your login session has expired. Please log in again to continue.",
+            "Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue",
           ),
-          [{ text: t("Main.ok") }],
+          [{ text: t("Main.OK") }],
         );
         navigation.navigate("Login");
         return;
@@ -112,14 +112,14 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
         Alert.alert(
           t("Error.Sorry"),
           t(
-            "Error.Your login session has expired. Please log in again to continue.",
+            "Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue",
           ),
-          [{ text: t("Main.ok") }],
+          [{ text: t("Main.OK") }],
         );
         navigation.navigate("Login");
       } else {
-        Alert.alert(t("Error.Error"), t("Error.somethingWentWrong"), [
-          { text: t("Main.ok") },
+        Alert.alert(t("Error.Error"), t("Error.SomethingWentWrongPleaseTryAgainLater"), [
+          { text: t("Main.OK") },
         ]);
       }
     } finally {
@@ -172,7 +172,7 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
   if (loading && !refreshing) {
     return (
       <LoadingPage
-        message={t("ManageOfficers.LoadingOfficers")}
+        message={t("ManageOfficers.LoadingOfficers...")}
         fullScreen={true}
       />
     );
@@ -199,7 +199,7 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 100, flexGrow: 1 }}
       >
-        <View className="px-6 py-4 space-y-3 flex-1">
+        <View className="px-6 py-4 gap-3 flex-1">
           <Text className="mt-2 text-[#21202B] text-base">
             <Text className="font-bold">
               {t("ManageOfficers.OfficersList")}{" "}
@@ -211,7 +211,7 @@ const ManageOfficers: React.FC<ManageOfficersProps> = ({ navigation }) => {
 
           {officers.length === 0 ? (
             <View className="flex-1 items-center justify-center">
-            <NoDataComponent message={t("ManageOfficers.NoOfficers")} />
+            <NoDataComponent message={t("ManageOfficers.NoOfficersFound")} />
             </View>
           ) : (
             officers.map((officer, index) => (

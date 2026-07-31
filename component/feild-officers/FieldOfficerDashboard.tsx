@@ -83,40 +83,44 @@ interface DraftVisit {
 }
 
 const LoadingSkeleton = () => {
-  const rectWidth = wp("38%");
-  const gapBetweenRects = wp("8%");
-  const totalWidth = 2 * rectWidth + gapBetweenRects;
-  const startX = (wp("100%") - totalWidth) / 2;
-
+  const contentWidth = wp("100%") - 24;
   return (
     <View
-      style={{ flex: 1, backgroundColor: "#fff", paddingVertical: hp("2%") }}
+      style={{ flex: 1, backgroundColor: "#fff", paddingVertical: hp("1%") }}
     >
       <ContentLoader
         speed={1}
-        width="100%"
-        height={hp("100%")}
+        width={contentWidth}
+        height={640}
+        viewBox={`0 0 ${contentWidth} 640`}
         backgroundColor="#f3f3f3"
         foregroundColor="#ecebeb"
       >
-        <View className="mt-20">
-          <Rect
-            x={wp("6%")}
-            y={hp("2%")}
-            rx="10"
-            ry="10"
-            width={wp("82%")}
-            height={hp("15%")}
-          />
-          <Rect
-            x={wp("6%")}
-            y={hp("24%")}
-            rx="10"
-            ry="10"
-            width={wp("82%")}
-            height={hp("15%")}
-          />
-        </View>
+        {/* Today Visits Header */}
+        <Rect x={8} y={15} rx={4} ry={4} width={130} height={18} />
+        <Rect x={contentWidth - 8 - 65} y={15} rx={4} ry={4} width={65} height={18} />
+        
+        {/* Today Visits Carousel */}
+        <Rect x={8} y={85} rx={4} ry={4} width={18} height={24} />
+        <Rect x={wp("14%") - 12} y={45} rx={10} ry={10} width={wp("72%")} height={110} />
+        <Rect x={contentWidth - 8 - 18} y={85} rx={4} ry={4} width={18} height={24} />
+
+        {/* Saved Draft Header */}
+        <Rect x={8} y={185} rx={4} ry={4} width={100} height={18} />
+        
+        {/* Saved Draft Carousel */}
+        <Rect x={8} y={255} rx={4} ry={4} width={18} height={24} />
+        <Rect x={wp("14%") - 12} y={215} rx={10} ry={10} width={wp("72%")} height={110} />
+        <Rect x={contentWidth - 8 - 18} y={255} rx={4} ry={4} width={18} height={24} />
+
+        {/* Assigned Target Button Skeleton */}
+        <Rect x={32} y={345} rx={10} ry={10} width={contentWidth - 64} height={80} />
+
+        {/* Capital Requests Button Skeleton */}
+        <Rect x={32} y={441} rx={10} ry={10} width={contentWidth - 64} height={80} />
+
+        {/* Onboard Suppliers Button Skeleton */}
+        <Rect x={32} y={537} rx={10} ry={10} width={contentWidth - 64} height={80} />
       </ContentLoader>
     </View>
   );
@@ -223,14 +227,18 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
   const fetchUserProfile = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
+      const intentionalLogout = await AsyncStorage.getItem("intentional_logout");
+
       if (!token) {
-        Alert.alert(
-          t("Error.Sorry"),
-          t(
-            "Error.Your login session has expired. Please log in again to continue.",
-          ),
-          [{ text: t("Main.ok") }],
-        );
+        if (intentionalLogout !== "true") {
+          Alert.alert(
+            t("Error.Sorry"),
+            t(
+              "Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue",
+            ),
+            [{ text: t("Main.OK") }],
+          );
+        }
         return;
       }
       if (token) {
@@ -249,9 +257,9 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
         Alert.alert(
           t("Error.Sorry"),
           t(
-            "Error.Your login session has expired. Please log in again to continue.",
+            "Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue",
           ),
-          [{ text: t("Main.ok") }],
+          [{ text: t("Main.OK") }],
         );
         navigation.navigate("Login");
       }
@@ -416,7 +424,7 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
           <View className="p-2 mt-4">
             <View className="flex-row justify-between items-center mb-1">
               <Text className="text-base font-bold">
-                {t("Dashboard.Today Visits")}{" "}
+                {t("Dashboard.TodayVisits")}{" "}
                 <Text className="text-[#4E6393]">
                   ({visitsData.length.toString().padStart(2, "0")})
                 </Text>
@@ -429,7 +437,7 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
                 }
               >
                 <Text className="text-pink-500 font-semibold">
-                  {t("Dashboard.View All")}
+                  {t("Dashboard.ViewAll")}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -563,14 +571,14 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
                 resizeMode="contain"
               />
               <Text className="italic text-[#787878] mt-2 text-center">
-                {t("Dashboard.No Jobs for Today")}
+                {t("Dashboard.NoJobsForToday")}
               </Text>
             </View>
           )}
 
           <View className="p-2 mt-10">
             <Text className="text-base font-bold mb-3">
-              {t("Dashboard.Saved Draft")}
+              {t("Dashboard.SavedDraft")}
             </Text>
           </View>
 
@@ -723,108 +731,108 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
                   resizeMode="contain"
                 />
                 <Text className="italic text-[#787878] mt-4 text-center">
-                  {t("Dashboard.No Saved Drafts for Today")}
+                  {t("Dashboard.NoSavedDraftsForToday")}
                 </Text>
               </View>
             )}
           </View>
-        </>
-      )}
-      <View className="mt-8 mx-8">
-        <TouchableOpacity
-          onPress={() =>
-            navigation.navigate("ViewAllVisits", {
-              officerId: profile?.empId ?? "",
-            })
-          }
-          className="bg-[#FFE5D6] rounded-lg p-3 h-20 mr-4 w-full flex-row justify-between items-center"
-          style={{
-            shadowColor: "#000",
-            shadowOffset: { width: 1, height: 1 },
-            shadowOpacity: 0.3,
-            shadowRadius: 6,
-            elevation: 2,
-          }}
-        >
-          <Text className="text-base font-bold text-[#434343]">
-            {t("Dashboard.Assigned Target")}
-          </Text>
-          <Image
-            source={require("../../assets/images/dashboard/assigned-target.webp")}
-            style={{
-              width: 100,
-              height: 70,
-              position: "absolute",
-              bottom: 0,
-              right: 10,
-            }}
-            resizeMode="contain"
-          />
-        </TouchableOpacity>
-      </View>
-      <View className="p-8">
-        <TouchableOpacity
-          className="bg-[#FEE5E6] rounded-lg p-3 h-20 mr-4 w-full flex-row justify-between items-center"
-          style={{
-            shadowColor: "#000",
-            shadowOffset: { width: 1, height: 1 },
-            shadowOpacity: 0.3,
-            shadowRadius: 6,
-            elevation: 2,
-          }}
-          onPress={() =>
-            navigation.navigate("Main", {
-              screen: "MainTabs",
-              params: {
-                screen: "CapitalRequests",
-              },
-            })
-          }
-        >
-          <Text className="text-base font-bold text-[#434343] ml-2">
-            {t("Dashboard.Capital Requests")}
-          </Text>
-          <Image
-            source={require("../../assets/images/dashboard/request.webp")}
-            style={{
-              width: 100,
-              height: 70,
-              position: "absolute",
-              bottom: 0,
-              right: 10,
-            }}
-            resizeMode="contain"
-          />
-        </TouchableOpacity>
-      </View>
-      <View className="px-8  mb-[15%]">
-        <TouchableOpacity
-          className="bg-[#FFF5BE] rounded-lg p-3 h-20 mr-4 w-full flex-row justify-between items-center"
-          style={{
-            shadowColor: "#000",
-            shadowOffset: { width: 1, height: 1 },
-            shadowOpacity: 0.3,
-            shadowRadius: 6,
-            elevation: 2,
-          }}
-          onPress={() => navigation.navigate("AddOnboardSupplierOfficer")}
-        >
-          <Text className="text-base font-bold text-[#434343] ml-2">
-            {t("Dashboard.Onboard Suppliers")}
-          </Text>
-          <Image
-            source={require("../../assets/images/dashboard/onboard-suppliers.webp")}
-            style={{
-              width: 100,
-              height: 70,
-              position: "absolute",
-              bottom: 0,
-              right: -5,
-            }}
-            resizeMode="contain"
-          />
-        </TouchableOpacity>
-      </View>
+          <View className="mt-8 mx-8">
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate("ViewAllVisits", {
+                    officerId: profile?.empId ?? "",
+                  })
+                }
+                className="bg-[#FFE5D6] rounded-lg p-3 h-20 mr-4 w-full flex-row justify-between items-center"
+                style={{
+                  shadowColor: "#000",
+                  shadowOffset: { width: 1, height: 1 },
+                  shadowOpacity: 0.3,
+                  shadowRadius: 6,
+                  elevation: 2,
+                }}
+              >
+                <Text className="text-base font-bold text-[#434343]">
+                  {t("Dashboard.AssignedTarget")}
+                </Text>
+                <Image
+                  source={require("../../assets/images/dashboard/assigned-target.webp")}
+                  style={{
+                    width: 100,
+                    height: 70,
+                    position: "absolute",
+                    bottom: 0,
+                    right: 10,
+                  }}
+                  resizeMode="contain"
+                />
+              </TouchableOpacity>
+            </View>
+            <View className="p-8">
+              <TouchableOpacity
+                className="bg-[#FEE5E6] rounded-lg p-3 h-20 mr-4 w-full flex-row justify-between items-center"
+                style={{
+                  shadowColor: "#000",
+                  shadowOffset: { width: 1, height: 1 },
+                  shadowOpacity: 0.3,
+                  shadowRadius: 6,
+                  elevation: 2,
+                }}
+                onPress={() =>
+                  navigation.navigate("Main", {
+                    screen: "MainTabs",
+                    params: {
+                      screen: "CapitalRequests",
+                    },
+                  })
+                }
+              >
+                <Text className="text-base font-bold text-[#434343] ml-2">
+                  {t("Dashboard.CapitalRequests")}
+                </Text>
+                <Image
+                  source={require("../../assets/images/dashboard/request.webp")}
+                  style={{
+                    width: 100,
+                    height: 70,
+                    position: "absolute",
+                    bottom: 0,
+                    right: 10,
+                  }}
+                  resizeMode="contain"
+                />
+              </TouchableOpacity>
+            </View>
+            <View className="px-8  mb-[15%]">
+              <TouchableOpacity
+                className="bg-[#FFF5BE] rounded-lg p-3 h-20 mr-4 w-full flex-row justify-between items-center"
+                style={{
+                  shadowColor: "#000",
+                  shadowOffset: { width: 1, height: 1 },
+                  shadowOpacity: 0.3,
+                  shadowRadius: 6,
+                  elevation: 2,
+                }}
+                onPress={() => navigation.navigate("AddOnboardSupplierOfficer")}
+              >
+                <Text className="text-base font-bold text-[#434343] ml-2">
+                  {t("Dashboard.OnboardSuppliers")}
+                </Text>
+                <Image
+                  source={require("../../assets/images/dashboard/onboard-suppliers.webp")}
+                  style={{
+                    width: 100,
+                    height: 70,
+                    position: "absolute",
+                    bottom: 0,
+                    right: -5,
+                  }}
+                  resizeMode="contain"
+                />
+              </TouchableOpacity>
+            </View>
+          </>
+        )}
       <Modal transparent visible={showPopup} animationType="none">
         <View
           style={{
@@ -913,7 +921,7 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
                       }}
                     >
                       <View
-                        className={`flex flex-row items-center justify-center rounded-full py-2 border ${
+                        className={`flex flex-row items-center justify-center rounded-full h-[50px] border ${
                           selectedItem?.latitude && selectedItem?.longitude
                             ? "border-[#F83B4F]"
                             : "border-[#9DB2CE]"
@@ -944,10 +952,10 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
                       className="flex w-1/2"
                       onPress={() => handleDial(selectedItem.farmerMobile)}
                     >
-                      <View className="flex-row items-center justify-center border border-[#F83B4F] rounded-full px-6 py-2">
+                      <View className="flex-row items-center justify-center border border-[#F83B4F] rounded-full px-6 h-[50px]">
                         <Ionicons name="call" size={20} color="#F83B4F" />
                         <Text className="text-base font-semibold  ml-2">
-                          {t("VisitPopup.Get Call")}
+                          {t("VisitPopup.GetCall")}
                         </Text>
                       </View>
                     </TouchableOpacity>
@@ -1006,7 +1014,7 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
                   colors={["#F2561D", "#FF1D85"]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
-                  className={`py-2 items-center justify-center rounded-full mt-4 ${
+                  className={`h-[50px] items-center justify-center rounded-full mt-4 ${
                     i18n.language === "si"
                       ? "px-24"
                       : i18n.language === "ta"

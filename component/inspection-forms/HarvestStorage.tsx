@@ -9,7 +9,7 @@ import {
   Platform,
   Modal,
 } from "react-native";
-import { AntDesign } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
 import { useTranslation } from "react-i18next";
 import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
@@ -21,7 +21,6 @@ import FormFooterButton from "./FormFooterButton";
 import {
   saveHarvestStorageInfo,
   getHarvestStorageInfo,
-  clearHarvestStorageInfo,
   HarvestStorageData,
 } from "@/database/inspectionharvest";
 import { updateLastScreen } from "@/database/inspectionprogress";
@@ -89,7 +88,7 @@ const YesNoSelect = ({
         </Text>
 
         <TouchableOpacity
-          className="bg-[#F6F6F6] rounded-full px-4 py-4 flex-row items-center justify-between"
+          className="bg-[#F6F6F6] rounded-full px-4 h-[50px] flex-row items-center justify-between"
           onPress={onOpen}
           activeOpacity={0.7}
         >
@@ -100,7 +99,7 @@ const YesNoSelect = ({
               {t("InspectionForm.--Select From Here--")}
             </Text>
           )}
-          <AntDesign name="down" size={20} color="#838B8C" />
+          <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
         </TouchableOpacity>
       </View>
     </>
@@ -232,12 +231,12 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
 
     setIsNextEnabled(
       hasOwnStorageValid &&
-        facilityAccessValid &&
-        primaryProcessingValid &&
-        valueAdditionTechValid &&
-        marketLinkageValid &&
-        qualityStandardsValid &&
-        !hasErrors,
+      facilityAccessValid &&
+      primaryProcessingValid &&
+      valueAdditionTechValid &&
+      marketLinkageValid &&
+      qualityStandardsValid &&
+      !hasErrors,
     );
   }, [formData, errors]);
 
@@ -358,8 +357,8 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       const errorMessage = "• " + Object.values(validationErrors).join("\n• ");
-      Alert.alert(t("Error.Validation Error"), errorMessage, [
-        { text: t("Main.ok") },
+      Alert.alert(t("Error.ValidationError"), errorMessage, [
+        { text: t("Main.OK") },
       ]);
       return;
     }
@@ -477,7 +476,7 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
           <View className="h-6" />
 
           <YesNoSelect
-            label={t("InspectionForm.Does the farmer own storage facility")}
+            label={t("InspectionForm.DoesTheFarmerOwnStorageFacility")}
             required
             value={formData.hasOwnStorage || null}
             visible={yesNoModalVisible && activeYesNoField === "hasOwnStorage"}
@@ -495,7 +494,7 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
           {formData.hasOwnStorage === "No" && (
             <YesNoSelect
               label={t(
-                "InspectionForm.If not, does the farmer have access to such facility",
+                "InspectionForm.IfNotDoesTheFarmerHaveAccessToSuchFacility",
               )}
               required
               value={formData.ifNotHasFacilityAccess || null}
@@ -519,7 +518,7 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
 
           <YesNoSelect
             label={t(
-              "InspectionForm.Does the farmer has access to primary processing facility",
+              "InspectionForm.DoesTheFarmerHasAccessToPrimaryProcessingFacility",
             )}
             required
             value={formData.hasPrimaryProcessingAccess || null}
@@ -542,7 +541,7 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
 
           <YesNoSelect
             label={t(
-              "InspectionForm.Does the farmer knows technologies for value addition of your crop",
+              "InspectionForm.DoesTheFarmerKnowsTechnologiesForValueAdditionOfYourCrop",
             )}
             required
             value={formData.knowsValueAdditionTech || null}
@@ -564,7 +563,7 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
 
           <YesNoSelect
             label={t(
-              "InspectionForm.Does the farmer has market linkage for value added products",
+              "InspectionForm.DoesTheFarmerHasMarketLinkageForValueAddedProducts",
             )}
             required
             value={formData.hasValueAddedMarketLinkage || null}
@@ -587,7 +586,7 @@ const HarvestStorage: React.FC<HarvestStorageProps> = ({ navigation }) => {
 
           <YesNoSelect
             label={t(
-              "InspectionForm.Is farmer aware about required quality standards of value added products of proposed crops",
+              "InspectionForm.IsFarmerAwareAboutRequiredQualityStandardsOfValueAddedProductsOfProposedCrops",
             )}
             required
             value={formData.awareOfQualityStandards || null}
