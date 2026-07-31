@@ -65,12 +65,33 @@ const AddOnboardSupplierOfficer: React.FC<AddOnboardSupplierOfficerProps> = ({
     return true;
   };
 
+  const validateDomain = (domain: string): boolean => {
+    if (!domain) return false;
+
+    if (domain.startsWith(".") || domain.endsWith(".")) return false;
+    if (domain.startsWith("-") || domain.endsWith("-")) return false;
+    if (domain.includes("..")) return false;
+
+    const labels = domain.split(".");
+    if (labels.length < 2) return false;
+
+    return labels.every((label) => {
+      if (label.length === 0) return false;
+      if (!/^[a-zA-Z0-9-]+$/.test(label)) return false;
+      if (label.startsWith("-") || label.endsWith("-")) return false;
+      return true;
+    });
+  };
+
   const validateEmail = (value: string): boolean => {
     const generalRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!generalRegex.test(value)) return false;
 
     const emailLower = value.toLowerCase();
     const [localPart, domain] = emailLower.split("@");
+
+    if (!validateDomain(domain)) return false;
+
     const allowedTLDs = [".com", ".gov", ".lk"];
 
     if (domain === "gmail.com" || domain === "googlemail.com")
@@ -110,10 +131,7 @@ const AddOnboardSupplierOfficer: React.FC<AddOnboardSupplierOfficerProps> = ({
     if (filtered.length === 0) {
       clearError("nic");
     } else if (!validateNicNumber(filtered)) {
-      setError(
-        "nic",
-        t("Error.NicNumberMustBe9DigitsFollowedByVOr12Digits"),
-      );
+      setError("nic", t("Error.NicNumberMustBe9DigitsFollowedByVOr12Digits"));
     } else {
       clearError("nic");
     }
@@ -132,7 +150,12 @@ const AddOnboardSupplierOfficer: React.FC<AddOnboardSupplierOfficerProps> = ({
     if (!validateEmail(trimmed)) {
       const domain = trimmed.toLowerCase().split("@")[1];
       if (domain === "gmail.com" || domain === "googlemail.com") {
-        setError("email", t("Error.InvalidGmailAddressGmailAddressesCannotHaveConsecutiveDotsLeadingTrailingDotsOrSpecialCharacters"));
+        setError(
+          "email",
+          t(
+            "Error.InvalidGmailAddressGmailAddressesCannotHaveConsecutiveDotsLeadingTrailingDotsOrSpecialCharacters",
+          ),
+        );
       } else {
         setError("email", t("Error.InvalidEmailAddress"));
       }
@@ -145,9 +168,7 @@ const AddOnboardSupplierOfficer: React.FC<AddOnboardSupplierOfficerProps> = ({
     const newErrors: Record<string, string> = {};
 
     if (!supplierName.trim())
-      newErrors.supplierName = t(
-        "OnboardSupplier.SupplierFullNameIsRequired",
-      );
+      newErrors.supplierName = t("OnboardSupplier.SupplierFullNameIsRequired");
 
     if (!contact.trim()) {
       newErrors.contact = t("Error.MobileNumberIsRequired");
@@ -160,9 +181,7 @@ const AddOnboardSupplierOfficer: React.FC<AddOnboardSupplierOfficerProps> = ({
     if (!nic.trim()) {
       newErrors.nic = t("Error.NicNumberIsRequired");
     } else if (!validateNicNumber(nic)) {
-      newErrors.nic = t(
-        "Error.NicNumberMustBe9DigitsFollowedByVOr12Digits",
-      );
+      newErrors.nic = t("Error.NicNumberMustBe9DigitsFollowedByVOr12Digits");
     }
 
     if (!email.trim()) {
@@ -180,9 +199,7 @@ const AddOnboardSupplierOfficer: React.FC<AddOnboardSupplierOfficerProps> = ({
       if (!token) {
         Alert.alert(
           t("Error.Sorry"),
-          t(
-            "Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue",
-          ),
+          t("Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue"),
         );
         return false;
       }
@@ -199,9 +216,7 @@ const AddOnboardSupplierOfficer: React.FC<AddOnboardSupplierOfficerProps> = ({
 
       const duplicateErrors: Record<string, string> = {};
       if (contactExists)
-        duplicateErrors.contact = t(
-          "Error.ThisPhoneNumberIsAlreadyRegistered",
-        );
+        duplicateErrors.contact = t("Error.ThisPhoneNumberIsAlreadyRegistered");
       if (emailExists)
         duplicateErrors.email = t("Error.ThisEmailIsAlreadyRegistered");
       if (nicExists)

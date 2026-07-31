@@ -109,7 +109,10 @@
     "LandOwnershipIsRequired": "ඉඩම් හිමිකම අවශ්‍යයි",
     "OwnershipStatusIsRequired": "හිමිකාරිත්ව තත්ත්වය අවශ්‍යයි",
     "KnowledgeFieldIsRequired": "දැනුම ක්ෂේත්‍රය අවශ්‍යයි",
-    "PreviousExperienceIsRequired": "පෙර අත්දැකීම් අවශ්‍යයි"
+    "PreviousExperienceIsRequired": "පෙර අත්දැකීම් අවශ්‍යයි",
+    "EmailDomainIsInvalidCheckForLeadingTrailingDotsOrHyphens": "වලංගු නොවන විද්‍යුත් තැපැල් වසම. කරුණාකර මුල/අගට තිත් හෝ හයිෆන් තිබේදැයි පරීක්ෂා කරන්න",
+    "InvalidYahooAddress": "කරුණාකර වලංගු Yahoo විද්‍යුත් තැපැල් ලිපිනයක් ඇතුළත් කරන්න",
+    "UnsupportedEmailDomain": "කරුණාකර සහාය දක්වන වසමක් (.com, .gov, .lk) සහිත වලංගු විද්‍යුත් තැපැල් ලිපිනයක් ඇතුළත් කරන්න"
   },
   "Login": {
     "Welcome": "සාදරයෙන් පිළිගනිමු!",

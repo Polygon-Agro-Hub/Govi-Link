@@ -221,10 +221,19 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
           });
         } else {
           if (role === "Chief Field Officer") {
-            navigation.navigate("Main", { screen: "Dashboard" });
+            navigation.reset({
+              index: 0,
+              routes: [{ name: "Main", params: { screen: "Dashboard" } }],
+            });
           } else if (role === "Field Officer") {
-            navigation.navigate("Main", {
-              screen: "FieldOfficerDashboard",
+            navigation.reset({
+              index: 0,
+              routes: [
+                {
+                  name: "Main",
+                  params: { screen: "FieldOfficerDashboard" },
+                },
+              ],
             });
           }
         }

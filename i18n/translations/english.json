@@ -109,7 +109,10 @@
     "LandOwnershipIsRequired": "Land ownership is required",
     "OwnershipStatusIsRequired": "Ownership status is required",
     "KnowledgeFieldIsRequired": "Knowledge field is required",
-    "PreviousExperienceIsRequired": "Previous experience is required"
+    "PreviousExperienceIsRequired": "Previous experience is required",
+    "EmailDomainIsInvalidCheckForLeadingTrailingDotsOrHyphens": "Invalid email domain. Please check for leading/trailing dots or hyphens",
+    "InvalidYahooAddress": "Please enter a valid Yahoo email address",
+    "UnsupportedEmailDomain": "Please enter a valid email address with a supported domain (.com, .gov, .lk)"
   },
   "Login": {
     "Welcome": "Welcome!",

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import {
   View,
   Text,
@@ -11,7 +11,7 @@ import {
   Pressable,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RouteProp, useRoute } from "@react-navigation/native";
+import { RouteProp, useRoute, useFocusEffect } from "@react-navigation/native";
 import { RootStackParamList } from "../types/types";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -193,9 +193,12 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
     } finally {
     }
   };
-  useEffect(() => {
-    fetchclusteVisits();
-  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchclusteVisits();
+    }, [feildauditId]),
+  );
 
   const handleDial = (farmerMobile: string) => {
     const phoneUrl = `tel:${farmerMobile}`;

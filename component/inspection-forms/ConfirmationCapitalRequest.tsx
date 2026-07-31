@@ -70,20 +70,43 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
     navigateToCapitalRequests();
   }, [navigateToCapitalRequests]);
 
-  const handleAutoAssign = useCallback(() => {
+  const handleAutoAssign = useCallback(async () => {
     if (hasNavigatedRef.current) return;
     if (cancelledRef.current) return;
 
     hasNavigatedRef.current = true;
     setShowConfirmationModal(false);
+    setAssigning(true);
 
-    navigation.replace("Main", {
-      screen: "MainTabs",
-      params: {
-        screen: "CapitalRequests",
-      },
-    });
-  }, [navigation]);
+    try {
+      const response = await axios.patch(
+        `${environment.API_BASE_URL}api/capital-request/confirm-leave/${requestId}`,
+      );
+
+      if (cancelledRef.current) return;
+
+      if (response.data.success) {
+        setAssigning(false);
+        setSuccessModalVisible(true);
+      } else {
+        throw new Error(response.data.message || "Confirmation failed");
+      }
+    } catch (error: any) {
+      if (cancelledRef.current) return;
+
+      console.error("Error auto-confirming request:", error);
+      setAssigning(false);
+
+      Alert.alert(
+        t("Main.Sorry"),
+        error.response?.data?.message ||
+          t("ConfirmationCapitalRequest.ConfirmFailed"),
+        [{ text: t("Main.OK") }],
+      );
+
+      navigateToCapitalRequests();
+    }
+  }, [requestId, t, navigateToCapitalRequests]);
 
   const startCountdownAnimation = useCallback(() => {
     if (isAnimationStartedRef.current) return;
@@ -158,7 +181,9 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
 
     Alert.alert(
       t("Main.Success"),
-      t("ConfirmationCapitalRequest.TheRequestCompletionProcessWasCancelledYourSubmittedDataRemainsUnchanged"),
+      t(
+        "ConfirmationCapitalRequest.TheRequestCompletionProcessWasCancelledYourSubmittedDataRemainsUnchanged",
+      ),
       [
         {
           text: t("Main.OK"),
@@ -324,7 +349,9 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
           </View>
 
           <Text className="text-md text-center text-[#4E6393] mb-1 leading-6">
-            {t("ConfirmationCapitalRequest.ThisRequestWillBeAutomaticallyConfirmedIn")}{" "}
+            {t(
+              "ConfirmationCapitalRequest.ThisRequestWillBeAutomaticallyConfirmedIn",
+            )}{" "}
             <Text className="underline font-semibold text-black">
               {formatTime(countdown)}
             </Text>{" "}
@@ -356,14 +383,13 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
                   className="px-10 py-3 rounded-3xl items-center"
-                  
                   style={{
                     shadowColor: "#000000",
                     shadowOffset: { width: 0, height: 4 },
                     shadowOpacity: 0.25,
                     shadowRadius: 10,
                     elevation: 6,
-                    overflow: "hidden"
+                    overflow: "hidden",
                   }}
                 >
                   {assigning ? (
@@ -400,7 +426,7 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
                 shadowOpacity: 0.25,
                 shadowRadius: 5,
                 elevation: 6,
-                overflow: "hidden" 
+                overflow: "hidden",
               }}
             >
               {assigning ? (
