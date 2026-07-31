@@ -127,7 +127,6 @@ function MainTabs() {
           <Tab.Screen name="Dashboard" component={Dashboard} />
           <Tab.Screen name="Profile" component={ProfileScreen} />
           <Tab.Screen name="ViewAllVisits" component={ViewAllVisits as any} />
-
           <Tab.Screen name="ManageOfficers" component={ManageOfficers} />
           <Tab.Screen name="AddOfficerStep1" component={AddOfficerStep1} />
           <Tab.Screen name="AddOfficerStep2" component={AddOfficerStep2} />
