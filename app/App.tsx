@@ -79,7 +79,6 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import BannedScreen from "@/component/auth/BannedScreen";
 import { AlertModal, setGlobalAlertListener } from "@/component/commons/AlertModal";
-
 import { initDatabase } from "@/database/index";
 
 LogBox.ignoreAllLogs(true);
@@ -128,7 +127,6 @@ function MainTabs() {
           <Tab.Screen name="Dashboard" component={Dashboard} />
           <Tab.Screen name="Profile" component={ProfileScreen} />
           <Tab.Screen name="ViewAllVisits" component={ViewAllVisits as any} />
-
           <Tab.Screen name="ManageOfficers" component={ManageOfficers} />
           <Tab.Screen name="AddOfficerStep1" component={AddOfficerStep1} />
           <Tab.Screen name="AddOfficerStep2" component={AddOfficerStep2} />
@@ -346,7 +344,11 @@ function AppContent() {
             <Stack.Screen name="Splash" component={Splash} />
             <Stack.Screen name="Language" component={Lanuage} />
             <Stack.Screen name="Login" component={Login} />
-            <Stack.Screen name="Main" component={MainDrawer} />
+            <Stack.Screen
+              name="Main"
+              component={MainDrawer}
+              options={{ gestureEnabled: false }}
+            />
             <Stack.Screen
               name="CertificateQuesanory"
               component={CertificateQuesanory}

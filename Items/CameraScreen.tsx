@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
-import { View, TouchableOpacity, Text, Linking, Alert } from "react-native";
+import React, { useRef, useState } from "react";
+import { View, TouchableOpacity, Text } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { Ionicons } from "@expo/vector-icons";
 import CameraAccess from "../component/permission/CameraAccess";
@@ -14,9 +14,13 @@ export function CameraScreen({
   const [isReady, setIsReady] = useState(false);
 
   const takePhoto = async () => {
-    if (cameraRef.current) {
+    if (!cameraRef.current || !isReady) return;
+    try {
       const photo = await cameraRef.current.takePictureAsync({ quality: 0.6 });
       onClose(photo?.uri ?? null);
+    } catch (err) {
+      console.error("Failed to take photo:", err);
+      onClose(null);
     }
   };
 
@@ -56,3 +60,5 @@ export function CameraScreen({
     </View>
   );
 }
+
+export default CameraScreen;

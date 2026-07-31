@@ -10,6 +10,7 @@ import {
   Platform,
   Keyboard,
   BackHandler,
+  Dimensions,
 } from "react-native";
 import React, { useCallback, useState } from "react";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -37,6 +38,8 @@ interface LoginProps {
 }
 
 const loginImage = require("@/assets/images/auth/login.webp");
+
+const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 const Login: React.FC<LoginProps> = ({ navigation }) => {
   const [empid, setEmpid] = useState("");
@@ -218,10 +221,19 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
           });
         } else {
           if (role === "Chief Field Officer") {
-            navigation.navigate("Main", { screen: "Dashboard" });
+            navigation.reset({
+              index: 0,
+              routes: [{ name: "Main", params: { screen: "Dashboard" } }],
+            });
           } else if (role === "Field Officer") {
-            navigation.navigate("Main", {
-              screen: "FieldOfficerDashboard",
+            navigation.reset({
+              index: 0,
+              routes: [
+                {
+                  name: "Main",
+                  params: { screen: "FieldOfficerDashboard" },
+                },
+              ],
             });
           }
         }
@@ -347,27 +359,53 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity
-            className="rounded-3xl mb-5 overflow-hidden h-[50px] w-full self-center"
-            disabled={loading}
-            onPress={handleLogin}
-            style={{ opacity: loading ? 0.7 : 1 }}
-          >
-            <LinearGradient
-              colors={["#F2561D", "#FF1D85"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              className="flex-1 items-center justify-center"
+          <View style={{ width: "100%", alignItems: "center", marginBottom: 20 }}>
+            <View
+              style={{
+                width: "100%",
+                borderRadius: 999,
+                shadowColor: "#FF1D85",
+                shadowOffset: { width: 0, height: 8 },
+                shadowOpacity: 0.45,
+                shadowRadius: 12,
+                elevation: 12,
+              }}
             >
-              {loading ? (
-                <ActivityIndicator color="white" size="small" />
-              ) : (
-                <Text className="text-white text-lg font-semibold tracking-wide text-center">
-                  {t("Login.SignIn")}
-                </Text>
-              )}
-            </LinearGradient>
-          </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handleLogin}
+                disabled={loading}
+                activeOpacity={0.8}
+                style={{ width: "100%", borderRadius: 999 }}
+              >
+                <LinearGradient
+                  colors={["#F2561D", "#FF1D85"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={{
+                    borderRadius: 999,
+                    paddingVertical: 16,
+                    width: "100%",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  {loading ? (
+                    <ActivityIndicator color="white" size="small" />
+                  ) : (
+                    <Text
+                      style={{
+                        color: "white",
+                        fontSize: SCREEN_HEIGHT > 900 ? 20 : 18,
+                        fontWeight: "700",
+                      }}
+                    >
+                      {t("Login.SignIn")}
+                    </Text>
+                  )}
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

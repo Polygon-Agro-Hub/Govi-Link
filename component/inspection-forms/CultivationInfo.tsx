@@ -956,7 +956,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
               })
             }
             required
-            keyboardType={"phone-pad"}
+            keyboardType={"decimal-pad"} 
             error={hasAttemptedNext ? errors.ph : undefined}
           />
 
