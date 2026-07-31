@@ -24,6 +24,8 @@ import { environment } from "@/environment/environment";
 import { Ionicons, FontAwesome6 } from "@expo/vector-icons";
 import { RouteProp } from "@react-navigation/native";
 import NoDataComponent from "../commons/NoDataComponent";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/services/store";
 
 type ViewAllVisitsNavigationProps = StackNavigationProp<
   RootStackParamList,
@@ -65,6 +67,17 @@ interface VisitItem {
 
 const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
   const { t, i18n } = useTranslation();
+  const userRole = useSelector((state: RootState) => state.auth.jobRole);
+  const [storedRole, setStoredRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    const getRole = async () => {
+      const role = await AsyncStorage.getItem("jobRole");
+      setStoredRole(role);
+    };
+    getRole();
+  }, []);
+
   const officerId = route.params?.officerId ?? "";
   const today = dayjs();
   const [selectedDate, setSelectedDate] = useState(dayjs());
@@ -241,8 +254,8 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
     );
   };
 
-  const shouldShowBackButton =
-    officerId && officerId.toString().startsWith("FIO");
+  const effectiveRole = userRole || storedRole;
+  const shouldShowBackButton = effectiveRole === "Field Officer";
 
   return (
     <View className="flex-1 bg-[#F5F7FB] pt-4">
@@ -407,6 +420,8 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
                     item.completionPercentage < "20"
                   ) {
                     displayStatus = `${t("Visits.Pending")} (${item.completedClusterCount}/${item.totalClusterCount})`;
+                  } else if (item.status === "Ongoing") {
+                    displayStatus = `${t("Visits.Ongoing")} (${item.completedClusterCount || 0}/${item.totalClusterCount})`;
                   } else {
                     displayStatus = `${t("Visits.Pending")} (0/${item.totalClusterCount})`;
                   }

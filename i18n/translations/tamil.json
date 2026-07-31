@@ -109,7 +109,10 @@
     "LandOwnershipIsRequired": "நில உரிமை தேவைப்படுகிறது",
     "OwnershipStatusIsRequired": "உரிமை நிலை தேவைப்படுகிறது",
     "KnowledgeFieldIsRequired": "துறை சார்ந்த அறிவு தேவைப்படுகிறது",
-    "PreviousExperienceIsRequired": "முன் அனுபவம் தேவை"
+    "PreviousExperienceIsRequired": "முன் அனுபவம் தேவை",
+    "EmailDomainIsInvalidCheckForLeadingTrailingDotsOrHyphens": "மின்னஞ்சல் டொமைன் தவறானது. முன்/பின் புள்ளிகள் அல்லது ஹைபன்கள் உள்ளதா எனச் சரிபார்க்கவும்",
+    "InvalidYahooAddress": "சரியான Yahoo மின்னஞ்சல் முகவரியை உள்ளிடவும்",
+    "UnsupportedEmailDomain": "ஆதரிக்கப்படும் டொமைனுடன் (.com, .gov, .lk) சரியான மின்னஞ்சல் முகவரியை உள்ளிடவும்"
   },
   "Login": {
     "Welcome": "வரவேற்கிறோம்",

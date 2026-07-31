@@ -65,12 +65,27 @@ const AddOnboardSupplier: React.FC<AddOnboardSupplierProps> = ({
     return true;
   };
 
+  const validateDomainStructure = (domain: string): boolean => {
+    if (!domain) return false;
+    if (domain.startsWith(".") || domain.endsWith(".")) return false;
+    if (domain.includes("..")) return false;
+
+    const labels = domain.split(".");
+    if (labels.length < 2) return false;
+
+    const labelRegex = /^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?$/;
+    return labels.every((label) => labelRegex.test(label));
+  };
+
   const validateEmail = (value: string): boolean => {
     const generalRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!generalRegex.test(value)) return false;
 
     const emailLower = value.toLowerCase();
     const [localPart, domain] = emailLower.split("@");
+
+    if (!validateDomainStructure(domain)) return false;
+
     const allowedTLDs = [".com", ".gov", ".lk"];
 
     if (domain === "gmail.com" || domain === "googlemail.com")

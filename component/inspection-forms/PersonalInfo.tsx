@@ -66,8 +66,9 @@ const Input = ({
       {label} {required && <Text className="text-black">*</Text>}
     </Text>
     <View
-      className={`bg-[#F6F6F6] rounded-3xl h-[50px] flex-row items-center ${error ? "border border-red-500" : ""
-        }`}
+      className={`bg-[#F6F6F6] rounded-3xl h-[50px] flex-row items-center ${
+        error ? "border border-red-500" : ""
+      }`}
     >
       <TextInput
         placeholder={placeholder}
@@ -97,11 +98,17 @@ type ValidationRule = {
 };
 
 const validateEmail = (email: string): boolean => {
-  const generalEmailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  const generalEmailRegex =
+    /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/;
+
   if (!generalEmailRegex.test(email)) return false;
 
   const emailLower = email.toLowerCase();
   const [localPart, domain] = emailLower.split("@");
+
+  if (domain.startsWith(".") || domain.endsWith(".") || domain.includes("..")) {
+    return false;
+  }
 
   if (domain === "gmail.com" || domain === "googlemail.com") {
     if (!/^[a-zA-Z0-9.+]+$/.test(localPart)) return false;
@@ -155,13 +162,15 @@ const validateAndFormat = (
         const domain = value.toLowerCase().split("@")[1];
         error =
           domain === "gmail.com" || domain === "googlemail.com"
-            ? t("Error.InvalidGmailAddressGmailAddressesCannotHaveConsecutiveDotsLeadingTrailingDotsOrSpecialCharacters")
+            ? t(
+                "Error.InvalidGmailAddressGmailAddressesCannotHaveConsecutiveDotsLeadingTrailingDotsOrSpecialCharacters",
+              )
             : t("Error.InvalidEmailAddress");
       } else if (rules.uniqueWith) {
         const isDuplicate = rules.uniqueWith.some(
           (key) =>
             formData[key]?.toLowerCase().trim() ===
-            value.toLowerCase().trim() && key !== currentKey,
+              value.toLowerCase().trim() && key !== currentKey,
         );
         if (isDuplicate) error = t("Error.EmailAddressesCannotBeTheSame");
       }
@@ -185,7 +194,7 @@ const validateAndFormat = (
       const isDuplicate = rules.uniqueWith.some(
         (key) =>
           formData[key]?.replace(/[^0-9]/g, "").replace(/^0+/, "") ===
-          numbersOnly && key !== currentKey,
+            numbersOnly && key !== currentKey,
       );
       if (isDuplicate) error = t("Error.LandNumbersCannotBeTheSame");
     }
@@ -212,7 +221,7 @@ const validateAndFormat = (
       const isDuplicate = rules.uniqueWith.some(
         (key) =>
           formData[key]?.replace(/[^0-9]/g, "").replace(/^0+/, "") ===
-          numbersOnly && key !== currentKey,
+            numbersOnly && key !== currentKey,
       );
       if (isDuplicate) error = t("Error.LandNumbersCannotBeTheSame");
     }
@@ -229,59 +238,59 @@ const validateAllFields = (
     key: keyof PersonalInfo;
     rules: ValidationRule;
   }> = [
-      { key: "firstName", rules: { required: true, type: "firstName" } },
-      { key: "lastName", rules: { required: true, type: "lastName" } },
-      { key: "otherName", rules: { required: true, type: "otherName" } },
-      { key: "callName", rules: { required: true, type: "callName" } },
-      {
-        key: "phone1",
-        rules: {
-          required: true,
-          type: "phone1",
-          uniqueWith: ["phone2", "familyPhone", "landWork", "landHome"],
-        },
+    { key: "firstName", rules: { required: true, type: "firstName" } },
+    { key: "lastName", rules: { required: true, type: "lastName" } },
+    { key: "otherName", rules: { required: true, type: "otherName" } },
+    { key: "callName", rules: { required: true, type: "callName" } },
+    {
+      key: "phone1",
+      rules: {
+        required: true,
+        type: "phone1",
+        uniqueWith: ["phone2", "familyPhone", "landWork", "landHome"],
       },
-      {
-        key: "phone2",
-        rules: {
-          type: "phone2",
-          uniqueWith: ["phone1", "familyPhone", "landWork", "landHome"],
-        },
+    },
+    {
+      key: "phone2",
+      rules: {
+        type: "phone2",
+        uniqueWith: ["phone1", "familyPhone", "landWork", "landHome"],
       },
-      {
-        key: "familyPhone",
-        rules: {
-          required: true,
-          type: "familyPhone",
-          uniqueWith: ["phone1", "phone2", "landWork", "landHome"],
-        },
+    },
+    {
+      key: "familyPhone",
+      rules: {
+        required: true,
+        type: "familyPhone",
+        uniqueWith: ["phone1", "phone2", "landWork", "landHome"],
       },
-      {
-        key: "landHome",
-        rules: {
-          type: "landHome",
-          uniqueWith: ["phone1", "phone2", "familyPhone", "landWork"],
-        },
+    },
+    {
+      key: "landHome",
+      rules: {
+        type: "landHome",
+        uniqueWith: ["phone1", "phone2", "familyPhone", "landWork"],
       },
-      {
-        key: "landWork",
-        rules: {
-          type: "landWork",
-          uniqueWith: ["phone1", "phone2", "familyPhone", "landHome"],
-        },
+    },
+    {
+      key: "landWork",
+      rules: {
+        type: "landWork",
+        uniqueWith: ["phone1", "phone2", "familyPhone", "landHome"],
       },
-      {
-        key: "email1",
-        rules: { required: true, type: "email1", uniqueWith: ["email2"] },
-      },
-      {
-        key: "email2",
-        rules: { type: "email2", uniqueWith: ["email1"] },
-      },
-      { key: "house", rules: { required: true, type: "house" } },
-      { key: "street", rules: { required: true, type: "street" } },
-      { key: "cityName", rules: { required: true, type: "cityName" } },
-    ];
+    },
+    {
+      key: "email1",
+      rules: { required: true, type: "email1", uniqueWith: ["email2"] },
+    },
+    {
+      key: "email2",
+      rules: { type: "email2", uniqueWith: ["email1"] },
+    },
+    { key: "house", rules: { required: true, type: "house" } },
+    { key: "street", rules: { required: true, type: "street" } },
+    { key: "cityName", rules: { required: true, type: "cityName" } },
+  ];
 
   const errors: Record<string, string> = {};
 
@@ -394,8 +403,8 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             setDisplayProvince(
               provinceObj
                 ? provinceObj.name[
-                i18n.language as keyof typeof provinceObj.name
-                ] || provinceObj.name.en
+                    i18n.language as keyof typeof provinceObj.name
+                  ] || provinceObj.name.en
                 : "",
             );
 
@@ -405,13 +414,10 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             setDisplayCountry(
               countryObj
                 ? countryObj.name[
-                i18n.language as keyof typeof countryObj.name
-                ] || countryObj.name.en
+                    i18n.language as keyof typeof countryObj.name
+                  ] || countryObj.name.en
                 : localData.country || "Sri Lanka",
             );
-
-            // Delay validation errors until form interaction
-
           } else {
             setIsExistingData(false);
           }
@@ -718,7 +724,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
 
     const displayProv = province
       ? province.name[i18n.language as keyof typeof province.name] ||
-      province.name.en
+        province.name.en
       : "";
 
     setSelectedProvince(province?.name.en || null);
@@ -776,7 +782,9 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
       <View className="bg-gray-100 h-[50px] rounded-3xl px-3 flex-row items-center">
         <MaterialIcons name="search" size={20} color="#666" />
         <TextInput
-          placeholder={t("AddOfficer.SearchDistrict...") || "Search district..."}
+          placeholder={
+            t("AddOfficer.SearchDistrict...") || "Search district..."
+          }
           value={districtSearch}
           onChangeText={setDistrictSearch}
           className="flex-1 ml-2 text-base"
@@ -1123,7 +1131,11 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
                         ? t(`Districts.${selectedDistrict}`)
                         : t("InspectionForm.SelectDistrict")}
                     </Text>
-                    <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
+                    <MaterialIcons
+                      name="arrow-drop-down"
+                      size={24}
+                      color="#666"
+                    />
                   </View>
                 </TouchableOpacity>
                 {errors.district && (

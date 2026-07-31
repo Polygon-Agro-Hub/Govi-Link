@@ -141,9 +141,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
       if (!token) {
         Alert.alert(
           t("Error.Sorry"),
-          t(
-            "Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue",
-          ),
+          t("Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue"),
           [{ text: t("Main.OK") }],
         );
         return;
@@ -204,24 +202,65 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     });
   };
 
+  const validateDomainFormat = (domain: string): boolean => {
+    if (!domain) return false;
+    if (domain.startsWith(".") || domain.endsWith(".")) return false;
+    if (domain.startsWith("-") || domain.endsWith("-")) return false;
+    if (domain.includes("..")) return false;
+
+    const labelRegex = /^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?$/;
+    const labels = domain.split(".");
+    return labels.every((label) => labelRegex.test(label));
+  };
+
   const validateGmailLocalPart = (localPart: string): boolean => {
     const validCharsRegex = /^[a-zA-Z0-9.+]+$/;
     if (!validCharsRegex.test(localPart)) {
       return false;
     }
-
     if (localPart.startsWith(".") || localPart.endsWith(".")) {
       return false;
     }
-
     if (localPart.includes("..")) {
       return false;
     }
-
-    if (localPart.length === 0) {
+    if (localPart.length === 0 || localPart.length > 30) {
       return false;
     }
+    return true;
+  };
 
+  const validateYahooLocalPart = (localPart: string): boolean => {
+    if (localPart.length < 4 || localPart.length > 32) {
+      return false;
+    }
+    const validCharsRegex = /^[a-zA-Z0-9._-]+$/;
+    if (!validCharsRegex.test(localPart)) {
+      return false;
+    }
+    if (/^[._-]|[._-]$/.test(localPart)) {
+      return false;
+    }
+    if (localPart.includes("..")) {
+      return false;
+    }
+    return true;
+  };
+
+  const validateGeneralLocalPart = (localPart: string): boolean => {
+    if (localPart.length < 1 || localPart.length > 64) {
+      return false;
+    }
+    const validCharsRegex = /^[a-zA-Z0-9._%+-]+$/;
+    if (!validCharsRegex.test(localPart)) {
+      return false;
+    }
+    if (localPart.startsWith(".") || localPart.endsWith(".")) {
+      return false;
+    }
+    if (localPart.includes("..")) {
+      return false;
+    }
     return true;
   };
 
@@ -235,6 +274,11 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
 
     const emailLower = email.toLowerCase();
     const [localPart, domain] = emailLower.split("@");
+
+    if (!validateDomainFormat(domain)) {
+      return false;
+    }
+
     const allowedTLDs = [".com", ".gov", ".lk"];
 
     if (domain === "gmail.com" || domain === "googlemail.com") {
@@ -242,12 +286,12 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     }
 
     if (domain === "yahoo.com") {
-      return true;
+      return validateYahooLocalPart(localPart);
     }
 
     for (const tld of allowedTLDs) {
       if (domain.endsWith(tld)) {
-        return true;
+        return validateGeneralLocalPart(localPart);
       }
     }
 
@@ -264,28 +308,18 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     const capitalizedText =
       filteredText.charAt(0).toUpperCase() + filteredText.slice(1);
 
-    let errorname = "";
-    let setterFunction: (value: string) => void;
-
     switch (fieldName) {
       case "firstNameEN":
         setFirstNameEN(capitalizedText);
-        errorname = "First name";
         break;
       case "lastNameEN":
         setLastNameEN(capitalizedText);
-        errorname = "Last name";
         break;
       default:
         return;
     }
 
-    // Clear error immediately when field is empty
-    if (capitalizedText.length === 0) {
-      clearFieldError(fieldName);
-    } else {
-      clearFieldError(fieldName);
-    }
+    clearFieldError(fieldName);
   };
 
   // Properly handle Unicode name changes (Sinhala/Tamil)
@@ -305,12 +339,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
         break;
     }
 
-    // Clear error immediately when user types or clears
-    if (!text.trim()) {
-      clearFieldError(fieldName);
-    } else {
-      clearFieldError(fieldName);
-    }
+    clearFieldError(fieldName);
   };
 
   // Validate on blur, not on every change
@@ -517,9 +546,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     } else if (!validateNicNumber(normalizedInput)) {
       setErrors((prev) => ({
         ...prev,
-        nic: t(
-          "Error.NicNumberMustBe9DigitsFollowedByVOr12Digits",
-        ),
+        nic: t("Error.NicNumberMustBe9DigitsFollowedByVOr12Digits"),
       }));
     } else {
       setErrors((prev) => ({
@@ -541,23 +568,58 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
       return;
     }
 
-    if (!validateEmail(trimmedInput)) {
-      const emailLower = trimmedInput.toLowerCase();
-      const domain = emailLower.split("@")[1];
+    const generalEmailRegex =
+      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
+    if (!generalEmailRegex.test(trimmedInput)) {
+      setErrors((prev) => ({
+        ...prev,
+        email: t("Error.InvalidEmailAddress"),
+      }));
+      return;
+    }
+
+    const emailLower = trimmedInput.toLowerCase();
+    const [localPart, domain] = emailLower.split("@");
+
+    if (!validateDomainFormat(domain)) {
+      setErrors((prev) => ({
+        ...prev,
+        email: t(
+          "Error.EmailDomainIsInvalidCheckForLeadingTrailingDotsOrHyphens",
+        ),
+      }));
+      return;
+    }
+
+    if (!validateEmail(trimmedInput)) {
       if (domain === "gmail.com" || domain === "googlemail.com") {
         setErrors((prev) => ({
           ...prev,
-          email: t("Error.InvalidGmailAddressGmailAddressesCannotHaveConsecutiveDotsLeadingTrailingDotsOrSpecialCharacters"),
+          email: t(
+            "Error.InvalidGmailAddressGmailAddressesCannotHaveConsecutiveDotsLeadingTrailingDotsOrSpecialCharacters",
+          ),
         }));
-      } else {
+      } else if (domain === "yahoo.com") {
         setErrors((prev) => ({
           ...prev,
-          email: t("Error.InvalidEmailAddress"),
+          email: t("Error.InvalidYahooAddress"),
+        }));
+      } else {
+        const allowedTLDs = [".com", ".gov", ".lk"];
+        const isDomainSupported = allowedTLDs.some((tld) =>
+          domain?.endsWith(tld),
+        );
+        setErrors((prev) => ({
+          ...prev,
+          email: isDomainSupported
+            ? t("Error.InvalidEmailAddress")
+            : t("Error.UnsupportedEmailDomain"),
         }));
       }
       return;
     }
+
     checkEmailExists(trimmedInput);
   };
 
@@ -786,7 +848,9 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
       className="px-4 py-3 border-b border-gray-200 flex-row justify-between items-center"
       onPress={() => {
         if (selectedDistricts.includes(item.value)) {
-          handleDistrictSelect(selectedDistricts.filter((d) => d !== item.value));
+          handleDistrictSelect(
+            selectedDistricts.filter((d) => d !== item.value),
+          );
         } else {
           handleDistrictSelect([...selectedDistricts, item.value]);
         }
@@ -797,7 +861,9 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
         value={isSelected}
         onValueChange={() => {
           if (selectedDistricts.includes(item.value)) {
-            handleDistrictSelect(selectedDistricts.filter((d) => d !== item.value));
+            handleDistrictSelect(
+              selectedDistricts.filter((d) => d !== item.value),
+            );
           } else {
             handleDistrictSelect([...selectedDistricts, item.value]);
           }
@@ -852,8 +918,25 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
       newErrors.phone2 = t("Error.InvalidMobileNumber");
     if (nic && !validateNicNumber(nic))
       newErrors.nic = t("Error.InvalidNicFormat");
-    if (email && !validateEmail(email))
-      newErrors.email = t("Error.InvalidEmailAddress");
+
+    if (email) {
+      const generalEmailRegex =
+        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      if (!generalEmailRegex.test(email)) {
+        newErrors.email = t("Error.InvalidEmailAddress");
+      } else {
+        const emailLower = email.toLowerCase();
+        const [, domain] = emailLower.split("@");
+        if (!validateDomainFormat(domain)) {
+          newErrors.email = t(
+            "Error.EmailDomainIsInvalidCheckForLeadingTrailingDotsOrHyphens",
+          );
+        } else if (!validateEmail(email)) {
+          newErrors.email = t("Error.InvalidEmailAddress");
+        }
+      }
+    }
+
     if (phone1 && phone2 && phone1 === phone2)
       newErrors.phone2 = t("Error.LandNumbersCannotBeTheSame");
 
@@ -1094,17 +1177,19 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
             {/* District */}
             <View>
               <TouchableOpacity
-                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${errors.districts && touched.districts
-                  ? "border-red-500"
-                  : "border-[#F4F4F4]"
-                  }`}
+                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${
+                  errors.districts && touched.districts
+                    ? "border-red-500"
+                    : "border-[#F4F4F4]"
+                }`}
                 onPress={districtModal.show}
               >
                 <Text
-                  className={`flex-1 text-base ${selectedDistricts.length > 0
-                    ? "text-black"
-                    : "text-[#7D7D7D]"
-                    }`}
+                  className={`flex-1 text-base ${
+                    selectedDistricts.length > 0
+                      ? "text-black"
+                      : "text-[#7D7D7D]"
+                  }`}
                 >
                   {getDistrictDisplayText()}
                 </Text>
@@ -1120,10 +1205,11 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
             {/* First Name English */}
             <View>
               <View
-                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${errors.firstNameEN && touched.firstNameEN
-                  ? "border-red-500"
-                  : "border-[#F4F4F4]"
-                  }`}
+                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${
+                  errors.firstNameEN && touched.firstNameEN
+                    ? "border-red-500"
+                    : "border-[#F4F4F4]"
+                }`}
               >
                 <TextInput
                   placeholder={t("AddOfficer.FirstNameEnglish")}
@@ -1147,10 +1233,11 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
             {/* Last Name English */}
             <View>
               <View
-                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${errors.lastNameEN && touched.lastNameEN
-                  ? "border-red-500"
-                  : "border-[#F4F4F4]"
-                  }`}
+                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${
+                  errors.lastNameEN && touched.lastNameEN
+                    ? "border-red-500"
+                    : "border-[#F4F4F4]"
+                }`}
               >
                 <TextInput
                   placeholder={t("AddOfficer.LastNameEnglish")}
@@ -1174,10 +1261,11 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
             {/* First Name Sinhala */}
             <View>
               <View
-                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${errors.firstNameSI && touched.firstNameSI
-                  ? "border-red-500"
-                  : "border-[#F4F4F4]"
-                  }`}
+                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${
+                  errors.firstNameSI && touched.firstNameSI
+                    ? "border-red-500"
+                    : "border-[#F4F4F4]"
+                }`}
               >
                 <TextInput
                   placeholder={t("AddOfficer.FirstNameSinhala")}
@@ -1201,10 +1289,11 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
             {/* Last Name Sinhala */}
             <View>
               <View
-                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${errors.lastNameSI && touched.lastNameSI
-                  ? "border-red-500"
-                  : "border-[#F4F4F4]"
-                  }`}
+                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${
+                  errors.lastNameSI && touched.lastNameSI
+                    ? "border-red-500"
+                    : "border-[#F4F4F4]"
+                }`}
               >
                 <TextInput
                   placeholder={t("AddOfficer.LastNameSinhala")}
@@ -1228,10 +1317,11 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
             {/* First Name Tamil */}
             <View>
               <View
-                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${errors.firstNameTA && touched.firstNameTA
-                  ? "border-red-500"
-                  : "border-[#F4F4F4]"
-                  }`}
+                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${
+                  errors.firstNameTA && touched.firstNameTA
+                    ? "border-red-500"
+                    : "border-[#F4F4F4]"
+                }`}
               >
                 <TextInput
                   placeholder={t("AddOfficer.FirstNameTamil")}
@@ -1255,10 +1345,11 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
             {/* Last Name Tamil */}
             <View>
               <View
-                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${errors.lastNameTA && touched.lastNameTA
-                  ? "border-red-500"
-                  : "border-[#F4F4F4]"
-                  }`}
+                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${
+                  errors.lastNameTA && touched.lastNameTA
+                    ? "border-red-500"
+                    : "border-[#F4F4F4]"
+                }`}
               >
                 <TextInput
                   placeholder={t("AddOfficer.LastNameTamil")}
@@ -1299,10 +1390,11 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
                 </TouchableOpacity>
 
                 <View
-                  className={`flex-1 flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${errors.phone1 && touched.phone1
-                    ? "border-red-500"
-                    : "border-[#F4F4F4]"
-                    }`}
+                  className={`flex-1 flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${
+                    errors.phone1 && touched.phone1
+                      ? "border-red-500"
+                      : "border-[#F4F4F4]"
+                  }`}
                 >
                   <TextInput
                     placeholder="7XXXXXXXX"
@@ -1339,10 +1431,11 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
                 </TouchableOpacity>
 
                 <View
-                  className={`flex-1 flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${errors.phone2 && touched.phone2
-                    ? "border-red-500"
-                    : "border-[#F4F4F4]"
-                    }`}
+                  className={`flex-1 flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${
+                    errors.phone2 && touched.phone2
+                      ? "border-red-500"
+                      : "border-[#F4F4F4]"
+                  }`}
                 >
                   <TextInput
                     placeholder="7XXXXXXXX"
@@ -1366,10 +1459,11 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
             {/* NIC */}
             <View>
               <View
-                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${errors.nic && touched.nic
-                  ? "border-red-500"
-                  : "border-[#F4F4F4]"
-                  }`}
+                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${
+                  errors.nic && touched.nic
+                    ? "border-red-500"
+                    : "border-[#F4F4F4]"
+                }`}
               >
                 <TextInput
                   placeholder={t("AddOfficer.NICNumber")}
@@ -1392,10 +1486,11 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
             {/* Email */}
             <View>
               <View
-                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${errors.email && touched.email
-                  ? "border-red-500"
-                  : "border-[#F4F4F4]"
-                  }`}
+                className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] px-3 ${
+                  errors.email && touched.email
+                    ? "border-red-500"
+                    : "border-[#F4F4F4]"
+                }`}
               >
                 <TextInput
                   placeholder={t("AddOfficer.EmailAddress")}

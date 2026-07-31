@@ -250,9 +250,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
       if (!token) {
         Alert.alert(
           t("Error.Sorry"),
-          t(
-            "Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue",
-          ),
+          t("Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue"),
           [{ text: t("Main.OK") }],
         );
         return;
@@ -279,10 +277,10 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
                     prev.map((item) =>
                       item.id === q.id
                         ? {
-                          ...item,
-                          officerTickResult: 0,
-                          officerUploadImage: null,
-                        }
+                            ...item,
+                            officerTickResult: 0,
+                            officerUploadImage: null,
+                          }
                         : item,
                     ),
                   );
@@ -303,9 +301,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
       if (newTickResult === 0) {
         Alert.alert(
           t("CertificateQuesanory.ConfirmUntick"),
-          t(
-            "CertificateQuesanory.AreYouSureYouWantToMarkThisTaskAsIncomplete",
-          ),
+          t("CertificateQuesanory.AreYouSureYouWantToMarkThisTaskAsIncomplete"),
           [
             { text: t("CertificateQuesanory.Cancel"), style: "cancel" },
             {
@@ -382,9 +378,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
       if (!token) {
         Alert.alert(
           t("Error.Sorry"),
-          t(
-            "Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue",
-          ),
+          t("Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue"),
           [{ text: t("Main.OK") }],
         );
         return;
@@ -428,10 +422,10 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
           prev.map((item) =>
             item.id === selectedQuestion.id
               ? {
-                ...item,
-                officerTickResult: 1,
-                officerUploadImage: capturedImage,
-              }
+                  ...item,
+                  officerTickResult: 1,
+                  officerUploadImage: capturedImage,
+                }
               : item,
           ),
         );
@@ -459,9 +453,9 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
 
   const handleCameraClose = (imageUri: string | null) => {
     setShowCamera(false);
+    setShowCameraModal(true);
     if (imageUri) {
       setCapturedImage(imageUri);
-      setShowCameraModal(true);
     }
   };
 
@@ -548,12 +542,12 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
                       {t("CertificateQuesanory.StartedOn")} :{" "}
                       {CertificateData?.createdAt
                         ? new Date(
-                          CertificateData.createdAt,
-                        ).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                        })
+                            CertificateData.createdAt,
+                          ).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          })
                         : ""}
                     </Text>
                   </View>
@@ -573,10 +567,11 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
                   className="bg-white rounded-xl p-6 mb-6 border border-gray-200 relative"
                 >
                   <TouchableOpacity
-                    className={`absolute top-4 right-4 border border-black p-1 rounded-full ${q.officerTickResult === 1 || q.officerUploadImage != null
+                    className={`absolute top-4 right-4 border border-black p-1 rounded-full ${
+                      q.officerTickResult === 1 || q.officerUploadImage != null
                         ? "bg-black"
                         : "bg-white"
-                      }`}
+                    }`}
                     onPress={() => handleCheck(q)}
                     disabled={loadingQuestionId === q.id}
                   >
@@ -585,7 +580,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
                         size="small"
                         color={
                           q.officerTickResult === 1 ||
-                            q.officerUploadImage != null
+                          q.officerUploadImage != null
                             ? "#fff"
                             : "#555"
                         }
@@ -596,7 +591,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
                         size={16}
                         color={
                           q.officerTickResult === 1 ||
-                            q.officerUploadImage != null
+                          q.officerUploadImage != null
                             ? "#fff"
                             : "#555"
                         }
@@ -641,9 +636,7 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
             </Text>
 
             <Text className="text-md text-black text-center mb-6">
-              {t(
-                "CertificateQuesanory.YouHaventMarkedAnyTasksAsCompleted",
-              )}
+              {t("CertificateQuesanory.YouHaventMarkedAnyTasksAsCompleted")}
             </Text>
 
             <View className="flex-row justify-between w-full gap-4">
@@ -703,7 +696,10 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
                   )}
                 </Text>
                 <TouchableOpacity
-                  onPress={() => setShowCamera(true)}
+                  onPress={() => {
+                    setShowCameraModal(false);
+                    setShowCamera(true);
+                  }}
                   className="bg-black rounded-3xl w-full py-3 items-center justify-center"
                 >
                   <Text className="text-white font-semibold text-base">
@@ -730,7 +726,10 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
                     </Text>
                   )}
                   <TouchableOpacity
-                    onPress={() => setShowCamera(true)}
+                    onPress={() => {
+                      setShowCameraModal(false);
+                      setShowCamera(true);
+                    }}
                     className="border border-black rounded-3xl py-3 items-center"
                   >
                     <Text className="text-black font-semibold text-base">

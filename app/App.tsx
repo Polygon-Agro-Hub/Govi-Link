@@ -345,7 +345,11 @@ function AppContent() {
             <Stack.Screen name="Splash" component={Splash} />
             <Stack.Screen name="Language" component={Lanuage} />
             <Stack.Screen name="Login" component={Login} />
-            <Stack.Screen name="Main" component={MainDrawer} />
+            <Stack.Screen
+              name="Main"
+              component={MainDrawer}
+              options={{ gestureEnabled: false }}
+            />
             <Stack.Screen
               name="CertificateQuesanory"
               component={CertificateQuesanory}
