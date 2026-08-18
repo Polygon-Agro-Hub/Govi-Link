@@ -290,7 +290,7 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
             className={`flex-row items-center px-2 h-10 rounded-full mr-2 border ${
               isOverdueSelected ? "border-transparent" : "border-[#F83B4F]"
             }`}
-            style={{ overflow: "hidden" }}
+            style={{ overflow: "hidden", borderRadius: 9999 }}
           >
             <View className="flex-row items-center">
               <Text

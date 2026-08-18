@@ -119,7 +119,14 @@ const Lanuage: React.FC<LanuageProps> = ({ navigation }) => {
                 }
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
-                className="py-5 items-center justify-center"
+                style={{
+                  borderRadius: 999,
+                  overflow: "hidden",
+                  paddingVertical: 16,
+                  width: "100%",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
               >
                 <Text className="text-white text-base font-semibold tracking-wide">
                   {lang.label}

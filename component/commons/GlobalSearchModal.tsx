@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -6,9 +6,9 @@ import {
   TouchableOpacity,
   FlatList,
   Modal,
+  ActivityIndicator,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useTranslation } from "react-i18next";
 
 interface GlobalSearchModalProps {
   visible: boolean;
@@ -23,9 +23,8 @@ interface GlobalSearchModalProps {
   multiSelect?: boolean;
   renderItem?: (item: any, isSelected: boolean) => React.ReactNode;
   searchKeys?: string[];
-  // New props for external search term control
-  searchTerm?: string;
-  onSearchTermChange?: (term: string) => void;
+  showSearch?: boolean;
+  isLoading?: boolean;
 }
 
 const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
@@ -41,52 +40,43 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
   multiSelect = false,
   renderItem,
   searchKeys = ["label"],
-  searchTerm: externalSearchTerm,
-  onSearchTermChange,
+  showSearch = true,
+  isLoading = false,
 }) => {
-  const { t } = useTranslation();
-  // Use internal state if external search term is not provided
-  const [internalSearchValue, setInternalSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState("");
   const [filteredData, setFilteredData] = useState(data);
   const [selectedValues, setSelectedValues] = useState<string[]>(selectedItems);
 
-  // Determine which search value to use (external or internal)
-  const searchValue = externalSearchTerm !== undefined ? externalSearchTerm : internalSearchValue;
+  const prevVisibleRef = useRef(visible);
 
   useEffect(() => {
-    setSelectedValues(selectedItems);
-  }, [selectedItems, visible]);
-
-  // Reset search when modal becomes visible
-  useEffect(() => {
-    if (visible) {
-      // Clear search when modal opens
-      if (onSearchTermChange) {
-        onSearchTermChange("");
-      } else {
-        setInternalSearchValue("");
-      }
+    if (visible && !prevVisibleRef.current) {
+      setSelectedValues(selectedItems);
+      setSearchValue("");
     }
+    prevVisibleRef.current = visible;
   }, [visible]);
 
+  const dataKey = JSON.stringify(data);
+  const searchKeysKey = JSON.stringify(searchKeys);
+
   useEffect(() => {
-    if (!searchValue.trim()) {
+    if (!showSearch || !searchValue.trim()) {
       setFilteredData(data);
       return;
     }
 
     const searchTerm = searchValue.toLowerCase();
-    const filtered = data.filter((item) => {
-      return searchKeys.some((key) => {
+    const filtered = data.filter((item) =>
+      searchKeys.some((key) => {
         const value = item[key];
-        if (typeof value === "string") {
-          return value.toLowerCase().includes(searchTerm);
-        }
-        return false;
-      });
-    });
+        return (
+          typeof value === "string" && value.toLowerCase().includes(searchTerm)
+        );
+      }),
+    );
     setFilteredData(filtered);
-  }, [searchValue, data, searchKeys]);
+  }, [searchValue, dataKey, searchKeysKey, showSearch]);
 
   const handleItemPress = (value: string) => {
     let newSelectedValues: string[];
@@ -115,24 +105,18 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
   };
 
   const clearSearch = () => {
-    if (onSearchTermChange) {
-      onSearchTermChange("");
-    } else {
-      setInternalSearchValue("");
-    }
+    setSearchValue("");
   };
 
-  const handleSearchChange = (text: string) => {
-    if (onSearchTermChange) {
-      onSearchTermChange(text);
-    } else {
-      setInternalSearchValue(text);
-    }
-  };
-
-  const renderDefaultItem = (item: any, isSelected: boolean) => (
+  const renderDefaultItem = (
+    item: any,
+    isSelected: boolean,
+    isLast: boolean,
+  ) => (
     <TouchableOpacity
-      className="px-4 py-3 border-b border-gray-200 flex-row items-center justify-between"
+      className={`px-4 py-3 flex-row items-center justify-between ${
+        !isLast ? "border-b border-gray-200" : ""
+      }`}
       onPress={() => handleItemPress(item.value)}
     >
       <Text className="text-base text-gray-800">{item.label}</Text>
@@ -142,25 +126,73 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
 
   const renderSearchInput = () => (
     <View className="px-4 py-2 border-b border-gray-200">
-      <View className="bg-gray-100 rounded-3xl px-3 h-[50px] flex-row items-center">
+      <View
+        className="bg-gray-100 rounded-lg px-3 flex-row items-center"
+        style={{ height: 44 }}
+      >
         <MaterialIcons name="search" size={20} color="#666" />
         <TextInput
           placeholder={searchPlaceholder}
           value={searchValue}
-          onChangeText={handleSearchChange}
-          className="flex-1 ml-2 text-base"
-          placeholderTextColor="#666"
+          onChangeText={setSearchValue}
+          className="ml-2 text-gray-800"
+          style={{
+            flex: 1,
+            minWidth: 0,
+            paddingVertical: 0,
+            fontSize: 16,
+            height: "100%",
+          }}
+          placeholderTextColor="#7F7F7F"
           autoCapitalize="none"
           autoCorrect={false}
         />
         {searchValue ? (
-          <TouchableOpacity onPress={clearSearch}>
+          <TouchableOpacity onPress={clearSearch} hitSlop={8}>
             <MaterialIcons name="close" size={20} color="#666" />
           </TouchableOpacity>
         ) : null}
       </View>
     </View>
   );
+
+  const renderContent = () => {
+    if (isLoading) {
+      return (
+        <View className="px-4 py-12 items-center justify-center">
+          <ActivityIndicator size="large" color="#6839CF" />
+          <Text className="text-sm mt-3 text-[#6839CF]">Loading...</Text>
+        </View>
+      );
+    }
+
+    if (filteredData.length === 0) {
+      return (
+        <View className="px-4 py-8 items-center">
+          <Text className="text-gray-500 text-base">{noResultsText}</Text>
+        </View>
+      );
+    }
+
+    return (
+      <FlatList
+        data={filteredData}
+        keyExtractor={(item) => item.value}
+        renderItem={({ item, index }) => {
+          const isSelected = selectedValues.includes(item.value);
+          const isLast = index === filteredData.length - 1;
+
+          if (renderItem) {
+            return renderItem(item, isSelected) as React.ReactElement | null;
+          }
+
+          return renderDefaultItem(item, isSelected, isLast);
+        }}
+        showsVerticalScrollIndicator={false}
+        className="max-h-64"
+      />
+    );
+  };
 
   return (
     <Modal
@@ -170,7 +202,8 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
       onRequestClose={onClose}
     >
       <View className="flex-1 bg-black/50 justify-center items-center">
-        <View className="bg-white rounded-2xl w-11/12 max-h-3/4 overflow-hidden">
+        <View className="bg-white rounded-2xl w-11/12 max-w-[500px] max-h-[80%]">
+          {/* Header */}
           <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
             <View>
               <Text className="text-lg font-semibold">{title}</Text>
@@ -185,37 +218,20 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
             </TouchableOpacity>
           </View>
 
-          {renderSearchInput()}
+          {/* Search Bar - Conditional Rendering */}
+          {showSearch && renderSearchInput()}
 
-          <FlatList
-            data={filteredData}
-            keyExtractor={(item) => item.value}
-            renderItem={({ item }) => {
-              const isSelected = selectedValues.includes(item.value);
-              if (renderItem) {
-                return renderItem(
-                  item,
-                  isSelected,
-                ) as React.ReactElement | null;
-              }
-              return renderDefaultItem(item, isSelected);
-            }}
-            showsVerticalScrollIndicator={false}
-            className="max-h-64"
-            ListEmptyComponent={
-              <View className="px-4 py-8 items-center">
-                <Text className="text-gray-500 text-base">{noResultsText}</Text>
-              </View>
-            }
-          />
+          {/* List or Loading State */}
+          {renderContent()}
 
+          {/* Done Button (only for multi-select) */}
           {multiSelect && (
             <View className="px-4 py-3 border-t border-gray-200">
               <TouchableOpacity
-                className="bg-[#21202B] rounded-3xl h-[50px] items-center justify-center"
+                className="bg-[#21202B] rounded-xl py-3 items-center"
                 onPress={handleDone}
               >
-                <Text className="text-white font-semibold text-lg">
+                <Text className="text-white font-semibold text-base">
                   {doneButtonText}
                 </Text>
               </TouchableOpacity>

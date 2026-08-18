@@ -59,12 +59,13 @@ const NavigationBar = ({
 
   return (
     <View
-      className="absolute bottom-0 flex-row justify-between items-center bg-[#ffffff] py-2 px-6 rounded-t-3xl w-full shadow-md"
+      className="absolute bottom-0 flex-row justify-between items-center bg-[#ffffff] py-2 px-6 rounded-t-3xl w-full "
       style={{
-        shadowColor: "#000",
-        shadowOpacity: 2,
-        shadowRadius: 4,
-        elevation: 20,
+         shadowColor: "#736e6e",
+        shadowOffset: { width: 0, height: -3 },
+        shadowOpacity: 0.15,
+        shadowRadius: 10,
+        elevation: 15,
       }}
     >
       {tabs.map((tab, index) => {
