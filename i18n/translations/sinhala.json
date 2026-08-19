@@ -325,7 +325,10 @@
     "NoDistrictsFound": "දිස්ත්‍රික්ක හමු නොවීය",
     "Sinhala": "සිංහල",
     "Tamil": "දෙමළ",
-    "English": "ඉංග්‍රීසි"
+    "English": "ඉංග්‍රීසි",
+    "NoProvincesFound":"පළාත් කිසිවක් හමු නොවීය",
+    "NoBanksFound":"බැංකුවක් හමු නොවීය",
+    "NoBranchesFound":"ශාඛාවක් හමු නොවීය"
   },
   "ManageOfficers": {
     "Officers": "නිලධාරීන්",

@@ -21,7 +21,11 @@ interface GlobalSearchModalProps {
   doneButtonText?: string;
   noResultsText?: string;
   multiSelect?: boolean;
-  renderItem?: (item: any, isSelected: boolean) => React.ReactNode;
+  renderItem?: (
+    item: any,
+    isSelected: boolean,
+    onToggle?: () => void,
+  ) => React.ReactNode;
   searchKeys?: string[];
   showSearch?: boolean;
   isLoading?: boolean;
@@ -134,7 +138,7 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         <TextInput
           placeholder={searchPlaceholder}
           value={searchValue}
-          onChangeText={setSearchValue}
+          onChangeText={(text) => setSearchValue(text.replace(/^\s+/, ""))}
           className="ml-2 text-gray-800"
           style={{
             flex: 1,
@@ -183,7 +187,11 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
           const isLast = index === filteredData.length - 1;
 
           if (renderItem) {
-            return renderItem(item, isSelected) as React.ReactElement | null;
+            return renderItem(
+              item,
+              isSelected,
+              () => handleItemPress(item.value),
+            ) as React.ReactElement | null;
           }
 
           return renderDefaultItem(item, isSelected, isLast);

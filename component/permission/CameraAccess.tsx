@@ -146,8 +146,14 @@ const CameraAccess: React.FC<CameraAccessProps> = ({
                   colors={["#EE8D5F", "#B31A51"]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
-                  className="w-full rounded-full h-[50px] justify-center items-center"
-                  style={{ overflow: "hidden" }}
+                  style={{
+                    width: "100%",
+                    height: 50,
+                    borderRadius: 9999,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    overflow: "hidden",
+                  }}
                 >
                   <Text className="text-white font-semibold text-center text-lg">
                     {isLoading

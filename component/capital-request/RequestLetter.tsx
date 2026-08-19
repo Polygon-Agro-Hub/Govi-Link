@@ -207,10 +207,13 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
           </Text>
 
           <Text className="text-base mb-4 text-[#070707] leading-6">
-            {t("RequestLetter.IFarmerNameAFarmerFromDistrictAmWritingToFormallyRequestAnAgriculturalLoanForTheUpcomingCultivationSeason", {
-              farmerName: requestData.farmerName,
-              district: t(`Districts.${requestData.district}`),
-            })}
+            {t(
+              "RequestLetter.IFarmerNameAFarmerFromDistrictAmWritingToFormallyRequestAnAgriculturalLoanForTheUpcomingCultivationSeason",
+              {
+                farmerName: requestData.farmerName,
+                district: t(`Districts.${requestData.district}`),
+              },
+            )}
           </Text>
 
           <Text className="text-base mb-4 text-[#070707] leading-6">
@@ -436,7 +439,11 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
               colors={["#F2561D", "#FF1D85"]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
-              className="flex-1 items-center justify-center"
+              style={{
+                flex: 1,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
             >
               <Text style={{ color: "white", fontSize: 18, fontWeight: "600" }}>
                 {t("RequestLetter.Start")}

@@ -325,7 +325,10 @@
     "NoDistrictsFound": "No districts found",
     "Sinhala": "சிங்களம்",
     "Tamil": "தமிழ்",
-    "English": "ஆங்கிலம்"
+    "English": "ஆங்கிலம்",
+    "NoProvincesFound":"மாகாணங்கள் எதுவும் காணப்படவில்லை",
+    "NoBanksFound":"வங்கி எதுவும் காணப்படவில்லை",
+    "NoBranchesFound":"கிளை எதுவும் காணப்படவில்லை"
   },
   "ManageOfficers": {
     "Officers": "Officers",

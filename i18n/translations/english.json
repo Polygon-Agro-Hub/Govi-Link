@@ -325,7 +325,10 @@
     "NoDistrictsFound": "No districts found",
     "Sinhala": "Sinhala",
     "Tamil": "Tamil",
-    "English": "English"
+    "English": "English",
+    "NoProvincesFound":"No Provinces Found",
+    "NoBanksFound":"No Bank Found",
+    "NoBranchesFound":"No Branch Found"
   },
   "ManageOfficers": {
     "Officers": "Officers",

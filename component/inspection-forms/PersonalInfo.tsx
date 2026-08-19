@@ -739,7 +739,14 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
       return newErrors;
     });
     setShowDistrictDropdown(false);
+    setDistrictSearch("");
   };
+
+  useEffect(() => {
+    if (!showDistrictDropdown) {
+      setDistrictSearch("");
+    }
+  }, [showDistrictDropdown]);
 
   const getFilteredCountries = () => {
     if (!countryData || countryData.length === 0) return [];
@@ -787,8 +794,16 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           }
           value={districtSearch}
           onChangeText={setDistrictSearch}
-          className="flex-1 ml-2 text-base"
-          placeholderTextColor="#666"
+          className="ml-2 text-gray-800"
+          style={{
+            flex: 1,
+            minWidth: 0,
+            paddingVertical: 0,
+            fontSize: 16,
+            height: "100%",
+          }}
+          placeholderTextColor="#7F7F7F"
+          autoCapitalize="none"
         />
         {districtSearch ? (
           <TouchableOpacity onPress={clearSearch}>
@@ -830,6 +845,13 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           onChangeText={onChangeText}
           className="flex-1 ml-2 text-base"
           placeholderTextColor="#666"
+          style={{
+            flex: 1,
+            minWidth: 0,
+            paddingVertical: 0,
+            fontSize: 16,
+            height: "100%",
+          }}
         />
         {value ? (
           <TouchableOpacity onPress={() => onChangeText("")}>
@@ -1120,7 +1142,10 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
                   </Text>
                 </Text>
                 <TouchableOpacity
-                  onPress={() => setShowDistrictDropdown(true)}
+                  onPress={() => {
+                    setDistrictSearch("");
+                    setShowDistrictDropdown(true);
+                  }}
                   activeOpacity={0.8}
                 >
                   <View className="bg-[#F6F6F6] rounded-full px-5 py-4 flex-row items-center justify-between">
@@ -1176,7 +1201,10 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
         visible={showDistrictDropdown}
         transparent={true}
         animationType="slide"
-        onRequestClose={() => setShowDistrictDropdown(false)}
+        onRequestClose={() => {
+          setShowDistrictDropdown(false);
+          setDistrictSearch("");
+        }}
       >
         <View className="flex-1 bg-black/50 justify-center items-center">
           <View className="bg-white rounded-2xl w-10/12 max-h-3/4">
@@ -1184,7 +1212,12 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
               <Text className="text-lg font-semibold">
                 {t("AddOfficer.SelectDistricts")}
               </Text>
-              <TouchableOpacity onPress={() => setShowDistrictDropdown(false)}>
+              <TouchableOpacity
+                onPress={() => {
+                  setShowDistrictDropdown(false);
+                  setDistrictSearch("");
+                }}
+              >
                 <MaterialIcons name="close" size={24} color="#666" />
               </TouchableOpacity>
             </View>

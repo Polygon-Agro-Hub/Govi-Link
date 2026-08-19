@@ -92,8 +92,12 @@ const FormFooterButton: React.FC<FormFooterButtonProps> = ({
               colors={gradientColors}
               start={gradientStart}
               end={gradientEnd}
-              className="rounded-full h-[50px] flex-row items-center justify-center"
               style={{
+                borderRadius: 9999,
+                height: 50,
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
                 shadowColor: "#000",
                 shadowOffset: { width: 0, height: 3 },
                 shadowOpacity: 0.25,
