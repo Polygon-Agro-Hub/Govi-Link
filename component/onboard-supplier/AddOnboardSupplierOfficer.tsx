@@ -16,7 +16,7 @@ import CustomHeader from "../commons/CustomHeader";
 import { t } from "i18next";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-import { environment } from "@/environment/environment";
+import environment from "@/environment/environment";
 
 type AddOnboardSupplierOfficerNavigationProp = StackNavigationProp<
   RootStackParamList,

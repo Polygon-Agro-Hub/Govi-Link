@@ -17,7 +17,7 @@ import { RootStackParamList } from "../types/types";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import axios from "axios";
-import { environment } from "@/environment/environment";
+import environment from "@/environment/environment";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CustomHeader from "../commons/CustomHeader";
 import LoadingPage from "../commons/LoadingPage";

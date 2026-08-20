@@ -15,7 +15,7 @@ import { RootStackParamList } from "../types/types";
 import * as ImagePicker from "expo-image-picker";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
-import { environment } from "@/environment/environment";
+import environment from "@/environment/environment";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { RouteProp, useRoute, useFocusEffect } from "@react-navigation/native";
 import CustomHeader from "../commons/CustomHeader";

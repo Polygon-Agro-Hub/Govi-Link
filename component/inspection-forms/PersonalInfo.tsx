@@ -16,7 +16,7 @@ import { MaterialIcons, FontAwesome } from "@expo/vector-icons";
 import FormTabs from "./FormTabs";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
-import { environment } from "@/environment/environment";
+import environment from "@/environment/environment";
 import countryData from "@/assets/json/country-flag.json";
 import sriLankaData from "@/assets/json/country-province.json";
 import districtData from "@/assets/json/country-districts.json";

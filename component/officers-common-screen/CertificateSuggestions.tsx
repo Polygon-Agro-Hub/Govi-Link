@@ -14,7 +14,7 @@ import { RouteProp, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../types/types";
 import { Entypo, FontAwesome5 } from "@expo/vector-icons";
 import axios from "axios";
-import { environment } from "@/environment/environment";
+import environment from "@/environment/environment";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTranslation } from "react-i18next";
 import ContentLoader, { Rect } from "react-content-loader/native";

@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { environment } from "@/environment/environment";
+import environment from "@/environment/environment";
 
 export const sendOTP = async (
   formattedPhonenumber: string,

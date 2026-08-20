@@ -18,7 +18,7 @@ import Svg, { Circle, G, Text as SvgText } from "react-native-svg";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-import { environment } from "@/environment/environment";
+import environment from "@/environment/environment";
 import { useFocusEffect } from "@react-navigation/native";
 
 type AssignJobOfficerListNavigationProps = StackNavigationProp<

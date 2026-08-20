@@ -20,7 +20,7 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
 import { useTranslation } from "react-i18next";
-import { environment } from "@/environment/environment";
+import environment from "@/environment/environment";
 import { CameraScreen } from "@/Items/CameraScreen";
 import CustomHeader from "../commons/CustomHeader";
 

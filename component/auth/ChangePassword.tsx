@@ -17,7 +17,7 @@ import { RouteProp, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../types/types";
 import axios from "axios";
 import { ScrollView } from "react-native-gesture-handler";
-import { environment } from "@/environment/environment";
+import environment from "@/environment/environment";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,

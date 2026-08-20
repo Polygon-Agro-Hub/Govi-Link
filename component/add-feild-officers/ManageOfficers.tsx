@@ -14,7 +14,7 @@ import { RootStackParamList } from "../types/types";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-import { environment } from "@/environment/environment";
+import environment from "@/environment/environment";
 import { useFocusEffect } from "@react-navigation/native";
 import i18n from "@/i18n/i18n";
 import NoDataComponent from "@/component/commons/NoDataComponent";

@@ -96,6 +96,7 @@
             "minSdkVersion": 24,
             "ndkVersion": "28.0.12433566",
             "enableProguardInReleaseBuilds": true,
+            "enableShrinkResourcesInReleaseBuilds": true,
             "packagingOptions": {
               "jniLibs": {
                 "useLegacyPackaging": false
@@ -110,6 +111,7 @@
           }
         }
       ],
+      "expo-tracking-transparency",
       "expo-sqlite",
       "expo-web-browser",
       "@react-native-community/datetimepicker",

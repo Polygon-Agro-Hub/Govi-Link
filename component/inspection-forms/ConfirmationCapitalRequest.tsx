@@ -16,7 +16,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { MaterialIcons } from "@expo/vector-icons";
 import Svg, { Circle, G, Text as SvgText } from "react-native-svg";
 import { RouteProp, useRoute } from "@react-navigation/native";
-import { environment } from "@/environment/environment";
+import environment from "@/environment/environment";
 import axios from "axios";
 import ConfirmationModal from "@/Items/ConfirmationModal";
 

@@ -16,7 +16,7 @@ import { RootStackParamList } from "../types/types";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-import { environment } from "@/environment/environment";
+import environment from "@/environment/environment";
 import { useTranslation } from "react-i18next";
 import ContentLoader, { Rect } from "react-content-loader/native";
 import {

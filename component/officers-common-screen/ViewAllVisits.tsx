@@ -20,7 +20,7 @@ import dayjs from "dayjs";
 import { useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-import { environment } from "@/environment/environment";
+import environment from "@/environment/environment";
 import { Ionicons, FontAwesome6 } from "@expo/vector-icons";
 import { RouteProp } from "@react-navigation/native";
 import NoDataComponent from "../commons/NoDataComponent";

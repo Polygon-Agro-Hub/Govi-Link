@@ -21,7 +21,7 @@ import countryData from "@/assets/json/country-flag.json";
 import { useTranslation } from "react-i18next";
 import i18n from "@/i18n/i18n";
 import axios from "axios";
-import { environment } from "@/environment/environment";
+import environment from "@/environment/environment";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
 import { useFocusEffect, RouteProp, useRoute } from "@react-navigation/native";
