@@ -54,7 +54,7 @@ const Lanuage: React.FC<LanuageProps> = ({ navigation }) => {
   };
 
   const dynamicStyles = {
-    imageHeight: screenWidth < 400 ? wp(35) : wp(38),
+    imageHeight: screenWidth < 400 ? wp(38) : wp(40),
     fontSize: screenWidth < 400 ? wp(4) : wp(5),
     paddingTopForLngBtns: screenWidth < 400 ? wp(5) : wp(0),
   };
@@ -119,7 +119,14 @@ const Lanuage: React.FC<LanuageProps> = ({ navigation }) => {
                 }
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
-                className="py-5 items-center justify-center"
+                style={{
+                  borderRadius: 999,
+                  overflow: "hidden",
+                  paddingVertical: 16,
+                  width: "100%",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
               >
                 <Text className="text-white text-base font-semibold tracking-wide">
                   {lang.label}

@@ -25,10 +25,7 @@ interface BannedScreenProps {
   route: RouteProp<RootStackParamList, "BannedScreen">;
 }
 
-const BannedScreen: React.FC<BannedScreenProps> = ({
-  route,
-  navigation,
-}) => {
+const BannedScreen: React.FC<BannedScreenProps> = ({ route, navigation }) => {
   const { statusType, message } = route.params || {};
   const { t } = useTranslation();
 
@@ -68,25 +65,21 @@ const BannedScreen: React.FC<BannedScreenProps> = ({
   };
 
   let title = t("Banned.AccessDenied", "Access Denied");
-  let description = t(
-    "Banned.YourAccountHasBeenRejectedOrIsNotApproved"
-  );
+  let description = t("Banned.YourAccountHasBeenRejectedOrIsNotApproved");
 
   if (statusType === "rejected") {
     title = t("Banned.AccountRejected");
     description = t(
-      "Banned.YourAccountApprovalHasBeenRevokedByTheAdministrator"
+      "Banned.YourAccountApprovalHasBeenRevokedByTheAdministrator",
     );
   } else if (statusType === "not_approved") {
     title = t("Banned.AccountNotApproved");
     description = t(
-      "Banned.YourAccountApprovalHasBeenRevokedByTheAdministrator"
+      "Banned.YourAccountApprovalHasBeenRevokedByTheAdministrator",
     );
   } else if (statusType === "pending") {
     title = t("Banned.PendingVerification");
-    description = t(
-      "Banned.YourAccountStatusIsPendingVerification"
-    );
+    description = t("Banned.YourAccountStatusIsPendingVerification");
   }
 
   if (message) {
@@ -137,7 +130,7 @@ const BannedScreen: React.FC<BannedScreenProps> = ({
               activeOpacity={0.7}
               style={{
                 width: "70%",
-                borderRadius: 30,
+                borderRadius: 999,
                 backgroundColor: "transparent",
                 shadowColor: "#000",
                 shadowOffset: { width: 0, height: 4 },
@@ -150,8 +143,14 @@ const BannedScreen: React.FC<BannedScreenProps> = ({
                 colors={["#F2561D", "#FF1D85"]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
-                className="h-[50px] items-center justify-center rounded-full"
-                style={{ overflow: "hidden" }}
+                style={{
+                  borderRadius: 999,
+                  overflow: "hidden", 
+                  paddingVertical: 16,
+                  width: "100%",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
               >
                 <Text className="text-center text-white font-bold text-lg">
                   {t("Banned.BackToLogin")}

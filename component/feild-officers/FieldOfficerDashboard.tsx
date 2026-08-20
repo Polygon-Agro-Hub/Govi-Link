@@ -98,29 +98,85 @@ const LoadingSkeleton = () => {
       >
         {/* Today Visits Header */}
         <Rect x={8} y={15} rx={4} ry={4} width={130} height={18} />
-        <Rect x={contentWidth - 8 - 65} y={15} rx={4} ry={4} width={65} height={18} />
-        
+        <Rect
+          x={contentWidth - 8 - 65}
+          y={15}
+          rx={4}
+          ry={4}
+          width={65}
+          height={18}
+        />
+
         {/* Today Visits Carousel */}
         <Rect x={8} y={85} rx={4} ry={4} width={18} height={24} />
-        <Rect x={wp("14%") - 12} y={45} rx={10} ry={10} width={wp("72%")} height={110} />
-        <Rect x={contentWidth - 8 - 18} y={85} rx={4} ry={4} width={18} height={24} />
+        <Rect
+          x={wp("14%") - 12}
+          y={45}
+          rx={10}
+          ry={10}
+          width={wp("72%")}
+          height={110}
+        />
+        <Rect
+          x={contentWidth - 8 - 18}
+          y={85}
+          rx={4}
+          ry={4}
+          width={18}
+          height={24}
+        />
 
         {/* Saved Draft Header */}
         <Rect x={8} y={185} rx={4} ry={4} width={100} height={18} />
-        
+
         {/* Saved Draft Carousel */}
         <Rect x={8} y={255} rx={4} ry={4} width={18} height={24} />
-        <Rect x={wp("14%") - 12} y={215} rx={10} ry={10} width={wp("72%")} height={110} />
-        <Rect x={contentWidth - 8 - 18} y={255} rx={4} ry={4} width={18} height={24} />
+        <Rect
+          x={wp("14%") - 12}
+          y={215}
+          rx={10}
+          ry={10}
+          width={wp("72%")}
+          height={110}
+        />
+        <Rect
+          x={contentWidth - 8 - 18}
+          y={255}
+          rx={4}
+          ry={4}
+          width={18}
+          height={24}
+        />
 
         {/* Assigned Target Button Skeleton */}
-        <Rect x={32} y={345} rx={10} ry={10} width={contentWidth - 64} height={80} />
+        <Rect
+          x={32}
+          y={345}
+          rx={10}
+          ry={10}
+          width={contentWidth - 64}
+          height={80}
+        />
 
         {/* Capital Requests Button Skeleton */}
-        <Rect x={32} y={441} rx={10} ry={10} width={contentWidth - 64} height={80} />
+        <Rect
+          x={32}
+          y={441}
+          rx={10}
+          ry={10}
+          width={contentWidth - 64}
+          height={80}
+        />
 
         {/* Onboard Suppliers Button Skeleton */}
-        <Rect x={32} y={537} rx={10} ry={10} width={contentWidth - 64} height={80} />
+        <Rect
+          x={32}
+          y={537}
+          rx={10}
+          ry={10}
+          width={contentWidth - 64}
+          height={80}
+        />
       </ContentLoader>
     </View>
   );
@@ -148,7 +204,7 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
   const { width, height } = Dimensions.get("window");
   const screenWidth = width;
   const dynamicStyles = {
-    cropcardPadding: screenWidth < width ? 0 : 25,
+    cropcardPadding: screenWidth < width ? 0 : 13,
     dynamicMarginLeft: screenWidth < 376 ? "-ml-5" : "",
   };
 
@@ -227,15 +283,14 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
   const fetchUserProfile = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
-      const intentionalLogout = await AsyncStorage.getItem("intentional_logout");
+      const intentionalLogout =
+        await AsyncStorage.getItem("intentional_logout");
 
       if (!token) {
         if (intentionalLogout !== "true") {
           Alert.alert(
             t("Error.Sorry"),
-            t(
-              "Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue",
-            ),
+            t("Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue"),
             [{ text: t("Main.OK") }],
           );
         }
@@ -256,9 +311,7 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
       if (error.response?.status === 401) {
         Alert.alert(
           t("Error.Sorry"),
-          t(
-            "Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue",
-          ),
+          t("Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue"),
           [{ text: t("Main.OK") }],
         );
         navigation.navigate("Login");
@@ -476,7 +529,7 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
                       padding: dynamicStyles.cropcardPadding,
                       width: wp("72%"),
                     }}
-                    className="border border-[#FF1D85] rounded-lg p-3 mr-4"
+                    className="border border-[#FF1D85] rounded-lg  mr-4"
                     activeOpacity={0.8}
                     onPress={() => {
                       if (
@@ -737,102 +790,102 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
             )}
           </View>
           <View className="mt-8 mx-8">
-              <TouchableOpacity
-                onPress={() =>
-                  navigation.navigate("ViewAllVisits", {
-                    officerId: profile?.empId ?? "",
-                  })
-                }
-                className="bg-[#FFE5D6] rounded-lg p-3 h-20 mr-4 w-full flex-row justify-between items-center"
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("ViewAllVisits", {
+                  officerId: profile?.empId ?? "",
+                })
+              }
+              className="bg-[#FFE5D6] rounded-lg p-3 h-20 mr-4 w-full flex-row justify-between items-center"
+              style={{
+                shadowColor: "#000",
+                shadowOffset: { width: 1, height: 1 },
+                shadowOpacity: 0.3,
+                shadowRadius: 6,
+                elevation: 2,
+              }}
+            >
+              <Text className="text-base font-bold text-[#434343]">
+                {t("Dashboard.AssignedTarget")}
+              </Text>
+              <Image
+                source={require("../../assets/images/dashboard/assigned-target.webp")}
                 style={{
-                  shadowColor: "#000",
-                  shadowOffset: { width: 1, height: 1 },
-                  shadowOpacity: 0.3,
-                  shadowRadius: 6,
-                  elevation: 2,
+                  width: 80,
+                  height: 50,
+                  position: "absolute",
+                  bottom: 0,
+                  right: 10,
                 }}
-              >
-                <Text className="text-base font-bold text-[#434343]">
-                  {t("Dashboard.AssignedTarget")}
-                </Text>
-                <Image
-                  source={require("../../assets/images/dashboard/assigned-target.webp")}
-                  style={{
-                    width: 100,
-                    height: 70,
-                    position: "absolute",
-                    bottom: 0,
-                    right: 10,
-                  }}
-                  resizeMode="contain"
-                />
-              </TouchableOpacity>
-            </View>
-            <View className="p-8">
-              <TouchableOpacity
-                className="bg-[#FEE5E6] rounded-lg p-3 h-20 mr-4 w-full flex-row justify-between items-center"
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
+          </View>
+          <View className="p-8">
+            <TouchableOpacity
+              className="bg-[#FEE5E6] rounded-lg p-3 h-20 mr-4 w-full flex-row justify-between items-center"
+              style={{
+                shadowColor: "#000",
+                shadowOffset: { width: 1, height: 1 },
+                shadowOpacity: 0.3,
+                shadowRadius: 6,
+                elevation: 2,
+              }}
+              onPress={() =>
+                navigation.navigate("Main", {
+                  screen: "MainTabs",
+                  params: {
+                    screen: "CapitalRequests",
+                  },
+                })
+              }
+            >
+              <Text className="text-base font-bold text-[#434343] ml-2">
+                {t("Dashboard.CapitalRequests")}
+              </Text>
+              <Image
+                source={require("../../assets/images/dashboard/request.webp")}
                 style={{
-                  shadowColor: "#000",
-                  shadowOffset: { width: 1, height: 1 },
-                  shadowOpacity: 0.3,
-                  shadowRadius: 6,
-                  elevation: 2,
+                  width: 80,
+                  height: 50,
+                  position: "absolute",
+                  bottom: 0,
+                  right: 10,
                 }}
-                onPress={() =>
-                  navigation.navigate("Main", {
-                    screen: "MainTabs",
-                    params: {
-                      screen: "CapitalRequests",
-                    },
-                  })
-                }
-              >
-                <Text className="text-base font-bold text-[#434343] ml-2">
-                  {t("Dashboard.CapitalRequests")}
-                </Text>
-                <Image
-                  source={require("../../assets/images/dashboard/request.webp")}
-                  style={{
-                    width: 100,
-                    height: 70,
-                    position: "absolute",
-                    bottom: 0,
-                    right: 10,
-                  }}
-                  resizeMode="contain"
-                />
-              </TouchableOpacity>
-            </View>
-            <View className="px-8  mb-[15%]">
-              <TouchableOpacity
-                className="bg-[#FFF5BE] rounded-lg p-3 h-20 mr-4 w-full flex-row justify-between items-center"
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
+          </View>
+          <View className="px-8  mb-[15%]">
+            <TouchableOpacity
+              className="bg-[#FFF5BE] rounded-lg p-3 h-20 mr-4 w-full flex-row justify-between items-center"
+              style={{
+                shadowColor: "#000",
+                shadowOffset: { width: 1, height: 1 },
+                shadowOpacity: 0.3,
+                shadowRadius: 6,
+                elevation: 2,
+              }}
+              onPress={() => navigation.navigate("AddOnboardSupplierOfficer")}
+            >
+              <Text className="text-base font-bold text-[#434343] ml-2">
+                {t("Dashboard.OnboardSuppliers")}
+              </Text>
+              <Image
+                source={require("../../assets/images/dashboard/onboard-suppliers.webp")}
                 style={{
-                  shadowColor: "#000",
-                  shadowOffset: { width: 1, height: 1 },
-                  shadowOpacity: 0.3,
-                  shadowRadius: 6,
-                  elevation: 2,
+                  width: 80,
+                  height: 50,
+                  position: "absolute",
+                  bottom: 0,
+                  right: -5,
                 }}
-                onPress={() => navigation.navigate("AddOnboardSupplierOfficer")}
-              >
-                <Text className="text-base font-bold text-[#434343] ml-2">
-                  {t("Dashboard.OnboardSuppliers")}
-                </Text>
-                <Image
-                  source={require("../../assets/images/dashboard/onboard-suppliers.webp")}
-                  style={{
-                    width: 100,
-                    height: 70,
-                    position: "absolute",
-                    bottom: 0,
-                    right: -5,
-                  }}
-                  resizeMode="contain"
-                />
-              </TouchableOpacity>
-            </View>
-          </>
-        )}
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
+          </View>
+        </>
+      )}
       <Modal transparent visible={showPopup} animationType="none">
         <View
           style={{

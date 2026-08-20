@@ -126,7 +126,7 @@ const YesNoSelect = ({
             <Text className="text-black">{t(`InspectionForm.${value}`)}</Text>
           ) : (
             <Text className="text-[#838B8C]">
-              {t("InspectionForm.--Select From Here--")}
+             {t("InspectionForm.SelectFromHere")}
             </Text>
           )}
           <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
@@ -997,7 +997,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
               >
                 {formData?.soilfertility
                   ? t(`InspectionForm.${formData.soilfertility}`)
-                  : t("InspectionForm.--Select From Here--")}
+                  : t("InspectionForm.SelectFromHere")}
               </Text>
 
               <MaterialIcons name="arrow-drop-down" size={24} color="#666" />

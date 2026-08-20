@@ -288,7 +288,11 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
                         colors={["#FF416C", "#FF4B2B"]}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 0 }}
-                        className="py-1.5"
+                        style={{
+                          height:30,
+                          alignItems:'center',
+                          justifyContent:'center'
+                        }}
                       >
                         <Text className="text-white text-base font-semibold text-center">
                           {t("Visits.Open")}

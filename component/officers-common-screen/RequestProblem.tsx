@@ -140,9 +140,7 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
       if (!token) {
         Alert.alert(
           t("Error.Sorry"),
-          t(
-            "Main.YourLoginSessionHasExpiredPleaseLogInAgainToContinue",
-          ),
+          t("Main.YourLoginSessionHasExpiredPleaseLogInAgainToContinue"),
           [{ text: t("Main.OK") }],
         );
         return;
@@ -219,9 +217,11 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
       }
     } catch (err) {
       console.error(" Error saving/updating problem:", err);
-      Alert.alert(t("Error.Sorry"), t("Main.SomethingWentWrongPleaseTryAgainLater"), [
-        { text: t("Main.OK") },
-      ]);
+      Alert.alert(
+        t("Error.Sorry"),
+        t("Main.SomethingWentWrongPleaseTryAgainLater"),
+        [{ text: t("Main.OK") }],
+      );
     } finally {
       setLoading(false);
     }
@@ -387,8 +387,13 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
             colors={["#F35125", "#FF1D85"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
-            className="rounded-full h-[50px] flex-row items-center justify-center w-full"
             style={{
+              borderRadius: 9999,
+              height: 50,
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              width: "100%",
               shadowColor: "#000",
               shadowOffset: { width: 0, height: 3 },
               shadowOpacity: 0.25,

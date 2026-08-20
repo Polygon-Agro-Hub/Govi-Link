@@ -15,10 +15,6 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../types/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { environment } from "@/environment/environment";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
 import { AntDesign } from "@expo/vector-icons";
 import { useSelector } from "react-redux";
 import { selectUserPersonal } from "@/store/authSlice";
@@ -225,7 +221,7 @@ const ComplainHistory: React.FC<ComplainHistoryProps> = ({ navigation }) => {
                   )}
                   <View style={{ flex: 1, alignItems: "flex-end" }}>
                     <Text
-                      className={`text-s px-4 py-1 rounded ${
+                      className={`text-xs px-5 py-2 rounded ${
                         complain.status === "Opened"
                           ? "bg-[#FFE2F1] text-[#FF0075]"
                           : "bg-[#FFF0EC] text-[#F35125]"
@@ -270,7 +266,7 @@ const ComplainHistory: React.FC<ComplainHistoryProps> = ({ navigation }) => {
                     ? `හිතවත් ${profile?.firstNameSinhala || ""} ${profile?.lastNameSinhala || ""},\n\nඔබගේ පැමිණිල්ල විසඳා ඇති බව අපි ඔබට සතුටින් දැනුම් දෙමු.\n\n${complainReply || "Loading..."}\n\nඔබට තවත් ගැටළු හෝ ප්‍රශ්න තිබේ නම්, අප හා සම්බන්ධ වන්න. ඔබගේ ඉවසීම සහ අවබෝධය සඳහා ස්තූතියි.\n\nමෙයට,\nPolygon පාරිභෝගික සහාය කණ්ඩායම`
                     : i18n.language === "ta"
                       ? `நம்பிக்கை  ${profile?.firstNameTamil || ""} ${profile?.lastNameTamil || ""},\n\nஉங்களால் தீர்க்கப்பட்டதாக நாங்கள் உங்களுக்கு மகிழ்ச்சியுடன் தெரிவிக்கிறோம்.\n\n${complainReply || "Loading..."}\n\nஉங்களுக்கு மேலும் சிக்கல்கள் அல்லது பிரச்சனைகள் இருந்தால், நீங்கள் தொடர்பு கொள்ள வேண்டும். உங்கள் பொறுமை மற்றும் புரிதலுக்கு நன்றி.\n\nஇதற்கு,\nஇதற்கு, பாலிகோன் ஆதரவு குழு`
-                      : `Dear ${profile?.firstName || ""} ${profile?.lastName || ""},\n\nWe are pleased to inform you that your complaint has been resolved.\n\n${complainReply || "Loading..."}\n\nIf you have any further concerns or questions, feel free to reach out.\nThank you for your patience and understanding.\n\nSincerely,\nPolygon Agro Customer Support Team`}
+                      : `Dear ${profile?.firstName || ""} ${profile?.lastName || ""},\n\nWe are pleased to inform you that your complaint has been resolved.\n\n${complainReply || "Loading..."}\n\nIf you have any further concerns or questions, feel free to reach out.\nThank you for your patience and understanding.\n\nSincerely,\nPolygon Customer Support Team`}
                 </Text>
                 {selectedComplain?.replyTime && (
                   <Text className="mb-3 mt-1">

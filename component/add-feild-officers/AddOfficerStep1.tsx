@@ -153,11 +153,20 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
             headers: { Authorization: `Bearer ${token}` },
           },
         );
-        const districts = response.data?.data;
-        if (Array.isArray(districts)) {
-          setCfoDistricts(districts);
-          if (districts.length === 1) {
-            setSelectedDistricts(districts);
+        const districtsData = response.data?.data;
+        if (Array.isArray(districtsData)) {
+          setCfoDistricts(districtsData);
+          if (districtsData.length === 1) {
+            const singleDistrict =
+              typeof districtsData[0] === "string"
+                ? districtsData[0]
+                : districtsData[0]?.name || districtsData[0]?.district;
+            if (singleDistrict) {
+              const matched = districts.find(
+                (d) => d.en.toLowerCase() === singleDistrict.toLowerCase(),
+              );
+              setSelectedDistricts([matched ? matched.en : singleDistrict]);
+            }
           }
         } else {
           console.warn("Unexpected districts format:", response.data);
@@ -169,8 +178,14 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
   };
 
   const getFilteredCFODistricts = () => {
-    if (!cfoDistricts || cfoDistricts.length === 0) return [];
-    return districts.filter((d) => cfoDistricts.includes(d.en));
+    if (!cfoDistricts || cfoDistricts.length === 0) return districts;
+    return districts.filter((d) =>
+      cfoDistricts.some((cfoD: any) => {
+        const val =
+          typeof cfoD === "string" ? cfoD : cfoD?.name || cfoD?.district || "";
+        return val.toLowerCase() === d.en.toLowerCase();
+      }),
+    );
   };
 
   const getDistrictsData = () => {
@@ -304,7 +319,8 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
 
   // Properly handle name field changes with correct validation
   const handleNameENChange = (text: string, fieldName: string) => {
-    const filteredText = text.replace(/[^a-zA-Z\s]/g, "");
+    const noLeadingSpace = text.replace(/^\s+/, ""); // strip leading space(s)
+    const filteredText = noLeadingSpace.replace(/[^a-zA-Z\s]/g, "");
     const capitalizedText =
       filteredText.charAt(0).toUpperCase() + filteredText.slice(1);
 
@@ -324,18 +340,20 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
 
   // Properly handle Unicode name changes (Sinhala/Tamil)
   const handleUnicodeNameChange = (text: string, fieldName: string) => {
+    const noLeadingSpace = text.replace(/^\s+/, ""); // strip leading space(s)
+
     switch (fieldName) {
       case "firstNameSI":
-        setFirstNameSI(text);
+        setFirstNameSI(noLeadingSpace);
         break;
       case "lastNameSI":
-        setLastNameSI(text);
+        setLastNameSI(noLeadingSpace);
         break;
       case "firstNameTA":
-        setFirstNameTA(text);
+        setFirstNameTA(noLeadingSpace);
         break;
       case "lastNameTA":
-        setLastNameTA(text);
+        setLastNameTA(noLeadingSpace);
         break;
     }
 
@@ -843,31 +861,19 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     }
   };
 
-  const renderDistrictItem = (item: any, isSelected: boolean) => (
+  const renderDistrictItem = (
+    item: any,
+    isSelected: boolean,
+    onToggle?: () => void,
+  ) => (
     <TouchableOpacity
       className="px-4 py-3 border-b border-gray-200 flex-row justify-between items-center"
-      onPress={() => {
-        if (selectedDistricts.includes(item.value)) {
-          handleDistrictSelect(
-            selectedDistricts.filter((d) => d !== item.value),
-          );
-        } else {
-          handleDistrictSelect([...selectedDistricts, item.value]);
-        }
-      }}
+      onPress={onToggle}
     >
       <Text className="text-base text-gray-800">{item.label}</Text>
       <Checkbox
         value={isSelected}
-        onValueChange={() => {
-          if (selectedDistricts.includes(item.value)) {
-            handleDistrictSelect(
-              selectedDistricts.filter((d) => d !== item.value),
-            );
-          } else {
-            handleDistrictSelect([...selectedDistricts, item.value]);
-          }
-        }}
+        onValueChange={onToggle}
         color={isSelected ? "#21202B" : undefined}
       />
     </TouchableOpacity>
@@ -1113,7 +1119,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
                 className="flex-row items-center"
                 onPress={() => setType("Permanent")}
               >
-                <RadioButton
+                <RadioButton.Android
                   value="Permanent"
                   status={type === "Permanent" ? "checked" : "unchecked"}
                   onPress={() => setType("Permanent")}
@@ -1128,7 +1134,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
                 className="flex-row items-center"
                 onPress={() => setType("Temporary")}
               >
-                <RadioButton
+                <RadioButton.Android
                   value="Temporary"
                   status={type === "Temporary" ? "checked" : "unchecked"}
                   onPress={() => setType("Temporary")}

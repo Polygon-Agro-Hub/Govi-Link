@@ -197,10 +197,7 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
     );
 
     if (!selectedJob) {
-      Alert.alert(
-        "Error",
-        "Could not find selected job details. Please try again.",
-      );
+      Alert.alert(t("Error.Error"), t("Error.PleaseSelectAJobBeforeAssigning"));
       return;
     }
 
@@ -383,14 +380,24 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
             }
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
-            className={`flex-row items-center px-2 pl-3 h-10 rounded-full mr-2 border ${isOverdueSelected ? "border-transparent" : "border-[#F83B4F]"
-              }`}
-            style={{ overflow: "hidden" }}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              paddingHorizontal: 8,
+              paddingLeft: 12,
+              height: 40,
+              borderRadius: 9999,
+              marginRight: 8,
+              borderWidth: 1,
+              borderColor: isOverdueSelected ? "transparent" : "#F83B4F",
+              overflow: "hidden",
+            }}
           >
             <View className="flex-row items-center">
               <Text
-                className={`font-semibold mr-2 ${isOverdueSelected ? "text-white" : "text-[#F83B4F]"
-                  }`}
+                className={`font-semibold mr-2 ${
+                  isOverdueSelected ? "text-white" : "text-[#F83B4F]"
+                }`}
               >
                 {t("Visits.OverDue")}
               </Text>
@@ -418,14 +425,24 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
             }
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
-            className={`flex-row items-center px-2 pl-3 h-10 rounded-full mr-2 border ${!isOverdueSelected ? "border-transparent" : "border-[#F83B4F]"
-              }`}
-            style={{ overflow: "hidden" }}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              paddingHorizontal: 8,
+              paddingLeft: 12,
+              height: 40,
+              borderRadius: 9999,
+              marginRight: 8,
+              borderWidth: 1,
+              borderColor: !isOverdueSelected ? "transparent" : "#F83B4F",
+              overflow: "hidden",
+            }}
           >
             <View className="flex-row items-center">
               <Text
-                className={`font-semibold mr-2 ${!isOverdueSelected ? "text-white" : "text-[#F83B4F]"
-                  }`}
+                className={`font-semibold mr-2 ${
+                  !isOverdueSelected ? "text-white" : "text-[#F83B4F]"
+                }`}
               >
                 {t("Visits.Today")}
               </Text>
@@ -459,7 +476,14 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
               colors={["#F2561D", "#FF1D85"]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
-              className="w-full h-[50px] rounded-full items-center justify-center"
+              style={{
+                width: "100%",
+                height: 50,
+                borderRadius: 9999,
+                alignItems: "center",
+                justifyContent: "center",
+                overflow: "hidden",
+              }}
             >
               <Text
                 className={`text-white font-bold ${i18n.language === "si" ? "text-base" : i18n.language === "ta" ? "text-base" : "text-lg"}`}
@@ -515,10 +539,11 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
                       e.stopPropagation();
                       toggleJobSelection(item.jobId);
                     }}
-                    className={`w-5 h-5 rounded-sm border-2 flex items-center justify-center mr-3 my-auto ${selectedJobs.includes(item.jobId)
-                      ? "bg-black border-black"
-                      : "bg-white border-gray-400"
-                      }`}
+                    className={`w-5 h-5 rounded-sm border-2 flex items-center justify-center mr-3 my-auto ${
+                      selectedJobs.includes(item.jobId)
+                        ? "bg-black border-black"
+                        : "bg-white border-gray-400"
+                    }`}
                   >
                     {selectedJobs.includes(item.jobId) && (
                       <AntDesign name="check" size={14} color="white" />
@@ -621,10 +646,11 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
                       }}
                     >
                       <View
-                        className={`flex flex-row items-center justify-center rounded-full h-[50px] border ${selectedItem?.latitude && selectedItem?.longitude
-                          ? "border-[#F83B4F]"
-                          : "border-[#9DB2CE]"
-                          }`}
+                        className={`flex flex-row items-center justify-center rounded-full h-[50px] border ${
+                          selectedItem?.latitude && selectedItem?.longitude
+                            ? "border-[#F83B4F]"
+                            : "border-[#9DB2CE]"
+                        }`}
                       >
                         <FontAwesome6
                           name="location-dot"
@@ -636,10 +662,11 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
                           }
                         />
                         <Text
-                          className={`text-base font-semibold ml-2 ${selectedItem?.latitude && selectedItem?.longitude
-                            ? "text-[#000000]"
-                            : "text-[#9DB2CE]"
-                            }`}
+                          className={`text-base font-semibold ml-2 ${
+                            selectedItem?.latitude && selectedItem?.longitude
+                              ? "text-[#000000]"
+                              : "text-[#9DB2CE]"
+                          }`}
                         >
                           {t("VisitPopup.Location")}
                         </Text>
@@ -662,18 +689,18 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
                   {(selectedItem.city ||
                     selectedItem.plotNo ||
                     selectedItem.street) && (
-                      <View className="flex text-center justify-center items-center">
-                        <Text className="text-sm font-semibold text-[#4E6393] mb-2">
-                          {t("VisitPopup.Address")}
-                        </Text>
-                        <Text className="text-base font-medium text-[#434343]">
-                          {selectedItem.plotNo}, {selectedItem.street},
-                        </Text>
-                        <Text className="text-base font-medium text-[#434343]">
-                          {selectedItem.city}
-                        </Text>
-                      </View>
-                    )}
+                    <View className="flex text-center justify-center items-center">
+                      <Text className="text-sm font-semibold text-[#4E6393] mb-2">
+                        {t("VisitPopup.Address")}
+                      </Text>
+                      <Text className="text-base font-medium text-[#434343]">
+                        {selectedItem.plotNo}, {selectedItem.street},
+                      </Text>
+                      <Text className="text-base font-medium text-[#434343]">
+                        {selectedItem.city}
+                      </Text>
+                    </View>
+                  )}
                 </>
               )}
 
@@ -686,8 +713,14 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
                     colors={["#F2561D", "#FF1D85"]}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
-                    className="items-center justify-center rounded-full h-[50px]"
-                    style={{ overflow: "hidden" }}
+                    style={{
+                      width: "100%",
+                      height: 50,
+                      borderRadius: 9999,
+                      alignItems: "center",
+                      justifyContent: "center",
+                      overflow: "hidden",
+                    }}
                   >
                     <Text
                       className={`text-white  font-semibold ${i18n.language === "si" ? "text-base" : i18n.language === "ta" ? "text-base" : "text-lg"}`}

@@ -71,14 +71,14 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
   const [showLocationAccess, setShowLocationAccess] = useState(false);
   const [pendingGeoLocationAction, setPendingGeoLocationAction] = useState(false);
 
-  const LEGAL_STATUS_OPTIONS = [
-    "Own land – Single owner",
-    "Own land – Multiple owners (undivided)",
-    "Leased land from private owner",
-    "Leased land from the government",
-    "Permit land – short term from the government",
-    "Permit land – long term from the government",
-  ];
+ const LEGAL_STATUS_OPTIONS = [
+  { key: "OwnLandSingleOwner", label: t("InspectionForm.OwnLandSingleOwner") },
+  { key: "OwnLandMultipleOwners", label: t("InspectionForm.OwnLandMultipleOwners") },
+  { key: "LeasedLandFromPrivateOwner", label: t("InspectionForm.LeasedLandFromPrivateOwner") },
+  { key: "LeasedLandFromTheGovernment", label: t("InspectionForm.LeasedLandFromTheGovernment") },
+  { key: "PermitLandShortTerm", label: t("InspectionForm.PermitLandShortTerm") },
+  { key: "PermitLandLongTerm", label: t("InspectionForm.PermitLandLongTerm") },
+];
 
   useFocusEffect(
     useCallback(() => {
@@ -491,23 +491,13 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
   };
 
 
-  if (showCameraAccess) {
-    return (
-      <CameraAccess
-        navigation={navigation}
-        onPermissionGranted={handleCameraPermissionGranted}
-        returnScreen="LandInfo"
-      />
-    );
-  }
-
-
   if (showLocationAccess) {
     return (
       <LocationAccess
         navigation={navigation}
         onPermissionGranted={handleLocationPermissionGranted}
         returnScreen="LandInfo"
+        onBackPress={() => setShowLocationAccess(false)}
       />
     );
   }
@@ -554,7 +544,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
                   </Text>
                 ) : (
                   <Text numberOfLines={1} className="text-[#838B8C]">
-                    {t("InspectionForm.--Select From Here--")}
+                    {t("InspectionForm.SelectFromHere")}
                   </Text>
                 )}
               </View>
@@ -586,21 +576,17 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
               onPress={() => setLegalStatusModal(true)}
               activeOpacity={0.7}
             >
-              <View style={{ flex: 1, marginRight: 8 }}>
-                {formData.ownershipStatus ? (
-                  <Text
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
-                    className="text-black"
-                  >
-                    {t(`InspectionForm.${formData.ownershipStatus}`)}
-                  </Text>
-                ) : (
-                  <Text numberOfLines={1} className="text-[#838B8C]">
-                    {t("InspectionForm.--Select From Here--")}
-                  </Text>
-                )}
-              </View>
+            <View style={{ flex: 1, marginRight: 8 }}>
+  {formData.ownershipStatus ? (
+    <Text numberOfLines={1} ellipsizeMode="tail" className="text-black">
+      {t(`InspectionForm.${formData.ownershipStatus}`)}
+    </Text>
+  ) : (
+    <Text numberOfLines={1} className="text-[#838B8C]">
+      {t("InspectionForm.SelectFromHere")}
+    </Text>
+  )}
+</View>
               <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
             </TouchableOpacity>
             {touched.ownershipStatus &&
@@ -843,45 +829,45 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
       </Modal>
 
       {/* Legal status modal */}
-      <Modal transparent visible={legalStatusModal} animationType="fade">
-        <TouchableOpacity
-          className="flex-1 bg-black/40 justify-center items-center"
-          activeOpacity={1}
-          onPress={() => {
-            setLegalStatusModal(false);
-            if (!formData.ownershipStatus) {
+     <Modal transparent visible={legalStatusModal} animationType="fade">
+  <TouchableOpacity
+    className="flex-1 bg-black/40 justify-center items-center"
+    activeOpacity={1}
+    onPress={() => {
+      setLegalStatusModal(false);
+      if (!formData.ownershipStatus) {
+        setTouched((prev) => ({ ...prev, ownershipStatus: true }));
+        setErrors((prev) => ({
+          ...prev,
+          ownershipStatus: t("Error.OwnershipStatusIsRequired"),
+        }));
+      }
+    }}
+  >
+    <View className="bg-white w-10/12 rounded-2xl overflow-hidden">
+      {LEGAL_STATUS_OPTIONS.map((item, index) => (
+        <View key={item.key}>
+          <TouchableOpacity
+            className="px-4 h-[50px] justify-center items-center"
+            onPress={() => {
+              updateFormData({ ownershipStatus: item.key });
               setTouched((prev) => ({ ...prev, ownershipStatus: true }));
-              setErrors((prev) => ({
-                ...prev,
-                ownershipStatus: t("Error.OwnershipStatusIsRequired"),
-              }));
-            }
-          }}
-        >
-          <View className="bg-white w-10/12 rounded-2xl overflow-hidden">
-            {LEGAL_STATUS_OPTIONS.map((item, index) => (
-              <View key={item}>
-                <TouchableOpacity
-                  className="px-4 h-[50px] justify-center items-center"
-                  onPress={() => {
-                    updateFormData({ ownershipStatus: item });
-                    setTouched((prev) => ({ ...prev, ownershipStatus: true }));
-                    setErrors((prev) => ({ ...prev, ownershipStatus: "" }));
-                    setLegalStatusModal(false);
-                  }}
-                >
-                  <Text className="text-center text-base text-black">
-                    {t(`InspectionForm.${item}`)}
-                  </Text>
-                </TouchableOpacity>
-                {index !== LEGAL_STATUS_OPTIONS.length - 1 && (
-                  <View className="h-px bg-gray-300 mx-4" />
-                )}
-              </View>
-            ))}
-          </View>
-        </TouchableOpacity>
-      </Modal>
+              setErrors((prev) => ({ ...prev, ownershipStatus: "" }));
+              setLegalStatusModal(false);
+            }}
+          >
+            <Text className="text-center text-base text-black">
+              {item.label}
+            </Text>
+          </TouchableOpacity>
+          {index !== LEGAL_STATUS_OPTIONS.length - 1 && (
+            <View className="h-px bg-gray-300 mx-4" />
+          )}
+        </View>
+      ))}
+    </View>
+  </TouchableOpacity>
+</Modal>
 
       <Modal visible={showCamera} animationType="slide">
         <CameraScreen onClose={handleCameraClose} />

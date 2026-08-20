@@ -277,8 +277,15 @@ const CapitalRequstQRScanner: React.FC<CapitalRequstQRScannerProps> = ({
               colors={["#F2561D", "#FF1D85"]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
-              className="items-center justify-center rounded-full mt-4 p-4 px-12"
-              style={{ overflow: "hidden" }}
+              style={{
+                alignItems: "center",
+                justifyContent: "center",
+                borderRadius: 9999,
+                marginTop: 16,
+                padding: 16,
+                paddingHorizontal: 48,
+                overflow: "hidden",
+              }}
             >
               <Text style={{ color: "#fff", fontSize: 16 }}>
                 {t("QRScanner.ScanAgain")}

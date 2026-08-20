@@ -73,12 +73,19 @@ const Input = ({
       <TextInput
         placeholder={placeholder}
         placeholderTextColor="#838B8C"
-        className="px-5  text-base text-black flex-1"
+        className="px-5  text-base text-black"
         value={value}
         onChangeText={onChangeText}
         keyboardType={keyboardType}
         autoCapitalize={isEmail ? "none" : "sentences"}
         autoCorrect={!isEmail}
+        style={{
+          flex: 1,
+          minWidth: 0,
+          paddingVertical: 0,
+          fontSize: 16,
+          height: "100%",
+        }}
       />
     </View>
     {error && (
@@ -122,6 +129,12 @@ const validateEmail = (email: string): boolean => {
   return allowedTLDs.some((tld) => domain.endsWith(tld));
 };
 
+const requiredErrorKeys: Record<string, string> = {
+  house: "Error.HousePlotNumberIsRequired",
+  street: "Error.StreetNameIsRequired",
+  cityName: "Error.CityIsRequired",
+};
+
 const validateAndFormat = (
   text: string,
   rules: ValidationRule,
@@ -147,9 +160,9 @@ const validateAndFormat = (
   }
 
   if (rules.type === "house") {
-    value = value.replace(/[^a-zA-Z0-9 ]/g, "").replace(/^\s+/, "");
+    value = value.replace(/[^a-zA-Z0-9 /\-,.'’()]/g, "").replace(/^\s+/, "");
     if (rules.required && value.trim().length === 0) {
-      error = t(`Error.${rules.type} is required`);
+      error = t(requiredErrorKeys.house);
     }
   }
 
@@ -206,7 +219,7 @@ const validateAndFormat = (
       value = value.charAt(0).toUpperCase() + value.slice(1);
     }
     if (rules.required && value.trim().length === 0) {
-      error = t(`Error.${rules.type} is required`);
+      error = t(requiredErrorKeys[rules.type as string]);
     }
   }
 
@@ -672,7 +685,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
       setIsExistingData(true);
       Alert.alert(
         t("Main.Success"),
-        t("InspectionForm.Data saved successfuDataSavedSuccessfully"),
+        t("InspectionForm.DataSavedSuccessfully"),
         [
           {
             text: t("Main.OK"),
@@ -739,7 +752,14 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
       return newErrors;
     });
     setShowDistrictDropdown(false);
+    setDistrictSearch("");
   };
+
+  useEffect(() => {
+    if (!showDistrictDropdown) {
+      setDistrictSearch("");
+    }
+  }, [showDistrictDropdown]);
 
   const getFilteredCountries = () => {
     if (!countryData || countryData.length === 0) return [];
@@ -787,8 +807,16 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           }
           value={districtSearch}
           onChangeText={setDistrictSearch}
-          className="flex-1 ml-2 text-base"
-          placeholderTextColor="#666"
+          className="ml-2 text-gray-800"
+          style={{
+            flex: 1,
+            minWidth: 0,
+            paddingVertical: 0,
+            fontSize: 16,
+            height: "100%",
+          }}
+          placeholderTextColor="#7F7F7F"
+          autoCapitalize="none"
         />
         {districtSearch ? (
           <TouchableOpacity onPress={clearSearch}>
@@ -830,6 +858,13 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           onChangeText={onChangeText}
           className="flex-1 ml-2 text-base"
           placeholderTextColor="#666"
+          style={{
+            flex: 1,
+            minWidth: 0,
+            paddingVertical: 0,
+            fontSize: 16,
+            height: "100%",
+          }}
         />
         {value ? (
           <TouchableOpacity onPress={() => onChangeText("")}>
@@ -1120,7 +1155,10 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
                   </Text>
                 </Text>
                 <TouchableOpacity
-                  onPress={() => setShowDistrictDropdown(true)}
+                  onPress={() => {
+                    setDistrictSearch("");
+                    setShowDistrictDropdown(true);
+                  }}
                   activeOpacity={0.8}
                 >
                   <View className="bg-[#F6F6F6] rounded-full px-5 py-4 flex-row items-center justify-between">
@@ -1176,7 +1214,10 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
         visible={showDistrictDropdown}
         transparent={true}
         animationType="slide"
-        onRequestClose={() => setShowDistrictDropdown(false)}
+        onRequestClose={() => {
+          setShowDistrictDropdown(false);
+          setDistrictSearch("");
+        }}
       >
         <View className="flex-1 bg-black/50 justify-center items-center">
           <View className="bg-white rounded-2xl w-10/12 max-h-3/4">
@@ -1184,7 +1225,12 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
               <Text className="text-lg font-semibold">
                 {t("AddOfficer.SelectDistricts")}
               </Text>
-              <TouchableOpacity onPress={() => setShowDistrictDropdown(false)}>
+              <TouchableOpacity
+                onPress={() => {
+                  setShowDistrictDropdown(false);
+                  setDistrictSearch("");
+                }}
+              >
                 <MaterialIcons name="close" size={24} color="#666" />
               </TouchableOpacity>
             </View>

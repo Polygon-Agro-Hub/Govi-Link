@@ -19,7 +19,12 @@ import { ScrollView } from "react-native-gesture-handler";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { environment } from "@/environment/environment";
 import { useTranslation } from "react-i18next";
-import { Ionicons, FontAwesome, SimpleLineIcons } from "@expo/vector-icons";
+import {
+  Ionicons,
+  FontAwesome,
+  SimpleLineIcons,
+  Entypo,
+} from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { setUser } from "../../store/authSlice";
 import { useDispatch } from "react-redux";
@@ -106,10 +111,7 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
     }
 
     if (!empid && password) {
-      Alert.alert(
-        t("Error.Sorry"),
-        t("Login.EmployeeIdIsNotAllowedToBeEmpty"),
-      );
+      Alert.alert(t("Error.Sorry"), t("Login.EmployeeIdIsNotAllowedToBeEmpty"));
       return false;
     }
 
@@ -187,7 +189,10 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
         } else if (lowerMessage.includes("user not found")) {
           Alert.alert(t("Error.Sorry"), t("Login.InvalidEmpIdPassword"));
         } else {
-          Alert.alert(t("Error.Sorry"), t("Main.SomethingWentWrongPleaseTryAgainLater"));
+          Alert.alert(
+            t("Error.Sorry"),
+            t("Main.SomethingWentWrongPleaseTryAgainLater"),
+          );
         }
 
         return;
@@ -241,7 +246,10 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
     } catch (error) {
       setLoading(false);
       console.error("Login error:", error);
-      Alert.alert(t("Error.Sorry"), t("Main.SomethingWentWrongPleaseTryAgainLater"));
+      Alert.alert(
+        t("Error.Sorry"),
+        t("Main.SomethingWentWrongPleaseTryAgainLater"),
+      );
     }
   };
 
@@ -253,9 +261,8 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
   useFocusEffect(
     useCallback(() => {
       const checkLogoutStatus = async () => {
-        const intentionalLogout = await AsyncStorage.getItem(
-          "intentional_logout",
-        );
+        const intentionalLogout =
+          await AsyncStorage.getItem("intentional_logout");
         if (intentionalLogout === "true") {
           Alert.alert(t("Main.Success"), t("Login.LogoutSuccessful"), [
             { text: t("Main.OK") },
@@ -281,29 +288,48 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1, backgroundColor: "white" }}
     >
-      <CustomHeader
-        title={""}
-        navigation={navigation}
-        showBackButton={true}
-        onBackPress={() => handleNavBack()}
-      />
+      {/* Fixed back button, floats above scroll content */}
+      <View
+        style={{
+          position: "absolute",
+          top: hp(2),
+          left: wp(4),
+          zIndex: 10,
+        }}
+      >
+        <TouchableOpacity
+          onPress={() => handleNavBack()}
+          activeOpacity={0.7}
+          style={{
+            height: 40,
+            width: 40,
+            borderRadius: 20,
+            backgroundColor: "#F6F6F6",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Entypo name="chevron-left" size={22} color="black" />
+        </TouchableOpacity>
+      </View>
+
       <ScrollView
         style={{ backgroundColor: "white" }}
         contentContainerStyle={{
           flexGrow: 1,
-          justifyContent: "center",
           alignItems: "center",
           paddingHorizontal: wp(6),
+          paddingTop: hp(2) + 40 + hp(2), 
         }}
         keyboardShouldPersistTaps="handled"
       >
         <Image
           source={loginImage}
-          style={{ width: 270, height: 270 }}
+          style={{ width: 220, height: 220 }}
           resizeMode="contain"
         />
 
-        <Text className="font-semibold text-2xl pt-[7%]">
+        <Text className="font-semibold text-2xl pt-[4%]">
           {t("Login.Welcome")}
         </Text>
         <Text className="text-center mt-2">
@@ -315,8 +341,9 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
             {t("Login.EmployeeID")}
           </Text>
           <View
-            className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] mb-2 px-3 ${empIdError ? "border-red-500" : "border-[#F4F4F4]"
-              }`}
+            className={`flex-row items-center bg-[#F4F4F4] border rounded-3xl h-[50px] mb-2 px-3 ${
+              empIdError ? "border-red-500" : "border-[#F4F4F4]"
+            }`}
           >
             <FontAwesome name="user-o" size={20} color="#353535" />
             <TextInput
@@ -325,13 +352,19 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
               value={empid}
               onChangeText={handleEmpIdChange}
               editable={!loading}
-              style={{ opacity: loading ? 0.6 : 1 }}
+              style={{
+                flex: 1,
+                marginLeft: 8,
+                fontSize: 16,
+                opacity: loading ? 0.6 : 1,
+                height: 50,
+                paddingVertical: 0,
+                includeFontPadding: false,
+              }}
             />
           </View>
           {empIdError && (
-            <Text className="text-red-500 text-sm pl-3 mb-4">
-              {empIdError}
-            </Text>
+            <Text className="text-red-500 text-sm pl-3 mb-4">{empIdError}</Text>
           )}
 
           <Text className="text-base pb-[2%] font-light">
@@ -345,7 +378,15 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
               value={password}
               onChangeText={handlePasswordChange}
               editable={!loading}
-              style={{ opacity: loading ? 0.6 : 1 }}
+              style={{
+                flex: 1,
+                marginLeft: 8,
+                fontSize: 16,
+                opacity: loading ? 0.6 : 1,
+                height: 50,
+                paddingVertical: 0,
+                includeFontPadding: false,
+              }}
             />
             <TouchableOpacity
               onPress={() => setSecureTextEntry(!secureTextEntry)}
@@ -359,7 +400,9 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
             </TouchableOpacity>
           </View>
 
-          <View style={{ width: "100%", alignItems: "center", marginBottom: 20 }}>
+          <View
+            style={{ width: "100%", alignItems: "center", marginBottom: 20 }}
+          >
             <View
               style={{
                 width: "100%",

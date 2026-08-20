@@ -196,7 +196,6 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={Platform.select({ ios: 60, android: 0 })}
       style={{ flex: 1, backgroundColor: "white" }}
     >
       <CustomHeader
@@ -209,8 +208,8 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
         keyboardShouldPersistTaps="handled"
         className="flex-1 bg-white px-0"
       >
-        <View className="flex-1 p-6">
-          <View className="items-center mb-6 -mt-12">
+        <View className="flex-1 px-6">
+          <View className="items-center mb-6 ">
             <Image
               source={require("@/assets/images/complaint/add-complaint.webp")}
               style={{
