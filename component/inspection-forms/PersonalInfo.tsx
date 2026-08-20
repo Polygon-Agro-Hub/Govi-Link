@@ -73,12 +73,19 @@ const Input = ({
       <TextInput
         placeholder={placeholder}
         placeholderTextColor="#838B8C"
-        className="px-5  text-base text-black flex-1"
+        className="px-5  text-base text-black"
         value={value}
         onChangeText={onChangeText}
         keyboardType={keyboardType}
         autoCapitalize={isEmail ? "none" : "sentences"}
         autoCorrect={!isEmail}
+        style={{
+          flex: 1,
+          minWidth: 0,
+          paddingVertical: 0,
+          fontSize: 16,
+          height: "100%",
+        }}
       />
     </View>
     {error && (
@@ -122,6 +129,12 @@ const validateEmail = (email: string): boolean => {
   return allowedTLDs.some((tld) => domain.endsWith(tld));
 };
 
+const requiredErrorKeys: Record<string, string> = {
+  house: "Error.HousePlotNumberIsRequired",
+  street: "Error.StreetNameIsRequired",
+  cityName: "Error.CityIsRequired",
+};
+
 const validateAndFormat = (
   text: string,
   rules: ValidationRule,
@@ -147,9 +160,9 @@ const validateAndFormat = (
   }
 
   if (rules.type === "house") {
-    value = value.replace(/[^a-zA-Z0-9 ]/g, "").replace(/^\s+/, "");
+    value = value.replace(/[^a-zA-Z0-9 /\-,.'’()]/g, "").replace(/^\s+/, "");
     if (rules.required && value.trim().length === 0) {
-      error = t(`Error.${rules.type} is required`);
+      error = t(requiredErrorKeys.house);
     }
   }
 
@@ -206,7 +219,7 @@ const validateAndFormat = (
       value = value.charAt(0).toUpperCase() + value.slice(1);
     }
     if (rules.required && value.trim().length === 0) {
-      error = t(`Error.${rules.type} is required`);
+      error = t(requiredErrorKeys[rules.type as string]);
     }
   }
 
@@ -672,7 +685,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
       setIsExistingData(true);
       Alert.alert(
         t("Main.Success"),
-        t("InspectionForm.Data saved successfuDataSavedSuccessfully"),
+        t("InspectionForm.DataSavedSuccessfully"),
         [
           {
             text: t("Main.OK"),

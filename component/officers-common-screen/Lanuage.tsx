@@ -54,7 +54,7 @@ const Lanuage: React.FC<LanuageProps> = ({ navigation }) => {
   };
 
   const dynamicStyles = {
-    imageHeight: screenWidth < 400 ? wp(35) : wp(38),
+    imageHeight: screenWidth < 400 ? wp(38) : wp(40),
     fontSize: screenWidth < 400 ? wp(4) : wp(5),
     paddingTopForLngBtns: screenWidth < 400 ? wp(5) : wp(0),
   };

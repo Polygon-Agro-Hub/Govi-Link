@@ -319,7 +319,8 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
 
   // Properly handle name field changes with correct validation
   const handleNameENChange = (text: string, fieldName: string) => {
-    const filteredText = text.replace(/[^a-zA-Z\s]/g, "");
+    const noLeadingSpace = text.replace(/^\s+/, ""); // strip leading space(s)
+    const filteredText = noLeadingSpace.replace(/[^a-zA-Z\s]/g, "");
     const capitalizedText =
       filteredText.charAt(0).toUpperCase() + filteredText.slice(1);
 
@@ -339,18 +340,20 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
 
   // Properly handle Unicode name changes (Sinhala/Tamil)
   const handleUnicodeNameChange = (text: string, fieldName: string) => {
+    const noLeadingSpace = text.replace(/^\s+/, ""); // strip leading space(s)
+
     switch (fieldName) {
       case "firstNameSI":
-        setFirstNameSI(text);
+        setFirstNameSI(noLeadingSpace);
         break;
       case "lastNameSI":
-        setLastNameSI(text);
+        setLastNameSI(noLeadingSpace);
         break;
       case "firstNameTA":
-        setFirstNameTA(text);
+        setFirstNameTA(noLeadingSpace);
         break;
       case "lastNameTA":
-        setLastNameTA(text);
+        setLastNameTA(noLeadingSpace);
         break;
     }
 
@@ -1116,7 +1119,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
                 className="flex-row items-center"
                 onPress={() => setType("Permanent")}
               >
-                     <RadioButton.Android
+                <RadioButton.Android
                   value="Permanent"
                   status={type === "Permanent" ? "checked" : "unchecked"}
                   onPress={() => setType("Permanent")}
@@ -1131,7 +1134,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
                 className="flex-row items-center"
                 onPress={() => setType("Temporary")}
               >
-                     <RadioButton.Android
+                <RadioButton.Android
                   value="Temporary"
                   status={type === "Temporary" ? "checked" : "unchecked"}
                   onPress={() => setType("Temporary")}

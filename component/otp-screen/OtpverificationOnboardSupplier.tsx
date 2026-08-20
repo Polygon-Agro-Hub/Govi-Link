@@ -52,7 +52,9 @@ const OtpverificationOnboardSupplier: React.FC = ({
     const subscription = AppState.addEventListener("change", (nextAppState) => {
       if (nextAppState === "active") {
         if (backgroundTime.current) {
-          const elapsed = Math.floor((Date.now() - backgroundTime.current) / 1000);
+          const elapsed = Math.floor(
+            (Date.now() - backgroundTime.current) / 1000,
+          );
           setTimer((prev) => Math.max(0, prev - elapsed));
           backgroundTime.current = null;
         }
@@ -189,9 +191,7 @@ const OtpverificationOnboardSupplier: React.FC = ({
       if (!token) {
         Alert.alert(
           t("Error.Sorry"),
-          t(
-            "Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue",
-          ),
+          t("Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue"),
           [{ text: t("Main.OK") }],
         );
         return false;
@@ -301,7 +301,9 @@ const OtpverificationOnboardSupplier: React.FC = ({
           if (verificationAttempts >= 2) {
             Alert.alert(
               t("Otpverification.InvalidOTP"),
-              t("Otpverification.YourOtpHasExpiredPleaseRequestANewOneToContinue"),
+              t(
+                "Otpverification.YourOtpHasExpiredPleaseRequestANewOneToContinue",
+              ),
               [
                 {
                   text: t("Otpverification.ResendOTP"),
@@ -320,9 +322,7 @@ const OtpverificationOnboardSupplier: React.FC = ({
           } else {
             Alert.alert(
               t("Otpverification.InvalidOTP"),
-              t(
-                "Otpverification.TheOtpYouEnteredIsIncorrectPleaseTryAgain",
-              ),
+              t("Otpverification.TheOtpYouEnteredIsIncorrectPleaseTryAgain"),
               [{ text: t("Main.OK") }],
             );
           }
@@ -332,7 +332,9 @@ const OtpverificationOnboardSupplier: React.FC = ({
           setIsOtpExpired(true);
           Alert.alert(
             t("Otpverification.OTPExpired"),
-            t("Otpverification.YourOtpHasExpiredPleaseRequestANewOneToContinue"),
+            t(
+              "Otpverification.YourOtpHasExpiredPleaseRequestANewOneToContinue",
+            ),
             [
               {
                 text: t("Otpverification.ResendOTP"),
@@ -343,9 +345,11 @@ const OtpverificationOnboardSupplier: React.FC = ({
           break;
 
         default:
-          Alert.alert(t("Error.Sorry"), t("Main.SomethingWentWrongPleaseTryAgainLater"), [
-            { text: t("Main.OK") },
-          ]);
+          Alert.alert(
+            t("Error.Sorry"),
+            t("Main.SomethingWentWrongPleaseTryAgainLater"),
+            [{ text: t("Main.OK") }],
+          );
       }
     } catch (error: any) {
       console.error(
@@ -365,15 +369,15 @@ const OtpverificationOnboardSupplier: React.FC = ({
       } else if (errCode === "1001") {
         Alert.alert(
           t("Error.Sorry"),
-          t(
-            "Otpverification.TheOtpYouEnteredIsIncorrectPleaseTryAgain",
-          ),
+          t("Otpverification.TheOtpYouEnteredIsIncorrectPleaseTryAgain"),
           [{ text: t("Main.OK") }],
         );
       } else {
-        Alert.alert(t("Error.Sorry"), t("Main.SomethingWentWrongPleaseTryAgainLater"), [
-          { text: t("Main.OK") },
-        ]);
+        Alert.alert(
+          t("Error.Sorry"),
+          t("Main.SomethingWentWrongPleaseTryAgainLater"),
+          [{ text: t("Main.OK") }],
+        );
       }
     }
   };
@@ -428,10 +432,15 @@ const OtpverificationOnboardSupplier: React.FC = ({
                 ref={(el: TextInput | null) => {
                   inputRefs.current[index] = el;
                 }}
-                className={`w-14 h-14 text-center text-xl rounded-lg ${otpCode[index]
-                  ? "bg-[#FF1D85] text-white"
-                  : "bg-[#FFE8F3] text-black"
-                  }`}
+                style={{
+                  width: 50,
+                  height: 50,
+                  textAlign: "center",
+                  fontSize: 20,
+                  borderRadius: 8,
+                  backgroundColor: otpCode[index] ? "#FF1D85" : "#FFE8F3",
+                  color: otpCode[index] ? "#FFFFFF" : "#000000",
+                }}
                 keyboardType="number-pad"
                 maxLength={1}
                 value={otpCode[index] || ""}
@@ -488,11 +497,19 @@ const OtpverificationOnboardSupplier: React.FC = ({
               activeOpacity={!isOtpValid || isVerified ? 1 : 0.7}
             >
               <LinearGradient
-                colors={!isOtpValid || isVerified ? ["#CCCCCC", "#CCCCCC"] : ["#F35125", "#FF1D85"]}
+                colors={
+                  !isOtpValid || isVerified
+                    ? ["#CCCCCC", "#CCCCCC"]
+                    : ["#F35125", "#FF1D85"]
+                }
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
-                className="flex-1 items-center justify-center"
-                style={{ overflow: "hidden" }}
+                style={{
+                  flex: 1,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  overflow: "hidden",
+                }}
               >
                 <Text className="text-white text-lg font-semibold">
                   {t("OnboardSupplier.Submit")}

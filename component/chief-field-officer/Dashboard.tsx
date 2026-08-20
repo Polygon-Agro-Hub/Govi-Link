@@ -152,7 +152,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
   const { width, height } = Dimensions.get("window");
   const screenWidth = width;
   const dynamicStyles = {
-    cropcardPadding: screenWidth < width ? 0 : 25,
+    cropcardPadding: screenWidth < width ? 0 : 13,
     dynamicMarginLeft: screenWidth < 376 ? "-ml-5" : "",
   };
   const translateY = useRef(new Animated.Value(0)).current;
@@ -751,7 +751,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                             padding: dynamicStyles.cropcardPadding,
                             width: wp("72%"),
                           }}
-                          className="border border-[#FF1D85] rounded-lg p-3 mr-4 flex-row justify-between"
+                          className="border border-[#FF1D85] rounded-lg  mr-4 flex-row justify-between"
                         >
                           <View>
                             <Text className="text-black text-sm font-medium">
@@ -797,14 +797,14 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                           </View>
 
                           <AnimatedCircularProgress
-                            size={70}
+                            size={60}
                             width={6}
                             fill={item.completionPercentage || 0}
                             tintColor="#FF6B6B"
                             backgroundColor="#E8DEF8"
                           >
                             {(fill: number) => (
-                              <Text className="text-black text-base font-semibold">
+                              <Text className="text-black text-sm font-semibold">
                                 {Math.round(fill)}%
                               </Text>
                             )}
@@ -847,13 +847,13 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
         )}
         <View className="px-8 mt-8">
           <TouchableOpacity
-            className="bg-[#FEE5E6] rounded-lg p-3 h-28 mr-4 w-full flex-row justify-between items-center"
+            className="bg-[#FEE5E6] rounded-lg p-3 h-20 mr-4 w-full flex-row justify-between items-center"
             style={{
               shadowColor: "#000",
-              shadowOffset: { width: 1, height: 1 },
-              shadowOpacity: 0.3,
-              shadowRadius: 6,
-              elevation: 2,
+              shadowOffset: { width: 2, height: 4 },
+              shadowOpacity: 0.25,
+              shadowRadius: 2,
+              elevation: 4,
             }}
             onPress={() => navigation.navigate("CapitalRequests")}
           >
@@ -863,8 +863,8 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
             <Image
               source={require("../../assets/images/dashboard/request.webp")}
               style={{
-                width: 100,
-                height: 70,
+                width: 80,
+                height: 50,
                 position: "absolute",
                 bottom: 0,
                 right: 10,
@@ -873,15 +873,20 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
             />
           </TouchableOpacity>
         </View>
-        <View className="px-8 mt-4 mb-80">
+        <View
+          className="px-8 mt-4"
+          style={{
+            marginBottom: 120,
+          }}
+        >
           <TouchableOpacity
-            className="bg-[#FFF5BE] rounded-lg p-3 h-28 mr-4 w-full flex-row justify-between items-center"
+            className="bg-[#FFF5BE] rounded-lg p-3 h-20 mr-4 w-full flex-row justify-between items-center"
             style={{
               shadowColor: "#000",
-              shadowOffset: { width: 1, height: 1 },
-              shadowOpacity: 0.3,
-              shadowRadius: 6,
-              elevation: 2,
+              shadowOffset: { width: 2, height: 4 },
+              shadowOpacity: 0.25,
+              shadowRadius: 2,
+              elevation: 4,
             }}
             onPress={() => navigation.navigate("AddOnboardSupplier")}
           >
@@ -891,8 +896,8 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
             <Image
               source={require("../../assets/images/dashboard/onboard-suppliers.webp")}
               style={{
-                width: 100,
-                height: 70,
+                width: 80,
+                height: 50,
                 position: "absolute",
                 bottom: 0,
                 right: -5,

@@ -19,7 +19,12 @@ import { ScrollView } from "react-native-gesture-handler";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { environment } from "@/environment/environment";
 import { useTranslation } from "react-i18next";
-import { Ionicons, FontAwesome, SimpleLineIcons } from "@expo/vector-icons";
+import {
+  Ionicons,
+  FontAwesome,
+  SimpleLineIcons,
+  Entypo,
+} from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { setUser } from "../../store/authSlice";
 import { useDispatch } from "react-redux";
@@ -283,29 +288,48 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1, backgroundColor: "white" }}
     >
-      <CustomHeader
-        title={""}
-        navigation={navigation}
-        showBackButton={true}
-        onBackPress={() => handleNavBack()}
-      />
+      {/* Fixed back button, floats above scroll content */}
+      <View
+        style={{
+          position: "absolute",
+          top: hp(2),
+          left: wp(4),
+          zIndex: 10,
+        }}
+      >
+        <TouchableOpacity
+          onPress={() => handleNavBack()}
+          activeOpacity={0.7}
+          style={{
+            height: 40,
+            width: 40,
+            borderRadius: 20,
+            backgroundColor: "#F6F6F6",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Entypo name="chevron-left" size={22} color="black" />
+        </TouchableOpacity>
+      </View>
+
       <ScrollView
         style={{ backgroundColor: "white" }}
         contentContainerStyle={{
           flexGrow: 1,
-          justifyContent: "center",
           alignItems: "center",
           paddingHorizontal: wp(6),
+          paddingTop: hp(2) + 40 + hp(2), 
         }}
         keyboardShouldPersistTaps="handled"
       >
         <Image
           source={loginImage}
-          style={{ width: 270, height: 270 }}
+          style={{ width: 220, height: 220 }}
           resizeMode="contain"
         />
 
-        <Text className="font-semibold text-2xl pt-[7%]">
+        <Text className="font-semibold text-2xl pt-[4%]">
           {t("Login.Welcome")}
         </Text>
         <Text className="text-center mt-2">

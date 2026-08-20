@@ -197,10 +197,7 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
     );
 
     if (!selectedJob) {
-      Alert.alert(
-        "Error",
-        "Could not find selected job details. Please try again.",
-      );
+      Alert.alert(t("Error.Error"), t("Error.PleaseSelectAJobBeforeAssigning"));
       return;
     }
 

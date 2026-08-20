@@ -295,7 +295,7 @@ const AddOnboardSupplier: React.FC<AddOnboardSupplierProps> = ({
         className="flex-1 px-5 pt-5"
         contentContainerStyle={{
           flexGrow: 1,
-          paddingBottom: 32,
+          paddingBottom: 70,
         }}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
@@ -412,7 +412,6 @@ const AddOnboardSupplier: React.FC<AddOnboardSupplierProps> = ({
               colors={["#F35125", "#FF1D85"]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
-              className="rounded-3xl"
               style={{
                 shadowColor: "#000000",
                 shadowOffset: { width: 0, height: 4 },
@@ -420,6 +419,8 @@ const AddOnboardSupplier: React.FC<AddOnboardSupplierProps> = ({
                 shadowRadius: 10,
                 elevation: 6,
                 overflow: "hidden",
+                borderRadius:999,
+                marginTop:5
               }}
             >
               <TouchableOpacity
