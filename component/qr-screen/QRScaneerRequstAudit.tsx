@@ -20,7 +20,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-import { environment } from "@/environment/environment";
+import environment from "@/environment/environment";
 import CustomHeader from "../commons/CustomHeader";
 import CameraAccess from "../permission/CameraAccess";
 

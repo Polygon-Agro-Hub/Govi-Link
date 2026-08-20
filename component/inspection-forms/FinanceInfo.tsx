@@ -21,7 +21,7 @@ import { RootStackParamList } from "../types/types";
 import banksData from "@/assets/json/bank-names.json";
 import branchesData from "@/assets/json/bank-branches.json";
 import axios from "axios";
-import { environment } from "@/environment/environment";
+import environment from "@/environment/environment";
 import FormFooterButton from "./FormFooterButton";
 import {
   saveFinanceInfo,
