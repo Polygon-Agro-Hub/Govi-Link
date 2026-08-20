@@ -99,11 +99,9 @@ const AttachGeoLocationScreen: React.FC<AttachGeoLocationScreenProps> = ({
       );
     } catch (error) {
       console.error("Error getting location:", error);
-      Alert.alert(
-        t("Error.Error"),
-        t("Error.UnableToGetYourCurrentLocation"),
-        [{ text: t("Main.OK") }],
-      );
+      Alert.alert(t("Error.Error"), t("Error.UnableToGetYourCurrentLocation"), [
+        { text: t("Main.OK") },
+      ]);
     } finally {
       setIsLoading(false);
     }
@@ -332,14 +330,19 @@ const AttachGeoLocationScreen: React.FC<AttachGeoLocationScreenProps> = ({
             colors={["#F35125", "#FF1D85"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
-            className="rounded-3xl h-[50px] flex-row justify-center items-center"
             style={{
+              width: "100%",
+              height: 50,
+              borderRadius: 9999,
+              flexDirection: "row",
+              justifyContent: "center",
+              alignItems: "center",
+              overflow: "hidden",
               shadowColor: "#000",
               shadowOffset: { width: 0, height: 3 },
               shadowOpacity: 0.25,
               shadowRadius: 5,
               elevation: 6,
-              overflow: "hidden",
             }}
           >
             <MaterialIcons name="done" size={24} color="#fff" />

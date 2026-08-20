@@ -52,8 +52,8 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
       {/* Title */}
       <View className="flex-1 items-center">
         <Text
-          style={{ color: titleColor }}
-          className="text-[22px] font-semibold text-center"
+          style={{ color: titleColor ,fontSize: 18 }}
+          className="font-semibold text-center"
         >
           {title}
         </Text>

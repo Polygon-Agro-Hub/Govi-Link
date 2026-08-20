@@ -14,7 +14,7 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../types/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-import { environment } from "@/environment/environment";
+import environment from "@/environment/environment";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -50,7 +50,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
     street: "",
     city: "",
     empId: "",
-    image: "",
+    profileImg: "",
   });
   const { t } = useTranslation();
 
@@ -75,6 +75,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
       );
 
       setFormData(response.data.data);
+      console.log(response.data.data);
     } catch (error) {
       console.error(error);
     }
@@ -141,9 +142,9 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
               <View className="bg-white rounded-t-3xl pt-4 mt-48">
                 <View className="items-center -mt-20">
                   <TouchableOpacity className="relative">
-                    {formData.image ? (
+                    {formData.profileImg ? (
                       <Image
-                        source={{ uri: formData.image }}
+                        source={{ uri: formData.profileImg }}
                         style={{
                           width: wp(35),
                           height: wp(35),

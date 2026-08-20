@@ -13,6 +13,7 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
+      "icon": "./assets/images/public/app-icon-ios.png",
       "supportsTablet": true,
       "bundleIdentifier": "com.polygonagro.GoviLink",
       "buildNumber": "1.0.0",
@@ -95,6 +96,7 @@
             "minSdkVersion": 24,
             "ndkVersion": "28.0.12433566",
             "enableProguardInReleaseBuilds": true,
+            "enableShrinkResourcesInReleaseBuilds": true,
             "packagingOptions": {
               "jniLibs": {
                 "useLegacyPackaging": false
@@ -109,6 +111,7 @@
           }
         }
       ],
+      "expo-tracking-transparency",
       "expo-sqlite",
       "expo-web-browser",
       "@react-native-community/datetimepicker",

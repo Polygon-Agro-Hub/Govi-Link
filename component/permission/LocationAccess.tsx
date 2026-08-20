@@ -31,6 +31,7 @@ interface LocationAccessProps {
   navigation: LocationAccessNavigationProp;
   onPermissionGranted?: () => void;
   returnScreen?: keyof RootStackParamList;
+  onBackPress?: () => void;
 }
 
 const locationImage = require("../../assets/images/permission/location.png");
@@ -39,6 +40,7 @@ const LocationAccess: React.FC<LocationAccessProps> = ({
   navigation,
   onPermissionGranted,
   returnScreen = "Main",
+  onBackPress,
 }) => {
   const { t } = useTranslation();
   const screenWidth = Dimensions.get("window").width;
@@ -48,18 +50,26 @@ const LocationAccess: React.FC<LocationAccessProps> = ({
     imageHeight: screenWidth < 400 ? wp(55) : wp(50),
   };
 
+  const handleBack = () => {
+    if (onBackPress) {
+      onBackPress();
+    } else if (navigation?.goBack) {
+      navigation.goBack();
+    }
+  };
+
   useFocusEffect(
     React.useCallback(() => {
-      const onBackPress = () => {
-        navigation.goBack();
+      const onHardwareBackPress = () => {
+        handleBack();
         return true;
       };
       const subscription = BackHandler.addEventListener(
         "hardwareBackPress",
-        onBackPress,
+        onHardwareBackPress,
       );
       return () => subscription.remove();
-    }, [navigation]),
+    }, [navigation, onBackPress]),
   );
 
   const requestLocationPermission = async () => {
@@ -106,7 +116,7 @@ const LocationAccess: React.FC<LocationAccessProps> = ({
       <CustomHeader
         title=""
         navigation={navigation}
-        onBackPress={() => navigation.goBack()}
+        onBackPress={handleBack}
         transparent
       />
 
@@ -152,8 +162,14 @@ const LocationAccess: React.FC<LocationAccessProps> = ({
                   colors={["#EE8D5F", "#B31A51"]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
-                  className="w-full rounded-full h-[50px] justify-center items-center"
-                  style={{ overflow: "hidden" }}
+                  style={{
+                    width: "100%",
+                    height: 50,
+                    borderRadius: 9999,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    overflow: "hidden",
+                  }}
                 >
                   <Text className="text-white font-semibold text-center text-lg">
                     {isLoading

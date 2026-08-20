@@ -1,5 +1,4 @@
-export const environment = {
-  production: true,
+const environment = {
   // LOCAL --------------------
    API_BASE_URL: "http://192.168.8.180:3000/govilink/",
 
@@ -20,3 +19,5 @@ export const environment = {
   // SHOUTOUT_API_KEY:
   //  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIwMDU2MjExMC0xNjk4LTExZjAtOGY3Mi05MWZhM2QzZDhmODYiLCJzdWIiOiJTSE9VVE9VVF9BUElfVVNFUiIsImlhdCI6MTc0NDM1MDI1NCwiZXhwIjoyMDU5ODgzMDU0LCJzY29wZXMiOnsiYWN0aXZpdGllcyI6WyJyZWFkIiwid3JpdGUiXSwibWVzc2FnZXMiOlsicmVhZCIsIndyaXRlIl0sImNvbnRhY3RzIjpbInJlYWQiLCJ3cml0ZSJdfSwic29fdXNlcl9pZCI6IjgzOTkzIiwic29fdXNlcl9yb2xlIjoidXNlciIsInNvX3Byb2ZpbGUiOiJhbGwiLCJzb191c2VyX25hbWUiOiIiLCJzb19hcGlrZXkiOiJub25lIn0.cw29Ns80bCYCSuzgTX7qF1ZJzNteXi_hGD6MJ-tcoQg",
 };
+
+export default environment;

@@ -20,7 +20,7 @@ import dayjs from "dayjs";
 import { useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-import { environment } from "@/environment/environment";
+import environment from "@/environment/environment";
 import { Ionicons, FontAwesome6 } from "@expo/vector-icons";
 import { RouteProp } from "@react-navigation/native";
 import NoDataComponent from "../commons/NoDataComponent";
@@ -287,10 +287,17 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
             }
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
-            className={`flex-row items-center px-2 h-10 rounded-full mr-2 border ${
-              isOverdueSelected ? "border-transparent" : "border-[#F83B4F]"
-            }`}
-            style={{ overflow: "hidden" }}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              paddingHorizontal: 8,
+              height: 40,
+              borderRadius: 9999,
+              marginRight: 8,
+              borderWidth: 1,
+              borderColor: isOverdueSelected ? "transparent" : "#F83B4F",
+              overflow: "hidden",
+            }}
           >
             <View className="flex-row items-center">
               <Text
@@ -334,8 +341,20 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
                       colors={["#F2561D", "#FF1D85"]}
                       start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 0 }}
-                      className="border flex-row gap-x-2 rounded-full w-20 h-10 items-center justify-center border-transparent ml-2 pl-2"
-                      style={{ overflow: "hidden" }}
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        width: 80,
+                        height: 40,
+                        borderRadius: 9999,
+                        borderWidth: 1,
+                        borderColor: "transparent",
+                        marginLeft: 8,
+                        paddingLeft: 8,
+                        overflow: "hidden",
+                        gap: 4,
+                      }}
                     >
                       <Text className="font-semibold text-white">
                         {dayNumber}
@@ -570,13 +589,13 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
 
               {selectedItem && (
                 <>
-                  <Text className="text-base font-semibold text-[#747474]">
+                  <Text className="text-lg font-semibold text-[#747474]">
                     #{selectedItem.jobId || "N/A"}
                   </Text>
-                  <Text className="text-lg font-bold mt-2">
+                  <Text className="text-xl font-bold mt-2">
                     {selectedItem.farmerName || "N/A"}
                   </Text>
-                  <Text className="text-base font-semibold mt-1">
+                  <Text className="text-lg font-semibold mt-1">
                     {(() => {
                       if (selectedItem.propose === "Individual") {
                         switch (i18n.language) {
@@ -600,7 +619,7 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
                     })()}
                   </Text>
 
-                  <Text className="text-sm font-medium text-[#4E6393] mt-1">
+                  <Text className="text-base font-medium text-[#4E6393] mt-1">
                     {t(`Districts.${selectedItem.district}`)}{" "}
                     {t("VisitPopup.District")}
                   </Text>
@@ -620,11 +639,14 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
                       }}
                     >
                       <View
-                        className={`flex flex-row items-center justify-center rounded-full h-[50px] border ${
+                        className={`flex flex-row items-center justify-center rounded-full  border ${
                           selectedItem?.latitude && selectedItem?.longitude
                             ? "border-[#F83B4F]"
                             : "border-[#9DB2CE]"
                         }`}
+                        style={{
+                          height:40
+                        }}
                       >
                         <FontAwesome6
                           name="location-dot"
@@ -651,7 +673,11 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
                       className="flex w-1/2"
                       onPress={() => handleDial(selectedItem.farmerMobile)}
                     >
-                      <View className="flex-row items-center justify-center border border-[#F83B4F] rounded-full px-6 h-[50px]">
+                      <View className="flex-row items-center justify-center border border-[#F83B4F] rounded-full px-6 "
+                      style={{
+                          height:40
+                        }}
+                      >
                         <Ionicons name="call" size={20} color="#F83B4F" />
                         <Text className="text-base font-semibold  ml-2">
                           {t("VisitPopup.GetCall")}
@@ -714,10 +740,20 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
                   style={{
+                    height: 50,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderRadius: 9999,
+                    marginTop: 16,
                     marginBottom: 30,
+                    paddingHorizontal:
+                      i18n.language === "si"
+                        ? 96
+                        : i18n.language === "ta"
+                          ? 96
+                          : "40%",
                     overflow: "hidden",
                   }}
-                  className={`h-[50px] items-center justify-center rounded-full mt-4 ${i18n.language === "si" ? "px-24" : i18n.language === "ta" ? "px-24" : "px-[40%]"}`}
                 >
                   <Text
                     className={`text-white  font-semibold ${i18n.language === "si" ? "text-base" : i18n.language === "ta" ? "text-base" : "text-lg"}`}

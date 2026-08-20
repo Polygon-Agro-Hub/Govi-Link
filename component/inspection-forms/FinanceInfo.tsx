@@ -21,7 +21,7 @@ import { RootStackParamList } from "../types/types";
 import banksData from "@/assets/json/bank-names.json";
 import branchesData from "@/assets/json/bank-branches.json";
 import axios from "axios";
-import { environment } from "@/environment/environment";
+import environment from "@/environment/environment";
 import FormFooterButton from "./FormFooterButton";
 import {
   saveFinanceInfo,
@@ -58,8 +58,9 @@ const Input = ({
       {label} {required && <Text className="text-black">*</Text>}
     </Text>
     <View
-      className={`bg-[#F6F6F6] rounded-3xl flex-row items-center ${error ? "border border-red-500" : ""
-        }`}
+      className={`bg-[#F6F6F6] rounded-3xl flex-row items-center ${
+        error ? "border border-red-500" : ""
+      }`}
     >
       <TextInput
         placeholder={placeholder}
@@ -217,10 +218,10 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
 
     setIsNextEnabled(
       allFilled &&
-      accountNumbersMatch &&
-      hasAssets &&
-      hasBankInfo &&
-      !hasErrors,
+        accountNumbersMatch &&
+        hasAssets &&
+        hasBankInfo &&
+        !hasErrors,
     );
   }, [formData, errors]);
 
@@ -246,9 +247,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     if (!valid) {
       setErrors((prev) => ({
         ...prev,
-        assets: t(
-          "Error.AtLeastOneCategoryOptionMustBeSelected",
-        ),
+        assets: t("Error.AtLeastOneCategoryOptionMustBeSelected"),
       }));
     } else {
       setErrors((prev) => {
@@ -739,6 +738,22 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     </TouchableOpacity>
   );
 
+  const renderEmptyBankList = () => (
+    <View className="px-4 py-6 items-center">
+      <Text className="text-gray-500 text-base mt-2">
+        {t("AddOfficer.NoBanksFound")}
+      </Text>
+    </View>
+  );
+
+  const renderEmptyBranchList = () => (
+    <View className="px-4 py-6 items-center">
+      <Text className="text-gray-500 text-base mt-2">
+        {t("AddOfficer.NoBranchesFound")}
+      </Text>
+    </View>
+  );
+
   useEffect(() => {
     const handleBackPress = () => {
       navigation.navigate("Main", {
@@ -781,7 +796,14 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
           placeholder={placeholder}
           value={value}
           onChangeText={onChangeText}
-          className="flex-1 ml-2 text-base"
+          className=" ml-2 "
+          style={{
+            flex: 1,
+            minWidth: 0,
+            paddingVertical: 0,
+            fontSize: 16,
+            height: "100%",
+          }}
           placeholderTextColor="#666"
         />
         {value ? (
@@ -968,8 +990,9 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               {t("InspectionForm.BankName")} *
             </Text>
             <TouchableOpacity
-              className={`bg-[#F4F4F4] rounded-full px-4 h-[50px] flex-row justify-between items-center ${errors.bank ? "border border-red-500" : ""
-                }`}
+              className={`bg-[#F4F4F4] rounded-full px-4 h-[50px] flex-row justify-between items-center ${
+                errors.bank ? "border border-red-500" : ""
+              }`}
               onPress={() => setShowBankDropdown(true)}
             >
               <Text
@@ -998,8 +1021,9 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               {t("InspectionForm.BranchName")} *
             </Text>
             <TouchableOpacity
-              className={`bg-[#F4F4F4] rounded-full px-4 h-[50px] flex-row justify-between items-center ${errors.branch ? "border border-red-500" : ""
-                }`}
+              className={`bg-[#F4F4F4] rounded-full px-4 h-[50px] flex-row justify-between items-center ${
+                errors.branch ? "border border-red-500" : ""
+              }`}
               onPress={() => setShowBranchDropdown(true)}
               disabled={availableBranches.length === 0}
             >
@@ -1031,8 +1055,9 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               {t("InspectionForm.ExistingDebtsOfTheFarmer")} *
             </Text>
             <View
-              className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${errors.debtsOfFarmer ? "border border-red-500" : ""
-                }`}
+              className={`bg-[#F6F6F6] rounded-3xl h-40 px-4 py-2 ${
+                errors.debtsOfFarmer ? "border border-red-500" : ""
+              }`}
             >
               <TextInput
                 placeholder={t("InspectionForm.TypeHere...")}
@@ -1180,7 +1205,8 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
                           textAlignVertical="top"
                         />
                       </View>
-                      {(!formData.assetsFarmTool || formData.assetsFarmTool.trim() === "") && (
+                      {(!formData.assetsFarmTool ||
+                        formData.assetsFarmTool.trim() === "") && (
                         <View className="flex-row items-start mt-2">
                           <FontAwesome
                             name="exclamation-triangle"
@@ -1189,7 +1215,9 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
                             style={{ marginTop: 2 }}
                           />
                           <Text className="text-red-500 text-sm ml-2 flex-1">
-                            {t("InspectionForm.PleaseSpecifyAnySpecialFarmToolsUtilizedByTheFarmer")}
+                            {t(
+                              "InspectionForm.PleaseSpecifyAnySpecialFarmToolsUtilizedByTheFarmer",
+                            )}
                           </Text>
                         </View>
                       )}
@@ -1246,7 +1274,8 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
                 renderItem={renderBankItem}
                 keyExtractor={(item) => item.id.toString()}
                 showsVerticalScrollIndicator={false}
-                className="max-h-96"
+                style={{ maxHeight: 384 }}
+                ListEmptyComponent={renderEmptyBankList}
               />
             </View>
           </View>
@@ -1278,7 +1307,8 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
                 renderItem={renderBranchItem}
                 keyExtractor={(item) => item.ID.toString()}
                 showsVerticalScrollIndicator={false}
-                className="max-h-96"
+                 style={{ maxHeight: 384 }}
+                ListEmptyComponent={renderEmptyBranchList}
               />
             </View>
           </View>

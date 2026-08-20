@@ -16,7 +16,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { MaterialIcons } from "@expo/vector-icons";
 import Svg, { Circle, G, Text as SvgText } from "react-native-svg";
 import { RouteProp, useRoute } from "@react-navigation/native";
-import { environment } from "@/environment/environment";
+import environment from "@/environment/environment";
 import axios from "axios";
 import ConfirmationModal from "@/Items/ConfirmationModal";
 
@@ -382,8 +382,11 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
                   }
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
-                  className="px-10 py-3 rounded-3xl items-center"
                   style={{
+                    paddingHorizontal: 40,
+                    paddingVertical: 12,
+                    borderRadius: 24,
+                    alignItems: "center",
                     shadowColor: "#000000",
                     shadowOffset: { width: 0, height: 4 },
                     shadowOpacity: 0.25,
@@ -419,8 +422,12 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
               }
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
-              className="rounded-3xl px-6 h-[50px] items-center justify-center"
               style={{
+                borderRadius: 24,
+                paddingHorizontal: 24,
+                height: 50,
+                alignItems: "center",
+                justifyContent: "center",
                 shadowColor: "#000",
                 shadowOffset: { width: 0, height: 3 },
                 shadowOpacity: 0.25,

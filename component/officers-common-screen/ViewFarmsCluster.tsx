@@ -16,7 +16,7 @@ import { RootStackParamList } from "../types/types";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-import { environment } from "@/environment/environment";
+import environment from "@/environment/environment";
 import { useTranslation } from "react-i18next";
 import ContentLoader, { Rect } from "react-content-loader/native";
 import {
@@ -288,7 +288,11 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
                         colors={["#FF416C", "#FF4B2B"]}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 0 }}
-                        className="py-1.5"
+                        style={{
+                          height:30,
+                          alignItems:'center',
+                          justifyContent:'center'
+                        }}
                       >
                         <Text className="text-white text-base font-semibold text-center">
                           {t("Visits.Open")}
