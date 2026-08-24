@@ -352,7 +352,8 @@
     "ID": "අංක",
     "CountFarmLeftToFinish": "ගොවිපල {{count}} ක් අවසන් කිරීමට ඉතිරිව ඇත",
     "1FarmLeftToFinish": "ගොවිපල 1 ක් අවසන් කිරීමට ඉතිරිව ඇත",
-    "Ongoing": "සිදුවෙමින් පවතින"
+    "Ongoing": "සිදුවෙමින් පවතින",
+    "Assigned":"පූර්ණ වෙමින්"
   },
   "ChangePassword": {
     "ChoosePassword": "මුරපදය වෙනස් කරන්න",

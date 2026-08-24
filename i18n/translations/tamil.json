@@ -352,7 +352,8 @@
     "ID": "ID",
     "CountFarmLeftToFinish": "{{count}} farms left to finish",
     "1FarmLeftToFinish": "1 farm left to finish",
-    "Ongoing": "நடந்துகொண்டிருக்கும்"
+    "Ongoing": "நடந்துகொண்டிருக்கும்",
+    "Assigned":"Assigned"
   },
   "ChangePassword": {
     "ChoosePassword": "கடவுச்சொல்லை மாற்றவும்",

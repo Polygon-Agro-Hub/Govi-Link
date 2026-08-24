@@ -352,7 +352,8 @@
     "Open": "Open",
     "ID": "ID",
     "CountFarmLeftToFinish": "{{count}} farms left to finish",
-    "1FarmLeftToFinish": "1 farm left to finish"
+    "1FarmLeftToFinish": "1 farm left to finish",
+    "Assigned": "Pending"
   },
   "ChangePassword": {
     "ChoosePassword": "Change Password",
