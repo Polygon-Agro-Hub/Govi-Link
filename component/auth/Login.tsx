@@ -288,15 +288,7 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1, backgroundColor: "white" }}
     >
-      {/* Fixed back button, floats above scroll content */}
-      <View
-        style={{
-          position: "absolute",
-          top: hp(2),
-          left: wp(4),
-          zIndex: 10,
-        }}
-      >
+      <View style={{ paddingHorizontal: wp(4), paddingTop: hp(2) }}>
         <TouchableOpacity
           onPress={() => handleNavBack()}
           activeOpacity={0.7}
@@ -312,24 +304,25 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
           <Entypo name="chevron-left" size={22} color="black" />
         </TouchableOpacity>
       </View>
-
+  
       <ScrollView
         style={{ backgroundColor: "white" }}
         contentContainerStyle={{
           flexGrow: 1,
+          justifyContent: "center",
           alignItems: "center",
           paddingHorizontal: wp(6),
-          paddingTop: hp(2) + 40 + hp(2), 
+          paddingBottom:30
         }}
         keyboardShouldPersistTaps="handled"
       >
         <Image
           source={loginImage}
-          style={{ width: 220, height: 220 }}
+          style={{ width: 270, height: 270 }}
           resizeMode="contain"
         />
 
-        <Text className="font-semibold text-2xl pt-[4%]">
+        <Text className="font-semibold text-2xl pt-[7%]">
           {t("Login.Welcome")}
         </Text>
         <Text className="text-center mt-2">
