@@ -63,24 +63,23 @@ const FormTabs: React.FC<FormTabsProps> = ({
 
       try {
         let lastCompletedIndex = -1;
-        
+
         for (let i = 0; i < tableNames.length; i++) {
           const tableName = tableNames[i];
-          
+
           const result = db.getFirstSync<{ requestId: number }>(
             `SELECT requestId FROM ${tableName} WHERE requestId = ?`,
-            [requestId]
+            [requestId],
           );
-          
+
           if (result) {
             lastCompletedIndex = i;
           } else {
             break;
           }
         }
-        
+
         setMaxAccessibleIndex(lastCompletedIndex);
-        
       } catch (error) {
         console.error("Error checking completed forms:", error);
         setMaxAccessibleIndex(0);
@@ -103,12 +102,12 @@ const FormTabs: React.FC<FormTabsProps> = ({
   const currentIndex = tabs.indexOf(activeKey);
 
   const isTabAccessible = (index: number): boolean => {
-    return index === currentIndex || index <= maxAccessibleIndex + 1;
+    return index === currentIndex || index <= maxAccessibleIndex;
   };
 
   const handleTabClick = (key: string, index: number) => {
     if (!isTabAccessible(index)) return;
-    
+
     if (onTabPress) {
       onTabPress(key);
     }
@@ -162,23 +161,23 @@ const FormTabs: React.FC<FormTabsProps> = ({
             const isCompleted = index <= maxAccessibleIndex;
             const isCurrent = key === activeKey;
 
-            let textColor = "text-[#A8A8A8]"; 
-            
+            let textColor = "text-[#A8A8A8]";
+
             if (isCurrent) {
-              textColor = "text-[#FA345A]"; 
+              textColor = "text-[#FA345A]";
             } else if (isCompleted && index < currentIndex) {
-              textColor = "text-[#5D5D5D]"; 
+              textColor = "text-[#5D5D5D]";
             } else if (isCompleted && index > currentIndex) {
-              textColor = "text-[#5D5D5D]"; 
+              textColor = "text-[#5D5D5D]";
             } else if (isAccessible && index < currentIndex) {
-              textColor = "text-[#5D5D5D]"; 
+              textColor = "text-[#5D5D5D]";
             }
 
-            let indicatorColor = "bg-[#A8A8A8]"; 
+            let indicatorColor = "bg-[#A8A8A8]";
             if (isCurrent) {
-              indicatorColor = "bg-[#FA345A]"; 
+              indicatorColor = "bg-[#FA345A]";
             } else if (isCompleted) {
-              indicatorColor = "bg-[#5D5D5D]"; 
+              indicatorColor = "bg-[#5D5D5D]";
             }
 
             return (

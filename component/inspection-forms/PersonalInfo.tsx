@@ -1243,6 +1243,9 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
               renderItem={renderDistrictItem}
               showsVerticalScrollIndicator={false}
               className="max-h-64"
+              ItemSeparatorComponent={() => (
+                <View className="h-[1px] bg-gray-200 mx-4" />
+              )}
               ListEmptyComponent={
                 <View className="px-4 py-8 items-center">
                   <Text className="text-gray-500 text-base">
@@ -1285,21 +1288,22 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
                   className="px-4 py-3 flex-row items-center"
                   onPress={() => handleCountrySelect(item)}
                 >
-                  <Text className="text-2xl mr-3">{item.emoji}</Text>
-                  <View className="flex-1">
-                    <Text className="text-base text-gray-800 font-medium">
-                      {item.name[i18n.language as keyof typeof item.name] ||
-                        item.name.en}
-                    </Text>
-                    <Text className="text-sm text-gray-600">
-                      {item.dial_code}
-                    </Text>
-                  </View>
+                  <Text className="text-2xl w-10">{item.emoji}</Text>
+                  <Text className="text-sm text-gray-600 w-12">
+                    {item.dial_code}
+                  </Text>
+                  <Text className="text-base text-gray-800 font-medium flex-1">
+                    {item.name[i18n.language as keyof typeof item.name] ||
+                      item.name.en}
+                  </Text>
                 </TouchableOpacity>
               )}
               keyExtractor={(item) => item.code}
               showsVerticalScrollIndicator={false}
               className="max-h-96"
+              ItemSeparatorComponent={() => (
+                <View className="h-[1px] bg-gray-200 mx-4" />
+              )}
             />
           </View>
         </View>

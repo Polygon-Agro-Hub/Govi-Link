@@ -77,7 +77,7 @@
     "NumberOfDependentsIsRequired": "යැපෙන්නන් සංඛ්‍යාව අවශ්‍ය වේ",
     "ExistingDebtsOfTheFarmerIsRequired": "ගොවියාගේ පවතින ණය ගෙවීම අවශ්‍ය වේ",
     "IdProofTypeIsRequired": "හැඳුනුම්පත් සාක්ෂි වර්ගය අවශ්‍යයි",
-    "AtLeastOneCategoryOptionMustBeSelected": "අවම වශයෙන් එක් {{category}} විකල්පයක්වත් තෝරා ගත යුතුය.",
+    "AtLeastOneCategoryOptionMustBeSelected": "අවම වශයෙන් එක් විකල්පයක්වත් තෝරා ගත යුතුය.",
     "PermissionDenied": "අවසරය ප්රතික්ෂේප කෙරිණි",
     "LocationPermissionIsRequiredToUseThisFeature": "මෙම විශේෂාංගය භාවිතා කිරීමට ස්ථාන අවසරය අවශ්‍ය වේ.",
     "UnableToGetYourCurrentLocation": "ඔබගේ වත්මන් ස්ථානය ලබා ගත නොහැක.",
@@ -113,7 +113,8 @@
     "EmailDomainIsInvalidCheckForLeadingTrailingDotsOrHyphens": "වලංගු නොවන විද්‍යුත් තැපැල් වසම. කරුණාකර මුල/අගට තිත් හෝ හයිෆන් තිබේදැයි පරීක්ෂා කරන්න",
     "InvalidYahooAddress": "කරුණාකර වලංගු Yahoo විද්‍යුත් තැපැල් ලිපිනයක් ඇතුළත් කරන්න",
     "UnsupportedEmailDomain": "කරුණාකර සහාය දක්වන වසමක් (.com, .gov, .lk) සහිත වලංගු විද්‍යුත් තැපැල් ලිපිනයක් ඇතුළත් කරන්න",
-    "PleaseSelectAJobBeforeAssigning": "පැවරීමට පෙර රැකියාවක් තෝරන්න"
+    "PleaseSelectAJobBeforeAssigning": "පැවරීමට පෙර රැකියාවක් තෝරන්න",
+     "NewPasswordMustBeDifferentFromCurrentPassword":"නව මුරපදය වත්මන් මුරපදයට වඩා වෙනස් විය යුතුය."
   },
   "Login": {
     "Welcome": "සාදරයෙන් පිළිගනිමු!",
@@ -329,7 +330,8 @@
     "English": "ඉංග්‍රීසි",
     "NoProvincesFound": "පළාත් කිසිවක් හමු නොවීය",
     "NoBanksFound": "බැංකුවක් හමු නොවීය",
-    "NoBranchesFound": "ශාඛාවක් හමු නොවීය"
+    "NoBranchesFound": "ශාඛාවක් හමු නොවීය",
+    "NoCountriesFound":"රටවල් හමු නොවීය"
   },
   "ManageOfficers": {
     "Officers": "නිලධාරීන්",

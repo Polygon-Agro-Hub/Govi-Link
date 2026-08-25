@@ -338,27 +338,31 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     clearFieldError(fieldName);
   };
 
-  // Properly handle Unicode name changes (Sinhala/Tamil)
-  const handleUnicodeNameChange = (text: string, fieldName: string) => {
-    const noLeadingSpace = text.replace(/^\s+/, ""); // strip leading space(s)
+// Properly handle Unicode name changes (Sinhala/Tamil) - blocks numbers & special characters only
+const handleUnicodeNameChange = (text: string, fieldName: string) => {
+  const noLeadingSpace = text.replace(/^\s+/, ""); // strip leading space(s)
 
-    switch (fieldName) {
-      case "firstNameSI":
-        setFirstNameSI(noLeadingSpace);
-        break;
-      case "lastNameSI":
-        setLastNameSI(noLeadingSpace);
-        break;
-      case "firstNameTA":
-        setFirstNameTA(noLeadingSpace);
-        break;
-      case "lastNameTA":
-        setLastNameTA(noLeadingSpace);
-        break;
-    }
+  // Allow any letters (English, Sinhala, Tamil, etc.) and spaces.
+  // Block digits, punctuation, and other special characters.
+  const filteredText = noLeadingSpace.replace(/[^\p{L}\s]/gu, "");
 
-    clearFieldError(fieldName);
-  };
+  switch (fieldName) {
+    case "firstNameSI":
+      setFirstNameSI(filteredText);
+      break;
+    case "lastNameSI":
+      setLastNameSI(filteredText);
+      break;
+    case "firstNameTA":
+      setFirstNameTA(filteredText);
+      break;
+    case "lastNameTA":
+      setLastNameTA(filteredText);
+      break;
+  }
+
+  clearFieldError(fieldName);
+};
 
   // Validate on blur, not on every change
   const handleFirstNameENBlur = () => {
@@ -879,22 +883,19 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     </TouchableOpacity>
   );
 
-  const renderCountryCodeItem = (item: any, isSelected: boolean) => (
-    <TouchableOpacity
-      className="px-4 py-3 border-b border-gray-200 flex-row items-center"
-      onPress={() => handleCountryCodeSelect([item.value])}
-    >
-      <Text className="text-2xl mr-3">{item.emoji}</Text>
-      <View className="flex-1 flex-row items-center justify-between">
-        <Text className="text-sm text-gray-600">{item.value}</Text>
-        <Text className="text-base text-gray-800 font-medium">
-          {item.label}
-        </Text>
-      </View>
-      {isSelected && <MaterialIcons name="check" size={20} color="#21202B" />}
-    </TouchableOpacity>
-  );
-
+const renderCountryCodeItem = (item: any, isSelected: boolean) => (
+  <TouchableOpacity
+    className="px-4 py-3 border-b border-gray-200 flex-row items-center"
+    onPress={() => handleCountryCodeSelect([item.value])}
+  >
+    <Text className="text-2xl w-10">{item.emoji}</Text>
+    <Text className="text-sm text-gray-600 w-12">{item.value}</Text>
+    <Text className="text-base text-gray-800 font-medium flex-1">
+      {item.label}
+    </Text>
+    {isSelected && <MaterialIcons name="check" size={20} color="#21202B" />}
+  </TouchableOpacity>
+);
   const validateStep1 = () => {
     const newErrors: Record<string, string> = {};
 

@@ -77,7 +77,7 @@
     "NumberOfDependentsIsRequired": "Number of dependents is required",
     "ExistingDebtsOfTheFarmerIsRequired": "Existing debts of the farmer is required",
     "IdProofTypeIsRequired": "ID proof type is required",
-    "AtLeastOneCategoryOptionMustBeSelected": "At least one {{category}} option must be selected",
+    "AtLeastOneCategoryOptionMustBeSelected": "At least one option must be selected",
     "PermissionDenied": "Permission Denied",
     "LocationPermissionIsRequiredToUseThisFeature": "Location permission is required to use this feature.",
     "UnableToGetYourCurrentLocation": "Unable to get your current location",
@@ -113,7 +113,8 @@
     "EmailDomainIsInvalidCheckForLeadingTrailingDotsOrHyphens": "மின்னஞ்சல் டொமைன் தவறானது. முன்/பின் புள்ளிகள் அல்லது ஹைபன்கள் உள்ளதா எனச் சரிபார்க்கவும்",
     "InvalidYahooAddress": "சரியான Yahoo மின்னஞ்சல் முகவரியை உள்ளிடவும்",
     "UnsupportedEmailDomain": "ஆதரிக்கப்படும் டொமைனுடன் (.com, .gov, .lk) சரியான மின்னஞ்சல் முகவரியை உள்ளிடவும்",
-    "PleaseSelectAJobBeforeAssigning": "ஒதுக்குவதற்கு முன் ஒரு பணியைத் தேர்ந்தெடுக்கவும்"
+    "PleaseSelectAJobBeforeAssigning": "ஒதுக்குவதற்கு முன் ஒரு பணியைத் தேர்ந்தெடுக்கவும்",
+     "NewPasswordMustBeDifferentFromCurrentPassword":"புதிய கடவுச்சொல் தற்போதைய கடவுச்சொல்லிலிருந்து வேறுபட்டதாக இருக்க வேண்டும்."
   },
   "Login": {
     "Welcome": "வரவேற்கிறோம்",
@@ -329,7 +330,8 @@
     "English": "ஆங்கிலம்",
     "NoProvincesFound": "மாகாணங்கள் எதுவும் காணப்படவில்லை",
     "NoBanksFound": "வங்கி எதுவும் காணப்படவில்லை",
-    "NoBranchesFound": "கிளை எதுவும் காணப்படவில்லை"
+    "NoBranchesFound": "கிளை எதுவும் காணப்படவில்லை",
+    "NoCountriesFound":"நாடுகள் எதுவும் காணப்படவில்லை"
   },
   "ManageOfficers": {
     "Officers": "Officers",

@@ -85,16 +85,25 @@ const Splash: React.FC = () => {
 
       if (response.data.status === "success") {
         const user = response.data.data;
+
+        // passwordUpdated = 0 -> force back to Login
+        if (!user.passwordUpdated) {
+          navigation.navigate("Login");
+          return;
+        }
+
         dispatch(
           setUser({ token, role: user.role, empId: user.empId.toString() }),
         );
 
-        if (response.data.data.role === "Chief Field Officer") {
+        if (user.role === "Chief Field Officer") {
           navigation.navigate("Main", { screen: "Dashboard" as any });
-        } else if (response.data.data.role === "Field Officer") {
+        } else if (user.role === "Field Officer") {
           navigation.navigate("Main", {
             screen: "FieldOfficerDashboard" as any,
           });
+        } else {
+          navigation.navigate("Login");
         }
       } else {
         navigation.navigate("Login");

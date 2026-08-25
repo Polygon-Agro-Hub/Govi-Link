@@ -429,7 +429,7 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
                     <TextInput
                       className="border border-[#9DB2CE] rounded-lg p-2 mb-4"
                       multiline
-                      placeholder={t("CertificateSuggestions.TypeHere....")}
+                      placeholder={t("CertificateSuggestions.TypeHere...")}
                       textAlignVertical="top"
                       value={item.problem}
                       onChangeText={(text) =>

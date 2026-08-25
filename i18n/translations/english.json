@@ -77,7 +77,7 @@
     "NumberOfDependentsIsRequired": "Number of dependents is required",
     "ExistingDebtsOfTheFarmerIsRequired": "Existing debts of the farmer is required",
     "IdProofTypeIsRequired": "ID proof type is required",
-    "AtLeastOneCategoryOptionMustBeSelected": "At least one {{category}} option must be selected",
+    "AtLeastOneCategoryOptionMustBeSelected": "At least one option must be selected",
     "PermissionDenied": "Permission Denied",
     "LocationPermissionIsRequiredToUseThisFeature": "Location permission is required to use this feature.",
     "UnableToGetYourCurrentLocation": "Unable to get your current location",
@@ -113,7 +113,8 @@
     "EmailDomainIsInvalidCheckForLeadingTrailingDotsOrHyphens": "Invalid email domain. Please check for leading/trailing dots or hyphens",
     "InvalidYahooAddress": "Please enter a valid Yahoo email address",
     "UnsupportedEmailDomain": "Please enter a valid email address with a supported domain (.com, .gov, .lk)",
-    "PleaseSelectAJobBeforeAssigning": "Please select a job before assigning"
+    "PleaseSelectAJobBeforeAssigning": "Please select a job before assigning",
+    "NewPasswordMustBeDifferentFromCurrentPassword":"New password must be different from current password"
   },
   "Login": {
     "Welcome": "Welcome!",
@@ -329,7 +330,8 @@
     "English": "English",
     "NoProvincesFound": "No Provinces Found",
     "NoBanksFound": "No Bank Found",
-    "NoBranchesFound": "No Branch Found"
+    "NoBranchesFound": "No Branch Found",
+    "NoCountriesFound":"No Countries Found"
   },
   "ManageOfficers": {
     "Officers": "Officers",
@@ -457,7 +459,7 @@
   },
   "InspectionForm": {
     "IDProof": "ID Proof",
-    "IdProofType": "IdProof Type",
+    "IdProofType": "Id Proof Type",
     "InspectionForm": "Inspection Form",
     "FirstName": "First Name",
     "LastName": "Last Name",

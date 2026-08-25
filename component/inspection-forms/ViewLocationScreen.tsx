@@ -1,7 +1,7 @@
-import React, { useRef } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import React, { useRef, useCallback } from "react";
+import { View, Text, TouchableOpacity, BackHandler } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RouteProp } from "@react-navigation/native";
+import { RouteProp, useFocusEffect } from "@react-navigation/native";
 import { WebView } from "react-native-webview";
 import { AntDesign } from "@expo/vector-icons";
 import {
@@ -33,6 +33,20 @@ const ViewLocationScreen: React.FC<ViewLocationScreenProps> = ({
   const webViewRef = useRef<WebView>(null);
 
   const { latitude, longitude } = route.params;
+
+  useFocusEffect(
+    useCallback(() => {
+      const handleBackPress = () => {
+        navigation.goBack();
+        return true;
+      };
+      const subscription = BackHandler.addEventListener(
+        "hardwareBackPress",
+        handleBackPress,
+      );
+      return () => subscription.remove();
+    }, [navigation])
+  );
 
   const lat = latitude || 7.2008;
   const lng = longitude || 79.8358;

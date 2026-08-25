@@ -435,7 +435,8 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
                 value={otpCode[index]}
                 onChangeText={(text) => handleOtpChange(text, index)}
                 onKeyPress={(e) => handleKeyPress(e, index)}
-                selectionColor="#FF1D85"
+                selectionColor={otpCode[index] ? "#FFFFFF" : "#FF1D85"}
+                cursorColor={otpCode[index] ? "#FFFFFF" : "#FF1D85"}
                 textAlign="center"
               />
             ))}

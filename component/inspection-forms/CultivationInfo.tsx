@@ -1082,9 +1082,9 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
 
                     <TouchableOpacity
                       onPress={() => onClearImage(index)}
-                      className="absolute top-[-8] right-[-8] bg-[#f21d1d] p-2 rounded-full"
+                       className="absolute top-[-8] right-[-7] bg-[#f21d1d] p-1 rounded-full"
                     >
-                      <AntDesign name="close" size={14} color="white" />
+                      <AntDesign name="close" size={12} color="white" />
                     </TouchableOpacity>
                   </View>
                 ))}

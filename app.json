@@ -36,7 +36,7 @@
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.polygonagro.GoviLink",
-      "softwareKeyboardLayoutMode": "pan",
+      "softwareKeyboardLayoutMode": "resize",
       "versionCode": 10,
       "compileSdkVersion": 36,
       "targetSdkVersion": 36,
