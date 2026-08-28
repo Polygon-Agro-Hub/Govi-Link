@@ -34,7 +34,7 @@ const formatNumberWithCommas = (value: string): string => {
   // Split into integer and decimal parts
   const parts = cleanValue.split(".");
   let integerPart = parts[0];
-  const decimalPart = parts[1] ? "." + parts[1] : "";
+  const decimalPart = parts.length > 1 ? "." + (parts[1] || "") : "";
 
   // Remove leading zeros
   integerPart = integerPart.replace(/^0+/, "");

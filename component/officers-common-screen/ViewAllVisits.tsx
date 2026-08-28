@@ -7,6 +7,7 @@ import {
   ScrollView,
   Modal,
   Linking,
+  Alert,
   ActivityIndicator,
   RefreshControl,
   Animated,
@@ -252,6 +253,20 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
     Linking.openURL(phoneUrl).catch((err) =>
       console.error("Failed to open dial pad:", err),
     );
+  };
+
+  const handleLocationPress = () => {
+    if (selectedItem?.latitude && selectedItem?.longitude) {
+      const lat = selectedItem.latitude;
+      const lon = selectedItem.longitude;
+      const url = `https://www.google.com/maps?q=${lat},${lon}`;
+      Linking.openURL(url);
+    } else {
+      Alert.alert(
+        t("VisitPopup.NoLocationTitle"),
+        t("VisitPopup.NoLocationMessage"),
+      );
+    }
   };
 
   const effectiveRole = userRole || storedRole;
@@ -626,44 +641,20 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
                   <View className="flex flex-row justify-center gap-x-2 mb-4 mt-6 px-4">
                     <TouchableOpacity
                       className="flex w-1/2"
-                      disabled={
-                        !selectedItem?.latitude || !selectedItem?.longitude
-                      }
-                      onPress={() => {
-                        if (selectedItem?.latitude && selectedItem?.longitude) {
-                          const lat = selectedItem.latitude;
-                          const lon = selectedItem.longitude;
-                          const url = `https://www.google.com/maps?q=${lat},${lon}`;
-                          Linking.openURL(url);
-                        }
-                      }}
+                      onPress={handleLocationPress}
                     >
                       <View
-                        className={`flex flex-row items-center justify-center rounded-full  border ${
-                          selectedItem?.latitude && selectedItem?.longitude
-                            ? "border-[#F83B4F]"
-                            : "border-[#9DB2CE]"
-                        }`}
+                        className="flex flex-row items-center justify-center rounded-full border border-[#F83B4F]"
                         style={{
-                          height:40
+                          height: 40,
                         }}
                       >
                         <FontAwesome6
                           name="location-dot"
                           size={20}
-                          color={
-                            selectedItem?.latitude && selectedItem?.longitude
-                              ? "#F83B4F"
-                              : "#9DB2CE"
-                          }
+                          color="#F83B4F"
                         />
-                        <Text
-                          className={`text-base font-semibold ml-2 ${
-                            selectedItem?.latitude && selectedItem?.longitude
-                              ? "text-[#000000]"
-                              : "text-[#9DB2CE]"
-                          }`}
-                        >
+                        <Text className="text-base font-semibold ml-2 text-[#000000]">
                           {t("VisitPopup.Location")}
                         </Text>
                       </View>
@@ -673,9 +664,10 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
                       className="flex w-1/2"
                       onPress={() => handleDial(selectedItem.farmerMobile)}
                     >
-                      <View className="flex-row items-center justify-center border border-[#F83B4F] rounded-full px-6 "
-                      style={{
-                          height:40
+                      <View
+                        className="flex-row items-center justify-center border border-[#F83B4F] rounded-full px-6 "
+                        style={{
+                          height: 40,
                         }}
                       >
                         <Ionicons name="call" size={20} color="#F83B4F" />

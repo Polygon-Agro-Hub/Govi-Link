@@ -160,7 +160,7 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
         [{ text: t("Main.Ok") }],
       );
       resetForm();
-      navigation.navigate("Main", { screen: "Dashboard" });
+      navigation.replace("ComplainHistory");
     } catch (error: unknown) {
       if (error instanceof Error) {
         console.error("Error message:", error.message);

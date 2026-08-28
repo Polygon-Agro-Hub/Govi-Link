@@ -77,7 +77,7 @@
     "NumberOfDependentsIsRequired": "Number of dependents is required",
     "ExistingDebtsOfTheFarmerIsRequired": "Existing debts of the farmer is required",
     "IdProofTypeIsRequired": "ID proof type is required",
-    "AtLeastOneCategoryOptionMustBeSelected": "At least one {{category}} option must be selected",
+    "AtLeastOneCategoryOptionMustBeSelected": "At least one option must be selected",
     "PermissionDenied": "Permission Denied",
     "LocationPermissionIsRequiredToUseThisFeature": "Location permission is required to use this feature.",
     "UnableToGetYourCurrentLocation": "Unable to get your current location",
@@ -113,7 +113,8 @@
     "EmailDomainIsInvalidCheckForLeadingTrailingDotsOrHyphens": "Invalid email domain. Please check for leading/trailing dots or hyphens",
     "InvalidYahooAddress": "Please enter a valid Yahoo email address",
     "UnsupportedEmailDomain": "Please enter a valid email address with a supported domain (.com, .gov, .lk)",
-    "PleaseSelectAJobBeforeAssigning": "Please select a job before assigning"
+    "PleaseSelectAJobBeforeAssigning": "Please select a job before assigning",
+    "NewPasswordMustBeDifferentFromCurrentPassword": "New password must be different from current password"
   },
   "Login": {
     "Welcome": "Welcome!",
@@ -184,7 +185,9 @@
     "Location": "Location",
     "GetCall": "Get Call",
     "Address": "Address :",
-    "Start": "Start"
+    "Start": "Start",
+    "NoLocationTitle": "No Location Found!",
+    "NoLocationMessage": "The farmer has not completed any tasks from the crop calendars, so no farm location has been added. Kindly contact the farmer to get directions to the farm."
   },
   "CertificateQuesanory": {
     "StartedOn": "Started on",
@@ -329,7 +332,13 @@
     "English": "English",
     "NoProvincesFound": "No Provinces Found",
     "NoBanksFound": "No Bank Found",
-    "NoBranchesFound": "No Branch Found"
+    "NoBranchesFound": "No Branch Found",
+    "NoCountriesFound": "No Countries Found",
+    "DragToReposition": "Drag the frame to reposition",
+    "Rotate": "Rotate",
+    "Flip": "Flip",
+    "Crop": "Crop",
+    "EditPhoto": "Edit Photo"
   },
   "ManageOfficers": {
     "Officers": "Officers",
@@ -352,7 +361,8 @@
     "Open": "Open",
     "ID": "ID",
     "CountFarmLeftToFinish": "{{count}} farms left to finish",
-    "1FarmLeftToFinish": "1 farm left to finish"
+    "1FarmLeftToFinish": "1 farm left to finish",
+    "Assigned": "Pending"
   },
   "ChangePassword": {
     "ChoosePassword": "Change Password",
@@ -456,7 +466,7 @@
   },
   "InspectionForm": {
     "IDProof": "ID Proof",
-    "IdProofType": "IdProof Type",
+    "IdProofType": "Id Proof Type",
     "InspectionForm": "Inspection Form",
     "FirstName": "First Name",
     "LastName": "Last Name",

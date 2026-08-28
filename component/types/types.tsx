@@ -8,6 +8,7 @@ export type RootStackParamList = {
     params?: any;
   };
   Dashboard: undefined;
+  CustomDrawerContent:undefined;
   Lanuage: undefined;
   Splash: undefined;
   Login: undefined;
