@@ -331,7 +331,12 @@
     "NoProvincesFound": "පළාත් කිසිවක් හමු නොවීය",
     "NoBanksFound": "බැංකුවක් හමු නොවීය",
     "NoBranchesFound": "ශාඛාවක් හමු නොවීය",
-    "NoCountriesFound":"රටවල් හමු නොවීය"
+    "NoCountriesFound":"රටවල් හමු නොවීය",
+    "DragToReposition":"නැවත ස්ථානගත කිරීමට රාමුව අදින්න",
+    "Rotate":"කරකවන්න",
+    "Flip":"පෙරළන්න",
+    "Crop":"Crop",
+    "EditPhoto":"ඡායාරූපය සංස්කරණය කරන්න"
   },
   "ManageOfficers": {
     "Officers": "නිලධාරීන්",

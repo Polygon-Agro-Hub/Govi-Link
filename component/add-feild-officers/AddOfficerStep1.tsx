@@ -28,6 +28,7 @@ import { useFocusEffect, RouteProp, useRoute } from "@react-navigation/native";
 import CustomHeader from "../commons/CustomHeader";
 import GlobalSearchModal from "@/component/commons/GlobalSearchModal";
 import { useModal } from "@/hooks/useModal";
+import ImageCropModal from "../commons/Imagecropmodal";
 
 type AddOfficerStep1NavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -70,6 +71,9 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
   const [nic, setNic] = useState("");
   const [email, setEmail] = useState("");
   const [profileImage, setProfileImage] = useState<string | null>(null);
+
+  const [pendingImageUri, setPendingImageUri] = useState<string | null>(null);
+  const [cropModalVisible, setCropModalVisible] = useState(false);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
@@ -319,7 +323,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
 
   // Properly handle name field changes with correct validation
   const handleNameENChange = (text: string, fieldName: string) => {
-    const noLeadingSpace = text.replace(/^\s+/, ""); // strip leading space(s)
+    const noLeadingSpace = text.replace(/^\s+/, "");
     const filteredText = noLeadingSpace.replace(/[^a-zA-Z\s]/g, "");
     const capitalizedText =
       filteredText.charAt(0).toUpperCase() + filteredText.slice(1);
@@ -338,31 +342,28 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     clearFieldError(fieldName);
   };
 
-// Properly handle Unicode name changes (Sinhala/Tamil) - blocks numbers & special characters only
-const handleUnicodeNameChange = (text: string, fieldName: string) => {
-  const noLeadingSpace = text.replace(/^\s+/, ""); // strip leading space(s)
+  const handleUnicodeNameChange = (text: string, fieldName: string) => {
+    const noLeadingSpace = text.replace(/^\s+/, "");
 
-  // Allow any letters (English, Sinhala, Tamil, etc.) and spaces.
-  // Block digits, punctuation, and other special characters.
-  const filteredText = noLeadingSpace.replace(/[^\p{L}\s]/gu, "");
+    const filteredText = noLeadingSpace.replace(/[^\p{L}\s]/gu, "");
 
-  switch (fieldName) {
-    case "firstNameSI":
-      setFirstNameSI(filteredText);
-      break;
-    case "lastNameSI":
-      setLastNameSI(filteredText);
-      break;
-    case "firstNameTA":
-      setFirstNameTA(filteredText);
-      break;
-    case "lastNameTA":
-      setLastNameTA(filteredText);
-      break;
-  }
+    switch (fieldName) {
+      case "firstNameSI":
+        setFirstNameSI(filteredText);
+        break;
+      case "lastNameSI":
+        setLastNameSI(filteredText);
+        break;
+      case "firstNameTA":
+        setFirstNameTA(filteredText);
+        break;
+      case "lastNameTA":
+        setLastNameTA(filteredText);
+        break;
+    }
 
-  clearFieldError(fieldName);
-};
+    clearFieldError(fieldName);
+  };
 
   // Validate on blur, not on every change
   const handleFirstNameENBlur = () => {
@@ -661,12 +662,12 @@ const handleUnicodeNameChange = (text: string, fieldName: string) => {
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ["images"],
         allowsEditing: false,
-        aspect: [1, 1],
-        quality: 0.8,
+        quality: 1,
       });
 
       if (!result.canceled && result.assets && result.assets.length > 0) {
-        setProfileImage(result.assets[0].uri);
+        setPendingImageUri(result.assets[0].uri);
+        setCropModalVisible(true);
       }
     } catch (error) {
       console.error("Error picking image:", error);
@@ -674,6 +675,18 @@ const handleUnicodeNameChange = (text: string, fieldName: string) => {
         { text: t("Main.OK") },
       ]);
     }
+  };
+
+  // Called once the user rotates/flips/crops and taps Crop.
+  const handleCropConfirm = (croppedUri: string) => {
+    setProfileImage(croppedUri);
+    setCropModalVisible(false);
+    setPendingImageUri(null);
+  };
+
+  const handleCropCancel = () => {
+    setCropModalVisible(false);
+    setPendingImageUri(null);
   };
 
   const checkNICExists = async (nicNumber: string): Promise<boolean> => {
@@ -883,19 +896,19 @@ const handleUnicodeNameChange = (text: string, fieldName: string) => {
     </TouchableOpacity>
   );
 
-const renderCountryCodeItem = (item: any, isSelected: boolean) => (
-  <TouchableOpacity
-    className="px-4 py-3 border-b border-gray-200 flex-row items-center"
-    onPress={() => handleCountryCodeSelect([item.value])}
-  >
-    <Text className="text-2xl w-10">{item.emoji}</Text>
-    <Text className="text-sm text-gray-600 w-12">{item.value}</Text>
-    <Text className="text-base text-gray-800 font-medium flex-1">
-      {item.label}
-    </Text>
-    {isSelected && <MaterialIcons name="check" size={20} color="#21202B" />}
-  </TouchableOpacity>
-);
+  const renderCountryCodeItem = (item: any, isSelected: boolean) => (
+    <TouchableOpacity
+      className="px-4 py-3 border-b border-gray-200 flex-row items-center"
+      onPress={() => handleCountryCodeSelect([item.value])}
+    >
+      <Text className="text-2xl w-10">{item.emoji}</Text>
+      <Text className="text-sm text-gray-600 w-12">{item.value}</Text>
+      <Text className="text-base text-gray-800 font-medium flex-1">
+        {item.label}
+      </Text>
+      {isSelected && <MaterialIcons name="check" size={20} color="#21202B" />}
+    </TouchableOpacity>
+  );
   const validateStep1 = () => {
     const newErrors: Record<string, string> = {};
 
@@ -1589,6 +1602,15 @@ const renderCountryCodeItem = (item: any, isSelected: boolean) => (
         multiSelect={false}
         renderItem={renderCountryCodeItem}
         searchKeys={["label", "value", "name.en", "name.si", "name.ta"]}
+      />
+
+      {/* Rotate / Flip / Crop screen shown right after the photo is picked */}
+      <ImageCropModal
+        visible={cropModalVisible}
+        imageUri={pendingImageUri}
+        onCancel={handleCropCancel}
+        onConfirm={handleCropConfirm}
+        aspect={1}
       />
     </KeyboardAvoidingView>
   );

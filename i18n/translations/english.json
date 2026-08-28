@@ -331,7 +331,12 @@
     "NoProvincesFound": "No Provinces Found",
     "NoBanksFound": "No Bank Found",
     "NoBranchesFound": "No Branch Found",
-    "NoCountriesFound":"No Countries Found"
+    "NoCountriesFound":"No Countries Found",
+    "DragToReposition":"Drag the frame to reposition",
+    "Rotate":"Rotate",
+    "Flip":"Flip",
+    "Crop":"Crop",
+    "EditPhoto":"Edit Photo"
   },
   "ManageOfficers": {
     "Officers": "Officers",

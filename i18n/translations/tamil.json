@@ -331,7 +331,12 @@
     "NoProvincesFound": "மாகாணங்கள் எதுவும் காணப்படவில்லை",
     "NoBanksFound": "வங்கி எதுவும் காணப்படவில்லை",
     "NoBranchesFound": "கிளை எதுவும் காணப்படவில்லை",
-    "NoCountriesFound":"நாடுகள் எதுவும் காணப்படவில்லை"
+    "NoCountriesFound":"நாடுகள் எதுவும் காணப்படவில்லை",
+    "DragToReposition":"நிலையை மாற்ற சட்டகத்தை இழுக்கவும்",
+    "Rotate":"சுழற்று",
+    "Flip":"புரட்டு",
+    "Crop":"பயிர்",
+    "EditPhoto":"புகைப்படத்தைத் திருத்து"
   },
   "ManageOfficers": {
     "Officers": "Officers",
