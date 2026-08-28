@@ -114,7 +114,7 @@
     "InvalidYahooAddress": "Please enter a valid Yahoo email address",
     "UnsupportedEmailDomain": "Please enter a valid email address with a supported domain (.com, .gov, .lk)",
     "PleaseSelectAJobBeforeAssigning": "Please select a job before assigning",
-    "NewPasswordMustBeDifferentFromCurrentPassword":"New password must be different from current password"
+    "NewPasswordMustBeDifferentFromCurrentPassword": "New password must be different from current password"
   },
   "Login": {
     "Welcome": "Welcome!",
@@ -185,7 +185,9 @@
     "Location": "Location",
     "GetCall": "Get Call",
     "Address": "Address :",
-    "Start": "Start"
+    "Start": "Start",
+    "NoLocationTitle": "No Location Found!",
+    "NoLocationMessage": "The farmer has not completed any tasks from the crop calendars, so no farm location has been added. Kindly contact the farmer to get directions to the farm."
   },
   "CertificateQuesanory": {
     "StartedOn": "Started on",
@@ -331,12 +333,12 @@
     "NoProvincesFound": "No Provinces Found",
     "NoBanksFound": "No Bank Found",
     "NoBranchesFound": "No Branch Found",
-    "NoCountriesFound":"No Countries Found",
-    "DragToReposition":"Drag the frame to reposition",
-    "Rotate":"Rotate",
-    "Flip":"Flip",
-    "Crop":"Crop",
-    "EditPhoto":"Edit Photo"
+    "NoCountriesFound": "No Countries Found",
+    "DragToReposition": "Drag the frame to reposition",
+    "Rotate": "Rotate",
+    "Flip": "Flip",
+    "Crop": "Crop",
+    "EditPhoto": "Edit Photo"
   },
   "ManageOfficers": {
     "Officers": "Officers",
