@@ -37,7 +37,7 @@
       "predictiveBackGestureEnabled": false,
       "package": "com.polygonagro.GoviLink",
       "softwareKeyboardLayoutMode": "resize",
-      "versionCode": 10,
+      "versionCode": 12,
       "compileSdkVersion": 36,
       "targetSdkVersion": 36,
       "minSdkVersion": 24,
