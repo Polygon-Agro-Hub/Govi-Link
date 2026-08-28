@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   View,
   Text,
@@ -6,9 +6,10 @@ import {
   Alert,
   ActivityIndicator,
   Modal,
+  BackHandler,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RouteProp } from "@react-navigation/native";
+import { RouteProp, useFocusEffect } from "@react-navigation/native";
 import { WebView } from "react-native-webview";
 import * as Location from "expo-location";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
@@ -55,6 +56,21 @@ const AttachGeoLocationScreen: React.FC<AttachGeoLocationScreenProps> = ({
     "Tap on the map to select a location",
   );
   const { t } = useTranslation();
+
+  useFocusEffect(
+    useCallback(() => {
+      const handleBackPress = () => {
+        navigation.goBack();
+        return true;
+      };
+      const subscription = BackHandler.addEventListener(
+        "hardwareBackPress",
+        handleBackPress,
+      );
+      return () => subscription.remove();
+    }, [navigation])
+  );
+
   useEffect(() => {
     if (!currentLatitude || !currentLongitude) {
       getCurrentLocation();

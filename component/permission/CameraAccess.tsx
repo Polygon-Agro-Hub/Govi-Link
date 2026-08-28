@@ -9,6 +9,7 @@ import {
   Dimensions,
   StatusBar,
   Linking,
+  ActivityIndicator,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -43,10 +44,55 @@ const CameraAccess: React.FC<CameraAccessProps> = ({
   const { t } = useTranslation();
   const screenWidth = Dimensions.get("window").width;
   const [isLoading, setIsLoading] = useState(false);
+  // Start as "checking" so we don't flash the permission UI (or trigger a
+  // native prompt) before we know whether permission is already granted.
+  const [isCheckingPermission, setIsCheckingPermission] = useState(true);
 
   const dynamicStyles = {
     imageHeight: screenWidth < 400 ? wp(55) : wp(50),
   };
+
+  const proceed = () => {
+    if (onPermissionGranted) {
+      onPermissionGranted();
+    } else {
+      // replace (not navigate) so this permission screen isn't left in the
+      // back stack once we've skipped past it
+      navigation.replace(returnScreen as any);
+    }
+  };
+
+  // On mount / whenever this screen regains focus, silently check current
+  // permission status (getCameraPermissionsAsync never shows a dialog).
+  // If it's already granted, skip this screen entirely - no UI, no prompt.
+  useFocusEffect(
+    React.useCallback(() => {
+      let isActive = true;
+
+      const checkPermission = async () => {
+        try {
+          const { status } = await Camera.getCameraPermissionsAsync();
+          if (!isActive) return;
+
+          if (status === "granted") {
+            proceed();
+            return;
+          }
+          setIsCheckingPermission(false);
+        } catch (error) {
+          console.error("Error checking camera permission:", error);
+          if (isActive) setIsCheckingPermission(false);
+        }
+      };
+
+      setIsCheckingPermission(true);
+      checkPermission();
+
+      return () => {
+        isActive = false;
+      };
+    }, []),
+  );
 
   useFocusEffect(
     React.useCallback(() => {
@@ -68,11 +114,7 @@ const CameraAccess: React.FC<CameraAccessProps> = ({
       const { status } = await Camera.requestCameraPermissionsAsync();
 
       if (status === "granted") {
-        if (onPermissionGranted) {
-          onPermissionGranted();
-        } else {
-          navigation.navigate(returnScreen as any);
-        }
+        proceed();
       } else if (status === "denied") {
         Alert.alert(
           t("Permission.PermissionDenied") || "Permission Denied",
@@ -92,6 +134,18 @@ const CameraAccess: React.FC<CameraAccessProps> = ({
       setIsLoading(false);
     }
   };
+
+  // Still checking existing permission status - render nothing (or a bare
+  // loader) rather than the "Allow camera access" UI, so a user who has
+  // already granted permission never sees this screen at all.
+  if (isCheckingPermission) {
+    return (
+      <View className="flex-1 bg-black items-center justify-center">
+        <StatusBar barStyle="light-content" backgroundColor="#000000" />
+        <ActivityIndicator color="#ffffff" />
+      </View>
+    );
+  }
 
   return (
     <View className="flex-1 bg-black">
