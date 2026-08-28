@@ -16,7 +16,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { MaterialIcons } from "@expo/vector-icons";
 import Svg, { Circle, G, Text as SvgText } from "react-native-svg";
 import { RouteProp, useRoute } from "@react-navigation/native";
-import { environment } from "@/environment/environment";
+import environment from "@/environment/environment";
 import axios from "axios";
 import ConfirmationModal from "@/Items/ConfirmationModal";
 
@@ -43,7 +43,15 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
   const progressAnim = useRef(new Animated.Value(100)).current;
   const countdownAnim = useRef(new Animated.Value(30)).current;
   const animationRef = useRef<Animated.CompositeAnimation | null>(null);
+
+  // Guards duplicate API submissions (auto-assign / confirm-and-leave / undo).
+  const hasSubmittedRef = useRef(false);
+  // Guards duplicate navigation calls. Kept separate from hasSubmittedRef so
+  // that setting the "submitted" flag early doesn't accidentally block the
+  // navigation that's supposed to happen later (this was the cause of the
+  // freeze-after-success bug).
   const hasNavigatedRef = useRef(false);
+
   const isAnimationStartedRef = useRef(false);
   const cancelledRef = useRef(false);
 
@@ -71,10 +79,10 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
   }, [navigateToCapitalRequests]);
 
   const handleAutoAssign = useCallback(async () => {
-    if (hasNavigatedRef.current) return;
+    if (hasSubmittedRef.current) return;
     if (cancelledRef.current) return;
 
-    hasNavigatedRef.current = true;
+    hasSubmittedRef.current = true;
     setShowConfirmationModal(false);
     setAssigning(true);
 
@@ -96,6 +104,7 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
 
       console.error("Error auto-confirming request:", error);
       setAssigning(false);
+      hasSubmittedRef.current = false; // allow retry
 
       Alert.alert(
         t("Main.Sorry"),
@@ -150,7 +159,6 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
         animationRef.current.stop();
       }
       isAnimationStartedRef.current = false;
-      hasNavigatedRef.current = false;
     };
   }, [startCountdownAnimation]);
 
@@ -166,10 +174,10 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
   }, [countdownAnim]);
 
   const handleUndo = async () => {
-    if (hasNavigatedRef.current) return;
+    if (hasSubmittedRef.current) return;
 
     cancelledRef.current = true;
-    hasNavigatedRef.current = true;
+    hasSubmittedRef.current = true;
 
     if (animationRef.current) {
       animationRef.current.stop();
@@ -194,12 +202,13 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
   };
 
   const handleConfirmAndLeave = async () => {
-    if (hasNavigatedRef.current) return;
+    if (hasSubmittedRef.current) return;
 
     if (animationRef.current) {
       animationRef.current.stop();
     }
 
+    hasSubmittedRef.current = true;
     setShowConfirmationModal(false);
     setAssigning(true);
 
@@ -221,6 +230,7 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
 
       console.error("Error confirming request:", error);
       setAssigning(false);
+      hasSubmittedRef.current = false; // allow retry
 
       Alert.alert(
         t("Main.Sorry"),
@@ -250,16 +260,10 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
   useEffect(() => {
     const handleBackPress = () => {
       cancelledRef.current = true;
-      hasNavigatedRef.current = true;
-
       if (animationRef.current) {
         animationRef.current.stop();
       }
-
-      navigation.navigate("Main", {
-        screen: "MainTabs",
-        params: { screen: "CapitalRequests" },
-      });
+      navigateToCapitalRequests();
       return true;
     };
 
@@ -269,7 +273,7 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
     );
 
     return () => subscription.remove();
-  }, [navigation]);
+  }, [navigateToCapitalRequests]);
 
   return (
     <View className="flex-1 bg-white">
@@ -277,16 +281,10 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
         <TouchableOpacity
           onPress={() => {
             cancelledRef.current = true;
-            hasNavigatedRef.current = true;
-
             if (animationRef.current) {
               animationRef.current.stop();
             }
-
-            navigation.navigate("Main", {
-              screen: "MainTabs",
-              params: { screen: "CapitalRequests" },
-            });
+            navigateToCapitalRequests();
           }}
           className="bg-[#F6F6F680] rounded-full py-4 px-3"
         >
@@ -371,19 +369,22 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
 
               <TouchableOpacity
                 onPress={handleUndo}
-                disabled={assigning || hasNavigatedRef.current}
+                disabled={assigning || hasSubmittedRef.current}
                 className="ml-3 mt-auto"
               >
                 <LinearGradient
                   colors={
-                    assigning || hasNavigatedRef.current
+                    assigning || hasSubmittedRef.current
                       ? ["#CCCCCC", "#CCCCCC"]
                       : ["#2C2C2C", "#000000"]
                   }
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
-                  className="px-10 py-3 rounded-3xl items-center"
                   style={{
+                    paddingHorizontal: 40,
+                    paddingVertical: 12,
+                    borderRadius: 24,
+                    alignItems: "center",
                     shadowColor: "#000000",
                     shadowOffset: { width: 0, height: 4 },
                     shadowOpacity: 0.25,
@@ -408,24 +409,32 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
         <View className="px-12 pb-8 mt-auto mb-14">
           <TouchableOpacity
             onPress={handleConfirmAndLeave}
-            disabled={assigning || hasNavigatedRef.current}
+            disabled={assigning || hasSubmittedRef.current}
             className="w-full"
+            style={{
+              borderRadius: 24,
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 3 },
+              shadowOpacity: 0.25,
+              shadowRadius: 5,
+              elevation: 6,
+              // NOTE: no overflow: hidden here
+            }}
           >
             <LinearGradient
               colors={
-                assigning || hasNavigatedRef.current
+                assigning || hasSubmittedRef.current
                   ? ["#CCCCCC", "#CCCCCC"]
                   : ["#F2561D", "#FF1D85"]
               }
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
-              className="rounded-3xl px-6 h-[50px] items-center justify-center"
               style={{
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 3 },
-                shadowOpacity: 0.25,
-                shadowRadius: 5,
-                elevation: 6,
+                borderRadius: 24,
+                paddingHorizontal: 24,
+                height: 50,
+                alignItems: "center",
+                justifyContent: "center",
                 overflow: "hidden",
               }}
             >

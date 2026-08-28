@@ -25,7 +25,7 @@ import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../types/types";
 import { CameraScreen } from "@/Items/CameraScreen";
 import axios from "axios";
-import { environment } from "@/environment/environment";
+import environment from "@/environment/environment";
 import FormFooterButton from "./FormFooterButton";
 import {
   saveCultivationInfo,
@@ -126,7 +126,7 @@ const YesNoSelect = ({
             <Text className="text-black">{t(`InspectionForm.${value}`)}</Text>
           ) : (
             <Text className="text-[#838B8C]">
-              {t("InspectionForm.--Select From Here--")}
+             {t("InspectionForm.SelectFromHere")}
             </Text>
           )}
           <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
@@ -997,7 +997,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
               >
                 {formData?.soilfertility
                   ? t(`InspectionForm.${formData.soilfertility}`)
-                  : t("InspectionForm.--Select From Here--")}
+                  : t("InspectionForm.SelectFromHere")}
               </Text>
 
               <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
@@ -1082,9 +1082,9 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
 
                     <TouchableOpacity
                       onPress={() => onClearImage(index)}
-                      className="absolute top-[-8] right-[-8] bg-[#f21d1d] p-2 rounded-full"
+                       className="absolute top-[-8] right-[-7] bg-[#f21d1d] p-1 rounded-full"
                     >
-                      <AntDesign name="close" size={14} color="white" />
+                      <AntDesign name="close" size={12} color="white" />
                     </TouchableOpacity>
                   </View>
                 ))}

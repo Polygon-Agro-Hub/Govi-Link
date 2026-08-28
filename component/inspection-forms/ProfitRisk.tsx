@@ -17,7 +17,7 @@ import { useTranslation } from "react-i18next";
 import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../types/types";
 import axios from "axios";
-import { environment } from "@/environment/environment";
+import environment from "@/environment/environment";
 import FormFooterButton from "./FormFooterButton";
 import {
   saveProfitInfo,
@@ -34,7 +34,7 @@ const formatNumberWithCommas = (value: string): string => {
   // Split into integer and decimal parts
   const parts = cleanValue.split(".");
   let integerPart = parts[0];
-  const decimalPart = parts[1] ? "." + parts[1] : "";
+  const decimalPart = parts.length > 1 ? "." + (parts[1] || "") : "";
 
   // Remove leading zeros
   integerPart = integerPart.replace(/^0+/, "");
@@ -191,7 +191,7 @@ const YesNoSelect = ({
             <Text className="text-black">{t(`InspectionForm.${value}`)}</Text>
           ) : (
             <Text className="text-[#838B8C]">
-              {t("InspectionForm.--Select From Here--")}
+             {t("InspectionForm.SelectFromHere")}
             </Text>
           )}
           <MaterialIcons name="arrow-drop-down" size={24} color="#666" />

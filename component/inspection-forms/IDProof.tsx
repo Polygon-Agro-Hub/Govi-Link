@@ -22,7 +22,7 @@ import {
 import FormTabs from "./FormTabs";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
-import { environment } from "@/environment/environment";
+import environment from "@/environment/environment";
 import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../types/types";
 import { CameraScreen } from "@/Items/CameraScreen";
@@ -38,6 +38,19 @@ import CameraAccess from "../permission/CameraAccess";
 
 type IDProofProps = {
   navigation: any;
+};
+
+type IdProofTypeConfig = { label: string; requiredError: string };
+
+const idProofTypeConfig: Record<string, IdProofTypeConfig> = {
+  "NIC Number": {
+    label: "InspectionForm.NICNumber",
+    requiredError: "Error.NicNumberIsRequired",
+  },
+  "Driving License ID": {
+    label: "InspectionForm.DrivingLicenseID",
+    requiredError: "Error.DrivingLicenseIdIsRequired",
+  },
 };
 
 const UploadButton = ({
@@ -128,19 +141,21 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
     }, [requestId]),
   );
 
-  const validateIdNumber = (pType: string, pNumber: string): string => {
-    if (!pType) return "";
-    if (!pNumber.trim()) return t(`Error.${pType} is required`);
-    if (pType === "NIC Number" && !validateNicNumber(pNumber)) {
-      return t(
-        "Error.NicNumberMustBe9DigitsFollowedByVOr12Digits",
-      );
-    }
-    if (pType === "Driving License ID" && !validateDrivingLicense(pNumber)) {
-      return t("Error.PleaseEnterAValidLicenseIdNumber1CapitalLetter7DigitsOr1012Digits");
-    }
-    return "";
-  };
+const validateIdNumber = (pType: string, pNumber: string): string => {
+  if (!pType) return "";
+  if (!pNumber.trim()) {
+    return t(idProofTypeConfig[pType]?.requiredError ?? "Error.SomethingWentWrongPleaseTryAgainLater");
+  }
+  if (pType === "NIC Number" && !validateNicNumber(pNumber)) {
+    return t("Error.NicNumberMustBe9DigitsFollowedByVOr12Digits");
+  }
+  if (pType === "Driving License ID" && !validateDrivingLicense(pNumber)) {
+    return t(
+      "Error.PleaseEnterAValidLicenseIdNumber1CapitalLetter7DigitsOr1012Digits",
+    );
+  }
+  return "";
+};
 
   useFocusEffect(
     useCallback(() => {
@@ -228,49 +243,49 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
   const validateDrivingLicense = (input: string) =>
     /^(?:[A-Z][0-9]{7}|[0-9]{10,12})$/.test(input);
 
-  const handleIdNumberChange = (input: string) => {
-    if (!formData.pType) return;
+const handleIdNumberChange = (input: string) => {
+  if (!formData.pType) return;
 
-    const rules =
-      formData.pType === "NIC Number"
-        ? { required: true, type: "NIC Number" }
-        : { required: true, type: "Driving License ID" };
+  const rules =
+    formData.pType === "NIC Number"
+      ? { required: true, type: "NIC Number" }
+      : { required: true, type: "Driving License ID" };
 
-    let value = input.toUpperCase();
+  let value = input.toUpperCase();
 
-    if (formData.pType === "NIC Number") {
-      value = value.replace(/[^0-9V]/g, "");
-      const vIndex = value.indexOf("V");
-      if (vIndex !== -1) {
-        value = value.slice(0, vIndex + 1);
-      }
+  if (formData.pType === "NIC Number") {
+    value = value.replace(/[^0-9V]/g, "");
+    const vIndex = value.indexOf("V");
+    if (vIndex !== -1) {
+      value = value.slice(0, vIndex + 1);
+    }
+  } else {
+    const hasLetter = /^[A-Z]/.test(value);
+    if (hasLetter) {
+      value = value.replace(/[^A-Z0-9]/g, "");
+      value = value[0] + value.slice(1).replace(/[A-Z]/g, "");
     } else {
-      const hasLetter = /^[A-Z]/.test(value);
-      if (hasLetter) {
-        value = value.replace(/[^A-Z0-9]/g, "");
-        value = value[0] + value.slice(1).replace(/[A-Z]/g, "");
-      } else {
-        value = value.replace(/[^0-9]/g, "");
-      }
+      value = value.replace(/[^0-9]/g, "");
     }
+  }
 
-    let error = "";
-    if (rules.required && value.trim().length === 0) {
-      error = t(`Error.${rules.type} is required`);
-    } else if (formData.pType === "NIC Number" && !validateNicNumber(value)) {
-      error = t(
-        "Error.NicNumberMustBe9DigitsFollowedByVOr12Digits",
-      );
-    } else if (
-      formData.pType === "Driving License ID" &&
-      !validateDrivingLicense(value)
-    ) {
-      error = t("Error.PleaseEnterAValidLicenseIdNumber1CapitalLetter7DigitsOr1012Digits");
-    }
+  let error = "";
+  if (rules.required && value.trim().length === 0) {
+    error = t(idProofTypeConfig[rules.type]?.requiredError ?? "Error.SomethingWentWrongPleaseTryAgainLater");
+  } else if (formData.pType === "NIC Number" && !validateNicNumber(value)) {
+    error = t("Error.NicNumberMustBe9DigitsFollowedByVOr12Digits");
+  } else if (
+    formData.pType === "Driving License ID" &&
+    !validateDrivingLicense(value)
+  ) {
+    error = t(
+      "Error.PleaseEnterAValidLicenseIdNumber1CapitalLetter7DigitsOr1012Digits",
+    );
+  }
 
-    setErrors((prev) => ({ ...prev, nic: error }));
-    updateFormData({ pNumber: value });
-  };
+  setErrors((prev) => ({ ...prev, nic: error }));
+  updateFormData({ pNumber: value });
+};
 
   useEffect(() => {
     const handleBackPress = () => {
@@ -363,6 +378,8 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
       return false;
     }
   };
+
+  
 
   const handleNext = async () => {
     if (!formData.pType) {
@@ -462,6 +479,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
       );
     }
   };
+  
 
   const handleTabPress = (tabKey: string) => {
     const routeMap: Record<string, string> = {
@@ -484,15 +502,6 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
     }
   };
 
-  if (showCameraAccess) {
-    return (
-      <CameraAccess
-        navigation={navigation}
-        onPermissionGranted={handleCameraPermissionGranted}
-        returnScreen="IDProof"
-      />
-    );
-  }
 
   return (
     <KeyboardAvoidingView
@@ -518,7 +527,7 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
           <View className="relative mb-4">
             <Text className="text-sm text-[#070707] mb-2">
               <Text className="text-black">
-                {t("InspectionForm.IDProof Type")} *
+                {t("InspectionForm.IdProofType")} *
               </Text>
             </Text>
             <TouchableOpacity
@@ -526,13 +535,11 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
               activeOpacity={0.8}
             >
               <View className="bg-[#F6F6F6] rounded-3xl px-5 h-[50px] flex-row items-center justify-between">
-                <Text
-                  className={`text-base ${formData.pType ? "text-black" : "text-[#838B8C]"}`}
-                >
-                  {formData.pType
-                    ? t(`InspectionForm.${formData.pType}`)
-                    : t("InspectionForm.SelectProofType")}
-                </Text>
+               <Text className={`text-base ${formData.pType ? "text-black" : "text-[#838B8C]"}`}>
+  {formData.pType
+    ? t(idProofTypeConfig[formData.pType]?.label ?? formData.pType)
+    : t("InspectionForm.SelectProofType")}
+</Text>
                 <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
               </View>
             </TouchableOpacity>
@@ -548,13 +555,21 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
                   </Text>
                 </Text>
                 <View
-                  className={`bg-[#F6F6F6] rounded-3xl flex-row items-center ${errors.nic ? "border border-red-500" : ""
-                    }`}
+                  className={`bg-[#F6F6F6] rounded-3xl flex-row items-center ${
+                    errors.nic ? "border border-red-500" : ""
+                  }`}
                 >
                   <TextInput
                     placeholder="----"
-                    placeholderTextColor="#7D7D7D"
-                    className="flex-1 px-2 h-[50px] text-base text-black ml-4"
+                    style={{
+                      flex: 1,
+                      minWidth: 0,
+                      paddingVertical: 0,
+                      fontSize: 16,
+                      height: 50,
+                    }}
+                    placeholderTextColor="#7F7F7F"
+                    className="px-2  text-base text-black ml-4"
                     value={formData.pNumber}
                     onChangeText={handleIdNumberChange}
                     underlineColorAndroid="transparent"

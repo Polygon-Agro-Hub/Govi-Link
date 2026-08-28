@@ -77,7 +77,7 @@
     "NumberOfDependentsIsRequired": "යැපෙන්නන් සංඛ්‍යාව අවශ්‍ය වේ",
     "ExistingDebtsOfTheFarmerIsRequired": "ගොවියාගේ පවතින ණය ගෙවීම අවශ්‍ය වේ",
     "IdProofTypeIsRequired": "හැඳුනුම්පත් සාක්ෂි වර්ගය අවශ්‍යයි",
-    "AtLeastOneCategoryOptionMustBeSelected": "අවම වශයෙන් එක් {{category}} විකල්පයක්වත් තෝරා ගත යුතුය.",
+    "AtLeastOneCategoryOptionMustBeSelected": "අවම වශයෙන් එක් විකල්පයක්වත් තෝරා ගත යුතුය.",
     "PermissionDenied": "අවසරය ප්රතික්ෂේප කෙරිණි",
     "LocationPermissionIsRequiredToUseThisFeature": "මෙම විශේෂාංගය භාවිතා කිරීමට ස්ථාන අවසරය අවශ්‍ය වේ.",
     "UnableToGetYourCurrentLocation": "ඔබගේ වත්මන් ස්ථානය ලබා ගත නොහැක.",
@@ -112,7 +112,9 @@
     "PreviousExperienceIsRequired": "පෙර අත්දැකීම් අවශ්‍යයි",
     "EmailDomainIsInvalidCheckForLeadingTrailingDotsOrHyphens": "වලංගු නොවන විද්‍යුත් තැපැල් වසම. කරුණාකර මුල/අගට තිත් හෝ හයිෆන් තිබේදැයි පරීක්ෂා කරන්න",
     "InvalidYahooAddress": "කරුණාකර වලංගු Yahoo විද්‍යුත් තැපැල් ලිපිනයක් ඇතුළත් කරන්න",
-    "UnsupportedEmailDomain": "කරුණාකර සහාය දක්වන වසමක් (.com, .gov, .lk) සහිත වලංගු විද්‍යුත් තැපැල් ලිපිනයක් ඇතුළත් කරන්න"
+    "UnsupportedEmailDomain": "කරුණාකර සහාය දක්වන වසමක් (.com, .gov, .lk) සහිත වලංගු විද්‍යුත් තැපැල් ලිපිනයක් ඇතුළත් කරන්න",
+    "PleaseSelectAJobBeforeAssigning": "පැවරීමට පෙර රැකියාවක් තෝරන්න",
+     "NewPasswordMustBeDifferentFromCurrentPassword":"නව මුරපදය වත්මන් මුරපදයට වඩා වෙනස් විය යුතුය."
   },
   "Login": {
     "Welcome": "සාදරයෙන් පිළිගනිමු!",
@@ -183,7 +185,9 @@
     "Location": "ස්ථානය",
     "GetCall": "ඇමතුම ගන්න",
     "Address": "ලිපිනය :",
-    "Start": "අරඹන්න"
+    "Start": "අරඹන්න",
+    "NoLocationTitle": "ගොවිපලේ පිහිටුම හමු නොවීය!",
+    "NoLocationMessage": "මෙම ගොවියා බෝග දින දර්ශනවලින් කිසිදු කාර්යයක් සම්පූර්ණ කර නොමැති බැවින්, ගොවිපලේ පිහිටුම ලබා ගත නොහැක. ගොවිපලට යන මාර්ගය සොයා ගැනීමට කරුණාකර ගොවියා අමතන්න."
   },
   "CertificateQuesanory": {
     "StartedOn": "ආරම්භ කළ දිනය",
@@ -325,7 +329,16 @@
     "NoDistrictsFound": "දිස්ත්‍රික්ක හමු නොවීය",
     "Sinhala": "සිංහල",
     "Tamil": "දෙමළ",
-    "English": "ඉංග්‍රීසි"
+    "English": "ඉංග්‍රීසි",
+    "NoProvincesFound": "පළාත් කිසිවක් හමු නොවීය",
+    "NoBanksFound": "බැංකුවක් හමු නොවීය",
+    "NoBranchesFound": "ශාඛාවක් හමු නොවීය",
+    "NoCountriesFound":"රටවල් හමු නොවීය",
+    "DragToReposition":"නැවත ස්ථානගත කිරීමට රාමුව අදින්න",
+    "Rotate":"කරකවන්න",
+    "Flip":"පෙරළන්න",
+    "Crop":"Crop",
+    "EditPhoto":"ඡායාරූපය සංස්කරණය කරන්න"
   },
   "ManageOfficers": {
     "Officers": "නිලධාරීන්",
@@ -348,7 +361,8 @@
     "ID": "අංක",
     "CountFarmLeftToFinish": "ගොවිපල {{count}} ක් අවසන් කිරීමට ඉතිරිව ඇත",
     "1FarmLeftToFinish": "ගොවිපල 1 ක් අවසන් කිරීමට ඉතිරිව ඇත",
-    "Ongoing": "සිදුවෙමින් පවතින"
+    "Ongoing": "සිදුවෙමින් පවතින",
+    "Assigned":"පූර්ණ වෙමින්"
   },
   "ChangePassword": {
     "ChoosePassword": "මුරපදය වෙනස් කරන්න",
@@ -452,6 +466,7 @@
   },
   "InspectionForm": {
     "IDProof": "හැඳුනුම්පත් සාක්ෂිය",
+    "IdProofType": "IdProof Type",
     "InspectionForm": "පරීක්ෂණ පෝරමය",
     "FirstName": "මුල් නම",
     "LastName": "අවසාන නම",
@@ -585,7 +600,49 @@
     "YouHaveFilledOutAllTheFormsIfYouNeedToMakeAnyChangesYouCanGoBackOtherwiseContinuingWillTakeYouToTheConfirmationStep": "ඔබ සියලුම පෝරම පුරවා ඇත. වෙනස්කම් කිරීමට අවශ්‍ය නම් ආපසු යා හැක. එසේ නොමැති නම්, ඉදිරියට යාමෙන් තහවුරු කිරීමේ අදියරට ඔබව ගෙන යනු ඇත.",
     "InspectionFormCompletedSuccessfully": "පරීක්ෂණ පෝරමය සාර්ථකව සම්පූර්ණ කර ඇත!",
     "CouldNotSaveToServerPleaseTryAgain": "සේවාදායකයට සුරකින්න නොහැකි විය. කරුණාකර නැවත උත්සාහ කරන්න.",
-    "AccountHoldersName": "ගිණුම් හිමියාගේ නම"
+    "AccountHoldersName": "ගිණුම් හිමියාගේ නම",
+    "Personal Info": "පුද්ගලික තොරතුරු",
+    "ID Proof": "හැඳුනුම්පත් සාක්ෂි",
+    "Finance Info": "මූල්‍ය තොරතුරු",
+    "Land Info": "ඉඩම් තොරතුරු",
+    "Investment Info": "ආයෝජන තොරතුරු",
+    "Cultivation Info": "වගා තොරතුරු",
+    "Cropping Systems": "බෝග වගා පද්ධති",
+    "Profit & Risk": "ලාභය සහ අවදානම",
+    "Economical": "ආර්ථිකයන්",
+    "Labour": "කම්කරු",
+    "Harvest Storage": "අස්වනු ගබඩා කිරීම",
+    "OwnLandSingleOwner": "තමන්ගේම ඉඩම – තනි හිමිකරු",
+    "OwnLandMultipleOwners": "තමන්ගේම ඉඩම – බහු හිමිකරුවන් (බෙදා නොගත්)",
+    "LeasedLandFromPrivateOwner": "පුද්ගලික හිමිකරුවෙකුගෙන් බදු ඉඩම",
+    "LeasedLandFromTheGovernment": "රජයෙන් බදු ඉඩම",
+    "PermitLandShortTerm": "රජයෙන් කෙටි කාලීන බලපත්‍ර ඉඩම",
+    "PermitLandLongTerm": "රජයෙන් දිගු කාලීන බලපත්‍ර ඉඩම",
+    "Temperature": "උෂ්ණත්වය",
+    "Rainfall": "වර්ෂාපතනය",
+    "Sun shine hours": "හිරු එළිය ලැබෙන පැය ගණන",
+    "Relative humidity": "සාපේක්ෂ ආර්ද්‍රතාවය",
+    "Wind velocity": "සුළං වේගය",
+    "Wind direction": "සුළං දිශාව",
+    "Seasons and agro-ecological zone": "සෘතු සහ කෘෂි-පාරිසරික කලාපය",
+    "Tanks": "වැව්",
+    "Wells": "ළිං",
+    "River": "ගඟ",
+    "Dams": "වේල්ල",
+    "Other": "වෙනත්",
+    "Excellent": "විශිෂ්ට",
+    "Good": "හොඳයි",
+    "Could be improved with additional effort": "අමතර උත්සාහයකින් වැඩිදියුණු කළ හැක",
+    "Not Suitable": "සුදුසු නොවේ",
+    "Inter cropping": "අන්තර් වගාව",
+    "Mixed cropping": "මිශ්‍ර වගාව",
+    "Multistoreyed cropping": "බහු-ස්ථර වගාව",
+    "Relay Cropping": "අනුක්‍රමික වගාව",
+    "Crop Rotation": "බෝග මාරු වගාව",
+    "No previous experience": "පෙර පළපුරුද්දක් නැත",
+    "Have grown this crop once or twice": "මෙම බෝගය වරක් හෝ දෙවරක් වගා කර ඇත",
+    "Have grown this crop multiple seasons": "මෙම බෝගය කන්නවල් කිහිපයක් වගා කර ඇත",
+    "Have been cultivating this crop for many years": "වසර ගණනාවක් තිස්සේ මෙම බෝගය වගා කරමින් සිටී"
   },
   "ConfirmationCapitalRequest": {
     "ConfirmAndLeave": "තහවුරු කර පිටවන්න",

@@ -17,7 +17,7 @@ import { RouteProp, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../types/types";
 import axios from "axios";
 import { ScrollView } from "react-native-gesture-handler";
-import { environment } from "@/environment/environment";
+import environment from "@/environment/environment";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -60,18 +60,33 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ navigation }) => {
       return false;
     }
 
+    if (newPassword === currentPassword) {
+      Alert.alert(
+        t("Error.Sorry"),
+        t("Error.NewPasswordMustBeDifferentFromCurrentPassword"),
+        [{ text: t("Main.OK") }],
+      );
+      return false;
+    }
+
     if (newPassword.length < 8) {
-      Alert.alert(t("Error.Sorry"), t("Error.YourPasswordMustContainAMinimumOf8CharactersWith1UppercaseNumbersSpecialCharacters"), [
-        { text: t("Main.OK") },
-      ]);
+      Alert.alert(
+        t("Error.Sorry"),
+        t(
+          "Error.YourPasswordMustContainAMinimumOf8CharactersWith1UppercaseNumbersSpecialCharacters",
+        ),
+        [{ text: t("Main.OK") }],
+      );
       return false;
     }
 
     if (!/[A-Z]/.test(newPassword)) {
       Alert.alert(
         t("Error.Sorry"),
-        t("Error.YourPasswordMustContainAMinimumOf8CharactersWith1UppercaseNumbersSpecialCharacters"),
-        [{ text: t("Main.Ok") }],
+        t(
+          "Error.YourPasswordMustContainAMinimumOf8CharactersWith1UppercaseNumbersSpecialCharacters",
+        ),
+        [{ text: t("Main.OK") }],
       );
       return false;
     }
@@ -79,7 +94,9 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ navigation }) => {
     if (!/[0-9]/.test(newPassword)) {
       Alert.alert(
         t("Error.Sorry"),
-        t("Error.YourPasswordMustContainAMinimumOf8CharactersWith1UppercaseNumbersSpecialCharacters"),
+        t(
+          "Error.YourPasswordMustContainAMinimumOf8CharactersWith1UppercaseNumbersSpecialCharacters",
+        ),
         [{ text: t("Main.OK") }],
       );
       return false;
@@ -88,7 +105,9 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ navigation }) => {
     if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(newPassword)) {
       Alert.alert(
         t("Error.Sorry"),
-        t("Error.YourPasswordMustContainAMinimumOf8CharactersWith1UppercaseNumbersSpecialCharacters"),
+        t(
+          "Error.YourPasswordMustContainAMinimumOf8CharactersWith1UppercaseNumbersSpecialCharacters",
+        ),
         [{ text: t("Main.OK") }],
       );
       return false;
@@ -137,6 +156,11 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ navigation }) => {
         t("ChangePassword.PasswordUpdatedSuccessfully"),
         [{ text: t("Main.OK") }],
       );
+
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+
       navigation.navigate("Login");
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
@@ -144,7 +168,7 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ navigation }) => {
           Alert.alert(
             t("Error.Sorry"),
             t("ChangePassword.InvalidCurrentPassword"),
-            [{ text: t("Ok") }],
+            [{ text: t("Main.OK") }],
           );
         } else {
           Alert.alert(
@@ -154,9 +178,11 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ navigation }) => {
           );
         }
       } else {
-        Alert.alert(t("Error.Sorry"), t("Main.SomethingWentWrongPleaseTryAgainLater"), [
-          { text: t("Main.OK") },
-        ]);
+        Alert.alert(
+          t("Error.Sorry"),
+          t("Main.SomethingWentWrongPleaseTryAgainLater"),
+          [{ text: t("Main.OK") }],
+        );
       }
     }
   };
@@ -180,150 +206,169 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ navigation }) => {
   );
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      enabled
-      style={{ flex: 1 }}
-    >
+    <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
       <CustomHeader
         title={""}
         navigation={navigation}
         showBackButton={true}
         onBackPress={() => navigation.goBack()}
       />
-      <ScrollView
-        className="flex-1 bg-white"
-        keyboardShouldPersistTaps="handled"
-        style={{ paddingHorizontal: wp(6) }}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? hp(10) : 0}
+        enabled
+        style={{ flex: 1, backgroundColor: "#FFFFFF" }}
       >
-        <View
-          className={`flex-row items-center justify-center gap-[-30%] ml-[5%]`}
+        <ScrollView
+          className="flex-1 bg-white"
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+          style={{ paddingHorizontal: wp(6), backgroundColor: "#FFFFFF" }}
+          contentContainerStyle={{
+            paddingBottom: hp(10),
+            flexGrow: 1,
+          }}
         >
-          <Image
-            source={require("@/assets/images/public/logo.webp")}
-            resizeMode="contain"
-            className="w-36 h-32"
-          />
-        </View>
-
-        <View className="items-center pt-[5%]">
-          <Text className="font-semibold text-2xl">
-            {t("ChangePassword.ChoosePassword")}
-          </Text>
-          <Text className="w-[53%] text-center font-light pt-3">
-            {t("ChangePassword.Changepassword")}
-          </Text>
-        </View>
-
-        <View className="items-center pt-[12%]">
-          <Text className="font-normal pb-2 self-start">
-            {t("ChangePassword.CurrentPassword")}
-          </Text>
-          <View className="flex-row items-center bg-[#F4F4F4] border border-[#F4F4F4] rounded-3xl mb-8 px-3">
-            <TextInput
-              className="flex-1 h-[50px] bg-[#F4F4F4]"
-              secureTextEntry={secureCurrent}
-              onChangeText={setCurrentPassword}
-              value={currentPassword}
+          <View
+            className={`flex-row items-center justify-center gap-[-30%] ml-[5%]`}
+          >
+            <Image
+              source={require("@/assets/images/public/logo.webp")}
+              resizeMode="contain"
+              className="w-36 h-32"
             />
-            <TouchableOpacity onPress={() => setSecureCurrent(!secureCurrent)}>
-              <MaterialCommunityIcons
-                name={secureCurrent ? "eye-off-outline" : "eye-outline"}
-                size={24}
-                color="#0000000"
-              />
-            </TouchableOpacity>
           </View>
 
-          <Text className="font-normal pb-2 items-start self-start">
-            {t("ChangePassword.NewPassword")}
-          </Text>
-          <View className="flex-row items-center bg-[#F4F4F4] border border-[#F4F4F4] rounded-3xl mb-8 px-3">
-            <TextInput
-              className="flex-1 h-[50px] "
-              secureTextEntry={secureNew}
-              value={newPassword}
-              onChangeText={(text) => {
-                const cleanText = text.replace(/\s/g, "");
-                setNewPassword(cleanText);
-              }}
-            />
-            <TouchableOpacity onPress={() => setSecureNew(!secureNew)}>
-              <MaterialCommunityIcons
-                name={secureNew ? "eye-off-outline" : "eye-outline"}
-                size={24}
-                color="#000000"
-              />
-            </TouchableOpacity>
+          <View className="items-center pt-[5%]">
+            <Text className="font-semibold text-2xl">
+              {t("ChangePassword.ChoosePassword")}
+            </Text>
+            <Text className="w-[53%] text-center font-light pt-3">
+              {t("ChangePassword.Changepassword")}
+            </Text>
           </View>
 
-          <Text className="font-normal pb-2 self-start">
-            {t("ChangePassword.ConfirmNewPassword")}
-          </Text>
-          <View className="flex-row items-center bg-[#F4F4F4] border border-[#F4F4F4] rounded-3xl mb-8 px-3">
-            <TextInput
-              className="flex-1 h-[50px] bg-[#F4F4F4]"
-              secureTextEntry={secureConfirm}
-              onChangeText={(text) => {
-                const cleanText = text.replace(/\s/g, "");
-                setConfirmPassword(cleanText);
-              }}
-              value={confirmPassword}
-            />
-            <TouchableOpacity onPress={() => setSecureConfirm(!secureConfirm)}>
-              <MaterialCommunityIcons
-                name={secureConfirm ? "eye-off-outline" : "eye-outline"}
-                size={24}
-                color="#000000"
+          <View className="items-center pt-[12%]">
+            <Text className="font-normal pb-2 self-start">
+              {t("ChangePassword.CurrentPassword")}
+            </Text>
+            <View className="flex-row items-center bg-[#F4F4F4] border border-[#F4F4F4] rounded-3xl mb-8 px-3">
+              <TextInput
+                className="flex-1 h-[50px] bg-[#F4F4F4]"
+                secureTextEntry={secureCurrent}
+                onChangeText={setCurrentPassword}
+                value={currentPassword}
               />
-            </TouchableOpacity>
-          </View>
-        </View>
+              <TouchableOpacity
+                onPress={() => setSecureCurrent(!secureCurrent)}
+              >
+                <MaterialCommunityIcons
+                  name={secureCurrent ? "eye-off-outline" : "eye-outline"}
+                  size={24}
+                  color="#000000"
+                />
+              </TouchableOpacity>
+            </View>
 
-        <View style={{ width: "100%", alignItems: "center", marginTop: 28, marginBottom: 80 }}>
+            <Text className="font-normal pb-2 items-start self-start">
+              {t("ChangePassword.NewPassword")}
+            </Text>
+            <View className="flex-row items-center bg-[#F4F4F4] border border-[#F4F4F4] rounded-3xl mb-8 px-3">
+              <TextInput
+                className="flex-1 h-[50px] "
+                secureTextEntry={secureNew}
+                value={newPassword}
+                onChangeText={(text) => {
+                  const cleanText = text.replace(/\s/g, "");
+                  setNewPassword(cleanText);
+                }}
+              />
+              <TouchableOpacity onPress={() => setSecureNew(!secureNew)}>
+                <MaterialCommunityIcons
+                  name={secureNew ? "eye-off-outline" : "eye-outline"}
+                  size={24}
+                  color="#000000"
+                />
+              </TouchableOpacity>
+            </View>
+
+            <Text className="font-normal pb-2 self-start">
+              {t("ChangePassword.ConfirmNewPassword")}
+            </Text>
+            <View className="flex-row items-center bg-[#F4F4F4] border border-[#F4F4F4] rounded-3xl mb-8 px-3">
+              <TextInput
+                className="flex-1 h-[50px] bg-[#F4F4F4]"
+                secureTextEntry={secureConfirm}
+                onChangeText={(text) => {
+                  const cleanText = text.replace(/\s/g, "");
+                  setConfirmPassword(cleanText);
+                }}
+                value={confirmPassword}
+              />
+              <TouchableOpacity
+                onPress={() => setSecureConfirm(!secureConfirm)}
+              >
+                <MaterialCommunityIcons
+                  name={secureConfirm ? "eye-off-outline" : "eye-outline"}
+                  size={24}
+                  color="#000000"
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
+
           <View
             style={{
               width: "100%",
-              borderRadius: 999,
-              shadowColor: "#FF1D85",
-              shadowOffset: { width: 0, height: 8 },
-              shadowOpacity: 0.45,
-              shadowRadius: 12,
-              elevation: 12,
+              alignItems: "center",
+              marginTop: 28,
+              marginBottom: 40,
             }}
           >
-            <TouchableOpacity
-              onPress={handleChangePassword}
-              activeOpacity={0.8}
-              style={{ width: "100%", borderRadius: 999 }}
+            <View
+              style={{
+                width: "100%",
+                borderRadius: 999,
+                shadowColor: "#FF1D85",
+                shadowOffset: { width: 0, height: 8 },
+                shadowOpacity: 0.45,
+                shadowRadius: 12,
+                elevation: 12,
+              }}
             >
-              <LinearGradient
-                colors={["#F2561D", "#FF1D85"]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={{
-                  borderRadius: 999,
-                  paddingVertical: 16,
-                  width: "100%",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
+              <TouchableOpacity
+                onPress={handleChangePassword}
+                activeOpacity={0.8}
+                style={{ width: "100%", borderRadius: 999 }}
               >
-                <Text
+                <LinearGradient
+                  colors={["#F2561D", "#FF1D85"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
                   style={{
-                    color: "white",
-                    fontSize: SCREEN_HEIGHT > 900 ? 20 : 18,
-                    fontWeight: "700",
+                    borderRadius: 999,
+                    paddingVertical: 16,
+                    width: "100%",
+                    alignItems: "center",
+                    justifyContent: "center",
                   }}
                 >
-                  {t("ChangePassword.Next")}
-                </Text>
-              </LinearGradient>
-            </TouchableOpacity>
+                  <Text
+                    style={{
+                      color: "white",
+                      fontSize: SCREEN_HEIGHT > 900 ? 20 : 18,
+                      fontWeight: "700",
+                    }}
+                  >
+                    {t("ChangePassword.Next")}
+                  </Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </View>
   );
 };
 

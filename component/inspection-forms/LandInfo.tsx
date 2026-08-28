@@ -25,7 +25,7 @@ import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../types/types";
 import { CameraScreen } from "@/Items/CameraScreen";
 import axios from "axios";
-import { environment } from "@/environment/environment";
+import environment from "@/environment/environment";
 import FormFooterButton from "./FormFooterButton";
 import {
   saveLandInfo,
@@ -65,19 +65,42 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
   const [isNextEnabled, setIsNextEnabled] = useState(false);
   const [isExistingData, setIsExistingData] = useState(false);
 
-  const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
+  const [hasCameraPermission, setHasCameraPermission] = useState<
+    boolean | null
+  >(null);
   const [showCameraAccess, setShowCameraAccess] = useState(false);
-  const [hasLocationPermission, setHasLocationPermission] = useState<boolean | null>(null);
+  const [hasLocationPermission, setHasLocationPermission] = useState<
+    boolean | null
+  >(null);
   const [showLocationAccess, setShowLocationAccess] = useState(false);
-  const [pendingGeoLocationAction, setPendingGeoLocationAction] = useState(false);
+  const [pendingGeoLocationAction, setPendingGeoLocationAction] =
+    useState(false);
 
   const LEGAL_STATUS_OPTIONS = [
-    "Own land – Single owner",
-    "Own land – Multiple owners (undivided)",
-    "Leased land from private owner",
-    "Leased land from the government",
-    "Permit land – short term from the government",
-    "Permit land – long term from the government",
+    {
+      key: "OwnLandSingleOwner",
+      label: t("InspectionForm.OwnLandSingleOwner"),
+    },
+    {
+      key: "OwnLandMultipleOwners",
+      label: t("InspectionForm.OwnLandMultipleOwners"),
+    },
+    {
+      key: "LeasedLandFromPrivateOwner",
+      label: t("InspectionForm.LeasedLandFromPrivateOwner"),
+    },
+    {
+      key: "LeasedLandFromTheGovernment",
+      label: t("InspectionForm.LeasedLandFromTheGovernment"),
+    },
+    {
+      key: "PermitLandShortTerm",
+      label: t("InspectionForm.PermitLandShortTerm"),
+    },
+    {
+      key: "PermitLandLongTerm",
+      label: t("InspectionForm.PermitLandLongTerm"),
+    },
   ];
 
   useFocusEffect(
@@ -99,22 +122,21 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
     return () => clearTimeout(timer);
   }, [formData, requestId]);
 
-
   useEffect(() => {
     checkPermissions();
   }, []);
 
   const checkPermissions = async () => {
-
-    const { status: cameraStatus } = await ImagePicker.getCameraPermissionsAsync();
+    const { status: cameraStatus } =
+      await ImagePicker.getCameraPermissionsAsync();
     if (cameraStatus === "granted") {
       setHasCameraPermission(true);
     } else {
       setHasCameraPermission(false);
     }
 
-
-    const { status: locationStatus } = await Location.getForegroundPermissionsAsync();
+    const { status: locationStatus } =
+      await Location.getForegroundPermissionsAsync();
     if (locationStatus === "granted") {
       setHasLocationPermission(true);
     } else {
@@ -241,20 +263,22 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
     setIsNextEnabled(allFilled);
   }, [formData]);
 
-  useEffect(() => {
-    const handleBackPress = () => {
-      navigation.navigate("Main", {
-        screen: "MainTabs",
-        params: { screen: "CapitalRequests" },
-      });
-      return true;
-    };
-    const subscription = BackHandler.addEventListener(
-      "hardwareBackPress",
-      handleBackPress,
-    );
-    return () => subscription.remove();
-  }, [navigation]);
+  useFocusEffect(
+    useCallback(() => {
+      const handleBackPress = () => {
+        navigation.navigate("Main", {
+          screen: "MainTabs",
+          params: { screen: "CapitalRequests" },
+        });
+        return true;
+      };
+      const subscription = BackHandler.addEventListener(
+        "hardwareBackPress",
+        handleBackPress,
+      );
+      return () => subscription.remove();
+    }, [navigation]),
+  );
 
   const updateFormData = (updates: Partial<LandInfoData>) => {
     setFormData((prev) => ({ ...prev, ...updates }));
@@ -369,21 +393,23 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
     const validationErrors: Record<string, string> = {};
 
     if (!formData.landDiscription || formData.landDiscription.trim() === "") {
-      validationErrors.landDiscription = t("Error.CultivationLandsDescriptionIsRequired");
+      validationErrors.landDiscription = t(
+        "Error.CultivationLandsDescriptionIsRequired",
+      );
     }
     if (!formData.isOwnByFarmer) {
       validationErrors.isOwnByFarmer = t("Error.LandOwnershipIsRequired");
     }
     if (!formData.ownershipStatus) {
-      validationErrors.ownershipStatus = t(
-        "Error.OwnershipStatusIsRequired",
-      );
+      validationErrors.ownershipStatus = t("Error.OwnershipStatusIsRequired");
     }
     if (!formData.geoLocation) {
       validationErrors.geoLocation = t("Error.Geo location is required");
     }
     if (!formData.images || formData.images.length === 0) {
-      validationErrors.images = t("Error.AtLeastOneCategoryOptionMustBeSelected");
+      validationErrors.images = t(
+        "Error.AtLeastOneCategoryOptionMustBeSelected",
+      );
     }
 
     if (Object.keys(validationErrors).length > 0) {
@@ -490,24 +516,13 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
     }
   };
 
-
-  if (showCameraAccess) {
-    return (
-      <CameraAccess
-        navigation={navigation}
-        onPermissionGranted={handleCameraPermissionGranted}
-        returnScreen="LandInfo"
-      />
-    );
-  }
-
-
   if (showLocationAccess) {
     return (
       <LocationAccess
         navigation={navigation}
         onPermissionGranted={handleLocationPermissionGranted}
         returnScreen="LandInfo"
+        onBackPress={() => setShowLocationAccess(false)}
       />
     );
   }
@@ -554,7 +569,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
                   </Text>
                 ) : (
                   <Text numberOfLines={1} className="text-[#838B8C]">
-                    {t("InspectionForm.--Select From Here--")}
+                    {t("InspectionForm.SelectFromHere")}
                   </Text>
                 )}
               </View>
@@ -597,7 +612,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
                   </Text>
                 ) : (
                   <Text numberOfLines={1} className="text-[#838B8C]">
-                    {t("InspectionForm.--Select From Here--")}
+                    {t("InspectionForm.SelectFromHere")}
                   </Text>
                 )}
               </View>
@@ -779,7 +794,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
                     />
                     <TouchableOpacity
                       onPress={() => handleRemoveImage(index)}
-                      className="absolute top-[-8] right-[-8] bg-[#f21d1d] p-2 rounded-full"
+                      className="absolute top-[-8] right-[-7] bg-[#f21d1d] p-1 rounded-full"
                     >
                       <AntDesign name="close" size={14} color="white" />
                     </TouchableOpacity>
@@ -860,18 +875,18 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
         >
           <View className="bg-white w-10/12 rounded-2xl overflow-hidden">
             {LEGAL_STATUS_OPTIONS.map((item, index) => (
-              <View key={item}>
+              <View key={item.key}>
                 <TouchableOpacity
                   className="px-4 h-[50px] justify-center items-center"
                   onPress={() => {
-                    updateFormData({ ownershipStatus: item });
+                    updateFormData({ ownershipStatus: item.key });
                     setTouched((prev) => ({ ...prev, ownershipStatus: true }));
                     setErrors((prev) => ({ ...prev, ownershipStatus: "" }));
                     setLegalStatusModal(false);
                   }}
                 >
                   <Text className="text-center text-base text-black">
-                    {t(`InspectionForm.${item}`)}
+                    {item.label}
                   </Text>
                 </TouchableOpacity>
                 {index !== LEGAL_STATUS_OPTIONS.length - 1 && (

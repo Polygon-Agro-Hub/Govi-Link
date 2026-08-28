@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Alert } from "react-native";
+import { View, Text, TouchableOpacity, Alert, Modal } from "react-native";
 import React, { useEffect, useState, useContext } from "react";
 import {
   DrawerContentScrollView,
@@ -172,11 +172,13 @@ export default function CustomDrawerContent(props: any) {
   // Show loading page while logging out
   if (isLoggingOut) {
     return (
-      <LoadingPage
-        fullScreen={true}
-        message={t("Drawer.LoggingOut...")}
-        color="#F35125"
-      />
+      <Modal visible={true} transparent={false} animationType="fade">
+        <LoadingPage
+          fullScreen={true}
+          message={t("Drawer.LoggingOut...")}
+          color="#F35125"
+        />
+      </Modal>
     );
   }
 

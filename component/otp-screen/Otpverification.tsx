@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { environment } from "@/environment/environment";
+import environment from "@/environment/environment";
 import { useTranslation } from "react-i18next";
 import { ScrollView } from "react-native-gesture-handler";
 import NetInfo from "@react-native-community/netinfo";
@@ -174,7 +174,9 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
           if (verificationAttempts >= 2) {
             Alert.alert(
               t("Otpverification.InvalidOTP"),
-              t("Otpverification.YourOtpHasExpiredPleaseRequestANewOneToContinue"),
+              t(
+                "Otpverification.YourOtpHasExpiredPleaseRequestANewOneToContinue",
+              ),
               [
                 {
                   text: t("Otpverification.ResendOTP"),
@@ -193,9 +195,7 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
           } else {
             Alert.alert(
               t("Otpverification.InvalidOTP"),
-              t(
-                "Otpverification.TheOtpYouEnteredIsIncorrectPleaseTryAgain",
-              ),
+              t("Otpverification.TheOtpYouEnteredIsIncorrectPleaseTryAgain"),
               [{ text: t("Main.OK") }],
             );
           }
@@ -204,7 +204,9 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
           setIsOtpExpired(true);
           Alert.alert(
             t("Otpverification.OTPExpired"),
-            t("Otpverification.YourOtpHasExpiredPleaseRequestANewOneToContinue"),
+            t(
+              "Otpverification.YourOtpHasExpiredPleaseRequestANewOneToContinue",
+            ),
             [
               {
                 text: t("Otpverification.ResendOTP"),
@@ -215,9 +217,11 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
           break;
 
         default:
-          Alert.alert(t("Error.Sorry"), t("Main.SomethingWentWrongPleaseTryAgainLater"), [
-            { text: t("Main.OK") },
-          ]);
+          Alert.alert(
+            t("Error.Sorry"),
+            t("Main.SomethingWentWrongPleaseTryAgainLater"),
+            [{ text: t("Main.OK") }],
+          );
       }
     } catch (error: any) {
       console.error("OTP Verification Error:", error);
@@ -236,9 +240,11 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
           [{ text: t("Main.OK") }],
         );
       } else {
-        Alert.alert(t("Error.Sorry"), t("Main.SomethingWentWrongPleaseTryAgainLater"), [
-          { text: t("Main.OK") },
-        ]);
+        Alert.alert(
+          t("Error.Sorry"),
+          t("Main.SomethingWentWrongPleaseTryAgainLater"),
+          [{ text: t("Main.OK") }],
+        );
       }
     }
   };
@@ -289,16 +295,16 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
       } else {
         Alert.alert(
           t("Error.Sorry"),
-          t(
-            "Otpverification.WeCouldntSendTheOtpPleaseTryAgainLater",
-          ),
+          t("Otpverification.WeCouldntSendTheOtpPleaseTryAgainLater"),
           [{ text: t("Main.OK") }],
         );
       }
     } catch (error) {
-      Alert.alert(t("Error.Sorry"), t("Main.SomethingWentWrongPleaseTryAgainLater"), [
-        { text: t("Main.OK") },
-      ]);
+      Alert.alert(
+        t("Error.Sorry"),
+        t("Main.SomethingWentWrongPleaseTryAgainLater"),
+        [{ text: t("Main.OK") }],
+      );
     }
   };
 
@@ -308,9 +314,7 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
       if (!token) {
         Alert.alert(
           t("Error.Sorry"),
-          t(
-            "Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue",
-          ),
+          t("Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue"),
           [{ text: t("Main.OK") }],
         );
         return false;
@@ -409,7 +413,7 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
 
           <Text className="text-base text-[#808080] text-center mt-2 px-4">
             {t(
-              "Otpverification.We have sent a Verification Code to Farmer's mobile number",
+              "Otpverification.WeHaveSentAVerificationCodeToFarmersMobileNumber",
             )}
           </Text>
 
@@ -421,16 +425,18 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
                 ref={(el: TextInput | null) => {
                   inputRefs.current[index] = el;
                 }}
-                className={`w-14 h-14 text-center text-xl rounded-lg ${otpCode[index]
-                  ? "bg-[#FF1D85] text-white"
-                  : "bg-[#FFE8F3] text-black"
-                  }`}
+                className={`w-14 h-14 text-center text-xl rounded-lg ${
+                  otpCode[index]
+                    ? "bg-[#FF1D85] text-white"
+                    : "bg-[#FFE8F3] text-black"
+                }`}
                 keyboardType="number-pad"
                 maxLength={1}
                 value={otpCode[index]}
                 onChangeText={(text) => handleOtpChange(text, index)}
                 onKeyPress={(e) => handleKeyPress(e, index)}
-                selectionColor="#FF1D85"
+                selectionColor={otpCode[index] ? "#FFFFFF" : "#FF1D85"}
+                cursorColor={otpCode[index] ? "#FFFFFF" : "#FF1D85"}
                 textAlign="center"
               />
             ))}
@@ -465,7 +471,14 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
           {/* Buttons */}
           <View className="w-full items-center gap-4 mt-4">
             <TouchableOpacity
-              className="w-2/3 h-[50px] bg-[#444444] justify-center items-center rounded-full"
+              style={{
+                width: "66.6667%",
+                height: 50,
+                backgroundColor: "#444444",
+                justifyContent: "center",
+                alignItems: "center",
+                borderRadius: 9999,
+              }}
               onPress={() => navigation.goBack()}
               activeOpacity={0.7}
             >
@@ -481,11 +494,19 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
               activeOpacity={!isOtpValid || isVerified ? 1 : 0.7}
             >
               <LinearGradient
-                colors={!isOtpValid || isVerified ? ["#CCCCCC", "#CCCCCC"] : ["#F35125", "#FF1D85"]}
+                colors={
+                  !isOtpValid || isVerified
+                    ? ["#CCCCCC", "#CCCCCC"]
+                    : ["#F35125", "#FF1D85"]
+                }
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
-                className="flex-1 items-center justify-center"
-                style={{ overflow: "hidden" }}
+                style={{
+                  flex: 1,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  overflow: "hidden",
+                }}
               >
                 <Text className="text-white text-lg font-semibold">
                   {t("Otpverification.Verify")}

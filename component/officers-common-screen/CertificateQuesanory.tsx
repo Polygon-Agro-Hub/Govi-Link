@@ -16,7 +16,7 @@ import { RootStackParamList } from "../types/types";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-import { environment } from "@/environment/environment";
+import environment from "@/environment/environment";
 import { useTranslation } from "react-i18next";
 import { LinearGradient } from "expo-linear-gradient";
 import { CameraScreen } from "@/Items/CameraScreen";
@@ -558,20 +558,35 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
                 <View
                   key={i}
                   style={{
+                    backgroundColor: "#FFFFFF",
+                    borderRadius: 12,
+                    padding: 24,
+                    marginBottom: 24,
+                    borderWidth: 1,
+                    borderColor: "#E5E7EB",
+                    position: "relative",
                     shadowColor: "#000",
-                    shadowOpacity: 0.5,
-                    shadowRadius: 5,
-                    shadowOffset: { width: 0, height: 2 },
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: 0.15,
+                    shadowRadius: 4,
                     elevation: 4,
                   }}
-                  className="bg-white rounded-xl p-6 mb-6 border border-gray-200 relative"
                 >
                   <TouchableOpacity
-                    className={`absolute top-4 right-4 border border-black p-1 rounded-full ${
-                      q.officerTickResult === 1 || q.officerUploadImage != null
-                        ? "bg-black"
-                        : "bg-white"
-                    }`}
+                    style={{
+                      position: "absolute",
+                      top: 16,
+                      right: 16,
+                      borderWidth: 1,
+                      borderColor: "#000000",
+                      padding: 4,
+                      borderRadius: 9999,
+                      backgroundColor:
+                        q.officerTickResult === 1 ||
+                        q.officerUploadImage != null
+                          ? "#000000"
+                          : "#FFFFFF",
+                    }}
                     onPress={() => handleCheck(q)}
                     disabled={loadingQuestionId === q.id}
                   >
@@ -599,8 +614,15 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
                     )}
                   </TouchableOpacity>
 
-                  <View className="flex-row justify-between items-center mr-5">
-                    <Text className="flex-1">{getLocalizedQuestion(q)}</Text>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      marginRight: 20,
+                    }}
+                  >
+                    <Text style={{ flex: 1 }}>{getLocalizedQuestion(q)}</Text>
                   </View>
                 </View>
               ))}
@@ -642,7 +664,18 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
             <View className="flex-row justify-between w-full gap-4">
               <TouchableOpacity
                 onPress={() => setShowConfirmationModal(false)}
-                className="flex-row items-center px-8 py-3 rounded-full bg-[#444444]"
+                className=" bg-[#444444]"
+                 style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent:'center',
+                    paddingHorizontal: 28,
+                    paddingVertical: 12,
+                    borderRadius: 9999,
+                    marginLeft: 10,
+                    overflow: "hidden",
+                    width:120
+                  }}
               >
                 <Text className="text-white font-semibold text-base">
                   {t("CertificateQuesanory.Cancel")}
@@ -659,7 +692,17 @@ const CertificateQuesanory: React.FC<CertificateQuesanoryProps> = ({
                   colors={["#F35125", "#FF1D85"]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
-                  className="flex-row items-center px-7 py-3 rounded-full mr-2"
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    paddingHorizontal: 28,
+                    paddingVertical: 12,
+                    borderRadius: 9999,
+                    marginRight: 8,
+                    overflow: "hidden",
+                    width:120,
+                    justifyContent:'center'
+                  }}
                 >
                   <Text className="text-white font-semibold text-base">
                     {t("CertificateQuesanory.Continue")}

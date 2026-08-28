@@ -15,7 +15,7 @@ import { RootStackParamList } from "../types/types";
 import * as ImagePicker from "expo-image-picker";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
-import { environment } from "@/environment/environment";
+import environment from "@/environment/environment";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { RouteProp, useRoute, useFocusEffect } from "@react-navigation/native";
 import CustomHeader from "../commons/CustomHeader";
@@ -318,7 +318,7 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
   }) => (
     <View className="mb-10">
       <TouchableOpacity
-        className={`bg-[#D9D9D9] rounded-3xl items-center justify-center h-[50px] flex-row justify-center items-center ${
+        className={`bg-[#D9D9D9] rounded-3xl items-center justify-center h-[50px] flex-row  ${
           error ? "border border-red-500" : ""
         }`}
         onPress={() => pickImage(type)}
@@ -406,7 +406,7 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
           {/* Buttons */}
           <View className="flex-col w-full gap-4 mt-4">
             <TouchableOpacity
-              className="bg-[#D9D9D9] rounded-3xl items-center justify-center h-[50px] w-full items-center"
+              className="bg-[#D9D9D9] rounded-3xl justify-center h-[50px] w-full items-center"
               onPress={handleGoBack}
               disabled={loading}
             >
@@ -416,7 +416,7 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
             </TouchableOpacity>
 
             <TouchableOpacity
-              className="bg-black rounded-3xl items-center justify-center h-[50px] w-full items-center"
+              className="bg-black rounded-3xl justify-center h-[50px] w-full items-center"
               onPress={handleSubmit}
               disabled={loading}
             >

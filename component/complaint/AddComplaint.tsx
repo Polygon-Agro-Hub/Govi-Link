@@ -20,7 +20,7 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import axios from "axios";
-import { environment } from "@/environment/environment";
+import environment from "@/environment/environment";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
 import { useTranslation } from "react-i18next";
@@ -160,7 +160,7 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
         [{ text: t("Main.Ok") }],
       );
       resetForm();
-      navigation.navigate("Main", { screen: "Dashboard" });
+      navigation.replace("ComplainHistory");
     } catch (error: unknown) {
       if (error instanceof Error) {
         console.error("Error message:", error.message);
@@ -196,7 +196,6 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={Platform.select({ ios: 60, android: 0 })}
       style={{ flex: 1, backgroundColor: "white" }}
     >
       <CustomHeader
@@ -209,8 +208,8 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
         keyboardShouldPersistTaps="handled"
         className="flex-1 bg-white px-0"
       >
-        <View className="flex-1 p-6">
-          <View className="items-center mb-6 -mt-12">
+        <View className="flex-1 px-6">
+          <View className="items-center mb-6 ">
             <Image
               source={require("@/assets/images/complaint/add-complaint.webp")}
               style={{

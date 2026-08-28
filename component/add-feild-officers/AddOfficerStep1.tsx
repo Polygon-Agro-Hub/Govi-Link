@@ -21,13 +21,14 @@ import countryData from "@/assets/json/country-flag.json";
 import { useTranslation } from "react-i18next";
 import i18n from "@/i18n/i18n";
 import axios from "axios";
-import { environment } from "@/environment/environment";
+import environment from "@/environment/environment";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
 import { useFocusEffect, RouteProp, useRoute } from "@react-navigation/native";
 import CustomHeader from "../commons/CustomHeader";
 import GlobalSearchModal from "@/component/commons/GlobalSearchModal";
 import { useModal } from "@/hooks/useModal";
+import ImageCropModal from "../commons/Imagecropmodal";
 
 type AddOfficerStep1NavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -70,6 +71,9 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
   const [nic, setNic] = useState("");
   const [email, setEmail] = useState("");
   const [profileImage, setProfileImage] = useState<string | null>(null);
+
+  const [pendingImageUri, setPendingImageUri] = useState<string | null>(null);
+  const [cropModalVisible, setCropModalVisible] = useState(false);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
@@ -153,11 +157,20 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
             headers: { Authorization: `Bearer ${token}` },
           },
         );
-        const districts = response.data?.data;
-        if (Array.isArray(districts)) {
-          setCfoDistricts(districts);
-          if (districts.length === 1) {
-            setSelectedDistricts(districts);
+        const districtsData = response.data?.data;
+        if (Array.isArray(districtsData)) {
+          setCfoDistricts(districtsData);
+          if (districtsData.length === 1) {
+            const singleDistrict =
+              typeof districtsData[0] === "string"
+                ? districtsData[0]
+                : districtsData[0]?.name || districtsData[0]?.district;
+            if (singleDistrict) {
+              const matched = districts.find(
+                (d) => d.en.toLowerCase() === singleDistrict.toLowerCase(),
+              );
+              setSelectedDistricts([matched ? matched.en : singleDistrict]);
+            }
           }
         } else {
           console.warn("Unexpected districts format:", response.data);
@@ -169,8 +182,14 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
   };
 
   const getFilteredCFODistricts = () => {
-    if (!cfoDistricts || cfoDistricts.length === 0) return [];
-    return districts.filter((d) => cfoDistricts.includes(d.en));
+    if (!cfoDistricts || cfoDistricts.length === 0) return districts;
+    return districts.filter((d) =>
+      cfoDistricts.some((cfoD: any) => {
+        const val =
+          typeof cfoD === "string" ? cfoD : cfoD?.name || cfoD?.district || "";
+        return val.toLowerCase() === d.en.toLowerCase();
+      }),
+    );
   };
 
   const getDistrictsData = () => {
@@ -304,7 +323,8 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
 
   // Properly handle name field changes with correct validation
   const handleNameENChange = (text: string, fieldName: string) => {
-    const filteredText = text.replace(/[^a-zA-Z\s]/g, "");
+    const noLeadingSpace = text.replace(/^\s+/, "");
+    const filteredText = noLeadingSpace.replace(/[^a-zA-Z\s]/g, "");
     const capitalizedText =
       filteredText.charAt(0).toUpperCase() + filteredText.slice(1);
 
@@ -322,20 +342,23 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     clearFieldError(fieldName);
   };
 
-  // Properly handle Unicode name changes (Sinhala/Tamil)
   const handleUnicodeNameChange = (text: string, fieldName: string) => {
+    const noLeadingSpace = text.replace(/^\s+/, "");
+
+    const filteredText = noLeadingSpace.replace(/[^\p{L}\s]/gu, "");
+
     switch (fieldName) {
       case "firstNameSI":
-        setFirstNameSI(text);
+        setFirstNameSI(filteredText);
         break;
       case "lastNameSI":
-        setLastNameSI(text);
+        setLastNameSI(filteredText);
         break;
       case "firstNameTA":
-        setFirstNameTA(text);
+        setFirstNameTA(filteredText);
         break;
       case "lastNameTA":
-        setLastNameTA(text);
+        setLastNameTA(filteredText);
         break;
     }
 
@@ -639,12 +662,12 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ["images"],
         allowsEditing: false,
-        aspect: [1, 1],
-        quality: 0.8,
+        quality: 1,
       });
 
       if (!result.canceled && result.assets && result.assets.length > 0) {
-        setProfileImage(result.assets[0].uri);
+        setPendingImageUri(result.assets[0].uri);
+        setCropModalVisible(true);
       }
     } catch (error) {
       console.error("Error picking image:", error);
@@ -652,6 +675,18 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
         { text: t("Main.OK") },
       ]);
     }
+  };
+
+  // Called once the user rotates/flips/crops and taps Crop.
+  const handleCropConfirm = (croppedUri: string) => {
+    setProfileImage(croppedUri);
+    setCropModalVisible(false);
+    setPendingImageUri(null);
+  };
+
+  const handleCropCancel = () => {
+    setCropModalVisible(false);
+    setPendingImageUri(null);
   };
 
   const checkNICExists = async (nicNumber: string): Promise<boolean> => {
@@ -843,31 +878,19 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
     }
   };
 
-  const renderDistrictItem = (item: any, isSelected: boolean) => (
+  const renderDistrictItem = (
+    item: any,
+    isSelected: boolean,
+    onToggle?: () => void,
+  ) => (
     <TouchableOpacity
       className="px-4 py-3 border-b border-gray-200 flex-row justify-between items-center"
-      onPress={() => {
-        if (selectedDistricts.includes(item.value)) {
-          handleDistrictSelect(
-            selectedDistricts.filter((d) => d !== item.value),
-          );
-        } else {
-          handleDistrictSelect([...selectedDistricts, item.value]);
-        }
-      }}
+      onPress={onToggle}
     >
       <Text className="text-base text-gray-800">{item.label}</Text>
       <Checkbox
         value={isSelected}
-        onValueChange={() => {
-          if (selectedDistricts.includes(item.value)) {
-            handleDistrictSelect(
-              selectedDistricts.filter((d) => d !== item.value),
-            );
-          } else {
-            handleDistrictSelect([...selectedDistricts, item.value]);
-          }
-        }}
+        onValueChange={onToggle}
         color={isSelected ? "#21202B" : undefined}
       />
     </TouchableOpacity>
@@ -878,17 +901,14 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
       className="px-4 py-3 border-b border-gray-200 flex-row items-center"
       onPress={() => handleCountryCodeSelect([item.value])}
     >
-      <Text className="text-2xl mr-3">{item.emoji}</Text>
-      <View className="flex-1 flex-row items-center justify-between">
-        <Text className="text-sm text-gray-600">{item.value}</Text>
-        <Text className="text-base text-gray-800 font-medium">
-          {item.label}
-        </Text>
-      </View>
+      <Text className="text-2xl w-10">{item.emoji}</Text>
+      <Text className="text-sm text-gray-600 w-12">{item.value}</Text>
+      <Text className="text-base text-gray-800 font-medium flex-1">
+        {item.label}
+      </Text>
       {isSelected && <MaterialIcons name="check" size={20} color="#21202B" />}
     </TouchableOpacity>
   );
-
   const validateStep1 = () => {
     const newErrors: Record<string, string> = {};
 
@@ -1113,7 +1133,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
                 className="flex-row items-center"
                 onPress={() => setType("Permanent")}
               >
-                <RadioButton
+                <RadioButton.Android
                   value="Permanent"
                   status={type === "Permanent" ? "checked" : "unchecked"}
                   onPress={() => setType("Permanent")}
@@ -1128,7 +1148,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
                 className="flex-row items-center"
                 onPress={() => setType("Temporary")}
               >
-                <RadioButton
+                <RadioButton.Android
                   value="Temporary"
                   status={type === "Temporary" ? "checked" : "unchecked"}
                   onPress={() => setType("Temporary")}
@@ -1582,6 +1602,15 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
         multiSelect={false}
         renderItem={renderCountryCodeItem}
         searchKeys={["label", "value", "name.en", "name.si", "name.ta"]}
+      />
+
+      {/* Rotate / Flip / Crop screen shown right after the photo is picked */}
+      <ImageCropModal
+        visible={cropModalVisible}
+        imageUri={pendingImageUri}
+        onCancel={handleCropCancel}
+        onConfirm={handleCropConfirm}
+        aspect={1}
       />
     </KeyboardAvoidingView>
   );

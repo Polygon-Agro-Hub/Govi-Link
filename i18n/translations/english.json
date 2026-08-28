@@ -77,7 +77,7 @@
     "NumberOfDependentsIsRequired": "Number of dependents is required",
     "ExistingDebtsOfTheFarmerIsRequired": "Existing debts of the farmer is required",
     "IdProofTypeIsRequired": "ID proof type is required",
-    "AtLeastOneCategoryOptionMustBeSelected": "At least one {{category}} option must be selected",
+    "AtLeastOneCategoryOptionMustBeSelected": "At least one option must be selected",
     "PermissionDenied": "Permission Denied",
     "LocationPermissionIsRequiredToUseThisFeature": "Location permission is required to use this feature.",
     "UnableToGetYourCurrentLocation": "Unable to get your current location",
@@ -112,7 +112,9 @@
     "PreviousExperienceIsRequired": "Previous experience is required",
     "EmailDomainIsInvalidCheckForLeadingTrailingDotsOrHyphens": "Invalid email domain. Please check for leading/trailing dots or hyphens",
     "InvalidYahooAddress": "Please enter a valid Yahoo email address",
-    "UnsupportedEmailDomain": "Please enter a valid email address with a supported domain (.com, .gov, .lk)"
+    "UnsupportedEmailDomain": "Please enter a valid email address with a supported domain (.com, .gov, .lk)",
+    "PleaseSelectAJobBeforeAssigning": "Please select a job before assigning",
+    "NewPasswordMustBeDifferentFromCurrentPassword": "New password must be different from current password"
   },
   "Login": {
     "Welcome": "Welcome!",
@@ -183,7 +185,9 @@
     "Location": "Location",
     "GetCall": "Get Call",
     "Address": "Address :",
-    "Start": "Start"
+    "Start": "Start",
+    "NoLocationTitle": "No Location Found!",
+    "NoLocationMessage": "The farmer has not completed any tasks from the crop calendars, so no farm location has been added. Kindly contact the farmer to get directions to the farm."
   },
   "CertificateQuesanory": {
     "StartedOn": "Started on",
@@ -325,7 +329,16 @@
     "NoDistrictsFound": "No districts found",
     "Sinhala": "Sinhala",
     "Tamil": "Tamil",
-    "English": "English"
+    "English": "English",
+    "NoProvincesFound": "No Provinces Found",
+    "NoBanksFound": "No Bank Found",
+    "NoBranchesFound": "No Branch Found",
+    "NoCountriesFound": "No Countries Found",
+    "DragToReposition": "Drag the frame to reposition",
+    "Rotate": "Rotate",
+    "Flip": "Flip",
+    "Crop": "Crop",
+    "EditPhoto": "Edit Photo"
   },
   "ManageOfficers": {
     "Officers": "Officers",
@@ -348,7 +361,8 @@
     "Open": "Open",
     "ID": "ID",
     "CountFarmLeftToFinish": "{{count}} farms left to finish",
-    "1FarmLeftToFinish": "1 farm left to finish"
+    "1FarmLeftToFinish": "1 farm left to finish",
+    "Assigned": "Pending"
   },
   "ChangePassword": {
     "ChoosePassword": "Change Password",
@@ -452,6 +466,7 @@
   },
   "InspectionForm": {
     "IDProof": "ID Proof",
+    "IdProofType": "Id Proof Type",
     "InspectionForm": "Inspection Form",
     "FirstName": "First Name",
     "LastName": "Last Name",
@@ -585,7 +600,49 @@
     "YouHaveFilledOutAllTheFormsIfYouNeedToMakeAnyChangesYouCanGoBackOtherwiseContinuingWillTakeYouToTheConfirmationStep": "You have filled out all the forms. If you need to make any changes, you can go back. Otherwise, continuing will take you to the confirmation step.",
     "InspectionFormCompletedSuccessfully": "Inspection form completed successfully!",
     "CouldNotSaveToServerPleaseTryAgain": "Could not save to server. Please try again.",
-    "AccountHoldersName": "Account Holder's Name"
+    "AccountHoldersName": "Account Holder's Name",
+    "Personal Info": "Personal Info",
+    "ID Proof": "ID Proof",
+    "Finance Info": "Finance Info",
+    "Land Info": "Land Info",
+    "Investment Info": "Investment Info",
+    "Cultivation Info": "Cultivation Info",
+    "Cropping Systems": "Cropping Systems",
+    "Profit & Risk": "Profit & Risk",
+    "Economical": "Economical",
+    "Labour": "Labour",
+    "Harvest Storage": "Harvest Storage",
+    "OwnLandSingleOwner": "Own land – Single owner",
+    "OwnLandMultipleOwners": "Own land – Multiple owners (undivided)",
+    "LeasedLandFromPrivateOwner": "Leased land from private owner",
+    "LeasedLandFromTheGovernment": "Leased land from the government",
+    "PermitLandShortTerm": "Permit land – short term from the government",
+    "PermitLandLongTerm": "Permit land – long term from the government",
+    "Temperature": "Temperature",
+    "Rainfall": "Rainfall",
+    "Sun shine hours": "Sun shine hours",
+    "Relative humidity": "Relative humidity",
+    "Wind velocity": "Wind velocity",
+    "Wind direction": "Wind direction",
+    "Seasons and agro-ecological zone": "Seasons and agro-ecological zone",
+    "Tanks": "Tanks",
+    "Wells": "Wells",
+    "River": "River",
+    "Dams": "Dams",
+    "Other": "Other",
+    "Excellent": "Excellent",
+    "Good": "Good",
+    "Could be improved with additional effort": "Could be improved with additional effort",
+    "Not Suitable": "Not Suitable",
+    "Inter cropping": "Inter cropping",
+    "Mixed cropping": "Mixed cropping",
+    "Multistoreyed cropping": "Multistoreyed cropping",
+    "Relay Cropping": "Relay Cropping",
+    "Crop Rotation": "Crop Rotation",
+    "No previous experience": "No previous experience",
+    "Have grown this crop once or twice": "Have grown this crop once or twice",
+    "Have grown this crop multiple seasons": "Have grown this crop multiple seasons",
+    "Have been cultivating this crop for many years": "Have been cultivating this crop for many years"
   },
   "ConfirmationCapitalRequest": {
     "ConfirmAndLeave": "Confirm & Leave",

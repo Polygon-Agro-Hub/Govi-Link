@@ -14,7 +14,7 @@ import { RouteProp, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../types/types";
 import { AntDesign, Entypo, FontAwesome5 } from "@expo/vector-icons";
 import axios from "axios";
-import { environment } from "@/environment/environment";
+import environment from "@/environment/environment";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
 import { useTranslation } from "react-i18next";
@@ -429,7 +429,7 @@ const RequestSuggestions: React.FC<RequestSuggestionsProps> = ({
                     <TextInput
                       className="border border-[#9DB2CE] rounded-lg p-2 mb-4"
                       multiline
-                      placeholder={t("CertificateSuggestions.TypeHere....")}
+                      placeholder={t("CertificateSuggestions.TypeHere...")}
                       textAlignVertical="top"
                       value={item.problem}
                       onChangeText={(text) =>

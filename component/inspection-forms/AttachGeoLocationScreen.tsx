@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   View,
   Text,
@@ -6,9 +6,10 @@ import {
   Alert,
   ActivityIndicator,
   Modal,
+  BackHandler,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RouteProp } from "@react-navigation/native";
+import { RouteProp, useFocusEffect } from "@react-navigation/native";
 import { WebView } from "react-native-webview";
 import * as Location from "expo-location";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
@@ -55,6 +56,21 @@ const AttachGeoLocationScreen: React.FC<AttachGeoLocationScreenProps> = ({
     "Tap on the map to select a location",
   );
   const { t } = useTranslation();
+
+  useFocusEffect(
+    useCallback(() => {
+      const handleBackPress = () => {
+        navigation.goBack();
+        return true;
+      };
+      const subscription = BackHandler.addEventListener(
+        "hardwareBackPress",
+        handleBackPress,
+      );
+      return () => subscription.remove();
+    }, [navigation])
+  );
+
   useEffect(() => {
     if (!currentLatitude || !currentLongitude) {
       getCurrentLocation();
@@ -99,11 +115,9 @@ const AttachGeoLocationScreen: React.FC<AttachGeoLocationScreenProps> = ({
       );
     } catch (error) {
       console.error("Error getting location:", error);
-      Alert.alert(
-        t("Error.Error"),
-        t("Error.UnableToGetYourCurrentLocation"),
-        [{ text: t("Main.OK") }],
-      );
+      Alert.alert(t("Error.Error"), t("Error.UnableToGetYourCurrentLocation"), [
+        { text: t("Main.OK") },
+      ]);
     } finally {
       setIsLoading(false);
     }
@@ -332,14 +346,19 @@ const AttachGeoLocationScreen: React.FC<AttachGeoLocationScreenProps> = ({
             colors={["#F35125", "#FF1D85"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
-            className="rounded-3xl h-[50px] flex-row justify-center items-center"
             style={{
+              width: "100%",
+              height: 50,
+              borderRadius: 9999,
+              flexDirection: "row",
+              justifyContent: "center",
+              alignItems: "center",
+              overflow: "hidden",
               shadowColor: "#000",
               shadowOffset: { width: 0, height: 3 },
               shadowOpacity: 0.25,
               shadowRadius: 5,
               elevation: 6,
-              overflow: "hidden",
             }}
           >
             <MaterialIcons name="done" size={24} color="#fff" />

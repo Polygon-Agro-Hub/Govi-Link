@@ -18,7 +18,7 @@ import Svg, { Circle, G, Text as SvgText } from "react-native-svg";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-import { environment } from "@/environment/environment";
+import environment from "@/environment/environment";
 import { useFocusEffect } from "@react-navigation/native";
 
 type AssignJobOfficerListNavigationProps = StackNavigationProp<
@@ -184,9 +184,11 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
     try {
       const token = await AsyncStorage.getItem("token");
       if (!token) {
-        Alert.alert(t("Error.Error"), t("Error.AuthTokenNotFoundPleaseLogInAgain"), [
-          { text: t("Main.OK") },
-        ]);
+        Alert.alert(
+          t("Error.Error"),
+          t("Error.AuthTokenNotFoundPleaseLogInAgain"),
+          [{ text: t("Main.OK") }],
+        );
         return;
       }
 
@@ -257,9 +259,11 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
     try {
       const token = await AsyncStorage.getItem("token");
       if (!token) {
-        Alert.alert(t("Error.Error"), t("Error.AuthTokenNotFoundPleaseLogInAgain"), [
-          { text: t("Main.OK") },
-        ]);
+        Alert.alert(
+          t("Error.Error"),
+          t("Error.AuthTokenNotFoundPleaseLogInAgain"),
+          [{ text: t("Main.OK") }],
+        );
         return;
       }
 
@@ -304,7 +308,9 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
     } catch (error: any) {
       console.error("Failed to assign jobs:", error);
 
-      let errorMessage = t("AssignJobOfficerList.FailedToAssignJobsPleaseTryAgain");
+      let errorMessage = t(
+        "AssignJobOfficerList.FailedToAssignJobsPleaseTryAgain",
+      );
 
       if (error.response) {
         console.error("Error response data:", error.response.data);
@@ -437,11 +443,9 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
                       </Text>
 
                       <Text className="text-sm font-normal text-[#000000]">
-  {t("AssignJobOfficerList.OfficerAssignedJobs")}:{" "}
-  <Text className="font-medium">
-    {officer.assigned}
-  </Text>
-</Text>
+                        {t("AssignJobOfficerList.OfficerAssignedJobs")}:{" "}
+                        <Text className="font-medium">{officer.assigned}</Text>
+                      </Text>
                     </View>
 
                     <TouchableOpacity
@@ -521,7 +525,9 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
               {t("AssignJobOfficerList.Seconds")}
             </Text>
             <Text className="text-md text-center text-[#4E6393] mb-8 leading-6">
-              {t("AssignJobOfficerList.YouCanUndoOtherwiseThisOfficerWillBeAssignedAutomatically")}
+              {t(
+                "AssignJobOfficerList.YouCanUndoOtherwiseThisOfficerWillBeAssignedAutomatically",
+              )}
             </Text>
 
             {selectedOfficer && (
@@ -555,8 +561,12 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
                       }
                       start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 0 }}
-                      className="px-10 rounded-full items-center justify-center h-[50px]"
                       style={{
+                        paddingHorizontal: 40,
+                        borderRadius: 9999,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        height: 50,
                         shadowColor: "#000",
                         shadowOffset: { width: 0, height: 3 },
                         shadowOpacity: 0.25,
@@ -590,7 +600,13 @@ const AssignJobOfficerList: React.FC<AssignJobOfficerListProps> = ({
                 }
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
-                className="rounded-full px-6 items-center justify-center h-[50px]"
+                style={{
+                  borderRadius: 9999,
+                  paddingHorizontal: 24,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  height: 50,
+                }}
               >
                 {assigning ? (
                   <ActivityIndicator size="small" color="white" />

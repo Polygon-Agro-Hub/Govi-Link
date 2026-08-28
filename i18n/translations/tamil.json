@@ -77,7 +77,7 @@
     "NumberOfDependentsIsRequired": "Number of dependents is required",
     "ExistingDebtsOfTheFarmerIsRequired": "Existing debts of the farmer is required",
     "IdProofTypeIsRequired": "ID proof type is required",
-    "AtLeastOneCategoryOptionMustBeSelected": "At least one {{category}} option must be selected",
+    "AtLeastOneCategoryOptionMustBeSelected": "At least one option must be selected",
     "PermissionDenied": "Permission Denied",
     "LocationPermissionIsRequiredToUseThisFeature": "Location permission is required to use this feature.",
     "UnableToGetYourCurrentLocation": "Unable to get your current location",
@@ -112,7 +112,9 @@
     "PreviousExperienceIsRequired": "முன் அனுபவம் தேவை",
     "EmailDomainIsInvalidCheckForLeadingTrailingDotsOrHyphens": "மின்னஞ்சல் டொமைன் தவறானது. முன்/பின் புள்ளிகள் அல்லது ஹைபன்கள் உள்ளதா எனச் சரிபார்க்கவும்",
     "InvalidYahooAddress": "சரியான Yahoo மின்னஞ்சல் முகவரியை உள்ளிடவும்",
-    "UnsupportedEmailDomain": "ஆதரிக்கப்படும் டொமைனுடன் (.com, .gov, .lk) சரியான மின்னஞ்சல் முகவரியை உள்ளிடவும்"
+    "UnsupportedEmailDomain": "ஆதரிக்கப்படும் டொமைனுடன் (.com, .gov, .lk) சரியான மின்னஞ்சல் முகவரியை உள்ளிடவும்",
+    "PleaseSelectAJobBeforeAssigning": "ஒதுக்குவதற்கு முன் ஒரு பணியைத் தேர்ந்தெடுக்கவும்",
+     "NewPasswordMustBeDifferentFromCurrentPassword":"புதிய கடவுச்சொல் தற்போதைய கடவுச்சொல்லிலிருந்து வேறுபட்டதாக இருக்க வேண்டும்."
   },
   "Login": {
     "Welcome": "வரவேற்கிறோம்",
@@ -183,7 +185,9 @@
     "Location": "Location",
     "GetCall": "Get Call",
     "Address": "முகவரி :",
-    "Start": "தொடக்கம்"
+    "Start": "தொடக்கம்",
+    "NoLocationTitle": "பண்ணையின் இருப்பிடம் காணப்படவில்லை!",
+    "NoLocationMessage": "இந்த விவசாயி பயிர் நாட்காட்டிகளில் உள்ள எந்தப் பணிகளையும் முடிக்காததால், பண்ணையின் இருப்பிடம் கிடைக்கவில்லை. பண்ணைக்குச் செல்லும் வழியைக் கண்டறிய, தயவுசெய்து விவசாயியைத் தொடர்பு கொள்ளவும்."
   },
   "CertificateQuesanory": {
     "StartedOn": "Started on",
@@ -325,7 +329,16 @@
     "NoDistrictsFound": "No districts found",
     "Sinhala": "சிங்களம்",
     "Tamil": "தமிழ்",
-    "English": "ஆங்கிலம்"
+    "English": "ஆங்கிலம்",
+    "NoProvincesFound": "மாகாணங்கள் எதுவும் காணப்படவில்லை",
+    "NoBanksFound": "வங்கி எதுவும் காணப்படவில்லை",
+    "NoBranchesFound": "கிளை எதுவும் காணப்படவில்லை",
+    "NoCountriesFound":"நாடுகள் எதுவும் காணப்படவில்லை",
+    "DragToReposition":"நிலையை மாற்ற சட்டகத்தை இழுக்கவும்",
+    "Rotate":"சுழற்று",
+    "Flip":"புரட்டு",
+    "Crop":"பயிர்",
+    "EditPhoto":"புகைப்படத்தைத் திருத்து"
   },
   "ManageOfficers": {
     "Officers": "Officers",
@@ -348,7 +361,8 @@
     "ID": "ID",
     "CountFarmLeftToFinish": "{{count}} farms left to finish",
     "1FarmLeftToFinish": "1 farm left to finish",
-    "Ongoing": "நடந்துகொண்டிருக்கும்"
+    "Ongoing": "நடந்துகொண்டிருக்கும்",
+    "Assigned":"Assigned"
   },
   "ChangePassword": {
     "ChoosePassword": "கடவுச்சொல்லை மாற்றவும்",
@@ -452,6 +466,7 @@
   },
   "InspectionForm": {
     "IDProof": "அடையாள சான்று",
+    "IdProofType": "IdProof Type",
     "InspectionForm": "ஆய்வு படிவம்",
     "FirstName": "முதல் பெயர்",
     "LastName": "கடைசி பெயர்",
@@ -585,7 +600,49 @@
     "YouHaveFilledOutAllTheFormsIfYouNeedToMakeAnyChangesYouCanGoBackOtherwiseContinuingWillTakeYouToTheConfirmationStep": "நீங்கள் அனைத்து படிவங்களையும் பூர்த்தி செய்துள்ளீர்கள். மாற்றங்கள் செய்ய வேண்டுமெனில் பின்னால் செல்லலாம். இல்லையெனில் தொடர்வது உறுதிப்படுத்தல் படிக்கு அழைத்துச் செல்லும்.",
     "InspectionFormCompletedSuccessfully": "ஆய்வு படிவம் வெற்றிகரமாக முடிக்கப்பட்டது!",
     "CouldNotSaveToServerPleaseTryAgain": "சேவையகத்தில் சேமிக்க முடியவில்லை. தயவுசெய்து மீண்டும் முயற்சிக்கவும்.",
-    "AccountHoldersName": "கணக்கு வைத்திருப்பவரின் பெயர்"
+    "AccountHoldersName": "கணக்கு வைத்திருப்பவரின் பெயர்",
+    "Personal Info": "தனிப்பட்ட தகவல்",
+    "ID Proof": "அடையாள அத்தாட்சி",
+    "Finance Info": "நிதித் தகவல்",
+    "Land Info": "நிலத் தகவல்",
+    "Investment Info": "முதலீட்டுத் தகவல்",
+    "Cultivation Info": "சாகுபடி தகவல்",
+    "Cropping Systems": "பயிர் சாகுபடி முறைகள்",
+    "Profit & Risk": "லாபம் மற்றும் இடர்",
+    "Economical": "பொருளாதார",
+    "Labour": "தொழிலாளர்",
+    "Harvest Storage": "அறுவடை சேமிப்பு",
+    "OwnLandSingleOwner": "சொந்த நிலம் – ஒரு உரிமையாளர்",
+    "OwnLandMultipleOwners": "சொந்த நிலம் – பல உரிமையாளர்கள் (பிரிக்கப்படாதது)",
+    "LeasedLandFromPrivateOwner": "தனியார் உரிமையாளரிடமிருந்து குத்தகை நிலம்",
+    "LeasedLandFromTheGovernment": "அரசாங்கத்திடமிருந்து குத்தகை நிலம்",
+    "PermitLandShortTerm": "அரசாங்கத்திடமிருந்து குறுகிய கால அனுமதி நிலம்",
+    "PermitLandLongTerm": "அரசாங்கத்திடமிருந்து நீண்ட கால அனுமதி நிலம்",
+    "Temperature": "வெப்பநிலை",
+    "Rainfall": "மழைப்பொழிவு",
+    "Sun shine hours": "சூரிய ஒளி மணிநேரம்",
+    "Relative humidity": "தொடர்புடைய ஈரப்பதம்",
+    "Wind velocity": "காற்றின் வேகம்",
+    "Wind direction": "காற்றின் திசை",
+    "Seasons and agro-ecological zone": "பருவங்கள் மற்றும் வேளாண் சூழலியல் மண்டலம்",
+    "Tanks": "குளங்கள்",
+    "Wells": "கிணறுகள்",
+    "River": "ஆறு",
+    "Dams": "அணைகள்",
+    "Other": "மற்றவை",
+    "Excellent": "மிகச் சிறந்தது",
+    "Good": "நல்லது",
+    "Could be improved with additional effort": "கூடுதல் முயற்சியுடன் மேம்படுத்தலாம்",
+    "Not Suitable": "பொருத்தமற்றது",
+    "Inter cropping": "இடையிடை பயிரிடல்",
+    "Mixed cropping": "கலப்பு பயிரிடல்",
+    "Multistoreyed cropping": "பல அடுக்கு பயிரிடல்",
+    "Relay Cropping": "தொடர் பயிரிடல்",
+    "Crop Rotation": "பயிர் சுழற்சி",
+    "No previous experience": "முந்தைய அனுபவம் இல்லை",
+    "Have grown this crop once or twice": "இந்த பயிரை ஒன்று அல்லது இரண்டு முறை வளர்த்துள்ளேன்",
+    "Have grown this crop multiple seasons": "இந்த பயிரை பல பருவங்களாக வளர்த்துள்ளேன்",
+    "Have been cultivating this crop for many years": "பல ஆண்டுகளாக இந்த பயிரை பயிரிட்டு வருகிறேன்"
   },
   "ConfirmationCapitalRequest": {
     "ConfirmAndLeave": "உறுதிசெய்து வெளியேறு",

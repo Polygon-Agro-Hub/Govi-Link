@@ -16,7 +16,7 @@ import CustomHeader from "../commons/CustomHeader";
 import { t } from "i18next";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-import { environment } from "@/environment/environment";
+import environment from "@/environment/environment";
 
 type AddOnboardSupplierOfficerNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -413,7 +413,6 @@ const AddOnboardSupplierOfficer: React.FC<AddOnboardSupplierOfficerProps> = ({
               colors={["#F35125", "#FF1D85"]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
-              className="rounded-3xl"
               style={{
                 shadowColor: "#000000",
                 shadowOffset: { width: 0, height: 4 },
@@ -421,6 +420,8 @@ const AddOnboardSupplierOfficer: React.FC<AddOnboardSupplierOfficerProps> = ({
                 shadowRadius: 10,
                 elevation: 6,
                 overflow: "hidden",
+                borderRadius: 999,
+                marginTop: 5,
               }}
             >
               <TouchableOpacity
