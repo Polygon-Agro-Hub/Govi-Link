@@ -54,7 +54,8 @@
         "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
         "android.permission.POST_NOTIFICATIONS",
         "android.permission.CALL_PHONE",
-        "android.permission.MODIFY_AUDIO_SETTINGS"
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "com.google.android.gms.permission.AD_ID"
       ],
       "blockedPermissions": [
         "com.google.android.gms.permission.AD_ID"
@@ -127,7 +128,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "384495ea-d98b-483e-a7f2-09dc951e2bf1"
+        "projectId": "b7fcc5d3-af65-4844-b10a-81c2cea8d773"
       }
     }
   }
