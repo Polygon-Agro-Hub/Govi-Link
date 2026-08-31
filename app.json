@@ -37,10 +37,7 @@
       "predictiveBackGestureEnabled": false,
       "package": "com.polygonagro.GoviLink",
       "softwareKeyboardLayoutMode": "resize",
-      "versionCode": 13,
-      "compileSdkVersion": 36,
-      "targetSdkVersion": 36,
-      "minSdkVersion": 24,
+      "versionCode": 14,
       "permissions": [
         "android.permission.INTERNET",
         "android.permission.CAMERA",
@@ -115,20 +112,23 @@
       "expo-sqlite",
       "expo-web-browser",
       "@react-native-community/datetimepicker",
-      "expo-asset"
+      "expo-asset",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
+          "recordAudioAndroid": true
+        }
+      ]
     ],
     "extra": {
       "router": {
         "origin": false
       },
       "eas": {
-        "projectId": "83ac7ee5-924c-484d-8bf3-a192a2e34670"
+        "projectId": ""
       }
-    },
-    "expo-camera": {
-      "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
-      "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
-      "recordAudioAndroid": true
     }
   }
 }
