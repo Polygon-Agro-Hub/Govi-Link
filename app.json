@@ -37,7 +37,7 @@
       "predictiveBackGestureEnabled": false,
       "package": "com.polygonagro.GoviLink",
       "softwareKeyboardLayoutMode": "resize",
-      "versionCode": 10,
+      "versionCode": 13,
       "compileSdkVersion": 36,
       "targetSdkVersion": 36,
       "minSdkVersion": 24,
@@ -58,6 +58,9 @@
         "android.permission.POST_NOTIFICATIONS",
         "android.permission.CALL_PHONE",
         "android.permission.MODIFY_AUDIO_SETTINGS"
+      ],
+      "blockedPermissions": [
+        "com.google.android.gms.permission.AD_ID"
       ]
     },
     "web": {
@@ -119,7 +122,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": ""
+        "projectId": "83ac7ee5-924c-484d-8bf3-a192a2e34670"
       }
     },
     "expo-camera": {
