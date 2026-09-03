@@ -114,7 +114,8 @@
     "InvalidYahooAddress": "කරුණාකර වලංගු Yahoo විද්‍යුත් තැපැල් ලිපිනයක් ඇතුළත් කරන්න",
     "UnsupportedEmailDomain": "කරුණාකර සහාය දක්වන වසමක් (.com, .gov, .lk) සහිත වලංගු විද්‍යුත් තැපැල් ලිපිනයක් ඇතුළත් කරන්න",
     "PleaseSelectAJobBeforeAssigning": "පැවරීමට පෙර රැකියාවක් තෝරන්න",
-     "NewPasswordMustBeDifferentFromCurrentPassword":"නව මුරපදය වත්මන් මුරපදයට වඩා වෙනස් විය යුතුය."
+    "NewPasswordMustBeDifferentFromCurrentPassword":"නව මුරපදය වත්මන් මුරපදයට වඩා වෙනස් විය යුතුය.",
+    "noOfDependents is required":"යැපෙන්නන් සංඛ්‍යාව අවශ්‍ය වේ."
   },
   "Login": {
     "Welcome": "සාදරයෙන් පිළිගනිමු!",
@@ -334,6 +335,7 @@
     "NoBanksFound": "බැංකුවක් හමු නොවීය",
     "NoBranchesFound": "ශාඛාවක් හමු නොවීය",
     "NoCountriesFound":"රටවල් හමු නොවීය",
+    "NoCountryFound":"රටක් හමු නොවීය",
     "DragToReposition":"නැවත ස්ථානගත කිරීමට රාමුව අදින්න",
     "Rotate":"කරකවන්න",
     "Flip":"පෙරළන්න",

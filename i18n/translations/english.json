@@ -62,7 +62,7 @@
     "YourPasswordMustContainAMinimumOf8CharactersWith1UppercaseNumbersSpecialCharacters": "Your password must contain a minimum of 8 characters with 1 Uppercase, Numbers & Special characters.",
     "NewPasswordAndConfirmPasswordDoNotMatch": "New password and confirm password do not match",
     "PasswordUpdatedSuccessfully": "Password updated successfully",
-    "LandNumbersCannotBeTheSame": "Land numbers cannot be the same",
+    "LandNumbersCannotBeTheSame": "Mobile numbers cannot be the same",
     "MobileNumberMustBe9DigitsLong": "Mobile number must be 9 digits long",
     "NicNumberMustBe9DigitsFollowedByVOr12Digits": "NIC Number must be 9 digits followed by 'V' or 12 digits.",
     "ThisNicIsAlreadyRegisteredInTheSystem": "This NIC is already registered in the system.",
@@ -114,7 +114,8 @@
     "InvalidYahooAddress": "Please enter a valid Yahoo email address",
     "UnsupportedEmailDomain": "Please enter a valid email address with a supported domain (.com, .gov, .lk)",
     "PleaseSelectAJobBeforeAssigning": "Please select a job before assigning",
-    "NewPasswordMustBeDifferentFromCurrentPassword": "New password must be different from current password"
+    "NewPasswordMustBeDifferentFromCurrentPassword": "New password must be different from current password",
+    "noOfDependents is required":"No. of Dependents is required"
   },
   "Login": {
     "Welcome": "Welcome!",
@@ -334,6 +335,7 @@
     "NoBanksFound": "No Bank Found",
     "NoBranchesFound": "No Branch Found",
     "NoCountriesFound": "No Countries Found",
+    "NoCountryFound":"No Country Found",
     "DragToReposition": "Drag the frame to reposition",
     "Rotate": "Rotate",
     "Flip": "Flip",
@@ -466,7 +468,7 @@
   },
   "InspectionForm": {
     "IDProof": "ID Proof",
-    "IdProofType": "Id Proof Type",
+    "IdProofType": "ID Proof Type",
     "InspectionForm": "Inspection Form",
     "FirstName": "First Name",
     "LastName": "Last Name",
