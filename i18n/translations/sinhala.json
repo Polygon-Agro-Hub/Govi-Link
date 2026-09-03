@@ -11,7 +11,8 @@
     "Success": "සාර්ථකයි",
     "GoBack": "ආපසු යන්න",
     "Continue": "ඉදිරියට යන්න",
-    "Cancel": "අවලංගු කරන්න"
+    "Cancel": "අවලංගු කරන්න",
+    "ProhibitedLanguageDetected": "ඔබගේ පණිවිඩයේ නුසුදුසු හෝ තහනම් වචන අඩංගු වේ. කරුණාකර ඒවා ඉවත් කර නැවත උත්සාහ කරන්න."
   },
   "Error": {
     "Error": "දෝෂය",
@@ -167,7 +168,8 @@
     "PleaseEnterYourComplaint": "කරුණාකර ඔබේ පැමිණිල්ල ඇතුළත් කරන්න.",
     "AddTheComplaintHere": "පැමිණිල්ල මෙතනට එකතු කරන්න..",
     "Submitting...": "යොමු කරමින් පවතී...",
-    "No categories found": "කාණ්ඩ කිසිවක් හමු නොවීය"
+    "No categories found": "කාණ්ඩ කිසිවක් හමු නොවීය",
+    "ProhibitedLanguageDetected": "ඔබගේ පැමිණිල්ලේ නුසුදුසු හෝ තහනම් වචන අඩංගු වේ. කරුණාකර ඒවා ඉවත් කර නැවත උත්සාහ කරන්න."
   },
   "Profile": {
     "EmployeeID": "පරිශීලක අංකය",

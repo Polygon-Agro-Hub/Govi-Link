@@ -9,9 +9,10 @@
     "PleaseTurnOnMobileDataOrWiFiToContinue": "தயவுசெய்து மொபைல் தரவுகள் அல்லது Wi-Fi ஐ இயக்கவும்.",
     "YourLoginSessionHasExpiredPleaseLogInAgainToContinue": "Your login session has expired. Please log in again to continue.",
     "Success": "வெற்றி",
-    "GoBack": "Go Back",
-    "Continue": "Continue",
-    "Cancel": "ரத்து செய்"
+    "GoBack": "திரும்பி செல்",
+    "Continue": "தொடரவும்",
+    "Cancel": "ரத்துசெய்",
+    "ProhibitedLanguageDetected": "உங்கள் செய்தியில் தடைசெய்யப்பட்ட அல்லது தகாத வார்த்தைகள் உள்ளன. தயவுசெய்து அவற்றை நீக்கிவிட்டு மீண்டும் முயற்சிக்கவும்."
   },
   "Error": {
     "Error": "Error",
@@ -167,7 +168,8 @@
     "PleaseEnterYourComplaint": "உங்கள் புகாரை உள்ளிடவும்.",
     "AddTheComplaintHere": "Add the Complaint here..",
     "Submitting...": "சமர்ப்பித்து கொண்டிருக்கிறது...",
-    "No categories found": "வகைகள் எதுவும் கிடைக்கவில்லை"
+    "No categories found": "வகைகள் எதுவும் கிடைக்கவில்லை",
+    "ProhibitedLanguageDetected": "உங்கள் புகாரில் தடைசெய்யப்பட்ட அல்லது தகாத வார்த்தைகள் உள்ளன. தயவுசெய்து அவற்றை நீக்கிவிட்டு மீண்டும் முயற்சிக்கவும்."
   },
   "Profile": {
     "EmployeeID": "பணியாளர் அடையாள எண்",

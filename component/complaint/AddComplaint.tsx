@@ -161,7 +161,17 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
       );
       resetForm();
       navigation.replace("ComplainHistory");
-    } catch (error: unknown) {
+    } catch (error: any) {
+      if (error?.response?.data?.code === "PROFANITY_DETECTED") {
+        Alert.alert(
+          t("Main.Sorry") || t("Error.Sorry"),
+          t("AddComplaint.ProhibitedLanguageDetected") ||
+            error?.response?.data?.message ||
+            "Your complaint contains prohibited or inappropriate language. Please remove it and try again.",
+          [{ text: t("Main.OK") }],
+        );
+        return;
+      }
       if (error instanceof Error) {
         console.error("Error message:", error.message);
         Alert.alert(

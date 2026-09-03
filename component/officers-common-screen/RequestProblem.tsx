@@ -215,8 +215,18 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
           [{ text: t("Main.OK") }],
         );
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(" Error saving/updating problem:", err);
+      if (err?.response?.data?.code === "PROFANITY_DETECTED") {
+        Alert.alert(
+          t("Main.Sorry") || t("Error.Sorry"),
+          t("Main.ProhibitedLanguageDetected") ||
+            err?.response?.data?.message ||
+            "Your message contains prohibited or inappropriate language. Please remove it and try again.",
+          [{ text: t("Main.OK") }],
+        );
+        return;
+      }
       Alert.alert(
         t("Error.Sorry"),
         t("Main.SomethingWentWrongPleaseTryAgainLater"),

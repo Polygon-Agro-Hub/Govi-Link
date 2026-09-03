@@ -11,7 +11,8 @@
     "Success": "Success",
     "GoBack": "Go Back",
     "Continue": "Continue",
-    "Cancel": "Cancel"
+    "Cancel": "Cancel",
+    "ProhibitedLanguageDetected": "Your message contains prohibited or inappropriate language. Please remove it and try again."
   },
   "Error": {
     "Error": "Error",
@@ -167,7 +168,8 @@
     "PleaseEnterYourComplaint": "Please enter your complaint.",
     "AddTheComplaintHere": "Add the Complaint here..",
     "Submitting...": "Submitting...",
-    "No categories found": "No categories found"
+    "No categories found": "No categories found",
+    "ProhibitedLanguageDetected": "Your complaint contains prohibited or inappropriate language. Please remove it and try again."
   },
   "Profile": {
     "EmployeeID": "Employee ID",
