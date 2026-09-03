@@ -114,7 +114,8 @@
     "InvalidYahooAddress": "சரியான Yahoo மின்னஞ்சல் முகவரியை உள்ளிடவும்",
     "UnsupportedEmailDomain": "ஆதரிக்கப்படும் டொமைனுடன் (.com, .gov, .lk) சரியான மின்னஞ்சல் முகவரியை உள்ளிடவும்",
     "PleaseSelectAJobBeforeAssigning": "ஒதுக்குவதற்கு முன் ஒரு பணியைத் தேர்ந்தெடுக்கவும்",
-     "NewPasswordMustBeDifferentFromCurrentPassword":"புதிய கடவுச்சொல் தற்போதைய கடவுச்சொல்லிலிருந்து வேறுபட்டதாக இருக்க வேண்டும்."
+    "NewPasswordMustBeDifferentFromCurrentPassword":"புதிய கடவுச்சொல் தற்போதைய கடவுச்சொல்லிலிருந்து வேறுபட்டதாக இருக்க வேண்டும்.",
+    "noOfDependents is required":"சார்ந்திருப்பவர்களின் எண்ணிக்கை தேவைப்படுகிறது"
   },
   "Login": {
     "Welcome": "வரவேற்கிறோம்",
@@ -334,6 +335,7 @@
     "NoBanksFound": "வங்கி எதுவும் காணப்படவில்லை",
     "NoBranchesFound": "கிளை எதுவும் காணப்படவில்லை",
     "NoCountriesFound":"நாடுகள் எதுவும் காணப்படவில்லை",
+    "NoCountryFound":"நாடு எதுவும் காணப்படவில்லை",
     "DragToReposition":"நிலையை மாற்ற சட்டகத்தை இழுக்கவும்",
     "Rotate":"சுழற்று",
     "Flip":"புரட்டு",

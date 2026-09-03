@@ -20,6 +20,7 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import environment from "@/environment/environment";
+import dayjs from "dayjs";
 import { useFocusEffect } from "@react-navigation/native";
 import { RootStackParamList } from "../types/types";
 import { useTranslation } from "react-i18next";
@@ -72,6 +73,16 @@ interface VisitsData {
   status?: string;
   completedClusterCount: number;
   totalClusterCount: number;
+  latitude?: number | string;
+  longitude?: number | string;
+  district?: string;
+  city?: string;
+  plotNo?: string;
+  street?: string;
+  farmerId?: number;
+  certificationpaymentId?: number;
+  sheduleDate?: string;
+  date?: string;
 }
 interface DraftVisit {
   certificationpaymentId: number;
@@ -347,20 +358,118 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
     );
   };
 
+  const handleLocationPress = async () => {
+    let lat = selectedItem?.latitude;
+    let lon = selectedItem?.longitude;
+
+    if (!lat || !lon) {
+      try {
+        const token = await AsyncStorage.getItem("token");
+        const dateStr =
+          selectedItem?.sheduleDate ||
+          selectedItem?.date ||
+          dayjs().format("YYYY-MM-DD");
+        const res = await axios.get(
+          `${environment.API_BASE_URL}api/officer/visits/${dayjs(dateStr).format("YYYY-MM-DD")}`,
+          { headers: { Authorization: `Bearer ${token}` } },
+        );
+        if (Array.isArray(res.data?.data)) {
+          const match = res.data.data.find(
+            (v: any) =>
+              (selectedItem?.jobId && String(v.jobId) === String(selectedItem.jobId)) ||
+              (selectedItem?.id && String(v.id) === String(selectedItem.id)),
+          );
+          if (match?.latitude && match?.longitude) {
+            lat = match.latitude;
+            lon = match.longitude;
+            setSelectedItem((prev: any) => ({
+              ...prev,
+              ...match,
+              latitude: match.latitude,
+              longitude: match.longitude,
+            }));
+          }
+        }
+      } catch (e) {
+        console.error("Error fetching location fallback:", e);
+      }
+    }
+
+    if (lat && lon) {
+      const url = `https://www.google.com/maps?q=${lat},${lon}`;
+      Linking.openURL(url);
+    } else {
+      Alert.alert(
+        t("VisitPopup.NoLocationTitle"),
+        t("VisitPopup.NoLocationMessage"),
+      );
+    }
+  };
+
   const fetchAllVisits = async () => {
     try {
       setLoadingVisitsdrafts(true);
       const token = await AsyncStorage.getItem("token");
       if (!token) return;
 
-      const response = await axios.get(
-        `${environment.API_BASE_URL}api/officer/visits`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
+      const today = dayjs().format("YYYY-MM-DD");
 
-      const { visits, draftVisits } = response.data.data;
+      const [allVisitsRes, todayVisitsRes] = await Promise.allSettled([
+        axios.get(`${environment.API_BASE_URL}api/officer/visits`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+        axios.get(`${environment.API_BASE_URL}api/officer/visits/${today}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+      ]);
+
+      let visits: VisitsData[] = [];
+      let draftVisits: DraftVisit[] = [];
+
+      if (
+        allVisitsRes.status === "fulfilled" &&
+        allVisitsRes.value.data?.data
+      ) {
+        visits = allVisitsRes.value.data.data.visits || [];
+        draftVisits = allVisitsRes.value.data.data.draftVisits || [];
+      }
+
+      if (
+        todayVisitsRes.status === "fulfilled" &&
+        Array.isArray(todayVisitsRes.value.data?.data)
+      ) {
+        const todayDetailedVisits = todayVisitsRes.value.data.data;
+        const detailsMap = new Map<string, any>();
+        todayDetailedVisits.forEach((v: any) => {
+          if (v.jobId) detailsMap.set(String(v.jobId), v);
+          if (v.id) detailsMap.set(String(v.id), v);
+        });
+
+        if (visits.length === 0) {
+          visits = todayDetailedVisits;
+        } else {
+          visits = visits.map((v: any) => {
+            const match =
+              detailsMap.get(String(v.jobId)) || detailsMap.get(String(v.id));
+            if (match) {
+              return {
+                ...v,
+                latitude: match.latitude ?? v.latitude,
+                longitude: match.longitude ?? v.longitude,
+                district: match.district ?? v.district,
+                city: match.city ?? v.city,
+                plotNo: match.plotNo ?? v.plotNo,
+                street: match.street ?? v.street,
+                farmerName: match.farmerName ?? v.farmerName,
+                farmerMobile: match.farmerMobile ?? v.farmerMobile,
+                date: match.date ?? v.date,
+                sheduleDate: match.sheduleDate ?? v.sheduleDate,
+              };
+            }
+            return v;
+          });
+        }
+      }
 
       const filteredVisits = visits.filter((visit: VisitsData) => {
         if (visit.propose === "Cluster") {
@@ -981,44 +1090,20 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                     <View className="flex flex-row justify-center gap-x-2 mb-4 mt-6 px-4">
                       <TouchableOpacity
                         className="flex w-1/2"
-                        disabled={
-                          !selectedItem?.latitude || !selectedItem?.longitude
-                        }
-                        onPress={() => {
-                          if (
-                            selectedItem?.latitude &&
-                            selectedItem?.longitude
-                          ) {
-                            const lat = selectedItem.latitude;
-                            const lon = selectedItem.longitude;
-                            const url = `https://www.google.com/maps?q=${lat},${lon}`;
-                            Linking.openURL(url);
-                          }
-                        }}
+                        onPress={handleLocationPress}
                       >
                         <View
-                          className={`flex flex-row items-center justify-center rounded-full py-2 border ${
-                            selectedItem?.latitude && selectedItem?.longitude
-                              ? "border-[#F83B4F]"
-                              : "border-[#9DB2CE]"
-                          }`}
+                          className="flex flex-row items-center justify-center rounded-full border border-[#F83B4F]"
+                          style={{
+                            height: 40,
+                          }}
                         >
                           <FontAwesome6
                             name="location-dot"
                             size={20}
-                            color={
-                              selectedItem?.latitude && selectedItem?.longitude
-                                ? "#F83B4F"
-                                : "#9DB2CE"
-                            }
+                            color="#F83B4F"
                           />
-                          <Text
-                            className={`text-base font-semibold ml-2 ${
-                              selectedItem?.latitude && selectedItem?.longitude
-                                ? "text-[#000000]"
-                                : "text-[#9DB2CE]"
-                            }`}
-                          >
+                          <Text className="text-base font-semibold ml-2 text-[#000000]">
                             {t("VisitPopup.Location")}
                           </Text>
                         </View>

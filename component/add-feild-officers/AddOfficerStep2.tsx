@@ -141,6 +141,8 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
 
+  const stripLeadingSpaces = (text: string) => text.replace(/^\s+/, "");
+
   const [availableProvinces, setAvailableProvinces] = useState<
     Array<{ name: { en: string; si: string; ta: string } }>
   >([]);
@@ -164,7 +166,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
       () => {
         navigation.navigate("AddOfficerStep1", { isnew: false });
         return true;
-      }
+      },
     );
 
     return () => backHandler.remove();
@@ -269,20 +271,23 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
   };
 
   const handleHousePlotNoChange = (text: string) => {
+    const filteredText = stripLeadingSpaces(text);
     clearFieldError("housePlotNo");
-    if (text.length === 0) {
+    if (filteredText.length === 0) {
       setErrors((prev) => ({
         ...prev,
         housePlotNo: t("Error.HousePlotNumberIsRequired"),
       }));
     }
-    setHousePlotNo(text);
+    setHousePlotNo(filteredText);
   };
 
   const handleStreetNameChange = (text: string) => {
     clearFieldError("streetName");
-    const capitalizedText = text.charAt(0).toUpperCase() + text.slice(1);
-    if (text.length === 0) {
+    const filteredText = stripLeadingSpaces(text);
+    const capitalizedText =
+      filteredText.charAt(0).toUpperCase() + filteredText.slice(1);
+    if (filteredText.length === 0) {
       setErrors((prev) => ({
         ...prev,
         streetName: t("Error.StreetNameIsRequired"),
@@ -293,13 +298,15 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
 
   const handleCityChange = (text: string) => {
     clearFieldError("city");
-    if (text.length === 0) {
+    const filteredText = stripLeadingSpaces(text);
+    if (filteredText.length === 0) {
       setErrors((prev) => ({
         ...prev,
         city: t("Error.CityIsRequired"),
       }));
     }
-    const capitalizedText = text.charAt(0).toUpperCase() + text.slice(1);
+    const capitalizedText =
+      filteredText.charAt(0).toUpperCase() + filteredText.slice(1);
     setCity(capitalizedText);
   };
 
@@ -344,7 +351,8 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
         accountHolderName: t("Error.AccountHoldersNameIsRequired"),
       }));
     }
-    const filteredText = text.replace(/[^a-zA-Z\s]/g, "");
+    const lettersOnly = text.replace(/[^a-zA-Z\s]/g, "");
+    const filteredText = stripLeadingSpaces(lettersOnly);
     const capitalizedText =
       filteredText.charAt(0).toUpperCase() + filteredText.slice(1);
     setAccountHolderName(capitalizedText);
@@ -367,7 +375,7 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
     if (text.length === 0) {
       setErrors((prev) => ({
         ...prev,
-        confirmAccountNumber: t("Error.Confirm account number is required"),
+        confirmAccountNumber: t("Error.ConfirmAccountNumberIsRequired"),
       }));
     }
     if (text.length !== 0 && accountNumber && text !== accountNumber) {
@@ -655,14 +663,10 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
     if (!selectedBranch) newErrors.branch = t("Error.BranchIsRequired");
 
     if (commissionAmount && isNaN(parseFloat(commissionAmount))) {
-      newErrors.commissionAmount = t(
-        "Error.CommissionAmountMustBeANumber",
-      );
+      newErrors.commissionAmount = t("Error.CommissionAmountMustBeANumber");
     }
     if (commissionAmount && parseFloat(commissionAmount) > 100) {
-      newErrors.commissionAmount = t(
-        "Error.CommissionAmountCannotExceed100",
-      );
+      newErrors.commissionAmount = t("Error.CommissionAmountCannotExceed100");
     }
 
     setErrors(newErrors);

@@ -29,6 +29,7 @@ import {
   PersonalInfo,
 } from "@/database/inspectionpersonal";
 import { updateLastScreen } from "@/database/inspectionprogress";
+import GlobalSearchModal from "../commons/GlobalSearchModal";
 
 interface District {
   en: string;
@@ -353,7 +354,6 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
   });
 
   const [showDistrictDropdown, setShowDistrictDropdown] = useState(false);
-  const [districtSearch, setDistrictSearch] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState<string | null>(null);
   const [displayProvince, setDisplayProvince] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -362,7 +362,6 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
   const [displayCountry, setDisplayCountry] = useState(
     t("InspectionForm.SriLanka"),
   );
-  const [countrySearch, setCountrySearch] = useState("");
   const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
   const [isNextEnabled, setIsNextEnabled] = useState(false);
   const [isExistingData, setIsExistingData] = useState(false);
@@ -712,24 +711,21 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
     }
   };
 
-  const getFilteredDistricts = () => {
-    const countryDistricts = districts[selectedCountry] || [];
-    if (countryDistricts.length === 0) return [];
-    if (districtSearch.trim()) {
-      const searchTerm = districtSearch.toLowerCase();
-      return countryDistricts.filter(
-        (d) =>
-          d.en.toLowerCase().includes(searchTerm) ||
-          d.si.includes(districtSearch) ||
-          d.ta.includes(districtSearch),
-      );
-    }
-    return countryDistricts;
+  const getTranslatedDistrict = (district: {
+    en: string;
+    si: string;
+    ta: string;
+  }) => {
+    const lang = i18n.language;
+    return district[lang as keyof typeof district] || district.en;
   };
 
-  const clearSearch = () => setDistrictSearch("");
+  const selectDistrict = (districtEn: string) => {
+    const district = (districts[selectedCountry] || []).find(
+      (d) => d.en === districtEn,
+    );
+    if (!district) return;
 
-  const selectDistrict = (district: { en: string; si: string; ta: string }) => {
     setSelectedDistrict(district.en);
     const province = sriLankaData["Sri Lanka"].provinces.find((prov) =>
       prov.districts.some((d) => d.en === district.en),
@@ -752,82 +748,12 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
       return newErrors;
     });
     setShowDistrictDropdown(false);
-    setDistrictSearch("");
   };
 
-  useEffect(() => {
-    if (!showDistrictDropdown) {
-      setDistrictSearch("");
-    }
-  }, [showDistrictDropdown]);
+  const handleCountrySelect = (countryEn: string) => {
+    const country = countryData.find((c) => c.name.en === countryEn);
+    if (!country) return;
 
-  const getFilteredCountries = () => {
-    if (!countryData || countryData.length === 0) return [];
-    if (!countrySearch) return countryData;
-    const term = countrySearch.toLowerCase();
-    return countryData.filter(
-      (c) =>
-        c.name.en.toLowerCase().includes(term) ||
-        c.name.si.includes(countrySearch) ||
-        c.name.ta.includes(countrySearch),
-    );
-  };
-
-  const getTranslatedDistrict = (district: {
-    en: string;
-    si: string;
-    ta: string;
-  }) => {
-    const lang = i18n.language;
-    return district[lang as keyof typeof district] || district.en;
-  };
-
-  const renderDistrictItem = ({
-    item,
-  }: {
-    item: { en: string; si: string; ta: string };
-  }) => (
-    <TouchableOpacity
-      className="px-4 py-3"
-      onPress={() => selectDistrict(item)}
-    >
-      <Text className="text-base text-gray-800">
-        {getTranslatedDistrict(item)}
-      </Text>
-    </TouchableOpacity>
-  );
-
-  const renderDistrictSearchInput = () => (
-    <View className="px-4 py-2 border-b border-gray-200">
-      <View className="bg-gray-100 h-[50px] rounded-3xl px-3 flex-row items-center">
-        <MaterialIcons name="search" size={20} color="#666" />
-        <TextInput
-          placeholder={
-            t("AddOfficer.SearchDistrict...") || "Search district..."
-          }
-          value={districtSearch}
-          onChangeText={setDistrictSearch}
-          className="ml-2 text-gray-800"
-          style={{
-            flex: 1,
-            minWidth: 0,
-            paddingVertical: 0,
-            fontSize: 16,
-            height: "100%",
-          }}
-          placeholderTextColor="#7F7F7F"
-          autoCapitalize="none"
-        />
-        {districtSearch ? (
-          <TouchableOpacity onPress={clearSearch}>
-            <MaterialIcons name="close" size={20} color="#666" />
-          </TouchableOpacity>
-        ) : null}
-      </View>
-    </View>
-  );
-
-  const handleCountrySelect = (country: any) => {
     setSelectedDistrict(null);
     setSelectedProvince(null);
     setDisplayProvince("");
@@ -843,37 +769,6 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
     });
     setShowCountryDropdown(false);
   };
-
-  const renderSearchInput = (
-    value: string,
-    onChangeText: (text: string) => void,
-    placeholder: string,
-  ) => (
-    <View className="px-4 py-2 border-b border-gray-200">
-      <View className="bg-gray-100 h-[50px] rounded-3xl px-3 flex-row items-center">
-        <MaterialIcons name="search" size={20} color="#666" />
-        <TextInput
-          placeholder={placeholder}
-          value={value}
-          onChangeText={onChangeText}
-          className="flex-1 ml-2 text-base"
-          placeholderTextColor="#666"
-          style={{
-            flex: 1,
-            minWidth: 0,
-            paddingVertical: 0,
-            fontSize: 16,
-            height: "100%",
-          }}
-        />
-        {value ? (
-          <TouchableOpacity onPress={() => onChangeText("")}>
-            <MaterialIcons name="close" size={20} color="#666" />
-          </TouchableOpacity>
-        ) : null}
-      </View>
-    </View>
-  );
 
   const handleExit = () => {
     navigation.navigate("Main", {
@@ -905,6 +800,26 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
       });
     }
   };
+
+  // Data shaped for GlobalSearchModal
+  const countryModalData = countryData.map((c) => ({
+    label: c.name[i18n.language as keyof typeof c.name] || c.name.en,
+    value: c.name.en,
+    en: c.name.en,
+    si: c.name.si,
+    ta: c.name.ta,
+    emoji: c.emoji,
+    dial_code: c.dial_code,
+    code: c.code,
+  }));
+
+  const districtModalData = (districts[selectedCountry] || []).map((d) => ({
+    label: getTranslatedDistrict(d),
+    value: d.en,
+    en: d.en,
+    si: d.si,
+    ta: d.ta,
+  }));
 
   return (
     <KeyboardAvoidingView
@@ -1155,10 +1070,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
                   </Text>
                 </Text>
                 <TouchableOpacity
-                  onPress={() => {
-                    setDistrictSearch("");
-                    setShowDistrictDropdown(true);
-                  }}
+                  onPress={() => setShowDistrictDropdown(true)}
                   activeOpacity={0.8}
                 >
                   <View className="bg-[#F6F6F6] rounded-full px-5 py-4 flex-row items-center justify-between">
@@ -1210,104 +1122,53 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
         </ScrollView>
       </View>
 
-      <Modal
+      <GlobalSearchModal
         visible={showDistrictDropdown}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => {
-          setShowDistrictDropdown(false);
-          setDistrictSearch("");
+        onClose={() => setShowDistrictDropdown(false)}
+        title={t("AddOfficer.SelectDistricts")}
+        data={districtModalData}
+        selectedItems={selectedDistrict ? [selectedDistrict] : []}
+        onSelect={(items) => {
+          if (items.length > 0) selectDistrict(items[0]);
         }}
-      >
-        <View className="flex-1 bg-black/50 justify-center items-center">
-          <View className="bg-white rounded-2xl w-10/12 max-h-3/4">
-            <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
-              <Text className="text-lg font-semibold">
-                {t("AddOfficer.SelectDistricts")}
-              </Text>
-              <TouchableOpacity
-                onPress={() => {
-                  setShowDistrictDropdown(false);
-                  setDistrictSearch("");
-                }}
-              >
-                <MaterialIcons name="close" size={24} color="#666" />
-              </TouchableOpacity>
-            </View>
+        searchPlaceholder={
+          t("AddOfficer.SearchDistrict...") || "Search district..."
+        }
+        noResultsText={
+          t("AddOfficer.NoDistrictsFound") || "No districts found"
+        }
+        searchKeys={["en", "si", "ta"]}
+      />
 
-            {renderDistrictSearchInput()}
-
-            <FlatList
-              data={getFilteredDistricts()}
-              keyExtractor={(item) => item.en}
-              renderItem={renderDistrictItem}
-              showsVerticalScrollIndicator={false}
-              className="max-h-64"
-              ItemSeparatorComponent={() => (
-                <View className="h-[1px] bg-gray-200 mx-4" />
-              )}
-              ListEmptyComponent={
-                <View className="px-4 py-8 items-center">
-                  <Text className="text-gray-500 text-base">
-                    {t("AddOfficer.NoDistrictsFound")}
-                  </Text>
-                </View>
-              }
-            />
-          </View>
-        </View>
-      </Modal>
-
-      <Modal
+      <GlobalSearchModal
         visible={showCountryDropdown}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setShowCountryDropdown(false)}
-      >
-        <View className="flex-1 bg-black/50 justify-center items-center">
-          <View className="bg-white rounded-2xl w-10/12 max-h-3/4">
-            <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
-              <Text className="text-lg font-semibold">
-                {t("AddOfficer.SelectCountry")}
-              </Text>
-              <TouchableOpacity onPress={() => setShowCountryDropdown(false)}>
-                <MaterialIcons name="close" size={24} color="#666" />
-              </TouchableOpacity>
-            </View>
+        onClose={() => setShowCountryDropdown(false)}
+        title={t("AddOfficer.SelectCountry")}
+        data={countryModalData}
+        selectedItems={selectedCountry ? [selectedCountry] : []}
+        onSelect={(items) => {
+          if (items.length > 0) handleCountrySelect(items[0]);
+        }}
+        searchPlaceholder={
+          t("AddOfficer.SearchCountry...") || "Search country..."
+        }
+        noResultsText={t("AddOfficer.NoCountryFound") || "No country found"}
+        searchKeys={["en", "si", "ta"]}
+        renderItem={(item, isSelected, onToggle) => (
+          <TouchableOpacity
+            key={item.value}
+            className="px-4 py-3 flex-row items-center border-b border-gray-200"
+            onPress={onToggle}
+          >
+            <Text className="text-2xl w-10">{item.emoji}</Text>
+           
+            <Text className="text-base text-gray-800 font-medium flex-1">
+              {item.label}
+            </Text>
+          </TouchableOpacity>
+        )}
+      />
 
-            {renderSearchInput(
-              countrySearch,
-              setCountrySearch,
-              t("AddOfficer.SearchCountry..."),
-            )}
-
-            <FlatList
-              data={getFilteredCountries()}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  className="px-4 py-3 flex-row items-center"
-                  onPress={() => handleCountrySelect(item)}
-                >
-                  <Text className="text-2xl w-10">{item.emoji}</Text>
-                  <Text className="text-sm text-gray-600 w-12">
-                    {item.dial_code}
-                  </Text>
-                  <Text className="text-base text-gray-800 font-medium flex-1">
-                    {item.name[i18n.language as keyof typeof item.name] ||
-                      item.name.en}
-                  </Text>
-                </TouchableOpacity>
-              )}
-              keyExtractor={(item) => item.code}
-              showsVerticalScrollIndicator={false}
-              className="max-h-96"
-              ItemSeparatorComponent={() => (
-                <View className="h-[1px] bg-gray-200 mx-4" />
-              )}
-            />
-          </View>
-        </View>
-      </Modal>
       <FormFooterButton
         exitText={t("InspectionForm.Exit")}
         nextText={t("InspectionForm.Next")}

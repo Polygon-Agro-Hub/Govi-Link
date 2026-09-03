@@ -34,7 +34,6 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
   const [isOtpExpired, setIsOtpExpired] = useState<boolean>(false);
   const [isActive, setIsActive] = useState<boolean>(true);
 
-  // Check if OTP is valid whenever otpCode changes
   useEffect(() => {
     const isValid = otpCode.every((digit) => digit !== "");
     setIsOtpValid(isValid);
@@ -419,10 +418,15 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
                 ref={(el: TextInput | null) => {
                   inputRefs.current[index] = el;
                 }}
-                className={`w-14 h-14 text-center text-xl rounded-lg ${otpCode[index]
-                  ? "bg-[#FF1D85] text-white"
-                  : "bg-[#FFE8F3] text-black"
-                  }`}
+                 style={{
+                  width: 50,
+                  height: 50,
+                  textAlign: "center",
+                  fontSize: 20,
+                  borderRadius: 8,
+                  backgroundColor: otpCode[index] ? "#FF1D85" : "#FFE8F3",
+                  color: otpCode[index] ? "#FFFFFF" : "#000000",
+                }}
                 keyboardType="number-pad"
                 maxLength={1}
                 value={otpCode[index] || ""}
@@ -430,6 +434,7 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
                 onKeyPress={(e) => handleKeyPress(e, index)}
                 selectionColor="#FF1D85"
                 textAlign="center"
+                cursorColor={otpCode[index] ? "#FFFFFF" : "#FF1D85"}
               />
             ))}
           </View>
@@ -482,8 +487,12 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
                 colors={!isOtpValid || isVerified ? ["#CCCCCC", "#CCCCCC"] : ["#F35125", "#FF1D85"]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
-                className="flex-1 items-center justify-center"
-                style={{ overflow: "hidden" }}
+                style={{
+                  flex: 1,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  overflow: "hidden",
+                }}
               >
                 <Text className="text-white text-lg font-semibold">
                   {t("Otpverification.Verify")}
