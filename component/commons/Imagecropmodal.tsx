@@ -428,7 +428,7 @@ const styles = StyleSheet.create({
     borderColor: "#21202B",
   },
   processingOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: "rgba(0,0,0,0.4)",
     alignItems: "center",
     justifyContent: "center",
