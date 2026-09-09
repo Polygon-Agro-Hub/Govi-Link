@@ -784,7 +784,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
                         risk:
                           formattedText.trim() === ""
                             ? t(
-                                "WhatAreTheRisksYouAreAnticipatingInTheProposedCropCroppingSystemIsRequired",
+                                "Error.WhatAreTheRisksYouAreAnticipatingInTheProposedCropCroppingSystemIsRequired",
                               )
                             : "",
                       }));

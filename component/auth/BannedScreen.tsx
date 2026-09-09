@@ -115,9 +115,7 @@ const BannedScreen: React.FC<BannedScreenProps> = ({ route, navigation }) => {
             <Text className="text-black text-center font-bold text-3xl">
               {title}
             </Text>
-            <Text className="text-[#747474] text-center mt-4 text-base leading-6">
-              {description}
-            </Text>
+        
             <Text className="text-[#747474] text-center mt-2 text-base font-semibold">
               {t("Banned.PleaseContactPolygonCustomerSupportForFurtherDetails")}
             </Text>
