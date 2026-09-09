@@ -53,7 +53,7 @@ const FormFooterButton: React.FC<FormFooterButtonProps> = ({
       style={[
         containerStyle,
         {
-          paddingBottom: Platform.OS === "android" ? 8 : 12,
+          paddingBottom: Platform.OS === "android" ? 12 : 24,
         },
       ]}
     >

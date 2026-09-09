@@ -189,7 +189,7 @@ const RequestProblem: React.FC<RequestProblemProps> = ({ navigation }) => {
 
       if (response.data.success) {
         Alert.alert(
-          t("Success"),
+          t("Main.Success"),
           existingProblemId
             ? t("RequestProblem.ProblemUpdatedSuccessfully")
             : t("RequestProblem.ProblemSavedSuccessfully"),

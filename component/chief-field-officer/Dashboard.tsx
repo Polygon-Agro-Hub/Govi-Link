@@ -399,10 +399,13 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
       const url = `https://www.google.com/maps?q=${lat},${lon}`;
       Linking.openURL(url);
     } else {
-      Alert.alert(
-        t("VisitPopup.NoLocationTitle"),
-        t("VisitPopup.NoLocationMessage"),
-      );
+      setShowPopup(false);
+      setTimeout(() => {
+        Alert.alert(
+          t("VisitPopup.NoLocationTitle"),
+          t("VisitPopup.NoLocationMessage"),
+        );
+      }, 400);
     }
   };
 
@@ -786,7 +789,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                   resizeMode="contain"
                 />
                 <Text className="italic text-[#787878] mt-2 text-center">
-                  {t("Dashboard.NoJobsForToday")}
+                  {t("Dashboard.NoJobsForToday")} {""}
                 </Text>
               </View>
             )}
@@ -947,7 +950,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                     resizeMode="contain"
                   />
                   <Text className="italic text-[#787878] mt-4 text-center">
-                    {t("Dashboard.NoSavedDraftsForToday")}
+                    {t("Dashboard.NoSavedDraftsForToday")}  {" "}
                   </Text>
                 </View>
               )}

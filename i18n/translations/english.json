@@ -28,6 +28,7 @@
     "LastNameInTamilIsRequired": "Last name in Tamil is required",
     "MobileNumberIsRequired": "Mobile number is required",
     "NicNumberIsRequired": "NIC number is required",
+    "DrivingLicenseIdIsRequired": "Driving license ID is required",
     "EmailIsRequired": "Email is required",
     "PleaseSelectAtLeastOneDistrict": "Please select at least one district",
     "PleaseSelectAtLeastOnePreferredLanguage": "Please select at least one preferred language",
@@ -116,7 +117,12 @@
     "UnsupportedEmailDomain": "Please enter a valid email address with a supported domain (.com, .gov, .lk)",
     "PleaseSelectAJobBeforeAssigning": "Please select a job before assigning",
     "NewPasswordMustBeDifferentFromCurrentPassword": "New password must be different from current password",
-    "noOfDependents is required":"No. of Dependents is required"
+    "noOfDependents is required":"No. of Dependents is required",
+    "GalleryPermissionIsRequired":"Gallery permission is required",
+    "firstName is required": "First name is required",
+    "lastName is required": "Last name is required",
+    "otherName is required": "Other name is required",
+    "callName is required": "Call name is required"
   },
   "Login": {
     "Welcome": "Welcome!",
@@ -472,6 +478,7 @@
     "IDProof": "ID Proof",
     "IdProofType": "ID Proof Type",
     "InspectionForm": "Inspection Form",
+    "DrivingLicense": "Driving License",
     "FirstName": "First Name",
     "LastName": "Last Name",
     "OtherNames": "Other Names",

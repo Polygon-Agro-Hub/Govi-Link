@@ -404,7 +404,7 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
           <Animated.View style={{ opacity: addressOpacity }}>
             <View className="items-center mt-3">
               <Text className="text-xs text-[#4E6393] font-medium">
-                Address :
+               {t("VisitPopup.Address")}
               </Text>
             </View>
             <View className="items-center mt-1">

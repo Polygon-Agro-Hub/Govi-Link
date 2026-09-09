@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { View, Text, Modal, Animated, TouchableOpacity, Alert } from "react-native";
 import { FontAwesome5, Ionicons } from "@expo/vector-icons";
 import LottieView from "lottie-react-native";
+import { t } from "i18next";
 
 interface AlertModalProps {
   visible: boolean;
@@ -149,7 +150,7 @@ export const AlertModal: React.FC<AlertModalProps> = ({
                 activeOpacity={0.8}
                 className="bg-[#F2561D] py-3 px-6 rounded-full flex-row items-center justify-center gap-x-2 shadow-md"
               >
-                <Text className="text-white font-bold text-base">OK</Text>
+                <Text className="text-white font-bold text-base">{t("Main.OK")}</Text>
               </TouchableOpacity>
             )}
           </View>

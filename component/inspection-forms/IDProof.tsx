@@ -117,9 +117,9 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
   >(null);
 
   const idProofOptions = [
-    { key: "NIC Number", label: "NIC Number" },
-    { key: "Driving License ID", label: "Driving License" },
-  ];
+  { key: "NIC Number", label: "InspectionForm.NICNumber" },
+  { key: "Driving License ID", label: "InspectionForm.DrivingLicense" },
+];
 
   useEffect(() => {
     const timer = setTimeout(async () => {
@@ -652,7 +652,7 @@ const handleIdNumberChange = (input: string) => {
                   });
                 }}
               >
-                <Text className="text-base text-black">{option.label}</Text>
+                <Text className="text-base text-black">{t(option.label)}</Text>
               </TouchableOpacity>
             ))}
           </View>

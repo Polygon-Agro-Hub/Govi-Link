@@ -28,6 +28,7 @@
     "LastNameInTamilIsRequired": "Tamil last name is required",
     "MobileNumberIsRequired": "தொலைபேசி எண் தேவை.",
     "NicNumberIsRequired": "தேசிய அடையாள அட்டை எண் அவசியம்.",
+    "DrivingLicenseIdIsRequired": "ஓட்டுநர் உரிம அடையாள எண் தேவை",
     "EmailIsRequired": "மின்னஞ்சல் தேவை.",
     "PleaseSelectAtLeastOneDistrict": "At least one district is required",
     "PleaseSelectAtLeastOnePreferredLanguage": "At least one language is required",
@@ -116,7 +117,13 @@
     "UnsupportedEmailDomain": "ஆதரிக்கப்படும் டொமைனுடன் (.com, .gov, .lk) சரியான மின்னஞ்சல் முகவரியை உள்ளிடவும்",
     "PleaseSelectAJobBeforeAssigning": "ஒதுக்குவதற்கு முன் ஒரு பணியைத் தேர்ந்தெடுக்கவும்",
     "NewPasswordMustBeDifferentFromCurrentPassword":"புதிய கடவுச்சொல் தற்போதைய கடவுச்சொல்லிலிருந்து வேறுபட்டதாக இருக்க வேண்டும்.",
-    "noOfDependents is required":"சார்ந்திருப்பவர்களின் எண்ணிக்கை தேவைப்படுகிறது"
+    "noOfDependents is required":"சார்ந்திருப்பவர்களின் எண்ணிக்கை தேவைப்படுகிறது",
+    "GalleryPermissionIsRequired":"கேலரி அனுமதி தேவை",
+    "firstName is required": "முதற்பெயர் தேவை",
+    "lastName is required": "கடைசிப் பெயர் தேவை",
+    "otherName is required": "மற்ற பெயர் தேவை",
+    "callName is required": "அழைப்புப் பெயர் தேவை"
+
   },
   "Login": {
     "Welcome": "வரவேற்கிறோம்",
@@ -470,8 +477,9 @@
   },
   "InspectionForm": {
     "IDProof": "அடையாள சான்று",
-    "IdProofType": "IdProof Type",
+    "IdProofType": "அடையாள சான்று வகை",
     "InspectionForm": "ஆய்வு படிவம்",
+     "DrivingLicense": "ஓட்டுநர் உரிமம்",
     "FirstName": "முதல் பெயர்",
     "LastName": "கடைசி பெயர்",
     "OtherNames": "மற்ற பெயர்கள்",

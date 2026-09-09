@@ -272,7 +272,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ navigation }) => {
         animationType="slide"
       >
         <View className="flex-1 justify-center items-center bg-black bg-opacity-70">
-          <View className="bg-white rounded-lg w-72 h-80 items-center relative overflow-hidden">
+          <View className="bg-white rounded-lg w-72 h-64 items-center relative overflow-hidden">
             <Pressable
               onPress={() => setIsUnsuccessfulModalVisible(false)}
               className="absolute top-3 right-3 z-10"

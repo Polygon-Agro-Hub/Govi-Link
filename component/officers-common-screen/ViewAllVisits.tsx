@@ -27,6 +27,8 @@ import { RouteProp } from "@react-navigation/native";
 import NoDataComponent from "../commons/NoDataComponent";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/services/store";
+import LocationAccess from "../permission/LocationAccess";
+import * as Location from "expo-location";
 
 type ViewAllVisitsNavigationProps = StackNavigationProp<
   RootStackParamList,
@@ -145,6 +147,7 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
   });
   const [showPopup, setShowPopup] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [showLocationAccess, setShowLocationAccess] = useState(false);
   const scrollRef = React.useRef<ScrollView>(null);
   const translateY = useRef(new Animated.Value(0)).current;
 
@@ -255,7 +258,7 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
     );
   };
 
-  const handleLocationPress = () => {
+  const openFarmLocation = () => {
     if (selectedItem?.latitude && selectedItem?.longitude) {
       const lat = selectedItem.latitude;
       const lon = selectedItem.longitude;
@@ -266,14 +269,40 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
       setTimeout(() => {
         Alert.alert(
           t("VisitPopup.NoLocationTitle"),
-          t("VisitPopup.NoLocationMessage"),
+          t("VisitPopup.NoLocationMessage")
         );
       }, 400);
     }
   };
 
+  const handleLocationPermissionGranted = () => {
+    setShowLocationAccess(false);
+    openFarmLocation();
+  };
+
+  const handleLocationPress = async () => {
+    const { status } = await Location.getForegroundPermissionsAsync();
+    if (status !== "granted") {
+      setShowPopup(false);
+      setTimeout(() => setShowLocationAccess(true), 300);
+    } else {
+      openFarmLocation();
+    }
+  };
+
   const effectiveRole = userRole || storedRole;
   const shouldShowBackButton = effectiveRole === "Field Officer";
+
+  if (showLocationAccess) {
+    return (
+      <LocationAccess
+        navigation={navigation as any}
+        onPermissionGranted={handleLocationPermissionGranted}
+        returnScreen="ViewAllVisits"
+        onBackPress={() => setShowLocationAccess(false)}
+      />
+    );
+  }
 
   return (
     <View className="flex-1 bg-[#F5F7FB] pt-4">
