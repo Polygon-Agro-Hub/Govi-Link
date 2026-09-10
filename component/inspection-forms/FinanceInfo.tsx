@@ -729,14 +729,24 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     );
   };
 
-  const renderBankItem = ({ item }: { item: { id: number; name: string } }) => (
-    <TouchableOpacity
-      className="px-4 py-3 border-b border-gray-200 rounded-2xl"
-      onPress={() => handleBankSelect(item)}
-    >
-      <Text className="text-base text-gray-800">{item.name}</Text>
-    </TouchableOpacity>
-  );
+  const renderBankItem = ({
+    item,
+    index,
+  }: {
+    item: { id: number; name: string };
+    index: number;
+  }) => {
+    const filteredBanks = getFilteredBanks();
+    const isLast = index === filteredBanks.length - 1;
+    return (
+      <TouchableOpacity
+        className={`px-4 py-3 ${!isLast ? "border-b border-gray-200" : ""}`}
+        onPress={() => handleBankSelect(item)}
+      >
+        <Text className="text-base text-gray-800">{item.name}</Text>
+      </TouchableOpacity>
+    );
+  };
 
   const renderEmptyBankList = () => (
     <View className="px-4 py-6 items-center">
@@ -773,16 +783,22 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
 
   const renderBranchItem = ({
     item,
+    index,
   }: {
     item: { ID: number; name: string };
-  }) => (
-    <TouchableOpacity
-      className="px-4 py-3 border-b border-gray-200 rounded-2xl"
-      onPress={() => handleBranchSelect(item)}
-    >
-      <Text className="text-base text-gray-800">{item.name}</Text>
-    </TouchableOpacity>
-  );
+    index: number;
+  }) => {
+    const filteredBranches = getFilteredBranches();
+    const isLast = index === filteredBranches.length - 1;
+    return (
+      <TouchableOpacity
+        className={`px-4 py-3 ${!isLast ? "border-b border-gray-200" : ""}`}
+        onPress={() => handleBranchSelect(item)}
+      >
+        <Text className="text-base text-gray-800">{item.name}</Text>
+      </TouchableOpacity>
+    );
+  };
 
   const renderSearchInput = (
     value: string,
@@ -912,7 +928,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
       style={{ flex: 1, backgroundColor: "white" }}
     >
       <View className="flex-1 bg-[#F3F3F3]">
@@ -1255,7 +1271,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
           onRequestClose={() => handleModalClose("bank")}
         >
           <View className="flex-1 bg-black/50 justify-center items-center">
-            <View className="bg-white rounded-2xl w-10/12 max-h-3/4">
+            <View className="bg-white rounded-2xl w-10/12 max-h-3/4 overflow-hidden">
               <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
                 <Text className="text-lg font-semibold">
                   {t("AddOfficer.SelectBank")}
@@ -1288,7 +1304,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
           onRequestClose={() => handleModalClose("branch")}
         >
           <View className="flex-1 bg-black/50 justify-center items-center">
-            <View className="bg-white rounded-2xl w-10/12 max-h-3/4">
+            <View className="bg-white rounded-2xl w-10/12 max-h-3/4 overflow-hidden">
               <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
                 <Text className="text-lg font-semibold">
                   {t("AddOfficer.SelectBranch")}

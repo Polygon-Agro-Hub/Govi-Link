@@ -457,9 +457,8 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
       style={{ flex: 1, backgroundColor: "white" }}
-      keyboardVerticalOffset={Platform.OS === "android" ? -200 : 0}
     >
       <View className="flex-1 bg-[#F3F3F3]">
         <FormTabs

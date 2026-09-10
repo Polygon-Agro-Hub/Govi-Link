@@ -823,9 +823,8 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
 
   return (
     <KeyboardAvoidingView
-      behavior="padding"
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
       style={{ flex: 1, backgroundColor: "white" }}
-      keyboardVerticalOffset={Platform.OS === "android" ? -200 : 0}
     >
       <View className="flex-1 bg-[#F3F3F3]">
         <FormTabs
@@ -1120,6 +1119,13 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             </>
           )}
         </ScrollView>
+        <FormFooterButton
+          exitText={t("InspectionForm.Exit")}
+          nextText={t("InspectionForm.Next")}
+          isNextEnabled={isNextEnabled}
+          onExit={handleExit}
+          onNext={handleNext}
+        />
       </View>
 
       <GlobalSearchModal
@@ -1154,10 +1160,12 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
         }
         noResultsText={t("AddOfficer.NoCountryFound") || "No country found"}
         searchKeys={["en", "si", "ta"]}
-        renderItem={(item, isSelected, onToggle) => (
+        renderItem={(item, isSelected, onToggle, isLast) => (
           <TouchableOpacity
             key={item.value}
-            className="px-4 py-3 flex-row items-center border-b border-gray-200"
+            className={`px-4 py-3 flex-row items-center ${
+              !isLast ? "border-b border-gray-200" : ""
+            }`}
             onPress={onToggle}
           >
             <Text className="text-2xl w-10">{item.emoji}</Text>
@@ -1167,14 +1175,6 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             </Text>
           </TouchableOpacity>
         )}
-      />
-
-      <FormFooterButton
-        exitText={t("InspectionForm.Exit")}
-        nextText={t("InspectionForm.Next")}
-        isNextEnabled={isNextEnabled}
-        onExit={handleExit}
-        onNext={handleNext}
       />
     </KeyboardAvoidingView>
   );
