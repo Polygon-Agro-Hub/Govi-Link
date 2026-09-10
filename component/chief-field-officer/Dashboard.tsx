@@ -104,7 +104,6 @@ interface DraftVisit {
 const LoadingSkeleton = () => {
   const rectWidth = wp("38%");
   const gapBetweenRects = wp("8%");
-  const totalWidth = 2 * rectWidth + gapBetweenRects;
 
   return (
     <View
@@ -532,7 +531,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
       : text;
   };
   return (
-    <View className="flex bg-white">
+    <View className="flex-1 bg-white">
       <ScrollView
         className="bg-white p-3"
         refreshControl={

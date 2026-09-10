@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { View, Image, Text, Animated } from "react-native";
+import { View, Image, Text, Animated, StyleSheet } from "react-native";
 import * as Progress from "react-native-progress";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -115,11 +115,10 @@ const Splash: React.FC = () => {
   };
 
   return (
-    <View className="bg-white flex-1 justify-center items-center">
+    <View className="bg-white flex-1 justify-center items-center relative">
       <Image source={logo} className="w-full h-48" resizeMode="contain" />
-      <Text className="mt-4 text-gray-700">POWERED POLYGON</Text>
 
-      <View className=" mt-6">
+      <View className="mt-6">
         <Progress.Bar
           progress={progress}
           animated={false}
@@ -130,8 +129,29 @@ const Splash: React.FC = () => {
           width={200}
         />
       </View>
+
+      <View style={styles.poweredByContainer}>
+        <Text style={styles.poweredByText}>POWERED BY POLYGON</Text>
+      </View>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  poweredByContainer: {
+    position: "absolute",
+    bottom: 24,
+    left: 0,
+    right: 0,
+    alignItems: "center",
+  },
+  poweredByText: {
+    fontSize: 16,
+    color: "#000000",
+    fontWeight: "400",
+    letterSpacing: 0.3,
+    opacity: 0.6,
+  },
+});
 
 export default Splash;

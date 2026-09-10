@@ -7,19 +7,18 @@ import {
   Alert,
   BackHandler,
   Dimensions,
-  StatusBar,
   Linking,
+  ScrollView,
+  Platform,
+  StatusBar,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../types/types";
 import { useTranslation } from "react-i18next";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Location from "expo-location";
+import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 import CustomHeader from "../commons/CustomHeader";
 
 type LocationAccessNavigationProp = StackNavigationProp<
@@ -30,6 +29,7 @@ type LocationAccessNavigationProp = StackNavigationProp<
 interface LocationAccessProps {
   navigation: LocationAccessNavigationProp;
   onPermissionGranted?: () => void;
+  onClose?: () => void;
   returnScreen?: keyof RootStackParamList;
   onBackPress?: () => void;
 }
@@ -39,37 +39,37 @@ const locationImage = require("../../assets/images/permission/location.png");
 const LocationAccess: React.FC<LocationAccessProps> = ({
   navigation,
   onPermissionGranted,
+  onClose,
   returnScreen = "Main",
   onBackPress,
 }) => {
   const { t } = useTranslation();
-  const screenWidth = Dimensions.get("window").width;
   const [isLoading, setIsLoading] = useState(false);
 
-  const dynamicStyles = {
-    imageHeight: screenWidth < 400 ? wp(55) : wp(50),
-  };
-
-  const handleBack = () => {
-    if (onBackPress) {
+  const handleDenyOrClose = () => {
+    if (onClose) {
+      onClose();
+    } else if (onBackPress) {
       onBackPress();
-    } else if (navigation?.goBack) {
+    } else if (navigation?.canGoBack && navigation.canGoBack()) {
       navigation.goBack();
+    } else {
+      navigation.navigate(returnScreen as any);
     }
   };
 
   useFocusEffect(
     React.useCallback(() => {
-      const onHardwareBackPress = () => {
-        handleBack();
+      const handleHardwareBackPress = () => {
+        handleDenyOrClose();
         return true;
       };
       const subscription = BackHandler.addEventListener(
         "hardwareBackPress",
-        onHardwareBackPress,
+        handleHardwareBackPress,
       );
       return () => subscription.remove();
-    }, [navigation, onBackPress]),
+    }, [navigation, onClose, onBackPress, returnScreen]),
   );
 
   const requestLocationPermission = async () => {
@@ -85,13 +85,30 @@ const LocationAccess: React.FC<LocationAccessProps> = ({
         }
       } else if (status === "denied") {
         Alert.alert(
-          t("Permission.PermissionDenied") || "Permission Denied",
-          t("Permission.LocationAccessIsRequiredPleaseEnableItInSettings") ||
-            "Location access is required. Please enable it in settings.",
+          t("LocationAccess.PermissionDenied") ||
+          t("Permission.PermissionDenied") ||
+          "Permission Denied",
+          t(
+            "LocationAccess.LocationAccessIsRequiredPleaseEnableItInSettings",
+          ) ||
+          t(
+            "Permission.LocationAccessIsRequiredPleaseEnableItInSettings",
+          ) ||
+          "Location access is required for this feature. Please enable it in settings.",
           [
-            { text: t("Main.Cancel") || "Cancel", style: "cancel" },
             {
-              text: t("Permission.OpenSettings") || "Open Settings",
+              text:
+                t("LocationAccess.NotNow") ||
+                t("Main.Cancel") ||
+                "Not Now",
+              style: "cancel",
+              onPress: handleDenyOrClose,
+            },
+            {
+              text:
+                t("LocationAccess.OpenSettings") ||
+                t("Permission.OpenSettings") ||
+                "Open Settings",
               onPress: () => Linking.openSettings(),
             },
           ],
@@ -100,9 +117,11 @@ const LocationAccess: React.FC<LocationAccessProps> = ({
     } catch (error) {
       console.error("Error requesting location permission:", error);
       Alert.alert(
-        t("Main.Sorry"),
-        t("Permission.UnableToRequestLocationPermissionPleaseTryAgain"),
-        [{ text: t("PublicForum.OK") || "OK" }],
+        t("Main.Error") || "Error",
+        t("LocationAccess.UnableToRequestLocationPermissionPleaseTryAgain") ||
+        t("Permission.UnableToRequestLocationPermissionPleaseTryAgain") ||
+        "Unable to request location permission. Please try again.",
+        [{ text: t("Main.OK") || "OK" }],
       );
     } finally {
       setIsLoading(false);
@@ -110,78 +129,168 @@ const LocationAccess: React.FC<LocationAccessProps> = ({
   };
 
   return (
-    <View className="flex-1 bg-black">
-      <StatusBar barStyle="light-content" backgroundColor="#000000" />
-
+    <View className="flex-1 bg-[#121212]">
+      <StatusBar barStyle="light-content" backgroundColor="#121212" />
       <CustomHeader
         title=""
         navigation={navigation}
-        onBackPress={handleBack}
-        transparent
+        onBackPress={handleDenyOrClose}
+        backgroundColor="#121212"
+        backButtonColor="white"
       />
-
-      <View className="flex-1 justify-center">
-        <View className="items-center justify-center px-4">
-          {/* Location Image */}
+      <ScrollView
+        className="flex-1 px-5"
+        contentContainerStyle={{ flexGrow: 1, paddingBottom: 32 }}
+        showsVerticalScrollIndicator={false}
+      >
+        <View className="items-center justify-center mt-4 mb-4">
           <Image
             source={locationImage}
+            className="w-32 h-32"
             resizeMode="contain"
-            style={{ height: dynamicStyles.imageHeight, width: "100%" }}
           />
+        </View>
 
-          {/* Title */}
-          <Text className="text-white font-bold text-center mt-8 text-2xl">
-            {t("Permission.LocationAccess") || "Location Access"}
-          </Text>
+        {/* Title */}
+        <Text className="text-white text-2xl font-bold text-center mb-2">
+          {t("LocationAccess.ProminentDisclosureTitle") ||
+            "Why GoViLink Uses Location Data"}
+        </Text>
 
-          {/* Description */}
-          <Text className="text-gray-400 text-center mt-4 px-8 text-base">
-            {t("Permission.EnableLocationAccessToAccessLocationInformation") ||
-              "Enable location access to access location information for better service delivery and personalized experience."}
-          </Text>
+        {/* Intro */}
+        <Text className="text-gray-300 text-sm text-center mb-5 leading-5">
+          {t("LocationAccess.ProminentDisclosureIntro") ||
+            "GoViLink collects and uses your device's location data to enable the following core field operations:"}
+        </Text>
 
-          {/* Allow Button */}
-          <View className="mt-20 w-full items-center">
-            <View
-              className="w-2/3 rounded-full"
-              style={{
-                shadowColor: "#009570",
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.3,
-                shadowRadius: 8,
-                elevation: 8,
-                backgroundColor: "transparent",
-              }}
-            >
-              <TouchableOpacity
-                onPress={requestLocationPermission}
-                disabled={isLoading}
-                activeOpacity={0.8}
-              >
-                <LinearGradient
-                  colors={["#EE8D5F", "#B31A51"]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  style={{
-                    width: "100%",
-                    height: 50,
-                    borderRadius: 9999,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    overflow: "hidden",
-                  }}
-                >
-                  <Text className="text-white font-semibold text-center text-lg">
-                    {isLoading
-                      ? t("Permission.Requesting...") || "Requesting..."
-                      : t("Permission.Allow")}
-                  </Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            </View>
+        {/* Feature 1: Navigation & Field Visits */}
+        <View className="bg-[#1E1E1E] p-4 rounded-xl mb-3 border border-gray-800 flex-row items-start">
+          <View
+            className="p-2.5 rounded-lg mr-3 mt-0.5"
+            style={{
+              backgroundColor: "rgba(238, 141, 95, 0.15)",
+              borderWidth: 1,
+              borderColor: "rgba(238, 141, 95, 0.3)",
+            }}
+          >
+            <MaterialCommunityIcons
+              name="map-marker-path"
+              size={24}
+              color="#EE8D5F"
+            />
+          </View>
+          <View className="flex-1">
+            <Text className="text-white font-semibold text-base mb-1">
+              {t("LocationAccess.FeatureNavTitle") ||
+                "Farm & Cluster Visit Navigation"}
+            </Text>
+            <Text className="text-gray-400 text-xs leading-4">
+              {t("LocationAccess.FeatureNavDesc") ||
+                "Provide real-time routing to farms, verify field officer arrival at scheduled clusters, and log field visits accurately."}
+            </Text>
           </View>
         </View>
-      </View>
+
+        {/* Feature 2: Geolocation & Land Auditing */}
+        <View className="bg-[#1E1E1E] p-4 rounded-xl mb-4 border border-gray-800 flex-row items-start">
+          <View
+            className="p-2.5 rounded-lg mr-3 mt-0.5"
+            style={{
+              backgroundColor: "rgba(179, 26, 81, 0.15)",
+              borderWidth: 1,
+              borderColor: "rgba(179, 26, 81, 0.3)",
+            }}
+          >
+            <MaterialCommunityIcons
+              name="crosshairs-gps"
+              size={24}
+              color="#EE8D5F"
+            />
+          </View>
+          <View className="flex-1">
+            <Text className="text-white font-semibold text-base mb-1">
+              {t("LocationAccess.FeatureAuditTitle") ||
+                "Farm Geolocation & Land Auditing"}
+            </Text>
+            <Text className="text-gray-400 text-xs leading-4">
+              {t("LocationAccess.FeatureAuditDesc") ||
+                "Tag and verify exact GPS coordinates during capital investment requests, crop problem audits, and land inspections."}
+            </Text>
+          </View>
+        </View>
+
+        {/* Privacy Note */}
+        <View
+          className="p-3 rounded-lg mb-6 flex-row items-start"
+          style={{
+            backgroundColor: "rgba(179, 26, 81, 0.1)",
+            borderWidth: 1,
+            borderColor: "rgba(238, 141, 95, 0.25)",
+          }}
+        >
+          <Ionicons
+            name="shield-checkmark-outline"
+            size={18}
+            color="#EE8D5F"
+            style={{ marginTop: 2, marginRight: 8 }}
+          />
+          <Text className="text-gray-300 text-xs flex-1 leading-4">
+            {t("LocationAccess.DisclosureFooter") ||
+              "Your location data is only accessed while using these features and is handled securely according to our Privacy Policy. We do not sell your location data or use it for background tracking."}
+          </Text>
+        </View>
+
+        {/* Action Buttons */}
+        <View className="items-center w-full mt-auto">
+          <TouchableOpacity
+            onPress={requestLocationPermission}
+            activeOpacity={0.8}
+            disabled={isLoading}
+            className="w-full mb-3"
+            style={{ borderRadius: 999, overflow: "hidden" }}
+          >
+            <LinearGradient
+              colors={["#EE8D5F", "#B31A51"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={{
+                height: 52,
+                borderRadius: 999,
+                alignItems: "center",
+                justifyContent: "center",
+                width: "100%",
+              }}
+            >
+              <View className="flex-row items-center justify-center">
+                <Ionicons
+                  name="location-outline"
+                  size={20}
+                  color="#FFFFFF"
+                  style={{ marginRight: 8 }}
+                />
+                <Text className="text-white font-extrabold text-base tracking-wide">
+                  {isLoading
+                    ? t("LocationAccess.Requesting...") ||
+                    t("Permission.Requesting...") ||
+                    "Requesting..."
+                    : t("LocationAccess.AgreeAndContinue") ||
+                    "Agree & Continue"}
+                </Text>
+              </View>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={handleDenyOrClose}
+            activeOpacity={0.7}
+            className="py-2.5 px-6 items-center justify-center"
+          >
+            <Text className="text-gray-400 font-semibold text-sm">
+              {t("LocationAccess.NotNow") || "Not Now"}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </View>
   );
 };

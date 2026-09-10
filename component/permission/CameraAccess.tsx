@@ -7,20 +7,18 @@ import {
   Alert,
   BackHandler,
   Dimensions,
-  StatusBar,
   Linking,
-  ActivityIndicator,
+  ScrollView,
+  Platform,
+  StatusBar,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../types/types";
 import { useTranslation } from "react-i18next";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
 import { LinearGradient } from "expo-linear-gradient";
 import { Camera } from "expo-camera";
+import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 import CustomHeader from "../commons/CustomHeader";
 
 type CameraAccessNavigationProp = StackNavigationProp<
@@ -31,7 +29,9 @@ type CameraAccessNavigationProp = StackNavigationProp<
 interface CameraAccessProps {
   navigation: CameraAccessNavigationProp;
   onPermissionGranted?: () => void;
+  onClose?: () => void;
   returnScreen?: keyof RootStackParamList;
+  onBackPress?: () => void;
 }
 
 const cameraImage = require("../../assets/images/permission/camera.png");
@@ -39,73 +39,37 @@ const cameraImage = require("../../assets/images/permission/camera.png");
 const CameraAccess: React.FC<CameraAccessProps> = ({
   navigation,
   onPermissionGranted,
+  onClose,
   returnScreen = "Main",
+  onBackPress,
 }) => {
   const { t } = useTranslation();
-  const screenWidth = Dimensions.get("window").width;
   const [isLoading, setIsLoading] = useState(false);
-  // Start as "checking" so we don't flash the permission UI (or trigger a
-  // native prompt) before we know whether permission is already granted.
-  const [isCheckingPermission, setIsCheckingPermission] = useState(true);
 
-  const dynamicStyles = {
-    imageHeight: screenWidth < 400 ? wp(55) : wp(50),
-  };
-
-  const proceed = () => {
-    if (onPermissionGranted) {
-      onPermissionGranted();
+  const handleDenyOrClose = () => {
+    if (onClose) {
+      onClose();
+    } else if (onBackPress) {
+      onBackPress();
+    } else if (navigation?.canGoBack && navigation.canGoBack()) {
+      navigation.goBack();
     } else {
-      // replace (not navigate) so this permission screen isn't left in the
-      // back stack once we've skipped past it
-      navigation.replace(returnScreen as any);
+      navigation.navigate(returnScreen as any);
     }
   };
 
-  // On mount / whenever this screen regains focus, silently check current
-  // permission status (getCameraPermissionsAsync never shows a dialog).
-  // If it's already granted, skip this screen entirely - no UI, no prompt.
   useFocusEffect(
     React.useCallback(() => {
-      let isActive = true;
-
-      const checkPermission = async () => {
-        try {
-          const { status } = await Camera.getCameraPermissionsAsync();
-          if (!isActive) return;
-
-          if (status === "granted") {
-            proceed();
-            return;
-          }
-          setIsCheckingPermission(false);
-        } catch (error) {
-          console.error("Error checking camera permission:", error);
-          if (isActive) setIsCheckingPermission(false);
-        }
-      };
-
-      setIsCheckingPermission(true);
-      checkPermission();
-
-      return () => {
-        isActive = false;
-      };
-    }, []),
-  );
-
-  useFocusEffect(
-    React.useCallback(() => {
-      const onBackPress = () => {
-        navigation.goBack();
+      const handleHardwareBackPress = () => {
+        handleDenyOrClose();
         return true;
       };
       const subscription = BackHandler.addEventListener(
         "hardwareBackPress",
-        onBackPress,
+        handleHardwareBackPress,
       );
       return () => subscription.remove();
-    }, [navigation]),
+    }, [navigation, onClose, onBackPress, returnScreen]),
   );
 
   const requestCameraPermission = async () => {
@@ -114,15 +78,33 @@ const CameraAccess: React.FC<CameraAccessProps> = ({
       const { status } = await Camera.requestCameraPermissionsAsync();
 
       if (status === "granted") {
-        proceed();
+        if (onPermissionGranted) {
+          onPermissionGranted();
+        } else {
+          navigation.navigate(returnScreen as any);
+        }
       } else if (status === "denied") {
         Alert.alert(
-          t("Permission.PermissionDenied") || "Permission Denied",
-          t("Permission.CameraAccessIsRequiredPleaseEnableItInSettings"),
+          t("CameraAccess.PermissionDenied") ||
+          t("Permission.PermissionDenied") ||
+          "Permission Denied",
+          t("CameraAccess.CameraAccessIsRequiredPleaseEnableItInSettings") ||
+          t("Permission.CameraAccessIsRequiredPleaseEnableItInSettings") ||
+          "Camera access is required. Please enable it in settings.",
           [
-            { text: t("Main.Cancel") || "Cancel", style: "cancel" },
             {
-              text: t("Permission.OpenSettings") || "Open Settings",
+              text:
+                t("CameraAccess.NotNow") ||
+                t("Main.Cancel") ||
+                "Not Now",
+              style: "cancel",
+              onPress: handleDenyOrClose,
+            },
+            {
+              text:
+                t("CameraAccess.OpenSettings") ||
+                t("Permission.OpenSettings") ||
+                "Open Settings",
               onPress: () => Linking.openSettings(),
             },
           ],
@@ -130,96 +112,182 @@ const CameraAccess: React.FC<CameraAccessProps> = ({
       }
     } catch (error) {
       console.error("Error requesting camera permission:", error);
+      Alert.alert(
+        t("Main.Error") || "Error",
+        t("CameraAccess.UnableToRequestCameraPermissionPleaseTryAgain") ||
+        t("Permission.UnableToRequestLocationPermissionPleaseTryAgain") ||
+        "Unable to request camera permission. Please try again.",
+        [{ text: t("Main.OK") || "OK" }],
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Still checking existing permission status - render nothing (or a bare
-  // loader) rather than the "Allow camera access" UI, so a user who has
-  // already granted permission never sees this screen at all.
-  if (isCheckingPermission) {
-    return (
-      <View className="flex-1 bg-black items-center justify-center">
-        <StatusBar barStyle="light-content" backgroundColor="#000000" />
-        <ActivityIndicator color="#ffffff" />
-      </View>
-    );
-  }
-
   return (
-    <View className="flex-1 bg-black">
-      <StatusBar barStyle="light-content" backgroundColor="#000000" />
-
+    <View className="flex-1 bg-[#121212]">
+      <StatusBar barStyle="light-content" backgroundColor="#121212" />
       <CustomHeader
         title=""
         navigation={navigation}
-        onBackPress={() => navigation.goBack()}
-        transparent
+        onBackPress={handleDenyOrClose}
+        backgroundColor="#121212"
+        backButtonColor="white"
       />
 
-      <View className="flex-1 justify-center">
-        <View className="items-center justify-center px-4">
-          {/* Location Image */}
+      <ScrollView
+        className="flex-1 px-5"
+        contentContainerStyle={{ flexGrow: 1, paddingBottom: 32 }}
+        showsVerticalScrollIndicator={false}
+      >
+        <View className="items-center justify-center mt-4 mb-4">
           <Image
             source={cameraImage}
+            className="w-32 h-32"
             resizeMode="contain"
-            style={{ height: dynamicStyles.imageHeight, width: "80%" }}
           />
+        </View>
 
-          {/* Title */}
-          <Text className="text-white font-bold text-center mt-8 text-2xl">
-            {t("Permission.CameraAccess")}
-          </Text>
+        {/* Title */}
+        <Text className="text-white text-2xl font-bold text-center mb-2">
+          {t("CameraAccess.ProminentDisclosureTitle") ||
+            "Why GoViLink Uses Camera"}
+        </Text>
 
-          {/* Description */}
-          <Text className="text-gray-400 text-center mt-4 px-8 text-base">
-            {t("Permission.EnableAccessToTheCameraToTakePhotos") ||
-              "Enable access to the camera to take photos."}
-          </Text>
+        {/* Intro */}
+        <Text className="text-gray-300 text-sm text-center mb-5 leading-5">
+          {t("CameraAccess.ProminentDisclosureIntro") ||
+            "GoViLink requires camera access to enable the following operational features:"}
+        </Text>
 
-          {/* Allow Button */}
-          <View className="mt-20 w-full items-center">
-            <View
-              className="w-2/3 rounded-full"
-              style={{
-                shadowColor: "#009570",
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.3,
-                shadowRadius: 8,
-                elevation: 8,
-                backgroundColor: "transparent",
-              }}
-            >
-              <TouchableOpacity
-                onPress={requestCameraPermission}
-                disabled={isLoading}
-                activeOpacity={0.8}
-              >
-                <LinearGradient
-                  colors={["#EE8D5F", "#B31A51"]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  style={{
-                    width: "100%",
-                    height: 50,
-                    borderRadius: 9999,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    overflow: "hidden",
-                  }}
-                >
-                  <Text className="text-white font-semibold text-center text-lg">
-                    {isLoading
-                      ? t("Permission.Requesting...") || "Requesting..."
-                      : t("Permission.Allow")}
-                  </Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            </View>
+        {/* Feature 1: QR Scanning */}
+        <View className="bg-[#1E1E1E] p-4 rounded-xl mb-3 border border-gray-800 flex-row items-start">
+          <View
+            className="p-2.5 rounded-lg mr-3 mt-0.5"
+            style={{
+              backgroundColor: "rgba(238, 141, 95, 0.15)",
+              borderWidth: 1,
+              borderColor: "rgba(238, 141, 95, 0.3)",
+            }}
+          >
+            <MaterialCommunityIcons
+              name="qrcode-scan"
+              size={24}
+              color="#EE8D5F"
+            />
+          </View>
+          <View className="flex-1">
+            <Text className="text-white font-semibold text-base mb-1">
+              {t("CameraAccess.FeatureQRTitle") ||
+                "Instant QR Code Scanning"}
+            </Text>
+            <Text className="text-gray-400 text-xs leading-4">
+              {t("CameraAccess.FeatureQRDesc") ||
+                "Scan farmer QR codes and request audit job codes for instant verification in the field."}
+            </Text>
           </View>
         </View>
-      </View>
+
+        {/* Feature 2: Inspection Photos */}
+        <View className="bg-[#1E1E1E] p-4 rounded-xl mb-4 border border-gray-800 flex-row items-start">
+          <View
+            className="p-2.5 rounded-lg mr-3 mt-0.5"
+            style={{
+              backgroundColor: "rgba(179, 26, 81, 0.15)",
+              borderWidth: 1,
+              borderColor: "rgba(179, 26, 81, 0.3)",
+            }}
+          >
+            <MaterialCommunityIcons
+              name="camera-outline"
+              size={24}
+              color="#EE8D5F"
+            />
+          </View>
+          <View className="flex-1">
+            <Text className="text-white font-semibold text-base mb-1">
+              {t("CameraAccess.FeatureInspectionTitle") ||
+                "Live Inspection & Land Photos"}
+            </Text>
+            <Text className="text-gray-400 text-xs leading-4">
+              {t("CameraAccess.FeatureInspectionDesc") ||
+                "Capture real-time photos of crops, land plots, water sources, and NIC documents during audits."}
+            </Text>
+          </View>
+        </View>
+
+        {/* Privacy Note */}
+        <View
+          className="p-3 rounded-lg mb-6 flex-row items-start"
+          style={{
+            backgroundColor: "rgba(179, 26, 81, 0.1)",
+            borderWidth: 1,
+            borderColor: "rgba(238, 141, 95, 0.25)",
+          }}
+        >
+          <Ionicons
+            name="shield-checkmark-outline"
+            size={18}
+            color="#EE8D5F"
+            style={{ marginTop: 2, marginRight: 8 }}
+          />
+          <Text className="text-gray-300 text-xs flex-1 leading-4">
+            {t("CameraAccess.DisclosureFooter") ||
+              "Camera access is only active while using QR scanning or live photo capture. No photos or videos are captured without your explicit tap."}
+          </Text>
+        </View>
+
+        {/* Action Buttons */}
+        <View className="items-center w-full mt-auto">
+          <TouchableOpacity
+            onPress={requestCameraPermission}
+            activeOpacity={0.8}
+            disabled={isLoading}
+            className="w-full mb-3"
+            style={{ borderRadius: 999, overflow: "hidden" }}
+          >
+            <LinearGradient
+              colors={["#EE8D5F", "#B31A51"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={{
+                height: 52,
+                borderRadius: 999,
+                alignItems: "center",
+                justifyContent: "center",
+                width: "100%",
+              }}
+            >
+              <View className="flex-row items-center justify-center">
+                <Ionicons
+                  name="camera-outline"
+                  size={20}
+                  color="#FFFFFF"
+                  style={{ marginRight: 8 }}
+                />
+                <Text className="text-white font-extrabold text-base tracking-wide">
+                  {isLoading
+                    ? t("CameraAccess.Requesting...") ||
+                    t("Permission.Requesting...") ||
+                    "Requesting..."
+                    : t("CameraAccess.AgreeAndContinue") ||
+                    "Agree & Continue"}
+                </Text>
+              </View>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={handleDenyOrClose}
+            activeOpacity={0.7}
+            className="py-2.5 px-6 items-center justify-center"
+          >
+            <Text className="text-gray-400 font-semibold text-sm">
+              {t("CameraAccess.NotNow") || "Not Now"}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </View>
   );
 };
