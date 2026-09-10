@@ -289,9 +289,9 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 0 }}
                         style={{
-                          height:30,
-                          alignItems:'center',
-                          justifyContent:'center'
+                          height: 30,
+                          alignItems: "center",
+                          justifyContent: "center",
                         }}
                       >
                         <Text className="text-white text-base font-semibold text-center">
@@ -463,10 +463,6 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
               )}
 
               <TouchableOpacity
-                className="rounded-full overflow-hidden mt-4"
-                style={{
-                  marginBottom: 30,
-                }}
                 onPress={() => {
                   setShowPopup(false);
 
@@ -490,13 +486,21 @@ const ViewFarmsCluster: React.FC<ViewFarmsClusterProps> = ({ navigation }) => {
                   colors={["#F2561D", "#FF1D85"]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
-                  className={`items-center justify-center rounded-full h-[50px] ${
-                    i18n.language === "si"
-                      ? "px-24"
-                      : i18n.language === "ta"
-                        ? "px-24"
-                        : "px-[40%]"
-                  }`}
+                  style={{
+                    height: 50,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderRadius: 9999,
+                    marginTop: 16,
+                    marginBottom: 30,
+                    paddingHorizontal:
+                      i18n.language === "si"
+                        ? 96
+                        : i18n.language === "ta"
+                          ? 96
+                          : "40%",
+                    overflow: "hidden",
+                  }}
                 >
                   <Text
                     className={`text-white  font-semibold ${i18n.language === "si" ? "text-base" : i18n.language === "ta" ? "text-base" : "text-lg"}`}

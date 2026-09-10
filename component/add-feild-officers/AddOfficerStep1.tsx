@@ -345,7 +345,8 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
   const handleUnicodeNameChange = (text: string, fieldName: string) => {
     const noLeadingSpace = text.replace(/^\s+/, "");
 
-    const filteredText = noLeadingSpace.replace(/[^\p{L}\s]/gu, "");
+    // \p{L} = base letters, \p{M} = combining marks (vowel signs, virama, etc.)
+    const filteredText = noLeadingSpace.replace(/[^\p{L}\p{M}\s]/gu, "");
 
     switch (fieldName) {
       case "firstNameSI":
@@ -653,7 +654,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
       if (status !== "granted") {
         Alert.alert(
           t("Error.PermissionDenied"),
-          t("Error.Gallery permission is required"),
+          t("Error.GalleryPermissionIsRequired"),
           [{ text: t("Main.OK") }],
         );
         return;
@@ -662,7 +663,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ["images"],
         allowsEditing: false,
-        quality: 1,
+        quality: 0.8,
       });
 
       if (!result.canceled && result.assets && result.assets.length > 0) {
@@ -901,8 +902,7 @@ const AddOfficerStep1: React.FC<AddOfficerStep1ScreenProps> = ({
       className="px-4 py-3 border-b border-gray-200 flex-row items-center"
       onPress={() => handleCountryCodeSelect([item.value])}
     >
-      <Text className="text-2xl w-10">{item.emoji}</Text>
-      <Text className="text-sm text-gray-600 w-12">{item.value}</Text>
+      <Text className="text-2xl w-10">{item.emoji} { }</Text>
       <Text className="text-base text-gray-800 font-medium flex-1">
         {item.label}
       </Text>

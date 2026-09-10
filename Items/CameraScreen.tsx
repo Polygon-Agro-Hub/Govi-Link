@@ -34,14 +34,14 @@ export function CameraScreen({
   }
 
   return (
-    <View className="flex-1 bg-black">
+    <View className="flex-1 bg-black  ">
       <CameraView
         style={{ flex: 1 }}
         ref={cameraRef}
         onCameraReady={() => setIsReady(true)}
       />
 
-      <View className="absolute bottom-12 w-full flex-row justify-center items-center">
+      <View className="absolute bottom-12 mb-5 w-full flex-row justify-center items-center">
         <TouchableOpacity
           className="bg-white/70 p-4 rounded-full mx-5"
           onPress={() => onClose(null)}

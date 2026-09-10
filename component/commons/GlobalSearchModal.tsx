@@ -25,6 +25,7 @@ interface GlobalSearchModalProps {
     item: any,
     isSelected: boolean,
     onToggle?: () => void,
+    isLast?: boolean,
   ) => React.ReactNode;
   searchKeys?: string[];
   showSearch?: boolean;
@@ -191,6 +192,7 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
               item,
               isSelected,
               () => handleItemPress(item.value),
+              isLast,
             ) as React.ReactElement | null;
           }
 
@@ -210,7 +212,7 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
       onRequestClose={onClose}
     >
       <View className="flex-1 bg-black/50 justify-center items-center">
-        <View className="bg-white rounded-2xl w-11/12 max-w-[500px] max-h-[80%]">
+        <View className="bg-white rounded-2xl w-11/12 max-w-[500px] max-h-[80%] overflow-hidden">
           {/* Header */}
           <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
             <View>

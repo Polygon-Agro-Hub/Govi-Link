@@ -92,9 +92,9 @@ const YesNoSelect = ({
           activeOpacity={0.7}
         >
           {value ? (
-            <Text className="text-black">{t(`InspectionForm.${value}`)}</Text>
+            <Text className="text-black text-sm">{t(`InspectionForm.${value}`)}</Text>
           ) : (
-            <Text className="text-[#838B8C]">
+            <Text className="text-[#838B8C] text-sm">
               {t("InspectionForm.SelectFromHere")}
             </Text>
           )}
@@ -511,7 +511,7 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
       style={{ flex: 1, backgroundColor: "white" }}
     >
       <View className="flex-1 bg-[#F3F3F3] ">
@@ -520,6 +520,7 @@ const Labour: React.FC<LabourProps> = ({ navigation }) => {
           navigation={navigation}
           requestId={requestId}
           onTabPress={handleTabPress}
+          isCurrentFormValid={isNextEnabled}
         />
 
         <ScrollView

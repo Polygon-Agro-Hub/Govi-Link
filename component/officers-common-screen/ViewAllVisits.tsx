@@ -22,11 +22,13 @@ import { useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import environment from "@/environment/environment";
-import { Ionicons, FontAwesome6 } from "@expo/vector-icons";
+import { Ionicons, FontAwesome6, Entypo } from "@expo/vector-icons";
 import { RouteProp } from "@react-navigation/native";
 import NoDataComponent from "../commons/NoDataComponent";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/services/store";
+import LocationAccess from "../permission/LocationAccess";
+import * as Location from "expo-location";
 
 type ViewAllVisitsNavigationProps = StackNavigationProp<
   RootStackParamList,
@@ -145,6 +147,7 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
   });
   const [showPopup, setShowPopup] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [showLocationAccess, setShowLocationAccess] = useState(false);
   const scrollRef = React.useRef<ScrollView>(null);
   const translateY = useRef(new Animated.Value(0)).current;
 
@@ -255,22 +258,51 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
     );
   };
 
-  const handleLocationPress = () => {
+  const openFarmLocation = () => {
     if (selectedItem?.latitude && selectedItem?.longitude) {
       const lat = selectedItem.latitude;
       const lon = selectedItem.longitude;
       const url = `https://www.google.com/maps?q=${lat},${lon}`;
       Linking.openURL(url);
     } else {
-      Alert.alert(
-        t("VisitPopup.NoLocationTitle"),
-        t("VisitPopup.NoLocationMessage"),
-      );
+      setShowPopup(false);
+      setTimeout(() => {
+        Alert.alert(
+          t("VisitPopup.NoLocationTitle"),
+          t("VisitPopup.NoLocationMessage")
+        );
+      }, 400);
+    }
+  };
+
+  const handleLocationPermissionGranted = () => {
+    setShowLocationAccess(false);
+    openFarmLocation();
+  };
+
+  const handleLocationPress = async () => {
+    const { status } = await Location.getForegroundPermissionsAsync();
+    if (status !== "granted") {
+      setShowPopup(false);
+      setTimeout(() => setShowLocationAccess(true), 300);
+    } else {
+      openFarmLocation();
     }
   };
 
   const effectiveRole = userRole || storedRole;
   const shouldShowBackButton = effectiveRole === "Field Officer";
+
+  if (showLocationAccess) {
+    return (
+      <LocationAccess
+        navigation={navigation as any}
+        onPermissionGranted={handleLocationPermissionGranted}
+        returnScreen="ViewAllVisits"
+        onBackPress={() => setShowLocationAccess(false)}
+      />
+    );
+  }
 
   return (
     <View className="flex-1 bg-[#F5F7FB] pt-4">
@@ -278,9 +310,15 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
         {shouldShowBackButton && (
           <TouchableOpacity
             onPress={() => navigation.goBack()}
-            className="absolute left-4 bg-[#EAEAEA] rounded-full h-8 w-8 items-center justify-center"
+            className="absolute left-4 bg-[#EAEAEA] rounded-full w-12 h-12 items-center justify-center"
           >
-            <Ionicons name="chevron-back" size={24} color="#000" />
+             <Entypo
+              name="chevron-left"
+              size={24}
+              color="black"
+              className="rounded-full p-3"
+              style={{ marginLeft: -1  ,marginTop:-1}}
+            />
           </TouchableOpacity>
         )}
         <View className="items-center">
@@ -546,10 +584,12 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
                         </Text>
                       ) : null}
 
-                      <Text className="text-[12px] font-medium text-[#4E6393] mt-1">
-                        {t(`Districts.${item.district}`)}{" "}
-                        {t("VisitPopup.District")}
-                      </Text>
+                      {item.district ? (
+                        <Text className="text-[12px] font-medium text-[#4E6393] mt-1">
+                          {t(`Districts.${item.district}`)}{" "}
+                          {t("VisitPopup.District")}
+                        </Text>
+                      ) : null}
 
                       <Text className="text-[12px] text-[#FF1D85] mt-1">
                         {displayStatus}
@@ -634,10 +674,12 @@ const ViewAllVisits: React.FC<ViewAllVisitsProps> = ({ navigation, route }) => {
                     })()}
                   </Text>
 
-                  <Text className="text-base font-medium text-[#4E6393] mt-1">
-                    {t(`Districts.${selectedItem.district}`)}{" "}
-                    {t("VisitPopup.District")}
-                  </Text>
+                  {selectedItem.district ? (
+                    <Text className="text-base font-medium text-[#4E6393] mt-1">
+                      {t(`Districts.${selectedItem.district}`)}{" "}
+                      {t("VisitPopup.District")}
+                    </Text>
+                  ) : null}
                   <View className="flex flex-row justify-center gap-x-2 mb-4 mt-6 px-4">
                     <TouchableOpacity
                       className="flex w-1/2"

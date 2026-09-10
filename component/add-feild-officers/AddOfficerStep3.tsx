@@ -8,11 +8,13 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
+  Image,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../types/types";
 import * as ImagePicker from "expo-image-picker";
+import * as ImageManipulator from "expo-image-manipulator";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import environment from "@/environment/environment";
@@ -80,7 +82,7 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
       mediaTypes: ["images"],
       allowsEditing: false,
       aspect: [4, 3],
-      quality: 1,
+      quality: 0.8,
     });
 
     if (!result.canceled && result.assets && result.assets.length > 0) {
@@ -153,17 +155,49 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
     fieldName: string,
   ) => {
     try {
-      const fileExtension = imageUri.split(".").pop() || "jpg";
-      const fileName = `${fieldName}_${Date.now()}.${fileExtension}`;
+      const actions: ImageManipulator.Action[] = [];
+
+      // Check dimensions before resizing to avoid unnecessary upscaling
+      const dimensions = await new Promise<{ width: number; height: number }>(
+        (resolve) => {
+          Image.getSize(
+            imageUri,
+            (width, height) => resolve({ width, height }),
+            () => resolve({ width: 0, height: 0 }),
+          );
+        },
+      );
+
+      const maxDim = fieldName === "profile" ? 800 : 1400;
+      if (dimensions.width > maxDim || dimensions.height > maxDim) {
+        if (dimensions.width >= dimensions.height) {
+          actions.push({ resize: { width: maxDim } });
+        } else {
+          actions.push({ resize: { height: maxDim } });
+        }
+      }
+
+      // Convert all images to compressed JPEG format to prevent payload size limits
+      const manipulated = await ImageManipulator.manipulateAsync(
+        imageUri,
+        actions,
+        { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG },
+      );
+
+      const fileName = `${fieldName}_${Date.now()}.jpg`;
 
       return {
-        uri: imageUri,
+        uri: manipulated.uri,
         type: "image/jpeg",
         name: fileName,
       };
     } catch (error) {
       console.error(`Error converting ${fieldName} image:`, error);
-      return null;
+      return {
+        uri: imageUri,
+        type: "image/jpeg",
+        name: `${fieldName}_${Date.now()}.jpg`,
+      };
     }
   };
 
@@ -198,7 +232,7 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
           submitFormData.append(key, JSON.stringify(formData[key]));
         } else if (key === "languages" && typeof formData[key] === "object") {
           submitFormData.append(key, JSON.stringify(formData[key]));
-        } else if (key === "profileImage") {
+        } else if (key === "profileImage" || key === "profile") {
           return;
         } else {
           submitFormData.append(key, formData[key]?.toString() || "");
@@ -287,7 +321,15 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
       console.error("Error submitting officer:", error);
       let errorMessage = t("Error.FailedToCreateOfficer");
 
-      if (error.response?.data?.message) {
+      if (
+        error.response?.status === 413 ||
+        (typeof error.response?.data === "string" &&
+          error.response.data.includes("FUNCTION_PAYLOAD_TOO_LARGE"))
+      ) {
+        errorMessage =
+          t("Error.ImageSizeTooLarge") ||
+          "The total image size is too large. Please select smaller images.";
+      } else if (error.response?.data?.message) {
         errorMessage = error.response.data.message;
       } else if (error.message) {
         errorMessage = error.message;
@@ -295,7 +337,7 @@ const AddOfficerStep3: React.FC<AddOfficerStep3Props> = ({ navigation }) => {
         errorMessage = t("Error.RequestTimeout");
       }
 
-      Alert.alert(t("Error.Error"), t("Error.SomethingWentWrongPleaseTryAgainLater"), [
+      Alert.alert(t("Error.Error"), errorMessage, [
         { text: t("Main.OK") },
       ]);
     } finally {
