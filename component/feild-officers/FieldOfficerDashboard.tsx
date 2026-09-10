@@ -461,10 +461,13 @@ const FieldOfficerDashboard: React.FC<FieldOfficerDashboardProps> = ({
       const url = `https://www.google.com/maps?q=${lat},${lon}`;
       Linking.openURL(url);
     } else {
-      Alert.alert(
-        t("VisitPopup.NoLocationTitle"),
-        t("VisitPopup.NoLocationMessage"),
-      );
+      setShowPopup(false);
+      setTimeout(() => {
+        Alert.alert(
+          t("VisitPopup.NoLocationTitle"),
+          t("VisitPopup.NoLocationMessage"),
+        );
+      }, 400);
     }
   };
 

@@ -343,20 +343,24 @@ const AddOfficerStep2: React.FC<AddOfficerStep2Props> = ({ navigation }) => {
     setCommissionAmount(filteredText);
   };
 
-  const handleAccountHolderNameChange = (text: string) => {
-    clearFieldError("accountHolderName");
-    if (text.length === 0) {
-      setErrors((prev) => ({
-        ...prev,
-        accountHolderName: t("Error.AccountHoldersNameIsRequired"),
-      }));
-    }
-    const lettersOnly = text.replace(/[^a-zA-Z\s]/g, "");
-    const filteredText = stripLeadingSpaces(lettersOnly);
-    const capitalizedText =
-      filteredText.charAt(0).toUpperCase() + filteredText.slice(1);
-    setAccountHolderName(capitalizedText);
-  };
+const handleAccountHolderNameChange = (text: string) => {
+  clearFieldError("accountHolderName");
+  if (text.length === 0) {
+    setErrors((prev) => ({
+      ...prev,
+      accountHolderName: t("Error.AccountHoldersNameIsRequired"),
+    }));
+  }
+  // Allow English, Sinhala (U+0D80–U+0DFF), Tamil (U+0B80–U+0BFF) letters + spaces
+  const lettersOnly = text.replace(
+    /[^a-zA-Z\u0D80-\u0DFF\u0B80-\u0BFF\s]/g,
+    ""
+  );
+  const filteredText = stripLeadingSpaces(lettersOnly);
+  const capitalizedText =
+    filteredText.charAt(0).toUpperCase() + filteredText.slice(1);
+  setAccountHolderName(capitalizedText);
+};
 
   const handleAccountNumberChange = (text: string) => {
     clearFieldError("accountNumber");

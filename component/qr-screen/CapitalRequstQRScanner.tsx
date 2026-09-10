@@ -11,13 +11,14 @@ import {
   Pressable,
   Alert,
   Linking,
+  ActivityIndicator,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../types/types";
 import { CameraView, Camera } from "expo-camera";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
-import { useRoute, RouteProp } from "@react-navigation/native";
+import { useRoute, RouteProp, useIsFocused } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect } from "@react-navigation/native";
 import { getLastScreen } from "@/database/inspectionprogress";
@@ -49,12 +50,15 @@ const CapitalRequstQRScanner: React.FC<CapitalRequstQRScannerProps> = ({
   navigation,
 }) => {
   const route = useRoute<CapitalRequstQRScannerRouteProp>();
-  const { farmerId, requestId, requestNumber } = route.params;
+  const isFocused = useIsFocused();
+  const { farmerId, requestId, requestNumber } = route.params || ({} as any);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanned, setScanned] = useState<boolean>(false);
   const [showPermissionModal, setShowPermissionModal] =
     useState<boolean>(false);
   const [showCameraAccess, setShowCameraAccess] = useState<boolean>(false);
+  const [isCameraReady, setIsCameraReady] = useState<boolean>(false);
+  const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { t } = useTranslation();
   const [isUnsuccessfulModalVisible, setIsUnsuccessfulModalVisible] =
@@ -63,7 +67,22 @@ const CapitalRequstQRScanner: React.FC<CapitalRequstQRScannerProps> = ({
 
   useEffect(() => {
     checkCameraPermissions();
-  }, []);
+
+    const unsubscribe = navigation.addListener("focus", () => {
+      setScanned(false);
+      setErrorMessage(null);
+      setIsUnsuccessfulModalVisible(false);
+      setIsCameraReady(false);
+    });
+
+    return unsubscribe;
+  }, [navigation]);
+
+  useEffect(() => {
+    if (!isFocused) {
+      setIsCameraReady(false);
+    }
+  }, [isFocused]);
 
   const checkCameraPermissions = async () => {
     const { status } = await Camera.getCameraPermissionsAsync();
@@ -98,8 +117,12 @@ const CapitalRequstQRScanner: React.FC<CapitalRequstQRScannerProps> = ({
   };
 
   const handleCameraPermissionGranted = () => {
+    setIsTransitioning(true);
     setShowCameraAccess(false);
     setHasPermission(true);
+    setTimeout(() => {
+      setIsTransitioning(false);
+    }, 300);
   };
 
   const resolveTargetScreen = (reqId: number): string => {
@@ -126,20 +149,24 @@ const CapitalRequstQRScanner: React.FC<CapitalRequstQRScannerProps> = ({
         throw new Error(t("QRScanner.WrongQRCode"));
       }
 
-      const token = await AsyncStorage.getItem("token");
+      const updateOfficerStatus = async (officerId: number) => {
+        try {
+          const token = await AsyncStorage.getItem("token");
+          if (!token) return;
 
-      const response = await axios.put(
-        `${environment.API_BASE_URL}api/capital-request/update-officer-status/${requestId}`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+          await axios.put(
+            `${environment.API_BASE_URL}api/capital-request/fieldofficer/status/${officerId}`,
+            {},
+            { headers: { Authorization: `Bearer ${token}` } },
+          );
+        } catch (error) {
+          console.error("Failed to update officer status:", error);
+          throw new Error(t("QRScanner.Failed to update officer status"));
+        }
+      };
 
-      if (response.status !== 200) {
-        throw new Error(t("QRScanner.Failed to update officer status"));
+      if (farmerId !== undefined) {
+        await updateOfficerStatus(farmerId);
       }
 
       const targetScreen = resolveTargetScreen(requestId);
@@ -183,7 +210,7 @@ const CapitalRequstQRScanner: React.FC<CapitalRequstQRScannerProps> = ({
         onBackPress,
       );
       return () => subscription.remove();
-    }, []),
+    }, [navigation]),
   );
 
   if (showCameraAccess) {
@@ -210,13 +237,13 @@ const CapitalRequstQRScanner: React.FC<CapitalRequstQRScannerProps> = ({
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <Text style={{ fontSize: 18, color: "#333" }}>
-          {t("QRScanner.Camera permission denied")}
+          {t("QRScanner.NoAccessToCamera")}
         </Text>
         <TouchableOpacity
           style={{
-            backgroundColor: "#34D399",
+            backgroundColor: "#2C2C2C",
             padding: 10,
-            borderRadius: 8,
+            borderRadius: 5,
             marginTop: 20,
           }}
           onPress={checkCameraPermissions}
@@ -238,12 +265,24 @@ const CapitalRequstQRScanner: React.FC<CapitalRequstQRScannerProps> = ({
         onBackPress={() => navigation.goBack()}
       />
 
-      <CameraView
-        className="flex-1"
-        onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
-        barcodeScannerSettings={{ barcodeTypes: ["qr", "pdf417"] }}
-        style={{ flex: 1 }}
-      />
+      {isFocused && !isTransitioning ? (
+        <CameraView
+          style={{ flex: 1 }}
+          onCameraReady={() => setIsCameraReady(true)}
+          onBarcodeScanned={
+            isCameraReady && !scanned ? handleBarCodeScanned : undefined
+          }
+          barcodeScannerSettings={
+            isCameraReady && !scanned
+              ? { barcodeTypes: ["qr", "pdf417"] }
+              : undefined
+          }
+        />
+      ) : (
+        <View style={{ flex: 1, backgroundColor: "#000", justifyContent: "center", alignItems: "center" }}>
+          <ActivityIndicator size="large" color="#EE8D5F" />
+        </View>
+      )}
 
       {/* Scanning overlay */}
       <View
@@ -302,7 +341,7 @@ const CapitalRequstQRScanner: React.FC<CapitalRequstQRScannerProps> = ({
         animationType="slide"
       >
         <View className="flex-1 justify-center items-center bg-black bg-opacity-70">
-          <View className="bg-white rounded-lg w-72 h-80 items-center relative overflow-hidden">
+          <View className="bg-white rounded-lg w-72 h-64 items-center relative overflow-hidden">
             <Pressable
               onPress={() => setIsUnsuccessfulModalVisible(false)}
               className="absolute top-3 right-3 z-10"

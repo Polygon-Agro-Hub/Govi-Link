@@ -310,7 +310,10 @@ const AddOnboardSupplier: React.FC<AddOnboardSupplierProps> = ({
               onChangeText={(text) => {
                 if (text.length > 0 && text[0] === " ") return;
 
-                const filtered = text.replace(/[^a-zA-Z\s]/g, "");
+                 const filtered = text.replace(
+    /[^a-zA-Z\u0D80-\u0DFF\u0B80-\u0BFF\s]/g,
+    "",
+  );
 
                 setSupplierName(filtered);
                 markTouched("supplierName");

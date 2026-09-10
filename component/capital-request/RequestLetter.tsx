@@ -73,9 +73,9 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ label, value }) => {
   );
 };
 
-const COLLAPSED_HEIGHT = 200;
+const COLLAPSED_HEIGHT = 180;
 
-const EXPANDED_HEIGHT = 300;
+const EXPANDED_HEIGHT = 250;
 
 const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
   const route = useRoute<RouteProp<RootStackParamList, "RequestDetails">>();
@@ -87,40 +87,28 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
 
   const animatedHeight = useRef(new Animated.Value(COLLAPSED_HEIGHT)).current;
 
-  const addressOpacity = useRef(new Animated.Value(0)).current;
+  const addressHeight = animatedHeight.interpolate({
+    inputRange: [COLLAPSED_HEIGHT, EXPANDED_HEIGHT],
+    outputRange: [0, 64],
+    extrapolate: "clamp",
+  });
+
+  const addressOpacity = animatedHeight.interpolate({
+    inputRange: [COLLAPSED_HEIGHT, COLLAPSED_HEIGHT + 25, EXPANDED_HEIGHT],
+    outputRange: [0, 0, 1],
+    extrapolate: "clamp",
+  });
 
   useEffect(() => {
     fetchRequestDetails();
   }, [requestId]);
 
   const toggleExpand = () => {
-    if (isExpanded) {
-      Animated.sequence([
-        Animated.timing(addressOpacity, {
-          toValue: 0,
-          duration: 150,
-          useNativeDriver: false,
-        }),
-        Animated.spring(animatedHeight, {
-          toValue: COLLAPSED_HEIGHT,
-          useNativeDriver: false,
-          bounciness: 4,
-        }),
-      ]).start();
-    } else {
-      Animated.sequence([
-        Animated.spring(animatedHeight, {
-          toValue: EXPANDED_HEIGHT,
-          useNativeDriver: false,
-          bounciness: 4,
-        }),
-        Animated.timing(addressOpacity, {
-          toValue: 1,
-          duration: 200,
-          useNativeDriver: false,
-        }),
-      ]).start();
-    }
+    Animated.spring(animatedHeight, {
+      toValue: isExpanded ? COLLAPSED_HEIGHT : EXPANDED_HEIGHT,
+      useNativeDriver: false,
+      bounciness: 4,
+    }).start();
     setIsExpanded((prev) => !prev);
   };
 
@@ -388,7 +376,7 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
             </View>
           </TouchableOpacity>
 
-          <View className="items-center mt-2 mb-3">
+          <View className="items-center mt-1.5 mb-2">
             <Text className="text-sm text-[#747474]">#{requestData.jobId}</Text>
           </View>
 
@@ -401,13 +389,19 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
             </View>
           </TouchableOpacity>
 
-          <Animated.View style={{ opacity: addressOpacity }}>
-            <View className="items-center mt-3">
+          <Animated.View
+            style={{
+              height: addressHeight,
+              opacity: addressOpacity,
+              overflow: "hidden",
+            }}
+          >
+            <View className="items-center mt-2">
               <Text className="text-xs text-[#4E6393] font-medium">
-                Address :
+               {t("VisitPopup.Address")}
               </Text>
             </View>
-            <View className="items-center mt-1">
+            <View className="items-center mt-0.5">
               <Text className="text-sm text-[#070707]">
                 {requestData.lndPlot}, {requestData.lndStreet},
               </Text>
@@ -420,7 +414,7 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({ navigation }) => {
           </Animated.View>
         </View>
 
-        <View className="px-8 pb-5">
+        <View className="px-8 pb-4">
           <TouchableOpacity
             onPress={async () => {
               try {

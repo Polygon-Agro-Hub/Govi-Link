@@ -59,11 +59,12 @@ const Input = ({
       <TextInput
         placeholder={placeholder}
         placeholderTextColor="#838B8C"
-        className="px-5 h-[50px] text-base text-black flex-1"
+        className="px-5 h-[50px] text-xs text-black flex-1"
         value={value}
         onChangeText={onChangeText}
         keyboardType={keyboardType}
         maxLength={maxLength}
+        style={{ fontSize: 12, includeFontPadding: false }}
       />
     </View>
 
@@ -457,9 +458,8 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
       style={{ flex: 1, backgroundColor: "white" }}
-      keyboardVerticalOffset={Platform.OS === "android" ? -200 : 0}
     >
       <View className="flex-1 bg-[#F3F3F3]">
         <FormTabs
@@ -467,6 +467,7 @@ const InvestmentInfo: React.FC<InvestmentInfoProps> = ({ navigation }) => {
           navigation={navigation}
           requestId={requestId}
           onTabPress={handleTabPress}
+          isCurrentFormValid={isNextEnabled}
         />
 
         <ScrollView

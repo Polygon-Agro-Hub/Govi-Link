@@ -225,19 +225,31 @@ const ImageCropModal: React.FC<ImageCropModalProps> = ({
       const cropW = Math.min(naturalW - originX, fW * scaleX);
       const cropH = Math.min(naturalH - originY, fH * scaleY);
 
+      const actions: ImageManipulator.Action[] = [
+        {
+          crop: {
+            originX: Math.round(originX),
+            originY: Math.round(originY),
+            width: Math.round(cropW),
+            height: Math.round(cropH),
+          },
+        },
+      ];
+
+      // Resize avatar down if larger than 600px
+      if (cropW > 600 || cropH > 600) {
+        actions.push({
+          resize: {
+            width: 600,
+            height: 600,
+          },
+        });
+      }
+
       const result = await ImageManipulator.manipulateAsync(
         workingUri,
-        [
-          {
-            crop: {
-              originX: Math.round(originX),
-              originY: Math.round(originY),
-              width: Math.round(cropW),
-              height: Math.round(cropH),
-            },
-          },
-        ],
-        { compress: 0.9, format: ImageManipulator.SaveFormat.JPEG },
+        actions,
+        { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG },
       );
       onConfirm(result.uri);
     } catch (error) {
@@ -459,6 +471,7 @@ const styles = StyleSheet.create({
   bottomRow: {
     width: "100%",
     marginTop: 16,
+    marginBottom:20
   },
   cancelButton: {
     backgroundColor: "#D9D9D9",

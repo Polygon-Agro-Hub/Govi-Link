@@ -104,7 +104,6 @@ interface DraftVisit {
 const LoadingSkeleton = () => {
   const rectWidth = wp("38%");
   const gapBetweenRects = wp("8%");
-  const totalWidth = 2 * rectWidth + gapBetweenRects;
 
   return (
     <View
@@ -296,7 +295,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
   }, []);
 
   const getName = () => {
-    if (!profile) return "Loading...";
+    if (!profile) return t("Main.Loading");
     switch (i18n.language) {
       case "si":
         return `${profile.firstNameSinhala}`;
@@ -376,7 +375,8 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
         if (Array.isArray(res.data?.data)) {
           const match = res.data.data.find(
             (v: any) =>
-              (selectedItem?.jobId && String(v.jobId) === String(selectedItem.jobId)) ||
+              (selectedItem?.jobId &&
+                String(v.jobId) === String(selectedItem.jobId)) ||
               (selectedItem?.id && String(v.id) === String(selectedItem.id)),
           );
           if (match?.latitude && match?.longitude) {
@@ -399,10 +399,13 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
       const url = `https://www.google.com/maps?q=${lat},${lon}`;
       Linking.openURL(url);
     } else {
-      Alert.alert(
-        t("VisitPopup.NoLocationTitle"),
-        t("VisitPopup.NoLocationMessage"),
-      );
+      setShowPopup(false);
+      setTimeout(() => {
+        Alert.alert(
+          t("VisitPopup.NoLocationTitle"),
+          t("VisitPopup.NoLocationMessage"),
+        );
+      }, 400);
     }
   };
 
@@ -528,7 +531,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
       : text;
   };
   return (
-    <View className="flex bg-white">
+    <View className="flex-1 bg-white">
       <ScrollView
         className="bg-white p-3"
         refreshControl={
@@ -786,7 +789,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                   resizeMode="contain"
                 />
                 <Text className="italic text-[#787878] mt-2 text-center">
-                  {t("Dashboard.NoJobsForToday")}
+                  {t("Dashboard.NoJobsForToday")} {""}
                 </Text>
               </View>
             )}
@@ -947,7 +950,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
                     resizeMode="contain"
                   />
                   <Text className="italic text-[#787878] mt-4 text-center">
-                    {t("Dashboard.NoSavedDraftsForToday")}
+                    {t("Dashboard.NoSavedDraftsForToday")}{" "}
                   </Text>
                 </View>
               )}

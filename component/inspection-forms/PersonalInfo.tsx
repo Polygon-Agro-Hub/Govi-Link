@@ -74,7 +74,7 @@ const Input = ({
       <TextInput
         placeholder={placeholder}
         placeholderTextColor="#838B8C"
-        className="px-5  text-base text-black"
+        className="px-5  text-sm text-black"
         value={value}
         onChangeText={onChangeText}
         keyboardType={keyboardType}
@@ -84,8 +84,9 @@ const Input = ({
           flex: 1,
           minWidth: 0,
           paddingVertical: 0,
-          fontSize: 16,
+          fontSize: 12,
           height: "100%",
+          includeFontPadding: false,
         }}
       />
     </View>
@@ -823,9 +824,8 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
 
   return (
     <KeyboardAvoidingView
-      behavior="padding"
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
       style={{ flex: 1, backgroundColor: "white" }}
-      keyboardVerticalOffset={Platform.OS === "android" ? -200 : 0}
     >
       <View className="flex-1 bg-[#F3F3F3]">
         <FormTabs
@@ -833,6 +833,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
           navigation={navigation}
           requestId={requestId}
           onTabPress={handleTabPress}
+          isCurrentFormValid={isNextEnabled}
         />
 
         <ScrollView
@@ -1052,7 +1053,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
             >
               <View className="bg-[#F6F6F6] rounded-full px-5 py-4 flex-row items-center justify-between">
                 <Text
-                  className={`text-base ${selectedCountry ? "text-black" : "text-[#838B8C]"}`}
+                  className={`text-sm ${selectedCountry ? "text-black" : "text-[#838B8C]"}`}
                 >
                   {displayCountry || t("InspectionForm.SelectCountry")}
                 </Text>
@@ -1075,7 +1076,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
                 >
                   <View className="bg-[#F6F6F6] rounded-full px-5 py-4 flex-row items-center justify-between">
                     <Text
-                      className={`text-base ${selectedDistrict ? "text-black" : "text-[#838B8C]"}`}
+                      className={`text-sm ${selectedDistrict ? "text-black" : "text-[#838B8C]"}`}
                     >
                       {selectedDistrict
                         ? t(`Districts.${selectedDistrict}`)
@@ -1109,17 +1110,22 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
                 </Text>
                 <View className="bg-[#F6F6F6] rounded-full px-5 py-4">
                   <Text
-                    className={`text-base ${selectedProvince ? "text-black" : "text-[#838B8C]"}`}
+                    className={`text-sm ${selectedProvince ? "text-black" : "text-[#838B8C]"}`}
                   >
-                    {selectedProvince
-                      ? displayProvince
-                      : t("InspectionForm.SelectProvince")}
+                    {selectedProvince ? displayProvince : "----"}
                   </Text>
                 </View>
               </View>
             </>
           )}
         </ScrollView>
+        <FormFooterButton
+          exitText={t("InspectionForm.Exit")}
+          nextText={t("InspectionForm.Next")}
+          isNextEnabled={isNextEnabled}
+          onExit={handleExit}
+          onNext={handleNext}
+        />
       </View>
 
       <GlobalSearchModal
@@ -1134,9 +1140,7 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
         searchPlaceholder={
           t("AddOfficer.SearchDistrict...") || "Search district..."
         }
-        noResultsText={
-          t("AddOfficer.NoDistrictsFound") || "No districts found"
-        }
+        noResultsText={t("AddOfficer.NoDistrictsFound") || "No districts found"}
         searchKeys={["en", "si", "ta"]}
       />
 
@@ -1154,27 +1158,21 @@ const InspectionForm1: React.FC<InspectionForm1Props> = ({ navigation }) => {
         }
         noResultsText={t("AddOfficer.NoCountryFound") || "No country found"}
         searchKeys={["en", "si", "ta"]}
-        renderItem={(item, isSelected, onToggle) => (
+        renderItem={(item, isSelected, onToggle, isLast) => (
           <TouchableOpacity
             key={item.value}
-            className="px-4 py-3 flex-row items-center border-b border-gray-200"
+            className={`px-4 py-3 flex-row items-center ${
+              !isLast ? "border-b border-gray-200" : ""
+            }`}
             onPress={onToggle}
           >
             <Text className="text-2xl w-10">{item.emoji}</Text>
-           
+
             <Text className="text-base text-gray-800 font-medium flex-1">
               {item.label}
             </Text>
           </TouchableOpacity>
         )}
-      />
-
-      <FormFooterButton
-        exitText={t("InspectionForm.Exit")}
-        nextText={t("InspectionForm.Next")}
-        isNextEnabled={isNextEnabled}
-        onExit={handleExit}
-        onNext={handleNext}
       />
     </KeyboardAvoidingView>
   );
