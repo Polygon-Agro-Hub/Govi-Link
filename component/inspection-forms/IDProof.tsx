@@ -86,7 +86,7 @@ const UploadButton = ({
         />
         <TouchableOpacity
           onPress={onClear}
-          className="absolute top-2 right-2 bg-[#f21d1d] p-2 rounded-full"
+          className="absolute top-[-8] right-[-7] bg-[#f21d1d] p-1 rounded-full"
         >
           <AntDesign name="close" size={16} color="white" />
         </TouchableOpacity>
@@ -117,9 +117,9 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
   >(null);
 
   const idProofOptions = [
-  { key: "NIC Number", label: "InspectionForm.NICNumber" },
-  { key: "Driving License ID", label: "InspectionForm.DrivingLicense" },
-];
+    { key: "NIC Number", label: "InspectionForm.NICNumber" },
+    { key: "Driving License ID", label: "InspectionForm.DrivingLicense" },
+  ];
 
   useEffect(() => {
     const timer = setTimeout(async () => {
@@ -141,21 +141,24 @@ const IDProof: React.FC<IDProofProps> = ({ navigation }) => {
     }, [requestId]),
   );
 
-const validateIdNumber = (pType: string, pNumber: string): string => {
-  if (!pType) return "";
-  if (!pNumber.trim()) {
-    return t(idProofTypeConfig[pType]?.requiredError ?? "Error.SomethingWentWrongPleaseTryAgainLater");
-  }
-  if (pType === "NIC Number" && !validateNicNumber(pNumber)) {
-    return t("Error.NicNumberMustBe9DigitsFollowedByVOr12Digits");
-  }
-  if (pType === "Driving License ID" && !validateDrivingLicense(pNumber)) {
-    return t(
-      "Error.PleaseEnterAValidLicenseIdNumber1CapitalLetter7DigitsOr1012Digits",
-    );
-  }
-  return "";
-};
+  const validateIdNumber = (pType: string, pNumber: string): string => {
+    if (!pType) return "";
+    if (!pNumber.trim()) {
+      return t(
+        idProofTypeConfig[pType]?.requiredError ??
+          "Error.SomethingWentWrongPleaseTryAgainLater",
+      );
+    }
+    if (pType === "NIC Number" && !validateNicNumber(pNumber)) {
+      return t("Error.NicNumberMustBe9DigitsFollowedByVOr12Digits");
+    }
+    if (pType === "Driving License ID" && !validateDrivingLicense(pNumber)) {
+      return t(
+        "Error.PleaseEnterAValidLicenseIdNumber1CapitalLetter7DigitsOr1012Digits",
+      );
+    }
+    return "";
+  };
 
   useFocusEffect(
     useCallback(() => {
@@ -243,49 +246,52 @@ const validateIdNumber = (pType: string, pNumber: string): string => {
   const validateDrivingLicense = (input: string) =>
     /^(?:[A-Z][0-9]{7}|[0-9]{10,12})$/.test(input);
 
-const handleIdNumberChange = (input: string) => {
-  if (!formData.pType) return;
+  const handleIdNumberChange = (input: string) => {
+    if (!formData.pType) return;
 
-  const rules =
-    formData.pType === "NIC Number"
-      ? { required: true, type: "NIC Number" }
-      : { required: true, type: "Driving License ID" };
+    const rules =
+      formData.pType === "NIC Number"
+        ? { required: true, type: "NIC Number" }
+        : { required: true, type: "Driving License ID" };
 
-  let value = input.toUpperCase();
+    let value = input.toUpperCase();
 
-  if (formData.pType === "NIC Number") {
-    value = value.replace(/[^0-9V]/g, "");
-    const vIndex = value.indexOf("V");
-    if (vIndex !== -1) {
-      value = value.slice(0, vIndex + 1);
-    }
-  } else {
-    const hasLetter = /^[A-Z]/.test(value);
-    if (hasLetter) {
-      value = value.replace(/[^A-Z0-9]/g, "");
-      value = value[0] + value.slice(1).replace(/[A-Z]/g, "");
+    if (formData.pType === "NIC Number") {
+      value = value.replace(/[^0-9V]/g, "");
+      const vIndex = value.indexOf("V");
+      if (vIndex !== -1) {
+        value = value.slice(0, vIndex + 1);
+      }
     } else {
-      value = value.replace(/[^0-9]/g, "");
+      const hasLetter = /^[A-Z]/.test(value);
+      if (hasLetter) {
+        value = value.replace(/[^A-Z0-9]/g, "");
+        value = value[0] + value.slice(1).replace(/[A-Z]/g, "");
+      } else {
+        value = value.replace(/[^0-9]/g, "");
+      }
     }
-  }
 
-  let error = "";
-  if (rules.required && value.trim().length === 0) {
-    error = t(idProofTypeConfig[rules.type]?.requiredError ?? "Error.SomethingWentWrongPleaseTryAgainLater");
-  } else if (formData.pType === "NIC Number" && !validateNicNumber(value)) {
-    error = t("Error.NicNumberMustBe9DigitsFollowedByVOr12Digits");
-  } else if (
-    formData.pType === "Driving License ID" &&
-    !validateDrivingLicense(value)
-  ) {
-    error = t(
-      "Error.PleaseEnterAValidLicenseIdNumber1CapitalLetter7DigitsOr1012Digits",
-    );
-  }
+    let error = "";
+    if (rules.required && value.trim().length === 0) {
+      error = t(
+        idProofTypeConfig[rules.type]?.requiredError ??
+          "Error.SomethingWentWrongPleaseTryAgainLater",
+      );
+    } else if (formData.pType === "NIC Number" && !validateNicNumber(value)) {
+      error = t("Error.NicNumberMustBe9DigitsFollowedByVOr12Digits");
+    } else if (
+      formData.pType === "Driving License ID" &&
+      !validateDrivingLicense(value)
+    ) {
+      error = t(
+        "Error.PleaseEnterAValidLicenseIdNumber1CapitalLetter7DigitsOr1012Digits",
+      );
+    }
 
-  setErrors((prev) => ({ ...prev, nic: error }));
-  updateFormData({ pNumber: value });
-};
+    setErrors((prev) => ({ ...prev, nic: error }));
+    updateFormData({ pNumber: value });
+  };
 
   useEffect(() => {
     const handleBackPress = () => {
@@ -378,8 +384,6 @@ const handleIdNumberChange = (input: string) => {
       return false;
     }
   };
-
-  
 
   const handleNext = async () => {
     if (!formData.pType) {
@@ -479,7 +483,6 @@ const handleIdNumberChange = (input: string) => {
       );
     }
   };
-  
 
   const handleTabPress = (tabKey: string) => {
     const routeMap: Record<string, string> = {
@@ -502,7 +505,6 @@ const handleIdNumberChange = (input: string) => {
     }
   };
 
-
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -514,6 +516,7 @@ const handleIdNumberChange = (input: string) => {
           navigation={navigation}
           requestId={requestId}
           onTabPress={handleTabPress}
+          isCurrentFormValid={isNextEnabled}
         />
 
         <ScrollView
@@ -534,11 +537,16 @@ const handleIdNumberChange = (input: string) => {
               activeOpacity={0.8}
             >
               <View className="bg-[#F6F6F6] rounded-3xl px-5 h-[50px] flex-row items-center justify-between">
-               <Text className={`text-base ${formData.pType ? "text-black" : "text-[#838B8C]"}`}>
-  {formData.pType
-    ? t(idProofTypeConfig[formData.pType]?.label ?? formData.pType)
-    : t("InspectionForm.SelectProofType")}
-</Text>
+                <Text
+                  className={`text-base ${formData.pType ? "text-black" : "text-[#838B8C]"}`}
+                >
+                  {formData.pType
+                    ? t(
+                        idProofTypeConfig[formData.pType]?.label ??
+                          formData.pType,
+                      )
+                    : t("InspectionForm.SelectProofType")}
+                </Text>
                 <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
               </View>
             </TouchableOpacity>
@@ -564,11 +572,12 @@ const handleIdNumberChange = (input: string) => {
                       flex: 1,
                       minWidth: 0,
                       paddingVertical: 0,
-                      fontSize: 16,
+                      fontSize: 12,
                       height: 50,
+                      includeFontPadding: false,
                     }}
                     placeholderTextColor="#7F7F7F"
-                    className="px-2  text-base text-black ml-4"
+                    className="px-2  text-sm text-black ml-4"
                     value={formData.pNumber}
                     onChangeText={handleIdNumberChange}
                     underlineColorAndroid="transparent"
@@ -635,11 +644,15 @@ const handleIdNumberChange = (input: string) => {
           activeOpacity={1}
           onPress={() => setShowIdProofDropdown(false)}
         >
-          <View className="bg-white rounded-2xl p-4 w-10/12">
+          <View className="bg-white rounded-2xl px-2 py-2 w-2/3">
             {idProofOptions.map((option, index) => (
               <TouchableOpacity
                 key={option.key}
-                className={`py-4 ${index < idProofOptions.length - 1 ? "border-b border-gray-200" : ""}`}
+                className={`py-4 items-center justify-center ${
+                  index < idProofOptions.length - 1
+                    ? "border-b border-gray-200"
+                    : ""
+                }`}
                 onPress={() => {
                   setShowIdProofDropdown(false);
                   setErrors({});
@@ -651,7 +664,9 @@ const handleIdNumberChange = (input: string) => {
                   });
                 }}
               >
-                <Text className="text-base text-black">{t(option.label)}</Text>
+                <Text className="text-base text-black text-center">
+                  {t(option.label)}
+                </Text>
               </TouchableOpacity>
             ))}
           </View>

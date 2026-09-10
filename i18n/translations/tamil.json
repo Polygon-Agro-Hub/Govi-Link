@@ -49,6 +49,7 @@
     "DistrictIsRequired": "மாவட்டம் அவசியம்.",
     "CommissionAmountIsRequired": "Commission amount is required",
     "AccountHoldersNameIsRequired": "கணக்கு வைத்திருப்பவரின் பெயர் அவசியம்.",
+    "accHolder is required": "கணக்கு வைத்திருப்பவரின் பெயர் அவசியம்.",
     "AccountNumberIsRequired": "கணக்கு எண் அவசியம்.",
     "ConfirmAccountNumberIsRequired": "Confirm account number is required",
     "BankIsRequired": "வங்கி அவசியம்.",
@@ -123,7 +124,8 @@
     "firstName is required": "முதற்பெயர் தேவை",
     "lastName is required": "கடைசிப் பெயர் தேவை",
     "otherName is required": "மற்ற பெயர் தேவை",
-    "callName is required": "அழைப்புப் பெயர் தேவை"
+    "callName is required": "அழைப்புப் பெயர் தேவை",
+     "PleaseSelectYesOrNoFor": "தயவுசெய்து {{param}} க்கு ஆம் அல்லது இல்லை எனத் தேர்ந்தெடுக்கவும்."
 
   },
   "Login": {
@@ -659,6 +661,7 @@
   },
   "ConfirmationCapitalRequest": {
     "ConfirmAndLeave": "உறுதிசெய்து வெளியேறு",
+    "RequestConfirmedSuccessfully":"கோரிக்கை வெற்றிகரமாக உறுதிப்படுத்தப்பட்டது.", 
     "Undo": "செயல்தவிர்",
     "ThisRequestWillBeAutomaticallyConfirmedIn": "இந்தக் கோரிக்கை தானாக உறுதிப்படுத்தப்படும்",
     "MinutesIfNoActionIsTaken": "நிமிடங்களில் எந்த நடவடிக்கையும் எடுக்கப்படாவிட்டால்.",

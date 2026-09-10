@@ -8,8 +8,6 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
-  Modal,
-  FlatList,
   BackHandler,
 } from "react-native";
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
@@ -23,12 +21,14 @@ import branchesData from "@/assets/json/bank-branches.json";
 import axios from "axios";
 import environment from "@/environment/environment";
 import FormFooterButton from "./FormFooterButton";
+
 import {
   saveFinanceInfo,
   getFinanceInfo,
   FinanceInfo as FinanceInfoData,
 } from "@/database/inspectionfinance";
 import { updateLastScreen } from "@/database/inspectionprogress";
+import GlobalSearchModal from "../commons/GlobalSearchModal";
 
 type AssetCategory = {
   key: string;
@@ -65,10 +65,19 @@ const Input = ({
       <TextInput
         placeholder={placeholder}
         placeholderTextColor="#838B8C"
-        className="px-5 h-[50px] text-base text-black flex-1"
+        className="px-5  text-sm text-black"
+         style={{
+          flex: 1,
+          minWidth: 0,
+          paddingVertical: 0,
+          fontSize: 12,
+          height: 50,
+          includeFontPadding: false,
+        }}
         value={value}
         onChangeText={onChangeText}
         keyboardType={keyboardType}
+       
       />
     </View>
     {error && (
@@ -152,8 +161,6 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
   );
   const [showBankDropdown, setShowBankDropdown] = useState(false);
   const [showBranchDropdown, setShowBranchDropdown] = useState(false);
-  const [bankSearch, setBankSearch] = useState("");
-  const [branchSearch, setBranchSearch] = useState("");
   const [selectedBranch, setSelectedBranch] = useState("");
   const [selectedBank, setSelectedBank] = useState("");
   const [isNextEnabled, setIsNextEnabled] = useState(false);
@@ -669,11 +676,9 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
 
   const handleModalClose = (modalType: string) => {
     if (modalType === "bank") {
-      setBankSearch("");
       setShowBankDropdown(false);
     }
     if (modalType === "branch") {
-      setBranchSearch("");
       setShowBranchDropdown(false);
     }
   };
@@ -711,59 +716,6 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
       a.name.toLowerCase().localeCompare(b.name.toLowerCase()),
     );
 
-  const getFilteredBanks = () => {
-    if (!bankSearch) return sortBanksAlphabetically(banks);
-    return sortBanksAlphabetically(
-      banks.filter((bank) =>
-        bank.name.toLowerCase().includes(bankSearch.toLowerCase()),
-      ),
-    );
-  };
-
-  const getFilteredBranches = () => {
-    if (!branchSearch) return sortBranchesAlphabetically(availableBranches);
-    return sortBranchesAlphabetically(
-      availableBranches.filter((branch) =>
-        branch.name.toLowerCase().includes(branchSearch.toLowerCase()),
-      ),
-    );
-  };
-
-  const renderBankItem = ({
-    item,
-    index,
-  }: {
-    item: { id: number; name: string };
-    index: number;
-  }) => {
-    const filteredBanks = getFilteredBanks();
-    const isLast = index === filteredBanks.length - 1;
-    return (
-      <TouchableOpacity
-        className={`px-4 py-3 ${!isLast ? "border-b border-gray-200" : ""}`}
-        onPress={() => handleBankSelect(item)}
-      >
-        <Text className="text-base text-gray-800">{item.name}</Text>
-      </TouchableOpacity>
-    );
-  };
-
-  const renderEmptyBankList = () => (
-    <View className="px-4 py-6 items-center">
-      <Text className="text-gray-500 text-base mt-2">
-        {t("AddOfficer.NoBanksFound")}
-      </Text>
-    </View>
-  );
-
-  const renderEmptyBranchList = () => (
-    <View className="px-4 py-6 items-center">
-      <Text className="text-gray-500 text-base mt-2">
-        {t("AddOfficer.NoBranchesFound")}
-      </Text>
-    </View>
-  );
-
   useEffect(() => {
     const handleBackPress = () => {
       navigation.navigate("Main", {
@@ -780,56 +732,6 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
 
     return () => subscription.remove();
   }, [navigation]);
-
-  const renderBranchItem = ({
-    item,
-    index,
-  }: {
-    item: { ID: number; name: string };
-    index: number;
-  }) => {
-    const filteredBranches = getFilteredBranches();
-    const isLast = index === filteredBranches.length - 1;
-    return (
-      <TouchableOpacity
-        className={`px-4 py-3 ${!isLast ? "border-b border-gray-200" : ""}`}
-        onPress={() => handleBranchSelect(item)}
-      >
-        <Text className="text-base text-gray-800">{item.name}</Text>
-      </TouchableOpacity>
-    );
-  };
-
-  const renderSearchInput = (
-    value: string,
-    onChangeText: (text: string) => void,
-    placeholder: string,
-  ) => (
-    <View className="px-4 py-2 border-b border-gray-200">
-      <View className="bg-gray-100 rounded-3xl h-[50px] px-3 flex-row items-center">
-        <MaterialIcons name="search" size={20} color="#666" />
-        <TextInput
-          placeholder={placeholder}
-          value={value}
-          onChangeText={onChangeText}
-          className=" ml-2 "
-          style={{
-            flex: 1,
-            minWidth: 0,
-            paddingVertical: 0,
-            fontSize: 16,
-            height: "100%",
-          }}
-          placeholderTextColor="#666"
-        />
-        {value ? (
-          <TouchableOpacity onPress={() => onChangeText("")}>
-            <MaterialIcons name="close" size={20} color="#666" />
-          </TouchableOpacity>
-        ) : null}
-      </View>
-    </View>
-  );
 
   const assetCategories: AssetCategory[] = [
     {
@@ -926,6 +828,22 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
     if (route) navigation.navigate(route, { requestId, requestNumber });
   };
 
+  // Data fed into GlobalSearchModal for the Bank picker
+  const bankModalData = sortBanksAlphabetically(banks).map((b) => ({
+    label: b.name,
+    value: b.name,
+    id: b.id,
+  }));
+
+  // Data fed into GlobalSearchModal for the Branch picker
+  const branchModalData = sortBranchesAlphabetically(availableBranches).map(
+    (b) => ({
+      label: b.name,
+      value: b.name,
+      ID: b.ID,
+    }),
+  );
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -937,6 +855,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
           navigation={navigation}
           requestId={requestId}
           onTabPress={handleTabPress}
+          isCurrentFormValid={isNextEnabled}
         />
 
         <ScrollView
@@ -1012,7 +931,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               onPress={() => setShowBankDropdown(true)}
             >
               <Text
-                className={`${selectedBank ? "text-black" : "text-[#7D7D7D]"}`}
+                className={`text-sm ${selectedBank ? "text-black" : "text-[#7D7D7D]"}`}
               >
                 {selectedBank || t("InspectionForm.SelectBank")}
               </Text>
@@ -1044,7 +963,7 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
               disabled={availableBranches.length === 0}
             >
               <Text
-                className={`${selectedBranch ? "text-black" : "text-[#7D7D7D]"}`}
+                className={`text-sm ${selectedBranch ? "text-black" : "text-[#7D7D7D]"}`}
               >
                 {selectedBranch || t("InspectionForm.SelectBranch")}
               </Text>
@@ -1098,6 +1017,8 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
                 keyboardType="default"
                 multiline={true}
                 textAlignVertical="top"
+                className="text-black text-sm"
+                style={{ fontSize: 12, includeFontPadding: false }}
               />
             </View>
             {errors.debtsOfFarmer && (
@@ -1219,6 +1140,8 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
                           }}
                           multiline
                           textAlignVertical="top"
+                          className="text-black text-sm"
+                          style={{ fontSize: 12, includeFontPadding: false }}
                         />
                       </View>
                       {(!formData.assetsFarmTool ||
@@ -1264,71 +1187,35 @@ const FinanceInfo: React.FC<FinanceInfoProps> = ({ navigation }) => {
           </View>
         </ScrollView>
 
-        <Modal
+        <GlobalSearchModal
           visible={showBankDropdown}
-          transparent={true}
-          animationType="slide"
-          onRequestClose={() => handleModalClose("bank")}
-        >
-          <View className="flex-1 bg-black/50 justify-center items-center">
-            <View className="bg-white rounded-2xl w-10/12 max-h-3/4 overflow-hidden">
-              <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
-                <Text className="text-lg font-semibold">
-                  {t("AddOfficer.SelectBank")}
-                </Text>
-                <TouchableOpacity onPress={() => handleModalClose("bank")}>
-                  <MaterialIcons name="close" size={24} color="#666" />
-                </TouchableOpacity>
-              </View>
-              {renderSearchInput(
-                bankSearch,
-                setBankSearch,
-                t("AddOfficer.SearchBank..."),
-              )}
-              <FlatList
-                data={getFilteredBanks()}
-                renderItem={renderBankItem}
-                keyExtractor={(item) => item.id.toString()}
-                showsVerticalScrollIndicator={false}
-                style={{ maxHeight: 384 }}
-                ListEmptyComponent={renderEmptyBankList}
-              />
-            </View>
-          </View>
-        </Modal>
+          onClose={() => handleModalClose("bank")}
+          title={t("AddOfficer.SelectBank")}
+          data={bankModalData}
+          selectedItems={selectedBank ? [selectedBank] : []}
+          onSelect={(items) => {
+            const bankObj = banks.find((b) => b.name === items[0]);
+            if (bankObj) handleBankSelect(bankObj);
+          }}
+          searchPlaceholder={t("AddOfficer.SearchBank...")}
+          noResultsText={t("AddOfficer.NoBanksFound")}
+        />
 
-        <Modal
+        <GlobalSearchModal
           visible={showBranchDropdown}
-          transparent={true}
-          animationType="slide"
-          onRequestClose={() => handleModalClose("branch")}
-        >
-          <View className="flex-1 bg-black/50 justify-center items-center">
-            <View className="bg-white rounded-2xl w-10/12 max-h-3/4 overflow-hidden">
-              <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
-                <Text className="text-lg font-semibold">
-                  {t("AddOfficer.SelectBranch")}
-                </Text>
-                <TouchableOpacity onPress={() => handleModalClose("branch")}>
-                  <MaterialIcons name="close" size={24} color="#666" />
-                </TouchableOpacity>
-              </View>
-              {renderSearchInput(
-                branchSearch,
-                setBranchSearch,
-                t("AddOfficer.SearchBranch..."),
-              )}
-              <FlatList
-                data={getFilteredBranches()}
-                renderItem={renderBranchItem}
-                keyExtractor={(item) => item.ID.toString()}
-                showsVerticalScrollIndicator={false}
-                 style={{ maxHeight: 384 }}
-                ListEmptyComponent={renderEmptyBranchList}
-              />
-            </View>
-          </View>
-        </Modal>
+          onClose={() => handleModalClose("branch")}
+          title={t("AddOfficer.SelectBranch")}
+          data={branchModalData}
+          selectedItems={selectedBranch ? [selectedBranch] : []}
+          onSelect={(items) => {
+            const branchObj = availableBranches.find(
+              (b) => b.name === items[0],
+            );
+            if (branchObj) handleBranchSelect(branchObj);
+          }}
+          searchPlaceholder={t("AddOfficer.SearchBranch...")}
+          noResultsText={t("AddOfficer.NoBranchesFound")}
+        />
 
         <FormFooterButton
           exitText={t("InspectionForm.Back")}

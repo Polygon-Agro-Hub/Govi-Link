@@ -82,41 +82,46 @@ const FormFooterButton: React.FC<FormFooterButtonProps> = ({
       </TouchableOpacity>
 
       {isNextEnabled ? (
-        <View className="flex-1">
-          <TouchableOpacity
-            className="flex-1"
-            onPress={onNext}
-            activeOpacity={0.8}
-          >
-            <LinearGradient
-              colors={gradientColors}
-              start={gradientStart}
-              end={gradientEnd}
-              style={{
-                borderRadius: 9999,
-                height: 50,
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 3 },
-                shadowOpacity: 0.25,
-                shadowRadius: 5,
-                elevation: 6,
-                overflow: "hidden",
-                ...nextButtonStyle,
-              }}
-            >
-              <Text
-                className="text-white text-base font-semibold mr-2"
-                style={nextTextStyle}
-              >
-                {nextText}
-              </Text>
-              <Ionicons name="arrow-forward" size={25} color="#fff" />
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
+         <View
+    className="flex-1"
+    style={{
+      borderRadius: 9999,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 3 },
+      shadowOpacity: 0.25,
+      shadowRadius: 5,
+      elevation: 6, // Android shadow, safe to keep here
+    }}
+  >
+    <TouchableOpacity
+      className="flex-1"
+      onPress={onNext}
+      activeOpacity={0.8}
+    >
+      <LinearGradient
+        colors={gradientColors}
+        start={gradientStart}
+        end={gradientEnd}
+        style={{
+          borderRadius: 9999,
+          height: 50,
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+          overflow: "hidden", // clipping now lives only here
+          ...nextButtonStyle,
+        }}
+      >
+        <Text
+          className="text-white text-base font-semibold mr-2"
+          style={nextTextStyle}
+        >
+          {nextText}
+        </Text>
+        <Ionicons name="arrow-forward" size={25} color="#fff" />
+      </LinearGradient>
+    </TouchableOpacity>
+  </View>
       ) : (
         <View
           className="flex-1 bg-gray-300 rounded-full h-[50px] flex-row items-center justify-center"

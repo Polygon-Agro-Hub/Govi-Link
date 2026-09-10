@@ -99,7 +99,7 @@ const YesNoSelect = ({
                     onClose();
                   }}
                 >
-                  <Text className="text-center text-base text-black">
+                  <Text className="text-center text-sm text-black">
                     {t(`InspectionForm.${item}`)}
                   </Text>
                 </TouchableOpacity>
@@ -123,9 +123,11 @@ const YesNoSelect = ({
           activeOpacity={0.7}
         >
           {value ? (
-            <Text className="text-black">{t(`InspectionForm.${value}`)}</Text>
+            <Text className="text-black text-sm">
+              {t(`InspectionForm.${value}`)}
+            </Text>
           ) : (
-            <Text className="text-[#838B8C]">
+            <Text className="text-[#838B8C] text-sm">
               {t("InspectionForm.SelectFromHere")}
             </Text>
           )}
@@ -169,7 +171,15 @@ const Input = ({
       <TextInput
         placeholder={placeholder}
         placeholderTextColor="#838B8C"
-        className="px-5 h-[50px] text-base text-black flex-1"
+        className="px-5  text-sm text-black"
+        style={{
+          flex: 1,
+          minWidth: 0,
+          paddingVertical: 0,
+          fontSize: 12,
+          height: 50,
+          includeFontPadding: false,
+        }}
         value={value}
         onChangeText={onChangeText}
         keyboardType={keyboardType}
@@ -500,8 +510,8 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
     const hasOther = updatedOptions.includes("Other");
     const otherFilled = (formData.otherWaterSources?.trim().length ?? 0) > 0;
 
-    if (updatedOptions.length === 0) {
-      errorMsg = t("Error.PleaseSelectAtLeastOneWaterSource");
+    if (option === "Other" && !hasOther) {
+      errorMsg = "";
     } else if (hasOther && !otherFilled) {
       errorMsg = t("Error.PleaseSpecifyTheOtherWaterSource");
     }
@@ -669,7 +679,14 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
     );
 
     if (!allClimateSelected) {
-      validationErrors.climate = t("Error.PleaseSelectYesOrNoForMissing");
+      const missingParam = climateParameters.find(
+        (param) =>
+          selections[param.key] !== "yes" && selections[param.key] !== "no",
+      );
+
+      validationErrors.climate = t("Error.PleaseSelectYesOrNoFor", {
+        param: t(`InspectionForm.${missingParam?.label}`),
+      });
     }
 
     const phVal = parseFloat(formData?.ph?.toString() || "0");
@@ -736,7 +753,6 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
       return;
     }
 
-   
     try {
       saveCultivationInfo(reqId, formData);
     } catch (err) {
@@ -849,6 +865,7 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
           navigation={navigation}
           requestId={requestId}
           onTabPress={handleTabPress}
+          isCurrentFormValid={isNextEnabled}
         />
 
         <ScrollView
@@ -1031,7 +1048,16 @@ const CultivationInfo: React.FC<CultivationInfoProps> = ({ navigation }) => {
               <TextInput
                 placeholder={t("InspectionForm.MentionOther")}
                 placeholderTextColor="#838B8C"
-                className="bg-[#F6F6F6] px-4 h-[50px] rounded-3xl text-black mb-2"
+                className="bg-[#F6F6F6] px-5  text-sm text-black"
+                style={{
+                  flex: 1,
+                  minWidth: 0,
+                  paddingVertical: 0,
+                  fontSize: 12,
+                  height: 50,
+                  includeFontPadding: false,
+                  borderRadius: 99,
+                }}
                 value={formData.otherWaterSources || ""}
                 onChangeText={handleOtherWaterSourceChange}
               />

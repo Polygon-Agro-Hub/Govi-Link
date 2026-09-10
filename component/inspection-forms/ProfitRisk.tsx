@@ -114,10 +114,19 @@ const Input = ({
       <TextInput
         placeholder={placeholder}
         placeholderTextColor="#838B8C"
-        className="px-5 h-[50px] text-base text-black flex-1"
+        className="px-5  text-sm text-black "
         value={value}
         onChangeText={onChangeText}
         keyboardType={keyboardType}
+          style={{
+                    flex: 1,
+                    minWidth: 0,
+                    paddingVertical: 0,
+                    fontSize: 12,
+                    height: 50,
+                    includeFontPadding: false,
+                    borderRadius: 99,
+                  }}
       />
     </View>
 
@@ -133,6 +142,7 @@ const YesNoSelect = ({
   onClose,
   onSelect,
   required = false,
+  error,
 }: {
   label: string;
   value: "Yes" | "No" | null;
@@ -141,12 +151,13 @@ const YesNoSelect = ({
   onClose: () => void;
   onSelect: (value: "Yes" | "No") => void;
   required?: boolean;
+  error?: string;
 }) => {
   const { t } = useTranslation();
 
   return (
     <>
-      <Modal transparent visible={visible} animationType="fade">
+      <Modal visible={visible} transparent animationType="fade">
         <TouchableOpacity
           className="flex-1 bg-black/40 justify-center items-center"
           activeOpacity={1}
@@ -188,14 +199,15 @@ const YesNoSelect = ({
           activeOpacity={0.7}
         >
           {value ? (
-            <Text className="text-black">{t(`InspectionForm.${value}`)}</Text>
+            <Text className="text-black text-sm">{t(`InspectionForm.${value}`)}</Text>
           ) : (
-            <Text className="text-[#838B8C]">
+            <Text className="text-[#838B8C] text-sm">
              {t("InspectionForm.SelectFromHere")}
             </Text>
           )}
           <MaterialIcons name="arrow-drop-down" size={24} color="#666" />
         </TouchableOpacity>
+        <ErrorMessage message={error} />
       </View>
     </>
   );
@@ -681,6 +693,7 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
           navigation={navigation}
           requestId={requestId}
           onTabPress={handleTabPress}
+          isCurrentFormValid={isNextEnabled}
         />
 
         <ScrollView
@@ -706,10 +719,20 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
               <TextInput
                 placeholder="0.00"
                 placeholderTextColor="#838B8C"
-                className="px-5 h-[50px] text-base text-black flex-1"
+                className="px-5  text-black "
+                  style={{
+                    flex: 1,
+                    minWidth: 0,
+                    paddingVertical: 0,
+                    fontSize: 12,
+                    height: 50,
+                    includeFontPadding: false,
+                    borderRadius: 99,
+                  }}
                 value={displayProfit}
                 onChangeText={handleProfitChange}
                 keyboardType="numeric"
+                
               />
             </View>
             <ErrorMessage message={errors.profit} />
@@ -790,7 +813,8 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
                     }}
                     multiline
                     textAlignVertical="top"
-                    className="text-black"
+                    className="text-black text-sm"
+                    style={{ fontSize: 12, includeFontPadding: false }}
                   />
                 </View>
 
@@ -834,7 +858,8 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
                     }}
                     multiline
                     textAlignVertical="top"
-                    className="text-black"
+                    className="text-black text-sm"
+                    style={{ fontSize: 12, includeFontPadding: false }}
                   />
                 </View>
 
@@ -900,7 +925,8 @@ const ProfitRisk: React.FC<ProfitRiskProps> = ({ navigation }) => {
                     }}
                     multiline
                     textAlignVertical="top"
-                    className="text-black"
+                    className="text-black text-sm"
+                    style={{ fontSize: 12, includeFontPadding: false }}
                   />
                 </View>
 

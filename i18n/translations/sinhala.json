@@ -49,6 +49,7 @@
     "DistrictIsRequired": "දිස්ත්‍රික්කය අවශ්‍යයි",
     "CommissionAmountIsRequired": "කොමිස් ප්‍රමාණය අවශ්‍යයි",
     "AccountHoldersNameIsRequired": "ගිණුම් හිමිකරුගේ නම අවශ්‍යයි",
+     "accHolder is required": "ගිණුම් හිමිකරුගේ නම අවශ්‍යයි",
     "AccountNumberIsRequired": "ගිණුම් අංකය අවශ්‍යයි",
     "ConfirmAccountNumberIsRequired": "ගිණුම් අංකය තහවුරු කිරීම අවශ්‍යයි",
     "BankIsRequired": "බැංකුව අවශ්‍යයි",
@@ -123,7 +124,8 @@
     "firstName is required": "මුල් නම අවශ්‍යයි",
     "lastName is required": "අවසන් නම අවශ්‍යයි",
     "otherName is required": "වෙනත් නම අවශ්‍යයි",
-    "callName is required": "ඇමතුම් නම අවශ්‍යයි"
+    "callName is required": "ඇමතුම් නම අවශ්‍යයි",
+    "PleaseSelectYesOrNoFor": "කරුණාකර {{param}} සඳහා ඔව් හෝ නැත තෝරන්න."
   },
   "Login": {
     "Welcome": "සාදරයෙන් පිළිගනිමු!",
@@ -658,6 +660,7 @@
   },
   "ConfirmationCapitalRequest": {
     "ConfirmAndLeave": "තහවුරු කර පිටවන්න",
+    "RequestConfirmedSuccessfully":"ඉල්ලීම සාර්ථකව තහවුරු කරන ලදී.", 
     "Undo": "අහෝසි කරන්න",
     "ThisRequestWillBeAutomaticallyConfirmedIn": "කිසිදු ක්‍රියාවක් සිදු නොකරන්නේ නම් මෙම ඉල්ලීම ස්වයංක්‍රීයව තහවුරු වන්නේ",
     "MinutesIfNoActionIsTaken": "විනාඩි ඇතුළතයි.",

@@ -49,6 +49,7 @@
     "DistrictIsRequired": "District is required",
     "CommissionAmountIsRequired": "Commission amount is required",
     "AccountHoldersNameIsRequired": "Account holder's name is required",
+    "accHolder is required": "Account holder's name is required",
     "AccountNumberIsRequired": "Account number is required",
     "ConfirmAccountNumberIsRequired": "Confirm account number is required",
     "BankIsRequired": "Bank is required",
@@ -123,7 +124,8 @@
     "firstName is required": "First name is required",
     "lastName is required": "Last name is required",
     "otherName is required": "Other name is required",
-    "callName is required": "Call name is required"
+    "callName is required": "Call name is required",
+    "PleaseSelectYesOrNoFor": "Please select Yes or No for {{param}}."
   },
   "Login": {
     "Welcome": "Welcome!",
@@ -658,6 +660,7 @@
   },
   "ConfirmationCapitalRequest": {
     "ConfirmAndLeave": "Confirm & Leave",
+    "RequestConfirmedSuccessfully":"Request Confirmed Successfully", 
     "Undo": "Undo",
     "ThisRequestWillBeAutomaticallyConfirmedIn": "This request will be automatically confirmed in",
     "MinutesIfNoActionIsTaken": "minutes if no action is taken.",
