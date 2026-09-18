@@ -9,7 +9,6 @@
     "android": {
       "package": "com.polygonagro.GoviLink",
       "versionCode": 14,
-      "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "softwareKeyboardLayoutMode": "resize",
       "adaptiveIcon": {
@@ -118,7 +117,8 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "./withCustomAndroidPermissions"
     ],
     "extra": {
       "eas": {
