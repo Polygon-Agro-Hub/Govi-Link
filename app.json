@@ -91,7 +91,6 @@
         }
       ],
       "expo-font",
-      "expo-tracking-transparency",
       "expo-sqlite",
       "expo-web-browser",
       "@react-native-community/datetimepicker",
@@ -100,13 +99,16 @@
         "expo-camera",
         {
           "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
+          "microphonePermission": false,
           "recordAudioAndroid": false
         }
       ],
       [
         "expo-image-picker",
         {
-          "photosPermission": "Photo library access is required to upload related images."
+          "photosPermission": "Photo library access is required to upload related images.",
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
+          "microphonePermission": false
         }
       ],
       "expo-location",
@@ -122,7 +124,7 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "c735bfa4-042d-4a69-add1-a6fa071ba2aa"
+        "projectId": ""
       }
     }
   }
