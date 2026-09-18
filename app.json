@@ -8,7 +8,7 @@
     "userInterfaceStyle": "light",
     "android": {
       "package": "com.polygonagro.GoviLink",
-      "versionCode": 14,
+      "versionCode": 15,
       "predictiveBackGestureEnabled": false,
       "softwareKeyboardLayoutMode": "resize",
       "adaptiveIcon": {
@@ -110,6 +110,7 @@
         }
       ],
       "expo-location",
+      "./plugins/withCustomAndroidPermissions",
       [
         "expo-splash-screen",
         {
@@ -117,12 +118,11 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ],
-      "./withCustomAndroidPermissions"
+      ]
     ],
     "extra": {
       "eas": {
-        "projectId": ""
+        "projectId": "c735bfa4-042d-4a69-add1-a6fa071ba2aa"
       }
     }
   }
