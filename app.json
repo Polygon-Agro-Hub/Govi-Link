@@ -8,8 +8,7 @@
     "userInterfaceStyle": "light",
     "android": {
       "package": "com.polygonagro.GoviLink",
-      "versionCode": 14,
-      "edgeToEdgeEnabled": true,
+      "versionCode": 15,
       "predictiveBackGestureEnabled": false,
       "softwareKeyboardLayoutMode": "resize",
       "adaptiveIcon": {
@@ -101,16 +100,20 @@
         "expo-camera",
         {
           "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
+          "microphonePermission": false,
           "recordAudioAndroid": false
         }
       ],
       [
         "expo-image-picker",
         {
-          "photosPermission": "Photo library access is required to upload related images."
+          "photosPermission": "Photo library access is required to upload related images.",
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
+          "microphonePermission": false
         }
       ],
       "expo-location",
+      "./plugins/withCustomAndroidPermissions",
       [
         "expo-splash-screen",
         {
