@@ -91,6 +91,7 @@
         }
       ],
       "expo-font",
+      "expo-tracking-transparency",
       "expo-sqlite",
       "expo-web-browser",
       "@react-native-community/datetimepicker",
