@@ -176,8 +176,9 @@ const CapitalRequests: React.FC<CapitalRequestsProps> = ({ navigation }) => {
               />
               <Text className="italic text-[#787878] mt-4">
                 {searchQuery
-                  ? t("CapitalRequests.NoRequestsFound")
+                  ? t("CapitalRequests.NoRequestsFound") 
                   : t("CapitalRequests.NoRequests")}
+                  {"  "}
               </Text>
             </View>
           ) : (

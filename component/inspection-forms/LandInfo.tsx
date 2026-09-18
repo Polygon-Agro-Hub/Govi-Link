@@ -44,6 +44,70 @@ type LandInfoProps = {
   navigation: any;
 };
 
+// ---------------------------------------------------------------------------
+// Backward-compatibility layer
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// Backward-compatibility and Backend Serialization Layer
+// ---------------------------------------------------------------------------
+// The backend database (plant_care.inspectionland.ownershipStatus) expects
+// standard English text labels, e.g. "Own land – Single owner".
+// In the mobile app UI, we use canonical i18n keys (e.g. "OwnLandSingleOwner")
+// so that Sinhala and Tamil translations render properly.
+// When sending to the backend, we convert the key back to the English label.
+
+const OWNERSHIP_STATUS_KEY_TO_BACKEND: Record<string, string> = {
+  OwnLandSingleOwner: "Own land – Single owner",
+  OwnLandMultipleOwners: "Own land – Multiple owners (undivided)",
+  LeasedLandFromPrivateOwner: "Leased land from private owner",
+  LeasedLandFromTheGovernment: "Leased land from the government",
+  PermitLandShortTerm: "Permit land – short term from the government",
+  PermitLandLongTerm: "Permit land – long term from the government",
+};
+
+const LEGACY_OWNERSHIP_STATUS_MAP: Record<string, string> = {
+  "Own land – Single owner": "OwnLandSingleOwner",
+  "Own land - Single owner": "OwnLandSingleOwner",
+  "Own land – Multiple owners (undivided)": "OwnLandMultipleOwners",
+  "Own land - Multiple owners (undivided)": "OwnLandMultipleOwners",
+  "Leased land from private owner": "LeasedLandFromPrivateOwner",
+  "Leased land from the government": "LeasedLandFromTheGovernment",
+  "Permit land – short term from the government": "PermitLandShortTerm",
+  "Permit land - short term from the government": "PermitLandShortTerm",
+  "Permit land – long term from the government": "PermitLandLongTerm",
+  "Permit land - long term from the government": "PermitLandLongTerm",
+};
+
+const CANONICAL_OWNERSHIP_STATUS_KEYS = [
+  "OwnLandSingleOwner",
+  "OwnLandMultipleOwners",
+  "LeasedLandFromPrivateOwner",
+  "LeasedLandFromTheGovernment",
+  "PermitLandShortTerm",
+  "PermitLandLongTerm",
+];
+
+const normalizeOwnershipStatus = (
+  value: string | undefined,
+): string | undefined => {
+  if (!value) return value;
+  const trimmed = value.trim();
+  if (CANONICAL_OWNERSHIP_STATUS_KEYS.includes(trimmed)) return trimmed;
+  if (LEGACY_OWNERSHIP_STATUS_MAP[trimmed]) {
+    return LEGACY_OWNERSHIP_STATUS_MAP[trimmed];
+  }
+  return trimmed;
+};
+
+const getBackendOwnershipStatus = (value: string | undefined): string => {
+  if (!value) return "";
+  const trimmed = value.trim();
+  if (OWNERSHIP_STATUS_KEY_TO_BACKEND[trimmed]) {
+    return OWNERSHIP_STATUS_KEY_TO_BACKEND[trimmed];
+  }
+  return trimmed;
+};
+
 const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
   const route = useRoute<RouteProp<RootStackParamList, "LandInfo">>();
   const { requestNumber, requestId } = route.params;
@@ -215,32 +279,59 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
           const reqId = Number(requestId);
           const localData = await getLandInfo(reqId);
           if (localData) {
-            setFormData(localData);
+            // Normalize legacy ownershipStatus values (human-readable
+            // English labels saved by older builds) back into the
+            // canonical i18n key so translation and comparisons work.
+            const normalizedData: LandInfoData = {
+              ...localData,
+              ownershipStatus: normalizeOwnershipStatus(
+                localData.ownershipStatus,
+              ),
+            };
+
+            setFormData(normalizedData);
             setIsExistingData(true);
 
             const validationErrors: Record<string, string> = {};
-            if (!localData.landDiscription?.trim())
+            if (!normalizedData.landDiscription?.trim())
               validationErrors.landDiscription = t(
                 "Error.CultivationLandsDescriptionIsRequired",
               );
-            if (!localData.isOwnByFarmer)
+            if (!normalizedData.isOwnByFarmer)
               validationErrors.isOwnByFarmer = t(
                 "Error.LandOwnershipIsRequired",
               );
-            if (!localData.ownershipStatus)
+            if (!normalizedData.ownershipStatus)
               validationErrors.ownershipStatus = t(
                 "Error.LandOwnershipIsRequired",
               );
-            if (!localData.geoLocation)
+            if (!normalizedData.geoLocation)
               validationErrors.geoLocation = t(
                 "Error.Geo location is required",
               );
-            if (!localData.images?.length)
+            if (!normalizedData.images?.length)
               validationErrors.images = t(
                 "Error.AtLeastOneCategoryOptionMustBeSelected",
               );
 
             setErrors(validationErrors);
+
+            // If the loaded record had a legacy-format value, persist the
+            // normalized key back to storage right away so future loads
+            // (and the backend) only ever see the canonical key.
+            if (
+              localData.ownershipStatus &&
+              localData.ownershipStatus !== normalizedData.ownershipStatus
+            ) {
+              try {
+                await saveLandInfo(reqId, normalizedData);
+              } catch (err) {
+                console.error(
+                  "Error persisting normalized ownershipStatus:",
+                  err,
+                );
+              }
+            }
           } else {
             setIsExistingData(false);
           }
@@ -329,7 +420,12 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
         "isOwnByFarmer",
         data.isOwnByFarmer === "Yes" ? "1" : "0",
       );
-      apiFormData.append("ownershipStatus", data.ownershipStatus || "");
+      // Pass the standard English label to the backend ownershipStatus column,
+      // not the translation key (e.g. OwnLandSingleOwner) or translated text.
+      apiFormData.append(
+        "ownershipStatus",
+        getBackendOwnershipStatus(data.ownershipStatus),
+      );
       apiFormData.append("landDiscription", data.landDiscription || "");
 
       if (data.geoLocation) {
@@ -529,9 +625,8 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
       style={{ flex: 1, backgroundColor: "white" }}
-      keyboardVerticalOffset={Platform.OS === "android" ? -200 : 0}
     >
       <View className="flex-1 bg-[#F3F3F3]">
         <FormTabs
@@ -539,6 +634,7 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
           navigation={navigation}
           requestId={requestId}
           onTabPress={handleTabPress}
+          isCurrentFormValid={isNextEnabled}
         />
 
         <ScrollView
@@ -563,12 +659,12 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
                   <Text
                     numberOfLines={1}
                     ellipsizeMode="tail"
-                    className="text-black"
+                    className="text-black text-sm"
                   >
                     {t(`InspectionForm.${formData.isOwnByFarmer}`)}
                   </Text>
                 ) : (
-                  <Text numberOfLines={1} className="text-[#838B8C]">
+                  <Text numberOfLines={1} className="text-[#838B8C] text-sm">
                     {t("InspectionForm.SelectFromHere")}
                   </Text>
                 )}
@@ -606,12 +702,14 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
                   <Text
                     numberOfLines={1}
                     ellipsizeMode="tail"
-                    className="text-black"
+                    className="text-black text-sm"
                   >
-                    {t(`InspectionForm.${formData.ownershipStatus}`)}
+                    {t(
+                      `InspectionForm.${normalizeOwnershipStatus(formData.ownershipStatus)}`,
+                    )}
                   </Text>
                 ) : (
-                  <Text numberOfLines={1} className="text-[#838B8C]">
+                  <Text numberOfLines={1} className="text-[#838B8C] text-sm">
                     {t("InspectionForm.SelectFromHere")}
                   </Text>
                 )}
@@ -668,6 +766,8 @@ const LandInfo: React.FC<LandInfoProps> = ({ navigation }) => {
                 keyboardType="default"
                 multiline={true}
                 textAlignVertical="top"
+                className="text-black text-sm"
+                style={{ fontSize: 12, includeFontPadding: false }}
               />
             </View>
             {touched.landDiscription && errors.landDiscription && (

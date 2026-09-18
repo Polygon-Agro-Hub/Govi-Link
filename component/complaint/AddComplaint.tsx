@@ -15,10 +15,6 @@ import {
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../types/types";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
 import axios from "axios";
 import environment from "@/environment/environment";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -48,7 +44,7 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
   const [complaintText, setComplaintText] = useState<string>("");
   const [category, setCategory] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const categoryModal = useModal();
 
@@ -76,13 +72,22 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
         const response = await axios.get(
           `${environment.API_BASE_URL}api/complaint/get-complain-category`,
         );
+
         if (response.data.status === "success") {
           const mappedCategories = response.data.data
-            .map((item: any) => ({
-              label: item.categoryEnglish,
-              value: item.id,
-              key: item.id,
-            }))
+            .map((item: any) => {
+              let label = item.categoryEnglish;
+              if (i18n.language === "si") {
+                label = item.categorySinhala || item.categoryEnglish;
+              } else if (i18n.language === "ta") {
+                label = item.categoryTamil || item.categoryEnglish;
+              }
+              return {
+                label,
+                value: item.id,
+                key: item.id,
+              };
+            })
             .filter((item: { key: any }) => item.key);
 
           setCategory(mappedCategories);
@@ -93,26 +98,22 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
     };
 
     fetchComplainCategory();
-  }, []);
+  }, [i18n.language]);
 
   const handleSubmit = async () => {
     Keyboard.dismiss();
 
     if (!selectedCategory && !complaintText.trim()) {
-      Alert.alert(
-        t("Error.Sorry"),
-        t("AddComplaint.PleaseFillOutAllFields"),
-        [{ text: t("Main.OK") }],
-      );
+      Alert.alert(t("Error.Sorry"), t("AddComplaint.PleaseFillOutAllFields"), [
+        { text: t("Main.OK") },
+      ]);
       return;
     }
 
     if (!selectedCategory && complaintText.trim()) {
-      Alert.alert(
-        t("Error.Sorry"),
-        t("AddComplaint.PleaseSelectACategory"),
-        [{ text: t("Main.OK") }],
-      );
+      Alert.alert(t("Error.Sorry"), t("AddComplaint.PleaseSelectACategory"), [
+        { text: t("Main.OK") },
+      ]);
       return;
     }
 
@@ -130,9 +131,7 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
       if (!storedToken) {
         Alert.alert(
           t("Error.Sorry"),
-          t(
-            "Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue",
-          ),
+          t("Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue"),
           [{ text: t("Main.OK") }],
         );
         return;
@@ -161,7 +160,17 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
       );
       resetForm();
       navigation.replace("ComplainHistory");
-    } catch (error: unknown) {
+    } catch (error: any) {
+      if (error?.response?.data?.code === "PROFANITY_DETECTED") {
+        Alert.alert(
+          t("Main.Sorry") || t("Error.Sorry"),
+          t("AddComplaint.ProhibitedLanguageDetected") ||
+            error?.response?.data?.message ||
+            "Your complaint contains prohibited or inappropriate language. Please remove it and try again.",
+          [{ text: t("Main.OK") }],
+        );
+        return;
+      }
       if (error instanceof Error) {
         console.error("Error message:", error.message);
         Alert.alert(
@@ -171,9 +180,11 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
         );
       } else {
         console.error("An unknown error occurred.");
-        Alert.alert(t("Error.Sorry"), t("Main.SomethingWentWrongPleaseTryAgainLater"), [
-          { text: t("Main.OK") },
-        ]);
+        Alert.alert(
+          t("Error.Sorry"),
+          t("Main.SomethingWentWrongPleaseTryAgainLater"),
+          [{ text: t("Main.OK") }],
+        );
       }
     } finally {
       setLoading(false);
@@ -226,7 +237,6 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
           <TouchableOpacity
             onPress={categoryModal.show}
             className="bg-[#F6F6F6] border border-[#F6F6F6] rounded-3xl px-5 flex-row items-center justify-between h-[50px]"
-            
           >
             <Text
               className={`text-base ${selectedCategory ? "text-black" : "text-[#434343]"}`}
@@ -256,11 +266,12 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
                 }
                 if (text.length > 0) {
                   const firstChar = text.charAt(0);
-                  const isAlphabetic = /^[a-zA-Z]$/.test(firstChar);
+                  const isAlphabetic =
+                    /^[a-zA-Z\u0D80-\u0DFF\u0B80-\u0BFF]$/.test(firstChar);
                   if (!isAlphabetic) {
                     return;
                   }
-                  if (text.length === 1) {
+                  if (text.length === 1 && /^[a-zA-Z]$/.test(firstChar)) {
                     text = text.toUpperCase();
                   }
                 }
@@ -270,7 +281,9 @@ const AddComplaintScreen: React.FC<AddComplaintScreenProps> = ({
             />
           </View>
 
-          <View style={{ width: "100%", alignItems: "center", marginBottom: 20 }}>
+          <View
+            style={{ width: "100%", alignItems: "center", marginBottom: 20 }}
+          >
             <View
               style={{
                 width: "100%",

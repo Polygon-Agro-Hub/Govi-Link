@@ -13,6 +13,7 @@ type FormTabsProps = {
   onTabPress?: (key: string) => void;
   navigation: StackNavigationProp<any>;
   requestId?: number;
+  isCurrentFormValid?: boolean;
 };
 
 const tabs = [
@@ -48,6 +49,7 @@ const FormTabs: React.FC<FormTabsProps> = ({
   onTabPress,
   navigation,
   requestId,
+  isCurrentFormValid,
 }) => {
   const { t } = useTranslation();
   const scrollRef = useRef<ScrollView>(null);
@@ -102,6 +104,7 @@ const FormTabs: React.FC<FormTabsProps> = ({
   const currentIndex = tabs.indexOf(activeKey);
 
   const isTabAccessible = (index: number): boolean => {
+    if (isCurrentFormValid === false && index !== currentIndex) return false;
     return index === currentIndex || index <= maxAccessibleIndex;
   };
 
@@ -165,18 +168,14 @@ const FormTabs: React.FC<FormTabsProps> = ({
 
             if (isCurrent) {
               textColor = "text-[#FA345A]";
-            } else if (isCompleted && index < currentIndex) {
-              textColor = "text-[#5D5D5D]";
-            } else if (isCompleted && index > currentIndex) {
-              textColor = "text-[#5D5D5D]";
-            } else if (isAccessible && index < currentIndex) {
+            } else if (isAccessible && isCompleted) {
               textColor = "text-[#5D5D5D]";
             }
 
             let indicatorColor = "bg-[#A8A8A8]";
             if (isCurrent) {
               indicatorColor = "bg-[#FA345A]";
-            } else if (isCompleted) {
+            } else if (isAccessible && isCompleted) {
               indicatorColor = "bg-[#5D5D5D]";
             }
 

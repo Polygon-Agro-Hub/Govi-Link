@@ -633,40 +633,33 @@ const AssignJobs: React.FC<AssignJobsProps> = ({ navigation }) => {
                   <View className="flex flex-row justify-center gap-x-2 mb-4 mt-6 px-4">
                     <TouchableOpacity
                       className="flex w-1/2"
-                      disabled={
-                        !selectedItem?.latitude || !selectedItem?.longitude
-                      }
                       onPress={() => {
                         if (selectedItem?.latitude && selectedItem?.longitude) {
                           const lat = selectedItem.latitude;
                           const lon = selectedItem.longitude;
                           const url = `https://www.google.com/maps?q=${lat},${lon}`;
                           Linking.openURL(url);
+                        } else {
+                          setShowPopup(false);
+                          setTimeout(() => {
+                            Alert.alert(
+                              t("VisitPopup.NoLocationTitle"),
+                              t("VisitPopup.NoLocationMessage"),
+                            );
+                          }, 400);
                         }
                       }}
                     >
                       <View
-                        className={`flex flex-row items-center justify-center rounded-full h-[50px] border ${
-                          selectedItem?.latitude && selectedItem?.longitude
-                            ? "border-[#F83B4F]"
-                            : "border-[#9DB2CE]"
-                        }`}
+                        className={`flex flex-row items-center justify-center rounded-full h-[50px] border border-[#F83B4F]`}
                       >
                         <FontAwesome6
                           name="location-dot"
                           size={20}
-                          color={
-                            selectedItem?.latitude && selectedItem?.longitude
-                              ? "#F83B4F"
-                              : "#9DB2CE"
-                          }
+                          color="#F83B4F"
                         />
                         <Text
-                          className={`text-base font-semibold ml-2 ${
-                            selectedItem?.latitude && selectedItem?.longitude
-                              ? "text-[#000000]"
-                              : "text-[#9DB2CE]"
-                          }`}
+                          className={`text-base font-semibold ml-2 text-[#000000] `}
                         >
                           {t("VisitPopup.Location")}
                         </Text>

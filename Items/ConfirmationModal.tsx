@@ -82,14 +82,16 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             {getMessage()}
           </Text>
 
-          <View className="w-full gap-3">
+          <View className="w-full gap-3" style={{ width: "100%", alignSelf: "stretch" }}>
             {type === "confirmation" && (
               <>
                 <TouchableOpacity
-                  className="bg-white border border-[#000000] rounded-3xl h-[50px] items-center justify-center"
+                  className="w-full bg-white border border-[#000000] rounded-3xl min-h-[50px] items-center justify-center px-4 py-3"
                   onPress={onClose}
                   activeOpacity={0.7}
                   style={{
+                    width: "100%",
+                    alignSelf: "stretch",
                     shadowColor: "#000",
                     shadowOffset: { width: 0, height: 2 },
                     shadowOpacity: 0.2,
@@ -97,16 +99,22 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                     elevation: 4,
                   }}
                 >
-                  <Text className="text-black text-lg font-semibold">
+                  <Text
+                    numberOfLines={1}
+                    className="text-black text-lg font-semibold text-center"
+                    style={{ flexShrink: 0 }}
+                  >
                     {t("Main.GoBack")}
                   </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  className="bg-[#1A1A1A] rounded-3xl h-[50px] items-center justify-center mt-6"
+                  className="w-full bg-[#1A1A1A] rounded-3xl min-h-[50px] items-center justify-center mt-3 px-4 py-3"
                   onPress={onConfirm}
                   activeOpacity={0.7}
                   style={{
+                    width: "100%",
+                    alignSelf: "stretch",
                     shadowColor: "#000",
                     shadowOffset: { width: 0, height: 3 },
                     shadowOpacity: 0.25,
@@ -114,7 +122,11 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                     elevation: 6,
                   }}
                 >
-                  <Text className="text-white text-lg font-semibold">
+                  <Text
+                    numberOfLines={1}
+                    className="text-white text-lg font-semibold text-center"
+                    style={{ flexShrink: 0 }}
+                  >
                     {t("Main.Continue")}
                   </Text>
                 </TouchableOpacity>
@@ -123,9 +135,10 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 
             {(type === "success" || type === "error") && (
               <TouchableOpacity
-                className="bg-[#1A1A1A] rounded-full py-4 items-center"
+                className="w-full bg-[#1A1A1A] rounded-full py-4 items-center"
                 onPress={onClose}
                 activeOpacity={0.7}
+                style={{ width: "100%", alignSelf: "stretch" }}
               >
                 <Text className="text-white text-base font-semibold">
                   {t("Main.OK")}

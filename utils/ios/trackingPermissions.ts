@@ -1,4 +1,4 @@
-﻿import { requestTrackingPermissionsAsync, getTrackingPermissionsAsync, PermissionStatus } from "expo-tracking-transparency";
+import { requestTrackingPermissionsAsync, getTrackingPermissionsAsync, PermissionStatus } from "expo-tracking-transparency";
 import { Platform } from "react-native";
 
 /**

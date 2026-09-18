@@ -105,7 +105,7 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
     if (empid && !password) {
       Alert.alert(
         t("Error.Sorry"),
-        t("Login.Password is not allowed to be empty"),
+        t("Login.PasswordIsNotAllowedToBeEmpty"),
       );
       return false;
     }

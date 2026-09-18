@@ -215,9 +215,7 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ navigation }) => {
       />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? hp(10) : 0}
-        enabled
-        style={{ flex: 1, backgroundColor: "#FFFFFF" }}
+        style={{ flex: 1, backgroundColor: "white" }}
       >
         <ScrollView
           className="flex-1 bg-white"

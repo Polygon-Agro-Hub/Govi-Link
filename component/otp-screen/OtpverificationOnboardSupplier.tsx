@@ -36,7 +36,6 @@ const OtpverificationOnboardSupplier: React.FC = ({
   const [isOtpExpired, setIsOtpExpired] = useState<boolean>(false);
   const [isActive, setIsActive] = useState<boolean>(true);
 
-  // Check if OTP is valid whenever otpCode changes
   useEffect(() => {
     const isValid = otpCode.every((digit) => digit !== "");
     setIsOtpValid(isValid);
@@ -446,7 +445,8 @@ const OtpverificationOnboardSupplier: React.FC = ({
                 value={otpCode[index] || ""}
                 onChangeText={(text) => handleOtpChange(text, index)}
                 onKeyPress={(e) => handleKeyPress(e, index)}
-                selectionColor="#FF1D85"
+                cursorColor={otpCode[index] ? "#FFFFFF" : "#FF1D85"}
+                selectionColor={otpCode[index] ? "#FFFFFF" : "#FF1D85"}
                 textAlign="center"
               />
             ))}

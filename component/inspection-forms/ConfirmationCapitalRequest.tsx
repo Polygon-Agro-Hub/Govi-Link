@@ -18,7 +18,8 @@ import Svg, { Circle, G, Text as SvgText } from "react-native-svg";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import environment from "@/environment/environment";
 import axios from "axios";
-import ConfirmationModal from "@/Items/ConfirmationModal";
+import { AlertModal } from "../commons/AlertModal";
+
 
 type ConfirmationCapitalRequestNavigationProps = StackNavigationProp<
   RootStackParamList,
@@ -450,10 +451,16 @@ const ConfirmationCapitalRequest: React.FC<ConfirmationCapitalRequestProps> = ({
         </View>
       </View>
 
-      <ConfirmationModal
+      <AlertModal
         visible={successModalVisible}
+        title={t("Main.Success")}
+        message={t(
+          "ConfirmationCapitalRequest.RequestConfirmedSuccessfully",
+        )}
         type="success"
         onClose={handleSuccessClose}
+        autoClose={false}
+        showOkButton={true}
       />
     </View>
   );

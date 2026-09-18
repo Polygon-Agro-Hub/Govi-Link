@@ -34,7 +34,6 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
   const [isOtpExpired, setIsOtpExpired] = useState<boolean>(false);
   const [isActive, setIsActive] = useState<boolean>(true);
 
-  // Check if OTP is valid whenever otpCode changes
   useEffect(() => {
     const isValid = otpCode.every((digit) => digit !== "");
     setIsOtpValid(isValid);
@@ -188,7 +187,9 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
           if (verificationAttempts >= 2) {
             Alert.alert(
               t("Otpverification.InvalidOTP"),
-              t("Otpverification.YourOtpHasExpiredPleaseRequestANewOneToContinue"),
+              t(
+                "Otpverification.YourOtpHasExpiredPleaseRequestANewOneToContinue",
+              ),
               [
                 {
                   text: t("Otpverification.ResendOTP"),
@@ -207,9 +208,7 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
           } else {
             Alert.alert(
               t("Otpverification.InvalidOTP"),
-              t(
-                "Otpverification.TheOtpYouEnteredIsIncorrectPleaseTryAgain",
-              ),
+              t("Otpverification.TheOtpYouEnteredIsIncorrectPleaseTryAgain"),
               [{ text: t("Main.OK") }],
             );
           }
@@ -218,7 +217,9 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
           setIsOtpExpired(true);
           Alert.alert(
             t("Otpverification.OTPExpired"),
-            t("Otpverification.YourOtpHasExpiredPleaseRequestANewOneToContinue"),
+            t(
+              "Otpverification.YourOtpHasExpiredPleaseRequestANewOneToContinue",
+            ),
             [
               {
                 text: t("Otpverification.ResendOTP"),
@@ -229,9 +230,11 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
           break;
 
         default:
-          Alert.alert(t("Error.Sorry"), t("Main.SomethingWentWrongPleaseTryAgainLater"), [
-            { text: t("Main.OK") },
-          ]);
+          Alert.alert(
+            t("Error.Sorry"),
+            t("Main.SomethingWentWrongPleaseTryAgainLater"),
+            [{ text: t("Main.OK") }],
+          );
       }
     } catch (error: any) {
       console.error("OTP Verification Error:", error);
@@ -250,9 +253,11 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
           [{ text: t("Main.OK") }],
         );
       } else {
-        Alert.alert(t("Error.Sorry"), t("Main.SomethingWentWrongPleaseTryAgainLater"), [
-          { text: t("Main.OK") },
-        ]);
+        Alert.alert(
+          t("Error.Sorry"),
+          t("Main.SomethingWentWrongPleaseTryAgainLater"),
+          [{ text: t("Main.OK") }],
+        );
       }
     }
   };
@@ -302,16 +307,16 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
       } else {
         Alert.alert(
           t("Error.Sorry"),
-          t(
-            "Otpverification.WeCouldntSendTheOtpPleaseTryAgainLater",
-          ),
+          t("Otpverification.WeCouldntSendTheOtpPleaseTryAgainLater"),
           [{ text: t("Main.OK") }],
         );
       }
     } catch (error) {
-      Alert.alert(t("Error.Sorry"), t("Main.SomethingWentWrongPleaseTryAgainLater"), [
-        { text: t("Main.OK") },
-      ]);
+      Alert.alert(
+        t("Error.Sorry"),
+        t("Main.SomethingWentWrongPleaseTryAgainLater"),
+        [{ text: t("Main.OK") }],
+      );
     }
   };
 
@@ -321,9 +326,7 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
       if (!token) {
         Alert.alert(
           t("Error.Sorry"),
-          t(
-            "Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue",
-          ),
+          t("Error.YourLoginSessionHasExpiredPleaseLogInAgainToContinue"),
           [{ text: t("Main.OK") }],
         );
         return false;
@@ -419,17 +422,23 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
                 ref={(el: TextInput | null) => {
                   inputRefs.current[index] = el;
                 }}
-                className={`w-14 h-14 text-center text-xl rounded-lg ${otpCode[index]
-                  ? "bg-[#FF1D85] text-white"
-                  : "bg-[#FFE8F3] text-black"
-                  }`}
+                style={{
+                  width: 50,
+                  height: 50,
+                  textAlign: "center",
+                  fontSize: 20,
+                  borderRadius: 8,
+                  backgroundColor: otpCode[index] ? "#FF1D85" : "#FFE8F3",
+                  color: otpCode[index] ? "#FFFFFF" : "#000000",
+                }}
                 keyboardType="number-pad"
                 maxLength={1}
                 value={otpCode[index] || ""}
                 onChangeText={(text) => handleOtpChange(text, index)}
                 onKeyPress={(e) => handleKeyPress(e, index)}
-                selectionColor="#FF1D85"
+                selectionColor={otpCode[index] ? "#FFFFFF" : "#FF1D85"}
                 textAlign="center"
+                cursorColor={otpCode[index] ? "#FFFFFF" : "#FF1D85"}
               />
             ))}
           </View>
@@ -479,11 +488,19 @@ const OtpverificationRequestAudit: React.FC = ({ navigation, route }: any) => {
               activeOpacity={!isOtpValid || isVerified ? 1 : 0.7}
             >
               <LinearGradient
-                colors={!isOtpValid || isVerified ? ["#CCCCCC", "#CCCCCC"] : ["#F35125", "#FF1D85"]}
+                colors={
+                  !isOtpValid || isVerified
+                    ? ["#CCCCCC", "#CCCCCC"]
+                    : ["#F35125", "#FF1D85"]
+                }
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
-                className="flex-1 items-center justify-center"
-                style={{ overflow: "hidden" }}
+                style={{
+                  flex: 1,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  overflow: "hidden",
+                }}
               >
                 <Text className="text-white text-lg font-semibold">
                   {t("Otpverification.Verify")}

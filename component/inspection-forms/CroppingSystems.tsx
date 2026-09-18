@@ -43,12 +43,9 @@ const validateField = (
 
   if (rules.type === "opportunity") {
     const opportunities = value || [];
-    const otherOpportunity = formData.otherOpportunity || "";
 
     if (rules.required && opportunities.length === 0) {
       error = t("Error.PleaseSelectAtLeastOneOpportunityToGoFor");
-    } else if (opportunities.includes("Other") && !otherOpportunity.trim()) {
-      error = t("Error.PleaseSpecifyTheOtherOpportunityToGoFor");
     }
     return { value: opportunities, error };
   }
@@ -144,7 +141,9 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isNextEnabled, setIsNextEnabled] = useState(false);
   const [yesNoModalVisible, setYesNoModalVisible] = useState(false);
-  const [activeYesNoField, setActiveYesNoField] = useState<string | null>(null);
+  const [activeYesNoField, setActiveYesNoField] = useState<string | null>(
+    null,
+  );
   const [experienceModalVisible, setExperienceModalVisible] = useState(false);
   const [isExistingData, setIsExistingData] = useState(false);
 
@@ -279,39 +278,17 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
         delete newErrors[key];
       }
 
-      // Handle cross-field validation for opportunity and otherOpportunity
-      if (key === "opportunity" || key === "otherOpportunity") {
-        const opportunityRules = { required: true, type: "opportunity" };
-        const otherOpportunityRules = {
-          required: true,
-          type: "otherOpportunity",
-        };
-
-        const newFormData = { ...formData, [key]: validatedValue };
-
-        const { error: oppError } = validateField(
-          key === "opportunity" ? validatedValue : newFormData.opportunity,
-          opportunityRules,
-          t,
-          newFormData,
-          "opportunity",
-        );
-
-        const { error: otherError } = validateField(
-          key === "otherOpportunity"
-            ? validatedValue
-            : newFormData.otherOpportunity,
-          otherOpportunityRules,
-          t,
-          newFormData,
-          "otherOpportunity",
-        );
-
-        if (oppError) newErrors.opportunity = oppError;
-        else delete newErrors.opportunity;
-
-        if (otherError) newErrors.otherOpportunity = otherError;
-        else delete newErrors.otherOpportunity;
+      if (key === "otherOpportunity") {
+        const opportunities = formData.opportunity || [];
+        if (!opportunities.includes("Other")) {
+          delete newErrors.otherOpportunity;
+        } else if (!validatedValue || !validatedValue.trim()) {
+          newErrors.otherOpportunity = t(
+            "Error.PleaseSpecifyTheOtherOpportunityToGoFor",
+          );
+        } else {
+          delete newErrors.otherOpportunity;
+        }
       }
 
       return newErrors;
@@ -322,27 +299,40 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
     const prevOptions = formData.opportunity || [];
     const isSelected = prevOptions.includes(option);
 
-    let updatedOptions = isSelected
+    const updatedOptions = isSelected
       ? prevOptions.filter((o) => o !== option)
       : [...prevOptions, option];
 
-    let otherOpportunity = formData.otherOpportunity;
+    const otherIsNowSelected = updatedOptions.includes("Other");
 
-    if (option === "Other" && isSelected) {
-      otherOpportunity = "";
-    }
+    // Clear the "Other" text whenever "Other" gets unchecked
+    const newOtherOpportunity = otherIsNowSelected
+      ? formData.otherOpportunity
+      : "";
 
-    handleFieldChange("opportunity", updatedOptions, {
-      required: true,
-      type: "opportunity",
+    updateFormData({
+      opportunity: updatedOptions,
+      otherOpportunity: newOtherOpportunity,
     });
 
-    if (option === "Other" && isSelected) {
-      handleFieldChange("otherOpportunity", "", {
-        required: true,
-        type: "otherOpportunity",
-      });
-    }
+    setErrors((prev) => {
+      const newErrors = { ...prev };
+
+      // When "Other" is unchecked, completely clear validation message for the related field and opportunity
+      if (!otherIsNowSelected) {
+        delete newErrors.otherOpportunity;
+        delete newErrors.opportunity;
+      } else {
+        // When "Other" is checked, do not flash error immediately before user types
+        delete newErrors.opportunity;
+      }
+
+      if (updatedOptions.length > 0) {
+        delete newErrors.opportunity;
+      }
+
+      return newErrors;
+    });
   };
 
   const handleOtherOpportunityChange = (text: string) => {
@@ -568,9 +558,8 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
       style={{ flex: 1, backgroundColor: "white" }}
-      keyboardVerticalOffset={Platform.OS === "android" ? -200 : 0}
     >
       <View className="flex-1 bg-[#F3F3F3]">
         {/* Tabs */}
@@ -579,6 +568,7 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
           navigation={navigation}
           requestId={requestId}
           onTabPress={handleTabPress}
+          isCurrentFormValid={isNextEnabled}
         />
 
         <ScrollView
@@ -606,9 +596,18 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
                   activeOpacity={0.7}
                   onPress={() => handleOpportunityToggle(option)}
                 >
+                  {/*
+                    NOTE: Checkbox is purely presentational here — it must
+                    NOT carry its own onValueChange, otherwise a single tap
+                    fires the toggle twice (once from this TouchableOpacity's
+                    onPress and once from the Checkbox's own change event),
+                    which is fragile and can produce inconsistent state.
+                    pointerEvents="none" guarantees only the wrapping
+                    TouchableOpacity ever handles the tap.
+                  */}
                   <Checkbox
                     value={selected}
-                    onValueChange={() => handleOpportunityToggle(option)}
+                    pointerEvents="none"
                     color={selected ? "#000" : undefined}
                     style={{
                       width: 20,
@@ -634,19 +633,36 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
                 <TextInput
                   placeholder={t("InspectionForm.MentionOther")}
                   placeholderTextColor="#838B8C"
-                  className="ml-4 text-black"
+                  className="bg-[#F6F6F6] px-5 text-black"
                   style={{
                     flex: 1,
                     minWidth: 0,
                     paddingVertical: 0,
-                    fontSize: 16,
-                    height: "100%",
+                    fontSize: 12,
+                    height: 50,
+                    includeFontPadding: false,
+                    borderRadius: 99,
                   }}
                   value={formData.otherOpportunity || ""}
                   onChangeText={handleOtherOpportunityChange}
                 />
               </View>
             )}
+
+            {/* "Other" specific error — only shown while "Other" is selected */}
+            {formData.opportunity?.includes("Other") &&
+              getErrorMessage("otherOpportunity") && (
+                <View className="flex-row items-center mt-1 ml-1 gap-1">
+                  <FontAwesome
+                    name="exclamation-triangle"
+                    size={14}
+                    color="#EF4444"
+                  />
+                  <Text className="text-red-500 text-sm ml-1 flex-1">
+                    {getErrorMessage("otherOpportunity")}
+                  </Text>
+                </View>
+              )}
 
             {getErrorMessage("opportunity") && (
               <View className="flex-row items-center mt-1 ml-1 gap-1">
@@ -682,11 +698,11 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
               activeOpacity={0.7}
             >
               {formData.hasKnowlage ? (
-                <Text className="text-black">
+                <Text className="text-black text-sm">
                   {t(`InspectionForm.${formData.hasKnowlage}`)}
                 </Text>
               ) : (
-                <Text className="text-[#838B8C]">
+                <Text className="text-[#838B8C] text-sm">
                   {t("InspectionForm.SelectFromHere")}
                 </Text>
               )}
@@ -726,9 +742,9 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
             >
               <View className="flex-1 mr-2">
                 <Text
-                  className={
+                  className={`text-sm ${
                     formData.prevExperince ? "text-black" : "text-[#A3A3A3]"
-                  }
+                  }`}
                   numberOfLines={2}
                 >
                   {formData.prevExperince
@@ -774,7 +790,8 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
                 keyboardType="default"
                 multiline={true}
                 textAlignVertical="top"
-                className="text-black"
+                className="text-black text-sm"
+                style={{ fontSize: 12, includeFontPadding: false }}
               />
             </View>
             {getErrorMessage("opinion") && (
@@ -840,7 +857,11 @@ const CroppingSystems: React.FC<CroppingSystemsProps> = ({ navigation }) => {
       </Modal>
 
       {/* Experience Modal */}
-      <Modal transparent animationType="fade" visible={experienceModalVisible}>
+      <Modal
+        transparent
+        animationType="fade"
+        visible={experienceModalVisible}
+      >
         <TouchableOpacity
           className="flex-1 bg-black/40 justify-center items-center"
           activeOpacity={1}
