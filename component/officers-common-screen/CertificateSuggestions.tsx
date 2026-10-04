@@ -315,7 +315,7 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
       }
 
       const body = {
-        source: "PolygonAgro",
+        source: "Polygon",
         transport: "sms",
         content: {
           sms: otpMessage,
