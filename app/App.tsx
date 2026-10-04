@@ -80,6 +80,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import BannedScreen from "@/component/auth/BannedScreen";
 import { AlertModal, setGlobalAlertListener } from "@/component/commons/AlertModal";
 import { initDatabase } from "@/database/index";
+import { AppUpdateProvider } from "@/app-update";
 
 LogBox.ignoreAllLogs(true);
 
@@ -495,7 +496,9 @@ export default function App() {
     <SafeAreaProvider>
       <Provider store={store}>
         <LanguageProvider>
-          <AppContent />
+          <AppUpdateProvider>
+            <AppContent />
+          </AppUpdateProvider>
         </LanguageProvider>
       </Provider>
     </SafeAreaProvider>

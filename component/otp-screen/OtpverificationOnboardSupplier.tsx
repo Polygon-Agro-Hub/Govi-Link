@@ -88,7 +88,7 @@ const OtpverificationOnboardSupplier: React.FC = ({
       : contact;
 
     const body = {
-      source: "PolygonAgro",
+      source: "Polygon",
       transport: "sms",
       content: { sms: otpMessage },
       destination: formattedContact,
