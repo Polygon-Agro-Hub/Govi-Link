@@ -298,12 +298,7 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
   const handleNext = async () => {
     setOtpSendLoading(true);
     try {
-      const apiUrl = "https://api.getshoutout.com/otpservice/send";
-
-      const headers = {
-        Authorization: `Apikey ${environment.SHOUTOUT_API_KEY}`,
-        "Content-Type": "application/json",
-      };
+      const apiUrl = `${environment.API_BASE_URL}api/otp/send`;
 
       let otpMessage = "";
       if (i18n.language === "en") {
@@ -315,15 +310,11 @@ const CertificateSuggestions: React.FC<CertificateSuggestionsProps> = ({
       }
 
       const body = {
-        source: "Polygon",
-        transport: "sms",
-        content: {
-          sms: otpMessage,
-        },
+        message: otpMessage,
         destination: farmerMobile,
       };
 
-      const otpResponse = await axios.post(apiUrl, body, { headers });
+      const otpResponse = await axios.post(apiUrl, body);
 
       await AsyncStorage.setItem("referenceId", otpResponse.data.referenceId);
 
