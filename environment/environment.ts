@@ -1,12 +1,16 @@
 import { getDevServerHostIp } from "./getHostIp";
 const devHostIp = getDevServerHostIp();
 
-const environment = {
+interface Environment {
+  API_BASE_URL: string;
+}
+
+const environment: Environment = {
   // LOCAL --------------------
   // API_BASE_URL: `http://${devHostIp}:3000/govilink/`,
 
   // DEV --------------------
-  // API_BASE_URL: "https://govi-link-back-dev-api.vercel.app/govilink/",
+  API_BASE_URL: "https://govi-link-back-dev-api.vercel.app/govilink/",
 
   // UAT --------------------
   // API_BASE_URL: "https://govi-link-api-uat.vercel.app/govilink/",
