@@ -70,11 +70,7 @@ const OtpverificationOnboardSupplier: React.FC = ({
   const sendOTP = async (): Promise<boolean> => {
     await AsyncStorage.removeItem("referenceId");
 
-    const apiUrl = "https://api.getshoutout.com/otpservice/send";
-    const headers = {
-      Authorization: `Apikey ${environment.SHOUTOUT_API_KEY}`,
-      "Content-Type": "application/json",
-    };
+    const apiUrl = `${environment.API_BASE_URL}api/otp/send`;
 
     const otpMessages: Record<string, string> = {
       en: `Greetings from GoViShop! Your OTP is {{code}}`,
@@ -88,14 +84,12 @@ const OtpverificationOnboardSupplier: React.FC = ({
       : contact;
 
     const body = {
-      source: "Polygon",
-      transport: "sms",
-      content: { sms: otpMessage },
+      message: otpMessage,
       destination: formattedContact,
     };
 
     try {
-      const response = await axios.post(apiUrl, body, { headers });
+      const response = await axios.post(apiUrl, body);
       console.log("OTP send response:", response.data);
 
       if (response.data.referenceId) {
@@ -259,18 +253,14 @@ const OtpverificationOnboardSupplier: React.FC = ({
     }
 
     try {
-      const url = "https://api.getshoutout.com/otpservice/verify";
-      const headers = {
-        Authorization: `Apikey ${environment.SHOUTOUT_API_KEY}`,
-        "Content-Type": "application/json",
-      };
+      const url = `${environment.API_BASE_URL}api/otp/verify`;
 
       const body = {
         code: code,
         referenceId: referenceId,
       };
 
-      const response = await axios.post(url, body, { headers });
+      const response = await axios.post(url, body);
       const { statusCode } = response.data;
       console.log("OTP verify response:", response.data);
 

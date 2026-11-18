@@ -8,24 +8,14 @@ export const sendOTP = async (
   navigation: any
 ) => {
   try {
-    const apiUrl = "https://api.getshoutout.com/otpservice/send";
-
-    const headers = {
-      Authorization:
-        `Apikey ${environment.SHOUTOUT_API_KEY}`,
-      "Content-Type": "application/json",
-    };
+    const apiUrl = `${environment.API_BASE_URL}api/otp/send`;
 
     const body = {
-      source: "Polygon",
-      transport: "sms",
-      content: {
-        sms: "Your code is {{code}}",
-      },
+      message: "Your code is {{code}}",
       destination: formattedPhonenumber,
     };
 
-    const response = await axios.post(apiUrl, body, { headers });
+    const response = await axios.post(apiUrl, body);
 
     await AsyncStorage.setItem("referenceId", response.data.referenceId);
 

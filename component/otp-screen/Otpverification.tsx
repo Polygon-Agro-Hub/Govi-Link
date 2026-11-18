@@ -128,18 +128,14 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
     try {
       const refId = referenceId;
 
-      const url = "https://api.getshoutout.com/otpservice/verify";
-      const headers = {
-        Authorization: `Apikey ${environment.SHOUTOUT_API_KEY}`,
-        "Content-Type": "application/json",
-      };
+      const url = `${environment.API_BASE_URL}api/otp/verify`;
 
       const body = {
         code: code,
         referenceId: refId,
       };
 
-      const response = await axios.post(url, body, { headers });
+      const response = await axios.post(url, body);
       const { statusCode, message } = response.data;
 
       const netState = await NetInfo.fetch();
@@ -253,11 +249,7 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
     await AsyncStorage.removeItem("referenceId");
 
     try {
-      const apiUrl = "https://api.getshoutout.com/otpservice/send";
-      const headers = {
-        Authorization: `Apikey ${environment.SHOUTOUT_API_KEY}`,
-        "Content-Type": "application/json",
-      };
+      const apiUrl = `${environment.API_BASE_URL}api/otp/send`;
 
       let otpMessage = "";
       if (i18n.language === "en") {
@@ -268,15 +260,11 @@ const Otpverification: React.FC = ({ navigation, route }: any) => {
         otpMessage = `உங்கள் GoviLink OTP {{code}} ஆகும்.`;
       }
       const body = {
-        source: "Polygon",
-        transport: "sms",
-        content: {
-          sms: otpMessage,
-        },
+        message: otpMessage,
         destination: farmerMobile,
       };
 
-      const response = await axios.post(apiUrl, body, { headers });
+      const response = await axios.post(apiUrl, body);
 
       if (response.data.referenceId) {
         await AsyncStorage.setItem("referenceId", response.data.referenceId);
